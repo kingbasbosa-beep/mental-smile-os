@@ -1,0 +1,1418 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function uid() {
+      return request.auth.uid;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && (
+          (
+            exists(/databases/$(database)/documents/admins/$(uid()))
+            && get(/databases/$(database)/documents/admins/$(uid())).data.active == true
+          )
+          ||
+          (
+            exists(/databases/$(database)/documents/clinicians/$(uid()))
+            && get(/databases/$(database)/documents/clinicians/$(uid())).data.isAdmin == true
+          )
+        );
+    }
+
+    function isClientDoc() {
+      return signedIn()
+        && (resource.data.clientId is string)
+        && resource.data.clientId == uid();
+    }
+
+    function isClinicianDoc() {
+      return signedIn()
+        && (resource.data.clinicianUid is string)
+        && resource.data.clinicianUid == uid();
+    }
+
+    function isAssignedClinicianDoc() {
+      return signedIn()
+        && (
+          (
+            resource.data.assignedClinicianId is string
+            && resource.data.assignedClinicianId == uid()
+          )
+          ||
+          (
+            resource.data.assignedClinicianUid is string
+            && resource.data.assignedClinicianUid == uid()
+          )
+          ||
+          (
+            resource.data.clinicianUid is string
+            && resource.data.clinicianUid == uid()
+          )
+        );
+    }
+
+    function clientCanReadBooking() {
+      return isClientDoc();
+    }
+
+    function clinicianCanReadBooking() {
+      return isAssignedClinicianDoc();
+    }
+
+    function centerCanReadBooking() {
+      return signedIn()
+        && resource != null
+        && (resource.data.requestKind is string)
+        && resource.data.requestKind == 'center'
+        && (resource.data.status is string)
+        && resource.data.status == 'center_follow_up'
+        && (resource.data.centerId is string)
+        && resource.data.centerId == uid();
+    }
+
+    function isOwnClientResource(uidDoc) {
+      return signedIn()
+        && (
+          uidDoc == uid()
+          || (
+            resource != null
+            && resource.data.email is string
+            && request.auth.token.email != null
+            && resource.data.email == request.auth.token.email
+          )
+        );
+    }
+
+    function isOwnClientRequest(uidDoc) {
+      return signedIn()
+        && (
+          uidDoc == uid()
+          || (
+            request.resource.data.email is string
+            && request.auth.token.email != null
+            && request.resource.data.email == request.auth.token.email
+          )
+        );
+    }
+
+    function isOwnClinicianProfileRequestResource() {
+      return signedIn()
+        && resource != null
+        && (resource.data.clinicianId is string)
+        && resource.data.clinicianId == uid();
+    }
+
+    function isOwnClinicianProfileRequestCreate() {
+      return signedIn()
+        && (request.resource.data.clinicianId is string)
+        && request.resource.data.clinicianId == uid();
+    }
+
+    function isOwnCenterProfileRequestResource() {
+      return signedIn()
+        && resource != null
+        && (resource.data.centerId is string)
+        && resource.data.centerId == uid();
+    }
+
+    function isOwnCenterProfileRequestCreate() {
+      return signedIn()
+        && (request.resource.data.centerId is string)
+        && request.resource.data.centerId == uid();
+    }
+
+    function isOwnCenterResource(uidDoc) {
+      return signedIn()
+        && (
+          uidDoc == uid()
+          || (
+            resource != null
+            && resource.data.email is string
+            && request.auth.token.email != null
+            && resource.data.email == request.auth.token.email
+          )
+        );
+    }
+
+    function isOwnCenterCreate(uidDoc) {
+      return signedIn()
+        && uidDoc == uid()
+        && request.resource.data.role == 'center'
+        && request.resource.data.approvalStatus == 'pending_admin'
+        && request.resource.data.isActive == false;
+    }
+
+    function ownCenterUpdateValid(uidDoc) {
+      return signedIn()
+        && uidDoc == uid()
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'displayName',
+              'centerName',
+              'phone',
+              'city',
+              'address',
+              'description',
+              'managerName',
+              'galleryItems',
+              'galleryImages',
+              'imagesReady',
+              'documentItems',
+              'documentsReady',
+              'updatedAt'
+            ])
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.approvalStatus == resource.data.approvalStatus
+        && request.resource.data.isActive == resource.data.isActive
+        && request.resource.data.active == resource.data.active
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    function ownClinicianUpdateValid(uidDoc) {
+      return signedIn()
+        && uid() == uidDoc
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.approvalStatus == resource.data.approvalStatus
+        && request.resource.data.isActive == resource.data.isActive
+        && request.resource.data.isAdmin == resource.data.isAdmin
+        && request.resource.data.isBlocked == resource.data.isBlocked
+        && request.resource.data.blockedAt == resource.data.blockedAt
+        && request.resource.data.blockedBy == resource.data.blockedBy
+        && request.resource.data.blockReason == resource.data.blockReason
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    function ownClientUpdateValid(uidDoc) {
+      return isOwnClientRequest(uidDoc)
+        && resource != null
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.isBlocked == resource.data.isBlocked
+        && request.resource.data.blockedAt == resource.data.blockedAt
+        && request.resource.data.blockedBy == resource.data.blockedBy
+        && request.resource.data.blockReason == resource.data.blockReason
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    function canReadSessionRating() {
+      return isAdmin()
+        || (
+          signedIn()
+          && resource != null
+          && (
+            (
+              resource.data.clientId is string
+              && resource.data.clientId == uid()
+            )
+            || (
+              resource.data.clinicianId is string
+              && resource.data.clinicianId == uid()
+            )
+            || (
+              resource.data.reviewerUid is string
+              && resource.data.reviewerUid == uid()
+            )
+          )
+        );
+    }
+
+    function clientUpdateValid() {
+      return isClientDoc()
+        && (resource.data.status == 'pending_admin')
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly(['note', 'updatedAt'])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.clinicianId == resource.data.clinicianId
+        && request.resource.data.clinicianName == resource.data.clinicianName
+        && request.resource.data.clinicianUid == resource.data.clinicianUid
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.adminForwarded == resource.data.adminForwarded
+        && request.resource.data.adminAssignedBy == resource.data.adminAssignedBy
+        && request.resource.data.adminAssignedAt == resource.data.adminAssignedAt;
+    }
+
+    function clientPaymentProofUpdateValid() {
+      return request.auth != null
+        && request.auth.uid == resource.data.clientId
+        && resource.data.status == 'awaiting_payment'
+        && request.resource.data.status == 'payment_review'
+        && request.resource.data.paymentStatus == 'submitted_by_client'
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clinicianId == resource.data.clinicianId
+        && (
+          (
+            !resource.data.keys().hasAny(['centerId'])
+            && !request.resource.data.keys().hasAny(['centerId'])
+          )
+          || (
+            resource.data.keys().hasAny(['centerId'])
+            && request.resource.data.keys().hasAny(['centerId'])
+            && request.resource.data.centerId == resource.data.centerId
+          )
+        );
+    }
+
+    function adminForwardValid() {
+      return isAdmin()
+        && (resource.data.status == 'pending_admin')
+        && (request.resource.data.status == 'assigned_clinician')
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'adminApproved',
+              'adminRejected',
+              'clinicianId',
+              'clinicianName',
+              'clinicianUid',
+              'assignedClinicianId',
+              'assignedClinicianName',
+              'adminForwarded',
+              'adminAssignedBy',
+              'adminAssignedAt',
+              'adminDecisionType',
+              'adminDecisionBy',
+              'adminDecisionAt',
+              'paymentStatus',
+              'sessionStatus',
+              'reviewStatus',
+              'payoutStatus',
+              'updatedAt'
+            ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note
+        && (request.resource.data.clinicianId is string)
+        && request.resource.data.clinicianId.size() > 0
+        && (request.resource.data.clinicianName is string)
+        && request.resource.data.clinicianName.size() > 0
+        && (request.resource.data.clinicianUid is string)
+        && request.resource.data.clinicianUid.size() > 0
+        && request.resource.data.adminForwarded == true
+        && (request.resource.data.adminAssignedBy is string)
+        && request.resource.data.adminAssignedBy == uid();
+    }
+
+    function adminRejectValid() {
+      return isAdmin()
+        && request.resource.data.status == 'rejected_admin'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'adminApproved',
+              'adminRejected',
+              'adminForwarded',
+              'adminDecisionType',
+              'adminDecisionBy',
+              'adminDecisionAt',
+              'adminAssignedBy',
+              'adminAssignedAt',
+              'paymentStatus',
+              'sessionStatus',
+              'reviewStatus',
+              'payoutStatus',
+              'updatedAt'
+            ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note;
+    }
+
+    function adminReturnToPendingValid() {
+      return isAdmin()
+        && request.resource.data.status == 'pending_admin'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'adminApproved',
+              'adminRejected',
+              'adminForwarded',
+              'adminAssignedBy',
+              'adminAssignedAt',
+              'adminDecisionType',
+              'adminDecisionBy',
+              'adminDecisionAt',
+              'assignedClinicianId',
+              'assignedClinicianName',
+              'clinicianId',
+              'clinicianName',
+              'clinicianUid',
+              'paymentStatus',
+              'sessionStatus',
+              'reviewStatus',
+              'payoutStatus',
+              'updatedAt'
+            ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note;
+    }
+
+    function adminPaymentApproveValid() {
+      return isAdmin()
+        && (
+          resource.data.status == 'payment_review'
+          || resource.data.paymentStatus == 'submitted_by_client'
+          || (
+            resource.data.status == 'awaiting_payment'
+            && (resource.data.paymentReceiptFileName is string)
+            && resource.data.paymentReceiptFileName.size() > 0
+          )
+        )
+        && request.resource.data.status == 'session_setup_pending'
+        && request.resource.data.paymentStatus == 'approved'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'paymentStatus',
+              'paymentApprovedAt',
+              'sessionStatus',
+              'updatedAt'
+            ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note;
+    }
+
+    function adminPaymentRejectValid() {
+      return isAdmin()
+        && (
+          resource.data.status == 'payment_review'
+          || resource.data.paymentStatus == 'submitted_by_client'
+          || (
+            resource.data.status == 'awaiting_payment'
+            && (resource.data.paymentReceiptFileName is string)
+            && resource.data.paymentReceiptFileName.size() > 0
+          )
+        )
+        && request.resource.data.status == 'awaiting_payment'
+        && request.resource.data.paymentStatus == 'rejected'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'paymentStatus',
+              'paymentRejectedAt',
+              'updatedAt'
+            ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note;
+    }
+
+    function adminPaymentUpdateValid() {
+      return adminPaymentApproveValid() || adminPaymentRejectValid();
+    }
+
+    function adminSessionScheduleValid() {
+      return isAdmin()
+        && (
+          resource.data.status == 'session_setup_pending'
+          || resource.data.status == 'reschedule_pending'
+        )
+        && request.resource.data.status == 'session_scheduled'
+        && request.resource.data.sessionStatus == 'scheduled'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'sessionStatus',
+              'sessionDateText',
+              'sessionLink',
+              'sessionCode',
+              'sessionAdminNotes',
+              'sessionCreatedAt',
+              'updatedAt'
+            ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note;
+    }
+
+    function adminSessionInProgressValid() {
+      return isAdmin()
+        && resource.data.status == 'session_scheduled'
+        && request.resource.data.status == 'session_in_progress'
+        && request.resource.data.sessionStatus == 'in_progress'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'sessionStatus',
+              'updatedAt'
+            ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note;
+    }
+
+    function adminSessionCompleteValid() {
+      return isAdmin()
+        && (
+          resource.data.status == 'session_scheduled'
+          || resource.data.status == 'session_in_progress'
+        )
+        && request.resource.data.status == 'session_completed_pending_reviews'
+        && request.resource.data.sessionStatus == 'completed'
+        && request.resource.data.reviewStatus == 'pending_reviews'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'sessionStatus',
+              'reviewStatus',
+              'updatedAt'
+            ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note;
+    }
+
+    function adminSessionRescheduleValid() {
+      return isAdmin()
+        && (
+          resource.data.status == 'session_scheduled'
+          || resource.data.status == 'session_in_progress'
+        )
+        && request.resource.data.status == 'reschedule_pending'
+        && request.resource.data.sessionStatus == 'reschedule_pending'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'sessionStatus',
+              'updatedAt'
+            ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note;
+    }
+
+    function adminSessionUpdateValid() {
+      return adminSessionScheduleValid()
+        || adminSessionInProgressValid()
+        || adminSessionCompleteValid()
+        || adminSessionRescheduleValid();
+    }
+
+    function adminPayoutConfirmValid() {
+      return isAdmin()
+        && resource.data.status == 'payout_pending'
+        && request.resource.data.status == 'completed_success'
+        && request.resource.data.sessionStatus == 'completed'
+        && request.resource.data.reviewStatus == 'completed'
+        && (
+          (
+            resource.data.requestKind == 'center'
+            && request.resource.data.payoutStatus == 'paid_to_center'
+          )
+          || (
+            resource.data.requestKind != 'center'
+            && request.resource.data.payoutStatus == 'paid_to_clinician'
+          )
+        )
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'sessionStatus',
+              'reviewStatus',
+              'payoutStatus',
+              'payoutTransferredAt',
+              'updatedAt'
+            ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note;
+    }
+
+    function adminCenterAccountingReviewValid() {
+      return isAdmin()
+        && resource.data.requestKind == 'center'
+        && resource.data.status == 'payout_pending'
+        && request.resource.data.status == 'payout_pending'
+        && request.resource.data.accountingReviewStatus == 'confirmed'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'accountingReviewStatus',
+              'grossClientPaidAmount',
+              'appCommissionPercent',
+              'appCommissionAmount',
+              'netAmountDueToCenter',
+              'accountingReviewNotes',
+              'accountingConfirmedBy',
+              'accountingConfirmedAt',
+              'updatedAt'
+            ])
+        && request.resource.data.accountingConfirmedBy == uid();
+    }
+
+    function adminArchiveValid() {
+      return isAdmin()
+        && request.resource.data.archived == true
+        && request.resource.data.archiveReady == true
+        && (
+          request.resource.data.archiveSection == 'sessions'
+          || request.resource.data.archiveSection == 'payments'
+        )
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'archived',
+              'archivedAt',
+              'archiveSection',
+              'archiveReady',
+              'updatedAt'
+            ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note;
+    }
+
+    function adminPayoutAndArchiveValid() {
+      return adminPayoutConfirmValid()
+        || adminCenterAccountingReviewValid()
+        || adminArchiveValid();
+    }
+
+    function clinicianBookingCreateValid() {
+      return signedIn()
+        && (request.resource.data.clientId is string)
+        && request.resource.data.clientId == uid()
+        && request.resource.data.status == 'pending_admin'
+        && (request.resource.data.clinicianId is string)
+        && request.resource.data.clinicianId.size() > 0
+        && (request.resource.data.clinicianName is string)
+        && request.resource.data.clinicianName.size() > 0
+        && (request.resource.data.clinicianUid is string)
+        && request.resource.data.clinicianUid.size() > 0
+        && request.resource.data.adminForwarded == false
+        && request.resource.data.adminAssignedBy == ''
+        && request.resource.data.adminAssignedAt == null;
+    }
+
+    function centerBookingCreateValid() {
+      return signedIn()
+        && (request.resource.data.requestKind is string)
+        && request.resource.data.requestKind == 'center'
+        && (request.resource.data.clientId is string)
+        && request.resource.data.clientId == uid()
+        && (request.resource.data.centerId is string)
+        && request.resource.data.centerId.size() > 0
+        && (request.resource.data.centerName is string)
+        && request.resource.data.centerName.size() > 0
+        && request.resource.data.status == 'pending_admin'
+        && request.resource.data.adminForwarded == false
+        && request.resource.data.adminAssignedBy == ''
+        && request.resource.data.adminAssignedAt == null
+        && (
+          !request.resource.data.keys().hasAny(['clinicianId'])
+          || request.resource.data.clinicianId == ''
+        )
+        && (
+          !request.resource.data.keys().hasAny(['clinicianName'])
+          || request.resource.data.clinicianName == ''
+        )
+        && (
+          !request.resource.data.keys().hasAny(['clinicianUid'])
+          || request.resource.data.clinicianUid == ''
+        );
+    }
+
+    function centerBaseFieldsUnchanged() {
+      let adminForwardedUnchanged =
+        (
+          !resource.data.keys().hasAny(['adminForwarded'])
+          && (
+            !request.resource.data.keys().hasAny(['adminForwarded'])
+            || request.resource.data.adminForwarded == false
+          )
+        )
+        || (
+          resource.data.keys().hasAny(['adminForwarded'])
+          && request.resource.data.keys().hasAny(['adminForwarded'])
+          && request.resource.data.adminForwarded == resource.data.adminForwarded
+        );
+
+      let adminAssignedByUnchanged =
+        (
+          !resource.data.keys().hasAny(['adminAssignedBy'])
+          && (
+            !request.resource.data.keys().hasAny(['adminAssignedBy'])
+            || request.resource.data.adminAssignedBy == ''
+          )
+        )
+        || (
+          resource.data.keys().hasAny(['adminAssignedBy'])
+          && (
+            (
+              request.resource.data.keys().hasAny(['adminAssignedBy'])
+              && request.resource.data.adminAssignedBy == resource.data.adminAssignedBy
+            )
+            || (
+              resource.data.adminAssignedBy == ''
+              && !request.resource.data.keys().hasAny(['adminAssignedBy'])
+            )
+          )
+        );
+
+      let adminAssignedAtUnchanged =
+        (
+          !resource.data.keys().hasAny(['adminAssignedAt'])
+          && !request.resource.data.keys().hasAny(['adminAssignedAt'])
+        )
+        || (
+          resource.data.keys().hasAny(['adminAssignedAt'])
+          && request.resource.data.keys().hasAny(['adminAssignedAt'])
+          && request.resource.data.adminAssignedAt == resource.data.adminAssignedAt
+        );
+
+      let requestGroupIdUnchanged =
+        (
+          !resource.data.keys().hasAny(['requestGroupId'])
+          && !request.resource.data.keys().hasAny(['requestGroupId'])
+        )
+        || (
+          resource.data.keys().hasAny(['requestGroupId'])
+          && request.resource.data.keys().hasAny(['requestGroupId'])
+          && request.resource.data.requestGroupId == resource.data.requestGroupId
+        );
+
+      let clinicianIdUnchanged =
+        (
+          !resource.data.keys().hasAny(['clinicianId'])
+          && (
+            !request.resource.data.keys().hasAny(['clinicianId'])
+            || request.resource.data.clinicianId == ''
+          )
+        )
+        || (
+          resource.data.keys().hasAny(['clinicianId'])
+          && (
+            (
+              request.resource.data.keys().hasAny(['clinicianId'])
+              && request.resource.data.clinicianId == resource.data.clinicianId
+            )
+            || (
+              resource.data.clinicianId == ''
+              && !request.resource.data.keys().hasAny(['clinicianId'])
+            )
+          )
+        );
+
+      let clinicianNameUnchanged =
+        (
+          !resource.data.keys().hasAny(['clinicianName'])
+          && (
+            !request.resource.data.keys().hasAny(['clinicianName'])
+            || request.resource.data.clinicianName == ''
+          )
+        )
+        || (
+          resource.data.keys().hasAny(['clinicianName'])
+          && (
+            (
+              request.resource.data.keys().hasAny(['clinicianName'])
+              && request.resource.data.clinicianName == resource.data.clinicianName
+            )
+            || (
+              resource.data.clinicianName == ''
+              && !request.resource.data.keys().hasAny(['clinicianName'])
+            )
+          )
+        );
+
+      let clinicianUidUnchanged =
+        (
+          !resource.data.keys().hasAny(['clinicianUid'])
+          && (
+            !request.resource.data.keys().hasAny(['clinicianUid'])
+            || request.resource.data.clinicianUid == ''
+          )
+        )
+        || (
+          resource.data.keys().hasAny(['clinicianUid'])
+          && (
+            (
+              request.resource.data.keys().hasAny(['clinicianUid'])
+              && request.resource.data.clinicianUid == resource.data.clinicianUid
+            )
+            || (
+              resource.data.clinicianUid == ''
+              && !request.resource.data.keys().hasAny(['clinicianUid'])
+            )
+          )
+        );
+
+      return request.resource.data.requestKind == resource.data.requestKind
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.centerName == resource.data.centerName
+        && clinicianIdUnchanged
+        && clinicianNameUnchanged
+        && clinicianUidUnchanged
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note
+        && adminForwardedUnchanged
+        && adminAssignedByUnchanged
+        && adminAssignedAtUnchanged
+        && requestGroupIdUnchanged;
+    }
+
+    function adminCenterFollowUpValid() {
+      return isAdmin()
+        && resource.data.requestKind == 'center'
+        && (
+          resource.data.status == 'pending_admin'
+          || resource.data.status == 'center_follow_up'
+        )
+        && request.resource.data.status == 'center_follow_up'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'adminFollowUpNote',
+              'adminDecisionNote',
+              'rejectReason',
+              'updatedAt',
+              'centerAdminHandledBy',
+              'centerAdminHandledAt'
+            ])
+        && (request.resource.data.centerAdminHandledBy is string)
+        && request.resource.data.centerAdminHandledBy == uid();
+    }
+
+    function adminCenterReturnToClientValid() {
+      return isAdmin()
+        && resource.data.requestKind == 'center'
+        && resource.data.status == 'center_follow_up'
+        && request.resource.data.status == 'client_update_required'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'lastCenterAvailabilityStatus',
+              'lastCenterAvailabilityNote',
+              'lastCenterSuggestedAlternativeKey',
+              'lastCenterSuggestedAlternativeLabelAr',
+              'lastCenterFeedbackRevisionNumber',
+              'adminCanApproveWithoutCenterRecheck',
+              'updatedAt'
+            ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.centerName == resource.data.centerName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note;
+    }
+
+    function adminCenterApproveValid() {
+      return isAdmin()
+        && resource.data.requestKind == 'center'
+        && (
+          resource.data.status == 'pending_admin'
+          || resource.data.status == 'center_follow_up'
+        )
+        && request.resource.data.status == 'awaiting_payment'
+        && request.resource.data.paymentStatus == 'pending_client_transfer'
+        && request.resource.data.sessionStatus == 'not_created'
+        && request.resource.data.reviewStatus == 'not_started'
+        && request.resource.data.payoutStatus == 'blocked'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'adminApproved',
+              'adminRejected',
+              'adminForwarded',
+              'adminDecisionType',
+              'adminDecisionBy',
+              'adminDecisionAt',
+              'adminAssignedBy',
+              'adminAssignedAt',
+              'assignedClinicianId',
+              'assignedClinicianName',
+              'clinicianId',
+              'clinicianName',
+              'clinicianUid',
+              'paymentStatus',
+              'sessionStatus',
+              'reviewStatus',
+              'payoutStatus',
+              'adminDecisionNote',
+              'adminFollowUpNote',
+              'rejectReason',
+              'updatedAt',
+              'centerAdminHandledBy',
+              'centerAdminHandledAt'
+            ])
+        && (
+          !request.resource.data.keys().hasAny(['centerAdminHandledBy'])
+          || request.resource.data.centerAdminHandledBy is string
+        );
+    }
+
+    function adminCenterRejectValid() {
+      return isAdmin()
+        && resource.data.requestKind == 'center'
+        && (
+          resource.data.status == 'pending_admin'
+          || resource.data.status == 'center_follow_up'
+        )
+        && request.resource.data.status == 'rejected'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'rejectReason',
+              'adminDecisionNote',
+              'adminFollowUpNote',
+              'updatedAt',
+              'centerAdminHandledBy',
+              'centerAdminHandledAt'
+            ])
+        && centerBaseFieldsUnchanged()
+        && (request.resource.data.centerAdminHandledBy is string)
+        && request.resource.data.centerAdminHandledBy == uid();
+    }
+
+    function adminCenterUpdateValid() {
+      return adminCenterFollowUpValid()
+        || adminCenterReturnToClientValid()
+        || adminCenterApproveValid()
+        || adminCenterRejectValid();
+    }
+
+    function centerAvailabilityUpdateValid() {
+      return signedIn()
+        && resource.data.requestKind == 'center'
+        && (resource.data.centerId is string)
+        && resource.data.centerId == uid()
+        && resource.data.status == 'center_follow_up'
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'centerAvailabilityStatus',
+              'centerAvailabilityNote',
+              'centerSuggestedAlternativeKey',
+              'centerSuggestedAlternativeLabelAr',
+              'centerAvailabilityRespondedAt',
+              'centerAvailabilityRespondedBy',
+              'updatedAt'
+            ])
+        && (
+          request.resource.data.centerAvailabilityStatus == 'available'
+          || request.resource.data.centerAvailabilityStatus == 'unavailable'
+        )
+        && (
+          request.resource.data.centerAvailabilityNote == null
+          || request.resource.data.centerAvailabilityNote is string
+        )
+        && (request.resource.data.centerAvailabilityRespondedBy is string)
+        && request.resource.data.centerAvailabilityRespondedBy == uid();
+    }
+
+    function clientCenterResubmitValid() {
+      return isClientDoc()
+        && resource.data.requestKind == 'center'
+        && resource.data.status == 'client_update_required'
+        && request.resource.data.status == 'pending_admin'
+        && request.resource.data.workflowStage == 'pending_admin'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'note',
+              'selectedAccommodationKey',
+              'selectedAccommodationLabelAr',
+              'selectedAccommodationPricingSnapshot',
+              'selectedAccommodationPrice',
+              'selectedAccommodationPricingUnit',
+              'centerAvailabilityStatus',
+              'centerAvailabilityNote',
+              'centerAvailabilityRespondedAt',
+              'centerAvailabilityRespondedBy',
+              'centerSuggestedAlternativeKey',
+              'centerSuggestedAlternativeLabelAr',
+              'clientRevisionNumber',
+              'clientUpdatedAfterCenterFeedback',
+              'adminCanApproveWithoutCenterRecheck',
+              'updatedAt'
+            ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.centerName == resource.data.centerName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.centerAvailabilityStatus == 'pending'
+        && request.resource.data.clientUpdatedAfterCenterFeedback == true;
+    }
+
+    function clinicianUpdateValid() {
+      return isAssignedClinicianDoc()
+        && (
+          (
+            resource.data.status == 'assigned_clinician'
+            && request.resource.data.status == 'awaiting_payment'
+            && request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly([
+                  'status',
+                  'updatedAt',
+                  'clinicianAccepted',
+                  'clinicianRejected',
+                  'clinicianCompleted',
+                  'clinicianRespondedAt',
+                  'paymentStatus',
+                  'sessionStatus',
+                  'reviewStatus',
+                  'payoutStatus'
+                ])
+          )
+          ||
+          (
+            resource.data.status == 'assigned_clinician'
+            && request.resource.data.status == 'clinician_rejected'
+            && request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly([
+                  'status',
+                  'updatedAt',
+                  'clinicianAccepted',
+                  'clinicianRejected',
+                  'clinicianCompleted',
+                  'clinicianRespondedAt',
+                  'paymentStatus',
+                  'sessionStatus',
+                  'reviewStatus',
+                  'payoutStatus'
+                ])
+          )
+          ||
+          (
+            (
+              resource.data.status == 'session_scheduled'
+              || resource.data.status == 'session_in_progress'
+            )
+            && request.resource.data.status == 'session_completed_pending_reviews'
+            && request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly([
+                  'status',
+                  'updatedAt',
+                  'clinicianAccepted',
+                  'clinicianRejected',
+                  'clinicianCompleted',
+                  'completedAt',
+                  'reviewStatus',
+                  'payoutStatus'
+                ])
+          )
+        );
+    }
+
+    function reviewBaseFieldsUnchanged() {
+      let centerIdUnchanged =
+        (
+          !resource.data.keys().hasAny(['centerId'])
+          && !request.resource.data.keys().hasAny(['centerId'])
+        )
+        || (
+          resource.data.keys().hasAny(['centerId'])
+          && request.resource.data.keys().hasAny(['centerId'])
+          && request.resource.data.centerId == resource.data.centerId
+        );
+
+      let centerNameUnchanged =
+        (
+          !resource.data.keys().hasAny(['centerName'])
+          && !request.resource.data.keys().hasAny(['centerName'])
+        )
+        || (
+          resource.data.keys().hasAny(['centerName'])
+          && request.resource.data.keys().hasAny(['centerName'])
+          && request.resource.data.centerName == resource.data.centerName
+        );
+
+      let assignedClinicianIdUnchanged =
+        (
+          !resource.data.keys().hasAny(['assignedClinicianId'])
+          && !request.resource.data.keys().hasAny(['assignedClinicianId'])
+        )
+        || (
+          resource.data.keys().hasAny(['assignedClinicianId'])
+          && request.resource.data.keys().hasAny(['assignedClinicianId'])
+          && request.resource.data.assignedClinicianId == resource.data.assignedClinicianId
+        );
+
+      let assignedClinicianNameUnchanged =
+        (
+          !resource.data.keys().hasAny(['assignedClinicianName'])
+          && !request.resource.data.keys().hasAny(['assignedClinicianName'])
+        )
+        || (
+          resource.data.keys().hasAny(['assignedClinicianName'])
+          && request.resource.data.keys().hasAny(['assignedClinicianName'])
+          && request.resource.data.assignedClinicianName == resource.data.assignedClinicianName
+        );
+
+      let requestGroupIdUnchanged =
+        (
+          !resource.data.keys().hasAny(['requestGroupId'])
+          && !request.resource.data.keys().hasAny(['requestGroupId'])
+        )
+        || (
+          resource.data.keys().hasAny(['requestGroupId'])
+          && request.resource.data.keys().hasAny(['requestGroupId'])
+          && request.resource.data.requestGroupId == resource.data.requestGroupId
+        );
+
+      return request.resource.data.requestKind == resource.data.requestKind
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && centerIdUnchanged
+        && centerNameUnchanged
+        && request.resource.data.clinicianId == resource.data.clinicianId
+        && request.resource.data.clinicianName == resource.data.clinicianName
+        && request.resource.data.clinicianUid == resource.data.clinicianUid
+        && assignedClinicianIdUnchanged
+        && assignedClinicianNameUnchanged
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note
+        && request.resource.data.paymentStatus == resource.data.paymentStatus
+        && request.resource.data.payoutStatus == resource.data.payoutStatus
+        && request.resource.data.adminForwarded == resource.data.adminForwarded
+        && request.resource.data.adminAssignedBy == resource.data.adminAssignedBy
+        && request.resource.data.adminAssignedAt == resource.data.adminAssignedAt
+        && requestGroupIdUnchanged;
+    }
+
+    function clientReviewUpdateValid() {
+      return request.auth != null
+        && request.auth.uid == resource.data.clientId
+        && (
+          resource.data.status == 'session_completed_pending_reviews'
+          || resource.data.status == 'payout_pending'
+        )
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'clientReviewSubmitted',
+              'clientReviewSubmittedAt',
+              'clientReviewTotalScore',
+              'clientReviewPercentage',
+              'clientReviewDerivedStars',
+              'status',
+              'reviewStatus',
+              'sessionStatus',
+              'finalReviewPercentage',
+              'updatedAt'
+            ])
+        && request.resource.data.clientReviewSubmitted == true
+        && request.resource.data.sessionStatus == 'completed'
+        && (
+          request.resource.data.status == 'session_completed_pending_reviews'
+          || request.resource.data.status == 'payout_pending'
+        )
+        && (
+          request.resource.data.reviewStatus == 'partial'
+          || request.resource.data.reviewStatus == 'completed'
+        );
+    }
+
+    function clinicianReviewUpdateValid() {
+      return (
+          isAssignedClinicianDoc()
+          || (
+            signedIn()
+            && resource.data.requestKind == 'center'
+            && (resource.data.centerId is string)
+            && resource.data.centerId == uid()
+          )
+        )
+        && (
+          resource.data.status == 'session_completed_pending_reviews'
+          || resource.data.status == 'payout_pending'
+        )
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'clinicianReviewSubmitted',
+              'clinicianReviewSubmittedAt',
+              'clinicianReviewTotalScore',
+              'clinicianReviewPercentage',
+              'clinicianReviewDerivedStars',
+              'status',
+              'reviewStatus',
+              'sessionStatus',
+              'finalReviewPercentage',
+              'updatedAt'
+            ])
+        && request.resource.data.clinicianReviewSubmitted == true
+        && request.resource.data.sessionStatus == 'completed'
+        && (
+          request.resource.data.status == 'session_completed_pending_reviews'
+          || request.resource.data.status == 'payout_pending'
+        )
+        && (
+          request.resource.data.reviewStatus == 'partial'
+          || request.resource.data.reviewStatus == 'completed'
+        );
+    }
+
+    function clinicianCanReadEscalation() {
+      return signedIn()
+        && (resource.data.assignedToType is string)
+        && (resource.data.assignedToUid is string)
+        && resource.data.assignedToType == 'clinician'
+        && resource.data.assignedToUid == uid();
+    }
+
+    function clinicianCanReadEscalationById(escalationId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/chat_escalations/$(escalationId))
+        && (get(/databases/$(database)/documents/chat_escalations/$(escalationId)).data.assignedToType is string)
+        && (get(/databases/$(database)/documents/chat_escalations/$(escalationId)).data.assignedToUid is string)
+        && get(/databases/$(database)/documents/chat_escalations/$(escalationId)).data.assignedToType == 'clinician'
+        && get(/databases/$(database)/documents/chat_escalations/$(escalationId)).data.assignedToUid == uid();
+    }
+
+    function isThreadOwnerDoc() {
+      return signedIn()
+        && (resource.data.ownerUid is string)
+        && resource.data.ownerUid == uid();
+    }
+
+    function isThreadAssignedClinicianDoc() {
+      return signedIn()
+        && (resource.data.assignedClinicianUid is string)
+        && resource.data.assignedClinicianUid == uid();
+    }
+
+    function canReadThreadDoc() {
+      return isAdmin() || isThreadOwnerDoc() || isThreadAssignedClinicianDoc();
+    }
+
+    function canReadThreadById(threadId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/chat_threads/$(threadId))
+        && (
+          isAdmin()
+          || (
+            get(/databases/$(database)/documents/chat_threads/$(threadId)).data.ownerUid is string
+            && get(/databases/$(database)/documents/chat_threads/$(threadId)).data.ownerUid == uid()
+          )
+          || (
+            get(/databases/$(database)/documents/chat_threads/$(threadId)).data.assignedClinicianUid is string
+            && get(/databases/$(database)/documents/chat_threads/$(threadId)).data.assignedClinicianUid == uid()
+          )
+        );
+    }
+
+    match /booking_requests/{docId} {
+      allow read: if clientCanReadBooking() || clinicianCanReadBooking() || centerCanReadBooking() || isAdmin();
+
+      allow create: if clinicianBookingCreateValid()
+        || centerBookingCreateValid();
+
+      allow update: if clientUpdateValid()
+        || clientCenterResubmitValid()
+        || clientPaymentProofUpdateValid()
+        || adminForwardValid()
+        || adminRejectValid()
+        || adminReturnToPendingValid()
+        || adminPaymentUpdateValid()
+        || adminSessionUpdateValid()
+        || adminPayoutAndArchiveValid()
+        || adminCenterUpdateValid()
+        || centerAvailabilityUpdateValid()
+        || clinicianUpdateValid()
+        || clientReviewUpdateValid()
+        || clinicianReviewUpdateValid();
+
+      allow delete: if false;
+    }
+
+    match /bookingRequests/{docId} {
+      allow read: if clientCanReadBooking() || clinicianCanReadBooking() || centerCanReadBooking() || isAdmin();
+
+      allow create: if clinicianBookingCreateValid()
+        || centerBookingCreateValid();
+
+      allow update: if clientUpdateValid()
+        || clientCenterResubmitValid()
+        || clientPaymentProofUpdateValid()
+        || adminForwardValid()
+        || adminRejectValid()
+        || adminReturnToPendingValid()
+        || adminPaymentUpdateValid()
+        || adminSessionUpdateValid()
+        || adminPayoutAndArchiveValid()
+        || adminCenterUpdateValid()
+        || centerAvailabilityUpdateValid()
+        || clinicianUpdateValid()
+        || clientReviewUpdateValid()
+        || clinicianReviewUpdateValid();
+
+      allow delete: if false;
+    }
+
+    match /chat_threads/{threadId} {
+      allow read: if canReadThreadDoc();
+
+      allow create: if signedIn()
+        && (request.resource.data.ownerUid is string)
+        && request.resource.data.ownerUid == uid();
+
+      allow update: if isAdmin() || isThreadOwnerDoc();
+
+      allow delete: if false;
+
+      match /messages/{messageId} {
+        allow read: if canReadThreadById(threadId);
+
+        allow create: if canReadThreadById(threadId)
+          && (
+            (
+              request.resource.data.senderType == 'user'
+              && (request.resource.data.senderUid is string)
+              && request.resource.data.senderUid == uid()
+            )
+            ||
+            (
+              request.resource.data.senderType == 'admin'
+              && isAdmin()
+              && (request.resource.data.senderUid is string)
+              && request.resource.data.senderUid == uid()
+            )
+            ||
+            (
+              request.resource.data.senderType == 'ai'
+              && !('senderUid' in request.resource.data)
+            )
+            ||
+            (
+              request.resource.data.senderType == 'ai'
+              && request.resource.data.senderUid == null
+            )
+          );
+
+        allow update, delete: if false;
+      }
+    }
+
+    match /clinicians/{uidDoc} {
+      allow read: if signedIn();
+      allow create: if signedIn() && uid() == uidDoc;
+      allow update: if ownClinicianUpdateValid(uidDoc) || isAdmin();
+      allow delete: if false;
+    }
+
+    match /clients/{uidDoc} {
+      allow read: if isAdmin() || isOwnClientResource(uidDoc);
+      allow create: if isAdmin() || isOwnClientRequest(uidDoc);
+      allow update: if isAdmin() || ownClientUpdateValid(uidDoc);
+      allow delete: if false;
+    }
+
+    match /clinician_profile_change_requests/{requestId} {
+      allow read: if isAdmin() || isOwnClinicianProfileRequestResource();
+
+      allow create: if isOwnClinicianProfileRequestCreate()
+        && request.resource.data.status == 'pending';
+
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    match /center_profile_change_requests/{requestId} {
+      allow read: if isAdmin() || isOwnCenterProfileRequestResource();
+
+      allow create: if isOwnCenterProfileRequestCreate()
+        && request.resource.data.status == 'pending';
+
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    match /sessionRatings/{docId} {
+      allow read: if canReadSessionRating();
+      allow create: if signedIn()
+        && (request.resource.data.reviewerUid is string)
+        && request.resource.data.reviewerUid == uid()
+        && (request.resource.data.requestId is string)
+        && (
+          request.resource.data.reviewerType == 'client'
+          || request.resource.data.reviewerType == 'clinician'
+        );
+      allow update: if signedIn()
+        && resource != null
+        && (resource.data.reviewerUid is string)
+        && resource.data.reviewerUid == uid()
+        && (request.resource.data.reviewerUid is string)
+        && request.resource.data.reviewerUid == resource.data.reviewerUid
+        && request.resource.data.requestId == resource.data.requestId
+        && request.resource.data.reviewerType == resource.data.reviewerType;
+      allow delete: if false;
+    }
+
+    match /admins/{uidDoc} {
+      allow read: if signedIn() && uid() == uidDoc;
+      allow write: if false;
+    }
+
+    match /resources/{docId} {
+      allow read, write: if true;
+      allow delete: if false;
+    }
+
+    match /centers/{docId} {
+      allow read: if signedIn()
+        && (
+          isAdmin()
+          || isOwnCenterResource(docId)
+          || (
+            resource != null
+            && resource.data.isActive == true
+          )
+        );
+      allow create: if isAdmin() || isOwnCenterCreate(docId);
+      allow update: if isAdmin() || ownCenterUpdateValid(docId);
+      allow delete: if false;
+    }
+
+    match /chat_escalations/{escalationId} {
+      allow read: if isAdmin() || clinicianCanReadEscalation();
+      allow update: if isAdmin();
+      allow create: if request.auth != null;
+    }
+
+    match /chat_escalations/{escalationId}/reports/{reportId} {
+      allow read: if isAdmin() || clinicianCanReadEscalationById(escalationId);
+      allow create: if request.auth != null;
+    }
+
+    match /debug/{docId} {
+      allow read, write: if true;
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

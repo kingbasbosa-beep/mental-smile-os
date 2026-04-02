@@ -1,0 +1,48 @@
+{
+  "pack": "C5",
+  "name": "Booking + Global UI (Pharaoh Modern)",
+  "version": "C5",
+  "notes": "All paths are relative to project root. Flutter web serves them under /assets/.",
+  "folders": [
+    "assets/c5/avatars/",
+    "assets/c5/icons/",
+    "assets/c5/ui/buttons/",
+    "assets/c5/ui/badges/",
+    "assets/c5/ui/status_dots/",
+    "assets/c5/ui/gradients/",
+    "assets/c5/ui/ornaments/",
+    "assets/c5/sheet/",
+    "assets/c5/docs/"
+  ],
+  "files": [
+    "assets/c5/sheet/c5_sheet.png",
+
+    "assets/c5/avatars/avatar_clinician_f.png",
+    "assets/c5/avatars/avatar_clinician_m.png",
+    "assets/c5/avatars/avatar_client.png",
+    "assets/c5/avatars/avatar_admin_support.png",
+
+    "assets/c5/icons/icon_pending.png",
+    "assets/c5/icons/icon_approved.png",
+    "assets/c5/icons/icon_rejected.png",
+    "assets/c5/icons/icon_booking.png",
+    "assets/c5/icons/icon_inbox.png",
+    "assets/c5/icons/icon_my_requests.png",
+
+    "assets/c5/ui/buttons/button_primary.png",
+    "assets/c5/ui/buttons/button_secondary.png",
+
+    "assets/c5/ui/badges/badge_verified.png",
+    "assets/c5/ui/badges/badge_new.png",
+
+    "assets/c5/ui/status_dots/dot_pending.png",
+    "assets/c5/ui/status_dots/dot_approved.png",
+    "assets/c5/ui/status_dots/dot_rejected.png",
+    "assets/c5/ui/status_dots/dot_online.png",
+
+    "assets/c5/ui/gradients/gradient_ribbon_1.png",
+    "assets/c5/ui/gradients/gradient_ribbon_2.png",
+
+    "assets/c5/ui/ornaments/ornament_divider_1.png"
+  ]
+}

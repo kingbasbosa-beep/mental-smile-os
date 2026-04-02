@@ -1,0 +1,1629 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/core/ui/app_design_system.dart';
+import 'package:flutterprojects/core/ui/app_shell_actions.dart';
+import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
+import 'package:flutterprojects/features/centers/presentation/center_document_requirements.dart';
+
+class CenterOperationsPage extends StatefulWidget {
+  const CenterOperationsPage({super.key});
+
+  @override
+  State<CenterOperationsPage> createState() => _CenterOperationsPageState();
+}
+
+class _CenterOperationsPageState extends State<CenterOperationsPage> {
+  final _centerNameController = TextEditingController();
+  final _managerNameController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _requestedFrontImageController = TextEditingController();
+  final _requestedReceptionImageController = TextEditingController();
+  final _requestedInside1ImageController = TextEditingController();
+  final _requestedInside2ImageController = TextEditingController();
+  final _frontImageController = TextEditingController();
+  final _receptionImageController = TextEditingController();
+  final _inside1ImageController = TextEditingController();
+  final _inside2ImageController = TextEditingController();
+
+  final _docFileNameController = TextEditingController();
+  final _docUrlController = TextEditingController();
+  final _docReviewNoteController = TextEditingController();
+  final Map<String, TextEditingController> _pricingControllers = {};
+  final Map<String, TextEditingController> _autismPricingControllers = {};
+
+  bool _savingImages = false;
+  bool _savingDocument = false;
+  bool _submittingChangeRequest = false;
+  String _lastCenterProfileSeed = '';
+  String _lastRequestedGallerySeed = '';
+  String _lastPricingSeed = '';
+  String? _selectedDocType;
+  late List<AccommodationCostItem> _requestedAccommodationCosts;
+  late List<AutismCareCostItem> _requestedAutismCareCosts;
+  CenterCapabilityFlags _requestedCapabilities = const CenterCapabilityFlags();
+
+  @override
+  void initState() {
+    super.initState();
+    _requestedAccommodationCosts = defaultAccommodationCostItems();
+    _requestedAutismCareCosts = defaultAutismCareCostItems();
+    for (final item in _requestedAccommodationCosts) {
+      _pricingControllers[item.key] =
+          TextEditingController(text: item.price == 0 ? '' : '${item.price}');
+    }
+    for (final item in _requestedAutismCareCosts) {
+      _autismPricingControllers[item.key] =
+          TextEditingController(text: item.price == 0 ? '' : '${item.price}');
+    }
+  }
+
+  bool _isArabic(BuildContext context) =>
+      Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+
+  String? get _uid => FirebaseAuth.instance.currentUser?.uid;
+
+  Stream<Map<String, dynamic>?> _centerStream() {
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) return Stream.value(null);
+
+    return FirebaseFirestore.instance
+        .collection('centers')
+        .doc(uid)
+        .snapshots()
+        .map((doc) => doc.exists ? doc.data() : null);
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    if (!context.mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      Routes.login,
+      (route) => false,
+    );
+  }
+
+  List<Map<String, dynamic>> _readDocs(Map<String, dynamic> data) {
+    final raw = data['documentItems'];
+    if (raw is List) {
+      return raw
+          .whereType<Map>()
+          .map((e) => e.map((k, v) => MapEntry('$k', v)))
+          .toList();
+    }
+    return [];
+  }
+
+  List<Map<String, dynamic>> _readGallery(Map<String, dynamic> data) {
+    final raw = data['galleryItems'];
+    if (raw is List) {
+      return raw
+          .whereType<Map>()
+          .map((e) => e.map((k, v) => MapEntry('$k', v)))
+          .toList();
+    }
+
+    final fallback = data['galleryImages'];
+    if (fallback is! List) return [];
+    return fallback.whereType<String>().map((e) => {'url': e}).toList();
+  }
+
+  void _prefillGallery(List<Map<String, dynamic>> items) {
+    String readUrl(String key) {
+      final item = items.cast<Map<String, dynamic>?>().firstWhere(
+            (e) => (e?['slotKey'] ?? '').toString() == key,
+            orElse: () => null,
+          );
+      return (item?['url'] ?? '').toString();
+    }
+
+    _frontImageController.text = readUrl('front');
+    _receptionImageController.text = readUrl('reception');
+    _inside1ImageController.text = readUrl('inside_1');
+    _inside2ImageController.text = readUrl('inside_2');
+  }
+
+  void _syncRequestedGalleryFields(List<Map<String, dynamic>> items) {
+    String readUrl(String key) {
+      final item = items.cast<Map<String, dynamic>?>().firstWhere(
+            (e) => (e?['slotKey'] ?? '').toString() == key,
+            orElse: () => null,
+          );
+      return (item?['url'] ?? '').toString();
+    }
+
+    final nextSeed = [
+      readUrl('front'),
+      readUrl('reception'),
+      readUrl('inside_1'),
+      readUrl('inside_2'),
+    ].join('||');
+
+    if (_lastRequestedGallerySeed == nextSeed) return;
+
+    _requestedFrontImageController.text = readUrl('front');
+    _requestedReceptionImageController.text = readUrl('reception');
+    _requestedInside1ImageController.text = readUrl('inside_1');
+    _requestedInside2ImageController.text = readUrl('inside_2');
+    _lastRequestedGallerySeed = nextSeed;
+  }
+
+  List<Map<String, dynamic>> _buildGalleryItems() {
+    return [
+      {
+        'slotKey': 'front',
+        'label': 'Front View',
+        'url': _frontImageController.text.trim(),
+        'status':
+            _frontImageController.text.trim().isEmpty ? 'pending' : 'uploaded',
+      },
+      {
+        'slotKey': 'reception',
+        'label': 'Reception',
+        'url': _receptionImageController.text.trim(),
+        'status': _receptionImageController.text.trim().isEmpty
+            ? 'pending'
+            : 'uploaded',
+      },
+      {
+        'slotKey': 'inside_1',
+        'label': 'Inside 1',
+        'url': _inside1ImageController.text.trim(),
+        'status': _inside1ImageController.text.trim().isEmpty
+            ? 'pending'
+            : 'uploaded',
+      },
+      {
+        'slotKey': 'inside_2',
+        'label': 'Inside 2',
+        'url': _inside2ImageController.text.trim(),
+        'status': _inside2ImageController.text.trim().isEmpty
+            ? 'pending'
+            : 'uploaded',
+      },
+    ];
+  }
+
+  List<Map<String, dynamic>> _buildRequestedGalleryItems() {
+    return [
+      {
+        'slotKey': 'front',
+        'label': 'Front View',
+        'url': _requestedFrontImageController.text.trim(),
+        'status': _requestedFrontImageController.text.trim().isEmpty
+            ? 'pending'
+            : 'uploaded',
+      },
+      {
+        'slotKey': 'reception',
+        'label': 'Reception',
+        'url': _requestedReceptionImageController.text.trim(),
+        'status': _requestedReceptionImageController.text.trim().isEmpty
+            ? 'pending'
+            : 'uploaded',
+      },
+      {
+        'slotKey': 'inside_1',
+        'label': 'Inside 1',
+        'url': _requestedInside1ImageController.text.trim(),
+        'status': _requestedInside1ImageController.text.trim().isEmpty
+            ? 'pending'
+            : 'uploaded',
+      },
+      {
+        'slotKey': 'inside_2',
+        'label': 'Inside 2',
+        'url': _requestedInside2ImageController.text.trim(),
+        'status': _requestedInside2ImageController.text.trim().isEmpty
+            ? 'pending'
+            : 'uploaded',
+      },
+    ];
+  }
+
+  void _syncProfileFields(Map<String, dynamic> data) {
+    final nextSeed = [
+      (data['centerName'] ?? data['displayName'] ?? '').toString(),
+      (data['managerName'] ?? '').toString(),
+      (data['city'] ?? '').toString(),
+      (data['address'] ?? '').toString(),
+      (data['description'] ?? '').toString(),
+    ].join('||');
+
+    if (_lastCenterProfileSeed == nextSeed) return;
+
+    _centerNameController.text =
+        (data['centerName'] ?? data['displayName'] ?? '').toString();
+    _managerNameController.text = (data['managerName'] ?? '').toString();
+    _cityController.text = (data['city'] ?? '').toString();
+    _addressController.text = (data['address'] ?? '').toString();
+    _descriptionController.text = (data['description'] ?? '').toString();
+    _lastCenterProfileSeed = nextSeed;
+  }
+
+  double _readPrice(TextEditingController? controller) {
+    return double.tryParse((controller?.text ?? '').trim()) ?? 0;
+  }
+
+  List<AccommodationCostItem> _currentRequestedAccommodationCosts() {
+    return _requestedAccommodationCosts
+        .map(
+          (item) => item.copyWith(
+            price: _readPrice(_pricingControllers[item.key]),
+          ),
+        )
+        .toList();
+  }
+
+  List<AutismCareCostItem> _currentRequestedAutismCareCosts() {
+    return _requestedAutismCareCosts
+        .map(
+          (item) => item.copyWith(
+            price: _readPrice(_autismPricingControllers[item.key]),
+          ),
+        )
+        .toList();
+  }
+
+  void _syncPricingFields(Map<String, dynamic> data) {
+    final category = (data['category'] ?? '').toString().trim();
+    final nextAccommodation =
+        mergeAccommodationCostItems(data['accommodationCosts']);
+    final nextAutism = mergeAutismCareCostItems(data['autismCareCosts']);
+    final nextCapabilities = CenterCapabilityFlags.fromMap(
+      data['centerCapabilities'] is Map
+          ? Map<String, dynamic>.from(data['centerCapabilities'])
+          : const <String, dynamic>{},
+    );
+
+    final nextSeed = [
+      category,
+      ...nextAccommodation.map((item) => item.toMap().toString()),
+      ...nextAutism.map((item) => item.toMap().toString()),
+      nextCapabilities.toMap().toString(),
+    ].join('||');
+
+    if (_lastPricingSeed == nextSeed) return;
+
+    _requestedAccommodationCosts = nextAccommodation;
+    _requestedAutismCareCosts = nextAutism;
+    _requestedCapabilities = nextCapabilities;
+
+    for (final item in nextAccommodation) {
+      _pricingControllers[item.key]?.text =
+          item.price == 0 ? '' : '${item.price}';
+    }
+    for (final item in nextAutism) {
+      _autismPricingControllers[item.key]?.text =
+          item.price == 0 ? '' : '${item.price}';
+    }
+
+    _lastPricingSeed = nextSeed;
+  }
+
+  Future<void> _saveImages() async {
+    final uid = _uid;
+    if (uid == null) return;
+
+    setState(() => _savingImages = true);
+    try {
+      final items = _buildGalleryItems();
+      final uploadedCount = items
+          .where((e) => (e['url'] ?? '').toString().trim().isNotEmpty)
+          .length;
+
+      await FirebaseFirestore.instance.collection('centers').doc(uid).update({
+        'galleryItems': items,
+        'galleryImages': items
+            .map((e) => (e['url'] ?? '').toString())
+            .where((e) => e.trim().isNotEmpty)
+            .toList(),
+        'imagesReady': uploadedCount == 4,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _isArabic(context) ? 'تم حفظ صور المركز' : 'Center images saved',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _savingImages = false);
+    }
+  }
+
+  Future<void> _addDocument(List<Map<String, dynamic>> currentDocs) async {
+    final uid = _uid;
+    if (uid == null) return;
+
+    final type = (_selectedDocType ?? '').trim();
+    final fileName = _docFileNameController.text.trim();
+    final fileUrl = _docUrlController.text.trim();
+    final reviewNote = _docReviewNoteController.text.trim();
+
+    if (type.isEmpty || fileName.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _isArabic(context)
+                ? 'أدخل نوع الوثيقة واسم الملف على الأقل'
+                : 'Enter document type and file name at minimum',
+          ),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _savingDocument = true);
+    try {
+      final updated = <Map<String, dynamic>>[
+        ...currentDocs,
+        {
+          'documentType': type,
+          'fileName': fileName,
+          'originalFileName': fileName,
+          'fileUrl': fileUrl,
+          'uploadedAt': DateTime.now().toIso8601String(),
+          'status': 'pending',
+          'reviewNote': reviewNote,
+          'storagePath': '',
+        },
+      ];
+
+      await FirebaseFirestore.instance.collection('centers').doc(uid).update({
+        'documentItems': updated,
+        'documentsReady': updated.isNotEmpty,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      _docFileNameController.clear();
+      _docUrlController.clear();
+      _docReviewNoteController.clear();
+      _selectedDocType = null;
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _isArabic(context) ? 'تمت إضافة الوثيقة' : 'Document added',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _savingDocument = false);
+    }
+  }
+
+  Future<void> _removeDocument({
+    required int index,
+    required List<Map<String, dynamic>> currentDocs,
+  }) async {
+    final uid = _uid;
+    if (uid == null) return;
+
+    setState(() => _savingDocument = true);
+    try {
+      final updated = <Map<String, dynamic>>[];
+      for (int i = 0; i < currentDocs.length; i++) {
+        if (i != index) {
+          updated.add(currentDocs[i]);
+        }
+      }
+
+      await FirebaseFirestore.instance.collection('centers').doc(uid).update({
+        'documentItems': updated,
+        'documentsReady': updated.isNotEmpty,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _isArabic(context) ? 'تم حذف الوثيقة' : 'Document removed',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _savingDocument = false);
+    }
+  }
+
+  Future<void> _submitCenterChangeRequest({
+    required Map<String, dynamic> currentData,
+    required List<Map<String, dynamic>> currentDocs,
+  }) async {
+    final uid = _uid;
+    if (uid == null) return;
+
+    setState(() => _submittingChangeRequest = true);
+    try {
+      final requestedGalleryItems = _buildRequestedGalleryItems();
+      final requestedImagesReady = requestedGalleryItems
+              .where((item) => (item['url'] ?? '').toString().trim().isNotEmpty)
+              .length ==
+          4;
+
+      await FirebaseFirestore.instance
+          .collection('center_profile_change_requests')
+          .add({
+        'centerId': uid,
+        'centerName': _centerNameController.text.trim(),
+        'centerEmail': (currentData['email'] ?? '').toString().trim(),
+        'requestType': 'profile_update',
+        'currentCenterName':
+            (currentData['centerName'] ?? currentData['displayName'] ?? '')
+                .toString()
+                .trim(),
+        'requestedCenterName': _centerNameController.text.trim(),
+        'currentManagerName':
+            (currentData['managerName'] ?? '').toString().trim(),
+        'requestedManagerName': _managerNameController.text.trim(),
+        'currentDescription':
+            (currentData['description'] ?? '').toString().trim(),
+        'requestedDescription': _descriptionController.text.trim(),
+        'currentCity': (currentData['city'] ?? '').toString().trim(),
+        'requestedCity': _cityController.text.trim(),
+        'currentAddress': (currentData['address'] ?? '').toString().trim(),
+        'requestedAddress': _addressController.text.trim(),
+        'currentGalleryItems': _readGallery(currentData),
+        'requestedGalleryItems': requestedGalleryItems,
+        'currentDocumentItems': _readDocs(currentData),
+        'requestedDocumentItems': currentDocs,
+        'currentAccommodationCosts': mergeAccommodationCostItems(
+          currentData['accommodationCosts'],
+        ).map((e) => e.toMap()).toList(),
+        'requestedAccommodationCosts': _currentRequestedAccommodationCosts()
+            .map((e) => e.toMap())
+            .toList(),
+        'currentAutismCareCosts': mergeAutismCareCostItems(
+          currentData['autismCareCosts'],
+        ).map((e) => e.toMap()).toList(),
+        'requestedAutismCareCosts':
+            _currentRequestedAutismCareCosts().map((e) => e.toMap()).toList(),
+        'currentCenterCapabilities': CenterCapabilityFlags.fromMap(
+          currentData['centerCapabilities'] is Map
+              ? Map<String, dynamic>.from(currentData['centerCapabilities'])
+              : const <String, dynamic>{},
+        ).toMap(),
+        'requestedCenterCapabilities': _requestedCapabilities.toMap(),
+        'requestedImagesReady': requestedImagesReady,
+        'requestedDocumentsReady': currentDocs.isNotEmpty,
+        'status': 'pending',
+        'adminDecision': '',
+        'adminNote': '',
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _isArabic(context)
+                ? 'تم إرسال طلب تعديل بيانات المركز للإدارة'
+                : 'Center data change request sent to admin',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _submittingChangeRequest = false);
+      }
+    }
+  }
+
+  String _docStatusLabel(String status, bool isArabic) {
+    switch (status) {
+      case 'approved':
+        return isArabic ? 'مقبول' : 'Approved';
+      case 'rejected':
+        return isArabic ? 'مرفوض' : 'Rejected';
+      case 'needs_update':
+        return isArabic ? 'يحتاج تحديث' : 'Needs update';
+      case 'uploaded':
+      case 'pending':
+      default:
+        return isArabic ? 'بانتظار المراجعة' : 'Pending review';
+    }
+  }
+
+  @override
+  void dispose() {
+    _centerNameController.dispose();
+    _managerNameController.dispose();
+    _cityController.dispose();
+    _addressController.dispose();
+    _descriptionController.dispose();
+    _requestedFrontImageController.dispose();
+    _requestedReceptionImageController.dispose();
+    _requestedInside1ImageController.dispose();
+    _requestedInside2ImageController.dispose();
+    _frontImageController.dispose();
+    _receptionImageController.dispose();
+    _inside1ImageController.dispose();
+    _inside2ImageController.dispose();
+    _docFileNameController.dispose();
+    _docUrlController.dispose();
+    _docReviewNoteController.dispose();
+    for (final controller in _pricingControllers.values) {
+      controller.dispose();
+    }
+    for (final controller in _autismPricingControllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  Widget _buildPricingToggle({
+    required BuildContext context,
+    required String title,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return SwitchListTile.adaptive(
+      value: value,
+      onChanged: _submittingChangeRequest ? null : onChanged,
+      title: Text(
+        title,
+        textAlign: _isArabic(context) ? TextAlign.right : TextAlign.left,
+      ),
+      contentPadding: EdgeInsets.zero,
+    );
+  }
+
+  Widget _buildCapabilityEditor(BuildContext context) {
+    final isArabic = _isArabic(context);
+    return AppSurfaceCard(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic ? 'قدرات المركز' : 'Center capabilities',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: 8),
+          _buildPricingToggle(
+            context: context,
+            title: isArabic
+                ? 'يدعم حالات الإدمان المصاحبة لفيروس HIV'
+                : 'Supports addiction cases with HIV',
+            value: _requestedCapabilities.supportsAddictionCasesWithHiv,
+            onChanged: (value) {
+              setState(() {
+                _requestedCapabilities = _requestedCapabilities.copyWith(
+                  supportsAddictionCasesWithHiv: value,
+                );
+              });
+            },
+          ),
+          _buildPricingToggle(
+            context: context,
+            title:
+                isArabic ? 'يستقبل حالات الإدمان' : 'Accepts addiction cases',
+            value: _requestedCapabilities.acceptsAddictionCases,
+            onChanged: (value) {
+              setState(() {
+                _requestedCapabilities = _requestedCapabilities.copyWith(
+                  acceptsAddictionCases: value,
+                );
+              });
+            },
+          ),
+          _buildPricingToggle(
+            context: context,
+            title: isArabic
+                ? 'يستقبل الحالات النفسية بدون إدمان'
+                : 'Accepts psychiatric cases without addiction',
+            value:
+                _requestedCapabilities.acceptsPsychiatricCasesWithoutAddiction,
+            onChanged: (value) {
+              setState(() {
+                _requestedCapabilities = _requestedCapabilities.copyWith(
+                  acceptsPsychiatricCasesWithoutAddiction: value,
+                );
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAccommodationEditor(
+    BuildContext context,
+    AccommodationCostItem item,
+  ) {
+    final isArabic = _isArabic(context);
+    return AppSectionPanel(
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          _buildPricingToggle(
+            context: context,
+            title: isArabic ? item.labelAr : item.labelEn,
+            value: item.enabled,
+            onChanged: (value) {
+              setState(() {
+                _requestedAccommodationCosts = _requestedAccommodationCosts
+                    .map((current) => current.key == item.key
+                        ? current.copyWith(enabled: value)
+                        : current)
+                    .toList();
+              });
+            },
+          ),
+          TextField(
+            controller: _pricingControllers[item.key],
+            decoration: appInputDecoration(
+              context: context,
+              label: isArabic ? 'السعر' : 'Price',
+              icon: Icons.payments_outlined,
+            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            initialValue: item.pricingUnit.isEmpty ? null : item.pricingUnit,
+            isExpanded: true,
+            decoration: appInputDecoration(
+              context: context,
+              label: isArabic ? 'وحدة التسعير' : 'Pricing unit',
+              icon: Icons.calendar_today_outlined,
+            ),
+            items: [
+              DropdownMenuItem(
+                value: 'day',
+                child: Text(isArabic ? 'يومي' : 'Per day'),
+              ),
+              DropdownMenuItem(
+                value: 'month',
+                child: Text(isArabic ? 'شهري' : 'Per month'),
+              ),
+            ],
+            onChanged: _submittingChangeRequest
+                ? null
+                : (value) {
+                    setState(() {
+                      _requestedAccommodationCosts =
+                          _requestedAccommodationCosts
+                              .map((current) => current.key == item.key
+                                  ? current.copyWith(pricingUnit: value ?? '')
+                                  : current)
+                              .toList();
+                    });
+                  },
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            initialValue: item.acMode.isEmpty ? null : item.acMode,
+            isExpanded: true,
+            decoration: appInputDecoration(
+              context: context,
+              label: isArabic ? 'نوع التكييف' : 'AC mode',
+              icon: Icons.ac_unit_outlined,
+            ),
+            items: [
+              DropdownMenuItem(
+                value: 'ac',
+                child: Text(isArabic ? 'مكيف' : 'AC'),
+              ),
+              DropdownMenuItem(
+                value: 'non_ac',
+                child: Text(isArabic ? 'غير مكيف' : 'Non-AC'),
+              ),
+            ],
+            onChanged: _submittingChangeRequest
+                ? null
+                : (value) {
+                    setState(() {
+                      _requestedAccommodationCosts =
+                          _requestedAccommodationCosts
+                              .map((current) => current.key == item.key
+                                  ? current.copyWith(acMode: value ?? '')
+                                  : current)
+                              .toList();
+                    });
+                  },
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              FilterChip(
+                label: Text(isArabic ? 'يشمل الدواء' : 'Medication'),
+                selected: item.includesMedication,
+                onSelected: _submittingChangeRequest
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _requestedAccommodationCosts =
+                              _requestedAccommodationCosts
+                                  .map((current) => current.key == item.key
+                                      ? current.copyWith(
+                                          includesMedication: value,
+                                        )
+                                      : current)
+                                  .toList();
+                        });
+                      },
+              ),
+              FilterChip(
+                label: Text(isArabic ? 'يشمل الوجبات' : 'Meals'),
+                selected: item.includesMeals,
+                onSelected: _submittingChangeRequest
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _requestedAccommodationCosts =
+                              _requestedAccommodationCosts
+                                  .map((current) => current.key == item.key
+                                      ? current.copyWith(includesMeals: value)
+                                      : current)
+                                  .toList();
+                        });
+                      },
+              ),
+              FilterChip(
+                label: Text(isArabic ? 'أنشطة خارجية' : 'Outdoor activities'),
+                selected: item.includesOutdoorActivities,
+                onSelected: _submittingChangeRequest
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _requestedAccommodationCosts =
+                              _requestedAccommodationCosts
+                                  .map((current) => current.key == item.key
+                                      ? current.copyWith(
+                                          includesOutdoorActivities: value,
+                                        )
+                                      : current)
+                                  .toList();
+                        });
+                      },
+              ),
+              FilterChip(
+                label: Text(isArabic ? 'الفحوصات المطلوبة' : 'Required tests'),
+                selected: item.includesRequiredTests,
+                onSelected: _submittingChangeRequest
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _requestedAccommodationCosts =
+                              _requestedAccommodationCosts
+                                  .map((current) => current.key == item.key
+                                      ? current.copyWith(
+                                          includesRequiredTests: value,
+                                        )
+                                      : current)
+                                  .toList();
+                        });
+                      },
+              ),
+              FilterChip(
+                label: Text(isArabic ? 'استقبال المطار' : 'Airport pickup'),
+                selected: item.includesAirportPickup,
+                onSelected: _submittingChangeRequest
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _requestedAccommodationCosts =
+                              _requestedAccommodationCosts
+                                  .map((current) => current.key == item.key
+                                      ? current.copyWith(
+                                          includesAirportPickup: value,
+                                        )
+                                      : current)
+                                  .toList();
+                        });
+                      },
+              ),
+              FilterChip(
+                label: Text(isArabic ? 'جولات خارجية' : 'Tourism/outings'),
+                selected: item.includesTourismOrExternalOutings,
+                onSelected: _submittingChangeRequest
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _requestedAccommodationCosts =
+                              _requestedAccommodationCosts
+                                  .map((current) => current.key == item.key
+                                      ? current.copyWith(
+                                          includesTourismOrExternalOutings:
+                                              value,
+                                        )
+                                      : current)
+                                  .toList();
+                        });
+                      },
+              ),
+              FilterChip(
+                label: Text(isArabic ? 'الضريبة شاملة' : 'Tax included'),
+                selected: item.taxIncluded,
+                onSelected: _submittingChangeRequest
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _requestedAccommodationCosts =
+                              _requestedAccommodationCosts
+                                  .map((current) => current.key == item.key
+                                      ? current.copyWith(taxIncluded: value)
+                                      : current)
+                                  .toList();
+                        });
+                      },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAutismPricingEditor(
+    BuildContext context,
+    AutismCareCostItem item,
+  ) {
+    final isArabic = _isArabic(context);
+    return AppSectionPanel(
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          _buildPricingToggle(
+            context: context,
+            title: isArabic ? item.labelAr : item.labelEn,
+            value: item.enabled,
+            onChanged: (value) {
+              setState(() {
+                _requestedAutismCareCosts = _requestedAutismCareCosts
+                    .map((current) => current.key == item.key
+                        ? current.copyWith(enabled: value)
+                        : current)
+                    .toList();
+              });
+            },
+          ),
+          TextField(
+            controller: _autismPricingControllers[item.key],
+            decoration: appInputDecoration(
+              context: context,
+              label: isArabic ? 'السعر' : 'Price',
+              icon: Icons.payments_outlined,
+            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            initialValue: item.pricingUnit.isEmpty ? null : item.pricingUnit,
+            isExpanded: true,
+            decoration: appInputDecoration(
+              context: context,
+              label: isArabic ? 'وحدة التسعير' : 'Pricing unit',
+              icon: Icons.calendar_today_outlined,
+            ),
+            items: [
+              DropdownMenuItem(
+                value: 'day',
+                child: Text(isArabic ? 'يومي' : 'Per day'),
+              ),
+              DropdownMenuItem(
+                value: 'month',
+                child: Text(isArabic ? 'شهري' : 'Per month'),
+              ),
+            ],
+            onChanged: _submittingChangeRequest
+                ? null
+                : (value) {
+                    setState(() {
+                      _requestedAutismCareCosts = _requestedAutismCareCosts
+                          .map((current) => current.key == item.key
+                              ? current.copyWith(pricingUnit: value ?? '')
+                              : current)
+                          .toList();
+                    });
+                  },
+          ),
+          const SizedBox(height: 12),
+          FilterChip(
+            label: Text(isArabic ? 'الضريبة شاملة' : 'Tax included'),
+            selected: item.taxIncluded,
+            onSelected: _submittingChangeRequest
+                ? null
+                : (value) {
+                    setState(() {
+                      _requestedAutismCareCosts = _requestedAutismCareCosts
+                          .map((current) => current.key == item.key
+                              ? current.copyWith(taxIncluded: value)
+                              : current)
+                          .toList();
+                    });
+                  },
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isArabic = _isArabic(context);
+
+    return Directionality(
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+      child: Scaffold(
+        appBar: AppShellActions.buildAppBar(
+          context,
+          title: isArabic ? 'غرفة عمليات المركز' : 'Center Operations',
+        ),
+        body: AppPageBackground(
+          child: StreamBuilder<Map<String, dynamic>?>(
+            stream: _centerStream(),
+            builder: (context, snapshot) {
+              final scheme = Theme.of(context).colorScheme;
+              final data = snapshot.data ?? <String, dynamic>{};
+              final centerName =
+                  (data['centerName'] ?? data['displayName'] ?? '')
+                      .toString()
+                      .trim();
+
+              final docs = _readDocs(data);
+              final gallery = _readGallery(data);
+              _syncProfileFields(data);
+              _syncRequestedGalleryFields(gallery);
+              _syncPricingFields(data);
+              final category = (data['category'] ?? '').toString().trim();
+              final usesAutismPricing = usesAutismCarePricing(category);
+
+              if (snapshot.hasData && gallery.isNotEmpty) {
+                _prefillGallery(gallery);
+              }
+
+              return ListView(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                children: [
+                  AppSurfaceCard(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: isArabic
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          centerName.isEmpty
+                              ? (isArabic
+                                  ? 'غرفة عمليات المركز'
+                                  : 'Center Operations')
+                              : centerName,
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          isArabic
+                              ? 'الوضع الحالي بدون Firebase Storage. الصور والوثائق تُسجل مؤقتًا كبيانات وروابط داخل Firestore لحين تفعيل التخزين.'
+                              : 'Temporary mode without Firebase Storage. Images and documents are stored as metadata/links in Firestore until storage is enabled.',
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppSurfaceCard(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: isArabic
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isArabic
+                              ? 'طلب تعديل بيانات المركز'
+                              : 'Center data change request',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                          textAlign:
+                              isArabic ? TextAlign.right : TextAlign.left,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          isArabic
+                              ? 'عدّل البيانات هنا ثم أرسلها للإدارة. سيشمل الطلب أيضًا أحدث الصور والوثائق المرفوعة.'
+                              : 'Update the fields here, then send them to admin. The request also includes the latest uploaded images and documents.',
+                          textAlign:
+                              isArabic ? TextAlign.right : TextAlign.left,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        TextField(
+                          controller: _centerNameController,
+                          textAlign:
+                              isArabic ? TextAlign.right : TextAlign.left,
+                          decoration: appInputDecoration(
+                            context: context,
+                            label: isArabic ? 'اسم المركز' : 'Center name',
+                            icon: Icons.business_outlined,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _managerNameController,
+                          textAlign:
+                              isArabic ? TextAlign.right : TextAlign.left,
+                          decoration: appInputDecoration(
+                            context: context,
+                            label: isArabic ? 'اسم المسؤول' : 'Manager name',
+                            icon: Icons.badge_outlined,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _cityController,
+                          textAlign:
+                              isArabic ? TextAlign.right : TextAlign.left,
+                          decoration: appInputDecoration(
+                            context: context,
+                            label: isArabic ? 'المدينة' : 'City',
+                            icon: Icons.location_city_outlined,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _addressController,
+                          textAlign:
+                              isArabic ? TextAlign.right : TextAlign.left,
+                          decoration: appInputDecoration(
+                            context: context,
+                            label: isArabic ? 'العنوان' : 'Address',
+                            icon: Icons.location_on_outlined,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _descriptionController,
+                          maxLines: 4,
+                          textAlign:
+                              isArabic ? TextAlign.right : TextAlign.left,
+                          decoration: appInputDecoration(
+                            context: context,
+                            label:
+                                isArabic ? 'وصف المركز' : 'Center description',
+                            icon: Icons.notes_outlined,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          isArabic
+                              ? 'تكلفة الإقامة وقدرات المركز'
+                              : 'Cost of stay and center capabilities',
+                          textAlign:
+                              isArabic ? TextAlign.right : TextAlign.left,
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          usesAutismPricing
+                              ? (isArabic
+                                  ? 'يعتمد هذا النوع على الاستضافة اليومية والزيارات المنزلية بدل فئات الغرف.'
+                                  : 'This center type uses daily hosting and home visits instead of room categories.')
+                              : (isArabic
+                                  ? 'فعّل فقط الفئات المتاحة للمركز، وسيتم إرسالها ضمن طلب تعديل البيانات للإدارة.'
+                                  : 'Enable only the categories currently available at the center. They will be sent to admin in the profile update request.'),
+                          textAlign:
+                              isArabic ? TextAlign.right : TextAlign.left,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildCapabilityEditor(context),
+                        const SizedBox(height: 12),
+                        ...(usesAutismPricing
+                            ? _requestedAutismCareCosts
+                                .map(
+                                  (item) => Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: _buildAutismPricingEditor(
+                                        context, item),
+                                  ),
+                                )
+                                .toList()
+                            : _requestedAccommodationCosts
+                                .map(
+                                  (item) => Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: _buildAccommodationEditor(
+                                        context, item),
+                                  ),
+                                )
+                                .toList()),
+                        const SizedBox(height: 16),
+                        AppSectionPanel(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          color: scheme.primary.withValues(alpha: 0.06),
+                          borderColor: scheme.outline.withValues(alpha: 0.12),
+                          child: Column(
+                            crossAxisAlignment: isArabic
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isArabic
+                                    ? 'طلب استبدال صور المركز'
+                                    : 'Center image replacement request',
+                                textAlign:
+                                    isArabic ? TextAlign.right : TextAlign.left,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleSmall
+                                    ?.copyWith(fontWeight: FontWeight.w800),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                isArabic
+                                    ? 'أدخل روابط الصور البديلة التي تريد من الإدارة اعتمادها ضمن طلب التعديل.'
+                                    : 'Enter the replacement image URLs you want admin to review as part of this request.',
+                                textAlign:
+                                    isArabic ? TextAlign.right : TextAlign.left,
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _requestedFrontImageController,
+                                textAlign:
+                                    isArabic ? TextAlign.right : TextAlign.left,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: isArabic
+                                      ? 'رابط صورة واجهة بديلة'
+                                      : 'Replacement front image URL',
+                                  icon: Icons.storefront_outlined,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _requestedReceptionImageController,
+                                textAlign:
+                                    isArabic ? TextAlign.right : TextAlign.left,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: isArabic
+                                      ? 'رابط صورة استقبال بديلة'
+                                      : 'Replacement reception image URL',
+                                  icon: Icons.meeting_room_outlined,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _requestedInside1ImageController,
+                                textAlign:
+                                    isArabic ? TextAlign.right : TextAlign.left,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: isArabic
+                                      ? 'رابط صورة داخلية بديلة 1'
+                                      : 'Replacement inside image 1 URL',
+                                  icon: Icons.photo_outlined,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _requestedInside2ImageController,
+                                textAlign:
+                                    isArabic ? TextAlign.right : TextAlign.left,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: isArabic
+                                      ? 'رابط صورة داخلية بديلة 2'
+                                      : 'Replacement inside image 2 URL',
+                                  icon: Icons.photo_library_outlined,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: FilledButton.icon(
+                            onPressed: _submittingChangeRequest
+                                ? null
+                                : () => _submitCenterChangeRequest(
+                                      currentData: data,
+                                      currentDocs: docs,
+                                    ),
+                            icon: _submittingChangeRequest
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.send_outlined),
+                            label: Text(
+                              _submittingChangeRequest
+                                  ? (isArabic
+                                      ? 'جارٍ الإرسال...'
+                                      : 'Sending...')
+                                  : (isArabic
+                                      ? 'إرسال طلب تعديل البيانات'
+                                      : 'Send data change request'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  AppSurfaceCard(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: isArabic
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isArabic
+                              ? 'صور المركز الأساسية'
+                              : 'Main Center Images',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          isArabic
+                              ? 'أدخل روابط الصور الأربع الأساسية مؤقتًا. لاحقًا سنحوّلها لرفع مباشر.'
+                              : 'Enter the 4 main image URLs temporarily. Later we will switch them to direct uploads.',
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        TextField(
+                          controller: _frontImageController,
+                          decoration: appInputDecoration(
+                            context: context,
+                            label: isArabic
+                                ? 'رابط صورة الواجهة'
+                                : 'Front image URL',
+                            icon: Icons.storefront_outlined,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _receptionImageController,
+                          decoration: InputDecoration(
+                            labelText: isArabic
+                                ? 'رابط صورة الاستقبال'
+                                : 'Reception image URL',
+                            border: const OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _inside1ImageController,
+                          decoration: InputDecoration(
+                            labelText: isArabic
+                                ? 'رابط الصورة الداخلية 1'
+                                : 'Inside image 1 URL',
+                            border: const OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _inside2ImageController,
+                          decoration: InputDecoration(
+                            labelText: isArabic
+                                ? 'رابط الصورة الداخلية 2'
+                                : 'Inside image 2 URL',
+                            border: const OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: FilledButton.icon(
+                            onPressed: _savingImages ? null : _saveImages,
+                            icon: _savingImages
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.photo_library_outlined),
+                            label: Text(
+                              _savingImages
+                                  ? (isArabic ? 'جارٍ الحفظ...' : 'Saving...')
+                                  : (isArabic
+                                      ? 'حفظ الصور الأربع'
+                                      : 'Save 4 images'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: scheme.surface,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: scheme.outline.withValues(alpha: 0.12),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: isArabic
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isArabic
+                              ? 'رفع الوثائق المنظمة'
+                              : 'Structured Documents',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          isArabic
+                              ? 'أدخل بيانات الوثيقة يدويًا مؤقتًا: النوع، اسم الملف، والرابط إن وجد.'
+                              : 'Temporarily enter document metadata manually: type, file name, and URL if available.',
+                        ),
+                        const SizedBox(height: 14),
+                        DropdownButtonFormField<String>(
+                          initialValue: _selectedDocType,
+                          isExpanded: true,
+                          items: kRequiredCenterDocumentTypes
+                              .map(
+                                (item) => DropdownMenuItem<String>(
+                                  value: item['key'],
+                                  child: Text(
+                                    centerDocumentLabel(
+                                      item['key'] ?? '',
+                                      isArabic,
+                                    ),
+                                    textAlign: isArabic
+                                        ? TextAlign.right
+                                        : TextAlign.left,
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: _savingDocument
+                              ? null
+                              : (value) {
+                                  setState(() => _selectedDocType = value);
+                                },
+                          decoration: InputDecoration(
+                            labelText:
+                                isArabic ? 'نوع الوثيقة *' : 'Document type *',
+                            border: const OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _docFileNameController,
+                          decoration: InputDecoration(
+                            labelText: isArabic ? 'اسم الملف' : 'File name',
+                            border: const OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _docUrlController,
+                          decoration: InputDecoration(
+                            labelText: isArabic
+                                ? 'رابط الملف (اختياري)'
+                                : 'File URL (optional)',
+                            border: const OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        AppSectionPanel(
+                          color:
+                              AppColors.accentLavender.withValues(alpha: 0.08),
+                          borderColor:
+                              AppColors.accentLavender.withValues(alpha: 0.12),
+                          child: Text(
+                            isArabic
+                                ? 'تُرسل كل وثيقة جديدة بحالة "بانتظار المراجعة"، وتقوم الإدارة فقط بتحديث حالة المراجعة لاحقًا.'
+                                : 'Each new document is sent as "Pending review", and only admin updates the review status later.',
+                            textAlign:
+                                isArabic ? TextAlign.right : TextAlign.left,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _docReviewNoteController,
+                          maxLines: 3,
+                          decoration: InputDecoration(
+                            labelText:
+                                isArabic ? 'ملاحظة إضافية' : 'Additional note',
+                            border: const OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: FilledButton.icon(
+                            onPressed: _savingDocument
+                                ? null
+                                : () => _addDocument(docs),
+                            icon: _savingDocument
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.upload_file_outlined),
+                            label: Text(
+                              _savingDocument
+                                  ? (isArabic ? 'جارٍ الإضافة...' : 'Adding...')
+                                  : (isArabic ? 'إضافة وثيقة' : 'Add document'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  if (docs.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: scheme.surface,
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: scheme.outline.withValues(alpha: 0.12),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: isArabic
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isArabic ? 'الوثائق الحالية' : 'Current Documents',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                          ),
+                          const SizedBox(height: 12),
+                          ...docs.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final doc = entry.value;
+
+                            final type = (doc['documentType'] ?? '').toString();
+                            final fileName = (doc['originalFileName'] ??
+                                    doc['fileName'] ??
+                                    '')
+                                .toString();
+                            final status =
+                                (doc['status'] ?? 'pending').toString();
+                            final reviewNote =
+                                (doc['reviewNote'] ?? '').toString().trim();
+
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 10),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: scheme.primary.withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: isArabic
+                                    ? CrossAxisAlignment.end
+                                    : CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    type.isEmpty
+                                        ? (isArabic ? 'وثيقة' : 'Document')
+                                        : type,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                  if (fileName.isNotEmpty) ...[
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      isArabic
+                                          ? 'الملف: $fileName'
+                                          : 'File: $fileName',
+                                    ),
+                                  ],
+                                  const SizedBox(height: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF6C55B3)
+                                          .withValues(alpha: 0.10),
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                    child: Text(
+                                      _docStatusLabel(status, isArabic),
+                                      style: const TextStyle(
+                                        color: Color(0xFF6C55B3),
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                  if (reviewNote.isNotEmpty) ...[
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      isArabic
+                                          ? 'الملاحظة: $reviewNote'
+                                          : 'Note: $reviewNote',
+                                    ),
+                                  ],
+                                  const SizedBox(height: 8),
+                                  Align(
+                                    alignment: isArabic
+                                        ? Alignment.centerLeft
+                                        : Alignment.centerRight,
+                                    child: OutlinedButton.icon(
+                                      onPressed: _savingDocument
+                                          ? null
+                                          : () => _removeDocument(
+                                                index: index,
+                                                currentDocs: docs,
+                                              ),
+                                      icon: const Icon(Icons.delete_outline),
+                                      label: Text(isArabic ? 'حذف' : 'Delete'),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
+                    ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 52,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _logout(context),
+                      icon: const Icon(Icons.logout),
+                      label: Text(isArabic ? 'تسجيل الخروج' : 'Logout'),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}

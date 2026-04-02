@@ -1,0 +1,13 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - _savepoints/**
+    - _savepoints_off/**
+    - _backup/**
+    - _handoff_latest/**
+    - build/**
+    - .dart_tool/**
+    - ios/**
+    - android/**
+    - web/**

@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // MIN_SAFE (Web without auth): public read for resources only
+    match /resources/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Debug only (temporary, remove later)
+    match /debug/{docId} {
+      allow read, write: if true;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

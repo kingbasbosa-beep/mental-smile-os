@@ -1,0 +1,34 @@
+{
+  "@@locale": "ar",
+  "appTitle": "مينتال كي",
+  "@appTitle": {
+    "description": "عنوان التطبيق"
+  },
+  "homeTitle": "الرئيسية",
+  "changeLanguage": "تغيير اللغة",
+  "localeLabel": "اللغة: {code} (اضغط أو 🌐)",
+  "@localeLabel": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "splashTitle": "شاشة البداية",
+  "routeNotFound": "المسار غير موجود",
+  "moduleSpecialists": "المختصون",
+  "moduleLearningLibrary": "مكتبة المعرفة",
+  "moduleAddictionSupport": "دعم الإدمان",
+  "moduleCenters": "المراكز",
+  "moduleSpecialNeedsFamilies": "أسر ذوي الاحتياجات الخاصة",
+  "moduleFamilyStress": "ضغط الأسرة",
+  "comingSoon": "{title} — قريبًا",
+  "@comingSoon": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "modulePlaceholderBody": "المحتوى قريبًا."
+}

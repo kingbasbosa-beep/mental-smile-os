@@ -1,0 +1,34 @@
+{
+  "@@locale": "en",
+  "appTitle": "Mental Key",
+  "@appTitle": {
+    "description": "Application title"
+  },
+  "homeTitle": "Home",
+  "changeLanguage": "Change language",
+  "localeLabel": "Locale: {code} (tap or 🌐)",
+  "@localeLabel": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "splashTitle": "Splash",
+  "routeNotFound": "Route not found",
+  "moduleSpecialists": "Specialists",
+  "moduleLearningLibrary": "Learning Library",
+  "moduleAddictionSupport": "Addiction Support",
+  "moduleCenters": "Centers",
+  "moduleSpecialNeedsFamilies": "Special Needs Families",
+  "moduleFamilyStress": "Family Stress",
+  "comingSoon": "{title} — Coming soon",
+  "@comingSoon": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "modulePlaceholderBody": "Content coming soon."
+}

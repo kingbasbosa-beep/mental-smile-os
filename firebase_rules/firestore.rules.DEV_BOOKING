@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+
+    // ---- DEV: Booking MVP (temporary) ----
+    match /booking_requests/{docId} {
+      // allow anonymous users to create/read their stuff
+      // allow clinicians to approve/reject (DEV: open update)
+      allow create, read, update: if signedIn();
+      allow delete: if false;
+    }
+
+    // keep existing dev behavior for resources
+    match /resources/{docId} {
+      allow read: if true;
+      allow write: if true; // DEV only
+    }
+
+    // keep debug open in dev if you want (optional)
+    match /debug/{docId} {
+      allow read, write: if true; // DEV only
+    }
+
+    // fallback
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

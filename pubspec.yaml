@@ -1,0 +1,52 @@
+name: flutterprojects
+description: Mental Smile / Mental Key V2
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^2.6.1
+
+  firebase_core: ^3.15.2
+  cloud_firestore: ^5.6.12
+  firebase_auth: ^5.7.0
+
+  shared_preferences: ^2.3.2
+  url_launcher: ^6.3.1
+  uuid: ^4.5.1
+  geolocator: ^14.0.2
+  geocoding: ^4.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  generate: true
+  uses-material-design: true
+
+  assets:
+    - assets/c5/
+    - assets/c5/avatars/avatar_admin_support.png
+    - assets/c6_library/
+    - assets/c6_library/brand/logo_wordmark.png
+    - assets/c7_branding/buttons/
+    - assets/c7_branding/home/
+    - assets/c7_branding/logo/
+    - assets/c7_branding/splash/
+    - assets/animations/
+    - assets/icons/
+    - assets/images/
+
+

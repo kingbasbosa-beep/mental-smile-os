@@ -1,0 +1,118 @@
+{
+  "avatar_admin_support.png": {
+    "w": 250,
+    "h": 365
+  },
+  "avatar_client.png": {
+    "w": 250,
+    "h": 370
+  },
+  "avatar_clinician_f.png": {
+    "w": 250,
+    "h": 370
+  },
+  "avatar_clinician_m.png": {
+    "w": 250,
+    "h": 370
+  },
+  "badge_new.png": {
+    "w": 500,
+    "h": 140
+  },
+  "badge_verified.png": {
+    "w": 500,
+    "h": 140
+  },
+  "dot_approved.png": {
+    "w": 120,
+    "h": 120
+  },
+  "dot_online.png": {
+    "w": 120,
+    "h": 112
+  },
+  "dot_pending.png": {
+    "w": 106,
+    "h": 120
+  },
+  "dot_rejected.png": {
+    "w": 120,
+    "h": 120
+  },
+  "gradient_bar_bottom.png": {
+    "w": 728,
+    "h": 135
+  },
+  "gradient_bar_top.png": {
+    "w": 695,
+    "h": 130
+  },
+  "icon_approved.png": {
+    "w": 314,
+    "h": 335
+  },
+  "icon_booking.png": {
+    "w": 313,
+    "h": 335
+  },
+  "icon_inbox.png": {
+    "w": 314,
+    "h": 335
+  },
+  "icon_my_requests.png": {
+    "w": 313,
+    "h": 335
+  },
+  "icon_pending.png": {
+    "w": 313,
+    "h": 335
+  },
+  "icon_rejected.png": {
+    "w": 299,
+    "h": 335
+  },
+  "palette_strip.png": {
+    "w": 920,
+    "h": 390
+  },
+  "primary_button.png": {
+    "w": 810,
+    "h": 125
+  },
+  "secondary_button.png": {
+    "w": 810,
+    "h": 125
+  },
+  "sheet_full.png": {
+    "w": 2048,
+    "h": 1365
+  },
+  "swatch_1.png": {
+    "w": 153,
+    "h": 390
+  },
+  "swatch_2.png": {
+    "w": 154,
+    "h": 390
+  },
+  "swatch_3.png": {
+    "w": 153,
+    "h": 390
+  },
+  "swatch_4.png": {
+    "w": 153,
+    "h": 390
+  },
+  "swatch_5.png": {
+    "w": 154,
+    "h": 390
+  },
+  "swatch_6.png": {
+    "w": 153,
+    "h": 390
+  },
+  "wing_divider.png": {
+    "w": 728,
+    "h": 205
+  }
+}

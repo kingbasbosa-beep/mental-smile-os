@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+
+    // PROD (after Auth): example scaffold
+    match /resources/{docId} {
+      allow read: if true;
+      allow write: if signedIn(); // tighten later (admin/claims)
+    }
+
+    match /users/{uid}/{document=**} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+
+    match /debug/{docId} {
+      allow read, write: if false; // disable debug in prod
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

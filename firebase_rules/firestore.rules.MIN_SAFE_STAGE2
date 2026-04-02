@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isClinician() {
+      return request.auth != null && request.auth.token.role == "clinician";
+    }
+
+
+    function signedIn() { return request.auth != null; }
+    function uid() { return request.auth.uid; }
+
+    function isClinicianAllowed() {
+      // FINAL policy:
+      // clinicianId in document must equal auth.uid AND token role must be clinician
+      return isClinician() && resource.data.clinicianId == request.auth.uid;
+}
+
+    function isOwner(doc) {
+      return signedIn() && doc.data.clientId == uid();
+    }
+
+    function validCreateBooking() {
+      return signedIn()
+        && request.resource.data.clientId == uid()
+        && request.resource.data.clinicianId is string
+        && request.resource.data.clinicianId.size() > 0
+        && request.resource.data.status == 'pending'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time
+        && (!('isDeleted' in request.resource.data) || request.resource.data.isDeleted == false);
+    }
+
+    function validOwnerUpdate(existing) {
+      let before = existing.data;
+      let after = request.resource.data;
+
+      // allow soft delete by owner (no hard delete)
+      let softDeleteOk =
+        after.isDeleted == true
+        && after.deletedAt == request.time
+        && after.updatedAt == request.time
+        && after.clientId == before.clientId
+        && after.clinicianId == before.clinicianId
+        && after.createdAt == before.createdAt;
+
+      let normalUpdateOk =
+        after.clientId == before.clientId
+        && after.clinicianId == before.clinicianId
+        && after.createdAt == before.createdAt
+        && after.updatedAt == request.time
+        && before.status == 'pending'
+        && after.status in ['pending','cancelled'];
+
+      return softDeleteOk || normalUpdateOk;
+    }
+
+    function validClinicianUpdate(existing) {
+      let before = existing.data;
+      let after = request.resource.data;
+
+      return before.status == 'pending'
+        && after.status in ['approved', 'rejected']
+        && after.clientId == before.clientId
+        && after.clinicianId == before.clinicianId
+        && after.createdAt == before.createdAt
+        && after.updatedAt == request.time;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    match /resources/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /debug/{docId} {
+      allow read, write: if signedIn() && docId == uid();
+    }
+
+    match /booking_requests/{docId} {
+      allow get, list: if isOwner(resource) || isClinicianAllowed();
+      allow create: if validCreateBooking();
+      allow update: if (isOwner(resource) && validOwnerUpdate(resource))
+                 || (isClinicianAllowed() && validClinicianUpdate(resource));
+      allow delete: if false;
+    }
+  }
+}
+
+
+
+

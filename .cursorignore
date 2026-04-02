@@ -1,0 +1,13 @@
+_archive/
+_backups/
+_dev_scripts_archive/
+_handoff_*/
+handoff_latest/
+READY_TO_USB/
+logs/
+_web_profiles/
+_chrome_profiles/
+.mk_chrome_profiles/
+build/
+.dart_tool/
+*.zip
