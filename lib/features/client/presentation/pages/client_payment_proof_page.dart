@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/core/ui/app_shell_actions.dart';
+import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class ClientPaymentProofPage extends StatefulWidget {
   const ClientPaymentProofPage({super.key});
@@ -501,3 +501,4 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
     );
   }
 }
+

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/ui/app_shell_actions.dart';
+import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/center_booking_request_page.dart';
 
 class MyBookingsPage extends StatefulWidget {
@@ -922,3 +922,4 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     );
   }
 }
+

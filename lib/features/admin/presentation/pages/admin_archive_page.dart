@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/ui/app_design_system.dart';
-import 'package:flutterprojects/core/ui/app_shell_actions.dart';
+import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class AdminArchivePage extends StatefulWidget {
   const AdminArchivePage({super.key});
@@ -468,3 +468,4 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
     );
   }
 }
+

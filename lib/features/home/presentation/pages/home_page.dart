@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/ui/app_design_system.dart';
+import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -229,3 +229,4 @@ class HomePage extends StatelessWidget {
     );
   }
 }
+

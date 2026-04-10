@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/ui/app_design_system.dart';
+import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/centers/data/services/centers_firestore_service.dart';
 
@@ -489,3 +489,4 @@ class _InfoChip extends StatelessWidget {
     );
   }
 }
+

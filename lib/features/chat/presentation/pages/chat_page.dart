@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
-import 'package:flutterprojects/core/ui/app_design_system.dart';
+import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/features/chat/controller/chat_controller.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_message_model.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
@@ -591,3 +591,4 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 }
+

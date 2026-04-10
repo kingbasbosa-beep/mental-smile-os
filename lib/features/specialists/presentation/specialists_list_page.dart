@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/ui/app_shell_actions.dart';
+import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class SpecialistsListPage extends StatelessWidget {
   const SpecialistsListPage({
@@ -424,3 +424,4 @@ class _MiniInfoBox extends StatelessWidget {
     );
   }
 }
+

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/ui/app_shell_actions.dart';
+import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class SupportEntryPage extends StatelessWidget {
   const SupportEntryPage.addiction({super.key})
@@ -516,3 +516,4 @@ class _HeroActionButton extends StatelessWidget {
     );
   }
 }
+
