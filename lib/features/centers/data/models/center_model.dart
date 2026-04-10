@@ -32,6 +32,7 @@ class CenterModel {
   final String id;
   final String name;
   final String category;
+  final String centerType;
   final String categoryLabelAr;
   final String categoryLabelEn;
   final String city;
@@ -40,6 +41,7 @@ class CenterModel {
   final String phone;
   final String whatsapp;
   final String address;
+  final bool hasDetoxUnit;
   final List<String> services;
   final bool isActive;
   final int sortOrder;
@@ -59,6 +61,7 @@ class CenterModel {
     required this.id,
     required this.name,
     required this.category,
+    required this.centerType,
     required this.categoryLabelAr,
     required this.categoryLabelEn,
     required this.city,
@@ -67,6 +70,7 @@ class CenterModel {
     required this.phone,
     required this.whatsapp,
     required this.address,
+    required this.hasDetoxUnit,
     required this.services,
     required this.isActive,
     required this.sortOrder,
@@ -100,6 +104,23 @@ class CenterModel {
       if (value is Timestamp) return value.toDate();
       if (value is DateTime) return value;
       return null;
+    }
+
+    String inferCenterType() {
+      final direct = (data['centerType'] ?? '').toString().trim();
+      if (direct.isNotEmpty) return direct;
+      switch ((data['category'] ?? '').toString().trim()) {
+        case 'detox':
+          return 'detox';
+        case 'hospital':
+        case 'hospitals':
+          return 'hospital';
+        case 'special_needs':
+          return 'special_needs_care';
+        case 'recovery':
+        default:
+          return 'halfway_house';
+      }
     }
 
     List<String> asStringList(dynamic value) {
@@ -187,6 +208,7 @@ class CenterModel {
         data['displayName'],
       ]),
       category: (data['category'] ?? '').toString(),
+      centerType: inferCenterType(),
       categoryLabelAr: (data['categoryLabelAr'] ?? '').toString(),
       categoryLabelEn: (data['categoryLabelEn'] ?? '').toString(),
       city: firstNonEmpty([data['city']]),
@@ -200,6 +222,8 @@ class CenterModel {
       phone: firstNonEmpty([data['phone'], data['contactPhone']]),
       whatsapp: firstNonEmpty([data['whatsapp'], data['whatsappNumber']]),
       address: firstNonEmpty([data['address']]),
+      hasDetoxUnit: ((data['hasDetoxUnit'] ?? false) == true) ||
+          inferCenterType() == 'detox',
       services: asStringList(data['services']),
       isActive: (data['isActive'] ?? true) == true,
       sortOrder: asInt(data['sortOrder'], fallback: 0),
@@ -226,6 +250,7 @@ class CenterModel {
     return {
       'name': name,
       'category': category,
+      'centerType': centerType,
       'categoryLabelAr': categoryLabelAr,
       'categoryLabelEn': categoryLabelEn,
       'city': city,
@@ -234,6 +259,7 @@ class CenterModel {
       'phone': phone,
       'whatsapp': whatsapp,
       'address': address,
+      'hasDetoxUnit': hasDetoxUnit,
       'services': services,
       'isActive': isActive,
       'sortOrder': sortOrder,
@@ -259,6 +285,7 @@ class CenterModel {
     String? id,
     String? name,
     String? category,
+    String? centerType,
     String? categoryLabelAr,
     String? categoryLabelEn,
     String? city,
@@ -267,6 +294,7 @@ class CenterModel {
     String? phone,
     String? whatsapp,
     String? address,
+    bool? hasDetoxUnit,
     List<String>? services,
     bool? isActive,
     int? sortOrder,
@@ -286,6 +314,7 @@ class CenterModel {
       id: id ?? this.id,
       name: name ?? this.name,
       category: category ?? this.category,
+      centerType: centerType ?? this.centerType,
       categoryLabelAr: categoryLabelAr ?? this.categoryLabelAr,
       categoryLabelEn: categoryLabelEn ?? this.categoryLabelEn,
       city: city ?? this.city,
@@ -294,6 +323,7 @@ class CenterModel {
       phone: phone ?? this.phone,
       whatsapp: whatsapp ?? this.whatsapp,
       address: address ?? this.address,
+      hasDetoxUnit: hasDetoxUnit ?? this.hasDetoxUnit,
       services: services ?? this.services,
       isActive: isActive ?? this.isActive,
       sortOrder: sortOrder ?? this.sortOrder,

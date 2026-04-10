@@ -2,12 +2,35 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   exclude:
-    - _savepoints/**
-    - _savepoints_off/**
-    - _backup/**
-    - _handoff_latest/**
-    - build/**
     - .dart_tool/**
-    - ios/**
-    - android/**
-    - web/**
+    - build/**
+    - coverage/**
+    - .idea/**
+    - .vscode/**
+    - .chrome_profile_mk/**
+    - _snapshot_center_flow_*/**
+    - _tools/**
+    - _archive/**
+    - _backups/**
+    - _dev_scripts_archive/**
+    - handoff_latest/**
+    - READY_TO_USB/**
+    - logs/**
+    - _logs/**
+    - _support/**
+    - _run/**
+    - _web_profiles/**
+    - _chrome_profiles/**
+    - .mk_chrome_profiles/**
+    - windows/flutter/ephemeral/**
+    - android/.gradle/**
+    - ios/Pods/**
+    - linux/flutter/ephemeral/**
+    - macos/Flutter/ephemeral/**
+  errors:
+    todo: ignore
+
+linter:
+  rules:
+    avoid_print: false
+    prefer_single_quotes: true

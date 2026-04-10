@@ -1072,6 +1072,8 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
     List<Map<String, dynamic>> ratings,
   ) {
     final isArabic = _isArabic(context);
+    final isCenterRequest =
+        (data['requestKind'] ?? '').toString().trim() == 'center';
     final lines = <String>[
       isArabic ? 'التقرير الإداري الموحد' : 'Unified Admin Report',
       '----------------------------------------',
@@ -1084,7 +1086,7 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
           .toString()
           .trim()
           .isNotEmpty)
-        '${isArabic ? 'الأخصائي' : 'Clinician'}: ${(data['assignedClinicianName'] ?? data['clinicianName'] ?? '').toString()}',
+        '${isArabic ? (isCenterRequest ? 'المركز' : 'الأخصائي') : (isCenterRequest ? 'Center' : 'Clinician')}: ${((isCenterRequest ? (data['centerName'] ?? '') : (data['assignedClinicianName'] ?? data['clinicianName'])) ?? '').toString()}',
       '${isArabic ? 'القسم' : 'Section'}: ${_sectionLabel((data['archiveSection'] ?? '').toString(), isArabic)}',
       '${isArabic ? 'الحالة' : 'Status'}: ${_statusLabel((data['status'] ?? '').toString(), isArabic)}',
       if ((data['paymentReceiptFileName'] ?? '').toString().trim().isNotEmpty)
@@ -1092,11 +1094,11 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
       if ((data['paymentClientNote'] ?? '').toString().trim().isNotEmpty)
         '${isArabic ? 'ملاحظة الدفع' : 'Payment note'}: ${(data['paymentClientNote'] ?? '').toString()}',
       if ((data['sessionDateText'] ?? '').toString().trim().isNotEmpty)
-        '${isArabic ? 'موعد الجلسة' : 'Session date'}: ${(data['sessionDateText'] ?? '').toString()}',
+        '${isArabic ? (isCenterRequest ? 'موعد بداية الإقامة' : 'موعد الجلسة') : (isCenterRequest ? 'Residency start' : 'Session date')}: ${(data['sessionDateText'] ?? '').toString()}',
       if ((data['sessionCode'] ?? '').toString().trim().isNotEmpty)
-        '${isArabic ? 'كود الجلسة' : 'Session code'}: ${(data['sessionCode'] ?? '').toString()}',
+        '${isArabic ? (isCenterRequest ? 'كود الإقامة' : 'كود الجلسة') : (isCenterRequest ? 'Residency code' : 'Session code')}: ${(data['sessionCode'] ?? '').toString()}',
       if ((data['sessionLink'] ?? '').toString().trim().isNotEmpty)
-        '${isArabic ? 'رابط الجلسة' : 'Session link'}: ${(data['sessionLink'] ?? '').toString()}',
+        '${isArabic ? (isCenterRequest ? 'رابط المتابعة' : 'رابط الجلسة') : (isCenterRequest ? 'Follow-up link' : 'Session link')}: ${(data['sessionLink'] ?? '').toString()}',
       if (_dateText(data['archivedAt']).isNotEmpty)
         '${isArabic ? 'تاريخ الأرشفة' : 'Archived at'}: ${_dateText(data['archivedAt'])}',
       if (ratings.isNotEmpty) '',
@@ -1107,7 +1109,12 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
         final percentage = ((rating['percentageScore'] ?? 0) as num)
             .toDouble()
             .toStringAsFixed(1);
-        return '${reviewerType == 'clinician' ? (isArabic ? 'تقييم الأخصائي' : 'Clinician review') : (isArabic ? 'تقييم العميل' : 'Client review')}: $percentage%';
+        final label = reviewerType == 'clinician'
+            ? (isArabic ? 'تقييم الأخصائي' : 'Clinician review')
+            : reviewerType == 'center'
+                ? (isArabic ? 'تقرير خروج المركز' : 'Center discharge report')
+                : (isArabic ? 'تقييم العميل' : 'Client review');
+        return '$label: $percentage%';
       }),
     ];
 
@@ -1117,10 +1124,16 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
   List<String> _financialPrintLines(
       BuildContext context, Map<String, dynamic> data) {
     final isArabic = _isArabic(context);
+    final isCenterRequest =
+        (data['requestKind'] ?? '').toString().trim() == 'center';
     final id = (data['_id'] ?? '').toString();
     final clientId = (data['clientId'] ?? '').toString();
     final clinicianId =
-        (data['assignedClinicianId'] ?? data['clinicianId'] ?? '').toString();
+        ((isCenterRequest
+                    ? (data['centerId'] ?? '')
+                    : (data['assignedClinicianId'] ?? data['clinicianId'])) ??
+                '')
+            .toString();
 
     return [
       isArabic ? 'تقرير مالي مختصر' : 'Accounting Summary',
@@ -1129,7 +1142,7 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
       if (clientId.trim().isNotEmpty)
         '${isArabic ? 'معرف العميل' : 'Client ID'}: $clientId',
       if (clinicianId.trim().isNotEmpty)
-        '${isArabic ? 'معرف الأخصائي' : 'Clinician ID'}: $clinicianId',
+        '${isArabic ? (isCenterRequest ? 'معرف المركز' : 'معرف الأخصائي') : (isCenterRequest ? 'Center ID' : 'Clinician ID')}: $clinicianId',
       '${isArabic ? 'حالة السداد' : 'Payment status'}: ${(data['paymentStatus'] ?? '').toString()}',
       '${isArabic ? 'حالة التحويل' : 'Payout status'}: ${(data['payoutStatus'] ?? '').toString()}',
       if ((data['paymentReceiptFileName'] ?? '').toString().trim().isNotEmpty)
@@ -1178,8 +1191,13 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
     final isArabic = _isArabic(context);
     final id = (item['_id'] ?? '').toString();
     final clientName = (item['clientName'] ?? '').toString().trim();
+    final isCenterRequest =
+        (item['requestKind'] ?? '').toString().trim() == 'center';
     final clinicianName =
-        (item['assignedClinicianName'] ?? item['clinicianName'] ?? '')
+        ((isCenterRequest
+                    ? (item['centerName'] ?? '')
+                    : (item['assignedClinicianName'] ?? item['clinicianName'])) ??
+                '')
             .toString()
             .trim();
     final archiveSection = (item['archiveSection'] ?? '').toString().trim();
@@ -1207,8 +1225,8 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
               [
                 if (clinicianName.isNotEmpty)
                   (isArabic
-                      ? 'الأخصائي: $clinicianName'
-                      : 'Clinician: $clinicianName'),
+                      ? '${isCenterRequest ? 'المركز' : 'الأخصائي'}: $clinicianName'
+                      : '${isCenterRequest ? 'Center' : 'Clinician'}: $clinicianName'),
                 if (archiveSection.isNotEmpty)
                   (isArabic
                       ? 'القسم: ${_sectionLabel(archiveSection, isArabic)}'
@@ -1255,7 +1273,9 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
                 ),
                 _infoRow(
                   context,
-                  isArabic ? 'الأخصائي' : 'Clinician',
+                  isCenterRequest
+                      ? (isArabic ? 'المركز' : 'Center')
+                      : (isArabic ? 'الأخصائي' : 'Clinician'),
                   clinicianName,
                 ),
               ],
@@ -1324,26 +1344,38 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
             ),
             _sectionCard(
               context,
-              title: isArabic ? 'بيانات الجلسة' : 'Session data',
+              title: isCenterRequest
+                  ? (isArabic ? 'بيانات الإقامة' : 'Residency data')
+                  : (isArabic ? 'بيانات الجلسة' : 'Session data'),
               children: [
                 _infoRow(
                   context,
-                  isArabic ? 'موعد الجلسة' : 'Session date',
+                  isCenterRequest
+                      ? (isArabic ? 'موعد بداية الإقامة' : 'Residency start')
+                      : (isArabic ? 'موعد الجلسة' : 'Session date'),
                   (item['sessionDateText'] ?? '').toString().trim(),
                 ),
                 _infoRow(
                   context,
-                  isArabic ? 'كود الجلسة' : 'Session code',
+                  isCenterRequest
+                      ? (isArabic ? 'كود الإقامة' : 'Residency code')
+                      : (isArabic ? 'كود الجلسة' : 'Session code'),
                   (item['sessionCode'] ?? '').toString().trim(),
                 ),
                 _infoRow(
                   context,
-                  isArabic ? 'رابط الجلسة' : 'Session link',
+                  isCenterRequest
+                      ? (isArabic ? 'رابط المتابعة' : 'Follow-up link')
+                      : (isArabic ? 'رابط الجلسة' : 'Session link'),
                   (item['sessionLink'] ?? '').toString().trim(),
                 ),
                 _infoRow(
                   context,
-                  isArabic ? 'ملاحظات الإدارة' : 'Admin notes',
+                  isCenterRequest
+                      ? (isArabic
+                          ? 'ملاحظات الإدارة على الإقامة'
+                          : 'Admin residency notes')
+                      : (isArabic ? 'ملاحظات الإدارة' : 'Admin notes'),
                   (item['sessionAdminNotes'] ?? '').toString().trim(),
                 ),
               ],
@@ -1544,125 +1576,148 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
                               ),
                             ),
                             const SizedBox(height: 14),
-                            Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
-                              children: [
-                                SizedBox(
-                                  width: 220,
-                                  child: DropdownButtonFormField<String>(
-                                    initialValue: _sectionFilter,
-                                    decoration: appInputDecoration(
-                                      context: context,
-                                      label: isArabic ? 'القسم' : 'Section',
-                                      icon: Icons.category_outlined,
-                                    ),
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: 'all',
-                                        child: Text(isArabic ? 'الكل' : 'All'),
-                                      ),
-                                      ...['sessions', 'payments'].map(
-                                        (e) => DropdownMenuItem(
-                                          value: e,
-                                          child:
-                                              Text(_sectionLabel(e, isArabic)),
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                final filterFieldWidth =
+                                    constraints.maxWidth < 240
+                                        ? constraints.maxWidth
+                                        : 220.0;
+                                return Wrap(
+                                  spacing: 10,
+                                  runSpacing: 10,
+                                  children: [
+                                    SizedBox(
+                                      width: filterFieldWidth,
+                                      child: DropdownButtonFormField<String>(
+                                        isExpanded: true,
+                                        initialValue: _sectionFilter,
+                                        decoration: appInputDecoration(
+                                          context: context,
+                                          label:
+                                              isArabic ? 'القسم' : 'Section',
+                                          icon: Icons.category_outlined,
+                                        ),
+                                        items: [
+                                          DropdownMenuItem(
+                                            value: 'all',
+                                            child:
+                                                Text(isArabic ? 'الكل' : 'All'),
+                                          ),
+                                          ...['sessions', 'payments'].map(
+                                            (e) => DropdownMenuItem(
+                                              value: e,
+                                              child: Text(
+                                                _sectionLabel(e, isArabic),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                        onChanged: (value) => setState(
+                                          () => _sectionFilter = value ?? 'all',
                                         ),
                                       ),
-                                    ],
-                                    onChanged: (value) => setState(
-                                      () => _sectionFilter = value ?? 'all',
                                     ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 220,
-                                  child: DropdownButtonFormField<String>(
-                                    initialValue: _statusFilter,
-                                    decoration: appInputDecoration(
-                                      context: context,
-                                      label: isArabic ? 'الحالة' : 'Status',
-                                      icon: Icons.filter_alt_outlined,
-                                    ),
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: 'all',
-                                        child: Text(isArabic ? 'الكل' : 'All'),
-                                      ),
-                                      ...[
-                                        'completed_success',
-                                        'payout_pending',
-                                        'session_completed_pending_reviews',
-                                        'session_scheduled',
-                                        'session_in_progress',
-                                        'session_setup_pending',
-                                      ].map(
-                                        (e) => DropdownMenuItem(
-                                          value: e,
-                                          child:
-                                              Text(_statusLabel(e, isArabic)),
+                                    SizedBox(
+                                      width: filterFieldWidth,
+                                      child: DropdownButtonFormField<String>(
+                                        isExpanded: true,
+                                        initialValue: _statusFilter,
+                                        decoration: appInputDecoration(
+                                          context: context,
+                                          label:
+                                              isArabic ? 'الحالة' : 'Status',
+                                          icon: Icons.filter_alt_outlined,
+                                        ),
+                                        items: [
+                                          DropdownMenuItem(
+                                            value: 'all',
+                                            child:
+                                                Text(isArabic ? 'الكل' : 'All'),
+                                          ),
+                                          ...[
+                                            'completed_success',
+                                            'payout_pending',
+                                            'session_completed_pending_reviews',
+                                            'session_scheduled',
+                                            'session_in_progress',
+                                            'session_setup_pending',
+                                          ].map(
+                                            (e) => DropdownMenuItem(
+                                              value: e,
+                                              child: Text(
+                                                _statusLabel(e, isArabic),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                        onChanged: (value) => setState(
+                                          () => _statusFilter = value ?? 'all',
                                         ),
                                       ),
-                                    ],
-                                    onChanged: (value) => setState(
-                                      () => _statusFilter = value ?? 'all',
                                     ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 220,
-                                  child: DropdownButtonFormField<String>(
-                                    initialValue: _clientFilter,
-                                    decoration: appInputDecoration(
-                                      context: context,
-                                      label: isArabic ? 'العميل' : 'Client',
-                                      icon: Icons.person_outline,
-                                    ),
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: 'all',
-                                        child: Text(isArabic ? 'الكل' : 'All'),
-                                      ),
-                                      ...clientNames.map(
-                                        (e) => DropdownMenuItem(
-                                          value: e,
-                                          child: Text(e),
+                                    SizedBox(
+                                      width: filterFieldWidth,
+                                      child: DropdownButtonFormField<String>(
+                                        isExpanded: true,
+                                        initialValue: _clientFilter,
+                                        decoration: appInputDecoration(
+                                          context: context,
+                                          label: isArabic ? 'العميل' : 'Client',
+                                          icon: Icons.person_outline,
+                                        ),
+                                        items: [
+                                          DropdownMenuItem(
+                                            value: 'all',
+                                            child:
+                                                Text(isArabic ? 'الكل' : 'All'),
+                                          ),
+                                          ...clientNames.map(
+                                            (e) => DropdownMenuItem(
+                                              value: e,
+                                              child: Text(e),
+                                            ),
+                                          ),
+                                        ],
+                                        onChanged: (value) => setState(
+                                          () => _clientFilter = value ?? 'all',
                                         ),
                                       ),
-                                    ],
-                                    onChanged: (value) => setState(
-                                      () => _clientFilter = value ?? 'all',
                                     ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 220,
-                                  child: DropdownButtonFormField<String>(
-                                    initialValue: _clinicianFilter,
-                                    decoration: appInputDecoration(
-                                      context: context,
-                                      label:
-                                          isArabic ? 'الأخصائي' : 'Clinician',
-                                      icon: Icons.medical_services_outlined,
-                                    ),
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: 'all',
-                                        child: Text(isArabic ? 'الكل' : 'All'),
-                                      ),
-                                      ...clinicianNames.map(
-                                        (e) => DropdownMenuItem(
-                                          value: e,
-                                          child: Text(e),
+                                    SizedBox(
+                                      width: filterFieldWidth,
+                                      child: DropdownButtonFormField<String>(
+                                        isExpanded: true,
+                                        initialValue: _clinicianFilter,
+                                        decoration: appInputDecoration(
+                                          context: context,
+                                          label: isArabic
+                                              ? 'الأخصائي'
+                                              : 'Clinician',
+                                          icon: Icons
+                                              .medical_services_outlined,
+                                        ),
+                                        items: [
+                                          DropdownMenuItem(
+                                            value: 'all',
+                                            child:
+                                                Text(isArabic ? 'الكل' : 'All'),
+                                          ),
+                                          ...clinicianNames.map(
+                                            (e) => DropdownMenuItem(
+                                              value: e,
+                                              child: Text(e),
+                                            ),
+                                          ),
+                                        ],
+                                        onChanged: (value) => setState(
+                                          () =>
+                                              _clinicianFilter = value ?? 'all',
                                         ),
                                       ),
-                                    ],
-                                    onChanged: (value) => setState(
-                                      () => _clinicianFilter = value ?? 'all',
                                     ),
-                                  ),
-                                ),
-                              ],
+                                  ],
+                                );
+                              },
                             ),
                           ],
                         ),

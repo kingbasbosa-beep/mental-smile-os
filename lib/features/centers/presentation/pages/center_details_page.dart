@@ -35,6 +35,20 @@ class CenterDetailsPage extends StatelessWidget {
     }
   }
 
+  String _centerTypeLabelAr(CenterModel c) {
+    switch (c.centerType.trim()) {
+      case 'detox':
+        return 'ديتوكس / أعراض انسحاب';
+      case 'hospital':
+        return 'مستشفى';
+      case 'special_needs_care':
+        return 'رعاية ذوي الاحتياجات الخاصة';
+      case 'halfway_house':
+      default:
+        return 'هاف واي';
+    }
+  }
+
   String _locationLine(CenterModel c) {
     final parts = <String>[];
     final city = c.city.trim();
@@ -361,6 +375,36 @@ class CenterDetailsPage extends StatelessWidget {
     );
   }
 
+  Widget _serviceTypeSection(BuildContext context, CenterModel c) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        _sectionCard(
+          context: context,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              _sectionTitle(context, 'نوع المركز وخدمته'),
+              const SizedBox(height: 10),
+              Text(
+                'النوع التشغيلي: ${_centerTypeLabelAr(c)}',
+                textAlign: TextAlign.right,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                c.hasDetoxUnit
+                    ? 'يوجد قسم داخلي لأعراض الانسحاب.'
+                    : 'لا يوجد قسم داخلي مستقل لأعراض الانسحاب.',
+                textAlign: TextAlign.right,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+      ],
+    );
+  }
+
   Widget _capabilitiesSection(BuildContext context, CenterModel c) {
     final items = <String>[];
     if (c.capabilities.supportsAddictionCasesWithHiv) {
@@ -517,6 +561,8 @@ class CenterDetailsPage extends StatelessWidget {
                       arguments: CenterBookingRequestArgs(
                         centerId: c.id,
                         centerName: name,
+                        centerType: c.centerType,
+                        hasDetoxUnit: c.hasDetoxUnit,
                       ),
                     );
                   },
@@ -637,6 +683,7 @@ class CenterDetailsPage extends StatelessWidget {
           ),
         ],
         _gallerySection(context, galleryValues),
+        _serviceTypeSection(context, c),
         _pricingSection(context, c),
         _capabilitiesSection(context, c),
         const SizedBox(height: 24),

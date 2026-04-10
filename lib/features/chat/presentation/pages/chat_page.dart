@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/core/ui/app_design_system.dart';
 import 'package:flutterprojects/features/chat/controller/chat_controller.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_message_model.dart';
@@ -52,22 +53,14 @@ class _ChatPageState extends State<ChatPage> {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null || uid.isEmpty) return false;
 
+    if (uid == kKnownPrimaryAdminUid) return true;
+
     final adminDoc =
         await FirebaseFirestore.instance.collection('admins').doc(uid).get();
 
     if (adminDoc.exists) {
       final data = adminDoc.data() ?? <String, dynamic>{};
       if ((data['active'] ?? false) == true) return true;
-    }
-
-    final clinicianDoc = await FirebaseFirestore.instance
-        .collection('clinicians')
-        .doc(uid)
-        .get();
-
-    if (clinicianDoc.exists) {
-      final data = clinicianDoc.data() ?? <String, dynamic>{};
-      if ((data['isAdmin'] ?? false) == true) return true;
     }
 
     return false;

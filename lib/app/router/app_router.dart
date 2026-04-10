@@ -60,6 +60,7 @@ import 'package:flutterprojects/features/client/presentation/pages/client_dashbo
 import 'package:flutterprojects/features/centers/presentation/pages/center_register_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_dashboard_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_operations_page.dart';
+import 'package:flutterprojects/features/centers/presentation/pages/center_residencies_page.dart';
 import 'package:flutterprojects/features/client/presentation/pages/client_sessions_page.dart';
 
 const String _adminBookingQueueRoute = '/admin/booking-queue';
@@ -104,6 +105,7 @@ class AppRouter {
     Routes.centerDashboard,
     Routes.centerOperations,
     Routes.centerInbox,
+    Routes.centerResidencies,
   };
 
   static const Set<String> _clientOnlyRoutes = {
@@ -135,6 +137,7 @@ class AppRouter {
       case Routes.centerDashboard:
       case Routes.centerOperations:
       case Routes.centerInbox:
+      case Routes.centerResidencies:
       case Routes.clinicianOperations:
       case Routes.clinicianInbox:
       case Routes.clinicianChatInbox:
@@ -174,17 +177,10 @@ class AppRouter {
     required Widget child,
     required RouteSettings settings,
   }) {
-    String? qaRoleOverride;
-    final args = settings.arguments;
-    if (args is Map && args['qaRoleOverride'] != null) {
-      qaRoleOverride = args['qaRoleOverride'].toString().trim().toLowerCase();
-    }
-
     return MaterialPageRoute(
       builder: (_) => _RouteAccessGate(
         routeName: settings.name,
         allowedRoles: _requiredRoles(settings.name),
-        qaRoleOverride: qaRoleOverride,
         child: child,
       ),
       settings: settings,
@@ -300,6 +296,12 @@ class AppRouter {
       case Routes.centerInbox:
         return _protectedRoute(
           child: const CenterInboxPage(),
+          settings: settings,
+        );
+
+      case Routes.centerResidencies:
+        return _protectedRoute(
+          child: const CenterResidenciesPage(),
           settings: settings,
         );
 
@@ -516,6 +518,8 @@ class AppRouter {
           allowedRoles = {_roleClient};
         } else if (reviewerType == _roleClinician) {
           allowedRoles = {_roleClinician, _roleCenter};
+        } else if (reviewerType == _roleCenter) {
+          allowedRoles = {_roleCenter};
         }
         final requestId = (args['requestId'] ?? '').toString();
         if (requestId.isEmpty || reviewerType.isEmpty) {
@@ -737,12 +741,10 @@ class _RouteAccessGate extends StatelessWidget {
     required this.routeName,
     required this.allowedRoles,
     required this.child,
-    this.qaRoleOverride,
   });
 
   final String? routeName;
   final Set<String>? allowedRoles;
-  final String? qaRoleOverride;
   final Widget child;
 
   @override
@@ -834,18 +836,8 @@ class _RouteAccessGate extends StatelessWidget {
     }
 
     final role = access.role;
-    final isAllowed = (role != null && allowedRoles!.contains(role)) ||
-        _canUseQaRoleOverride(user, access);
+    final isAllowed = role != null && allowedRoles!.contains(role);
     return _RouteAccessDecision(allowed: isAllowed);
-  }
-
-  bool _canUseQaRoleOverride(User user, SignedInAccessState access) {
-    if (!access.isAdmin) return false;
-    final override = (qaRoleOverride ?? '').trim().toLowerCase();
-    if (override.isEmpty) return false;
-    if (allowedRoles == null || !allowedRoles!.contains(override)) return false;
-    final email = (user.email ?? '').trim().toLowerCase();
-    return AccountAccessService.knownAdminEmails.contains(email);
   }
 }
 

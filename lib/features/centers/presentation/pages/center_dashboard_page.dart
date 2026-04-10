@@ -157,6 +157,22 @@ class CenterDashboardPage extends StatelessWidget {
     }
   }
 
+  String _centerTypeLabel(String type, bool isArabic) {
+    switch (type.trim()) {
+      case 'detox':
+        return isArabic ? 'ديتوكس / أعراض انسحاب' : 'Detox / Withdrawal';
+      case 'hospital':
+        return isArabic ? 'مستشفى' : 'Hospital';
+      case 'special_needs_care':
+        return isArabic
+            ? 'رعاية ذوي الاحتياجات الخاصة'
+            : 'Special Needs Care';
+      case 'halfway_house':
+      default:
+        return isArabic ? 'هاف واي' : 'Halfway House';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
@@ -185,6 +201,9 @@ class CenterDashboardPage extends StatelessWidget {
               final address = (data['address'] ?? '').toString().trim();
               final description = (data['description'] ?? '').toString().trim();
               final managerName = (data['managerName'] ?? '').toString().trim();
+              final centerType = (data['centerType'] ?? '').toString().trim();
+              final hasDetoxUnit = ((data['hasDetoxUnit'] ?? false) == true) ||
+                  centerType == 'detox';
               final approvalStatus =
                   (data['approvalStatus'] ?? 'pending_admin').toString().trim();
               final imagesReady = (data['imagesReady'] ?? false) == true;
@@ -253,6 +272,10 @@ class CenterDashboardPage extends StatelessWidget {
                                     color: const Color(0xFF6C55B3),
                                   ),
                                   _MiniBadge(
+                                    label: _centerTypeLabel(centerType, isArabic),
+                                    color: const Color(0xFF2F6B5F),
+                                  ),
+                                  _MiniBadge(
                                     label: statusLabel,
                                     color: _approvalStatusColor(
                                       approvalStatus,
@@ -273,9 +296,27 @@ class CenterDashboardPage extends StatelessWidget {
                         ? 'الطلبات التي أحالتها الإدارة إلى المركز للرد على التوفر'
                         : 'Requests routed by admin for availability response',
                     icon: Icons.inbox_outlined,
+                    accent: const Color(0xFFB8860B),
+                    badgeLabel: isArabic ? 'بوابة الرد' : 'Response Gate',
+                    assetPath: 'assets/c7_branding/logo/logo_mark.png',
                     actionLabel: isArabic ? 'فتح الوارد' : 'Open inbox',
                     onTap: () =>
                         Navigator.of(context).pushNamed(Routes.centerInbox),
+                  ),
+                  const SizedBox(height: 12),
+                  _SectionCard(
+                    title: isArabic ? 'الإقامات والمتابعة' : 'Residencies',
+                    subtitle: isArabic
+                        ? 'متابعة الإقامات المجدولة والجارية وتقارير الخروج'
+                        : 'Track scheduled stays, active residencies, and discharge reports',
+                    icon: Icons.hotel_outlined,
+                    accent: const Color(0xFF2F6B5F),
+                    badgeLabel: isArabic ? 'إقامة' : 'Residency',
+                    assetPath: 'assets/c7_branding/home/hero_art.png',
+                    actionLabel:
+                        isArabic ? 'فتح الإقامات' : 'Open residencies',
+                    onTap: () => Navigator.of(context)
+                        .pushNamed(Routes.centerResidencies),
                   ),
                   const SizedBox(height: 12),
                   _SectionCard(
@@ -284,6 +325,9 @@ class CenterDashboardPage extends StatelessWidget {
                         ? 'متابعة الطلبات والرسائل ورفع الصور والوثائق'
                         : 'Track requests, messages, images, and documents',
                     icon: Icons.dashboard_customize_outlined,
+                    accent: const Color(0xFF7A4E2D),
+                    badgeLabel: isArabic ? 'تشغيل' : 'Operations',
+                    assetPath: 'assets/c7_branding/home/home_bg.png',
                     actionLabel: isArabic ? 'فتح الغرفة' : 'Open room',
                     onTap: () => Navigator.of(context)
                         .pushNamed(Routes.centerOperations),
@@ -331,6 +375,15 @@ class CenterDashboardPage extends StatelessWidget {
                     body: [
                       if (managerName.isNotEmpty)
                         (isArabic ? 'المسؤول: ' : 'Manager: ') + managerName,
+                      if (centerType.isNotEmpty)
+                        (isArabic ? 'النوع التشغيلي: ' : 'Operational type: ') +
+                            _centerTypeLabel(centerType, isArabic),
+                      (isArabic
+                              ? 'قسم أعراض انسحاب داخلي: '
+                              : 'Internal withdrawal unit: ') +
+                          (hasDetoxUnit
+                              ? (isArabic ? 'نعم' : 'Yes')
+                              : (isArabic ? 'لا' : 'No')),
                       if (phone.isNotEmpty)
                         (isArabic ? 'الهاتف: ' : 'Phone: ') + phone,
                       if (city.isNotEmpty)
@@ -679,6 +732,9 @@ class _SectionCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final IconData icon;
+  final Color accent;
+  final String badgeLabel;
+  final String assetPath;
   final String actionLabel;
   final VoidCallback onTap;
 
@@ -686,6 +742,9 @@ class _SectionCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.icon,
+    required this.accent,
+    required this.badgeLabel,
+    required this.assetPath,
     required this.actionLabel,
     required this.onTap,
   });
@@ -697,52 +756,124 @@ class _SectionCard extends StatelessWidget {
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: scheme.surface,
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            accent.withValues(alpha: 0.18),
+            accent.withValues(alpha: 0.06),
+            scheme.surface,
+          ],
+        ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: scheme.outline.withValues(alpha: 0.12),
+          color: accent.withValues(alpha: 0.25),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withValues(alpha: 0.08),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
-      child: Row(
+      child: Stack(
         children: [
-          Container(
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(
-              color: scheme.primary.withValues(alpha: 0.10),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: scheme.primary),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment:
-                  isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.w800),
-                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  subtitle,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                ),
-              ],
+          Positioned(
+            top: -8,
+            right: isArabic ? null : -10,
+            left: isArabic ? -10 : null,
+            child: Opacity(
+              opacity: 0.10,
+              child: Image.asset(
+                assetPath,
+                width: 128,
+                height: 128,
+                fit: BoxFit.contain,
+              ),
             ),
           ),
-          const SizedBox(width: 10),
-          FilledButton(
-            onPressed: onTap,
-            child: Text(actionLabel),
+          Positioned(
+            top: 0,
+            left: isArabic ? null : 0,
+            right: isArabic ? 0 : null,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(
+                color: accent.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: accent.withValues(alpha: 0.24)),
+              ),
+              child: Text(
+                badgeLabel,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: accent,
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+            ),
+          ),
+          Row(
+            children: [
+              Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: accent.withValues(alpha: 0.24)),
+                ),
+                child: Icon(icon, color: accent, size: 28),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 40),
+                  child: Column(
+                    crossAxisAlignment: isArabic
+                        ? CrossAxisAlignment.end
+                        : CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w900,
+                                  color: const Color(0xFF3F2B17),
+                                ),
+                        textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: const Color(0xFF5B5348),
+                              height: 1.45,
+                            ),
+                        textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                      ),
+                      const SizedBox(height: 14),
+                      Align(
+                        alignment: isArabic
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                        child: FilledButton.icon(
+                          onPressed: onTap,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: accent,
+                            foregroundColor: Colors.white,
+                          ),
+                          icon: const Icon(Icons.arrow_forward_outlined),
+                          label: Text(actionLabel),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

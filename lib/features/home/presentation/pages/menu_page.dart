@@ -2,53 +2,32 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/core/ui/app_design_system.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
 
-  static const Set<String> _knownAdminEmails = {
-    'kingbasbosa@gmail.com',
-    'kingbasbosa@hotmail.com',
-  };
-
   Future<bool> _isAdminResolved() async {
     final user = FirebaseAuth.instance.currentUser;
     final uid = user?.uid;
-    final email = (user?.email ?? '').trim().toLowerCase();
     if (uid == null || uid.isEmpty || user?.isAnonymous == true) return false;
 
+    if (uid == kKnownPrimaryAdminUid) return true;
+
     try {
-      final clinicianDoc = await FirebaseFirestore.instance
-          .collection('clinicians')
+      final adminDoc = await FirebaseFirestore.instance
+          .collection('admins')
           .doc(uid)
           .get();
-      final data = clinicianDoc.data();
-      if (data != null && (data['isAdmin'] ?? false) == true) {
+      final data = adminDoc.data();
+      if (data != null && (data['active'] ?? false) == true) {
         return true;
       }
     } on FirebaseException {
       return false;
     }
-
-    if (_knownAdminEmails.contains(email)) {
-      return true;
-    }
-
-    if (email.isEmpty) return false;
-
-    try {
-      final byEmail = await FirebaseFirestore.instance
-          .collection('clinicians')
-          .where('email', isEqualTo: email)
-          .where('isAdmin', isEqualTo: true)
-          .limit(1)
-          .get();
-
-      return byEmail.docs.isNotEmpty;
-    } on FirebaseException {
-      return false;
-    }
+    return false;
   }
 
   Future<bool> _isClinicianResolved() async {
@@ -64,8 +43,7 @@ class MenuPage extends StatelessWidget {
           .get();
       final data = clinicianDoc.data();
       if (data != null) {
-        return (data['role'] ?? '') == 'clinician' &&
-            (data['isAdmin'] ?? false) != true;
+        return (data['role'] ?? '') == 'clinician';
       }
     } on FirebaseException {
       return false;
@@ -82,8 +60,7 @@ class MenuPage extends StatelessWidget {
 
       if (byEmail.docs.isEmpty) return false;
       final emailData = byEmail.docs.first.data();
-      return (emailData['role'] ?? '') == 'clinician' &&
-          (emailData['isAdmin'] ?? false) != true;
+      return (emailData['role'] ?? '') == 'clinician';
     } on FirebaseException {
       return false;
     }
@@ -190,6 +167,8 @@ class MenuPage extends StatelessWidget {
             : 'Browse centers and available services',
         icon: Icons.apartment_outlined,
         route: Routes.centers,
+        assetPath: 'assets/c7_branding/home/hero_art.png',
+        accent: AppColors.mutedGold,
       ),
       _MenuCardData(
         title: isArabic ? 'الأخصائيون' : 'Specialists',
@@ -198,6 +177,8 @@ class MenuPage extends StatelessWidget {
             : 'Browse specialists and request a booking',
         icon: Icons.psychology_alt_outlined,
         route: Routes.specialists,
+        assetPath: 'assets/c7_branding/logo/logo_mark.png',
+        accent: AppColors.accentLavender,
       ),
       _MenuCardData(
         title: isArabic ? 'المكتبة' : 'Library',
@@ -206,6 +187,8 @@ class MenuPage extends StatelessWidget {
             : 'Supportive and educational content',
         icon: Icons.auto_stories_outlined,
         route: Routes.library,
+        assetPath: 'assets/c7_branding/home/home_bg.png',
+        accent: AppColors.softTerracotta,
       ),
       _MenuCardData(
         title: isArabic
@@ -216,6 +199,8 @@ class MenuPage extends StatelessWidget {
             : 'A family-aware support path with clear next steps',
         icon: Icons.family_restroom_outlined,
         route: Routes.specialNeeds,
+        assetPath: 'assets/c7_branding/home/hero_art.png',
+        accent: AppColors.info,
       ),
       _MenuCardData(
         title: isArabic ? 'دعم المدمن المتعافي' : 'Recovered Addict Support',
@@ -224,6 +209,8 @@ class MenuPage extends StatelessWidget {
             : 'A calm recovery path across specialists, centers, and support chat',
         icon: Icons.healing_outlined,
         route: Routes.addiction,
+        assetPath: 'assets/c7_branding/home/home_bg.png',
+        accent: AppColors.success,
       ),
     ];
 
@@ -465,12 +452,16 @@ class _MenuCardData {
   final String subtitle;
   final IconData icon;
   final String route;
+  final String assetPath;
+  final Color accent;
 
   const _MenuCardData({
     required this.title,
     required this.subtitle,
     required this.icon,
     required this.route,
+    required this.assetPath,
+    required this.accent,
   });
 }
 
@@ -488,42 +479,103 @@ class _MenuCard extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(AppRadii.xl),
       onTap: () => Navigator.of(context).pushNamed(item.route),
-      child: AppSurfaceCard(
-        color: Colors.white.withValues(alpha: 0.82),
-        child: Row(
-          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+      child: Container(
+        decoration: AppDecorations.surfaceCard(
+          color: Colors.white.withValues(alpha: 0.82),
+        ),
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: AppColors.deepTeal.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                item.icon,
-                color: AppColors.deepTeal,
-                size: 31,
+            Positioned.fill(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(AppRadii.xl),
+                child: Opacity(
+                  opacity: 0.14,
+                  child: Image.asset(
+                    item.assetPath,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: isArabic
-                    ? CrossAxisAlignment.end
-                    : CrossAxisAlignment.start,
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: Row(
+                textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
                 children: [
-                  Text(
-                    item.title,
-                    textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                    style: Theme.of(context).textTheme.titleLarge,
+                  Container(
+                    width: 74,
+                    height: 74,
+                    decoration: BoxDecoration(
+                      color: item.accent.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: item.accent.withValues(alpha: 0.18),
+                      ),
+                    ),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(24),
+                          child: Opacity(
+                            opacity: 0.20,
+                            child: Image.asset(
+                              item.assetPath,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Center(
+                          child: Icon(
+                            item.icon,
+                            color: AppColors.deepTeal,
+                            size: 33,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    item.subtitle,
-                    textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                    style: Theme.of(context).textTheme.bodyMedium,
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: isArabic
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: item.accent.withValues(alpha: 0.10),
+                            borderRadius: BorderRadius.circular(AppRadii.pill),
+                          ),
+                          child: Text(
+                            isArabic ? 'مسار رئيسي' : 'Main track',
+                            style:
+                                Theme.of(context).textTheme.labelLarge?.copyWith(
+                                      color: item.accent,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          item.title,
+                          textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          item.subtitle,
+                          textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

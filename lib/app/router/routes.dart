@@ -23,6 +23,7 @@ class Routes {
   static const centerDashboard = '/center/dashboard';
   static const centerOperations = '/center/operations';
   static const centerInbox = '/center/inbox';
+  static const centerResidencies = '/center/residencies';
 
   static const chat = '/chat';
   static const chatEscalations = '/chat/escalations';

@@ -21,15 +21,6 @@ class AdminSessionReportPage extends StatelessWidget {
       };
     }
 
-    final b = await db.collection('bookingRequests').doc(requestId).get();
-    if (b.exists && b.data() != null) {
-      return {
-        '_source': 'bookingRequests',
-        '_id': b.id,
-        ...b.data()!,
-      };
-    }
-
     return null;
   }
 
@@ -168,7 +159,9 @@ class AdminSessionReportPage extends StatelessWidget {
 
     final reviewerLabel = reviewerType == 'clinician'
         ? (isArabic ? 'تقييم الأخصائي' : 'Clinician review')
-        : (isArabic ? 'تقييم العميل' : 'Client review');
+        : reviewerType == 'center'
+            ? (isArabic ? 'تقرير خروج المركز' : 'Center discharge report')
+            : (isArabic ? 'تقييم العميل' : 'Client review');
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -240,7 +233,7 @@ class AdminSessionReportPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppShellActions.buildAppBar(
           context,
-          title: isArabic ? 'تقرير الجلسة' : 'Session Report',
+          title: isArabic ? 'تقرير الطلب' : 'Request Report',
           canLogout: false,
         ),
         body: AppPageBackground(
@@ -277,6 +270,9 @@ class AdminSessionReportPage extends StatelessWidget {
                             '')
                         .toString()
                         .trim();
+                    final centerName = (data['centerName'] ?? '').toString().trim();
+                    final isCenterRequest =
+                        (data['requestKind'] ?? '').toString() == 'center';
 
                     final status = (data['status'] ?? '').toString();
                     final paymentStatus =
@@ -309,13 +305,21 @@ class AdminSessionReportPage extends StatelessWidget {
 
                     final clientReviewSubmitted =
                         (data['clientReviewSubmitted'] ?? false) == true;
-                    final clinicianReviewSubmitted =
-                        (data['clinicianReviewSubmitted'] ?? false) == true;
+                    final clinicianReviewSubmitted = isCenterRequest
+                        ? ((data['centerReviewSubmitted'] ??
+                                        data['clinicianReviewSubmitted']) ??
+                                    false) ==
+                                true
+                        : (data['clinicianReviewSubmitted'] ?? false) == true;
                     final clientReviewPercentage =
                         ((data['clientReviewPercentage'] ?? 0) as num)
                             .toDouble();
-                    final clinicianReviewPercentage =
-                        ((data['clinicianReviewPercentage'] ?? 0) as num)
+                    final clinicianReviewPercentage = (((isCenterRequest
+                                        ? (data['centerReviewPercentage'] ??
+                                            data['clinicianReviewPercentage'])
+                                        : data['clinicianReviewPercentage']) ??
+                                    0)
+                                as num)
                             .toDouble();
                     final finalReviewPercentage =
                         ((data['finalReviewPercentage'] ?? 0) as num)
@@ -333,8 +337,12 @@ class AdminSessionReportPage extends StatelessWidget {
                     final archivedAt = _dateText(data['archivedAt']);
                     final clientReviewSubmittedAt =
                         _dateText(data['clientReviewSubmittedAt']);
-                    final clinicianReviewSubmittedAt =
-                        _dateText(data['clinicianReviewSubmittedAt']);
+                    final clinicianReviewSubmittedAt = _dateText(
+                      isCenterRequest
+                          ? (data['centerReviewSubmittedAt'] ??
+                              data['clinicianReviewSubmittedAt'])
+                          : data['clinicianReviewSubmittedAt'],
+                    );
 
                     return FutureBuilder<List<Map<String, dynamic>>>(
                       future: _loadSessionRatings(requestId),
@@ -388,8 +396,10 @@ class AdminSessionReportPage extends StatelessWidget {
                                 ),
                                 _infoRow(
                                   context,
-                                  isArabic ? 'الأخصائي' : 'Clinician',
-                                  clinicianName,
+                                  isCenterRequest
+                                      ? (isArabic ? 'المركز' : 'Center')
+                                      : (isArabic ? 'الأخصائي' : 'Clinician'),
+                                  isCenterRequest ? centerName : clinicianName,
                                 ),
                               ],
                             ),
@@ -465,8 +475,13 @@ class AdminSessionReportPage extends StatelessWidget {
                             const SizedBox(height: 12),
                             _sectionCard(
                               context,
-                              title:
-                                  isArabic ? 'بيانات الجلسة' : 'Session Data',
+                              title: isCenterRequest
+                                  ? (isArabic
+                                      ? 'بيانات الإقامة'
+                                      : 'Residency Data')
+                                  : (isArabic
+                                      ? 'بيانات الجلسة'
+                                      : 'Session Data'),
                               children: [
                                 _infoRow(
                                   context,
@@ -477,24 +492,46 @@ class AdminSessionReportPage extends StatelessWidget {
                                 ),
                                 _infoRow(
                                   context,
-                                  isArabic ? 'موعد الجلسة' : 'Session Date',
+                                  isCenterRequest
+                                      ? (isArabic
+                                          ? 'موعد بداية الإقامة'
+                                          : 'Residency start')
+                                      : (isArabic
+                                          ? 'موعد الجلسة'
+                                          : 'Session Date'),
                                   sessionDateText,
                                 ),
                                 _infoRow(
                                   context,
-                                  isArabic ? 'كود الجلسة' : 'Session Code',
+                                  isCenterRequest
+                                      ? (isArabic
+                                          ? 'كود الإقامة'
+                                          : 'Residency code')
+                                      : (isArabic
+                                          ? 'كود الجلسة'
+                                          : 'Session Code'),
                                   sessionCode,
                                 ),
                                 _infoRow(
                                   context,
-                                  isArabic ? 'رابط الجلسة' : 'Session Link',
+                                  isCenterRequest
+                                      ? (isArabic
+                                          ? 'رابط المتابعة'
+                                          : 'Follow-up link')
+                                      : (isArabic
+                                          ? 'رابط الجلسة'
+                                          : 'Session Link'),
                                   sessionLink,
                                 ),
                                 _infoRow(
                                   context,
-                                  isArabic
-                                      ? 'ملاحظات الإدارة'
-                                      : 'Admin session notes',
+                                  isCenterRequest
+                                      ? (isArabic
+                                          ? 'ملاحظات الإدارة على الإقامة'
+                                          : 'Admin residency notes')
+                                      : (isArabic
+                                          ? 'ملاحظات الإدارة'
+                                          : 'Admin session notes'),
                                   sessionAdminNotes,
                                 ),
                               ],
@@ -520,9 +557,13 @@ class AdminSessionReportPage extends StatelessWidget {
                                 ),
                                 _infoRow(
                                   context,
-                                  isArabic
-                                      ? 'تقييم الأخصائي'
-                                      : 'Clinician review submitted',
+                                  isCenterRequest
+                                      ? (isArabic
+                                          ? 'تقرير خروج المركز'
+                                          : 'Center discharge report submitted')
+                                      : (isArabic
+                                          ? 'تقييم الأخصائي'
+                                          : 'Clinician review submitted'),
                                   clinicianReviewSubmittedAt,
                                 ),
                                 _infoRow(
@@ -556,8 +597,12 @@ class AdminSessionReportPage extends StatelessWidget {
                                 _infoRow(
                                   context,
                                   isArabic
-                                      ? 'تم تقييم الأخصائي'
-                                      : 'Clinician review submitted',
+                                      ? (isCenterRequest
+                                          ? 'تم إرسال تقرير المركز'
+                                          : 'تم تقييم الأخصائي')
+                                      : (isCenterRequest
+                                          ? 'Center report submitted'
+                                          : 'Clinician review submitted'),
                                   clinicianReviewSubmitted ? 'نعم' : 'لا',
                                 ),
                                 _infoRow(
@@ -572,8 +617,12 @@ class AdminSessionReportPage extends StatelessWidget {
                                 _infoRow(
                                   context,
                                   isArabic
-                                      ? 'نسبة تقييم الأخصائي'
-                                      : 'Clinician review percentage',
+                                      ? (isCenterRequest
+                                          ? 'نسبة تقرير المركز'
+                                          : 'نسبة تقييم الأخصائي')
+                                      : (isCenterRequest
+                                          ? 'Center report percentage'
+                                          : 'Clinician review percentage'),
                                   clinicianReviewPercentage > 0
                                       ? '${clinicianReviewPercentage.toStringAsFixed(1)}%'
                                       : '',

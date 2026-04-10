@@ -127,7 +127,11 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
                   ),
                   children: [
                     const SizedBox(height: AppSpacing.lg),
-                    const AppHeroHeader(title: 'حساب عميل جديد'),
+                    const AppHeroHeader(
+                      title: 'حساب عميل جديد',
+                      subtitle:
+                          'ابدأ حسابًا بسيطًا وواضحًا بنفس الطابع البصري الهادئ، مع صورة شخصية وإعدادات أساسية جاهزة للمتابعة لاحقًا.',
+                    ),
                     const SizedBox(height: AppSpacing.lg),
                     AppSurfaceCard(
                       child: Column(

@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_escalation_model.dart';
 import 'package:flutterprojects/features/chat/data/models/clinician_option_model.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_firestore_service.dart';
@@ -83,6 +85,18 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
   List<ChatEscalationModel> _applyFilter(List<ChatEscalationModel> items) {
     if (_filter == 'all') return items;
     return items.where((e) => e.status == _filter).toList();
+  }
+
+  Future<bool> _isCurrentAdminUser() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null || uid.isEmpty) return false;
+
+    if (uid == kKnownPrimaryAdminUid) return true;
+
+    final adminDoc =
+        await FirebaseFirestore.instance.collection('admins').doc(uid).get();
+    final data = adminDoc.data();
+    return adminDoc.exists && data != null && (data['active'] ?? false) == true;
   }
 
   Future<void> _pickClinicianAndForward(
@@ -262,18 +276,18 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
               ),
             ),
             Expanded(
-              child: StreamBuilder<Map<String, ClinicianOptionModel>>(
-                stream: _service.streamCliniciansMap(),
-                builder: (context, cliniciansSnapshot) {
-                  final cliniciansMap = cliniciansSnapshot.data ?? {};
-                  final currentUid = FirebaseAuth.instance.currentUser?.uid;
-                  final isAdminUser = currentUid != null &&
-                      currentUid.isNotEmpty &&
-                      cliniciansMap[currentUid]?.isAdmin == true;
+              child: FutureBuilder<bool>(
+                future: _isCurrentAdminUser(),
+                builder: (context, adminSnapshot) {
+                  final isAdminUser = adminSnapshot.data == true;
+                  return StreamBuilder<Map<String, ClinicianOptionModel>>(
+                    stream: _service.streamCliniciansMap(),
+                    builder: (context, cliniciansSnapshot) {
+                      final cliniciansMap = cliniciansSnapshot.data ?? {};
 
-                  return StreamBuilder<List<ChatEscalationModel>>(
-                    stream: _service.streamEscalations(),
-                    builder: (context, snapshot) {
+                      return StreamBuilder<List<ChatEscalationModel>>(
+                        stream: _service.streamEscalations(),
+                        builder: (context, snapshot) {
                       if (snapshot.hasError) {
                         return Center(
                           child: Text('فشل تحميل التصعيدات: ${snapshot.error}'),
@@ -461,6 +475,8 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
                           );
                         },
                       );
+                    },
+                  );
                     },
                   );
                 },

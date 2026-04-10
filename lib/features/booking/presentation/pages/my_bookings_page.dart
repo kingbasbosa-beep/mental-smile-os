@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +21,20 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     {'key': 'completed', 'label': 'المكتملة'},
     {'key': 'closed', 'label': 'المغلقة'},
   ];
+
+  String _centerTypeLabel(String type) {
+    switch (type.trim()) {
+      case 'detox':
+        return 'ديتوكس / أعراض انسحاب';
+      case 'hospital':
+        return 'مستشفى';
+      case 'special_needs_care':
+        return 'رعاية ذوي الاحتياجات الخاصة';
+      case 'halfway_house':
+      default:
+        return 'هاف واي';
+    }
+  }
 
   Widget _statusTabs(BuildContext context) {
     return Padding(
@@ -51,58 +63,8 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
   Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> _requestsStream(
     String uid,
   ) {
-    final primary = _query(uid).snapshots();
-    final legacy = FirebaseFirestore.instance
-        .collection('bookingRequests')
-        .where('clientId', isEqualTo: uid)
-        .snapshots();
-
-    return Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>>.multi(
-      (controller) {
-        QuerySnapshot<Map<String, dynamic>>? primarySnapshot;
-        QuerySnapshot<Map<String, dynamic>>? legacySnapshot;
-
-        void emitMerged() {
-          final merged =
-              <String, QueryDocumentSnapshot<Map<String, dynamic>>>{};
-
-          if (legacySnapshot != null) {
-            for (final doc in legacySnapshot!.docs) {
-              merged[doc.id] = doc;
-            }
-          }
-
-          if (primarySnapshot != null) {
-            for (final doc in primarySnapshot!.docs) {
-              merged[doc.id] = doc;
-            }
-          }
-
-          final docs = merged.values.toList()..sort(_compareCreatedAt);
-          controller.add(docs);
-        }
-
-        final primarySub = primary.listen(
-          (snapshot) {
-            primarySnapshot = snapshot;
-            emitMerged();
-          },
-          onError: controller.addError,
-        );
-
-        final legacySub = legacy.listen(
-          (snapshot) {
-            legacySnapshot = snapshot;
-            emitMerged();
-          },
-          onError: controller.addError,
-        );
-
-        controller.onCancel = () async {
-          await primarySub.cancel();
-          await legacySub.cancel();
-        };
-      },
+    return _query(uid).snapshots().map(
+      (snapshot) => snapshot.docs.toList()..sort(_compareCreatedAt),
     );
   }
 
@@ -134,6 +96,312 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     return null;
   }
 
+  Future<Map<String, dynamic>?> _showIntakeDialog(
+    BuildContext context,
+    Map<String, dynamic> requestData,
+  ) async {
+    final reasonController = TextEditingController();
+    final substanceTypeController = TextEditingController();
+    final lastUseController = TextEditingController();
+    final withdrawalSymptomsController = TextEditingController();
+    final priorDetoxHistoryController = TextEditingController();
+    final priorDiagnosisController = TextEditingController();
+    final medicationsController = TextEditingController();
+    final symptomsController = TextEditingController();
+    final riskNotesController = TextEditingController();
+    final familyNotesController = TextEditingController();
+    final specialNeedsConditionController = TextEditingController();
+    final mobilitySupportController = TextEditingController();
+    final nutritionSupportController = TextEditingController();
+    final specialCareNotesController = TextEditingController();
+
+    var hasSubstanceUse = false;
+    var hasPriorDiagnosis = false;
+    var hasPriorTreatment = false;
+    var needsCompanion = false;
+    final selectedCenterType =
+        (requestData['selectedCenterType'] ?? '').toString().trim();
+    final centerHasDetoxUnit = (requestData['centerHasDetoxUnit'] ?? false) == true;
+    final showDetoxSection =
+        selectedCenterType == 'detox' || centerHasDetoxUnit;
+    final showSpecialNeedsSection =
+        selectedCenterType == 'special_needs_care';
+
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('بيانات التقييم الأولي'),
+              content: SizedBox(
+                width: 560,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: reasonController,
+                        maxLines: 2,
+                        decoration: const InputDecoration(
+                          labelText: 'سبب طلب الإقامة',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      CheckboxListTile(
+                        contentPadding: EdgeInsets.zero,
+                        value: hasSubstanceUse,
+                        onChanged: (value) =>
+                            setState(() => hasSubstanceUse = value ?? false),
+                        title: const Text('يوجد تعاطٍ حالي أو سابق'),
+                      ),
+                      if (hasSubstanceUse) ...[
+                        TextField(
+                          controller: substanceTypeController,
+                          decoration: const InputDecoration(
+                            labelText: 'نوع المادة/المخدر',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        if (showDetoxSection) ...[
+                          TextField(
+                            controller: lastUseController,
+                            decoration: const InputDecoration(
+                              labelText: 'آخر تعاطٍ أو توقيت آخر جرعة',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: withdrawalSymptomsController,
+                            maxLines: 2,
+                            decoration: const InputDecoration(
+                              labelText:
+                                  'أعراض الانسحاب الحالية إن وجدت (رجفة، قيء، هياج، تعرق...)',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: priorDetoxHistoryController,
+                            maxLines: 2,
+                            decoration: const InputDecoration(
+                              labelText: 'تاريخ سابق مع الديتوكس أو أعراض الانسحاب',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                      ],
+                      CheckboxListTile(
+                        contentPadding: EdgeInsets.zero,
+                        value: hasPriorDiagnosis,
+                        onChanged: (value) =>
+                            setState(() => hasPriorDiagnosis = value ?? false),
+                        title: const Text('يوجد تشخيص سابق'),
+                      ),
+                      if (hasPriorDiagnosis) ...[
+                        TextField(
+                          controller: priorDiagnosisController,
+                          maxLines: 2,
+                          decoration: const InputDecoration(
+                            labelText: 'التشخيص السابق',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      CheckboxListTile(
+                        contentPadding: EdgeInsets.zero,
+                        value: hasPriorTreatment,
+                        onChanged: (value) =>
+                            setState(() => hasPriorTreatment = value ?? false),
+                        title: const Text('سبق العلاج أو دخول مركز'),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: medicationsController,
+                        maxLines: 2,
+                        decoration: const InputDecoration(
+                          labelText: 'الأدوية الحالية إن وجدت',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: symptomsController,
+                        maxLines: 3,
+                        decoration: const InputDecoration(
+                          labelText:
+                              'الأعراض العامة الحالية (نوم، قلق، هياج، انسحاب، هلاوس...)',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: riskNotesController,
+                        maxLines: 2,
+                        decoration: const InputDecoration(
+                          labelText:
+                              'ملاحظات الخطورة أو السلوك (عدوانية، أفكار انتحارية، نوبات...)',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: familyNotesController,
+                        maxLines: 3,
+                        decoration: const InputDecoration(
+                          labelText: 'ملاحظات الأسرة',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      if (showSpecialNeedsSection) ...[
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: specialNeedsConditionController,
+                          maxLines: 2,
+                          decoration: const InputDecoration(
+                            labelText: 'نوع الاحتياج أو الحالة الخاصة',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        CheckboxListTile(
+                          contentPadding: EdgeInsets.zero,
+                          value: needsCompanion,
+                          onChanged: (value) =>
+                              setState(() => needsCompanion = value ?? false),
+                          title: const Text('الحالة تحتاج مرافق أو إشراف لصيق'),
+                        ),
+                        TextField(
+                          controller: mobilitySupportController,
+                          maxLines: 2,
+                          decoration: const InputDecoration(
+                            labelText: 'احتياجات الحركة أو الدعم اليومي',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: nutritionSupportController,
+                          maxLines: 2,
+                          decoration: const InputDecoration(
+                            labelText: 'احتياجات التغذية أو الحساسية أو الروتين الطبي',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: specialCareNotesController,
+                          maxLines: 3,
+                          decoration: const InputDecoration(
+                            labelText: 'ملاحظات الرعاية الخاصة',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: const Text('إلغاء'),
+                ),
+                FilledButton(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop({
+                      'intakeReason': reasonController.text.trim(),
+                      'intakeHasSubstanceUse': hasSubstanceUse,
+                      'intakeSubstanceType': substanceTypeController.text.trim(),
+                      'intakeLastSubstanceUseAt': lastUseController.text.trim(),
+                      'intakeWithdrawalSymptomsText':
+                          withdrawalSymptomsController.text.trim(),
+                      'intakePriorDetoxHistory':
+                          priorDetoxHistoryController.text.trim(),
+                      'intakeHasPriorDiagnosis': hasPriorDiagnosis,
+                      'intakePriorDiagnosisText':
+                          priorDiagnosisController.text.trim(),
+                      'intakeHasPriorTreatment': hasPriorTreatment,
+                      'intakeCurrentMedications':
+                          medicationsController.text.trim(),
+                      'intakeSymptomsText': symptomsController.text.trim(),
+                      'intakeRiskNotes': riskNotesController.text.trim(),
+                      'intakeFamilyNotes': familyNotesController.text.trim(),
+                      'intakeSpecialNeedsConditionType':
+                          specialNeedsConditionController.text.trim(),
+                      'intakeNeedsCompanion': needsCompanion,
+                      'intakeMobilitySupport':
+                          mobilitySupportController.text.trim(),
+                      'intakeNutritionSupport':
+                          nutritionSupportController.text.trim(),
+                      'intakeSpecialCareNotes':
+                          specialCareNotesController.text.trim(),
+                    });
+                  },
+                  child: const Text('إرسال البيانات'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    reasonController.dispose();
+    substanceTypeController.dispose();
+    lastUseController.dispose();
+    withdrawalSymptomsController.dispose();
+    priorDetoxHistoryController.dispose();
+    priorDiagnosisController.dispose();
+    medicationsController.dispose();
+    symptomsController.dispose();
+    riskNotesController.dispose();
+    familyNotesController.dispose();
+    specialNeedsConditionController.dispose();
+    mobilitySupportController.dispose();
+    nutritionSupportController.dispose();
+    specialCareNotesController.dispose();
+    return result;
+  }
+
+  Future<void> _submitInitialIntake(
+    BuildContext context,
+    String requestId,
+    Map<String, dynamic> requestData,
+  ) async {
+    final result = await _showIntakeDialog(context, requestData);
+    if (result == null) return;
+    if ((result['intakeReason'] ?? '').toString().trim().isEmpty) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('أدخل سبب طلب الإقامة أولًا')),
+      );
+      return;
+    }
+
+    await FirebaseFirestore.instance
+        .collection('booking_requests')
+        .doc(requestId)
+        .update({
+      ...result,
+      'intakeFormSubmitted': true,
+      'intakeSubmittedAt': FieldValue.serverTimestamp(),
+      'status': 'center_recommendation_pending',
+      'workflowStage': 'center_recommendation_pending',
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('تم إرسال بيانات التقييم الأولي للمركز')),
+    );
+  }
+
   String _statusLabel(String requestKind, String status) {
     final isCenter = requestKind == 'center';
 
@@ -145,6 +413,10 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
           return 'الطلب لدى المركز للتحقق من التوفر';
         case 'client_update_required':
           return 'المركز طلب تعديل نوع الإقامة';
+        case 'center_intake_pending':
+          return 'بانتظار استكمال بيانات التقييم الأولي';
+        case 'center_recommendation_pending':
+          return 'بانتظار توصية المركز بعد مراجعة الحالة';
         case 'approved':
           return 'تمت الموافقة على طلبك';
         case 'awaiting_payment':
@@ -210,7 +482,9 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
   bool _matchesClientView(String status) {
     switch (_viewFilter) {
       case 'action_needed':
-        return status == 'awaiting_payment' || status == 'client_update_required';
+        return status == 'awaiting_payment' ||
+            status == 'client_update_required' ||
+            status == 'center_intake_pending';
       case 'completed':
         return status == 'completed_success';
       case 'closed':
@@ -221,8 +495,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
             status == 'dispute_pending';
       case 'current':
       default:
-        return status != 'awaiting_payment' &&
-            status != 'rejected' &&
+        return status != 'rejected' &&
             status != 'completed_success' &&
             status != 'rejected_admin' &&
             status != 'clinician_rejected' &&
@@ -261,6 +534,14 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     final rejectReason = (data['rejectReason'] ?? '').toString();
     final selectedAccommodationLabelAr =
         (data['selectedAccommodationLabelAr'] ?? '').toString();
+    final selectedCenterType =
+        (data['selectedCenterType'] ?? '').toString().trim();
+    final centerHasDetoxUnit = (data['centerHasDetoxUnit'] ?? false) == true;
+    final intakeReason = (data['intakeReason'] ?? '').toString();
+    final intakeWithdrawalSymptomsText =
+        (data['intakeWithdrawalSymptomsText'] ?? '').toString();
+    final intakeSpecialNeedsConditionType =
+        (data['intakeSpecialNeedsConditionType'] ?? '').toString();
     final lastCenterAvailabilityNote =
         (data['lastCenterAvailabilityNote'] ?? '').toString();
     final lastCenterSuggestedAlternativeLabelAr =
@@ -268,6 +549,11 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     final paymentReceiptFileName =
         (data['paymentReceiptFileName'] ?? '').toString();
     final paymentClientNote = (data['paymentClientNote'] ?? '').toString();
+    final stayStartDateText = (data['stayStartDateText'] ?? '').toString();
+    final stayEndDateText = (data['stayEndDateText'] ?? '').toString();
+    final stayDurationDays = (data['stayDurationDays'] ?? '').toString();
+    final paymentBreakdownText = (data['paymentBreakdownText'] ?? '').toString();
+    final stayTotalAmount = (data['stayTotalAmount'] ?? '').toString();
     final sessionDateText = (data['sessionDateText'] ?? '').toString();
     final sessionLink = (data['sessionLink'] ?? '').toString();
     final sessionCode = (data['sessionCode'] ?? '').toString();
@@ -280,6 +566,20 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
       if (approvedSlot.isNotEmpty) 'الموعد المعتمد: $approvedSlot',
       if (selectedAccommodationLabelAr.isNotEmpty)
         'نوع الإقامة: $selectedAccommodationLabelAr',
+      if (selectedCenterType.isNotEmpty)
+        'نوع المركز: ${_centerTypeLabel(selectedCenterType)}',
+      if (centerHasDetoxUnit && selectedCenterType != 'detox')
+        'يوجد قسم أعراض انسحاب داخلي',
+      if (intakeReason.isNotEmpty) 'سبب الإقامة: $intakeReason',
+      if (intakeWithdrawalSymptomsText.isNotEmpty)
+        'أعراض الانسحاب الحالية: $intakeWithdrawalSymptomsText',
+      if (intakeSpecialNeedsConditionType.isNotEmpty)
+        'نوع الاحتياج الخاص: $intakeSpecialNeedsConditionType',
+      if (stayStartDateText.isNotEmpty) 'بداية الإقامة: $stayStartDateText',
+      if (stayEndDateText.isNotEmpty) 'نهاية الإقامة المبدئية: $stayEndDateText',
+      if (stayDurationDays.isNotEmpty) 'مدة الإقامة المبدئية: $stayDurationDays يوم',
+      if (paymentBreakdownText.isNotEmpty) 'بيان الدفع: $paymentBreakdownText',
+      if (stayTotalAmount.isNotEmpty) 'الإجمالي المستحق: $stayTotalAmount',
       if (lastCenterAvailabilityNote.isNotEmpty)
         'ملاحظة المركز الأخيرة: $lastCenterAvailabilityNote',
       if (lastCenterSuggestedAlternativeLabelAr.isNotEmpty)
@@ -552,6 +852,14 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                                         (d['centerId'] ?? '')
                                                             .toString(),
                                                     centerName: centerName,
+                                                    centerType:
+                                                        (d['selectedCenterType'] ??
+                                                                '')
+                                                            .toString(),
+                                                    hasDetoxUnit:
+                                                        (d['centerHasDetoxUnit'] ??
+                                                                false) ==
+                                                            true,
                                                     existingRequestId:
                                                         visibleDocs[i].id,
                                                   ),
@@ -561,6 +869,41 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                               const Icon(Icons.edit_outlined),
                                           label:
                                               const Text('تعديل نوع الإقامة'),
+                                        ),
+                                      ),
+                                    ],
+                                    if (isCenter &&
+                                        status == 'center_intake_pending') ...[
+                                      const SizedBox(height: 12),
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: FilledButton.icon(
+                                          onPressed: () => _submitInitialIntake(
+                                            context,
+                                            visibleDocs[i].id,
+                                            d,
+                                          ),
+                                          icon: const Icon(
+                                            Icons.assignment_outlined,
+                                          ),
+                                          label: const Text(
+                                            'استكمال بيانات التقييم الأولي',
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                    if (status == 'awaiting_payment') ...[
+                                      const SizedBox(height: 12),
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: FilledButton.icon(
+                                          onPressed: () {
+                                            Navigator.of(context).pushNamed(
+                                              Routes.clientPaymentProof,
+                                            );
+                                          },
+                                          icon: const Icon(Icons.upload_file_outlined),
+                                          label: const Text('رفع إثبات التحويل'),
                                         ),
                                       ),
                                     ],

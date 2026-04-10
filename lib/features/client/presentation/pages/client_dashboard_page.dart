@@ -202,6 +202,11 @@ class ClientDashboardPage extends StatelessWidget {
     return (data['phone'] ?? data['phoneNumber'] ?? '').toString().trim();
   }
 
+  String _readAvatarAsset(Map<String, dynamic>? data) {
+    if (data == null) return '';
+    return (data['avatarAsset'] ?? '').toString().trim();
+  }
+
   String _readCity(Map<String, dynamic>? data) {
     if (data == null) return '';
     return (data['city'] ?? '').toString().trim();
@@ -244,11 +249,15 @@ class ClientDashboardPage extends StatelessWidget {
               final name = _readName(data);
               final email = _readEmail(data);
               final phone = _readPhone(data);
+              final avatarAsset = _readAvatarAsset(data);
               final city = _readCity(data);
               final statusLabel = _readStatusLabel(isArabic, data);
               final accountType = _readAccountType(isArabic, data);
               final notes = _readNotes(data, isArabic);
               final isActive = _readIsActive(data);
+              debugPrint('CLIENT_DASHBOARD avatarAsset=$avatarAsset');
+              debugPrint('CLIENT_DASHBOARD name=$name');
+              debugPrint('CLIENT_DASHBOARD data=$data');
 
               return ListView(
                 padding: const EdgeInsets.all(AppSpacing.lg),
@@ -263,14 +272,23 @@ class ClientDashboardPage extends StatelessWidget {
                           radius: 32,
                           backgroundColor:
                               AppColors.deepTeal.withValues(alpha: 0.12),
-                          child: Text(
-                            _initials(name),
-                            style: TextStyle(
-                              color: AppColors.deepTeal,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 20,
-                            ),
-                          ),
+                          child: avatarAsset.isNotEmpty
+                              ? ClipOval(
+                                  child: Image.asset(
+                                    avatarAsset,
+                                    width: 64,
+                                    height: 64,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : Text(
+                                  _initials(name),
+                                  style: TextStyle(
+                                    color: AppColors.deepTeal,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 20,
+                                  ),
+                                ),
                         ),
                         const SizedBox(width: 14),
                         Expanded(

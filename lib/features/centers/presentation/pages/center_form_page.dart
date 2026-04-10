@@ -214,6 +214,21 @@ class _CenterFormPageState extends State<CenterFormPage> {
         id: id,
         name: _nameCtrl.text.trim(),
         category: _categoryCtrl.text.trim(),
+        centerType: existing?.centerType ??
+            (() {
+              switch (_categoryCtrl.text.trim()) {
+                case 'detox':
+                  return 'detox';
+                case 'hospital':
+                case 'hospitals':
+                  return 'hospital';
+                case 'special_needs':
+                  return 'special_needs_care';
+                case 'recovery':
+                default:
+                  return 'halfway_house';
+              }
+            })(),
         categoryLabelAr: _categoryLabelArCtrl.text.trim(),
         categoryLabelEn: _categoryLabelEnCtrl.text.trim(),
         city: _cityCtrl.text.trim(),
@@ -222,6 +237,9 @@ class _CenterFormPageState extends State<CenterFormPage> {
         phone: _phoneCtrl.text.trim(),
         whatsapp: _whatsappCtrl.text.trim(),
         address: _addressCtrl.text.trim(),
+        hasDetoxUnit: existing?.hasDetoxUnit == true ||
+            (existing?.centerType == 'detox') ||
+            _categoryCtrl.text.trim() == 'detox',
         services: _parseServices(_servicesCtrl.text),
         isActive: _isActive,
         sortOrder: _parseSortOrder(_sortOrderCtrl.text),

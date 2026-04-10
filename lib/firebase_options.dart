@@ -47,28 +47,29 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBKMIvencDi85fANUSihZuBophyqvwtQvo',
-    appId: '1:917979251021:web:1ff654fd9da92df23df704',
-    messagingSenderId: '917979251021',
-    projectId: 'mental-key-v2',
-    authDomain: 'mental-key-v2.firebaseapp.com',
-    storageBucket: 'mental-key-v2.firebasestorage.app',
+    apiKey: 'AIzaSyBMcsJptGGi_8q74YPmS4g5-A7MZ8IYFv8',
+    appId: '1:643226562725:web:1ae813db68acb6c444dd4c',
+    messagingSenderId: '643226562725',
+    projectId: 'mental-smile-app-clean',
+    authDomain: 'mental-smile-app-clean.firebaseapp.com',
+    storageBucket: 'mental-smile-app-clean.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAdyoVtoxBdZ1v97cauyoskvWvtx9LUYq0',
-    appId: '1:917979251021:android:ff37fa9e12b5f4b43df704',
-    messagingSenderId: '917979251021',
-    projectId: 'mental-key-v2',
-    storageBucket: 'mental-key-v2.firebasestorage.app',
+    apiKey: 'AIzaSyDymcf1znn-RAv2irkwNoHw83KfoEhc8F0',
+    appId: '1:643226562725:android:889e4f18923f415b44dd4c',
+    messagingSenderId: '643226562725',
+    projectId: 'mental-smile-app-clean',
+    storageBucket: 'mental-smile-app-clean.firebasestorage.app',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBKMIvencDi85fANUSihZuBophyqvwtQvo',
-    appId: '1:917979251021:web:0d24611d0b10545f3df704',
-    messagingSenderId: '917979251021',
-    projectId: 'mental-key-v2',
-    authDomain: 'mental-key-v2.firebaseapp.com',
-    storageBucket: 'mental-key-v2.firebasestorage.app',
+    apiKey: 'AIzaSyBMcsJptGGi_8q74YPmS4g5-A7MZ8IYFv8',
+    appId: '1:643226562725:web:fe79ac56c44f928144dd4c',
+    messagingSenderId: '643226562725',
+    projectId: 'mental-smile-app-clean',
+    authDomain: 'mental-smile-app-clean.firebaseapp.com',
+    storageBucket: 'mental-smile-app-clean.firebasestorage.app',
   );
+
 }

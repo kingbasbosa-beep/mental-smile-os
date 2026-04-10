@@ -16,6 +16,21 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
   String _tab = 'payment_review';
   final Set<String> _busyIds = {};
 
+  Map<String, dynamic> _withCanonicalWorkflowStage(
+    Map<String, dynamic> updates,
+  ) {
+    final status = updates['status'];
+    if (status is String &&
+        status.trim().isNotEmpty &&
+        !updates.containsKey('workflowStage')) {
+      return {
+        ...updates,
+        'workflowStage': status,
+      };
+    }
+    return updates;
+  }
+
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
@@ -35,32 +50,35 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
     Map<String, dynamic> updates,
   ) async {
     final payload = {
-      ...updates,
+      ..._withCanonicalWorkflowStage(updates),
       'updatedAt': FieldValue.serverTimestamp(),
     };
 
-    final db = FirebaseFirestore.instance;
-    final refs = [
-      db.collection('booking_requests').doc(requestId),
-      db.collection('bookingRequests').doc(requestId),
-    ];
-
-    for (final ref in refs) {
-      final snap = await ref.get();
-      if (snap.exists) {
-        await ref.update(payload);
-      }
+    final ref = FirebaseFirestore.instance
+        .collection('booking_requests')
+        .doc(requestId);
+    final snap = await ref.get();
+    if (snap.exists) {
+      await ref.update(payload);
     }
   }
 
   Future<void> _approvePayment(String requestId) async {
     await _setBusy(requestId, true);
     try {
+      final snap = await FirebaseFirestore.instance
+          .collection('booking_requests')
+          .doc(requestId)
+          .get();
+      final data = snap.data() ?? const <String, dynamic>{};
+      final isCenterRequest =
+          (data['requestKind'] ?? '').toString().trim() == 'center' ||
+              (data['centerId'] ?? '').toString().trim().isNotEmpty;
       await _updateRequestEverywhere(requestId, {
-        'status': 'session_setup_pending',
+        'status': isCenterRequest ? 'session_scheduled' : 'session_setup_pending',
         'paymentStatus': 'approved',
         'paymentApprovedAt': FieldValue.serverTimestamp(),
-        'sessionStatus': 'not_created',
+        'sessionStatus': isCenterRequest ? 'scheduled' : 'not_created',
       });
 
       if (!mounted) return;
@@ -68,8 +86,12 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'تم اعتماد السداد وتحويل الطلب إلى قسم الجلسات'
-                : 'Payment approved and moved to sessions setup',
+                ? (isCenterRequest
+                    ? 'تم اعتماد السداد وتحويل الطلب إلى إقامة مبدئية مجدولة'
+                    : 'تم اعتماد السداد وتحويل الطلب إلى قسم الجلسات')
+                : (isCenterRequest
+                    ? 'Payment approved and request moved to preliminary residency scheduled'
+                    : 'Payment approved and moved to sessions setup'),
           ),
         ),
       );
@@ -230,6 +252,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
       final commissionAmount = gross * (commissionPercent / 100);
       final netAmount = gross - commissionAmount;
       await _updateRequestEverywhere(requestId, {
+        'status': 'payout_pending',
         'accountingReviewStatus': 'confirmed',
         'grossClientPaidAmount': gross,
         'appCommissionPercent': commissionPercent,
@@ -474,45 +497,24 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
             stream: FirebaseFirestore.instance
                 .collection('booking_requests')
                 .snapshots(),
-            builder: (context, snapA) {
-              return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance
-                    .collection('bookingRequests')
-                    .snapshots(),
-                builder: (context, snapB) {
-                  if (snapA.hasError && snapB.hasError) {
-                    return AppEmptyState(
-                      message: isArabic
-                          ? 'تعذر تحميل المدفوعات'
-                          : 'Unable to load payments',
-                      icon: Icons.error_outline,
-                    );
-                  }
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return AppEmptyState(
+                  message: isArabic
+                      ? 'تعذر تحميل المدفوعات'
+                      : 'Unable to load payments',
+                  icon: Icons.error_outline,
+                );
+              }
 
-                  if (!snapA.hasData && !snapB.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-                  final all = <Map<String, dynamic>>[];
-
-                  if (snapA.hasData) {
-                    all.addAll(
-                        _normalizeDocs(snapA.data!.docs, 'booking_requests'));
-                  }
-
-                  if (snapB.hasData) {
-                    all.addAll(
-                        _normalizeDocs(snapB.data!.docs, 'bookingRequests'));
-                  }
-
-                  final unique = <String, Map<String, dynamic>>{};
-                  for (final item in all) {
-                    final id = (item['_id'] ?? '').toString();
-                    if (id.isEmpty) continue;
-                    unique[id] = item;
-                  }
-
-                  final docs = unique.values.where(_matchesTab).toList()
+              final docs = _normalizeDocs(
+                    snapshot.data!.docs,
+                    'booking_requests',
+                  ).where(_matchesTab).toList()
                     ..sort((a, b) {
                       final aTs = a['archivedAt'] ??
                           a['payoutTransferredAt'] ??
@@ -532,7 +534,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                       return bd.compareTo(ad);
                     });
 
-                  return ListView(
+              return ListView(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     children: [
                       AppSurfaceCard(
@@ -886,8 +888,6 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                         }),
                     ],
                   );
-                },
-              );
             },
           ),
         ),

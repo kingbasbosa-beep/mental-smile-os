@@ -64,6 +64,38 @@ class AppPageBackground extends StatelessWidget {
       decoration: AppDecorations.pageBackground(),
       child: Stack(
         children: [
+          Positioned(
+            top: -40,
+            left: -20,
+            child: IgnorePointer(
+              child: Opacity(
+                opacity: 0.10,
+                child: Image.asset(
+                  'assets/c7_branding/home/hero_art.png',
+                  width: 260,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const SizedBox.shrink(),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            right: -30,
+            bottom: -10,
+            child: IgnorePointer(
+              child: Opacity(
+                opacity: 0.08,
+                child: Image.asset(
+                  'assets/c7_branding/home/home_bg.png',
+                  width: 300,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const SizedBox.shrink(),
+                ),
+              ),
+            ),
+          ),
           if (showPattern)
             Positioned.fill(
               child: IgnorePointer(
@@ -146,29 +178,63 @@ class AppHeroHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        AppLogoWordmark(width: logoWidth),
-        const SizedBox(height: AppSpacing.md),
-        Text(
-          title,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w900,
+    return AppSurfaceCard(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: AppSpacing.xl,
+      ),
+      color: Colors.white.withValues(alpha: 0.76),
+      borderColor: AppColors.mutedGold.withValues(alpha: 0.18),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.xs,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.mutedGold.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(AppRadii.pill),
+              border: Border.all(
+                color: AppColors.mutedGold.withValues(alpha: 0.18),
               ),
-        ),
-        if (subtitle != null && subtitle!.trim().isNotEmpty) ...[
-          const SizedBox(height: AppSpacing.xs),
+            ),
+            child: Text(
+              'Mental Smile',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: AppColors.deepTeal,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.4,
+                  ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          AppLogoWordmark(width: logoWidth),
+          const SizedBox(height: AppSpacing.md),
           Text(
-            subtitle!,
+            title,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.mist,
-                  height: 1.55,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w900,
                 ),
           ),
+          if (subtitle != null && subtitle!.trim().isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.xs),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 620),
+              child: Text(
+                subtitle!,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppColors.mist,
+                      height: 1.65,
+                    ),
+              ),
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
@@ -190,12 +256,79 @@ class AppSurfaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: padding,
+      clipBehavior: Clip.antiAlias,
       decoration: AppDecorations.surfaceCard(
         color: color,
         borderColor: borderColor,
       ),
-      child: child,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.96),
+                    (color ?? Colors.white).withValues(alpha: 0.86),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: -18,
+            right: -18,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.mutedGold.withValues(alpha: 0.09),
+              ),
+              child: const SizedBox(width: 88, height: 88),
+            ),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 4,
+              color: AppColors.mutedGold.withValues(alpha: 0.20),
+            ),
+          ),
+          Positioned(
+            top: 18,
+            right: 18,
+            child: IgnorePointer(
+              child: Opacity(
+                opacity: 0.08,
+                child: Image.asset(
+                  'assets/c7_branding/logo/logo_mark.png',
+                  width: 58,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const SizedBox.shrink(),
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Opacity(
+                opacity: 0.025,
+                child: CustomPaint(
+                  painter: const _PagePatternPainter(color: AppColors.deepTeal),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: padding,
+            child: child,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -217,12 +350,53 @@ class AppSectionPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: padding,
+      clipBehavior: Clip.antiAlias,
       decoration: AppDecorations.softPanel(
         color: color,
         borderColor: borderColor,
       ),
-      child: child,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.92),
+                    (color ?? Colors.white).withValues(alpha: 0.84),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 3,
+              color: AppColors.mutedGold.withValues(alpha: 0.15),
+            ),
+          ),
+          Positioned(
+            bottom: -16,
+            left: -16,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.deepTeal.withValues(alpha: 0.05),
+              ),
+              child: const SizedBox(width: 72, height: 72),
+            ),
+          ),
+          Padding(
+            padding: padding,
+            child: child,
+          ),
+        ],
+      ),
     );
   }
 }

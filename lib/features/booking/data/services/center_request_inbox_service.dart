@@ -15,120 +15,152 @@ class CenterInboxRequest {
 class CenterRequestInboxService {
   const CenterRequestInboxService();
 
+  static const List<String> _actionableStatuses = <String>[
+    'center_follow_up',
+    'session_setup_pending',
+    'session_scheduled',
+    'reschedule_pending',
+  ];
+
   void _log({
     required String operation,
-    required String collection,
     String? documentId,
-    String? requestKind,
+    String? centerId,
     String? status,
-    String? writeStatus,
+    String? availabilityStatus,
     Object? error,
   }) {
     final user = FirebaseAuth.instance.currentUser;
     debugPrint(
-      'CENTER_FLOW page=center_inbox role=center uid=${user?.uid ?? 'null'} '
-      'op=$operation collection=$collection doc=${documentId ?? '-'} '
-      'requestKind=${requestKind ?? '-'} status=${status ?? '-'} '
-      'writeStatus=${writeStatus ?? '-'} error=${error ?? '-'}',
+      'CENTER_FLOW page=center_inbox role=center '
+      'uid=${user?.uid ?? 'null'} '
+      'op=$operation '
+      'collection=booking_requests '
+      'doc=${documentId ?? '-'} '
+      'centerId=${centerId ?? '-'} '
+      'status=${status ?? '-'} '
+      'availabilityStatus=${availabilityStatus ?? '-'} '
+      'error=${error ?? '-'}',
     );
   }
 
   Stream<List<CenterInboxRequest>> watchRequestsForCenter(String centerId) {
     _log(
       operation: 'stream_start',
-      collection: 'booking_requests',
-      requestKind: 'center',
-      status: 'center_follow_up',
+      centerId: centerId,
+      status: _actionableStatuses.join(','),
     );
 
     return FirebaseFirestore.instance
         .collection('booking_requests')
         .where('centerId', isEqualTo: centerId)
         .where('requestKind', isEqualTo: 'center')
-        .where('status', isEqualTo: 'center_follow_up')
+        .where('status', whereIn: _actionableStatuses)
         .snapshots()
         .map((snap) {
       _log(
         operation: 'stream_data',
-        collection: 'booking_requests',
-        requestKind: 'center',
-        status: 'center_follow_up',
+        centerId: centerId,
+        status: _actionableStatuses.join(','),
       );
 
-      final docs = snap.docs.where((doc) {
-        final requestKind = (doc.data()['requestKind'] ?? '').toString().trim();
-        return requestKind == 'center';
-      }).toList()
-        ..sort((a, b) => _moment(b.data()['createdAt'])
-            .compareTo(_moment(a.data()['createdAt'])));
-
-      return docs
+      final requests = snap.docs
           .map((doc) => CenterInboxRequest(id: doc.id, data: doc.data()))
-          .toList();
+          .toList()
+        ..sort((a, b) {
+          DateTime moment(Map<String, dynamic> data) {
+            final value = data['updatedAt'] ?? data['createdAt'];
+            if (value is Timestamp) return value.toDate();
+            if (value is DateTime) return value;
+            if (value is String) {
+              return DateTime.tryParse(value) ?? DateTime(1970);
+            }
+            return DateTime(1970);
+          }
+
+          return moment(b.data).compareTo(moment(a.data));
+        });
+
+      return requests;
+    }).handleError((error) {
+      _log(
+        operation: 'stream_error',
+        centerId: centerId,
+        status: _actionableStatuses.join(','),
+        error: error,
+      );
     });
   }
 
   Future<void> respondToAvailability({
     required String requestId,
-    required String responderCenterId,
+    required String centerId,
     required String availabilityStatus,
     required String note,
+    required String suggestedAlternativeLabelAr,
   }) async {
-    final db = FirebaseFirestore.instance;
-    final payload = <String, dynamic>{
-      'centerAvailabilityStatus': availabilityStatus,
-      'centerAvailabilityNote': note,
-      'centerAvailabilityRespondedAt': FieldValue.serverTimestamp(),
-      'centerAvailabilityRespondedBy': responderCenterId,
-      'updatedAt': FieldValue.serverTimestamp(),
-    };
+    final ref =
+        FirebaseFirestore.instance.collection('booking_requests').doc(requestId);
 
-    final refs = [
-      db.collection('booking_requests').doc(requestId),
-      db.collection('bookingRequests').doc(requestId),
-    ];
+    _log(
+      operation: 'respond_read',
+      documentId: requestId,
+      centerId: centerId,
+      status: 'center_follow_up',
+      availabilityStatus: availabilityStatus,
+    );
 
-    for (final ref in refs) {
-      try {
-        _log(
-          operation: 'read',
-          collection: ref.parent.id,
-          documentId: requestId,
-          requestKind: 'center',
-          status: 'center_follow_up',
-          writeStatus: availabilityStatus,
-        );
-        final snap = await ref.get();
-        if (snap.exists) {
-          _log(
-            operation: 'update',
-            collection: ref.parent.id,
-            documentId: requestId,
-            requestKind: (snap.data()?['requestKind'] ?? '').toString(),
-            status: (snap.data()?['status'] ?? '').toString(),
-            writeStatus: availabilityStatus,
-          );
-          await ref.update(payload);
-        }
-      } catch (e) {
-        _log(
-          operation: 'update_error',
-          collection: ref.parent.id,
-          documentId: requestId,
-          requestKind: 'center',
-          status: 'center_follow_up',
-          writeStatus: availabilityStatus,
-          error: e,
-        );
-        rethrow;
+    try {
+      final snap = await ref.get();
+      if (!snap.exists) {
+        throw Exception('Center request not found');
       }
-    }
-  }
 
-  static DateTime _moment(dynamic value) {
-    if (value is Timestamp) return value.toDate();
-    if (value is DateTime) return value;
-    if (value is String) return DateTime.tryParse(value) ?? DateTime(1970);
-    return DateTime(1970);
+      final data = snap.data() ?? const <String, dynamic>{};
+      _log(
+        operation: 'respond_update',
+        documentId: requestId,
+        centerId: centerId,
+        status: (data['status'] ?? '').toString(),
+        availabilityStatus: availabilityStatus,
+      );
+
+      await ref.update({
+        'status': availabilityStatus == 'available'
+            ? 'center_intake_pending'
+            : (data['status'] ?? 'center_follow_up'),
+        'workflowStage': availabilityStatus == 'available'
+            ? 'center_intake_pending'
+            : (data['workflowStage'] ?? data['status'] ?? 'center_follow_up'),
+        'centerAvailabilityStatus': availabilityStatus,
+        'centerAvailabilityNote': note.trim(),
+        'centerSuggestedAlternativeKey':
+            suggestedAlternativeLabelAr.trim().isEmpty
+                ? ''
+                : suggestedAlternativeLabelAr.trim(),
+        'centerSuggestedAlternativeLabelAr': suggestedAlternativeLabelAr.trim(),
+        'centerAvailabilityRespondedAt': FieldValue.serverTimestamp(),
+        'centerAvailabilityRespondedBy': centerId,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      _log(
+        operation: 'respond_success',
+        documentId: requestId,
+        centerId: centerId,
+        status: 'center_follow_up',
+        availabilityStatus: availabilityStatus,
+      );
+    } catch (e) {
+      _log(
+        operation: 'respond_error',
+        documentId: requestId,
+        centerId: centerId,
+        status: 'center_follow_up',
+        availabilityStatus: availabilityStatus,
+        error: e,
+      );
+      rethrow;
+    }
   }
 }

@@ -231,6 +231,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
 
       final requestData = {
         'requestId': requestRef.id,
+        'requestKind': 'clinician',
         'clientId': uid,
         'clientName': clientName,
         'clientEmail': clientEmail,
@@ -238,6 +239,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
         'clinicianUid': widget.args.clinicianId,
         'clinicianName': widget.args.clinicianName,
         'status': 'pending_admin',
+        'workflowStage': 'pending_admin',
         'createdAt': now,
         'updatedAt': now,
         'note': note,

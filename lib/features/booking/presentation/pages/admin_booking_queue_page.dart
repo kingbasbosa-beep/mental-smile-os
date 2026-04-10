@@ -14,9 +14,50 @@ class AdminBookingQueuePage extends StatefulWidget {
 }
 
 class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
+  String _centerTypeLabel(String type, bool isArabic) {
+    switch (type.trim()) {
+      case 'detox':
+        return isArabic ? 'ديتوكس / أعراض انسحاب' : 'Detox / Withdrawal';
+      case 'hospital':
+        return isArabic ? 'مستشفى' : 'Hospital';
+      case 'special_needs_care':
+        return isArabic
+            ? 'رعاية ذوي الاحتياجات الخاصة'
+            : 'Special Needs Care';
+      case 'halfway_house':
+      default:
+        return isArabic ? 'هاف واي' : 'Halfway House';
+    }
+  }
+
   String _tab = 'pending_admin';
   final Map<String, String> _selectedClinicianByRequest = {};
   final Set<String> _busyIds = {};
+  late final Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>>
+      _bookingDocsStreamRef;
+  late final Stream<QuerySnapshot<Map<String, dynamic>>> _cliniciansStreamRef;
+
+  @override
+  void initState() {
+    super.initState();
+    _bookingDocsStreamRef = _bookingDocsStream();
+    _cliniciansStreamRef = _cliniciansStream();
+  }
+
+  Map<String, dynamic> _withCanonicalWorkflowStage(
+    Map<String, dynamic> updates,
+  ) {
+    final status = updates['status'];
+    if (status is String &&
+        status.trim().isNotEmpty &&
+        !updates.containsKey('workflowStage')) {
+      return {
+        ...updates,
+        'workflowStage': status,
+      };
+    }
+    return updates;
+  }
 
   static const List<Map<String, String>> _tabs = [
     {
@@ -30,14 +71,19 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       'labelEn': 'Center follow-up'
     },
     {
+      'key': 'center_intake_pending',
+      'labelAr': 'بانتظار بيانات التقييم الأولي',
+      'labelEn': 'Awaiting intake data'
+    },
+    {
+      'key': 'center_recommendation_pending',
+      'labelAr': 'بانتظار توصية المركز',
+      'labelEn': 'Awaiting center recommendation'
+    },
+    {
       'key': 'client_update_required',
       'labelAr': 'بانتظار تعديل العميل',
       'labelEn': 'Client update required'
-    },
-    {
-      'key': 'approved',
-      'labelAr': 'طلبات مراكز معتمدة',
-      'labelEn': 'Approved center requests'
     },
     {
       'key': 'assigned_clinician',
@@ -104,6 +150,57 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
 
   bool _isArabic(BuildContext context) {
     return Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+  }
+
+  Future<void> _refreshAuthContextForFirestore({
+    required String stage,
+    required String requestId,
+  }) async {
+    final auth = FirebaseAuth.instance;
+    final beforeUser = auth.currentUser;
+    print(
+      'CENTER_AUTH_TRACE '
+      'stage=$stage '
+      'requestId=$requestId '
+      'phase=before_refresh '
+      'currentUserExists=${beforeUser != null} '
+      'currentUserUid=${beforeUser?.uid ?? ''}',
+    );
+
+    await beforeUser?.reload();
+
+    final reloadedUser = auth.currentUser;
+    print(
+      'CENTER_AUTH_TRACE '
+      'stage=$stage '
+      'requestId=$requestId '
+      'phase=after_reload '
+      'currentUserExists=${reloadedUser != null} '
+      'currentUserUid=${reloadedUser?.uid ?? ''}',
+    );
+
+    if (reloadedUser != null) {
+      await reloadedUser.getIdToken(true);
+      print(
+        'CENTER_AUTH_TRACE '
+        'stage=$stage '
+        'requestId=$requestId '
+        'phase=after_token_refresh '
+        'currentUserExists=true '
+        'currentUserUid=${reloadedUser.uid} '
+        'tokenRefresh=true',
+      );
+    } else {
+      print(
+        'CENTER_AUTH_TRACE '
+        'stage=$stage '
+        'requestId=$requestId '
+        'phase=after_token_refresh '
+        'currentUserExists=false '
+        'currentUserUid= '
+        'tokenRefresh=false',
+      );
+    }
   }
 
   void _logFirestore({
@@ -175,15 +272,13 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     Map<String, dynamic> updates,
   ) async {
     final nowUpdates = {
-      ...updates,
+      ..._withCanonicalWorkflowStage(updates),
       'updatedAt': FieldValue.serverTimestamp(),
     };
 
     final db = FirebaseFirestore.instance;
-
     final refs = [
       db.collection('booking_requests').doc(requestId),
-      db.collection('bookingRequests').doc(requestId),
     ];
 
     for (final ref in refs) {
@@ -226,6 +321,105 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     }
   }
 
+  Future<DocumentSnapshot<Map<String, dynamic>>> _readPrimaryBookingRequest(
+    String requestId,
+  ) async {
+    final ref =
+        FirebaseFirestore.instance.collection('booking_requests').doc(requestId);
+    _logFirestore(
+      page: 'admin_booking_queue',
+      role: 'admin',
+      operation: 'read',
+      collection: 'booking_requests',
+      documentId: requestId,
+    );
+    return ref.get();
+  }
+
+  Future<void> _updatePrimaryCenterRequest(
+    String requestId,
+    Map<String, dynamic> updates,
+  ) async {
+    final ref =
+        FirebaseFirestore.instance.collection('booking_requests').doc(requestId);
+    final nowUpdates = {
+      ..._withCanonicalWorkflowStage(updates),
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+
+    try {
+      await _refreshAuthContextForFirestore(
+        stage: '_updatePrimaryCenterRequest',
+        requestId: requestId,
+      );
+      final snap = await _readPrimaryBookingRequest(requestId);
+      if (!snap.exists) {
+        throw Exception('Center request not found');
+      }
+      final data = snap.data() ?? <String, dynamic>{};
+      print(
+        'CENTER_FOLLOWUP_TRACE '
+        'requestId=$requestId '
+        'currentAuthUid=${FirebaseAuth.instance.currentUser?.uid ?? ''} '
+        'resourceRequestKind=${(data['requestKind'] ?? '').toString()} '
+        'resourceStatus=${(data['status'] ?? '').toString()} '
+        'resourceClientUpdatedAfterCenterFeedback=${data['clientUpdatedAfterCenterFeedback']} '
+        'writeStatus=${(nowUpdates['status'] ?? '').toString()} '
+        'writeWorkflowStage=${(nowUpdates['workflowStage'] ?? '').toString()} '
+        'writeAdminDecisionType=${(nowUpdates['adminDecisionType'] ?? '').toString()} '
+        'writeCenterAdminHandledBy=${(nowUpdates['centerAdminHandledBy'] ?? '').toString()}',
+      );
+      _logFirestore(
+        page: 'admin_booking_queue',
+        role: 'admin',
+        operation: 'update',
+        collection: 'booking_requests',
+        documentId: requestId,
+        requestKind: (data['requestKind'] ?? '').toString(),
+        status: (data['status'] ?? '').toString(),
+        writeStatus: (updates['status'] ?? '').toString(),
+      );
+      print(
+        'CENTER_AUTH_TRACE '
+        'stage=_updatePrimaryCenterRequest '
+        'requestId=$requestId '
+        'phase=before_firestore_update '
+        'currentUserExists=${FirebaseAuth.instance.currentUser != null} '
+        'currentUserUid=${FirebaseAuth.instance.currentUser?.uid ?? ''} '
+        'afterRefresh=true',
+      );
+      await ref.update(nowUpdates);
+      _logFirestore(
+        page: 'admin_booking_queue',
+        role: 'admin',
+        operation: 'transition_success',
+        collection: 'booking_requests',
+        documentId: requestId,
+        requestKind: 'center',
+        status: (data['status'] ?? '').toString(),
+        writeStatus: (updates['status'] ?? '').toString(),
+      );
+    } catch (e) {
+      print(
+        'CENTER_FOLLOWUP_TRACE_ERROR '
+        'requestId=$requestId '
+        'currentAuthUid=${FirebaseAuth.instance.currentUser?.uid ?? ''} '
+        'error=$e',
+      );
+      _logFirestore(
+        page: 'admin_booking_queue',
+        role: 'admin',
+        operation: 'update_error',
+        collection: 'booking_requests',
+        documentId: requestId,
+        requestKind: 'center',
+        writeStatus: (updates['status'] ?? '').toString(),
+        error: e,
+      );
+      rethrow;
+    }
+  }
+
   Future<void> _appendSystemMessage({
     required String requestId,
     required String text,
@@ -235,7 +429,6 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
 
     final requestRefs = [
       db.collection('booking_requests').doc(requestId),
-      db.collection('bookingRequests').doc(requestId),
     ];
 
     for (final ref in requestRefs) {
@@ -282,22 +475,19 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final chatThreadsSnap = await chatThreadsRef.get();
     if (chatThreadsSnap.exists) {
       threadRef = chatThreadsRef;
-    } else {
-      final legacyThreadRef = db.collection('chatThreads').doc(threadId);
+    }
+
+    if (threadRef == null) {
       _logFirestore(
         page: 'admin_booking_queue',
         role: 'admin',
-        operation: 'read',
-        collection: 'chatThreads',
+        operation: 'skip_system_message',
+        collection: 'chat_threads',
         documentId: threadId,
+        error: 'thread_not_found_in_chat_threads',
       );
-      final legacyThreadSnap = await legacyThreadRef.get();
-      if (legacyThreadSnap.exists) {
-        threadRef = legacyThreadRef;
-      }
+      return;
     }
-
-    if (threadRef == null) return;
 
     _logFirestore(
       page: 'admin_booking_queue',
@@ -382,31 +572,13 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         .collection('booking_requests')
         .orderBy('createdAt', descending: true)
         .snapshots();
-    _logFirestore(
-      page: 'admin_booking_queue',
-      role: 'admin',
-      operation: 'stream_start',
-      collection: 'bookingRequests',
-    );
-    final legacy = FirebaseFirestore.instance
-        .collection('bookingRequests')
-        .orderBy('createdAt', descending: true)
-        .snapshots();
-
     return Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>>.multi(
       (controller) {
         QuerySnapshot<Map<String, dynamic>>? primarySnapshot;
-        QuerySnapshot<Map<String, dynamic>>? legacySnapshot;
 
         void emitMerged() {
           final mergedByDocId =
               <String, QueryDocumentSnapshot<Map<String, dynamic>>>{};
-
-          if (legacySnapshot != null) {
-            for (final doc in legacySnapshot!.docs) {
-              mergedByDocId[doc.id] = doc;
-            }
-          }
 
           if (primarySnapshot != null) {
             for (final doc in primarySnapshot!.docs) {
@@ -460,32 +632,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
           },
         );
 
-        final legacySub = legacy.listen(
-          (snapshot) {
-            _logFirestore(
-              page: 'admin_booking_queue',
-              role: 'admin',
-              operation: 'stream_data',
-              collection: 'bookingRequests',
-            );
-            legacySnapshot = snapshot;
-            emitMerged();
-          },
-          onError: (error) {
-            _logFirestore(
-              page: 'admin_booking_queue',
-              role: 'admin',
-              operation: 'stream_error',
-              collection: 'bookingRequests',
-              error: error,
-            );
-            controller.addError(error);
-          },
-        );
-
         controller.onCancel = () async {
           await primarySub.cancel();
-          await legacySub.cancel();
         };
       },
     );
@@ -516,11 +664,14 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     });
   }
 
-  Future<void> _rejectRequest(String requestId) async {
+  Future<void> _rejectRequest(
+    String requestId, {
+    required bool isCenterRequest,
+  }) async {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
+      final payload = {
         'status': 'rejected_admin',
         'workflowStage': 'rejected_admin',
         'adminApproved': false,
@@ -535,7 +686,12 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         'sessionStatus': 'cancelled',
         'reviewStatus': 'blocked',
         'payoutStatus': 'blocked',
-      });
+      };
+      if (isCenterRequest) {
+        await _updatePrimaryCenterRequest(requestId, payload);
+      } else {
+        await _updateRequestEverywhere(requestId, payload);
+      }
 
       await _appendSystemMessage(
         requestId: requestId,
@@ -609,6 +765,20 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
+      await _refreshAuthContextForFirestore(
+        stage: '_moveCenterToFollowUp',
+        requestId: requestId,
+      );
+      print(
+        'CENTER_FOLLOWUP_TRACE '
+        'requestId=$requestId '
+        'currentAuthUid=${FirebaseAuth.instance.currentUser?.uid ?? ''} '
+        'payloadCenterAdminHandledBy=${FirebaseAuth.instance.currentUser?.uid ?? ''} '
+        'writeStatus=center_follow_up '
+        'writeWorkflowStage=center_follow_up '
+        'writeAdminDecisionType=center_follow_up '
+        'afterRefresh=true',
+      );
       _logFirestore(
         page: 'admin_booking_queue',
         role: 'admin',
@@ -619,8 +789,17 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         status: 'pending_admin',
         writeStatus: 'center_follow_up',
       );
-      await _updateRequestEverywhere(requestId, {
+      await _updatePrimaryCenterRequest(requestId, {
         'status': 'center_follow_up',
+        'workflowStage': 'center_follow_up',
+        'adminApproved': false,
+        'adminRejected': false,
+        'adminForwarded': false,
+        'adminDecisionType': 'center_follow_up',
+        'adminDecisionBy': FirebaseAuth.instance.currentUser?.uid ?? '',
+        'adminDecisionAt': FieldValue.serverTimestamp(),
+        'adminAssignedBy': FirebaseAuth.instance.currentUser?.uid ?? '',
+        'adminAssignedAt': FieldValue.serverTimestamp(),
         'centerAdminHandledBy': FirebaseAuth.instance.currentUser?.uid ?? '',
         'centerAdminHandledAt': FieldValue.serverTimestamp(),
       });
@@ -665,9 +844,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'status': 'awaiting_payment',
-        'workflowStage': 'awaiting_payment',
+      await _updatePrimaryCenterRequest(requestId, {
+        'status': 'session_setup_pending',
+        'workflowStage': 'session_setup_pending',
         'adminApproved': true,
         'adminRejected': false,
         'adminForwarded': false,
@@ -690,18 +869,18 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       await _appendSystemMessage(
         requestId: requestId,
         text: isArabic
-            ? 'تم اعتماد طلب المركز بعد المتابعة والتحقق.'
-            : 'The center request was approved after follow-up and verification.',
+            ? 'تم اعتماد طلب المركز وتحويله إلى مرحلة تجهيز الإقامة المبدئية قبل فتح الدفع.'
+            : 'The center request was approved and moved to preliminary residency setup before payment.',
       );
 
       if (!mounted) return;
-      setState(() => _tab = 'awaiting_payment');
+      setState(() => _tab = 'session_setup_pending');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             isArabic
-                ? 'تم اعتماد طلب المركز وتحويله إلى انتظار الدفع'
-                : 'Center request approved and moved to awaiting payment',
+                ? 'تم اعتماد طلب المركز وتحويله إلى تجهيز الإقامة المبدئية'
+                : 'Center request approved and moved to preliminary residency setup',
           ),
         ),
       );
@@ -720,7 +899,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       final revision = data['clientRevisionNumber'];
       final revisionNumber =
           revision is num ? revision.toInt() : int.tryParse('$revision') ?? 0;
-      await _updateRequestEverywhere(requestId, {
+      await _updatePrimaryCenterRequest(requestId, {
         'status': 'client_update_required',
         'workflowStage': 'client_update_required',
         'lastCenterAvailabilityStatus':
@@ -733,6 +912,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
             (data['centerSuggestedAlternativeLabelAr'] ?? '').toString(),
         'lastCenterFeedbackRevisionNumber': revisionNumber,
         'adminCanApproveWithoutCenterRecheck': false,
+        'adminDecisionType': 'returned_to_client',
+        'adminDecisionBy': FirebaseAuth.instance.currentUser?.uid ?? '',
+        'adminDecisionAt': FieldValue.serverTimestamp(),
       });
 
       if (!mounted) return;
@@ -851,6 +1033,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       final netAmount = gross - commissionAmount;
 
       await _updateRequestEverywhere(requestId, {
+        'status': 'payout_pending',
         'accountingReviewStatus': 'confirmed',
         'grossClientPaidAmount': gross,
         'appCommissionPercent': commissionPercent,
@@ -910,19 +1093,32 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
+      final snap = await FirebaseFirestore.instance
+          .collection('booking_requests')
+          .doc(requestId)
+          .get();
+      final data = snap.data() ?? const <String, dynamic>{};
+      final isCenterRequest =
+          (data['requestKind'] ?? '').toString().trim() == 'center' ||
+              (data['centerId'] ?? '').toString().trim().isNotEmpty;
       await _updateRequestEverywhere(requestId, {
-        'status': 'session_setup_pending',
-        'workflowStage': 'session_setup_pending',
+        'status': isCenterRequest ? 'session_scheduled' : 'session_setup_pending',
+        'workflowStage':
+            isCenterRequest ? 'session_scheduled' : 'session_setup_pending',
         'paymentStatus': 'approved',
         'paymentApprovedAt': FieldValue.serverTimestamp(),
-        'sessionStatus': 'not_created',
+        'sessionStatus': isCenterRequest ? 'scheduled' : 'not_created',
       });
 
       await _appendSystemMessage(
         requestId: requestId,
         text: isArabic
-            ? 'تم اعتماد السداد وتحويل الطلب إلى مرحلة تجهيز الجلسة.'
-            : 'Payment approved and request moved to session setup.',
+            ? (isCenterRequest
+                ? 'تم اعتماد السداد وتحويل الطلب إلى إقامة مبدئية مجدولة.'
+                : 'تم اعتماد السداد وتحويل الطلب إلى مرحلة تجهيز الجلسة.')
+            : (isCenterRequest
+                ? 'Payment approved and request moved to preliminary residency scheduled.'
+                : 'Payment approved and request moved to session setup.'),
       );
 
       if (!mounted) return;
@@ -930,8 +1126,12 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         SnackBar(
           content: Text(
             isArabic
-                ? 'تم اعتماد السداد وتحويل الطلب إلى تجهيز الجلسة'
-                : 'Payment approved and moved to session setup',
+                ? (isCenterRequest
+                    ? 'تم اعتماد السداد وتحويل الطلب إلى إقامة مبدئية مجدولة'
+                    : 'تم اعتماد السداد وتحويل الطلب إلى تجهيز الجلسة')
+                : (isCenterRequest
+                    ? 'Payment approved and moved to preliminary residency scheduled'
+                    : 'Payment approved and moved to session setup'),
           ),
         ),
       );
@@ -1118,6 +1318,14 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         return isArabic ? 'متابعة المراكز' : 'Center follow-up';
       case 'client_update_required':
         return isArabic ? 'بانتظار تعديل العميل' : 'Client update required';
+      case 'center_intake_pending':
+        return isArabic
+            ? 'بانتظار بيانات التقييم الأولي'
+            : 'Awaiting intake data';
+      case 'center_recommendation_pending':
+        return isArabic
+            ? 'بانتظار توصية المركز'
+            : 'Awaiting center recommendation';
       case 'approved':
         return isArabic ? 'طلب مركز معتمد' : 'Approved center request';
       case 'assigned_clinician':
@@ -1165,6 +1373,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         return const Color(0xFF2E5AAC);
       case 'center_follow_up':
       case 'client_update_required':
+      case 'center_intake_pending':
+      case 'center_recommendation_pending':
       case 'awaiting_payment':
       case 'payment_review':
       case 'reschedule_pending':
@@ -1186,7 +1396,11 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final archived = (data['archived'] ?? false) == true;
     if (archived) return false;
 
-    final status = (data['status'] ?? 'pending_admin').toString();
+    final status = (data['status'] ?? '').toString().trim();
+    final requestKind = (data['requestKind'] ?? '').toString().trim();
+    if (status.isEmpty || requestKind.isEmpty) {
+      return false;
+    }
     return status == _tab;
   }
 
@@ -1205,6 +1419,19 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
 
   String _safeText(Map<String, dynamic> data, String key) {
     return (data[key] ?? '').toString().trim();
+  }
+
+  Color _requestTypeAccent(bool isCenterRequest) {
+    return isCenterRequest
+        ? const Color(0xFF2AA7A1)
+        : const Color(0xFF7C6EF6);
+  }
+
+  String _requestTypeLabel(bool isArabic, bool isCenterRequest) {
+    if (isCenterRequest) {
+      return isArabic ? 'طلب مركز' : 'Center request';
+    }
+    return isArabic ? 'طلب أخصائي' : 'Clinician request';
   }
 
   Widget _buildDetailLine({
@@ -1251,15 +1478,18 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         ? 'Client'
         : _safeText(data, 'clientName');
     final clientId = _safeText(data, 'clientId');
-    final status = (data['status'] ?? 'pending_admin').toString();
+    final status = (data['status'] ?? '').toString().trim();
     final requestKind = _safeText(data, 'requestKind');
+    if (status.isEmpty || requestKind.isEmpty) {
+      return const SizedBox.shrink();
+    }
     final isCenterRequest = requestKind == 'center';
     final canAssignClinician = status == 'pending_admin' && !isCenterRequest;
-    final adminCanApproveWithoutCenterRecheck =
-        (data['adminCanApproveWithoutCenterRecheck'] ?? false) == true;
+    final clientUpdatedAfterCenterFeedback =
+        (data['clientUpdatedAfterCenterFeedback'] ?? false) == true;
     final canMoveCenterToFollowUp = isCenterRequest &&
         status == 'pending_admin' &&
-        !adminCanApproveWithoutCenterRecheck;
+        !clientUpdatedAfterCenterFeedback;
     final note = _safeText(data, 'note');
     final createdAt = _dateText(data['createdAt']);
     final assignedName = _safeText(data, 'assignedClinicianName').isNotEmpty
@@ -1287,6 +1517,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         _safeText(data, 'centerSuggestedAlternativeLabelAr');
     final selectedAccommodationLabelAr =
         _safeText(data, 'selectedAccommodationLabelAr');
+    final selectedCenterType = _safeText(data, 'selectedCenterType');
+    final centerHasDetoxUnit = (data['centerHasDetoxUnit'] ?? false) == true;
     final lastCenterAvailabilityNote =
         _safeText(data, 'lastCenterAvailabilityNote');
     final lastCenterSuggestedAlternativeLabelAr =
@@ -1298,9 +1530,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final netAmountDueToCenter = _safeText(data, 'netAmountDueToCenter');
     final accountingReviewNotes = _safeText(data, 'accountingReviewNotes');
     final canApproveCenter = isCenterRequest &&
-        ((status == 'center_follow_up' &&
-                centerAvailabilityStatus == 'available') ||
-            (status == 'pending_admin' && adminCanApproveWithoutCenterRecheck));
+        (status == 'center_recommendation_pending' ||
+            (status == 'pending_admin' && clientUpdatedAfterCenterFeedback));
 
     final selectedClinicianId = _selectedClinicianByRequest[requestId];
     final selectedClinician =
@@ -1329,61 +1560,84 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
             status == 'session_in_progress' ||
             status == 'session_completed_pending_reviews' ||
             status == 'reschedule_pending' ||
-            status == 'center_follow_up' ||
-            status == 'rejected_admin' ||
             status == 'clinician_rejected');
+    final requestAccent = _requestTypeAccent(isCenterRequest);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
-      child: AppSurfaceCard(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment:
-              isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: isArabic
-                        ? CrossAxisAlignment.end
-                        : CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        clientName,
-                        textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w800,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppRadii.xl),
+          border: Border.all(
+            color: requestAccent.withValues(alpha: 0.30),
+            width: 2,
+          ),
+        ),
+        child: AppSurfaceCard(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment:
+                isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: isArabic
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          clientName,
+                          textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          alignment: isArabic
+                              ? WrapAlignment.end
+                              : WrapAlignment.start,
+                          children: [
+                            AppStatusBadge(
+                              label: _requestTypeLabel(
+                                isArabic,
+                                isCenterRequest,
+                              ),
+                              color: requestAccent,
                             ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        isCenterRequest
-                            ? (isArabic
-                                ? 'طلب مركز عبر الإدارة'
-                                : 'Center request via admin')
-                            : (isArabic
-                                ? 'طلب أخصائي'
-                                : 'Specialist booking request'),
-                        textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.mist,
+                            AppStatusBadge(
+                              label: _statusLabel(status, isArabic),
+                              color: _statusColor(status),
                             ),
-                      ),
-                    ],
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          isCenterRequest
+                              ? (isArabic
+                                  ? 'طلب مركز عبر الإدارة'
+                                  : 'Center request via admin')
+                              : (isArabic
+                                  ? 'طلب أخصائي'
+                                  : 'Specialist booking request'),
+                          textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.mist,
+                                  ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Flexible(
-                  child: AppStatusBadge(
-                    label: _statusLabel(status, isArabic),
-                    color: _statusColor(status),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            _buildDetailLine(
+                ],
+              ),
+              const SizedBox(height: 12),
+              _buildDetailLine(
               context: context,
               isArabic: isArabic,
               arLabel: 'الأخصائي الحالي',
@@ -1432,7 +1686,24 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
               enLabel: 'Selected accommodation',
               value: selectedAccommodationLabelAr,
             ),
-            if (adminCanApproveWithoutCenterRecheck)
+            _buildDetailLine(
+              context: context,
+              isArabic: isArabic,
+              arLabel: 'نوع المركز',
+              enLabel: 'Center type',
+              value: selectedCenterType.isEmpty
+                  ? ''
+                  : _centerTypeLabel(selectedCenterType, isArabic),
+            ),
+            if (centerHasDetoxUnit && selectedCenterType != 'detox')
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'قسم أعراض الانسحاب',
+                enLabel: 'Withdrawal unit',
+                value: isArabic ? 'متاح داخليًا' : 'Available internally',
+              ),
+            if (clientUpdatedAfterCenterFeedback)
               _buildDetailLine(
                 context: context,
                 isArabic: isArabic,
@@ -1599,50 +1870,55 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
               enLabel: 'Accounting notes',
               value: accountingReviewNotes,
             ),
-            const SizedBox(height: 12),
-            if (canAssignClinician) ...[
-              AppSectionPanel(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                color: const Color(0xFFF8F5FC),
-                child: DropdownButtonFormField<String>(
-                  initialValue: selectedClinicianId,
-                  isExpanded: true,
-                  decoration: appInputDecoration(
-                    context: context,
-                    label: isArabic
-                        ? 'اختر الأخصائي للتحويل'
-                        : 'Select clinician to assign',
-                    icon: Icons.person_search_outlined,
+              const SizedBox(height: 12),
+              if (canAssignClinician) ...[
+                AppSectionPanel(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  color: const Color(0xFFF8F5FC),
+                  child: DropdownButtonFormField<String>(
+                    initialValue: selectedClinicianId,
+                    isExpanded: true,
+                    decoration: appInputDecoration(
+                      context: context,
+                      label: isArabic
+                          ? 'اختر الأخصائي للتحويل'
+                          : 'Select clinician to assign',
+                      icon: Icons.person_search_outlined,
+                    ),
+                    items: clinicians.map((item) {
+                      return DropdownMenuItem<String>(
+                        value: item['id']!,
+                        child: Text(item['name']!),
+                      );
+                    }).toList(),
+                    onChanged: busy
+                        ? null
+                        : (value) {
+                            setState(() {
+                              if (value == null) {
+                                _selectedClinicianByRequest.remove(requestId);
+                              } else {
+                                _selectedClinicianByRequest[requestId] = value;
+                              }
+                            });
+                          },
                   ),
-                  items: clinicians.map((item) {
-                    return DropdownMenuItem<String>(
-                      value: item['id']!,
-                      child: Text(item['name']!),
-                    );
-                  }).toList(),
-                  onChanged: busy
-                      ? null
-                      : (value) {
-                          setState(() {
-                            if (value == null) {
-                              _selectedClinicianByRequest.remove(requestId);
-                            } else {
-                              _selectedClinicianByRequest[requestId] = value;
-                            }
-                          });
-                        },
                 ),
-              ),
-              const SizedBox(height: 14),
-            ],
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              alignment: isArabic ? WrapAlignment.end : WrapAlignment.start,
-              children: [
+                const SizedBox(height: 14),
+              ],
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                alignment: isArabic ? WrapAlignment.end : WrapAlignment.start,
+                children: [
                 if (status == 'pending_admin')
                   OutlinedButton.icon(
-                    onPressed: busy ? null : () => _rejectRequest(requestId),
+                    onPressed: busy
+                        ? null
+                        : () => _rejectRequest(
+                              requestId,
+                              isCenterRequest: isCenterRequest,
+                            ),
                     icon: const Icon(Icons.cancel_outlined),
                     label: Text(isArabic ? 'رفض' : 'Reject'),
                   ),
@@ -1676,8 +1952,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                     icon: const Icon(Icons.verified_outlined),
                     label: Text(
                       isArabic
-                          ? 'اعتماد وفتح الدفع'
-                          : 'Approve and open payment',
+                          ? 'اعتماد وفتح الجدولة'
+                          : 'Approve and open scheduling',
                     ),
                   ),
                 if (canReturnCenterToClient)
@@ -1760,7 +2036,12 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                   ),
                 if (isCenterRequest && status == 'center_follow_up')
                   OutlinedButton.icon(
-                    onPressed: busy ? null : () => _rejectRequest(requestId),
+                    onPressed: busy
+                        ? null
+                        : () => _rejectRequest(
+                              requestId,
+                              isCenterRequest: true,
+                            ),
                     icon: const Icon(Icons.cancel_outlined),
                     label: Text(isArabic ? 'رفض' : 'Reject'),
                   ),
@@ -1772,9 +2053,10 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                       isArabic ? 'إرجاع للبندنج' : 'Return to pending',
                     ),
                   ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1796,7 +2078,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         body: AppPageBackground(
           child:
               StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
-            stream: _bookingDocsStream(),
+            stream: _bookingDocsStreamRef,
             builder: (context, bookingSnap) {
               if (bookingSnap.hasError) {
                 return AppEmptyState(
@@ -1813,7 +2095,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
               }
 
               return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: _cliniciansStream(),
+                stream: _cliniciansStreamRef,
                 builder: (context, clinicianSnap) {
                   if (clinicianSnap.hasError) {
                     return AppEmptyState(
@@ -1844,6 +2126,24 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                   final allDocs = bookingDocs
                       .where((doc) => _matchTab(doc.data()))
                       .toList();
+                  if (_tab == 'pending_admin') {
+                    allDocs.sort((a, b) {
+                      final aCenter =
+                          (a.data()['requestKind'] ?? '').toString() == 'center';
+                      final bCenter =
+                          (b.data()['requestKind'] ?? '').toString() == 'center';
+                      if (aCenter != bCenter) {
+                        return aCenter ? -1 : 1;
+                      }
+
+                      final aCreatedAt = a.data()['createdAt'];
+                      final bCreatedAt = b.data()['createdAt'];
+                      if (aCreatedAt is Timestamp && bCreatedAt is Timestamp) {
+                        return bCreatedAt.compareTo(aCreatedAt);
+                      }
+                      return 0;
+                    });
+                  }
 
                   return ListView(
                     padding: const EdgeInsets.all(AppSpacing.lg),
@@ -1869,6 +2169,25 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                         ),
                       ),
                       const SizedBox(height: 16),
+                      if (_tab == 'pending_admin')
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: AppSectionPanel(
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            color: const Color(0xFFF8FAFC),
+                            child: Text(
+                              isArabic
+                                  ? 'تظهر طلبات المراكز أولًا داخل هذه المرحلة، مع شارة ولون مخصصين لتمييزها عن طلبات الأخصائيين.'
+                                  : 'Center requests appear first in this stage, with a dedicated badge and accent color to distinguish them from clinician requests.',
+                              textAlign:
+                                  isArabic ? TextAlign.right : TextAlign.left,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(color: AppColors.obsidian),
+                            ),
+                          ),
+                        ),
                       if (allDocs.isEmpty)
                         AppEmptyState(
                           message: isArabic

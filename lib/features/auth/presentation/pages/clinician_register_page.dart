@@ -426,7 +426,11 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                   ),
                   children: [
                     const SizedBox(height: AppSpacing.lg),
-                    const AppHeroHeader(title: 'تسجيل أخصائي جديد'),
+                    const AppHeroHeader(
+                      title: 'تسجيل أخصائي جديد',
+                      subtitle:
+                          'ملف مهني أوضح وأهدأ بنفس الهوية الدافئة للمشروع، مع تقسيم بصري أنظف للبيانات والمستندات والمعاينة.',
+                    ),
                     const SizedBox(height: AppSpacing.lg),
                     AppSurfaceCard(
                       child: Column(

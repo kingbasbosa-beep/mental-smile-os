@@ -19,6 +19,7 @@ class SessionReviewPage extends StatefulWidget {
 
 class _SessionReviewPageState extends State<SessionReviewPage> {
   bool _loading = false;
+  Map<String, dynamic>? _requestData;
 
   final TextEditingController _notesController = TextEditingController();
 
@@ -34,7 +35,36 @@ class _SessionReviewPageState extends State<SessionReviewPage> {
   bool get _isArabic =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
+  bool _isCenterRequestData(Map<String, dynamic> data) {
+    final requestKind = (data['requestKind'] ?? '').toString().trim();
+    final centerId = (data['centerId'] ?? '').toString().trim();
+    final centerName = (data['centerName'] ?? '').toString().trim();
+    return requestKind == 'center' ||
+        centerId.isNotEmpty ||
+        centerName.isNotEmpty;
+  }
+
   List<String> _questions() {
+    if (widget.reviewerType == 'center') {
+      return _isArabic
+          ? const [
+              'مدى التزام الحالة والأسرة بنظام المركز',
+              'وضوح التشخيص والمتابعة أثناء الإقامة',
+              'مدى مناسبة الخطة العلاجية المنفذة خلال الإقامة',
+              'مدى تعاون الحالة مع التعليمات والإجراءات',
+              'مدى جاهزية الحالة للمتابعة بعد الخروج',
+              'التقييم العام لسير الإقامة داخل المركز',
+            ]
+          : const [
+              'Commitment to center rules',
+              'Clarity of diagnosis and monitoring during residency',
+              'Suitability of the treatment plan during residency',
+              'Cooperation with instructions and procedures',
+              'Readiness for follow-up after discharge',
+              'Overall residency assessment',
+            ];
+    }
+
     if (widget.reviewerType == 'clinician') {
       return _isArabic
           ? const [
@@ -97,10 +127,7 @@ class _SessionReviewPageState extends State<SessionReviewPage> {
   Future<List<DocumentSnapshot<Map<String, dynamic>>>>
       _existingRequestDocs() async {
     final db = FirebaseFirestore.instance;
-    final refs = [
-      db.collection('booking_requests').doc(widget.requestId),
-      db.collection('bookingRequests').doc(widget.requestId),
-    ];
+    final refs = [db.collection('booking_requests').doc(widget.requestId)];
 
     final existing = <DocumentSnapshot<Map<String, dynamic>>>[];
     for (final ref in refs) {
@@ -114,10 +141,7 @@ class _SessionReviewPageState extends State<SessionReviewPage> {
 
   Future<Map<String, dynamic>?> _readRequest() async {
     final db = FirebaseFirestore.instance;
-    final refs = [
-      db.collection('booking_requests').doc(widget.requestId),
-      db.collection('bookingRequests').doc(widget.requestId),
-    ];
+    final refs = [db.collection('booking_requests').doc(widget.requestId)];
 
     for (final ref in refs) {
       final snap = await ref.get();
@@ -148,10 +172,20 @@ class _SessionReviewPageState extends State<SessionReviewPage> {
           _isArabic ? 'لم يتم العثور على الطلب' : 'Request not found',
         );
       }
+      _requestData = requestData;
 
+      final isCenterReview = widget.reviewerType == 'center';
+      final isCenterRequest = _isCenterRequestData(requestData);
+      final partnerReviewSubmitted =
+          ((isCenterRequest ? requestData['centerReviewSubmitted'] : null) ??
+                  requestData['clinicianReviewSubmitted'] ??
+                  false) ==
+              true;
       final alreadySubmitted = widget.reviewerType == 'client'
           ? (requestData['clientReviewSubmitted'] ?? false) == true
-          : (requestData['clinicianReviewSubmitted'] ?? false) == true;
+          : isCenterReview
+              ? partnerReviewSubmitted
+              : (requestData['clinicianReviewSubmitted'] ?? false) == true;
       if (alreadySubmitted) {
         throw Exception(
           _isArabic ? 'تم إرسال التقييم مسبقًا' : 'Review already submitted',
@@ -175,11 +209,13 @@ class _SessionReviewPageState extends State<SessionReviewPage> {
                 requestData['clinicianId'] ??
                 '')
             .toString(),
+        'centerId': (requestData['centerId'] ?? '').toString(),
         'clientName': (requestData['clientName'] ?? '').toString(),
         'clinicianName': (requestData['assignedClinicianName'] ??
                 requestData['clinicianName'] ??
                 '')
             .toString(),
+        'centerName': (requestData['centerName'] ?? '').toString(),
         'answers': _answers,
         'totalScore': totalScore,
         'percentageScore': percentageScore,
@@ -196,6 +232,12 @@ class _SessionReviewPageState extends State<SessionReviewPage> {
         updates['clientReviewTotalScore'] = totalScore;
         updates['clientReviewPercentage'] = percentageScore;
         updates['clientReviewDerivedStars'] = derivedStars;
+      } else if (isCenterReview) {
+        updates['clinicianReviewSubmitted'] = true;
+        updates['clinicianReviewSubmittedAt'] = FieldValue.serverTimestamp();
+        updates['clinicianReviewTotalScore'] = totalScore;
+        updates['clinicianReviewPercentage'] = percentageScore;
+        updates['clinicianReviewDerivedStars'] = derivedStars;
       } else {
         updates['clinicianReviewSubmitted'] = true;
         updates['clinicianReviewSubmittedAt'] = FieldValue.serverTimestamp();
@@ -208,30 +250,39 @@ class _SessionReviewPageState extends State<SessionReviewPage> {
           ? true
           : (requestData['clientReviewSubmitted'] ?? false) == true;
 
-      final alreadyClinician = widget.reviewerType == 'clinician'
+      final alreadyPartner = isCenterReview
           ? true
-          : (requestData['clinicianReviewSubmitted'] ?? false) == true;
+          : widget.reviewerType == 'clinician'
+              ? true
+              : partnerReviewSubmitted;
 
       final clientPercentage = widget.reviewerType == 'client'
           ? percentageScore
           : ((requestData['clientReviewPercentage'] ?? 0) as num).toDouble();
 
-      final clinicianPercentage = widget.reviewerType == 'clinician'
-          ? percentageScore
-          : ((requestData['clinicianReviewPercentage'] ?? 0) as num).toDouble();
+      final partnerPercentage = (isCenterReview
+              ? percentageScore
+              : widget.reviewerType == 'clinician'
+                  ? percentageScore
+                  : (((isCenterRequest
+                                  ? requestData['centerReviewPercentage']
+                                  : null) ??
+                              requestData['clinicianReviewPercentage']) ??
+                          0) as num)
+          .toDouble();
 
-      if (alreadyClient && alreadyClinician) {
+      if (alreadyClient && alreadyPartner) {
         updates['status'] = 'payout_pending';
         updates['reviewStatus'] = 'completed';
         updates['sessionStatus'] = 'completed';
         updates['finalReviewPercentage'] =
-            ((clientPercentage + clinicianPercentage) / 2);
+            ((clientPercentage + partnerPercentage) / 2);
       } else {
         updates['status'] = 'session_completed_pending_reviews';
         updates['reviewStatus'] = 'partial';
         updates['sessionStatus'] = 'completed';
         updates['finalReviewPercentage'] =
-            alreadyClient ? clientPercentage : clinicianPercentage;
+            alreadyClient ? clientPercentage : partnerPercentage;
       }
 
       final requestDocs = await _existingRequestDocs();
@@ -252,8 +303,32 @@ class _SessionReviewPageState extends State<SessionReviewPage> {
         ...updates,
         'updatedAt': FieldValue.serverTimestamp(),
       };
-      await ratingRef.set(reviewPayload);
-      await targetRef.update(payload);
+      debugPrint(
+        'CENTER_REVIEW_TRACE requestId=${widget.requestId} reviewerType=${widget.reviewerType} '
+        'requestKind=${requestData['requestKind']} status_before=${requestData['status']} '
+        'reviewStatus_before=${requestData['reviewStatus']} payload_keys=${payload.keys.toList()} '
+        'payload_status=${payload['status']} payload_reviewStatus=${payload['reviewStatus']} '
+        'payload_sessionStatus=${payload['sessionStatus']}',
+      );
+      try {
+        await ratingRef.set(reviewPayload);
+      } catch (e) {
+        throw Exception(
+          _isArabic
+              ? 'فشل حفظ سجل التقييم: $e'
+              : 'Failed to save rating record: $e',
+        );
+      }
+
+      try {
+        await targetRef.update(payload);
+      } catch (e) {
+        throw Exception(
+          _isArabic
+              ? 'فشل تحديث الطلب بعد التقييم: $e'
+              : 'Failed to update booking after review: $e',
+        );
+      }
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -278,6 +353,19 @@ class _SessionReviewPageState extends State<SessionReviewPage> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  String _pageTitle() {
+    final isCenterRequest = _requestData == null
+        ? false
+        : _isCenterRequestData(_requestData!);
+    if (widget.reviewerType == 'center') {
+      return _isArabic ? 'تقرير خروج المركز' : 'Center discharge report';
+    }
+    if (widget.reviewerType == 'client' && isCenterRequest) {
+      return _isArabic ? 'تقييم الإقامة' : 'Residency review';
+    }
+    return _isArabic ? 'تقييم الجلسة' : 'Session Review';
   }
 
   Widget _scoreRow(String key, String label) {
@@ -379,7 +467,7 @@ class _SessionReviewPageState extends State<SessionReviewPage> {
       child: Scaffold(
         appBar: AppShellActions.buildAppBar(
           context,
-          title: _isArabic ? 'تقييم الجلسة' : 'Session Review',
+          title: _pageTitle(),
         ),
         body: ListView(
           padding: const EdgeInsets.all(16),
