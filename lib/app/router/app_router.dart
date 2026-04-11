@@ -48,7 +48,7 @@ import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_payments_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_reports_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_session_report_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_clinician_profile_requests_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_profile_requests_page.dart';
 import 'package:flutterprojects/features/reviews/presentation/pages/session_review_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_payments_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_sessions_page.dart';
