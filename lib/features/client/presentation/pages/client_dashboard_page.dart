@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/shared/contracts/role_names.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
@@ -190,8 +191,9 @@ class ClientDashboardPage extends StatelessWidget {
   }
 
   String _readAccountType(bool isArabic, Map<String, dynamic>? data) {
-    final role = (data?['role'] ?? 'client').toString().trim().toLowerCase();
-    if (role == 'client') {
+    final role =
+        (data?['role'] ?? RoleNames.client).toString().trim().toLowerCase();
+    if (role == RoleNames.client) {
       return isArabic ? 'عميل' : 'Client';
     }
     return role;
