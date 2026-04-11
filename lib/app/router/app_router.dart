@@ -187,20 +187,8 @@ class AppRouter {
     );
   }
 
-  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    final needsNonAnonymous = _requiresSignedInNonAnonymous(settings);
-    if (needsNonAnonymous && (currentUser == null || currentUser.isAnonymous)) {
-      return _redirectToLogin(settings);
-    }
-
+  static Route<dynamic>? adminSurfaceRoutes(RouteSettings settings) {
     switch (settings.name) {
-      case Routes.menu:
-        return MaterialPageRoute(
-          builder: (_) => const MenuPage(),
-          settings: settings,
-        );
-
       case Routes.adminHub:
         return _protectedRoute(
           child: const AdminHubPage(),
@@ -225,6 +213,84 @@ class AppRouter {
           settings: settings,
         );
 
+      case Routes.adminSupportChats:
+        return _protectedRoute(
+          child: const AdminSupportChatPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchivePayments:
+        return _protectedRoute(
+          child: const AdminArchivePaymentsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchiveClinicians:
+        return _protectedRoute(
+          child: const AdminArchiveCliniciansPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchiveCenters:
+        return _protectedRoute(
+          child: const AdminArchiveCentersPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchiveSupport:
+        return _protectedRoute(
+          child: const AdminArchiveSupportPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchiveAccounting:
+        return _protectedRoute(
+          child: const AdminArchiveAccountingPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchiveReports:
+        return _protectedRoute(
+          child: const AdminArchiveReportsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchiveSessions:
+        return _protectedRoute(
+          child: const AdminArchiveSessionsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchive:
+        return _protectedRoute(
+          child: const AdminArchivePage(),
+          settings: settings,
+        );
+
+      default:
+        return null;
+    }
+  }
+
+  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final needsNonAnonymous = _requiresSignedInNonAnonymous(settings);
+    if (needsNonAnonymous && (currentUser == null || currentUser.isAnonymous)) {
+      return _redirectToLogin(settings);
+    }
+
+    final adminSurfaceRoute = adminSurfaceRoutes(settings);
+    if (adminSurfaceRoute != null) {
+      return adminSurfaceRoute;
+    }
+
+    switch (settings.name) {
+      case Routes.menu:
+        return MaterialPageRoute(
+          builder: (_) => const MenuPage(),
+          settings: settings,
+        );
+
       case Routes.adminPayments:
         return _protectedRoute(
           child: const AdminPaymentsPage(),
@@ -234,12 +300,6 @@ class AppRouter {
       case Routes.adminSessions:
         return _protectedRoute(
           child: const AdminSessionsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminSupportChats:
-        return _protectedRoute(
-          child: const AdminSupportChatPage(),
           settings: settings,
         );
 
@@ -451,54 +511,6 @@ class AppRouter {
         final args = settings.arguments as CenterBookingRequestArgs;
         return _protectedRoute(
           child: CenterBookingRequestPage(args: args),
-          settings: settings,
-        );
-
-      case Routes.adminArchivePayments:
-        return _protectedRoute(
-          child: const AdminArchivePaymentsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveClinicians:
-        return _protectedRoute(
-          child: const AdminArchiveCliniciansPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveCenters:
-        return _protectedRoute(
-          child: const AdminArchiveCentersPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveSupport:
-        return _protectedRoute(
-          child: const AdminArchiveSupportPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveAccounting:
-        return _protectedRoute(
-          child: const AdminArchiveAccountingPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveReports:
-        return _protectedRoute(
-          child: const AdminArchiveReportsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveSessions:
-        return _protectedRoute(
-          child: const AdminArchiveSessionsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchive:
-        return _protectedRoute(
-          child: const AdminArchivePage(),
           settings: settings,
         );
 
