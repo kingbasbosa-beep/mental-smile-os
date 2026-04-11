@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutterprojects/shared/contracts/role_names.dart';
 
 const String kKnownPrimaryAdminUid = '1p1UEwzwXFYCHExp22bc0xGSjJj2';
 
@@ -19,7 +20,7 @@ class SignedInAccessState {
   final String? collection;
   final String? docId;
 
-  bool get isAdmin => role == 'admin';
+  bool get isAdmin => role == RoleNames.admin;
 }
 
 class AccountAccessService {
