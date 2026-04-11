@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
+import 'package:flutterprojects/shared/contracts/role_names.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 
 class LoginPage extends StatefulWidget {
@@ -50,13 +51,13 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     switch (access.role) {
-      case 'admin':
+      case RoleNames.admin:
         return Routes.adminHub;
-      case 'clinician':
+      case RoleNames.clinician:
         return Routes.clinicianOperations;
-      case 'center':
+      case RoleNames.center:
         return Routes.centerDashboard;
-      case 'client':
+      case RoleNames.client:
         return Routes.clientDashboard;
     }
 
