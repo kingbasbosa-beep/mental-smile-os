@@ -3,6 +3,7 @@ import 'package:flutterprojects/features/chat/data/models/chat_message_model.dar
 import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_ai_service.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_firestore_service.dart';
+import 'package:flutterprojects/shared/gateways/role_access_gateway.dart';
 
 class ChatController {
   ChatController({
@@ -99,13 +100,15 @@ class ChatController {
       }
     }
 
+    final isCenter = await RoleAccessGateway().isCenter();
+
     final thread = await _firestoreService.createThread(
       ownerUid: user.uid,
-      ownerType: 'registered_client',
+      ownerType: isCenter ? 'registered_center' : 'registered_client',
       displayName: user.email ?? 'مستخدم',
       sourceType: 'admin_support',
       isTemporary: false,
-      identityState: 'registered_client',
+      identityState: isCenter ? 'registered_center' : 'registered_client',
     );
 
     await _firestoreService.updateThreadState(

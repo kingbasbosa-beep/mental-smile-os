@@ -333,6 +333,23 @@ class CenterDashboardPage extends StatelessWidget {
                         .pushNamed(Routes.centerOperations),
                   ),
                   const SizedBox(height: 12),
+                  _SectionCard(
+                    title: isArabic ? 'الشات مع الإدارة' : 'Chat with Admin',
+                    subtitle: isArabic
+                        ? 'قناة مباشرة وآمنة للتواصل مع الإدارة والمتابعة'
+                        : 'A direct and safe channel to communicate with admin',
+                    icon: Icons.chat_bubble_outline_rounded,
+                    accent: const Color(0xFF496D7C),
+                    badgeLabel: isArabic ? 'دعم إداري' : 'Admin Support',
+                    assetPath: 'assets/c7_branding/logo/logo_mark.png',
+                    actionLabel: isArabic ? 'فتح الشات' : 'Open chat',
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      Routes.chat,
+                      arguments: const {'mode': 'admin_support'},
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                   _CenterGalleryCard(
                     title: isArabic ? 'صور المركز' : 'Center Gallery',
                     subtitle: isArabic
