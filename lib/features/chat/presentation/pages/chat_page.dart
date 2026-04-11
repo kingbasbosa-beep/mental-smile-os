@@ -35,9 +35,15 @@ class _ChatPageState extends State<ChatPage> {
   bool _isArabic() =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
-  String get _avatarAsset => widget.adminSupportMode
-      ? 'assets/c5/avatars/avatar_admin_support.png'
-      : 'assets/c5/avatars/avatar_client.png';
+  String get _avatarAsset {
+    final value = widget.adminSupportMode
+        ? 'assets/c5/avatars/avatar_admin_support.png'
+        : 'assets/c5/avatars/avatar_client.png';
+    if (value.startsWith('assets/assets/')) {
+      return value.replaceFirst('assets/assets/', 'assets/');
+    }
+    return value;
+  }
 
   String _pageSubtitle(bool isArabic) {
     if (widget.adminSupportMode) {
