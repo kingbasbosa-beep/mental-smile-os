@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:flutterprojects/shared/gateways/role_access_gateway.dart';
 import 'package:flutterprojects/features/chat/controller/chat_controller.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_message_model.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
@@ -50,20 +51,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<bool> _isAdminUser() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null || uid.isEmpty) return false;
-
-    if (uid == kKnownPrimaryAdminUid) return true;
-
-    final adminDoc =
-        await FirebaseFirestore.instance.collection('admins').doc(uid).get();
-
-    if (adminDoc.exists) {
-      final data = adminDoc.data() ?? <String, dynamic>{};
-      if ((data['active'] ?? false) == true) return true;
-    }
-
-    return false;
+    return RoleAccessGateway().isAdmin();
   }
 
   @override
