@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
+// ADMIN_SURFACE: SAFE_UI
 class AdminArchiveAccountingPage extends StatefulWidget {
   const AdminArchiveAccountingPage({super.key});
 

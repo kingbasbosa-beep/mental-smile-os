@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
+// ADMIN_SURFACE: SAFE_UI
 class AdminArchiveReportsPage extends StatefulWidget {
   const AdminArchiveReportsPage({super.key});
 

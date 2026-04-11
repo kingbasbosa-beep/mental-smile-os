@@ -5,6 +5,7 @@ import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
+// ADMIN_SURFACE: SAFE_UI
 class AdminClinicianRequestsPage extends StatefulWidget {
   const AdminClinicianRequestsPage({super.key});
 

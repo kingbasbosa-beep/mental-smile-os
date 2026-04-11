@@ -4,6 +4,7 @@ import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
+// ADMIN_SURFACE: SAFE_UI
 class AdminHubPage extends StatelessWidget {
   const AdminHubPage({super.key});
 

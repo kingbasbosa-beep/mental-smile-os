@@ -4,6 +4,7 @@ import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
 
+// ADMIN_SURFACE: SAFE_UI
 class AdminClinicianProfileRequestsPage extends StatefulWidget {
   const AdminClinicianProfileRequestsPage({super.key});
 
