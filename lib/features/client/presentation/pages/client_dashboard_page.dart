@@ -204,7 +204,11 @@ class ClientDashboardPage extends StatelessWidget {
 
   String _readAvatarAsset(Map<String, dynamic>? data) {
     if (data == null) return '';
-    return (data['avatarAsset'] ?? '').toString().trim();
+    final value = (data['avatarAsset'] ?? '').toString().trim();
+    if (value.startsWith('assets/assets/')) {
+      return value.replaceFirst('assets/assets/', 'assets/');
+    }
+    return value;
   }
 
   String _readCity(Map<String, dynamic>? data) {
