@@ -42,7 +42,7 @@ import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.
 import 'package:flutterprojects/features/admin_surface/pages/admin_archive_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_centers_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_clinicians_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_support_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_archive_support_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_accounting_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_sessions_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_payments_page.dart';
