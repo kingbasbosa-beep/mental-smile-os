@@ -247,10 +247,14 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
     await _setBusy(requestId, true);
     try {
       final gross = double.tryParse(grossController.text.trim()) ?? 0;
+      final baseSeed = data['stayBaseAmount'] ?? 0;
+      final baseAmount = baseSeed is num
+          ? baseSeed.toDouble()
+          : double.tryParse('$baseSeed') ?? 0;
       final commissionPercent =
           double.tryParse(commissionController.text.trim()) ?? 10;
-      final commissionAmount = gross * (commissionPercent / 100);
-      final netAmount = gross - commissionAmount;
+      final commissionAmount = baseAmount * (commissionPercent / 100);
+      final netAmount = baseAmount - commissionAmount;
       await _updateRequestEverywhere(requestId, {
         'status': 'payout_pending',
         'accountingReviewStatus': 'confirmed',

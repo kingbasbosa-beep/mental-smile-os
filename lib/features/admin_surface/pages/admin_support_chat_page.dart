@@ -29,11 +29,14 @@ class AdminSupportChatPage extends StatelessWidget {
     final sourceType = (data['sourceType'] ?? '').toString();
     final ownerType = (data['ownerType'] ?? '').toString();
 
-    if (sourceType == 'admin_support') {
-      return 'assets/c5/avatars/avatar_admin_support.png';
-    }
     if (ownerType.contains('clinician')) {
       return 'assets/c5/avatars/avatar_clinician_m.png';
+    }
+    if (ownerType.contains('center')) {
+      return 'assets/c5/avatars/avatar_center.png';
+    }
+    if (sourceType == 'admin_support') {
+      return 'assets/c5/avatars/avatar_admin_support.png';
     }
     return 'assets/c5/avatars/avatar_client.png';
   }
