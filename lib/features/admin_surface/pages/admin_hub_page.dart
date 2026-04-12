@@ -150,6 +150,39 @@ class AdminHubPage extends StatelessWidget {
         .snapshots()
         .map((snapshot) => snapshot.docs.length);
 
+    final quickActions = <_AdminQuickAction>[
+      _AdminQuickAction(
+        label: 'Admin Messages',
+        icon: Icons.support_agent_outlined,
+        route: Routes.adminSupportChats,
+        color: const Color(0xFFE58667),
+      ),
+      _AdminQuickAction(
+        label: 'Clients',
+        icon: Icons.people_alt_outlined,
+        route: Routes.adminClients,
+        color: const Color(0xFF5D8CFF),
+      ),
+      _AdminQuickAction(
+        label: 'Clinician Requests',
+        icon: Icons.verified_user_outlined,
+        route: Routes.adminClinicianRequests,
+        color: const Color(0xFFE2A067),
+      ),
+      _AdminQuickAction(
+        label: 'Profile/Data Requests',
+        icon: Icons.manage_accounts_outlined,
+        route: Routes.adminClinicianProfileRequests,
+        color: AppColors.accentLavender,
+      ),
+      _AdminQuickAction(
+        label: 'Archive',
+        icon: Icons.archive_outlined,
+        route: Routes.adminArchive,
+        color: const Color(0xFF4D7C6A),
+      ),
+    ];
+
     final items = <_AdminHubItem>[
       _AdminHubItem(
         title: isArabic ? 'تسجيل الأخصائيين' : 'Clinician Registrations',
@@ -293,6 +326,10 @@ class AdminHubPage extends StatelessWidget {
                     child: AppLogoWordmark(width: 220, height: 128),
                   ),
                   const SizedBox(height: AppSpacing.md),
+                  _AdminQuickActionsSection(
+                    actions: quickActions,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
                   _AdminQuickStatsSection(
                     isArabic: isArabic,
                     clinicianPendingStream: clinicianPendingStream,
@@ -330,6 +367,81 @@ class AdminHubPage extends StatelessWidget {
             },
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _AdminQuickAction {
+  final String label;
+  final IconData icon;
+  final String route;
+  final Color color;
+
+  const _AdminQuickAction({
+    required this.label,
+    required this.icon,
+    required this.route,
+    required this.color,
+  });
+}
+
+class _AdminQuickActionsSection extends StatelessWidget {
+  const _AdminQuickActionsSection({
+    required this.actions,
+  });
+
+  final List<_AdminQuickAction> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Admin Control Center',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: actions.map((action) {
+              return InkWell(
+                borderRadius: BorderRadius.circular(AppRadii.lg),
+                onTap: () => Navigator.pushNamed(context, action.route),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                  decoration: BoxDecoration(
+                    color: action.color.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(AppRadii.lg),
+                    border: Border.all(
+                      color: action.color.withValues(alpha: 0.22),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(action.icon, color: action.color, size: 20),
+                      const SizedBox(width: AppSpacing.xs),
+                      Text(
+                        action.label,
+                        style: TextStyle(
+                          color: action.color,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
       ),
     );
   }
