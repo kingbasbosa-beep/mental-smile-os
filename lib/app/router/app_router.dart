@@ -39,7 +39,7 @@ import 'package:flutterprojects/features/centers/presentation/pages/admin_center
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_hub_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_archive_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_centers_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_clinicians_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_support_page.dart';
