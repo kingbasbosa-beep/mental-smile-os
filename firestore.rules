@@ -1024,12 +1024,73 @@ service cloud.firestore {
       return isCenterCycleAdmin()
         && resource.data.requestKind == 'center'
         && resource.data.status == 'center_follow_up'
-        && resource.data.centerAvailabilityStatus == 'unavailable'
         && request.resource.data.status == 'client_update_required'
         && request.resource.data.workflowStage == 'client_update_required'
         && request.resource.data.adminDecisionType == 'returned_to_client'
         && (request.resource.data.adminDecisionBy is string)
         && request.resource.data.adminDecisionBy == uid();
+    }
+
+    /**
+     * ADMIN CENTER RETURN → CLIENT (BRIDGE RULE)
+     *
+     * السبب:
+     * بعض الطلبات القديمة كانت تحتوي على قيم غير صحيحة في:
+     * centerAvailabilityStatus (مثل 300 بدل 'unavailable')
+     *
+     * مما أدى إلى فشل rule الأساسية:
+     * adminCenterReturnToClientValid()
+     *
+     * لأن هذه rule تشترط:
+     * resource.data.centerAvailabilityStatus == 'unavailable'
+     *
+     * الحل:
+     * - تم إصلاح المصدر (center_request_inbox_service) لمنع القيم الخاطئة مستقبلًا
+     * - لكن الطلبات القديمة قد تظل غير متوافقة
+     *
+     * لذلك:
+     * تم إنشاء bridge rule مطابقة تمامًا للـ payload الفعلي لزر:
+     * "إرجاع للعميل للتعديل"
+     *
+     * الشروط:
+     * - requestKind == center
+     * - status → client_update_required
+     * - workflowStage → client_update_required
+     * - adminDecisionType == returned_to_client
+     * - adminDecisionBy == uid()
+     * - changedKeys محدودة جدًا لضمان الأمان
+     *
+     * ملاحظة:
+     * هذه rule transitional safety layer
+     * يمكن مراجعتها أو حذفها لاحقًا بعد التأكد أن كل البيانات أصبحت نظيفة
+     */
+    function adminCenterReturnToClientBridgeValid() {
+      return isCenterCycleAdmin()
+        && resource.data.requestKind == 'center'
+        && resource.data.status == 'center_follow_up'
+        && request.resource.data.requestKind == resource.data.requestKind
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.status == 'client_update_required'
+        && request.resource.data.workflowStage == 'client_update_required'
+        && request.resource.data.adminDecisionType == 'returned_to_client'
+        && (request.resource.data.adminDecisionBy is string)
+        && request.resource.data.adminDecisionBy == uid()
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'lastCenterAvailabilityStatus',
+              'lastCenterAvailabilityNote',
+              'lastCenterSuggestedAlternativeKey',
+              'lastCenterSuggestedAlternativeLabelAr',
+              'lastCenterFeedbackRevisionNumber',
+              'adminCanApproveWithoutCenterRecheck',
+              'adminDecisionType',
+              'adminDecisionBy',
+              'adminDecisionAt',
+              'updatedAt'
+            ]);
     }
 
     function adminCenterApproveValid() {
@@ -1880,6 +1941,7 @@ service cloud.firestore {
         || centerBookingCreateValid();
 
       allow update: if adminCenterFollowUpBridgeValid()
+        || adminCenterReturnToClientBridgeValid()
         || adminCenterApproveBridgeValid()
         || adminCenterScheduleBridgeValid()
         || adminPaymentApproveBridgeValid()

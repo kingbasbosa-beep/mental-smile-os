@@ -99,6 +99,15 @@ class CenterRequestInboxService {
     required String note,
     required String suggestedAlternativeLabelAr,
   }) async {
+    final normalizedAvailabilityStatus =
+        availabilityStatus.trim().toLowerCase();
+    if (normalizedAvailabilityStatus != 'available' &&
+        normalizedAvailabilityStatus != 'unavailable') {
+      throw ArgumentError(
+        'Invalid availabilityStatus: $availabilityStatus',
+      );
+    }
+
     final ref =
         FirebaseFirestore.instance.collection('booking_requests').doc(requestId);
 
@@ -107,7 +116,7 @@ class CenterRequestInboxService {
       documentId: requestId,
       centerId: centerId,
       status: 'center_follow_up',
-      availabilityStatus: availabilityStatus,
+      availabilityStatus: normalizedAvailabilityStatus,
     );
 
     try {
@@ -122,17 +131,17 @@ class CenterRequestInboxService {
         documentId: requestId,
         centerId: centerId,
         status: (data['status'] ?? '').toString(),
-        availabilityStatus: availabilityStatus,
+        availabilityStatus: normalizedAvailabilityStatus,
       );
 
       await ref.update({
-        'status': availabilityStatus == 'available'
+        'status': normalizedAvailabilityStatus == 'available'
             ? 'center_intake_pending'
             : (data['status'] ?? 'center_follow_up'),
-        'workflowStage': availabilityStatus == 'available'
+        'workflowStage': normalizedAvailabilityStatus == 'available'
             ? 'center_intake_pending'
             : (data['workflowStage'] ?? data['status'] ?? 'center_follow_up'),
-        'centerAvailabilityStatus': availabilityStatus,
+        'centerAvailabilityStatus': normalizedAvailabilityStatus,
         'centerAvailabilityNote': note.trim(),
         'centerSuggestedAlternativeKey':
             suggestedAlternativeLabelAr.trim().isEmpty
@@ -149,7 +158,7 @@ class CenterRequestInboxService {
         documentId: requestId,
         centerId: centerId,
         status: 'center_follow_up',
-        availabilityStatus: availabilityStatus,
+        availabilityStatus: normalizedAvailabilityStatus,
       );
     } catch (e) {
       _log(
@@ -157,7 +166,7 @@ class CenterRequestInboxService {
         documentId: requestId,
         centerId: centerId,
         status: 'center_follow_up',
-        availabilityStatus: availabilityStatus,
+        availabilityStatus: normalizedAvailabilityStatus,
         error: e,
       );
       rethrow;
