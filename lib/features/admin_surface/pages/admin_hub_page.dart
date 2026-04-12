@@ -774,8 +774,8 @@ class _QuickStatCard extends StatelessWidget {
         borderColor: item.color.withValues(alpha: 0.22),
         padding: const EdgeInsets.all(AppSpacing.md),
         child: StreamBuilder<int>(
-          stream: item.stream,
-          builder: (context, snapshot) {
+        stream: item.stream,
+        builder: (context, snapshot) {
             final waiting =
                 snapshot.connectionState == ConnectionState.waiting &&
                     !snapshot.hasData;
@@ -783,33 +783,52 @@ class _QuickStatCard extends StatelessWidget {
             final count = snapshot.data;
             final countText = hasError
                 ? '!'
-                : (waiting ? '...' : (count == null ? '—' : '$count'));
+                : (count == null ? '—' : '$count');
+            final statusText = hasError
+                ? (isArabic ? 'تعذر التحميل' : 'Load failed')
+                : (waiting
+                    ? (isArabic ? 'جارٍ التحديث' : 'Updating')
+                    : item.title);
 
             return Column(
               crossAxisAlignment:
                   isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
-                Text(
-                  countText,
-                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                  style: TextStyle(
-                    color: item.color,
-                    fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
+                SizedBox(
+                  height: 32,
+                  child: Align(
+                    alignment: isArabic
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    child: Text(
+                      countText,
+                      textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                      style: TextStyle(
+                        color: item.color,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
-                Text(
-                  hasError
-                      ? (isArabic ? 'تعذر التحميل' : 'Load failed')
-                      : item.title,
-                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                  style: TextStyle(
-                    color: item.color,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    height: 1.2,
+                SizedBox(
+                  height: 34,
+                  child: Align(
+                    alignment: isArabic
+                        ? Alignment.topRight
+                        : Alignment.topLeft,
+                    child: Text(
+                      statusText,
+                      textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                      style: TextStyle(
+                        color: item.color,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
+                      ),
+                    ),
                   ),
                 ),
               ],
