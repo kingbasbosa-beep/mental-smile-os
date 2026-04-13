@@ -343,15 +343,17 @@ class AdminHubPage extends StatelessWidget {
                     archivedItemsStream: archivedItemsStream,
                     centersPendingStream: centersPendingStream,
                   ),
+                  const SizedBox(height: AppSpacing.lg),
+                  const _ControlRoomIntro(),
                   const SizedBox(height: AppSpacing.md),
                   const _AdminSystemHealthCard(),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacing.lg),
                   const _PendingActionsCard(),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacing.lg),
                   const _ActiveConversationsCard(),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacing.lg),
                   const _CriticalAlertsCard(),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacing.lg),
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -411,10 +413,17 @@ class _AdminQuickActionsSection extends StatelessWidget {
             'Admin Control Center',
             style: Theme.of(context).textTheme.titleLarge,
           ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Fast access to the current admin surfaces',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.obsidian.withValues(alpha: 0.70),
+                ),
+          ),
           const SizedBox(height: AppSpacing.md),
           Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
+            spacing: AppSpacing.md,
+            runSpacing: AppSpacing.md,
             children: actions.map((action) {
               return InkWell(
                 borderRadius: BorderRadius.circular(AppRadii.lg),
@@ -779,21 +788,21 @@ class _AdminSystemHealthCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('System Health'),
-        const SizedBox(height: AppSpacing.sm),
         AppStatusBadge(
           label: 'Status: $statusText',
           color: AppColors.info,
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: AppSpacing.md),
         const Text(
           'Issues: —',
           style: TextStyle(
             fontWeight: FontWeight.w800,
           ),
         ),
-        const SizedBox(height: AppSpacing.xs),
-        const Text('Summary: No audit data yet'),
+        const SizedBox(height: AppSpacing.sm),
+        const _ControlRoomEmptyState(
+          message: 'No audit data yet',
+        ),
       ],
     );
   }
@@ -812,23 +821,21 @@ class _AdminSystemHealthCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('System Health'),
-        const SizedBox(height: AppSpacing.sm),
         AppStatusBadge(
           label: 'Status: $statusText',
           color: _statusColor(statusText),
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: AppSpacing.md),
         Text(
           'Issues: $issuesText',
           style: const TextStyle(
             fontWeight: FontWeight.w800,
           ),
         ),
-        const SizedBox(height: AppSpacing.xs),
+        const SizedBox(height: AppSpacing.sm),
         if (timestampText.isNotEmpty) ...[
           Text('Last Scan: $timestampText'),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: AppSpacing.sm),
         ],
         Text('Summary: $summaryText'),
       ],
@@ -837,7 +844,9 @@ class _AdminSystemHealthCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppSurfaceCard(
+    return _ControlRoomCardShell(
+      title: 'System Health',
+      subtitle: 'Python QA snapshot',
       child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection('system_health')
@@ -891,7 +900,9 @@ class _PendingActionsCard extends StatelessWidget {
     final centersPendingStream =
         centers.where('approvalStatus', isEqualTo: 'pending_admin').snapshots();
 
-    return AppSurfaceCard(
+    return _ControlRoomCardShell(
+      title: 'Pending Actions',
+      subtitle: 'Requests needing attention',
       child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: clientUpdatesStream,
         builder: (context, clientSnapshot) {
@@ -933,15 +944,10 @@ class _PendingActionsCard extends StatelessWidget {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Pending Actions',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          const SizedBox(height: AppSpacing.md),
                           if (waiting)
                             Wrap(
-                              spacing: AppSpacing.sm,
-                              runSpacing: AppSpacing.sm,
+                              spacing: AppSpacing.md,
+                              runSpacing: AppSpacing.md,
                               children: const [
                                 _StaticInfoChip(label: 'Client Updates: —'),
                                 _StaticInfoChip(label: 'Center Follow-up: —'),
@@ -951,11 +957,13 @@ class _PendingActionsCard extends StatelessWidget {
                               ],
                             )
                           else if (totalCount == 0)
-                            const Text('No pending actions')
+                            const _ControlRoomEmptyState(
+                              message: 'No pending actions',
+                            )
                           else
                             Wrap(
-                              spacing: AppSpacing.sm,
-                              runSpacing: AppSpacing.sm,
+                              spacing: AppSpacing.md,
+                              runSpacing: AppSpacing.md,
                               children: [
                                 _StaticInfoChip(
                                   label: 'Client Updates: $clientCount',
@@ -991,7 +999,9 @@ class _ActiveConversationsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppSurfaceCard(
+    return _ControlRoomCardShell(
+      title: 'Active Conversations',
+      subtitle: 'Open human-support threads',
       child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection('chat_threads')
@@ -1012,15 +1022,10 @@ class _ActiveConversationsCard extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Active Conversations',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: AppSpacing.md),
               if (snapshot.connectionState == ConnectionState.waiting)
                 Wrap(
-                  spacing: AppSpacing.sm,
-                  runSpacing: AppSpacing.sm,
+                  spacing: AppSpacing.md,
+                  runSpacing: AppSpacing.md,
                   children: const [
                     _StaticInfoChip(label: 'Human Support: —'),
                     _StaticInfoChip(label: 'Center Chats: —'),
@@ -1029,11 +1034,13 @@ class _ActiveConversationsCard extends StatelessWidget {
                 )
               else if (snapshot.connectionState == ConnectionState.active &&
                   docs.isEmpty)
-                const Text('No active conversations')
+                const _ControlRoomEmptyState(
+                  message: 'No active conversations',
+                )
               else
                 Wrap(
-                  spacing: AppSpacing.sm,
-                  runSpacing: AppSpacing.sm,
+                  spacing: AppSpacing.md,
+                  runSpacing: AppSpacing.md,
                   children: [
                     _ConversationCountChip(
                       label: 'Human Support',
@@ -1073,7 +1080,9 @@ class _CriticalAlertsCard extends StatelessWidget {
     final pendingPayoutsStream =
         bookingRequests.where('status', isEqualTo: 'payout_pending').snapshots();
 
-    return AppSurfaceCard(
+    return _ControlRoomCardShell(
+      title: 'Critical Alerts',
+      subtitle: 'Operational warning signals',
       child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: stuckFollowUpsStream,
         builder: (context, followUpsSnapshot) {
@@ -1101,15 +1110,10 @@ class _CriticalAlertsCard extends StatelessWidget {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Critical Alerts',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
                       if (waiting)
                         Wrap(
-                          spacing: AppSpacing.sm,
-                          runSpacing: AppSpacing.sm,
+                          spacing: AppSpacing.md,
+                          runSpacing: AppSpacing.md,
                           children: const [
                             _StaticInfoChip(label: 'Stuck Follow-ups: —'),
                             _StaticInfoChip(label: 'Support Alerts: —'),
@@ -1123,11 +1127,13 @@ class _CriticalAlertsCard extends StatelessWidget {
                           payoutsSnapshot.connectionState ==
                               ConnectionState.active &&
                           totalCount == 0)
-                        const Text('No critical alerts')
+                        const _ControlRoomEmptyState(
+                          message: 'No critical alerts',
+                        )
                       else
                         Wrap(
-                          spacing: AppSpacing.sm,
-                          runSpacing: AppSpacing.sm,
+                          spacing: AppSpacing.md,
+                          runSpacing: AppSpacing.md,
                           children: [
                             _StaticInfoChip(
                               label: 'Stuck Follow-ups: $stuckFollowUpsCount',
@@ -1153,6 +1159,104 @@ class _CriticalAlertsCard extends StatelessWidget {
   }
 }
 
+class _ControlRoomIntro extends StatelessWidget {
+  const _ControlRoomIntro();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Control Room',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Live operational snapshots for health, requests, conversations, and alerts.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.obsidian.withValues(alpha: 0.70),
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ControlRoomCardShell extends StatelessWidget {
+  const _ControlRoomCardShell({
+    required this.title,
+    required this.subtitle,
+    required this.child,
+  });
+
+  final String title;
+  final String subtitle;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSurfaceCard(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            subtitle,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.obsidian.withValues(alpha: 0.68),
+                ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _ControlRoomEmptyState extends StatelessWidget {
+  const _ControlRoomEmptyState({
+    required this.message,
+  });
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.md,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.mist.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+      ),
+      child: Text(
+        message,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppColors.obsidian.withValues(alpha: 0.72),
+              fontWeight: FontWeight.w600,
+            ),
+      ),
+    );
+  }
+}
+
 class _StaticInfoChip extends StatelessWidget {
   const _StaticInfoChip({
     required this.label,
@@ -1165,7 +1269,7 @@ class _StaticInfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
+        vertical: AppSpacing.md,
       ),
       decoration: BoxDecoration(
         color: AppColors.mist,
@@ -1176,9 +1280,10 @@ class _StaticInfoChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(
-          fontWeight: FontWeight.w700,
-        ),
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              height: 1.2,
+            ),
       ),
     );
   }
@@ -1198,7 +1303,7 @@ class _ConversationCountChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
+        vertical: AppSpacing.md,
       ),
       decoration: BoxDecoration(
         color: AppColors.mist,
@@ -1209,9 +1314,10 @@ class _ConversationCountChip extends StatelessWidget {
       ),
       child: Text(
         '$label: $count',
-        style: const TextStyle(
-          fontWeight: FontWeight.w700,
-        ),
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              height: 1.2,
+            ),
       ),
     );
   }
