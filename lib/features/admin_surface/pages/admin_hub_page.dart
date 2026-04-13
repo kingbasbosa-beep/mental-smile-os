@@ -352,6 +352,8 @@ class AdminHubPage extends StatelessWidget {
                   const SizedBox(height: AppSpacing.lg),
                   const _ActiveConversationsCard(),
                   const SizedBox(height: AppSpacing.lg),
+                  const _OperationalAlertsCard(),
+                  const SizedBox(height: AppSpacing.lg),
                   const _CriticalAlertsCard(),
                   const SizedBox(height: AppSpacing.lg),
                   GridView.builder(
@@ -903,7 +905,8 @@ class _PendingActionsCard extends StatelessWidget {
     return _ControlRoomCardShell(
       title: 'Pending Actions',
       subtitle: 'Requests needing attention',
-      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      child: _ControlRoomBodyFrame(
+        child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: clientUpdatesStream,
         builder: (context, clientSnapshot) {
           return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -989,6 +992,7 @@ class _PendingActionsCard extends StatelessWidget {
             },
           );
         },
+        ),
       ),
     );
   }
@@ -1002,7 +1006,8 @@ class _ActiveConversationsCard extends StatelessWidget {
     return _ControlRoomCardShell(
       title: 'Active Conversations',
       subtitle: 'Open human-support threads',
-      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      child: _ControlRoomBodyFrame(
+        child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection('chat_threads')
             .where('needsHumanSupport', isEqualTo: true)
@@ -1059,6 +1064,116 @@ class _ActiveConversationsCard extends StatelessWidget {
             ],
           );
         },
+        ),
+      ),
+    );
+  }
+}
+
+class _OperationalAlertsCard extends StatelessWidget {
+  const _OperationalAlertsCard();
+
+  String _dateText(dynamic value) {
+    if (value is Timestamp) {
+      return value.toDate().toIso8601String();
+    }
+    return value?.toString().trim() ?? '';
+  }
+
+  Color _statusColor(String status) {
+    switch (status.trim().toLowerCase()) {
+      case 'ok':
+        return const Color(0xFF1F9D63);
+      case 'warning':
+        return const Color(0xFFE39B2E);
+      case 'error':
+        return const Color(0xFFC74646);
+      default:
+        return AppColors.info;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _ControlRoomCardShell(
+      title: 'Operational Alerts',
+      subtitle: 'Python-generated operational signals',
+      child: _ControlRoomBodyFrame(
+        child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+        stream: FirebaseFirestore.instance
+            .collection('system_alerts')
+            .doc('latest')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Wrap(
+              spacing: AppSpacing.md,
+              runSpacing: AppSpacing.md,
+              children: const [
+                _StaticInfoChip(label: 'Center Follow-up: —'),
+                _StaticInfoChip(label: 'Client Update Required: —'),
+                _StaticInfoChip(label: 'Payout Pending: —'),
+              ],
+            );
+          }
+
+          if (!snapshot.hasData || snapshot.data == null || !snapshot.data!.exists) {
+            return const _ControlRoomEmptyState(
+              message: 'No alert snapshot available',
+            );
+          }
+
+          final data = snapshot.data!.data();
+          if (data == null) {
+            return const _ControlRoomEmptyState(
+              message: 'No alert snapshot available',
+            );
+          }
+
+          final status = (data['status'] ?? 'unknown').toString();
+          final summary = (data['summary'] ?? '').toString().trim();
+          final timestamp = _dateText(data['timestamp']);
+          final centerFollowUpCount =
+              (data['centerFollowUpCount'] ?? 0).toString();
+          final clientUpdateRequiredCount =
+              (data['clientUpdateRequiredCount'] ?? 0).toString();
+          final payoutPendingCount =
+              (data['payoutPendingCount'] ?? 0).toString();
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AppStatusBadge(
+                label: 'Status: $status',
+                color: _statusColor(status),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Wrap(
+                spacing: AppSpacing.md,
+                runSpacing: AppSpacing.md,
+                children: [
+                  _StaticInfoChip(
+                    label: 'Center Follow-up: $centerFollowUpCount',
+                  ),
+                  _StaticInfoChip(
+                    label:
+                        'Client Update Required: $clientUpdateRequiredCount',
+                  ),
+                  _StaticInfoChip(
+                    label: 'Payout Pending: $payoutPendingCount',
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text('Summary: $summary'),
+              if (timestamp.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Text('Last Scan: $timestamp'),
+              ],
+            ],
+          );
+        },
+        ),
       ),
     );
   }
@@ -1083,7 +1198,8 @@ class _CriticalAlertsCard extends StatelessWidget {
     return _ControlRoomCardShell(
       title: 'Critical Alerts',
       subtitle: 'Operational warning signals',
-      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      child: _ControlRoomBodyFrame(
+        child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: stuckFollowUpsStream,
         builder: (context, followUpsSnapshot) {
           return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -1154,6 +1270,7 @@ class _CriticalAlertsCard extends StatelessWidget {
             },
           );
         },
+        ),
       ),
     );
   }
@@ -1236,22 +1353,34 @@ class _ControlRoomEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.md,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.mist.withValues(alpha: 0.55),
-        borderRadius: BorderRadius.circular(AppRadii.lg),
-      ),
+    return Align(
+      alignment: AlignmentDirectional.topStart,
       child: Text(
         message,
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.obsidian.withValues(alpha: 0.72),
-              fontWeight: FontWeight.w600,
+              color: AppColors.obsidian.withValues(alpha: 0.68),
+              fontWeight: FontWeight.w500,
+              height: 1.25,
             ),
+      ),
+    );
+  }
+}
+
+class _ControlRoomBodyFrame extends StatelessWidget {
+  const _ControlRoomBodyFrame({
+    required this.child,
+  });
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 80),
+      child: Align(
+        alignment: AlignmentDirectional.topStart,
+        child: child,
       ),
     );
   }
