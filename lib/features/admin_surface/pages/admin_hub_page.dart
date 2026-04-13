@@ -749,28 +749,120 @@ class _AdminQuickStatsSection extends StatelessWidget {
 class _AdminSystemHealthCard extends StatelessWidget {
   const _AdminSystemHealthCard();
 
+  String _dateText(dynamic value) {
+    if (value is Timestamp) {
+      return value.toDate().toIso8601String();
+    }
+    return value?.toString().trim() ?? '';
+  }
+
+  Color _statusColor(String status) {
+    switch (status.trim().toLowerCase()) {
+      case 'ok':
+        return const Color(0xFF1F9D63);
+      case 'warning':
+        return const Color(0xFFE39B2E);
+      case 'error':
+        return const Color(0xFFC74646);
+      default:
+        return AppColors.info;
+    }
+  }
+
+  Widget _buildSystemHealthFallback(String statusText) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('System Health'),
+        const SizedBox(height: AppSpacing.sm),
+        AppStatusBadge(
+          label: 'Status: $statusText',
+          color: AppColors.info,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        const Text(
+          'Issues: —',
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        const Text('Summary: No audit data yet'),
+      ],
+    );
+  }
+
+  Widget _buildSystemHealthContent({
+    required dynamic status,
+    required dynamic issues,
+    required dynamic summary,
+    required dynamic timestamp,
+  }) {
+    final statusText = status.toString().trim();
+    final issuesText = issues.toString().trim();
+    final summaryText = summary.toString().trim();
+    final timestampText = _dateText(timestamp);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('System Health'),
+        const SizedBox(height: AppSpacing.sm),
+        AppStatusBadge(
+          label: 'Status: $statusText',
+          color: _statusColor(statusText),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
+          'Issues: $issuesText',
+          style: const TextStyle(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        if (timestampText.isNotEmpty) ...[
+          Text('Last Scan: $timestampText'),
+          const SizedBox(height: AppSpacing.xs),
+        ],
+        Text('Summary: $summaryText'),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppSurfaceCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'System Health',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Awaiting QA snapshot',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Python audit integration ready',
-          ),
-        ],
+      child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+        stream: FirebaseFirestore.instance
+            .collection('system_health')
+            .doc('latest')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return _buildSystemHealthFallback("جارٍ التحديث...");
+          }
+
+          if (!snapshot.hasData || snapshot.data == null || !snapshot.data!.exists) {
+            return _buildSystemHealthFallback("Awaiting QA snapshot");
+          }
+
+          final data = snapshot.data!.data();
+          if (data == null) {
+            return _buildSystemHealthFallback("No audit data yet");
+          }
+
+          final status = data['status'] ?? 'unknown';
+          final issues = data['issuesCount'] ?? 0;
+          final summary = data['summary'] ?? '';
+          final timestamp = data['timestamp'] ?? '';
+
+          return _buildSystemHealthContent(
+            status: status,
+            issues: issues,
+            summary: summary,
+            timestamp: timestamp,
+          );
+        },
       ),
     );
   }

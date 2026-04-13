@@ -334,12 +334,13 @@ def save_report(result: AuditResult) -> Path:
 
 def save_latest_report_summary(result: AuditResult) -> Path:
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    issues_count = len(result.issues)
     latest_report_path = REPORTS_DIR / "latest_report.json"
     latest_report_path.write_text(
         json.dumps(
             {
                 "status": "ok",
-                "issues_count": len(result.issues),
+                "issues_count": issues_count,
                 "checked_collections": ["centers"],
                 "timestamp": datetime.now(UTC).isoformat(),
             },
@@ -349,6 +350,29 @@ def save_latest_report_summary(result: AuditResult) -> Path:
         encoding="utf-8",
     )
     return latest_report_path
+
+
+def write_system_health_snapshot(db, result: AuditResult) -> None:
+    issues_count = len(result.issues)
+    status = "ok" if issues_count == 0 else "warning"
+    severity = "low" if issues_count == 0 else "medium"
+    summary = (
+        "Audit completed successfully"
+        if issues_count == 0
+        else f"{issues_count} issues detected in audit"
+    )
+
+    db.collection("system_health").document("latest").set(
+        {
+            "status": status,
+            "issuesCount": issues_count,
+            "checkedCollections": ["centers"],
+            "timestamp": datetime.now(UTC).isoformat(),
+            "source": "qa_audit.py",
+            "summary": summary,
+            "severity": severity,
+        }
+    )
 
 
 def print_summary(result: AuditResult, report_path: Path) -> None:
@@ -412,6 +436,7 @@ def main() -> int:
     audit_legacy_collection(db, result)
     report_path = save_report(result)
     save_latest_report_summary(result)
+    write_system_health_snapshot(db, result)
     print_summary(result, report_path)
     return 0
 
