@@ -348,6 +348,10 @@ class AdminHubPage extends StatelessWidget {
                   const SizedBox(height: AppSpacing.md),
                   const _PendingActionsCard(),
                   const SizedBox(height: AppSpacing.md),
+                  const _ActiveConversationsCard(),
+                  const SizedBox(height: AppSpacing.md),
+                  const _CriticalAlertsCard(),
+                  const SizedBox(height: AppSpacing.md),
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -875,111 +879,340 @@ class _PendingActionsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bookingRequests = FirebaseFirestore.instance.collection('booking_requests');
+    final bookingRequests =
+        FirebaseFirestore.instance.collection('booking_requests');
     final centers = FirebaseFirestore.instance.collection('centers');
+    final clientUpdatesStream =
+        bookingRequests.where('status', isEqualTo: 'client_update_required').snapshots();
+    final centerFollowUpStream =
+        bookingRequests.where('status', isEqualTo: 'center_follow_up').snapshots();
+    final payoutPendingStream =
+        bookingRequests.where('status', isEqualTo: 'payout_pending').snapshots();
+    final centersPendingStream =
+        centers.where('approvalStatus', isEqualTo: 'pending_admin').snapshots();
 
     return AppSurfaceCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Pending Actions',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: const [
-              _PendingActionChip(
-                label: 'Client Updates',
-                stream: null,
-                collection: 'booking_requests',
-                field: 'status',
-                value: 'client_update_required',
-              ),
-              _PendingActionChip(
-                label: 'Center Follow-up',
-                stream: null,
-                collection: 'booking_requests',
-                field: 'status',
-                value: 'center_follow_up',
-              ),
-              _PendingActionChip(
-                label: 'Payout Pending',
-                stream: null,
-                collection: 'booking_requests',
-                field: 'status',
-                value: 'payout_pending',
-              ),
-              _PendingActionChip(
-                label: 'Centers Pending Admin',
-                stream: null,
-                collection: 'centers',
-                field: 'approvalStatus',
-                value: 'pending_admin',
-              ),
-            ].map((chip) {
-              final source = chip.collection == 'centers' ? centers : bookingRequests;
-              return _PendingActionChip(
-                label: chip.label,
-                stream: source.where(chip.field, isEqualTo: chip.value).snapshots(),
-                collection: chip.collection,
-                field: chip.field,
-                value: chip.value,
+      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: clientUpdatesStream,
+        builder: (context, clientSnapshot) {
+          return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+            stream: centerFollowUpStream,
+            builder: (context, followUpSnapshot) {
+              return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: payoutPendingStream,
+                builder: (context, payoutSnapshot) {
+                  return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                    stream: centersPendingStream,
+                    builder: (context, centersSnapshot) {
+                      final waiting = clientSnapshot.connectionState ==
+                              ConnectionState.waiting ||
+                          followUpSnapshot.connectionState ==
+                              ConnectionState.waiting ||
+                          payoutSnapshot.connectionState ==
+                              ConnectionState.waiting ||
+                          centersSnapshot.connectionState ==
+                              ConnectionState.waiting ||
+                          !clientSnapshot.hasData ||
+                          !followUpSnapshot.hasData ||
+                          !payoutSnapshot.hasData ||
+                          !centersSnapshot.hasData;
+
+                      final clientCount =
+                          clientSnapshot.data?.docs.length ?? 0;
+                      final followUpCount =
+                          followUpSnapshot.data?.docs.length ?? 0;
+                      final payoutCount =
+                          payoutSnapshot.data?.docs.length ?? 0;
+                      final centersCount =
+                          centersSnapshot.data?.docs.length ?? 0;
+                      final totalCount = clientCount +
+                          followUpCount +
+                          payoutCount +
+                          centersCount;
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Pending Actions',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          if (waiting)
+                            Wrap(
+                              spacing: AppSpacing.sm,
+                              runSpacing: AppSpacing.sm,
+                              children: const [
+                                _StaticInfoChip(label: 'Client Updates: —'),
+                                _StaticInfoChip(label: 'Center Follow-up: —'),
+                                _StaticInfoChip(label: 'Payout Pending: —'),
+                                _StaticInfoChip(
+                                    label: 'Centers Pending Admin: —'),
+                              ],
+                            )
+                          else if (totalCount == 0)
+                            const Text('No pending actions')
+                          else
+                            Wrap(
+                              spacing: AppSpacing.sm,
+                              runSpacing: AppSpacing.sm,
+                              children: [
+                                _StaticInfoChip(
+                                  label: 'Client Updates: $clientCount',
+                                ),
+                                _StaticInfoChip(
+                                  label: 'Center Follow-up: $followUpCount',
+                                ),
+                                _StaticInfoChip(
+                                  label: 'Payout Pending: $payoutCount',
+                                ),
+                                _StaticInfoChip(
+                                  label:
+                                      'Centers Pending Admin: $centersCount',
+                                ),
+                              ],
+                            ),
+                        ],
+                      );
+                    },
+                  );
+                },
               );
-            }).toList(),
-          ),
-        ],
+            },
+          );
+        },
       ),
     );
   }
 }
 
-class _PendingActionChip extends StatelessWidget {
-  const _PendingActionChip({
-    required this.label,
-    required this.stream,
-    required this.collection,
-    required this.field,
-    required this.value,
-  });
-
-  final String label;
-  final Stream<QuerySnapshot<Map<String, dynamic>>>? stream;
-  final String collection;
-  final String field;
-  final String value;
+class _ActiveConversationsCard extends StatelessWidget {
+  const _ActiveConversationsCard();
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: stream,
-      builder: (context, snapshot) {
-        final count = snapshot.hasError
-            ? '—'
-            : (!snapshot.hasData ? '—' : '${snapshot.data!.docs.length}');
+    return AppSurfaceCard(
+      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: FirebaseFirestore.instance
+            .collection('chat_threads')
+            .where('needsHumanSupport', isEqualTo: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          final docs = snapshot.data?.docs ?? const [];
+          final humanSupportCount = docs.length;
+          final centerChatsCount = docs.where((doc) {
+            final ownerType = (doc.data()['ownerType'] ?? '').toString().toLowerCase();
+            return ownerType.contains('center');
+          }).length;
+          final clientChatsCount = docs.where((doc) {
+            final ownerType = (doc.data()['ownerType'] ?? '').toString().toLowerCase();
+            return !ownerType.contains('center');
+          }).length;
 
-        return Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.mist,
-            borderRadius: BorderRadius.circular(AppRadii.lg),
-            border: Border.all(
-              color: AppColors.info.withValues(alpha: 0.20),
-            ),
-          ),
-          child: Text(
-            '$label: $count',
-            style: const TextStyle(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        );
-      },
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Active Conversations',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              if (snapshot.connectionState == ConnectionState.waiting)
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.sm,
+                  children: const [
+                    _StaticInfoChip(label: 'Human Support: —'),
+                    _StaticInfoChip(label: 'Center Chats: —'),
+                    _StaticInfoChip(label: 'Client Chats: —'),
+                  ],
+                )
+              else if (snapshot.connectionState == ConnectionState.active &&
+                  docs.isEmpty)
+                const Text('No active conversations')
+              else
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.sm,
+                  children: [
+                    _ConversationCountChip(
+                      label: 'Human Support',
+                      count: '$humanSupportCount',
+                    ),
+                    _ConversationCountChip(
+                      label: 'Center Chats',
+                      count: '$centerChatsCount',
+                    ),
+                    _ConversationCountChip(
+                      label: 'Client Chats',
+                      count: '$clientChatsCount',
+                    ),
+                  ],
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _CriticalAlertsCard extends StatelessWidget {
+  const _CriticalAlertsCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final bookingRequests =
+        FirebaseFirestore.instance.collection('booking_requests');
+    final chatThreads = FirebaseFirestore.instance.collection('chat_threads');
+
+    final stuckFollowUpsStream =
+        bookingRequests.where('status', isEqualTo: 'center_follow_up').snapshots();
+    final unresolvedSupportChatsStream =
+        chatThreads.where('needsHumanSupport', isEqualTo: true).snapshots();
+    final pendingPayoutsStream =
+        bookingRequests.where('status', isEqualTo: 'payout_pending').snapshots();
+
+    return AppSurfaceCard(
+      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: stuckFollowUpsStream,
+        builder: (context, followUpsSnapshot) {
+          return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+            stream: unresolvedSupportChatsStream,
+            builder: (context, chatsSnapshot) {
+              return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: pendingPayoutsStream,
+                builder: (context, payoutsSnapshot) {
+                  final waiting =
+                      followUpsSnapshot.connectionState == ConnectionState.waiting ||
+                          chatsSnapshot.connectionState == ConnectionState.waiting ||
+                          payoutsSnapshot.connectionState == ConnectionState.waiting;
+
+                  final stuckFollowUpsCount =
+                      followUpsSnapshot.data?.docs.length ?? 0;
+                  final unresolvedSupportChatsCount =
+                      chatsSnapshot.data?.docs.length ?? 0;
+                  final pendingPayoutsCount =
+                      payoutsSnapshot.data?.docs.length ?? 0;
+                  final totalCount = stuckFollowUpsCount +
+                      unresolvedSupportChatsCount +
+                      pendingPayoutsCount;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Critical Alerts',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      if (waiting)
+                        Wrap(
+                          spacing: AppSpacing.sm,
+                          runSpacing: AppSpacing.sm,
+                          children: const [
+                            _StaticInfoChip(label: 'Stuck Follow-ups: —'),
+                            _StaticInfoChip(label: 'Support Alerts: —'),
+                            _StaticInfoChip(label: 'Pending Payouts: —'),
+                          ],
+                        )
+                      else if (followUpsSnapshot.connectionState ==
+                              ConnectionState.active &&
+                          chatsSnapshot.connectionState ==
+                              ConnectionState.active &&
+                          payoutsSnapshot.connectionState ==
+                              ConnectionState.active &&
+                          totalCount == 0)
+                        const Text('No critical alerts')
+                      else
+                        Wrap(
+                          spacing: AppSpacing.sm,
+                          runSpacing: AppSpacing.sm,
+                          children: [
+                            _StaticInfoChip(
+                              label: 'Stuck Follow-ups: $stuckFollowUpsCount',
+                            ),
+                            _StaticInfoChip(
+                              label:
+                                  'Support Alerts: $unresolvedSupportChatsCount',
+                            ),
+                            _StaticInfoChip(
+                              label: 'Pending Payouts: $pendingPayoutsCount',
+                            ),
+                          ],
+                        ),
+                    ],
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _StaticInfoChip extends StatelessWidget {
+  const _StaticInfoChip({
+    required this.label,
+  });
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.mist,
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        border: Border.all(
+          color: AppColors.info.withValues(alpha: 0.20),
+        ),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
+
+class _ConversationCountChip extends StatelessWidget {
+  const _ConversationCountChip({
+    required this.label,
+    required this.count,
+  });
+
+  final String label;
+  final String count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.mist,
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        border: Border.all(
+          color: AppColors.info.withValues(alpha: 0.20),
+        ),
+      ),
+      child: Text(
+        '$label: $count',
+        style: const TextStyle(
+          fontWeight: FontWeight.w700,
+        ),
+      ),
     );
   }
 }
