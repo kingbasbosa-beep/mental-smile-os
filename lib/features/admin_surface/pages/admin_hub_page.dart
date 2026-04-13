@@ -344,6 +344,8 @@ class AdminHubPage extends StatelessWidget {
                     centersPendingStream: centersPendingStream,
                   ),
                   const SizedBox(height: AppSpacing.md),
+                  const _AdminSystemHealthCard(),
+                  const SizedBox(height: AppSpacing.md),
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -737,6 +739,36 @@ class _AdminQuickStatsSection extends StatelessWidget {
                 );
               }).toList(),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AdminSystemHealthCard extends StatelessWidget {
+  const _AdminSystemHealthCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'System Health',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Awaiting QA snapshot',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Python audit integration ready',
           ),
         ],
       ),

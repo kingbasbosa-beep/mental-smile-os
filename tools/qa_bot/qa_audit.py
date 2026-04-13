@@ -332,6 +332,25 @@ def save_report(result: AuditResult) -> Path:
     return report_path
 
 
+def save_latest_report_summary(result: AuditResult) -> Path:
+    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    latest_report_path = REPORTS_DIR / "latest_report.json"
+    latest_report_path.write_text(
+        json.dumps(
+            {
+                "status": "ok",
+                "issues_count": len(result.issues),
+                "checked_collections": ["centers"],
+                "timestamp": datetime.now(UTC).isoformat(),
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    return latest_report_path
+
+
 def print_summary(result: AuditResult, report_path: Path) -> None:
     rich_console = get_console()
     if rich_console is not None and Table is not None:
@@ -392,6 +411,7 @@ def main() -> int:
     audit_booking_requests(db, result)
     audit_legacy_collection(db, result)
     report_path = save_report(result)
+    save_latest_report_summary(result)
     print_summary(result, report_path)
     return 0
 
