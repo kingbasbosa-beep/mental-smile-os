@@ -346,6 +346,8 @@ class AdminHubPage extends StatelessWidget {
                   const SizedBox(height: AppSpacing.md),
                   const _AdminSystemHealthCard(),
                   const SizedBox(height: AppSpacing.md),
+                  const _PendingActionsCard(),
+                  const SizedBox(height: AppSpacing.md),
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -864,6 +866,120 @@ class _AdminSystemHealthCard extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _PendingActionsCard extends StatelessWidget {
+  const _PendingActionsCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final bookingRequests = FirebaseFirestore.instance.collection('booking_requests');
+    final centers = FirebaseFirestore.instance.collection('centers');
+
+    return AppSurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Pending Actions',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: const [
+              _PendingActionChip(
+                label: 'Client Updates',
+                stream: null,
+                collection: 'booking_requests',
+                field: 'status',
+                value: 'client_update_required',
+              ),
+              _PendingActionChip(
+                label: 'Center Follow-up',
+                stream: null,
+                collection: 'booking_requests',
+                field: 'status',
+                value: 'center_follow_up',
+              ),
+              _PendingActionChip(
+                label: 'Payout Pending',
+                stream: null,
+                collection: 'booking_requests',
+                field: 'status',
+                value: 'payout_pending',
+              ),
+              _PendingActionChip(
+                label: 'Centers Pending Admin',
+                stream: null,
+                collection: 'centers',
+                field: 'approvalStatus',
+                value: 'pending_admin',
+              ),
+            ].map((chip) {
+              final source = chip.collection == 'centers' ? centers : bookingRequests;
+              return _PendingActionChip(
+                label: chip.label,
+                stream: source.where(chip.field, isEqualTo: chip.value).snapshots(),
+                collection: chip.collection,
+                field: chip.field,
+                value: chip.value,
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PendingActionChip extends StatelessWidget {
+  const _PendingActionChip({
+    required this.label,
+    required this.stream,
+    required this.collection,
+    required this.field,
+    required this.value,
+  });
+
+  final String label;
+  final Stream<QuerySnapshot<Map<String, dynamic>>>? stream;
+  final String collection;
+  final String field;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: stream,
+      builder: (context, snapshot) {
+        final count = snapshot.hasError
+            ? '—'
+            : (!snapshot.hasData ? '—' : '${snapshot.data!.docs.length}');
+
+        return Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.mist,
+            borderRadius: BorderRadius.circular(AppRadii.lg),
+            border: Border.all(
+              color: AppColors.info.withValues(alpha: 0.20),
+            ),
+          ),
+          child: Text(
+            '$label: $count',
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        );
+      },
     );
   }
 }
