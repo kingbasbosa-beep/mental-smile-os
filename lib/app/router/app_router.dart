@@ -13,7 +13,7 @@ import 'package:flutterprojects/features/booking/presentation/pages/center_booki
 import 'package:flutterprojects/features/booking/presentation/pages/my_bookings_page.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/clinician_inbox_page.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/center_inbox_page.dart';
-import 'package:flutterprojects/features/booking/presentation/pages/admin_booking_queue_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_booking_queue_page.dart';
 
 import 'package:flutterprojects/features/library/presentation/pages/library_page.dart';
 import 'package:flutterprojects/features/splash/presentation/pages/splash_page.dart';
@@ -29,13 +29,13 @@ import 'package:flutterprojects/features/auth/presentation/pages/login_page.dart
 import 'package:flutterprojects/features/auth/presentation/pages/client_register_page.dart';
 import 'package:flutterprojects/features/auth/presentation/pages/clinician_register_page.dart';
 import 'package:flutterprojects/features/chat/presentation/pages/chat_page.dart';
-import 'package:flutterprojects/features/chat/presentation/pages/chat_escalations_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/chat_escalations_page.dart';
 import 'package:flutterprojects/features/chat/presentation/pages/chat_escalation_report_page.dart';
 import 'package:flutterprojects/features/chat/presentation/pages/clinician_chat_inbox_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/centers_landing_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/centers_list_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_details_page.dart';
-import 'package:flutterprojects/features/centers/presentation/pages/admin_centers_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_centers_page.dart';
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_hub_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.dart';
@@ -48,11 +48,11 @@ import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_
 import 'package:flutterprojects/features/admin_surface/pages/admin_archive_sessions_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_archive_payments_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_archive_reports_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_session_report_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_session_report_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_profile_requests_page.dart';
 import 'package:flutterprojects/features/reviews/presentation/pages/session_review_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_payments_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_sessions_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_payments_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_sessions_page.dart';
 import 'package:flutterprojects/features/client/presentation/pages/client_payment_proof_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_requests_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_support_chat_page.dart';
