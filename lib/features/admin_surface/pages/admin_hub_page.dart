@@ -8,6 +8,9 @@ import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 class AdminHubPage extends StatelessWidget {
   const AdminHubPage({super.key});
 
+  static const String _adminBookingQueueRoute = '/admin/booking-queue';
+  static const String _adminAlertsReviewRoute = '/admin/alerts-review';
+
   Stream<int> _openEscalationsStream() {
     return FirebaseFirestore.instance
         .collection('chat_escalations')
@@ -346,15 +349,15 @@ class AdminHubPage extends StatelessWidget {
                   const SizedBox(height: AppSpacing.lg),
                   const _ControlRoomIntro(),
                   const SizedBox(height: AppSpacing.md),
-                  const _AdminSystemHealthCard(),
-                  const SizedBox(height: AppSpacing.lg),
-                  const _PendingActionsCard(),
-                  const SizedBox(height: AppSpacing.lg),
-                  const _ActiveConversationsCard(),
-                  const SizedBox(height: AppSpacing.lg),
-                  const _OperationalAlertsCard(),
-                  const SizedBox(height: AppSpacing.lg),
-                  const _CriticalAlertsCard(),
+                  const _ControlRoomTileGrid(
+                    children: [
+                      _AdminSystemHealthCard(),
+                      _PendingActionsCard(),
+                      _ActiveConversationsCard(),
+                      _OperationalAlertsCard(),
+                      _CriticalAlertsCard(),
+                    ],
+                  ),
                   const SizedBox(height: AppSpacing.lg),
                   GridView.builder(
                     shrinkWrap: true,
@@ -964,23 +967,40 @@ class _PendingActionsCard extends StatelessWidget {
                               message: 'No pending actions',
                             )
                           else
-                            Wrap(
-                              spacing: AppSpacing.md,
-                              runSpacing: AppSpacing.md,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _StaticInfoChip(
-                                  label: 'Client Updates: $clientCount',
+                                Wrap(
+                                  spacing: AppSpacing.md,
+                                  runSpacing: AppSpacing.md,
+                                  children: [
+                                    _StaticInfoChip(
+                                      label: 'Client Updates: $clientCount',
+                                    ),
+                                    _StaticInfoChip(
+                                      label: 'Center Follow-up: $followUpCount',
+                                    ),
+                                    _StaticInfoChip(
+                                      label: 'Payout Pending: $payoutCount',
+                                    ),
+                                    _StaticInfoChip(
+                                      label:
+                                          'Centers Pending Admin: $centersCount',
+                                    ),
+                                  ],
                                 ),
-                                _StaticInfoChip(
-                                  label: 'Center Follow-up: $followUpCount',
-                                ),
-                                _StaticInfoChip(
-                                  label: 'Payout Pending: $payoutCount',
-                                ),
-                                _StaticInfoChip(
-                                  label:
-                                      'Centers Pending Admin: $centersCount',
-                                ),
+                                if (totalCount > 0) ...[
+                                  const SizedBox(height: AppSpacing.sm),
+                                  _ControlRoomActionButton(
+                                    label: 'Open Requests Queue',
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        AdminHubPage._adminBookingQueueRoute,
+                                      );
+                                    },
+                                  ),
+                                ],
                               ],
                             ),
                         ],
@@ -1043,22 +1063,39 @@ class _ActiveConversationsCard extends StatelessWidget {
                   message: 'No active conversations',
                 )
               else
-                Wrap(
-                  spacing: AppSpacing.md,
-                  runSpacing: AppSpacing.md,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _ConversationCountChip(
-                      label: 'Human Support',
-                      count: '$humanSupportCount',
+                    Wrap(
+                      spacing: AppSpacing.md,
+                      runSpacing: AppSpacing.md,
+                      children: [
+                        _ConversationCountChip(
+                          label: 'Human Support',
+                          count: '$humanSupportCount',
+                        ),
+                        _ConversationCountChip(
+                          label: 'Center Chats',
+                          count: '$centerChatsCount',
+                        ),
+                        _ConversationCountChip(
+                          label: 'Client Chats',
+                          count: '$clientChatsCount',
+                        ),
+                      ],
                     ),
-                    _ConversationCountChip(
-                      label: 'Center Chats',
-                      count: '$centerChatsCount',
-                    ),
-                    _ConversationCountChip(
-                      label: 'Client Chats',
-                      count: '$clientChatsCount',
-                    ),
+                    if (humanSupportCount > 0) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      _ControlRoomActionButton(
+                        label: 'Open Human Support Chats',
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            Routes.adminSupportChats,
+                          );
+                        },
+                      ),
+                    ],
                   ],
                 ),
             ],
@@ -1139,6 +1176,10 @@ class _OperationalAlertsCard extends StatelessWidget {
               (data['clientUpdateRequiredCount'] ?? 0).toString();
           final payoutPendingCount =
               (data['payoutPendingCount'] ?? 0).toString();
+          final alertsCount =
+              (int.tryParse(centerFollowUpCount) ?? 0) +
+              (int.tryParse(clientUpdateRequiredCount) ?? 0) +
+              (int.tryParse(payoutPendingCount) ?? 0);
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1169,6 +1210,18 @@ class _OperationalAlertsCard extends StatelessWidget {
               if (timestamp.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.sm),
                 Text('Last Scan: $timestamp'),
+              ],
+              if (alertsCount > 0) ...[
+                const SizedBox(height: AppSpacing.sm),
+                _ControlRoomActionButton(
+                  label: 'Review Alerts',
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      AdminHubPage._adminAlertsReviewRoute,
+                    );
+                  },
+                ),
               ],
             ],
           );
@@ -1247,20 +1300,38 @@ class _CriticalAlertsCard extends StatelessWidget {
                           message: 'No critical alerts',
                         )
                       else
-                        Wrap(
-                          spacing: AppSpacing.md,
-                          runSpacing: AppSpacing.md,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _StaticInfoChip(
-                              label: 'Stuck Follow-ups: $stuckFollowUpsCount',
+                            Wrap(
+                              spacing: AppSpacing.md,
+                              runSpacing: AppSpacing.md,
+                              children: [
+                                _StaticInfoChip(
+                                  label:
+                                      'Stuck Follow-ups: $stuckFollowUpsCount',
+                                ),
+                                _StaticInfoChip(
+                                  label:
+                                      'Support Alerts: $unresolvedSupportChatsCount',
+                                ),
+                                _StaticInfoChip(
+                                  label: 'Pending Payouts: $pendingPayoutsCount',
+                                ),
+                              ],
                             ),
-                            _StaticInfoChip(
-                              label:
-                                  'Support Alerts: $unresolvedSupportChatsCount',
-                            ),
-                            _StaticInfoChip(
-                              label: 'Pending Payouts: $pendingPayoutsCount',
-                            ),
+                            if (totalCount > 0) ...[
+                              const SizedBox(height: AppSpacing.sm),
+                              _ControlRoomActionButton(
+                                label: 'Review Alerts',
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    AdminHubPage._adminAlertsReviewRoute,
+                                  );
+                                },
+                              ),
+                            ],
                           ],
                         ),
                     ],
@@ -1301,6 +1372,38 @@ class _ControlRoomIntro extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ControlRoomTileGrid extends StatelessWidget {
+  const _ControlRoomTileGrid({
+    required this.children,
+  });
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const gap = AppSpacing.md;
+        final useTwoColumns = constraints.maxWidth >= 980;
+        final tileWidth = useTwoColumns
+            ? (constraints.maxWidth - gap) / 2
+            : constraints.maxWidth;
+
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: children.map((child) {
+            return SizedBox(
+              width: tileWidth,
+              child: child,
+            );
+          }).toList(),
+        );
+      },
     );
   }
 }
@@ -1384,6 +1487,46 @@ class _ControlRoomBodyFrame extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ControlRoomActionButton extends StatelessWidget {
+  const _ControlRoomActionButton({
+    required this.label,
+    required this.onPressed,
+  });
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: TextButton(
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.xs,
+          ),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.compact,
+        ),
+        child: Text(label),
+      ),
+    );
+  }
+}
+
+void _showControlRoomSnackBar(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      behavior: SnackBarBehavior.floating,
+      duration: const Duration(seconds: 2),
+    ),
+  );
 }
 
 class _StaticInfoChip extends StatelessWidget {

@@ -40,6 +40,7 @@ import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_hub_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_archive_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_alerts_review_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_centers_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_clinicians_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_archive_support_page.dart';
@@ -64,6 +65,7 @@ import 'package:flutterprojects/features/centers/presentation/pages/center_resid
 import 'package:flutterprojects/features/client/presentation/pages/client_sessions_page.dart';
 
 const String _adminBookingQueueRoute = '/admin/booking-queue';
+const String _adminAlertsReviewRoute = '/admin/alerts-review';
 const String _roleAdmin = 'admin';
 const String _roleClinician = 'clinician';
 const String _roleCenter = 'center';
@@ -79,6 +81,7 @@ class AppRouter {
     Routes.adminSessions,
     Routes.adminSupportChats,
     _adminBookingQueueRoute,
+    _adminAlertsReviewRoute,
     Routes.adminArchive,
     Routes.adminArchiveSessions,
     Routes.adminArchivePayments,
@@ -117,23 +120,17 @@ class AppRouter {
     Routes.centerBookingRequest,
   };
 
+  static bool _isAdminRoute(String? routeName) {
+    if (routeName == null) return false;
+    return _adminOnlyRoutes.contains(routeName);
+  }
+
   static bool _requiresSignedInNonAnonymous(RouteSettings settings) {
+    if (_isAdminRoute(settings.name)) {
+      return true;
+    }
+
     switch (settings.name) {
-      case Routes.adminHub:
-      case Routes.adminClinicianRequests:
-      case Routes.adminClinicianProfileRequests:
-      case Routes.adminClients:
-      case Routes.adminPayments:
-      case Routes.adminSessions:
-      case Routes.adminSupportChats:
-      case _adminBookingQueueRoute:
-      case Routes.adminArchive:
-      case Routes.adminArchiveSessions:
-      case Routes.adminArchivePayments:
-      case Routes.adminSessionReport:
-      case Routes.adminCenters:
-      case Routes.chatEscalations:
-      case Routes.chatEscalationReport:
       case Routes.centerDashboard:
       case Routes.centerOperations:
       case Routes.centerInbox:
@@ -159,7 +156,7 @@ class AppRouter {
 
   static Set<String>? _requiredRoles(String? routeName) {
     if (routeName == null) return null;
-    if (_adminOnlyRoutes.contains(routeName)) return {_roleAdmin};
+    if (_isAdminRoute(routeName)) return {_roleAdmin};
     if (_clinicianOnlyRoutes.contains(routeName)) return {_roleClinician};
     if (_centerOnlyRoutes.contains(routeName)) return {_roleCenter};
     if (_clientOnlyRoutes.contains(routeName)) return {_roleClient};
@@ -187,82 +184,102 @@ class AppRouter {
     );
   }
 
+  static Route<dynamic> _adminProtectedRoute({
+    required Widget child,
+    required RouteSettings settings,
+  }) {
+    return MaterialPageRoute(
+      builder: (_) => _RouteAccessGate(
+        routeName: settings.name,
+        allowedRoles: const {_roleAdmin},
+        child: child,
+      ),
+      settings: settings,
+    );
+  }
+
   static Route<dynamic>? adminSurfaceRoutes(RouteSettings settings) {
     switch (settings.name) {
       case Routes.adminHub:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminHubPage(),
           settings: settings,
         );
 
       case Routes.adminClinicianRequests:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminClinicianRequestsPage(),
           settings: settings,
         );
 
       case Routes.adminClinicianProfileRequests:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminClinicianProfileRequestsPage(),
           settings: settings,
         );
 
       case Routes.adminClients:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminClientsPage(),
           settings: settings,
         );
 
       case Routes.adminSupportChats:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminSupportChatPage(),
           settings: settings,
         );
 
+      case _adminAlertsReviewRoute:
+        return _adminProtectedRoute(
+          child: const AdminAlertsReviewPage(),
+          settings: settings,
+        );
+
       case Routes.adminArchivePayments:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminArchivePaymentsPage(),
           settings: settings,
         );
 
       case Routes.adminArchiveClinicians:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminArchiveCliniciansPage(),
           settings: settings,
         );
 
       case Routes.adminArchiveCenters:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminArchiveCentersPage(),
           settings: settings,
         );
 
       case Routes.adminArchiveSupport:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminArchiveSupportPage(),
           settings: settings,
         );
 
       case Routes.adminArchiveAccounting:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminArchiveAccountingPage(),
           settings: settings,
         );
 
       case Routes.adminArchiveReports:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminArchiveReportsPage(),
           settings: settings,
         );
 
       case Routes.adminArchiveSessions:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminArchiveSessionsPage(),
           settings: settings,
         );
 
       case Routes.adminArchive:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminArchivePage(),
           settings: settings,
         );
@@ -292,13 +309,13 @@ class AppRouter {
         );
 
       case Routes.adminPayments:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminPaymentsPage(),
           settings: settings,
         );
 
       case Routes.adminSessions:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminSessionsPage(),
           settings: settings,
         );
@@ -316,7 +333,7 @@ class AppRouter {
         );
 
       case _adminBookingQueueRoute:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminBookingQueuePage(),
           settings: settings,
         );
@@ -515,7 +532,7 @@ class AppRouter {
         );
 
       case Routes.adminSessionReport:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminSessionReportPage(),
           settings: settings,
         );
@@ -724,7 +741,7 @@ class AppRouter {
             settings: settings,
           );
         }
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminCentersPage(),
           settings: settings,
         );
@@ -773,6 +790,14 @@ class _RouteAccessGate extends StatelessWidget {
         }
 
         final decision = snapshot.data!;
+        debugPrint(
+          'ADMIN_GUARD route=$routeName '
+          'isAdminRoute=${AppRouter._isAdminRoute(routeName)} '
+          'signedIn=${FirebaseAuth.instance.currentUser != null && !FirebaseAuth.instance.currentUser!.isAnonymous} '
+          'isAdmin=${decision.isAdmin} '
+          'allowed=${decision.allowed} '
+          'redirect=${decision.redirectTarget}',
+        );
         if (decision.redirectToLogin) {
           return const LoginPage();
         }
@@ -827,29 +852,58 @@ class _RouteAccessGate extends StatelessWidget {
 
   Future<_RouteAccessDecision> _resolveRouteAccess() async {
     final user = FirebaseAuth.instance.currentUser;
+    final isAdminRoute = AppRouter._isAdminRoute(routeName);
     if (user == null || user.isAnonymous) {
+      debugPrint(
+        'ADMIN_GUARD route=$routeName '
+        'isAdminRoute=$isAdminRoute '
+        'signedIn=false '
+        'isAdmin=false '
+        'allowed=false '
+        'redirect=${Routes.login}',
+      );
       return const _RouteAccessDecision(
         allowed: false,
         redirectToLogin: true,
+        redirectTarget: Routes.login,
       );
     }
 
     final access = await AccountAccessService().resolve(user);
+    final isAdmin = access.isAdmin;
     if (access.isBlocked && !access.isAdmin) {
+      debugPrint(
+        'ADMIN_GUARD route=$routeName '
+        'isAdminRoute=$isAdminRoute '
+        'signedIn=true '
+        'isAdmin=$isAdmin '
+        'allowed=false '
+        'redirect=blocked_account',
+      );
       return _RouteAccessDecision(
         allowed: false,
         isBlocked: true,
         blockReason: access.blockReason,
+        isAdmin: isAdmin,
+        redirectTarget: 'blocked_account',
       );
     }
 
     if (allowedRoles == null || allowedRoles!.isEmpty) {
-      return const _RouteAccessDecision(allowed: true);
+      return _RouteAccessDecision(
+        allowed: true,
+        isAdmin: isAdmin,
+        redirectTarget: 'none',
+      );
     }
 
     final role = access.role;
     final isAllowed = role != null && allowedRoles!.contains(role);
-    return _RouteAccessDecision(allowed: isAllowed);
+    return _RouteAccessDecision(
+      allowed: isAllowed,
+      isAdmin: isAdmin,
+      redirectTarget: isAllowed ? 'none' : Routes.menu,
+    );
   }
 }
 
@@ -859,10 +913,14 @@ class _RouteAccessDecision {
     this.redirectToLogin = false,
     this.isBlocked = false,
     this.blockReason = '',
+    this.isAdmin = false,
+    this.redirectTarget = 'none',
   });
 
   final bool allowed;
   final bool redirectToLogin;
   final bool isBlocked;
   final String blockReason;
+  final bool isAdmin;
+  final String redirectTarget;
 }

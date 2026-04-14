@@ -33,7 +33,7 @@ class AdminSupportChatPage extends StatelessWidget {
       return 'assets/c5/avatars/avatar_clinician_m.png';
     }
     if (ownerType.contains('center')) {
-      return 'assets/c5/avatars/avatar_center.png';
+      return 'assets/c5/avatars/avatar_admin_support.png';
     }
     if (sourceType == 'admin_support') {
       return 'assets/c5/avatars/avatar_admin_support.png';
