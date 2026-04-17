@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class SupportEntryPage extends StatelessWidget {
   const SupportEntryPage.addiction({super.key})
@@ -11,7 +13,7 @@ class SupportEntryPage extends StatelessWidget {
         _subtitleEn =
             'A calm, safe path for daily support, asking for help, and reaching specialists and centers without shame or alarm.',
         _accent = const Color(0xFFE58667),
-        _heroAsset = 'assets/c7_branding/home/hero_art.png',
+        _heroAsset = 'c7_branding/home/hero_art.png',
         _cards = const [
           _SupportPathCard(
             titleAr: 'أخصائي السلوكيات الإدمانية',
@@ -65,7 +67,7 @@ class SupportEntryPage extends StatelessWidget {
         _subtitleEn =
             'A family-aware support path for understanding, organizing, and requesting the right help for both family and child.',
         _accent = const Color(0xFF37B8B0),
-        _heroAsset = 'assets/c7_branding/home/hero_art.png',
+        _heroAsset = 'c7_branding/home/hero_art.png',
         _cards = const [
           _SupportPathCard(
             titleAr: 'ابدأ مع الأخصائيين',
@@ -134,7 +136,7 @@ class SupportEntryPage extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             Image.asset(
-              'assets/c7_branding/home/home_bg.png',
+              normalizeAssetPath('assets/c7_branding/home/home_bg.png'),
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(color: const Color(0xFFF4EFF6));
@@ -236,7 +238,7 @@ class SupportEntryPage extends StatelessWidget {
                     Expanded(
                       child: _HeroActionButton(
                         label: isArabic ? 'فتح الشات' : 'Open chat',
-                        asset: 'assets/c7_branding/buttons/primary_button.png',
+                        asset: 'c7_branding/buttons/primary_button.png',
                         onTap: () =>
                             Navigator.of(context).pushNamed(Routes.chat),
                       ),
@@ -248,7 +250,7 @@ class SupportEntryPage extends StatelessWidget {
                             ? 'استعرض الأخصائيين'
                             : 'Browse specialists',
                         asset:
-                            'assets/c7_branding/buttons/secondary_button.png',
+                            'c7_branding/buttons/secondary_button.png',
                         onTap: () =>
                             Navigator.of(context).pushNamed(Routes.specialists),
                       ),
@@ -307,7 +309,7 @@ class _ModuleHero extends StatelessWidget {
             height: 270,
             width: double.infinity,
             child: Image.asset(
-              heroAsset,
+              normalizeAssetPath(heroAsset),
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(
@@ -492,7 +494,7 @@ class _HeroActionButton extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Image.asset(
-                    asset,
+                    normalizeAssetPath(asset),
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(

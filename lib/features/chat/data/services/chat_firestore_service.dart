@@ -24,6 +24,7 @@ class ChatFirestoreService {
     required String ownerUid,
     required String ownerType,
     required String displayName,
+    String? threadType,
     String sourceType = 'guest',
     String language = 'ar',
     bool isTemporary = true,
@@ -35,6 +36,7 @@ class ChatFirestoreService {
       id: doc.id,
       ownerUid: ownerUid,
       ownerType: ownerType,
+      threadType: threadType,
       displayName: displayName,
       status: 'active',
       sourceType: sourceType,
@@ -121,11 +123,77 @@ class ChatFirestoreService {
   }
 
   Stream<List<ChatEscalationModel>> streamEscalations() {
-    return _escalations.orderBy('createdAt', descending: true).snapshots().map(
-          (snapshot) => snapshot.docs
-              .map((doc) => ChatEscalationModel.fromFirestore(doc))
-              .toList(),
-        );
+    return _escalations
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .asyncMap((snapshot) async {
+      final items = <ChatEscalationModel>[];
+
+      for (final doc in snapshot.docs) {
+        final escalation = ChatEscalationModel.fromFirestore(doc);
+        final thread = await getThread(escalation.threadId);
+        if (thread == null) continue;
+        if (_isEscalationSourceThread(thread)) {
+          items.add(escalation);
+        }
+      }
+
+      return items;
+    });
+  }
+
+  bool _isLegacyAiSupportThread(ChatThreadModel thread) {
+    final threadType = thread.threadType?.trim() ?? '';
+    if (threadType.isNotEmpty) return false;
+    return thread.sourceType == 'client' || thread.sourceType == 'guest';
+  }
+
+  bool _isEscalationSourceThread(ChatThreadModel thread) {
+    if (thread.threadType == 'ai_support') return true;
+    return _isLegacyAiSupportThread(thread);
+  }
+
+  bool _isLegacyAdminSupportThread(ChatThreadModel thread) {
+    final threadType = thread.threadType?.trim() ?? '';
+    if (threadType.isNotEmpty) return false;
+    return thread.sourceType == 'admin_support';
+  }
+
+  bool _isLegacyClinicianCaseThread(ChatThreadModel thread) {
+    final threadType = thread.threadType?.trim() ?? '';
+    if (threadType.isNotEmpty) return false;
+    return thread.handoffState == 'clinician_review' ||
+        thread.lifecycleState == 'assigned_clinician';
+  }
+
+  bool _isClinicianInboxSourceThread(ChatThreadModel thread) {
+    if (thread.threadType == 'clinician_case') return true;
+    return _isLegacyClinicianCaseThread(thread);
+  }
+
+  Stream<List<ChatThreadModel>> streamAdminSupportInboxThreads() {
+    return _threads.orderBy('updatedAt', descending: true).snapshots().map(
+      (snapshot) {
+        final typed = <ChatThreadModel>[];
+        final legacyFallback = <ChatThreadModel>[];
+
+        for (final doc in snapshot.docs) {
+          final thread = ChatThreadModel.fromFirestore(doc);
+          if (thread.archived) continue;
+
+          if (thread.threadType == 'admin_support') {
+            typed.add(thread);
+            continue;
+          }
+
+          if (_isLegacyAdminSupportThread(thread)) {
+            legacyFallback.add(thread);
+          }
+        }
+
+        return [...typed, ...legacyFallback];
+      },
+    );
   }
 
   /// Streams escalated chat cases assigned to a specific clinician.
@@ -138,11 +206,20 @@ class ChatFirestoreService {
         .where('assignedToUid', isEqualTo: clinicianUid)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => ChatEscalationModel.fromFirestore(doc))
-              .toList(),
-        );
+        .asyncMap((snapshot) async {
+      final items = <ChatEscalationModel>[];
+
+      for (final doc in snapshot.docs) {
+        final escalation = ChatEscalationModel.fromFirestore(doc);
+        final thread = await getThread(escalation.threadId);
+        if (thread == null) continue;
+        if (_isClinicianInboxSourceThread(thread)) {
+          items.add(escalation);
+        }
+      }
+
+      return items;
+    });
   }
 
   Stream<List<ClinicianOptionModel>> streamClinicians() {

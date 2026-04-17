@@ -3,7 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
+import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
@@ -167,7 +169,7 @@ class MenuPage extends StatelessWidget {
             : 'Browse centers and available services',
         icon: Icons.apartment_outlined,
         route: Routes.centers,
-        assetPath: 'assets/c7_branding/home/hero_art.png',
+        assetPath: 'c7_branding/home/hero_art.png',
         accent: AppColors.mutedGold,
       ),
       _MenuCardData(
@@ -177,7 +179,7 @@ class MenuPage extends StatelessWidget {
             : 'Browse specialists and request a booking',
         icon: Icons.psychology_alt_outlined,
         route: Routes.specialists,
-        assetPath: 'assets/c7_branding/logo/logo_mark.png',
+        assetPath: 'c7_branding/logo/logo_mark.png',
         accent: AppColors.accentLavender,
       ),
       _MenuCardData(
@@ -187,7 +189,7 @@ class MenuPage extends StatelessWidget {
             : 'Supportive and educational content',
         icon: Icons.auto_stories_outlined,
         route: Routes.library,
-        assetPath: 'assets/c7_branding/home/home_bg.png',
+        assetPath: 'c7_branding/home/home_bg.png',
         accent: AppColors.softTerracotta,
       ),
       _MenuCardData(
@@ -199,7 +201,7 @@ class MenuPage extends StatelessWidget {
             : 'A family-aware support path with clear next steps',
         icon: Icons.family_restroom_outlined,
         route: Routes.specialNeeds,
-        assetPath: 'assets/c7_branding/home/hero_art.png',
+        assetPath: 'c7_branding/home/hero_art.png',
         accent: AppColors.info,
       ),
       _MenuCardData(
@@ -209,7 +211,7 @@ class MenuPage extends StatelessWidget {
             : 'A calm recovery path across specialists, centers, and support chat',
         icon: Icons.healing_outlined,
         route: Routes.addiction,
-        assetPath: 'assets/c7_branding/home/home_bg.png',
+        assetPath: 'c7_branding/home/home_bg.png',
         accent: AppColors.success,
       ),
     ];
@@ -278,7 +280,7 @@ class MenuPage extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             Image.asset(
-              'assets/c7_branding/home/home_bg.png',
+              'c7_branding/home/home_bg.png',
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(decoration: AppDecorations.pageBackground());
@@ -375,7 +377,7 @@ class MenuPage extends StatelessWidget {
                                       .withValues(alpha: 0.10),
                                   child: ClipOval(
                                     child: Image.asset(
-                                      'assets/c5/avatars/avatar_admin_support.png',
+                                      'c5/avatars/avatar_admin_support.png',
                                       width: 72,
                                       height: 72,
                                       fit: BoxFit.cover,
@@ -489,15 +491,17 @@ class _MenuCard extends StatelessWidget {
             Positioned.fill(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(AppRadii.xl),
-                child: Opacity(
-                  opacity: 0.14,
-                  child: Image.asset(
-                    item.assetPath,
-                    fit: BoxFit.cover,
+                  child: Opacity(
+                    opacity: 0.14,
+                    child: Image.asset(
+                      normalizeAssetPath(item.assetPath),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const AppMissingAssetPlaceholder(),
+                    ),
                   ),
                 ),
               ),
-            ),
             Padding(
               padding: const EdgeInsets.all(AppSpacing.xl),
               child: Row(
@@ -521,8 +525,10 @@ class _MenuCard extends StatelessWidget {
                           child: Opacity(
                             opacity: 0.20,
                             child: Image.asset(
-                              item.assetPath,
+                              normalizeAssetPath(item.assetPath),
                               fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const AppMissingAssetPlaceholder(),
                             ),
                           ),
                         ),

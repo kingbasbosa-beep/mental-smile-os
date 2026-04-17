@@ -514,7 +514,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
                       decoration: const InputDecoration(
                         labelText: 'صورة الغلاف المحلية (coverImageAsset)',
                         hintText:
-                            'assets/c6_library/hero/center_placeholder.png',
+                            'assets/c6_library/hero/library_hero.png',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -576,7 +576,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
                       decoration: const InputDecoration(
                         labelText: 'صورة معرض محلية 1',
                         hintText:
-                            'assets/c6_library/hero/center_placeholder.png',
+                            'assets/c6_library/hero/library_hero.png',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -587,7 +587,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
                       decoration: const InputDecoration(
                         labelText: 'صورة معرض محلية 2',
                         hintText:
-                            'assets/c6_library/hero/center_placeholder.png',
+                            'assets/c6_library/hero/library_hero.png',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -598,7 +598,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
                       decoration: const InputDecoration(
                         labelText: 'صورة معرض محلية 3',
                         hintText:
-                            'assets/c6_library/hero/center_placeholder.png',
+                            'assets/c6_library/hero/library_hero.png',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -609,7 +609,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
                       decoration: const InputDecoration(
                         labelText: 'صورة معرض محلية 4',
                         hintText:
-                            'assets/c6_library/hero/center_placeholder.png',
+                            'assets/c6_library/hero/library_hero.png',
                         border: OutlineInputBorder(),
                       ),
                     ),

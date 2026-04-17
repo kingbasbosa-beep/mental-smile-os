@@ -3,8 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/shared/contracts/role_names.dart';
+import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class ClientDashboardPage extends StatelessWidget {
   const ClientDashboardPage({super.key});
@@ -281,10 +283,16 @@ class ClientDashboardPage extends StatelessWidget {
                           child: avatarAsset.isNotEmpty
                               ? ClipOval(
                                   child: Image.asset(
-                                    avatarAsset,
+                                    normalizeAssetPath(avatarAsset),
                                     width: 64,
                                     height: 64,
                                     fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const AppMissingAssetPlaceholder(
+                                              width: 64,
+                                              height: 64,
+                                            ),
                                   ),
                                 )
                               : Text(

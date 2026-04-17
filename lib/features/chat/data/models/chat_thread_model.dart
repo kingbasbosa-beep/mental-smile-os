@@ -4,6 +4,7 @@ class ChatThreadModel {
   final String id;
   final String ownerUid;
   final String ownerType;
+  final String? threadType;
   final String displayName;
   final String status;
   final String sourceType;
@@ -40,6 +41,7 @@ class ChatThreadModel {
     required this.id,
     required this.ownerUid,
     required this.ownerType,
+    required this.threadType,
     required this.displayName,
     required this.status,
     required this.sourceType,
@@ -86,6 +88,7 @@ class ChatThreadModel {
       id: doc.id,
       ownerUid: (data['ownerUid'] ?? '').toString(),
       ownerType: (data['ownerType'] ?? 'anonymous_client').toString(),
+      threadType: data['threadType']?.toString(),
       displayName: (data['displayName'] ?? 'مستخدم').toString(),
       status: (data['status'] ?? 'active').toString(),
       sourceType: (data['sourceType'] ?? 'guest').toString(),
@@ -129,6 +132,7 @@ class ChatThreadModel {
     return {
       'ownerUid': ownerUid,
       'ownerType': ownerType,
+      'threadType': threadType,
       'displayName': displayName,
       'status': status,
       'sourceType': sourceType,
@@ -170,6 +174,7 @@ class ChatThreadModel {
     String? id,
     String? ownerUid,
     String? ownerType,
+    String? threadType,
     String? displayName,
     String? status,
     String? sourceType,
@@ -204,6 +209,7 @@ class ChatThreadModel {
       id: id ?? this.id,
       ownerUid: ownerUid ?? this.ownerUid,
       ownerType: ownerType ?? this.ownerType,
+      threadType: threadType ?? this.threadType,
       displayName: displayName ?? this.displayName,
       status: status ?? this.status,
       sourceType: sourceType ?? this.sourceType,

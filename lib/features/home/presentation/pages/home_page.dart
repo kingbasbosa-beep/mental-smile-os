@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -47,7 +48,7 @@ class HomePage extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             Image.asset(
-              'assets/c7_branding/home/home_bg.png',
+              normalizeAssetPath('assets/c7_branding/home/home_bg.png'),
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(decoration: AppDecorations.pageBackground());

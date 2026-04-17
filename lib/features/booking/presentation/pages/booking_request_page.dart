@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 const String kDevClinicianUid =
     String.fromEnvironment('MK_DEV_CLINICIAN_UID', defaultValue: '');
@@ -349,7 +350,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
         backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: ClipOval(
           child: Image.asset(
-            asset,
+            normalizeAssetPath(asset),
             width: 56,
             height: 56,
             fit: BoxFit.cover,

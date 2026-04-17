@@ -38,9 +38,22 @@ flutter:
 
   assets:
     - assets/c5/
-    - assets/c5/avatars/avatar_admin_support.png
-    - assets/c6_library/
+    - assets/c6_library/brand/logo_mark.png
     - assets/c6_library/brand/logo_wordmark.png
+    - assets/c6_library/hero/library_hero.png
+    - assets/c6_library/ui/buttons/btn_primary.png
+    - assets/c6_library/ui/buttons/btn_secondary.png
+    - assets/c6_library/ui/ornaments/ornament_divider_1.png
+    - assets/c6_library/ui/badges/badge_new.png
+    - assets/c6_library/ui/badges/badge_pro.png
+    - assets/c6_library/categories/cat_articles.png
+    - assets/c6_library/categories/cat_exercises.png
+    - assets/c6_library/categories/cat_audio.png
+    - assets/c6_library/categories/cat_videos.png
+    - assets/c6_library/categories/cat_tools.png
+    - assets/c6_library/categories/cat_saved.png
+    - assets/c6_library/states/empty_library.png
+    - assets/c6_library/states/locked_clinicians.png
     - assets/c7_branding/buttons/
     - assets/c7_branding/home/
     - assets/c7_branding/logo/

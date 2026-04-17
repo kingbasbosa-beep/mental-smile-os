@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/centers/data/services/centers_firestore_service.dart';
 
@@ -73,7 +75,11 @@ class CentersListPage extends StatelessWidget {
   }
 
   String _fallbackAsset(CenterModel c) {
-    if (c.coverImageAsset.trim().isNotEmpty) return c.coverImageAsset.trim();
+    if (c.coverImageAsset.trim().isNotEmpty) {
+      return c.coverImageAsset
+          .trim()
+          .replaceFirst('assets/assets/', 'assets/');
+    }
     if (c.category == 'detox') return 'assets/c7_branding/home/home_bg.png';
     if (c.category == 'special_needs') {
       return 'assets/c7_branding/logo/logo_mark.png';
@@ -400,11 +406,21 @@ class _CenterCover extends StatelessWidget {
         trimmedUrl,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          return Image.asset(assetPath, fit: BoxFit.cover);
+          return Image.asset(
+            normalizeAssetPath(assetPath),
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) =>
+                const AppMissingAssetPlaceholder(),
+          );
         },
       );
     }
-    return Image.asset(assetPath, fit: BoxFit.cover);
+    return Image.asset(
+      normalizeAssetPath(assetPath),
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) =>
+          const AppMissingAssetPlaceholder(),
+    );
   }
 }
 
@@ -426,11 +442,21 @@ class _CenterLogoBubble extends StatelessWidget {
         trimmedUrl,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          return Image.asset(assetPath, fit: BoxFit.cover);
+          return Image.asset(
+            normalizeAssetPath(assetPath),
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) =>
+                const AppMissingAssetPlaceholder(),
+          );
         },
       );
     } else {
-      child = Image.asset(assetPath, fit: BoxFit.cover);
+      child = Image.asset(
+        normalizeAssetPath(assetPath),
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) =>
+            const AppMissingAssetPlaceholder(),
+      );
     }
 
     return Container(

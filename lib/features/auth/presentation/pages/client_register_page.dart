@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class ClientRegisterPage extends StatefulWidget {
   const ClientRegisterPage({super.key});
@@ -19,13 +21,13 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
   bool _loading = false;
   String? _error;
 
-  String _selectedAvatar = 'assets/images/avatar_client_fmale.png';
+  String _selectedAvatar = 'images/avatar_client_fmale.png';
 
   static const List<String> _avatarOptions = [
-    'assets/images/avatar_client_fmale.png',
-    'assets/images/avatar_client_male.png',
-    'assets/images/avatar_clinician_fmale.png',
-    'assets/images/avatar_clinician_male.png',
+    'images/avatar_client_fmale.png',
+    'images/avatar_client_male.png',
+    'images/avatar_clinician_fmale.png',
+    'images/avatar_clinician_male.png',
   ];
 
   Future<void> _register() async {
@@ -179,8 +181,11 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
                                   ),
                                   child: ClipOval(
                                     child: Image.asset(
-                                      avatar,
+                                      normalizeAssetPath(avatar),
                                       fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const AppMissingAssetPlaceholder(),
                                     ),
                                   ),
                                 ),

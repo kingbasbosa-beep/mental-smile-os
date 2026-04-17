@@ -1,12 +1,17 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
+import 'package:flutterprojects/features/chat/data/services/chat_firestore_service.dart';
+import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 // ADMIN_SURFACE: SAFE_UI
 class AdminSupportChatPage extends StatelessWidget {
   const AdminSupportChatPage({super.key});
+
+  static final ChatFirestoreService _chatFirestoreService =
+      ChatFirestoreService();
 
   bool _isArabic(BuildContext context) {
     return Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
@@ -30,15 +35,15 @@ class AdminSupportChatPage extends StatelessWidget {
     final ownerType = (data['ownerType'] ?? '').toString();
 
     if (ownerType.contains('clinician')) {
-      return 'assets/c5/avatars/avatar_clinician_m.png';
+      return 'c5/avatars/avatar_clinician_m.png';
     }
     if (ownerType.contains('center')) {
-      return 'assets/c5/avatars/avatar_admin_support.png';
+      return 'c5/avatars/avatar_admin_support.png';
     }
     if (sourceType == 'admin_support') {
-      return 'assets/c5/avatars/avatar_admin_support.png';
+      return 'c5/avatars/avatar_admin_support.png';
     }
-    return 'assets/c5/avatars/avatar_client.png';
+    return 'c5/avatars/avatar_client.png';
   }
 
   String _sourceLabel(Map<String, dynamic> data, bool isArabic) {
@@ -73,11 +78,8 @@ class AdminSupportChatPage extends StatelessWidget {
           canLogout: false,
         ),
         body: AppPageBackground(
-          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: FirebaseFirestore.instance
-                .collection('chat_threads')
-                .orderBy('updatedAt', descending: true)
-                .snapshots(),
+          child: StreamBuilder<List<ChatThreadModel>>(
+            stream: _chatFirestoreService.streamAdminSupportInboxThreads(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return AppEmptyState(
@@ -92,12 +94,9 @@ class AdminSupportChatPage extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              final docs = snapshot.data!.docs.where((doc) {
-                final data = doc.data();
-                return (data['needsHumanSupport'] ?? false) == true;
-              }).toList();
+              final threads = snapshot.data!;
 
-              if (docs.isEmpty) {
+              if (threads.isEmpty) {
                 return AppEmptyState(
                   message: isArabic
                       ? 'لا توجد محادثات بانتظار الإدارة'
@@ -108,25 +107,26 @@ class AdminSupportChatPage extends StatelessWidget {
 
               return ListView.separated(
                 padding: const EdgeInsets.all(AppSpacing.lg),
-                itemCount: docs.length,
+                itemCount: threads.length,
                 separatorBuilder: (_, __) =>
                     const SizedBox(height: AppSpacing.md),
                 itemBuilder: (context, index) {
-                  final doc = docs[index];
-                  final data = doc.data();
+                  final thread = threads[index];
+                  final data = <String, dynamic>{
+                    'sourceType': thread.sourceType,
+                    'ownerType': thread.ownerType,
+                  };
 
-                  final threadId = doc.id;
-                  final displayName =
-                      (data['displayName'] ?? data['ownerUid'] ?? 'Client')
-                          .toString();
-                  final preview =
-                      (data['lastMessagePreview'] ?? '').toString().trim();
-                  final handoffState =
-                      (data['handoffState'] ?? 'admin_review').toString();
-                  final lifecycleState =
-                      (data['lifecycleState'] ?? 'assigned_admin').toString();
-                  final bookingRequestId =
-                      (data['bookingRequestId'] ?? '').toString();
+                  final threadId = thread.id;
+                  final displayName = thread.displayName.trim().isEmpty
+                      ? (thread.ownerUid.trim().isEmpty
+                          ? 'Client'
+                          : thread.ownerUid)
+                      : thread.displayName;
+                  final preview = thread.lastMessagePreview.trim();
+                  final handoffState = thread.handoffState;
+                  final lifecycleState = thread.lifecycleState;
+                  final bookingRequestId = thread.bookingRequestId ?? '';
 
                   return InkWell(
                     borderRadius: BorderRadius.circular(AppRadii.lg),
@@ -144,7 +144,9 @@ class AdminSupportChatPage extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 26,
-                            backgroundImage: AssetImage(_avatarAsset(data)),
+                            backgroundImage: safeAssetImageProvider(
+                              _avatarAsset(data),
+                            ),
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Expanded(

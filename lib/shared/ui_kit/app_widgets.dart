@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 import 'app_theme.dart';
 
@@ -71,7 +72,7 @@ class AppPageBackground extends StatelessWidget {
               child: Opacity(
                 opacity: 0.10,
                 child: Image.asset(
-                  'assets/c7_branding/home/hero_art.png',
+                  normalizeAssetPath('c7_branding/home/hero_art.png'),
                   width: 260,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) =>
@@ -87,7 +88,7 @@ class AppPageBackground extends StatelessWidget {
               child: Opacity(
                 opacity: 0.08,
                 child: Image.asset(
-                  'assets/c7_branding/home/home_bg.png',
+                  normalizeAssetPath('c7_branding/home/home_bg.png'),
                   width: 300,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) =>
@@ -145,7 +146,7 @@ class AppLogoWordmark extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Image.asset(
-        'assets/c6_library/brand/logo_wordmark.png',
+        normalizeAssetPath('c6_library/brand/logo_wordmark.png'),
         width: width,
         height: height,
         fit: BoxFit.contain,
@@ -304,7 +305,7 @@ class AppSurfaceCard extends StatelessWidget {
               child: Opacity(
                 opacity: 0.08,
                 child: Image.asset(
-                  'assets/c7_branding/logo/logo_mark.png',
+                  normalizeAssetPath('c7_branding/logo/logo_mark.png'),
                   width: 58,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) =>

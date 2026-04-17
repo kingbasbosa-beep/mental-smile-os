@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class SpecialistsListPage extends StatelessWidget {
@@ -194,7 +195,7 @@ class SpecialistsListPage extends StatelessWidget {
                     final imageProvider = photoUrl.isNotEmpty
                         ? NetworkImage(photoUrl) as ImageProvider
                         : (photoAsset.startsWith('assets/')
-                            ? AssetImage(photoAsset)
+                            ? safeAssetImageProvider(photoAsset)
                             : null);
                     final offersGroups =
                         (data['offersGroupSessions'] ?? false) == true;

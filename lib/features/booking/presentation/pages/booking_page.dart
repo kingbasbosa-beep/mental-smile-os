@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/booking_request_page.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 const bool kDevUi = bool.fromEnvironment('MK_DEV_UI', defaultValue: false);
 
@@ -123,7 +124,7 @@ class BookingPage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: ClipOval(
           child: Image.asset(
-            asset,
+            normalizeAssetPath(asset),
             width: 52,
             height: 52,
             fit: BoxFit.cover,

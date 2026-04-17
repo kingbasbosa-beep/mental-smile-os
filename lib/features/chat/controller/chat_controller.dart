@@ -79,6 +79,7 @@ class ChatController {
     return _firestoreService.createThread(
       ownerUid: user.uid,
       ownerType: isAnonymous ? 'anonymous_client' : 'registered_client',
+      threadType: 'ai_support',
       displayName: user.email ?? 'مستخدم',
       sourceType: isAnonymous ? 'guest' : 'client',
       isTemporary: isAnonymous,
@@ -105,6 +106,7 @@ class ChatController {
     final thread = await _firestoreService.createThread(
       ownerUid: user.uid,
       ownerType: isCenter ? 'registered_center' : 'registered_client',
+      threadType: 'admin_support',
       displayName: user.email ?? 'مستخدم',
       sourceType: 'admin_support',
       isTemporary: false,
@@ -145,6 +147,7 @@ class ChatController {
     return _firestoreService.createThread(
       ownerUid: user.uid,
       ownerType: isAnonymous ? 'anonymous_client' : 'registered_client',
+      threadType: 'ai_support',
       displayName: user.email ?? 'مستخدم',
       sourceType: isAnonymous ? 'guest' : 'client',
       isTemporary: isAnonymous,

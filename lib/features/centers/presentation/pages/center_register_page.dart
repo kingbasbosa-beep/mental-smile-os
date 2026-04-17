@@ -3,7 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -928,8 +930,10 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
       fit: StackFit.expand,
       children: [
         Image.asset(
-          'assets/c7_branding/home/hero_art.png',
+          normalizeAssetPath('assets/c7_branding/home/hero_art.png'),
           fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) =>
+              const AppMissingAssetPlaceholder(),
         ),
         DecoratedBox(
           decoration: BoxDecoration(
@@ -953,7 +957,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
       );
     } else if (assetPath.isNotEmpty) {
       preview = Image.asset(
-        assetPath,
+        normalizeAssetPath(assetPath),
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) => _imageFallback(),
       );

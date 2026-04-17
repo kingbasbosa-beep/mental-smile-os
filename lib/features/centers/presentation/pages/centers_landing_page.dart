@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class CentersLandingPage extends StatelessWidget {
   const CentersLandingPage({super.key});
@@ -23,7 +25,7 @@ class CentersLandingPage extends StatelessWidget {
         icon: Icons.volunteer_activism_outlined,
         color: const Color(0xFF2F6B5F),
         accent: const Color(0xFFE2B65B),
-        assetPath: 'assets/c7_branding/home/hero_art.png',
+        assetPath: 'c7_branding/home/hero_art.png',
         route: Routes.centersList,
         arguments: {'category': 'recovery'},
       ),
@@ -34,7 +36,7 @@ class CentersLandingPage extends StatelessWidget {
         icon: Icons.auto_awesome_mosaic_outlined,
         color: const Color(0xFF6D5542),
         accent: const Color(0xFFD4AF37),
-        assetPath: 'assets/c7_branding/home/home_bg.png',
+        assetPath: 'c7_branding/home/home_bg.png',
         route: Routes.centersList,
         arguments: {'category': 'detox'},
       ),
@@ -48,7 +50,7 @@ class CentersLandingPage extends StatelessWidget {
         icon: Icons.accessibility_new_outlined,
         color: const Color(0xFF4E6A7D),
         accent: const Color(0xFFCBB88A),
-        assetPath: 'assets/c7_branding/logo/logo_mark.png',
+        assetPath: 'c7_branding/logo/logo_mark.png',
         route: Routes.centersList,
         arguments: {'category': 'special_needs'},
       ),
@@ -60,7 +62,7 @@ class CentersLandingPage extends StatelessWidget {
         icon: Icons.local_hospital_outlined,
         color: const Color(0xFF7B5C41),
         accent: const Color(0xFFE0B97B),
-        assetPath: 'assets/c7_branding/home/hero_art.png',
+        assetPath: 'c7_branding/home/hero_art.png',
         route: Routes.centersList,
         arguments: {'category': 'hospital'},
       ),
@@ -255,8 +257,10 @@ class _CenterCategoryCard extends StatelessWidget {
                         child: Opacity(
                           opacity: 0.22,
                           child: Image.asset(
-                            item.assetPath,
+                            normalizeAssetPath(item.assetPath),
                             fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const AppMissingAssetPlaceholder(),
                           ),
                         ),
                       ),
@@ -328,9 +332,11 @@ class _CenterCategoryCard extends StatelessWidget {
               child: Opacity(
                 opacity: 0.18,
                 child: Image.asset(
-                  item.assetPath,
+                  normalizeAssetPath(item.assetPath),
                   height: 56,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const AppMissingAssetPlaceholder(height: 56),
                 ),
               ),
             ),

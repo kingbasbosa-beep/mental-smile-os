@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/booking_request_page.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class SpecialistDetailsPage extends StatelessWidget {
   const SpecialistDetailsPage({
@@ -122,7 +123,7 @@ class SpecialistDetailsPage extends StatelessWidget {
     if (assetPath.isNotEmpty) {
       return ClipOval(
         child: Image.asset(
-          assetPath,
+          normalizeAssetPath(assetPath),
           width: 132,
           height: 132,
           fit: BoxFit.cover,

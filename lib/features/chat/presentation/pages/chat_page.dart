@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/gateways/role_access_gateway.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 import 'package:flutterprojects/features/chat/controller/chat_controller.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_message_model.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
@@ -37,8 +38,8 @@ class _ChatPageState extends State<ChatPage> {
 
   String get _avatarAsset {
     final value = widget.adminSupportMode
-        ? 'assets/c5/avatars/avatar_admin_support.png'
-        : 'assets/c5/avatars/avatar_client.png';
+        ? 'c5/avatars/avatar_admin_support.png'
+        : 'c5/avatars/avatar_client.png';
     if (value.startsWith('assets/assets/')) {
       return value.replaceFirst('assets/assets/', 'assets/');
     }
@@ -444,7 +445,7 @@ class _ChatPageState extends State<ChatPage> {
                                             .withValues(alpha: 0.10),
                                         child: ClipOval(
                                           child: Image.asset(
-                                            _avatarAsset,
+                                            normalizeAssetPath(_avatarAsset),
                                             width: 52,
                                             height: 52,
                                             fit: BoxFit.cover,

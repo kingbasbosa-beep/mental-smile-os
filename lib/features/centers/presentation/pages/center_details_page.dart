@@ -94,7 +94,7 @@ class CenterDetailsPage extends StatelessWidget {
     BoxFit fit = BoxFit.cover,
     BorderRadius? borderRadius,
   }) {
-    final v = value.trim();
+    final v = value.trim().replaceFirst('assets/assets/', 'assets/');
     if (v.isEmpty) return const SizedBox.shrink();
 
     final bool isAsset = v.startsWith('assets/');

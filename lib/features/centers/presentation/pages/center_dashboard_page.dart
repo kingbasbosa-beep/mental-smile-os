@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class CenterDashboardPage extends StatelessWidget {
   const CenterDashboardPage({super.key});
@@ -298,7 +300,7 @@ class CenterDashboardPage extends StatelessWidget {
                     icon: Icons.inbox_outlined,
                     accent: const Color(0xFFB8860B),
                     badgeLabel: isArabic ? 'بوابة الرد' : 'Response Gate',
-                    assetPath: 'assets/c7_branding/logo/logo_mark.png',
+                    assetPath: 'c7_branding/logo/logo_mark.png',
                     actionLabel: isArabic ? 'فتح الوارد' : 'Open inbox',
                     onTap: () =>
                         Navigator.of(context).pushNamed(Routes.centerInbox),
@@ -312,7 +314,7 @@ class CenterDashboardPage extends StatelessWidget {
                     icon: Icons.hotel_outlined,
                     accent: const Color(0xFF2F6B5F),
                     badgeLabel: isArabic ? 'إقامة' : 'Residency',
-                    assetPath: 'assets/c7_branding/home/hero_art.png',
+                    assetPath: 'c7_branding/home/hero_art.png',
                     actionLabel:
                         isArabic ? 'فتح الإقامات' : 'Open residencies',
                     onTap: () => Navigator.of(context)
@@ -327,7 +329,7 @@ class CenterDashboardPage extends StatelessWidget {
                     icon: Icons.dashboard_customize_outlined,
                     accent: const Color(0xFF7A4E2D),
                     badgeLabel: isArabic ? 'تشغيل' : 'Operations',
-                    assetPath: 'assets/c7_branding/home/home_bg.png',
+                    assetPath: 'c7_branding/home/home_bg.png',
                     actionLabel: isArabic ? 'فتح الغرفة' : 'Open room',
                     onTap: () => Navigator.of(context)
                         .pushNamed(Routes.centerOperations),
@@ -341,7 +343,7 @@ class CenterDashboardPage extends StatelessWidget {
                     icon: Icons.chat_bubble_outline_rounded,
                     accent: const Color(0xFF496D7C),
                     badgeLabel: isArabic ? 'دعم إداري' : 'Admin Support',
-                    assetPath: 'assets/c7_branding/logo/logo_mark.png',
+                    assetPath: 'c7_branding/logo/logo_mark.png',
                     actionLabel: isArabic ? 'فتح الشات' : 'Open chat',
                     onTap: () => Navigator.pushNamed(
                       context,
@@ -805,10 +807,12 @@ class _SectionCard extends StatelessWidget {
             child: Opacity(
               opacity: 0.10,
               child: Image.asset(
-                assetPath,
+                normalizeAssetPath(assetPath),
                 width: 128,
                 height: 128,
                 fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) =>
+                    const AppMissingAssetPlaceholder(width: 128, height: 128),
               ),
             ),
           ),
