@@ -401,6 +401,7 @@ class ChatFirestoreService {
 
       tx.update(_threads.doc(threadId), {
         'assignedClinicianUid': clinicianUid,
+        'threadType': 'clinician_case',
         'handoffState': 'clinician_review',
         'lifecycleState': 'assigned_clinician',
         'needsHumanSupport': true,
