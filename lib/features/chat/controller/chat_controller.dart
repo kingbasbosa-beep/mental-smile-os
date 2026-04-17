@@ -16,6 +16,15 @@ class ChatController {
   final FirebaseAuth _auth;
   final ChatAiService _aiService = const ChatAiService();
 
+  bool _isBookingFollowupThread(ChatThreadModel thread) {
+    final threadType = thread.threadType?.trim() ?? '';
+    if (threadType.isNotEmpty) {
+      return threadType == 'booking_followup';
+    }
+
+    return thread.sourceType == 'booking_flow' || thread.bookingLinked;
+  }
+
   bool _isAdminSupportThread(ChatThreadModel thread) {
     return thread.sourceType == 'admin_support' ||
         thread.handoffState == 'admin_review' ||
@@ -61,7 +70,9 @@ class ChatController {
     final existingThreads =
         await _firestoreService.getThreadsForOwner(user.uid);
     final aiThreads = existingThreads
-        .where((thread) => !_isAdminSupportThread(thread))
+        .where((thread) =>
+            !_isAdminSupportThread(thread) &&
+            !_isBookingFollowupThread(thread))
         .toList()
       ..sort((a, b) {
         final aDate = a.updatedAt ??

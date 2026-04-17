@@ -352,6 +352,7 @@ class ChatFirestoreService {
     required String officialClientUid,
   }) async {
     await _threads.doc(threadId).update({
+      'threadType': 'booking_followup',
       'bookingLinked': true,
       'bookingRequestId': bookingRequestId,
       'convertedToOfficialClient': true,
