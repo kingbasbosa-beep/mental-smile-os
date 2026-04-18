@@ -20,13 +20,23 @@ class ChatController {
     return (thread.threadType?.trim().isNotEmpty ?? false);
   }
 
-  bool _isBookingFollowupThread(ChatThreadModel thread) {
+  bool _isMissingThreadType(ChatThreadModel thread) {
     final threadType = thread.threadType?.trim() ?? '';
-    if (threadType.isNotEmpty) {
-      return threadType == 'booking_followup';
-    }
+    return threadType.isEmpty;
+  }
 
+  bool _isTypedBookingFollowupThread(ChatThreadModel thread) {
+    return thread.threadType == 'booking_followup';
+  }
+
+  bool _isLegacyBookingFollowupFallbackThread(ChatThreadModel thread) {
+    if (!_isMissingThreadType(thread)) return false;
     return thread.sourceType == 'booking_flow' || thread.bookingLinked;
+  }
+
+  bool _isBookingFollowupThread(ChatThreadModel thread) {
+    if (_isTypedBookingFollowupThread(thread)) return true;
+    return _isLegacyBookingFollowupFallbackThread(thread);
   }
 
   bool _isAdminSupportThread(ChatThreadModel thread) {
