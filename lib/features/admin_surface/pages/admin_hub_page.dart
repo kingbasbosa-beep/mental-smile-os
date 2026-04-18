@@ -161,6 +161,12 @@ class AdminHubPage extends StatelessWidget {
         color: const Color(0xFFE58667),
       ),
       _AdminQuickAction(
+        label: 'AI Policies',
+        icon: Icons.psychology_alt_outlined,
+        route: Routes.adminAiPolicies,
+        color: const Color(0xFF4F7BFF),
+      ),
+      _AdminQuickAction(
         label: 'Clients',
         icon: Icons.people_alt_outlined,
         route: Routes.adminClients,
