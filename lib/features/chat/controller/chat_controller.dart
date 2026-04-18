@@ -16,6 +16,7 @@ class ChatController {
   final ChatFirestoreService _firestoreService;
   final FirebaseAuth _auth;
   final ChatAiService _aiService = const ChatAiService();
+  static const bool _enableLegacyBookingFollowupFallback = false;
 
   bool _hasExplicitThreadType(ChatThreadModel thread) {
     return (thread.threadType?.trim().isNotEmpty ?? false);
@@ -31,6 +32,9 @@ class ChatController {
   }
 
   bool _isLegacyBookingFollowupFallbackThread(ChatThreadModel thread) {
+    // Soft-cut disabled after repeated zero-usage measurement in real flows.
+    // Keep this rollback trivial until broader stability is confirmed.
+    if (!_enableLegacyBookingFollowupFallback) return false;
     if (!_isMissingThreadType(thread)) return false;
     return thread.sourceType == 'booking_flow' || thread.bookingLinked;
   }

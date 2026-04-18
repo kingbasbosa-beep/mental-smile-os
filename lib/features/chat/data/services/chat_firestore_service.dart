@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_escalation_model.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_message_model.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
@@ -182,6 +183,26 @@ class ChatFirestoreService {
     return _isLegacyClinicianCaseFallbackThread(thread);
   }
 
+  void _debugMeasureLegacyClinicianFallbackThreads(
+    String clinicianUid,
+    List<ChatThreadModel> threads,
+  ) {
+    if (!kDebugMode) return;
+
+    final legacyFallbackThreads = threads
+        .where(_isLegacyClinicianCaseFallbackThread)
+        .toList();
+
+    if (legacyFallbackThreads.isEmpty) return;
+
+    debugPrint(
+      'CHAT_CLINICIAN_FALLBACK_MEASURE '
+      'clinicianUid=$clinicianUid '
+      'legacyClinicianFallbackCount=${legacyFallbackThreads.length} '
+      'sampleThreadIds=${legacyFallbackThreads.take(5).map((t) => t.id).join(",")}',
+    );
+  }
+
   Stream<List<ChatThreadModel>> streamAdminSupportInboxThreads() {
     return _threads.orderBy('updatedAt', descending: true).snapshots().map(
       (snapshot) {
@@ -219,15 +240,22 @@ class ChatFirestoreService {
         .snapshots()
         .asyncMap((snapshot) async {
       final items = <ChatEscalationModel>[];
+      final matchedThreads = <ChatThreadModel>[];
 
       for (final doc in snapshot.docs) {
         final escalation = ChatEscalationModel.fromFirestore(doc);
         final thread = await getThread(escalation.threadId);
         if (thread == null) continue;
         if (_matchesClinicianInboxThread(thread)) {
+          matchedThreads.add(thread);
           items.add(escalation);
         }
       }
+
+      _debugMeasureLegacyClinicianFallbackThreads(
+        clinicianUid,
+        matchedThreads,
+      );
 
       return items;
     });
