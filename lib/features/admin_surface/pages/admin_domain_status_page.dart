@@ -128,6 +128,7 @@ class AdminDomainStatusPage extends StatelessWidget {
                         status.degradedFeatures.isNotEmpty;
                     final isAiPolicyDomain = domain.key == DomainKey.aiPolicy;
                     final isChatDomain = domain.key == DomainKey.chat;
+                    final isBookingDomain = domain.key == DomainKey.booking;
 
                     return AppSurfaceCard(
                       child: Column(
@@ -255,6 +256,64 @@ class AdminDomainStatusPage extends StatelessWidget {
                                   label: 'openAdminSupportCount',
                                   value: _stringText(
                                     status.metadata['openAdminSupportCount'],
+                                  ),
+                                ),
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'lastHealthSampleType',
+                                  value: _stringText(
+                                    status.metadata['lastHealthSampleType'],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                          if (isBookingDomain && status.metadata.isNotEmpty) ...[
+                            const SizedBox(height: AppSpacing.sm),
+                            _buildMetadataSection(
+                              context,
+                              title: 'Booking Health',
+                              children: [
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'pendingRequestsCount',
+                                  value: _stringText(
+                                    status.metadata['pendingRequestsCount'],
+                                  ),
+                                ),
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'awaitingPaymentCount',
+                                  value: _stringText(
+                                    status.metadata['awaitingPaymentCount'],
+                                  ),
+                                ),
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'paymentReviewCount',
+                                  value: _stringText(
+                                    status.metadata['paymentReviewCount'],
+                                  ),
+                                ),
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'sessionSetupPendingCount',
+                                  value: _stringText(
+                                    status.metadata['sessionSetupPendingCount'],
+                                  ),
+                                ),
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'pendingReviewsCount',
+                                  value: _stringText(
+                                    status.metadata['pendingReviewsCount'],
+                                  ),
+                                ),
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'payoutPendingCount',
+                                  value: _stringText(
+                                    status.metadata['payoutPendingCount'],
                                   ),
                                 ),
                                 _buildMetadataLine(
