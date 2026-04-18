@@ -25,6 +25,24 @@ class ChatAiResult {
 class ChatAiService {
   const ChatAiService();
 
+  static const Map<String, int> _stateScores = {
+    'justification': 2,
+    'denial': 2,
+    'craving': 3,
+    'hopelessness': 2,
+    'fear': 0,
+    'guilt': 0,
+    'collapse': 0,
+    'manipulation': 2,
+  };
+
+  static const int _lossOfControlScore = 3;
+  static const int _explicitSelfHarmScore = 5;
+
+  static const int _mediumRiskThreshold = 3;
+  static const int _highRiskThreshold = 6;
+  static const int _criticalRiskThreshold = 9;
+
   static const Map<String, String> _responseTemplates = {
     'critical':
         'أنا سامع إن الخطر هنا مباشر، والأولوية الآن هي الأمان فقط. ابعد حالًا عن أي شيء ممكن تستخدمه لإيذاء نفسك، وخليك في نفس المكان مع شخص موثوق أو اتصل به فورًا، واطلب دعمًا بشريًا مباشرًا الآن. لو أنت وحدك، تحرك فورًا لمكان فيه ناس قريبين منك. أنا معك الآن، ونركز فقط على النجاة من الدقائق الحالية بأمان.',
@@ -231,52 +249,52 @@ class ChatAiService {
     }
 
     if (containsAny(_statePhrasePacks['justification']!)) {
-      addState('justification', 2);
+      addState('justification', _stateScores['justification']!);
     }
 
     if (containsAny(_statePhrasePacks['denial']!)) {
-      addState('denial', 2);
+      addState('denial', _stateScores['denial']!);
     }
 
     if (containsAny(_statePhrasePacks['craving']!)) {
-      addState('craving', 3);
+      addState('craving', _stateScores['craving']!);
     }
 
     if (containsAny(_statePhrasePacks['hopelessness']!)) {
-      addState('hopelessness', 2);
+      addState('hopelessness', _stateScores['hopelessness']!);
     }
 
     if (containsAny(_statePhrasePacks['fear']!)) {
-      addState('fear', 0);
+      addState('fear', _stateScores['fear']!);
     }
 
     if (containsAny(_statePhrasePacks['guilt']!)) {
-      addState('guilt', 0);
+      addState('guilt', _stateScores['guilt']!);
     }
 
     if (containsAny(_statePhrasePacks['collapse']!)) {
-      addState('collapse', 0);
+      addState('collapse', _stateScores['collapse']!);
     }
 
     if (containsAny(_statePhrasePacks['manipulation']!)) {
-      addState('manipulation', 2);
+      addState('manipulation', _stateScores['manipulation']!);
     }
 
     if (containsAny(_lossOfControlPhrases)) {
-      riskScore += 3;
+      riskScore += _lossOfControlScore;
     }
 
     if (containsAny(_selfHarmPhrases)) {
       explicitSelfHarmIntent = true;
-      riskScore += 5;
+      riskScore += _explicitSelfHarmScore;
     }
 
     final String riskLevel;
-    if (explicitSelfHarmIntent || riskScore >= 9) {
+    if (explicitSelfHarmIntent || riskScore >= _criticalRiskThreshold) {
       riskLevel = 'critical';
-    } else if (riskScore >= 6) {
+    } else if (riskScore >= _highRiskThreshold) {
       riskLevel = 'high';
-    } else if (riskScore >= 3) {
+    } else if (riskScore >= _mediumRiskThreshold) {
       riskLevel = 'medium';
     } else {
       riskLevel = 'low';
