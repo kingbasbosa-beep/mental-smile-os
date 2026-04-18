@@ -43,6 +43,27 @@ class ChatAiService {
   static const int _highRiskThreshold = 6;
   static const int _criticalRiskThreshold = 9;
 
+  static const Map<String, String> _strategyByRiskLevel = {
+    'critical': 'safety_override',
+    'high': 'reality_linking_boundary',
+    'medium': 'awareness_disruption',
+    'low': 'containment',
+  };
+
+  static const Set<String> _needsHumanSupportLevels = {
+    'critical',
+    'high',
+  };
+
+  static const Set<String> _containsEscalationSignalLevels = {
+    'critical',
+    'high',
+  };
+
+  static const Set<String> _safetyTriggeredLevels = {
+    'critical',
+  };
+
   static const Map<String, String> _responseTemplates = {
     'critical':
         'أنا سامع إن الخطر هنا مباشر، والأولوية الآن هي الأمان فقط. ابعد حالًا عن أي شيء ممكن تستخدمه لإيذاء نفسك، وخليك في نفس المكان مع شخص موثوق أو اتصل به فورًا، واطلب دعمًا بشريًا مباشرًا الآن. لو أنت وحدك، تحرك فورًا لمكان فيه ناس قريبين منك. أنا معك الآن، ونركز فقط على النجاة من الدقائق الحالية بأمان.',
@@ -223,6 +244,23 @@ class ChatAiService {
     return _responseTemplates[key] ?? _responseTemplates['default']!;
   }
 
+  String _strategyForRiskLevel(String riskLevel) {
+    return _strategyByRiskLevel[riskLevel] ??
+        _strategyByRiskLevel['low']!;
+  }
+
+  bool _needsHumanSupportForRiskLevel(String riskLevel) {
+    return _needsHumanSupportLevels.contains(riskLevel);
+  }
+
+  bool _containsEscalationSignalForRiskLevel(String riskLevel) {
+    return _containsEscalationSignalLevels.contains(riskLevel);
+  }
+
+  bool _safetyTriggeredForRiskLevel(String riskLevel) {
+    return _safetyTriggeredLevels.contains(riskLevel);
+  }
+
   ChatAiResult processUserMessage(String text) {
     final input = _normalize(text);
 
@@ -300,22 +338,13 @@ class ChatAiService {
       riskLevel = 'low';
     }
 
-    final String strategyMode;
-    if (riskLevel == 'critical') {
-      strategyMode = 'safety_override';
-    } else if (riskLevel == 'high') {
-      strategyMode = 'reality_linking_boundary';
-    } else if (riskLevel == 'medium') {
-      strategyMode = 'awareness_disruption';
-    } else {
-      strategyMode = 'containment';
-    }
+    final String strategyMode = _strategyForRiskLevel(riskLevel);
 
-    final bool safetyTriggered = riskLevel == 'critical';
+    final bool safetyTriggered = _safetyTriggeredForRiskLevel(riskLevel);
     final bool needsHumanSupport =
-        riskLevel == 'critical' || riskLevel == 'high';
+        _needsHumanSupportForRiskLevel(riskLevel);
     final bool containsEscalationSignal =
-        riskLevel == 'critical' || riskLevel == 'high';
+        _containsEscalationSignalForRiskLevel(riskLevel);
 
     final responseText = _buildResponse(
       riskLevel: riskLevel,
