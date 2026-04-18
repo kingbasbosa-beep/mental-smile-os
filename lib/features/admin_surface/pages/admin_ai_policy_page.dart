@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutterprojects/core/system/domain_registry.dart';
+import 'package:flutterprojects/core/system/domain_status.dart';
+import 'package:flutterprojects/core/system/domain_status_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/features/admin_surface/services/ai_policy_health_service.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_ai_service.dart';
@@ -16,6 +19,7 @@ class AdminAiPolicyPage extends StatefulWidget {
 class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
   static const AiPolicyHealthService _aiPolicyHealthService =
       AiPolicyHealthService();
+  static const DomainStatusService _domainStatusService = DomainStatusService();
   final TextEditingController _testMessageController = TextEditingController();
   final ChatAiService _chatAiService = const ChatAiService();
   final TextEditingController _draftNotesController = TextEditingController();
@@ -67,6 +71,139 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
       return value.toDate().toIso8601String();
     }
     return value?.toString().trim() ?? '—';
+  }
+
+  String _statusSourceLabel(String value) {
+    switch (value) {
+      case 'admin_set':
+        return 'Admin Set';
+      case 'mixed':
+        return 'Mixed';
+      default:
+        return 'Observed';
+    }
+  }
+
+  Color _advisoryColor(String status) {
+    switch (status) {
+      case 'disabled':
+        return const Color(0xFFC97C7C);
+      case 'maintenance':
+        return const Color(0xFF6A8FBE);
+      case 'degraded':
+        return const Color(0xFFD9A441);
+      default:
+        return AppColors.mist;
+    }
+  }
+
+  String _advisoryTitle(bool isArabic, String status) {
+    switch (status) {
+      case 'disabled':
+        return isArabic ? 'تنبيه: النطاق معطل' : 'Advisory: Domain disabled';
+      case 'maintenance':
+        return isArabic
+            ? 'تنبيه: النطاق تحت صيانة مخططة'
+            : 'Advisory: Planned maintenance';
+      default:
+        return isArabic
+            ? 'تنبيه: النطاق في حالة degraded'
+            : 'Advisory: Domain degraded';
+    }
+  }
+
+  String _advisoryBody(bool isArabic, DomainStatus status) {
+    final reason = (status.statusReason ?? status.note ?? '').trim();
+    final source = _statusSourceLabel(status.statusSource);
+
+    final intro = switch (status.status) {
+      'disabled' => isArabic
+          ? 'هذه الصفحة تعرض حالة نطاق AI Policy على أنها معطلة حاليًا.'
+          : 'This page is showing the AI Policy domain as currently disabled.',
+      'maintenance' => isArabic
+          ? 'هذه الصفحة تعرض أن نطاق AI Policy تحت صيانة مخططة.'
+          : 'This page is showing the AI Policy domain as under planned maintenance.',
+      _ => isArabic
+          ? 'هذه الصفحة تعرض أن نطاق AI Policy في حالة degraded ويجب التعامل مع بياناته بحذر.'
+          : 'This page is showing the AI Policy domain as degraded and its signals should be treated with reduced trust.',
+    };
+
+    if (reason.isEmpty) {
+      return '$intro ${isArabic ? 'المصدر' : 'Source'}: $source.';
+    }
+
+    return '$intro ${isArabic ? 'المصدر' : 'Source'}: $source. ${isArabic ? 'الملاحظة' : 'Note'}: $reason';
+  }
+
+  Widget _buildDomainAdvisoryBanner(BuildContext context, bool isArabic) {
+    return StreamBuilder<DomainStatus>(
+      stream: _domainStatusService.watchDomainStatus(DomainKey.aiPolicy),
+      builder: (context, snapshot) {
+        final status = snapshot.data;
+        if (status == null || status.status == 'active' || status.isUnknown) {
+          return const SizedBox.shrink();
+        }
+
+        final color = _advisoryColor(status.status);
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+          child: AppSurfaceCard(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 12,
+                  height: 12,
+                  margin: const EdgeInsets.only(top: 6),
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: isArabic
+                        ? CrossAxisAlignment.end
+                        : CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _advisoryTitle(isArabic, status.status),
+                        textAlign:
+                            isArabic ? TextAlign.right : TextAlign.left,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        _advisoryBody(isArabic, status),
+                        textAlign:
+                            isArabic ? TextAlign.right : TextAlign.left,
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        isArabic
+                            ? 'هذا تنبيه معلوماتي فقط. Runtime policy الحالية لم تتغير.'
+                            : 'This is informational only. Policy runtime is unchanged.',
+                        textAlign:
+                            isArabic ? TextAlign.right : TextAlign.left,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color:
+                                  AppColors.obsidian.withValues(alpha: 0.72),
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   String _stringValue(Map<String, dynamic> data, String key) {
@@ -1131,6 +1268,7 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
           child: ListView(
             padding: const EdgeInsets.all(AppSpacing.lg),
             children: [
+              _buildDomainAdvisoryBanner(context, isArabic),
               AppSurfaceCard(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Column(
