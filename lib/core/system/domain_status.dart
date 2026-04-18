@@ -7,6 +7,7 @@ class DomainStatus {
     this.updatedBy,
     this.note,
     this.degradedFeatures = const <String>[],
+    this.metadata = const <String, dynamic>{},
   });
 
   final String status;
@@ -14,14 +15,23 @@ class DomainStatus {
   final String? updatedBy;
   final String? note;
   final List<String> degradedFeatures;
+  final Map<String, dynamic> metadata;
 
   factory DomainStatus.fromMap(Map<String, dynamic> map) {
+    final metadata = Map<String, dynamic>.from(map)
+      ..remove('status')
+      ..remove('updatedAt')
+      ..remove('updatedBy')
+      ..remove('note')
+      ..remove('degradedFeatures');
+
     return DomainStatus(
       status: (map['status'] ?? 'unknown').toString(),
       updatedAt: _dateTimeFromValue(map['updatedAt']),
       updatedBy: _stringOrNull(map['updatedBy']),
       note: _stringOrNull(map['note']),
       degradedFeatures: _stringListFromValue(map['degradedFeatures']),
+      metadata: metadata,
     );
   }
 
@@ -39,6 +49,7 @@ class DomainStatus {
       'updatedBy': updatedBy,
       'note': note,
       'degradedFeatures': degradedFeatures,
+      ...metadata,
     };
   }
 

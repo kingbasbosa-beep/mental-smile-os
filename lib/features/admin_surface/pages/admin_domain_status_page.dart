@@ -31,6 +31,61 @@ class AdminDomainStatusPage extends StatelessWidget {
     return '${value.year}-${two(value.month)}-${two(value.day)} ${two(value.hour)}:${two(value.minute)}';
   }
 
+  String _boolText(dynamic value) {
+    if (value is bool) return value ? 'yes' : 'no';
+    return '—';
+  }
+
+  String _stringText(dynamic value) {
+    final text = (value ?? '').toString().trim();
+    return text.isEmpty ? '—' : text;
+  }
+
+  Widget _buildMetadataLine(
+    BuildContext context, {
+    required String label,
+    required String value,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+      child: Text(
+        '$label: $value',
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+    );
+  }
+
+  Widget _buildMetadataSection(
+    BuildContext context, {
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        border: Border.all(
+          color: AppColors.mist.withValues(alpha: 0.55),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          ...children,
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,6 +124,9 @@ class AdminDomainStatusPage extends StatelessWidget {
                   builder: (context, snapshot) {
                     final status = snapshot.data ?? DomainStatus.unknown();
                     final statusText = status.isUnknown ? 'unknown' : status.status;
+                    final hasDegradedFeatures =
+                        status.degradedFeatures.isNotEmpty;
+                    final isAiPolicyDomain = domain.key == DomainKey.aiPolicy;
 
                     return AppSurfaceCard(
                       child: Column(
@@ -124,6 +182,58 @@ class AdminDomainStatusPage extends StatelessWidget {
                             Text(
                               'Note: ${status.note}',
                               style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                          if (hasDegradedFeatures) ...[
+                            const SizedBox(height: AppSpacing.sm),
+                            _buildMetadataSection(
+                              context,
+                              title: 'Degraded Features',
+                              children: status.degradedFeatures
+                                  .map((feature) => _buildMetadataLine(
+                                        context,
+                                        label: '-',
+                                        value: feature,
+                                      ))
+                                  .toList(),
+                            ),
+                          ],
+                          if (isAiPolicyDomain &&
+                              status.metadata.isNotEmpty) ...[
+                            const SizedBox(height: AppSpacing.sm),
+                            _buildMetadataSection(
+                              context,
+                              title: 'AI Policy Health',
+                              children: [
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'draftExists',
+                                  value: _boolText(
+                                    status.metadata['draftExists'],
+                                  ),
+                                ),
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'publishedExists',
+                                  value: _boolText(
+                                    status.metadata['publishedExists'],
+                                  ),
+                                ),
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'draftVersion',
+                                  value: _stringText(
+                                    status.metadata['draftVersion'],
+                                  ),
+                                ),
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'publishedVersion',
+                                  value: _stringText(
+                                    status.metadata['publishedVersion'],
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                           if (domain.ownedCollections.isNotEmpty) ...[
