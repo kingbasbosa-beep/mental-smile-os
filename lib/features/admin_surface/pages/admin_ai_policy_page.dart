@@ -4,6 +4,7 @@ import 'package:flutterprojects/core/system/domain_status.dart';
 import 'package:flutterprojects/core/system/domain_status_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/features/admin_surface/services/ai_policy_health_service.dart';
+import 'package:flutterprojects/features/admin_surface/widgets/domain_advisory_banner.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_ai_service.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
@@ -73,30 +74,6 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
     return value?.toString().trim() ?? '—';
   }
 
-  String _statusSourceLabel(String value) {
-    switch (value) {
-      case 'admin_set':
-        return 'Admin Set';
-      case 'mixed':
-        return 'Mixed';
-      default:
-        return 'Observed';
-    }
-  }
-
-  Color _advisoryColor(String status) {
-    switch (status) {
-      case 'disabled':
-        return const Color(0xFFC97C7C);
-      case 'maintenance':
-        return const Color(0xFF6A8FBE);
-      case 'degraded':
-        return const Color(0xFFD9A441);
-      default:
-        return AppColors.mist;
-    }
-  }
-
   String _advisoryTitle(bool isArabic, String status) {
     switch (status) {
       case 'disabled':
@@ -114,7 +91,7 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
 
   String _advisoryBody(bool isArabic, DomainStatus status) {
     final reason = (status.statusReason ?? status.note ?? '').trim();
-    final source = _statusSourceLabel(status.statusSource);
+    final source = DomainAdvisoryBanner.statusSourceLabel(status.statusSource);
 
     final intro = switch (status.status) {
       'disabled' => isArabic
@@ -144,63 +121,16 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
           return const SizedBox.shrink();
         }
 
-        final color = _advisoryColor(status.status);
-
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.md),
-          child: AppSurfaceCard(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 12,
-                  height: 12,
-                  margin: const EdgeInsets.only(top: 6),
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: isArabic
-                        ? CrossAxisAlignment.end
-                        : CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _advisoryTitle(isArabic, status.status),
-                        textAlign:
-                            isArabic ? TextAlign.right : TextAlign.left,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        _advisoryBody(isArabic, status),
-                        textAlign:
-                            isArabic ? TextAlign.right : TextAlign.left,
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        isArabic
-                            ? 'هذا تنبيه معلوماتي فقط. Runtime policy الحالية لم تتغير.'
-                            : 'This is informational only. Policy runtime is unchanged.',
-                        textAlign:
-                            isArabic ? TextAlign.right : TextAlign.left,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color:
-                                  AppColors.obsidian.withValues(alpha: 0.72),
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+        return DomainAdvisoryBanner(
+          status: status,
+          domainDisplayName: 'AI Policy',
+          title: _advisoryTitle(isArabic, status.status),
+          body: _advisoryBody(isArabic, status),
+          nonBlockingMessage: isArabic
+              ? 'هذا تنبيه معلوماتي فقط. Runtime policy الحالية لم تتغير.'
+              : 'This is informational only. Policy runtime is unchanged.',
+          isArabic: isArabic,
+          margin: const EdgeInsets.only(bottom: AppSpacing.md),
         );
       },
     );
