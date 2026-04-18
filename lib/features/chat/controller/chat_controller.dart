@@ -34,10 +34,7 @@ class ChatController {
       return thread.threadType == 'admin_support';
     }
 
-    return thread.sourceType == 'admin_support' ||
-        thread.handoffState == 'admin_review' ||
-        thread.handoffState == 'admin_replying' ||
-        thread.lifecycleState == 'assigned_admin';
+    return thread.sourceType == 'admin_support';
   }
 
   Future<void> _maybeCreateEscalation({
