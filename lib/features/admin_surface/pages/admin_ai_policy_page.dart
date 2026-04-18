@@ -15,8 +15,18 @@ class AdminAiPolicyPage extends StatefulWidget {
 class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
   final TextEditingController _testMessageController = TextEditingController();
   final ChatAiService _chatAiService = const ChatAiService();
+  final TextEditingController _draftNotesController = TextEditingController();
+  final Map<String, TextEditingController> _draftTemplateControllers = {
+    'critical': TextEditingController(),
+    'high': TextEditingController(),
+    'medium': TextEditingController(),
+    'family_member': TextEditingController(),
+    'default': TextEditingController(),
+  };
 
   ChatAiResult? _testResult;
+  bool _savingDraft = false;
+  String? _loadedDraftVersion;
 
   bool _isArabic(BuildContext context) {
     return Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
@@ -87,6 +97,77 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
     return '${thresholds[key] ?? '—'}';
   }
 
+  void _syncDraftEditors(Map<String, dynamic> data) {
+    final version = _stringValue(data, 'policyVersion');
+    if (_loadedDraftVersion == version) return;
+
+    _loadedDraftVersion = version;
+    _draftNotesController.text = _stringValue(data, 'notes') == '—'
+        ? ''
+        : _stringValue(data, 'notes');
+
+    final templatesRaw = data['responseTemplates'];
+    final templates = templatesRaw is Map
+        ? Map<String, dynamic>.from(templatesRaw)
+        : const <String, dynamic>{};
+
+    for (final entry in _draftTemplateControllers.entries) {
+      final value = templates[entry.key]?.toString() ?? '';
+      entry.value.text = value;
+    }
+  }
+
+  Future<void> _saveDraftPolicy(BuildContext context, bool isArabic) async {
+    setState(() {
+      _savingDraft = true;
+    });
+
+    try {
+      final responseTemplates = <String, String>{};
+      for (final entry in _draftTemplateControllers.entries) {
+        responseTemplates[entry.key] = entry.value.text.trim();
+      }
+
+      await FirebaseFirestore.instance
+          .collection('ai_policies')
+          .doc('draft')
+          .set({
+        'notes': _draftNotesController.text.trim(),
+        'responseTemplates': responseTemplates,
+        'updatedAt': FieldValue.serverTimestamp(),
+        'updatedBy': 'admin_ui',
+      }, SetOptions(merge: true));
+
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'تم حفظ مسودة السياسة بنجاح'
+                : 'Draft policy saved successfully',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'فشل حفظ مسودة السياسة: $e'
+                : 'Failed to save draft policy: $e',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _savingDraft = false;
+        });
+      }
+    }
+  }
+
   Widget _buildDocumentLoadingState(BuildContext context, String title) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,6 +232,84 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
     return AppStatusBadge(
       label: '$label: $value',
       color: color,
+    );
+  }
+
+  Widget _buildDraftEditingSection(BuildContext context, bool isArabic) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F0FF),
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        border: Border.all(
+          color: AppColors.accentLavender.withValues(alpha: 0.32),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic ? 'Editing Draft Only' : 'Editing Draft Only',
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            isArabic
+                ? 'يمكن تعديل الملاحظات وقوالب الرد في المسودة فقط. المستند المنشور والحقول الحساسة تظل للقراءة فقط.'
+                : 'Only draft notes and response templates can be edited here. The published document and safety-critical fields remain read-only.',
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          TextField(
+            controller: _draftNotesController,
+            minLines: 2,
+            maxLines: 4,
+            textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+            decoration: InputDecoration(
+              labelText: isArabic ? 'ملاحظات المسودة' : 'Draft notes',
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          ..._draftTemplateControllers.entries.map(
+            (entry) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+              child: TextField(
+                controller: entry.value,
+                minLines: 2,
+                maxLines: 5,
+                textDirection:
+                    isArabic ? TextDirection.rtl : TextDirection.ltr,
+                decoration: InputDecoration(
+                  labelText: 'responseTemplates.${entry.key}',
+                ),
+              ),
+            ),
+          ),
+          Align(
+            alignment: isArabic ? Alignment.centerRight : Alignment.centerLeft,
+            child: FilledButton.icon(
+              onPressed:
+                  _savingDraft ? null : () => _saveDraftPolicy(context, isArabic),
+              icon: _savingDraft
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.save_outlined),
+              label: Text(isArabic ? 'حفظ المسودة' : 'Save Draft'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -318,6 +477,7 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
     required String documentId,
     required Color accent,
   }) {
+    final isDraft = documentId == 'draft';
     final stream = FirebaseFirestore.instance
         .collection('ai_policies')
         .doc(documentId)
@@ -363,6 +523,9 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
 
           final thresholds = _thresholds(data);
           final strategyMap = _strategyMap(data);
+          if (isDraft) {
+            _syncDraftEditors(data);
+          }
 
           return Column(
             crossAxisAlignment:
@@ -419,6 +582,10 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
                 textAlign: isArabic ? TextAlign.right : TextAlign.left,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
+              if (isDraft) ...[
+                const SizedBox(height: AppSpacing.md),
+                _buildDraftEditingSection(context, isArabic),
+              ],
               const SizedBox(height: AppSpacing.md),
               Wrap(
                 spacing: AppSpacing.md,
@@ -812,6 +979,10 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
   @override
   void dispose() {
     _testMessageController.dispose();
+    _draftNotesController.dispose();
+    for (final controller in _draftTemplateControllers.values) {
+      controller.dispose();
+    }
     super.dispose();
   }
 }
