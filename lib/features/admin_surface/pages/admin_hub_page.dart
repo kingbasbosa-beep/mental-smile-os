@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/core/system/domain_registry.dart';
+import 'package:flutterprojects/core/system/domain_status.dart';
+import 'package:flutterprojects/core/system/domain_status_service.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
@@ -10,6 +15,69 @@ class AdminHubPage extends StatelessWidget {
 
   static const String _adminBookingQueueRoute = '/admin/booking-queue';
   static const String _adminAlertsReviewRoute = '/admin/alerts-review';
+  static const DomainStatusService _domainStatusService = DomainStatusService();
+
+  Stream<_SystemAdvisorySummary> _systemAdvisoryStream() {
+    return Stream<_SystemAdvisorySummary>.multi((controller) {
+      final statuses = <DomainKey, DomainStatus>{};
+      final subscriptions = <StreamSubscription<DomainStatus>>[];
+
+      void emit() {
+        if (statuses.length < domainRegistry.length) return;
+
+        final affected = statuses.entries
+            .where((entry) => entry.value.status != 'active')
+            .toList();
+
+        if (affected.isEmpty) {
+          controller.add(const _SystemAdvisorySummary.none());
+          return;
+        }
+
+        String highestSeverity = 'unknown';
+        int rank = -1;
+
+        for (final entry in affected) {
+          final status = entry.value.status;
+          final currentRank = switch (status) {
+            'disabled' => 3,
+            'maintenance' => 2,
+            'degraded' => 1,
+            _ => 0,
+          };
+
+          if (currentRank > rank) {
+            rank = currentRank;
+            highestSeverity = status;
+          }
+        }
+
+        controller.add(
+          _SystemAdvisorySummary(
+            affectedCount: affected.length,
+            highestSeverity: highestSeverity,
+          ),
+        );
+      }
+
+      for (final domain in domainRegistry) {
+        final sub = _domainStatusService.watchDomainStatus(domain.key).listen(
+          (status) {
+            statuses[domain.key] = status;
+            emit();
+          },
+          onError: controller.addError,
+        );
+        subscriptions.add(sub);
+      }
+
+      controller.onCancel = () async {
+        for (final subscription in subscriptions) {
+          await subscription.cancel();
+        }
+      };
+    });
+  }
 
   Stream<int> _openEscalationsStream() {
     return FirebaseFirestore.instance
@@ -345,6 +413,10 @@ class AdminHubPage extends StatelessWidget {
                     actions: quickActions,
                   ),
                   const SizedBox(height: AppSpacing.md),
+                  _SystemAdvisoryCard(
+                    advisoryStream: _systemAdvisoryStream(),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
                   _AdminQuickStatsSection(
                     isArabic: isArabic,
                     clinicianPendingStream: clinicianPendingStream,
@@ -395,6 +467,106 @@ class AdminHubPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _SystemAdvisorySummary {
+  const _SystemAdvisorySummary({
+    required this.affectedCount,
+    required this.highestSeverity,
+  });
+
+  const _SystemAdvisorySummary.none()
+      : affectedCount = 0,
+        highestSeverity = 'active';
+
+  final int affectedCount;
+  final String highestSeverity;
+
+  bool get hasAdvisory => affectedCount > 0;
+}
+
+class _SystemAdvisoryCard extends StatelessWidget {
+  const _SystemAdvisoryCard({
+    required this.advisoryStream,
+  });
+
+  final Stream<_SystemAdvisorySummary> advisoryStream;
+
+  Color _severityColor(String severity) {
+    switch (severity) {
+      case 'disabled':
+        return const Color(0xFFC97C7C);
+      case 'maintenance':
+        return const Color(0xFF6A8FBE);
+      case 'degraded':
+        return const Color(0xFFD9A441);
+      default:
+        return AppColors.mist;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<_SystemAdvisorySummary>(
+      stream: advisoryStream,
+      builder: (context, snapshot) {
+        final summary = snapshot.data;
+        if (summary == null || !summary.hasAdvisory) {
+          return const SizedBox.shrink();
+        }
+
+        final color = _severityColor(summary.highestSeverity);
+
+        return AppSurfaceCard(
+          child: Row(
+            children: [
+              Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'System Advisory',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      '${summary.affectedCount} domains require attention (highest: ${summary.highestSeverity})',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'This is an informational advisory. No actions are blocked.',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.obsidian.withValues(alpha: 0.72),
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, Routes.adminDomainStatus);
+                },
+                child: const Text('View details'),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

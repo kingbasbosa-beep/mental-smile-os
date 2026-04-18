@@ -41,6 +41,17 @@ class AdminDomainStatusPage extends StatelessWidget {
     return text.isEmpty ? '—' : text;
   }
 
+  String _statusSourceLabel(String value) {
+    switch (value) {
+      case 'admin_set':
+        return 'Admin Set';
+      case 'mixed':
+        return 'Mixed';
+      default:
+        return 'Observed';
+    }
+  }
+
   Widget _buildMetadataLine(
     BuildContext context, {
     required String label,
@@ -129,6 +140,9 @@ class AdminDomainStatusPage extends StatelessWidget {
                     final isAiPolicyDomain = domain.key == DomainKey.aiPolicy;
                     final isChatDomain = domain.key == DomainKey.chat;
                     final isBookingDomain = domain.key == DomainKey.booking;
+                    final hasGovernanceContext =
+                        status.statusSource == 'admin_set' ||
+                        status.statusSource == 'mixed';
 
                     return AppSurfaceCard(
                       child: Column(
@@ -172,6 +186,11 @@ class AdminDomainStatusPage extends StatelessWidget {
                             'Last updated: ${_formatDate(status.updatedAt)}',
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            'Status source: ${_statusSourceLabel(status.statusSource)}',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
                           if ((status.updatedBy ?? '').isNotEmpty) ...[
                             const SizedBox(height: AppSpacing.xs),
                             Text(
@@ -184,6 +203,32 @@ class AdminDomainStatusPage extends StatelessWidget {
                             Text(
                               'Note: ${status.note}',
                               style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                          if (hasGovernanceContext) ...[
+                            const SizedBox(height: AppSpacing.sm),
+                            _buildMetadataSection(
+                              context,
+                              title: 'Governance Context',
+                              children: [
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'statusSetBy',
+                                  value: _stringText(status.statusSetBy),
+                                ),
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'statusSetAt',
+                                  value: status.statusSetAt == null
+                                      ? '—'
+                                      : _formatDate(status.statusSetAt!),
+                                ),
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'statusReason',
+                                  value: _stringText(status.statusReason),
+                                ),
+                              ],
                             ),
                           ],
                           if (hasDegradedFeatures) ...[

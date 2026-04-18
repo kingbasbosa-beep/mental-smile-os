@@ -7,6 +7,10 @@ class DomainStatus {
     this.updatedBy,
     this.note,
     this.degradedFeatures = const <String>[],
+    this.statusSource = 'observed',
+    this.statusReason,
+    this.statusSetAt,
+    this.statusSetBy,
     this.metadata = const <String, dynamic>{},
   });
 
@@ -15,6 +19,10 @@ class DomainStatus {
   final String? updatedBy;
   final String? note;
   final List<String> degradedFeatures;
+  final String statusSource;
+  final String? statusReason;
+  final DateTime? statusSetAt;
+  final String? statusSetBy;
   final Map<String, dynamic> metadata;
 
   factory DomainStatus.fromMap(Map<String, dynamic> map) {
@@ -24,6 +32,10 @@ class DomainStatus {
       ..remove('updatedBy')
       ..remove('note')
       ..remove('degradedFeatures');
+      ..remove('statusSource')
+      ..remove('statusReason')
+      ..remove('statusSetAt')
+      ..remove('statusSetBy');
 
     return DomainStatus(
       status: (map['status'] ?? 'unknown').toString(),
@@ -31,6 +43,10 @@ class DomainStatus {
       updatedBy: _stringOrNull(map['updatedBy']),
       note: _stringOrNull(map['note']),
       degradedFeatures: _stringListFromValue(map['degradedFeatures']),
+      statusSource: _statusSourceFromValue(map['statusSource']),
+      statusReason: _stringOrNull(map['statusReason']),
+      statusSetAt: _optionalDateTimeFromValue(map['statusSetAt']),
+      statusSetBy: _stringOrNull(map['statusSetBy']),
       metadata: metadata,
     );
   }
@@ -49,6 +65,11 @@ class DomainStatus {
       'updatedBy': updatedBy,
       'note': note,
       'degradedFeatures': degradedFeatures,
+      'statusSource': statusSource,
+      'statusReason': statusReason,
+      'statusSetAt':
+          statusSetAt == null ? null : Timestamp.fromDate(statusSetAt!),
+      'statusSetBy': statusSetBy,
       ...metadata,
     };
   }
@@ -64,9 +85,29 @@ class DomainStatus {
     return DateTime.fromMillisecondsSinceEpoch(0);
   }
 
+  static DateTime? _optionalDateTimeFromValue(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    return null;
+  }
+
   static String? _stringOrNull(dynamic value) {
     final text = (value ?? '').toString().trim();
     return text.isEmpty ? null : text;
+  }
+
+  static String _statusSourceFromValue(dynamic value) {
+    final text = (value ?? '').toString().trim();
+    switch (text) {
+      case 'admin_set':
+      case 'mixed':
+      case 'observed':
+        return text;
+      default:
+        return 'observed';
+    }
   }
 
   static List<String> _stringListFromValue(dynamic value) {
