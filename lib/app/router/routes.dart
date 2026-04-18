@@ -53,6 +53,7 @@ class Routes {
       '/admin/clinician-profile-requests';
   static const adminSupportChats = '/admin/support-chats';
   static const adminAiPolicies = '/admin/ai-policies';
+  static const adminDomainStatus = '/admin/system-domains';
   static const adminCenters = '/admin/centers';
   static const adminArchive = '/admin/archive';
   static const adminArchiveSessions = '/admin/archive/sessions';

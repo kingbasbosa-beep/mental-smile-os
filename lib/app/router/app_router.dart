@@ -40,6 +40,7 @@ import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_hub_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_ai_policy_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_domain_status_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_archive_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_alerts_review_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_centers_page.dart';
@@ -82,6 +83,7 @@ class AppRouter {
     Routes.adminSessions,
     Routes.adminSupportChats,
     Routes.adminAiPolicies,
+    Routes.adminDomainStatus,
     _adminBookingQueueRoute,
     _adminAlertsReviewRoute,
     Routes.adminArchive,
@@ -235,6 +237,12 @@ class AppRouter {
       case Routes.adminAiPolicies:
         return _adminProtectedRoute(
           child: const AdminAiPolicyPage(),
+          settings: settings,
+        );
+
+      case Routes.adminDomainStatus:
+        return _adminProtectedRoute(
+          child: const AdminDomainStatusPage(),
           settings: settings,
         );
 

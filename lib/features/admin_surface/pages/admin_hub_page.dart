@@ -167,6 +167,12 @@ class AdminHubPage extends StatelessWidget {
         color: const Color(0xFF4F7BFF),
       ),
       _AdminQuickAction(
+        label: 'System Domains',
+        icon: Icons.hub_outlined,
+        route: Routes.adminDomainStatus,
+        color: const Color(0xFF3E8B7B),
+      ),
+      _AdminQuickAction(
         label: 'Clients',
         icon: Icons.people_alt_outlined,
         route: Routes.adminClients,
