@@ -25,6 +25,23 @@ class ChatAiResult {
 class ChatAiService {
   const ChatAiService();
 
+  static const Map<String, String> _responseTemplates = {
+    'critical':
+        'أنا سامع إن الخطر هنا مباشر، والأولوية الآن هي الأمان فقط. ابعد حالًا عن أي شيء ممكن تستخدمه لإيذاء نفسك، وخليك في نفس المكان مع شخص موثوق أو اتصل به فورًا، واطلب دعمًا بشريًا مباشرًا الآن. لو أنت وحدك، تحرك فورًا لمكان فيه ناس قريبين منك. أنا معك الآن، ونركز فقط على النجاة من الدقائق الحالية بأمان.',
+    'high':
+        'واضح إن الضغط عالي جدًا عليك الآن، ومهم ما تفضلش مع ده وحدك. خلينا نهدي الإيقاع ونركز على خطوة آمنة جدًا الآن، ومعها يكون الأفضل التواصل مع شخص موثوق أو دعم بشري قريب.',
+    'medium':
+        'إحساسك مفهوم، ومش لازم تحل كل شيء الآن. خلينا نبطيء اللحظة ونشوف أول خطوة صغيرة تساعدك تستعيد هدوءك وسيطرتك.',
+    'family_member':
+        'واضح إنك شايل هم كبير، ووجودك هنا مهم. خلينا نفهم الموقف بهدوء ونركز على خطوة آمنة ومتزنة تساعدك وتساعد الطرف الآخر بدون تصعيد.',
+    'default':
+        'أنا معك. نقدر نمسك اللي حاصل بهدوء ونفهمه خطوة خطوة، من غير ضغط ومن غير أحكام.',
+  };
+
+  String _responseTemplateOrDefault(String key) {
+    return _responseTemplates[key] ?? _responseTemplates['default']!;
+  }
+
   ChatAiResult processUserMessage(String text) {
     final input = _normalize(text);
 
@@ -293,22 +310,22 @@ class ChatAiService {
     required String roleDetected,
   }) {
     if (riskLevel == 'critical') {
-      return 'أنا سامع إن الخطر هنا مباشر، والأولوية الآن هي الأمان فقط. ابعد حالًا عن أي شيء ممكن تستخدمه لإيذاء نفسك، وخليك في نفس المكان مع شخص موثوق أو اتصل به فورًا، واطلب دعمًا بشريًا مباشرًا الآن. لو أنت وحدك، تحرك فورًا لمكان فيه ناس قريبين منك. أنا معك الآن، ونركز فقط على النجاة من الدقائق الحالية بأمان.';
+      return _responseTemplateOrDefault('critical');
     }
 
     if (riskLevel == 'high') {
-      return 'واضح إن الضغط عالي جدًا عليك الآن، ومهم ما تفضلش مع ده وحدك. خلينا نهدي الإيقاع ونركز على خطوة آمنة جدًا الآن، ومعها يكون الأفضل التواصل مع شخص موثوق أو دعم بشري قريب.';
+      return _responseTemplateOrDefault('high');
     }
 
     if (riskLevel == 'medium') {
-      return 'إحساسك مفهوم، ومش لازم تحل كل شيء الآن. خلينا نبطيء اللحظة ونشوف أول خطوة صغيرة تساعدك تستعيد هدوءك وسيطرتك.';
+      return _responseTemplateOrDefault('medium');
     }
 
     if (roleDetected == 'family_member') {
-      return 'واضح إنك شايل هم كبير، ووجودك هنا مهم. خلينا نفهم الموقف بهدوء ونركز على خطوة آمنة ومتزنة تساعدك وتساعد الطرف الآخر بدون تصعيد.';
+      return _responseTemplateOrDefault('family_member');
     }
 
-    return 'أنا معك. نقدر نمسك اللي حاصل بهدوء ونفهمه خطوة خطوة، من غير ضغط ومن غير أحكام.';
+    return _responseTemplateOrDefault('default');
   }
 
   String _normalize(String text) {
