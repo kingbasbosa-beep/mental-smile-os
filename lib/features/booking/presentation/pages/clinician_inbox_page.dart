@@ -131,6 +131,45 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
     );
   }
 
+  Widget _buildLegacyInboxIntro(BuildContext context) {
+    final isArabic =
+        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: scheme.outline.withValues(alpha: 0.14),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic ? 'صندوق وارد توافق/legacy' : 'Legacy compatibility inbox',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            isArabic
+                ? 'هذه الصفحة ما زالت متاحة للتوافق والمتابعة، لكن المساحة الأساسية لطلبات الأخصائي داخل Specialist Workspace أصبحت غرفة عمليات الأخصائي.'
+                : 'This page remains available for compatibility and follow-up, but the primary specialist workspace for assignments is now Clinician Operations.',
+            style: Theme.of(context).textTheme.bodyMedium,
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _onApprovePressed(BuildContext context, String docId) async {
     final messenger = ScaffoldMessenger.of(context);
     final slot = _slotCtrl.text.trim();
@@ -228,6 +267,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
         ),
         body: Column(
           children: [
+            _buildLegacyInboxIntro(context),
             _statusTabs(context),
             if (_statusFilter == 'assigned_clinician')
               Padding(
