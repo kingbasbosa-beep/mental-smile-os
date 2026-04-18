@@ -16,6 +16,7 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
   final TextEditingController _testMessageController = TextEditingController();
   final ChatAiService _chatAiService = const ChatAiService();
   final TextEditingController _draftNotesController = TextEditingController();
+  final TextEditingController _publishNoteController = TextEditingController();
   final Map<String, TextEditingController> _draftTemplateControllers = {
     'critical': TextEditingController(),
     'high': TextEditingController(),
@@ -170,6 +171,7 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
   }
 
   Future<bool> _confirmPublishDraft(BuildContext context, bool isArabic) async {
+    _publishNoteController.text = '';
     final result = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
@@ -184,7 +186,29 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
                 : 'This will copy the current admin-managed draft values into the published document. It does not change the live chatbot runtime.',
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
           ),
+          contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          scrollable: true,
+          actionsOverflowAlignment: OverflowBarAlignment.end,
+          contentTextStyle: Theme.of(dialogContext).textTheme.bodyMedium,
           actions: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
+              child: TextField(
+                controller: _publishNoteController,
+                minLines: 2,
+                maxLines: 4,
+                textDirection:
+                    isArabic ? TextDirection.rtl : TextDirection.ltr,
+                decoration: InputDecoration(
+                  labelText: isArabic ? 'ملاحظة النشر' : 'Publish note',
+                  hintText: isArabic
+                      ? 'اكتب سبب النشر أو ملخص التغيير'
+                      : 'Add a short reason or release note',
+                ),
+              ),
+            ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
               child: Text(isArabic ? 'إلغاء' : 'Cancel'),
@@ -241,6 +265,10 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
         'basedOnVersion': draftVersion,
         'updatedAt': FieldValue.serverTimestamp(),
         'updatedBy': 'admin_ui_publish',
+        'publishedAt': FieldValue.serverTimestamp(),
+        'publishedBy': 'admin_ui_publish',
+        'publishNote': _publishNoteController.text.trim(),
+        'lastPublishedFromVersion': draftVersion,
       }, SetOptions(merge: true));
 
       if (!context.mounted) return;
@@ -651,6 +679,10 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
           if (isDraft) {
             _syncDraftEditors(data);
           }
+          final publishNote = _stringValue(data, 'publishNote');
+          final publishedBy = _stringValue(data, 'publishedBy');
+          final lastPublishedFromVersion =
+              _stringValue(data, 'lastPublishedFromVersion');
 
           return Column(
             crossAxisAlignment:
@@ -707,6 +739,32 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
                 textAlign: isArabic ? TextAlign.right : TextAlign.left,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
+              if (!isDraft) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  '${isArabic ? 'نُشرت بواسطة' : 'Published by'}: $publishedBy',
+                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  '${isArabic ? 'وقت النشر' : 'Published at'}: ${_timestampText(data['publishedAt'])}',
+                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  '${isArabic ? 'آخر نشر من إصدار' : 'Last published from version'}: $lastPublishedFromVersion',
+                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  '${isArabic ? 'ملاحظة النشر' : 'Publish note'}: $publishNote',
+                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
               if (isDraft) ...[
                 const SizedBox(height: AppSpacing.md),
                 _buildDraftEditingSection(context, isArabic),
@@ -1105,6 +1163,7 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
   void dispose() {
     _testMessageController.dispose();
     _draftNotesController.dispose();
+    _publishNoteController.dispose();
     for (final controller in _draftTemplateControllers.values) {
       controller.dispose();
     }
