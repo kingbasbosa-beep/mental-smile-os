@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/core/system/domain_governance_capability.dart';
 import 'package:flutterprojects/core/system/domain_registry.dart';
 import 'package:flutterprojects/core/system/domain_status.dart';
 import 'package:flutterprojects/core/system/domain_status_service.dart';
@@ -97,6 +98,39 @@ class AdminDomainStatusPage extends StatelessWidget {
     );
   }
 
+  List<Widget> _buildGovernanceCapabilityLines(
+    BuildContext context,
+    DomainGovernanceCapability capability,
+  ) {
+    return [
+      _buildMetadataLine(
+        context,
+        label: 'advisoryOnly',
+        value: capability.advisoryOnly ? 'yes' : 'no',
+      ),
+      _buildMetadataLine(
+        context,
+        label: 'maintenanceNotice',
+        value: capability.maintenanceNotice ? 'yes' : 'no',
+      ),
+      _buildMetadataLine(
+        context,
+        label: 'editorDisable',
+        value: capability.editorDisable ? 'yes' : 'no',
+      ),
+      _buildMetadataLine(
+        context,
+        label: 'entryPointHide',
+        value: capability.entryPointHide ? 'yes' : 'no',
+      ),
+      _buildMetadataLine(
+        context,
+        label: 'protectedRawWrites',
+        value: capability.protectedRawWrites ? 'yes' : 'no',
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,6 +162,7 @@ class AdminDomainStatusPage extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             ...domainRegistry.map((domain) {
+              final capability = domain.key.governanceCapability;
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.md),
                 child: StreamBuilder<DomainStatus>(
@@ -205,6 +240,15 @@ class AdminDomainStatusPage extends StatelessWidget {
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ],
+                          const SizedBox(height: AppSpacing.sm),
+                          _buildMetadataSection(
+                            context,
+                            title: 'Governance Capability Matrix',
+                            children: _buildGovernanceCapabilityLines(
+                              context,
+                              capability,
+                            ),
+                          ),
                           if (hasGovernanceContext) ...[
                             const SizedBox(height: AppSpacing.sm),
                             _buildMetadataSection(
