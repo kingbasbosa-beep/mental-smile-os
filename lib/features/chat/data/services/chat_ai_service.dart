@@ -7,6 +7,7 @@ class ChatAiResult {
   final int riskScore;
   final String riskLevel;
   final String strategyMode;
+  final String policyVersion;
   final bool safetyTriggered;
   final bool needsHumanSupport;
   final bool containsEscalationSignal;
@@ -18,6 +19,7 @@ class ChatAiResult {
     required this.riskScore,
     required this.riskLevel,
     required this.strategyMode,
+    required this.policyVersion,
     required this.safetyTriggered,
     required this.needsHumanSupport,
     required this.containsEscalationSignal,
@@ -151,6 +153,7 @@ class ChatAiService {
       riskScore: riskScore,
       riskLevel: riskLevel,
       strategyMode: strategyMode,
+      policyVersion: _policy.policyVersion,
       safetyTriggered: safetyTriggered,
       needsHumanSupport: needsHumanSupport,
       containsEscalationSignal: containsEscalationSignal,
