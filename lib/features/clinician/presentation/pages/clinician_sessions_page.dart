@@ -6,6 +6,9 @@ import 'package:flutterprojects/app/router/routes.dart';
 class ClinicianSessionsPage extends StatelessWidget {
   const ClinicianSessionsPage({super.key});
 
+  static const String _primaryBookingSource = 'booking_requests';
+  static const String _legacyBookingSource = 'bookingRequests';
+
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
@@ -158,6 +161,36 @@ class ClinicianSessionsPage extends StatelessWidget {
     return DateTime.fromMillisecondsSinceEpoch(0);
   }
 
+  List<Map<String, dynamic>> _mergeBookingSources({
+    required QuerySnapshot<Map<String, dynamic>>? primarySnapshot,
+    required QuerySnapshot<Map<String, dynamic>>? legacySnapshot,
+  }) {
+    // Canonical specialist booking source.
+    final primaryDocs = primarySnapshot == null
+        ? const <Map<String, dynamic>>[]
+        : _normalizeDocs(primarySnapshot.docs, _primaryBookingSource);
+
+    // Legacy compatibility mirror kept temporarily to avoid hiding older data.
+    final legacyDocs = legacySnapshot == null
+        ? const <Map<String, dynamic>>[]
+        : _normalizeDocs(legacySnapshot.docs, _legacyBookingSource);
+
+    final all = <Map<String, dynamic>>[
+      ...primaryDocs,
+      ...legacyDocs,
+    ];
+
+    final unique = <String, Map<String, dynamic>>{};
+    for (final item in all) {
+      final id = (item['_id'] ?? '').toString();
+      if (id.isEmpty) continue;
+      final existing = unique[id];
+      unique[id] = existing == null ? item : _preferredDoc(existing, item);
+    }
+
+    return unique.values.toList();
+  }
+
   Map<String, dynamic> _preferredDoc(
     Map<String, dynamic> current,
     Map<String, dynamic> incoming,
@@ -169,8 +202,8 @@ class ClinicianSessionsPage extends StatelessWidget {
 
     final currentSource = (current['_source'] ?? '').toString();
     final incomingSource = (incoming['_source'] ?? '').toString();
-    if (incomingSource == 'booking_requests' &&
-        currentSource != 'booking_requests') {
+    if (incomingSource == _primaryBookingSource &&
+        currentSource != _primaryBookingSource) {
       return incoming;
     }
     return current;
@@ -200,13 +233,13 @@ class ClinicianSessionsPage extends StatelessWidget {
               )
             : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                 stream: FirebaseFirestore.instance
-                    .collection('booking_requests')
+                    .collection(_primaryBookingSource)
                     .where('assignedClinicianId', isEqualTo: uid)
                     .snapshots(),
                 builder: (context, snapA) {
                   return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                     stream: FirebaseFirestore.instance
-                        .collection('bookingRequests')
+                        .collection(_legacyBookingSource)
                         .where('assignedClinicianId', isEqualTo: uid)
                         .snapshots(),
                     builder: (context, snapB) {
@@ -224,28 +257,10 @@ class ClinicianSessionsPage extends StatelessWidget {
                         return const Center(child: CircularProgressIndicator());
                       }
 
-                      final all = <Map<String, dynamic>>[];
-
-                      if (snapA.hasData) {
-                        all.addAll(_normalizeDocs(
-                            snapA.data!.docs, 'booking_requests'));
-                      }
-                      if (snapB.hasData) {
-                        all.addAll(_normalizeDocs(
-                            snapB.data!.docs, 'bookingRequests'));
-                      }
-
-                      final unique = <String, Map<String, dynamic>>{};
-                      for (final item in all) {
-                        final id = (item['_id'] ?? '').toString();
-                        if (id.isEmpty) continue;
-                        final existing = unique[id];
-                        unique[id] = existing == null
-                            ? item
-                            : _preferredDoc(existing, item);
-                      }
-
-                      final docs = unique.values
+                      final docs = _mergeBookingSources(
+                            primarySnapshot: snapA.data,
+                            legacySnapshot: snapB.data,
+                          )
                           .where(_isSessionRelated)
                           .toList()
                         ..sort((a, b) {
