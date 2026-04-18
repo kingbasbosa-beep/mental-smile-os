@@ -26,6 +26,7 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
 
   ChatAiResult? _testResult;
   bool _savingDraft = false;
+  bool _publishingDraft = false;
   String? _loadedDraftVersion;
 
   bool _isArabic(BuildContext context) {
@@ -168,6 +169,110 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
     }
   }
 
+  Future<bool> _confirmPublishDraft(BuildContext context, bool isArabic) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(
+            isArabic ? 'نشر المسودة' : 'Publish Draft',
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+          ),
+          content: Text(
+            isArabic
+                ? 'سيتم نسخ القيم الإدارية الحالية من المسودة إلى الوثيقة المنشورة. هذا لا يغيّر runtime الشات الحية.'
+                : 'This will copy the current admin-managed draft values into the published document. It does not change the live chatbot runtime.',
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(isArabic ? 'إلغاء' : 'Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(isArabic ? 'نشر' : 'Publish'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result == true;
+  }
+
+  Future<void> _publishDraftPolicy(BuildContext context, bool isArabic) async {
+    final confirmed = await _confirmPublishDraft(context, isArabic);
+    if (!confirmed) return;
+
+    setState(() {
+      _publishingDraft = true;
+    });
+
+    try {
+      final draftSnapshot = await FirebaseFirestore.instance
+          .collection('ai_policies')
+          .doc('draft')
+          .get();
+
+      final draftData = draftSnapshot.data();
+      if (!draftSnapshot.exists || draftData == null) {
+        throw Exception(
+          isArabic ? 'وثيقة المسودة غير موجودة' : 'Draft document is missing',
+        );
+      }
+
+      final responseTemplatesRaw = draftData['responseTemplates'];
+      final responseTemplates = responseTemplatesRaw is Map
+          ? Map<String, dynamic>.from(responseTemplatesRaw)
+          : <String, dynamic>{};
+
+      final draftVersion = _stringValue(draftData, 'policyVersion');
+
+      await FirebaseFirestore.instance
+          .collection('ai_policies')
+          .doc('published')
+          .set({
+        'responseTemplates': responseTemplates,
+        'notes': _stringValue(draftData, 'notes') == '—'
+            ? ''
+            : _stringValue(draftData, 'notes'),
+        'status': 'published',
+        'basedOnVersion': draftVersion,
+        'updatedAt': FieldValue.serverTimestamp(),
+        'updatedBy': 'admin_ui_publish',
+      }, SetOptions(merge: true));
+
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'تم نشر المسودة إلى الوثيقة المنشورة بنجاح'
+                : 'Draft published to the published document successfully',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'فشل نشر المسودة: $e'
+                : 'Failed to publish draft: $e',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _publishingDraft = false;
+        });
+      }
+    }
+  }
+
   Widget _buildDocumentLoadingState(BuildContext context, String title) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,23 +395,43 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
               ),
             ),
           ),
-          Align(
-            alignment: isArabic ? Alignment.centerRight : Alignment.centerLeft,
-            child: FilledButton.icon(
-              onPressed:
-                  _savingDraft ? null : () => _saveDraftPolicy(context, isArabic),
-              icon: _savingDraft
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Icon(Icons.save_outlined),
-              label: Text(isArabic ? 'حفظ المسودة' : 'Save Draft'),
-            ),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            alignment: WrapAlignment.end,
+            children: [
+              FilledButton.icon(
+                onPressed: _savingDraft
+                    ? null
+                    : () => _saveDraftPolicy(context, isArabic),
+                icon: _savingDraft
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(Icons.save_outlined),
+                label: Text(isArabic ? 'حفظ المسودة' : 'Save Draft'),
+              ),
+              OutlinedButton.icon(
+                onPressed: _publishingDraft
+                    ? null
+                    : () => _publishDraftPolicy(context, isArabic),
+                icon: _publishingDraft
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Icon(Icons.publish_outlined),
+                label: Text(isArabic ? 'نشر المسودة' : 'Publish Draft'),
+              ),
+            ],
           ),
         ],
       ),
