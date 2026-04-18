@@ -282,6 +282,21 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
         .handleError((_) => 0);
   }
 
+  Stream<int> _chatCasesCountStream() {
+    if (_uid.isEmpty) return Stream.value(0);
+
+    return FirebaseFirestore.instance
+        .collection('chat_escalations')
+        .where('assignedToType', isEqualTo: 'clinician')
+        .where('assignedToUid', isEqualTo: _uid)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.where((doc) {
+              final data = doc.data();
+              return (data['status'] ?? '').toString() != 'resolved';
+            }).length)
+        .handleError((_) => 0);
+  }
+
   Widget _buildHomeSummary({
     required BuildContext context,
     required bool isArabic,
@@ -300,6 +315,11 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           clinicianPhotoUrl: clinicianPhotoUrl,
         ),
         const SizedBox(height: 14),
+        _buildChatCasesSummaryCard(
+          context: context,
+          isArabic: isArabic,
+        ),
+        const SizedBox(height: 12),
         _buildAdminChatSummaryCard(
           context: context,
           isArabic: isArabic,
@@ -476,6 +496,29 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
               Routes.chat,
               arguments: const {'mode': 'admin_support'},
             );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildChatCasesSummaryCard({
+    required BuildContext context,
+    required bool isArabic,
+  }) {
+    return StreamBuilder<int>(
+      stream: _chatCasesCountStream(),
+      builder: (context, snapshot) {
+        final count = snapshot.data ?? 0;
+        return _SectionCard(
+          title: isArabic ? 'حالات الشات المحالة' : 'Referred chat cases',
+          subtitle: isArabic
+              ? 'حالات شات مصعّدة أو مُحالة تتطلب تدخل الأخصائي: $count'
+              : 'Escalated or referred chat cases that need clinician involvement: $count',
+          icon: Icons.forum_outlined,
+          actionLabel: isArabic ? 'فتح الحالات' : 'Open cases',
+          onTap: () {
+            Navigator.of(context).pushNamed(Routes.clinicianChatInbox);
           },
         );
       },
