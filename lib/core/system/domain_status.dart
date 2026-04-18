@@ -31,7 +31,7 @@ class DomainStatus {
       ..remove('updatedAt')
       ..remove('updatedBy')
       ..remove('note')
-      ..remove('degradedFeatures');
+      ..remove('degradedFeatures')
       ..remove('statusSource')
       ..remove('statusReason')
       ..remove('statusSetAt')
