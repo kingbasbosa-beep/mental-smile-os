@@ -2,16 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_firestore_service.dart';
+import 'package:flutterprojects/features/chat/data/services/chat_health_service.dart';
 import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 // ADMIN_SURFACE: SAFE_UI
-class AdminSupportChatPage extends StatelessWidget {
+class AdminSupportChatPage extends StatefulWidget {
   const AdminSupportChatPage({super.key});
 
+  @override
+  State<AdminSupportChatPage> createState() => _AdminSupportChatPageState();
+}
+
+class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
   static final ChatFirestoreService _chatFirestoreService =
       ChatFirestoreService();
+  static const ChatHealthService _chatHealthService = ChatHealthService();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _emitChatHealth();
+    });
+  }
+
+  Future<void> _emitChatHealth() async {
+    try {
+      await _chatHealthService.emitHealthSnapshot(
+        sampleType: 'admin_support_page_open',
+      );
+    } catch (_) {
+      // Health reporting must stay quiet and never block admin chat usage.
+    }
+  }
 
   bool _isArabic(BuildContext context) {
     return Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';

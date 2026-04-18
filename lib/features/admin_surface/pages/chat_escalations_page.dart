@@ -6,6 +6,7 @@ import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_escalation_model.dart';
 import 'package:flutterprojects/features/chat/data/models/clinician_option_model.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_firestore_service.dart';
+import 'package:flutterprojects/features/chat/data/services/chat_health_service.dart';
 
 class ChatEscalationsPage extends StatefulWidget {
   const ChatEscalationsPage({super.key});
@@ -16,7 +17,26 @@ class ChatEscalationsPage extends StatefulWidget {
 
 class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
   final ChatFirestoreService _service = ChatFirestoreService();
+  static const ChatHealthService _chatHealthService = ChatHealthService();
   String _filter = 'all';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _emitChatHealth();
+    });
+  }
+
+  Future<void> _emitChatHealth() async {
+    try {
+      await _chatHealthService.emitHealthSnapshot(
+        sampleType: 'chat_escalations_page_open',
+      );
+    } catch (_) {
+      // Health reporting must stay quiet and never block escalation workflows.
+    }
+  }
 
   Color _riskColor(String riskLevel) {
     switch (riskLevel) {
