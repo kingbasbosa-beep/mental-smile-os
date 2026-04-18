@@ -328,6 +328,11 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
   }) {
     return Column(
       children: [
+        _buildAssignmentsIntro(
+          context: context,
+          isArabic: isArabic,
+        ),
+        const SizedBox(height: 12),
         _buildAssignmentsHeader(
           context: context,
           isArabic: isArabic,
@@ -355,6 +360,35 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
             );
           }),
       ],
+    );
+  }
+
+  Widget _buildAssignmentsIntro({
+    required BuildContext context,
+    required bool isArabic,
+  }) {
+    return Align(
+      alignment: isArabic ? Alignment.centerRight : Alignment.centerLeft,
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic ? 'الحالات والطلبات المعينة' : 'Assigned cases and requests',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            isArabic
+                ? 'هذه هي المساحة الأساسية لمراجعة الطلبات المحوّلة إليك واتخاذ إجراءات القبول أو الرفض أو الإكمال.'
+                : 'This is the primary area for reviewing requests assigned to you and taking accept, reject, or completion actions.',
+            style: Theme.of(context).textTheme.bodyMedium,
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+          ),
+        ],
+      ),
     );
   }
 
