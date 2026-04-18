@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_message_model.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_ai_service.dart';
@@ -37,6 +38,27 @@ class ChatController {
   bool _isBookingFollowupThread(ChatThreadModel thread) {
     if (_isTypedBookingFollowupThread(thread)) return true;
     return _isLegacyBookingFollowupFallbackThread(thread);
+  }
+
+  void _debugMeasureLegacyBookingFollowupThreads(
+    String ownerUid,
+    List<ChatThreadModel> threads,
+  ) {
+    if (!kDebugMode) return;
+
+    final legacyFallbackThreads = threads
+        .where(_isLegacyBookingFollowupFallbackThread)
+        .toList();
+
+    if (legacyFallbackThreads.isEmpty) return;
+
+    debugPrint(
+      'CHAT_BOOKING_FALLBACK_MEASURE '
+      'ownerUid=$ownerUid '
+      'legacyBookingFallbackCount=${legacyFallbackThreads.length} '
+      'totalActiveThreads=${threads.length} '
+      'sampleThreadIds=${legacyFallbackThreads.take(5).map((t) => t.id).join(",")}',
+    );
   }
 
   bool _isAdminSupportThread(ChatThreadModel thread) {
@@ -84,6 +106,7 @@ class ChatController {
 
     final existingThreads =
         await _firestoreService.getThreadsForOwner(user.uid);
+    _debugMeasureLegacyBookingFollowupThreads(user.uid, existingThreads);
     final aiThreads = existingThreads
         .where((thread) =>
             !_isAdminSupportThread(thread) &&
