@@ -2140,6 +2140,12 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    match /ai_policies/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+      allow delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
