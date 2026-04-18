@@ -327,15 +327,10 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
         const SizedBox(height: 12),
         _buildRatingsSummary(isArabic),
         const SizedBox(height: 12),
-        _buildProfileChangeRequestCard(
+        _buildProfileWorkspaceSection(
           context: context,
           isArabic: isArabic,
           clinicianData: clinicianData,
-        ),
-        const SizedBox(height: 12),
-        _buildProfileChangeRequestsSection(
-          context: context,
-          isArabic: isArabic,
         ),
       ],
     );
@@ -409,6 +404,53 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildProfileWorkspaceSection({
+    required BuildContext context,
+    required bool isArabic,
+    required Map<String, dynamic> clinicianData,
+  }) {
+    return Column(
+      children: [
+        Align(
+          alignment: isArabic ? Alignment.centerRight : Alignment.centerLeft,
+          child: Column(
+            crossAxisAlignment:
+                isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            children: [
+              Text(
+                isArabic
+                    ? 'الملف المهني المضمّن'
+                    : 'Embedded professional profile',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                isArabic
+                    ? 'هذه مساحة ملف مهني مدمجة مؤقتًا داخل الصفحة الرئيسية. وهي ليست مسارًا تشغيليًا موازيًا للطلبات أو الجلسات أو حالات الشات.'
+                    : 'This is a temporary embedded professional profile area inside the home workspace. It is not a parallel operational flow like assignments, sessions, or chat cases.',
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: isArabic ? TextAlign.right : TextAlign.left,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        _buildProfileChangeRequestCard(
+          context: context,
+          isArabic: isArabic,
+          clinicianData: clinicianData,
+        ),
+        const SizedBox(height: 12),
+        _buildProfileChangeRequestsSection(
+          context: context,
+          isArabic: isArabic,
+        ),
+      ],
     );
   }
 
