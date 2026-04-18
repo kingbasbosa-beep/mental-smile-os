@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/features/admin_surface/services/ai_policy_health_service.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_ai_service.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
@@ -13,6 +14,8 @@ class AdminAiPolicyPage extends StatefulWidget {
 }
 
 class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
+  static const AiPolicyHealthService _aiPolicyHealthService =
+      AiPolicyHealthService();
   final TextEditingController _testMessageController = TextEditingController();
   final ChatAiService _chatAiService = const ChatAiService();
   final TextEditingController _draftNotesController = TextEditingController();
@@ -32,6 +35,22 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
 
   bool _isArabic(BuildContext context) {
     return Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _emitAiPolicyHealth();
+    });
+  }
+
+  Future<void> _emitAiPolicyHealth() async {
+    try {
+      await _aiPolicyHealthService.emitHealthSnapshot();
+    } catch (_) {
+      // Health reporting must stay quiet and never block the admin surface.
+    }
   }
 
   void _runTestConsole() {
@@ -139,6 +158,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
         'updatedAt': FieldValue.serverTimestamp(),
         'updatedBy': 'admin_ui',
       }, SetOptions(merge: true));
+
+      await _emitAiPolicyHealth();
 
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -270,6 +291,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
         'publishNote': _publishNoteController.text.trim(),
         'lastPublishedFromVersion': draftVersion,
       }, SetOptions(merge: true));
+
+      await _emitAiPolicyHealth();
 
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
