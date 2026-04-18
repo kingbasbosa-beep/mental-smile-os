@@ -282,6 +282,626 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
         .handleError((_) => 0);
   }
 
+  Widget _buildHomeSummary({
+    required BuildContext context,
+    required bool isArabic,
+    required Map<String, dynamic> clinicianData,
+    required String clinicianName,
+    required String clinicianBio,
+    required String clinicianPhotoUrl,
+  }) {
+    return Column(
+      children: [
+        _buildClinicianHeaderCard(
+          context: context,
+          isArabic: isArabic,
+          clinicianName: clinicianName,
+          clinicianBio: clinicianBio,
+          clinicianPhotoUrl: clinicianPhotoUrl,
+        ),
+        const SizedBox(height: 14),
+        _buildAdminChatSummaryCard(
+          context: context,
+          isArabic: isArabic,
+        ),
+        const SizedBox(height: 12),
+        _buildRatingsSummary(isArabic),
+        const SizedBox(height: 12),
+        _buildProfileChangeRequestCard(
+          context: context,
+          isArabic: isArabic,
+          clinicianData: clinicianData,
+        ),
+        const SizedBox(height: 12),
+        _buildProfileChangeRequestsSection(
+          context: context,
+          isArabic: isArabic,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAssignmentsSection({
+    required BuildContext context,
+    required bool isArabic,
+    required List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+  }) {
+    return Column(
+      children: [
+        _buildAssignmentsHeader(
+          context: context,
+          isArabic: isArabic,
+        ),
+        const SizedBox(height: 16),
+        if (docs.isEmpty)
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Text(
+                isArabic
+                    ? 'لا توجد طلبات في هذا القسم'
+                    : 'No requests in this section',
+              ),
+            ),
+          )
+        else
+          ...docs.map((doc) {
+            final data = doc.data();
+            return _buildAssignmentCard(
+              context: context,
+              isArabic: isArabic,
+              requestId: doc.id,
+              data: data,
+            );
+          }),
+      ],
+    );
+  }
+
+  Widget _buildClinicianHeaderCard({
+    required BuildContext context,
+    required bool isArabic,
+    required String clinicianName,
+    required String clinicianBio,
+    required String clinicianPhotoUrl,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return AppSurfaceCard(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Row(
+        textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+        children: [
+          CircleAvatar(
+            radius: 32,
+            backgroundColor: scheme.primary.withValues(alpha: 0.12),
+            backgroundImage: clinicianPhotoUrl.trim().isNotEmpty
+                ? NetworkImage(clinicianPhotoUrl)
+                : null,
+            child: clinicianPhotoUrl.trim().isNotEmpty
+                ? null
+                : Text(
+                    clinicianName.isEmpty ? 'C' : clinicianName.characters.first,
+                    style: TextStyle(
+                      color: scheme.primary,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 22,
+                    ),
+                  ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+                  isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                Text(
+                  clinicianName.isEmpty
+                      ? (isArabic ? 'أخصائي' : 'Clinician')
+                      : clinicianName,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(fontWeight: FontWeight.w800),
+                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  clinicianBio.isEmpty
+                      ? (isArabic
+                          ? 'لا توجد نبذة محفوظة حاليًا'
+                          : 'No saved bio yet')
+                      : clinicianBio,
+                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdminChatSummaryCard({
+    required BuildContext context,
+    required bool isArabic,
+  }) {
+    return StreamBuilder<int>(
+      stream: _messagesCountStream(),
+      builder: (context, msgSnapshot) {
+        final count = msgSnapshot.data ?? 0;
+        return _SectionCard(
+          title: isArabic ? 'الشات مع الإدارة' : 'Chat with admin',
+          subtitle: isArabic
+              ? 'عدد المحادثات المفتوحة مع الإدارة: $count'
+              : 'Open conversations with admin: $count',
+          icon: Icons.chat_bubble_outline_rounded,
+          actionLabel: isArabic ? 'فتح الشات' : 'Open chat',
+          onTap: () {
+            Navigator.of(context).pushNamed(
+              Routes.chat,
+              arguments: const {'mode': 'admin_support'},
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildProfileChangeRequestCard({
+    required BuildContext context,
+    required bool isArabic,
+    required Map<String, dynamic> clinicianData,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: scheme.outline.withValues(alpha: 0.12),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic
+                ? 'طلب تعديل الصورة أو النبذة'
+                : 'Request photo or bio update',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            isArabic
+                ? 'أي تعديل على الصورة الشخصية أو النبذة يذهب للإدارة أولًا للمراجعة والموافقة. الاسم والوثائق غير قابلة للتعديل من هنا.'
+                : 'Any update to the profile photo or bio is sent to admin for approval first. Name and documents cannot be edited here.',
+          ),
+          const SizedBox(height: 14),
+          TextField(
+            controller: _requestedPhotoUrlController,
+            decoration: InputDecoration(
+              labelText: isArabic ? 'رابط الصورة الجديدة' : 'New photo URL',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _requestedBioController,
+            maxLines: 4,
+            decoration: InputDecoration(
+              labelText: isArabic ? 'النبذة الجديدة' : 'New bio',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: FilledButton.icon(
+              onPressed: _submittingChangeRequest
+                  ? null
+                  : () => _submitProfileChangeRequest(context, clinicianData),
+              icon: _submittingChangeRequest
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Icon(Icons.fact_check_outlined),
+              label: Text(
+                _submittingChangeRequest
+                    ? (isArabic ? 'جارٍ إرسال الطلب...' : 'Sending request...')
+                    : (isArabic
+                        ? 'إرسال طلب التعديل'
+                        : 'Send change request'),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileChangeRequestsSection({
+    required BuildContext context,
+    required bool isArabic,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance
+          .collection('clinician_profile_change_requests')
+          .where('clinicianId', isEqualTo: _uid)
+          .orderBy('createdAt', descending: true)
+          .snapshots(),
+      builder: (context, reqSnapshot) {
+        if (reqSnapshot.hasError) {
+          return Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: scheme.outline.withValues(alpha: 0.12),
+              ),
+            ),
+            child: Text(
+              isArabic
+                  ? 'تعذر تحميل طلبات التعديل: ${reqSnapshot.error}'
+                  : 'Unable to load change requests: ${reqSnapshot.error}',
+              textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            ),
+          );
+        }
+
+        if (!reqSnapshot.hasData) {
+          return Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: scheme.outline.withValues(alpha: 0.12),
+              ),
+            ),
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        final requests = reqSnapshot.data!.docs;
+
+        return Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: scheme.outline.withValues(alpha: 0.12),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment:
+                isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            children: [
+              Text(
+                isArabic
+                    ? 'طلبات التعديل السابقة'
+                    : 'Previous change requests',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+              const SizedBox(height: 12),
+              if (requests.isEmpty)
+                Text(
+                  isArabic
+                      ? 'لا توجد طلبات تعديل حتى الآن'
+                      : 'No change requests yet',
+                )
+              else
+                ...requests.map((doc) {
+                  final data = doc.data();
+                  final status = (data['status'] ?? 'pending').toString();
+                  final requestType = (data['requestType'] ?? '').toString();
+                  final requestedBio = (data['requestedBio'] ?? '').toString();
+                  final requestedPhotoUrl =
+                      (data['requestedPhotoUrl'] ?? '').toString();
+                  final adminNote = (data['adminNote'] ?? '').toString();
+                  final createdAt = _dateText(data['createdAt']);
+
+                  String typeLabel() {
+                    switch (requestType) {
+                      case 'bio_update':
+                        return isArabic
+                            ? 'نوع الطلب: تعديل نبذة'
+                            : 'Type: Bio update';
+                      case 'photo_update':
+                        return isArabic
+                            ? 'نوع الطلب: تعديل صورة'
+                            : 'Type: Photo update';
+                      case 'photo_add':
+                        return isArabic
+                            ? 'نوع الطلب: إضافة صورة'
+                            : 'Type: Photo add';
+                      default:
+                        return isArabic
+                            ? 'نوع الطلب: تعديل بيانات'
+                            : 'Type: Profile update';
+                    }
+                  }
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: scheme.primary.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: isArabic
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isArabic ? 'الحالة: $status' : 'Status: $status',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(typeLabel()),
+                        if (createdAt.isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            isArabic
+                                ? 'تاريخ الطلب: $createdAt'
+                                : 'Request date: $createdAt',
+                          ),
+                        ],
+                        if (requestedPhotoUrl.isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            isArabic
+                                ? 'الصورة المطلوبة: $requestedPhotoUrl'
+                                : 'Requested photo: $requestedPhotoUrl',
+                          ),
+                        ],
+                        if (requestedBio.isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            isArabic
+                                ? 'النبذة المطلوبة: $requestedBio'
+                                : 'Requested bio: $requestedBio',
+                          ),
+                        ],
+                        if (adminNote.isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            isArabic
+                                ? 'ملاحظة الإدارة: $adminNote'
+                                : 'Admin note: $adminNote',
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAssignmentsHeader({
+    required BuildContext context,
+    required bool isArabic,
+  }) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        FilledButton.icon(
+          onPressed: () => Navigator.of(context).pushNamed(Routes.clinicianSessions),
+          icon: const Icon(Icons.video_call_outlined),
+          label: Text(isArabic ? 'جلساتي' : 'My Sessions'),
+        ),
+        ChoiceChip(
+          selected: _tab == 'assigned_clinician',
+          label: Text(isArabic ? 'طلبات جديدة' : 'New'),
+          onSelected: (_) => setState(() => _tab = 'assigned_clinician'),
+        ),
+        ChoiceChip(
+          selected: _tab == 'in_progress',
+          label: Text(isArabic ? 'طلبات نشطة' : 'In progress'),
+          onSelected: (_) => setState(() => _tab = 'in_progress'),
+        ),
+        ChoiceChip(
+          selected: _tab == 'completed',
+          label: Text(isArabic ? 'مكتملة' : 'Completed'),
+          onSelected: (_) => setState(() => _tab = 'completed'),
+        ),
+        ChoiceChip(
+          selected: _tab == 'closed',
+          label: Text(isArabic ? 'مرفوضة/ملغاة' : 'Closed'),
+          onSelected: (_) => setState(() => _tab = 'closed'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAssignmentCard({
+    required BuildContext context,
+    required bool isArabic,
+    required String requestId,
+    required Map<String, dynamic> data,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+    final busy = _busyIds.contains(requestId);
+
+    final clientName = (data['clientName'] ?? 'Client').toString();
+    final clientId = (data['clientId'] ?? '').toString();
+    final note = (data['note'] ?? '').toString();
+    final status = (data['status'] ?? 'assigned_clinician').toString();
+    final clinicianReviewSubmitted =
+        (data['clinicianReviewSubmitted'] ?? false) == true;
+    final createdAt = _dateText(data['createdAt']);
+    final assignedName = (data['assignedClinicianName'] ?? '').toString();
+    final sessionStatus = (data['sessionStatus'] ?? '').toString();
+    final reviewStatus = (data['reviewStatus'] ?? '').toString();
+    final canReviewSession = !clinicianReviewSubmitted &&
+        (status == 'session_completed_pending_reviews' ||
+            status == 'payout_pending' ||
+            (sessionStatus == 'completed' &&
+                (reviewStatus == 'pending_reviews' ||
+                    reviewStatus == 'partial')));
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: scheme.outline.withValues(alpha: 0.14),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment:
+                      isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      clientName,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                      textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      isArabic
+                          ? 'طلب محول من الإدارة'
+                          : 'Request assigned by admin',
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: _statusColor(status).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  _statusLabel(status, isArabic),
+                  style: TextStyle(
+                    color: _statusColor(status),
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (assignedName.trim().isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                isArabic
+                    ? 'الأخصائي المعين: $assignedName'
+                    : 'Assigned clinician: $assignedName',
+              ),
+            ),
+          if (clientId.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                isArabic ? 'معرف العميل: $clientId' : 'Client ID: $clientId',
+              ),
+            ),
+          if (createdAt.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                isArabic
+                    ? 'تاريخ الطلب: $createdAt'
+                    : 'Request date: $createdAt',
+              ),
+            ),
+          if (note.trim().isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                isArabic ? 'ملاحظة العميل: $note' : 'Client note: $note',
+              ),
+            ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              if (status == 'assigned_clinician')
+                FilledButton.icon(
+                  onPressed: busy ? null : () => _acceptRequest(requestId),
+                  icon: const Icon(Icons.check_circle_outline),
+                  label: Text(isArabic ? 'قبول الطلب' : 'Accept request'),
+                ),
+              if (status == 'assigned_clinician')
+                OutlinedButton.icon(
+                  onPressed: busy ? null : () => _rejectRequest(requestId),
+                  icon: const Icon(Icons.cancel_outlined),
+                  label: Text(isArabic ? 'رفض الطلب' : 'Reject request'),
+                ),
+              if (status == 'session_scheduled' ||
+                  status == 'session_in_progress')
+                FilledButton.tonalIcon(
+                  onPressed: busy ? null : () => _markCompleted(requestId),
+                  icon: const Icon(Icons.task_alt_outlined),
+                  label: Text(isArabic ? 'تعليم كمكتمل' : 'Mark completed'),
+                ),
+              if (canReviewSession)
+                FilledButton.icon(
+                  onPressed: busy
+                      ? null
+                      : () {
+                          Navigator.of(context).pushNamed(
+                            Routes.sessionReview,
+                            arguments: {
+                              'requestId': requestId,
+                              'reviewerType': 'clinician',
+                            },
+                          );
+                        },
+                  icon: const Icon(Icons.rate_review_outlined),
+                  label: Text(isArabic ? 'تقييم الجلسة' : 'Review session'),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildRatingsSummary(bool isArabic) {
     if (_uid.isEmpty) return const SizedBox.shrink();
 
@@ -493,7 +1113,6 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           child: StreamBuilder<Map<String, dynamic>?>(
             stream: _clinicianStream(),
             builder: (context, clinicianSnapshot) {
-              final scheme = Theme.of(context).colorScheme;
               final clinicianData =
                   clinicianSnapshot.data ?? <String, dynamic>{};
               final clinicianName =
@@ -540,611 +1159,20 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                   return ListView(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     children: [
-                      AppSurfaceCard(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        child: Row(
-                          textDirection:
-                              isArabic ? TextDirection.rtl : TextDirection.ltr,
-                          children: [
-                            CircleAvatar(
-                              radius: 32,
-                              backgroundColor:
-                                  scheme.primary.withValues(alpha: 0.12),
-                              backgroundImage:
-                                  clinicianPhotoUrl.trim().isNotEmpty
-                                      ? NetworkImage(clinicianPhotoUrl)
-                                      : null,
-                              child: clinicianPhotoUrl.trim().isNotEmpty
-                                  ? null
-                                  : Text(
-                                      clinicianName.isEmpty
-                                          ? 'C'
-                                          : clinicianName.characters.first,
-                                      style: TextStyle(
-                                        color: scheme.primary,
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 22,
-                                      ),
-                                    ),
-                            ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: isArabic
-                                    ? CrossAxisAlignment.end
-                                    : CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    clinicianName.isEmpty
-                                        ? (isArabic ? 'أخصائي' : 'Clinician')
-                                        : clinicianName,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.copyWith(fontWeight: FontWeight.w800),
-                                    textAlign: isArabic
-                                        ? TextAlign.right
-                                        : TextAlign.left,
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    clinicianBio.isEmpty
-                                        ? (isArabic
-                                            ? 'لا توجد نبذة محفوظة حاليًا'
-                                            : 'No saved bio yet')
-                                        : clinicianBio,
-                                    textAlign: isArabic
-                                        ? TextAlign.right
-                                        : TextAlign.left,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      StreamBuilder<int>(
-                        stream: _messagesCountStream(),
-                        builder: (context, msgSnapshot) {
-                          final count = msgSnapshot.data ?? 0;
-                          return _SectionCard(
-                            title: isArabic
-                                ? 'الشات مع الإدارة'
-                                : 'Chat with admin',
-                            subtitle: isArabic
-                                ? 'عدد المحادثات المفتوحة مع الإدارة: $count'
-                                : 'Open conversations with admin: $count',
-                            icon: Icons.chat_bubble_outline_rounded,
-                            actionLabel: isArabic ? 'فتح الشات' : 'Open chat',
-                            onTap: () {
-                              Navigator.of(context).pushNamed(
-                                Routes.chat,
-                                arguments: const {'mode': 'admin_support'},
-                              );
-                            },
-                          );
-                        },
+                      _buildHomeSummary(
+                        context: context,
+                        isArabic: isArabic,
+                        clinicianData: clinicianData,
+                        clinicianName: clinicianName,
+                        clinicianBio: clinicianBio,
+                        clinicianPhotoUrl: clinicianPhotoUrl,
                       ),
                       const SizedBox(height: 12),
-                      _buildRatingsSummary(isArabic),
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: scheme.surface,
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                            color: scheme.outline.withValues(alpha: 0.12),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: isArabic
-                              ? CrossAxisAlignment.end
-                              : CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isArabic
-                                  ? 'طلب تعديل الصورة أو النبذة'
-                                  : 'Request photo or bio update',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              isArabic
-                                  ? 'أي تعديل على الصورة الشخصية أو النبذة يذهب للإدارة أولًا للمراجعة والموافقة. الاسم والوثائق غير قابلة للتعديل من هنا.'
-                                  : 'Any update to the profile photo or bio is sent to admin for approval first. Name and documents cannot be edited here.',
-                            ),
-                            const SizedBox(height: 14),
-                            TextField(
-                              controller: _requestedPhotoUrlController,
-                              decoration: InputDecoration(
-                                labelText: isArabic
-                                    ? 'رابط الصورة الجديدة'
-                                    : 'New photo URL',
-                                border: const OutlineInputBorder(),
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            TextField(
-                              controller: _requestedBioController,
-                              maxLines: 4,
-                              decoration: InputDecoration(
-                                labelText:
-                                    isArabic ? 'النبذة الجديدة' : 'New bio',
-                                border: const OutlineInputBorder(),
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            SizedBox(
-                              width: double.infinity,
-                              height: 52,
-                              child: FilledButton.icon(
-                                onPressed: _submittingChangeRequest
-                                    ? null
-                                    : () => _submitProfileChangeRequest(
-                                          context,
-                                          clinicianData,
-                                        ),
-                                icon: _submittingChangeRequest
-                                    ? const SizedBox(
-                                        width: 18,
-                                        height: 18,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      )
-                                    : const Icon(Icons.fact_check_outlined),
-                                label: Text(
-                                  _submittingChangeRequest
-                                      ? (isArabic
-                                          ? 'جارٍ إرسال الطلب...'
-                                          : 'Sending request...')
-                                      : (isArabic
-                                          ? 'إرسال طلب التعديل'
-                                          : 'Send change request'),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                      _buildAssignmentsSection(
+                        context: context,
+                        isArabic: isArabic,
+                        docs: docs,
                       ),
-                      const SizedBox(height: 12),
-                      StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                        stream: FirebaseFirestore.instance
-                            .collection('clinician_profile_change_requests')
-                            .where('clinicianId', isEqualTo: _uid)
-                            .orderBy('createdAt', descending: true)
-                            .snapshots(),
-                        builder: (context, reqSnapshot) {
-                          if (reqSnapshot.hasError) {
-                            return Container(
-                              padding: const EdgeInsets.all(18),
-                              decoration: BoxDecoration(
-                                color: scheme.surface,
-                                borderRadius: BorderRadius.circular(24),
-                                border: Border.all(
-                                  color: scheme.outline.withValues(alpha: 0.12),
-                                ),
-                              ),
-                              child: Text(
-                                isArabic
-                                    ? 'تعذر تحميل طلبات التعديل: ${reqSnapshot.error}'
-                                    : 'Unable to load change requests: ${reqSnapshot.error}',
-                                textAlign:
-                                    isArabic ? TextAlign.right : TextAlign.left,
-                              ),
-                            );
-                          }
-
-                          if (!reqSnapshot.hasData) {
-                            return Container(
-                              padding: const EdgeInsets.all(18),
-                              decoration: BoxDecoration(
-                                color: scheme.surface,
-                                borderRadius: BorderRadius.circular(24),
-                                border: Border.all(
-                                  color: scheme.outline.withValues(alpha: 0.12),
-                                ),
-                              ),
-                              child: const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                          }
-
-                          final requests = reqSnapshot.data!.docs;
-
-                          return Container(
-                            padding: const EdgeInsets.all(18),
-                            decoration: BoxDecoration(
-                              color: scheme.surface,
-                              borderRadius: BorderRadius.circular(24),
-                              border: Border.all(
-                                color: scheme.outline.withValues(alpha: 0.12),
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: isArabic
-                                  ? CrossAxisAlignment.end
-                                  : CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  isArabic
-                                      ? 'طلبات التعديل السابقة'
-                                      : 'Previous change requests',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.w800),
-                                ),
-                                const SizedBox(height: 12),
-                                if (requests.isEmpty)
-                                  Text(
-                                    isArabic
-                                        ? 'لا توجد طلبات تعديل حتى الآن'
-                                        : 'No change requests yet',
-                                  )
-                                else
-                                  ...requests.map((doc) {
-                                    final data = doc.data();
-                                    final status = (data['status'] ?? 'pending')
-                                        .toString();
-                                    final requestType =
-                                        (data['requestType'] ?? '').toString();
-                                    final requestedBio =
-                                        (data['requestedBio'] ?? '').toString();
-                                    final requestedPhotoUrl =
-                                        (data['requestedPhotoUrl'] ?? '')
-                                            .toString();
-                                    final adminNote =
-                                        (data['adminNote'] ?? '').toString();
-                                    final createdAt =
-                                        _dateText(data['createdAt']);
-
-                                    String typeLabel() {
-                                      switch (requestType) {
-                                        case 'bio_update':
-                                          return isArabic
-                                              ? 'نوع الطلب: تعديل نبذة'
-                                              : 'Type: Bio update';
-                                        case 'photo_update':
-                                          return isArabic
-                                              ? 'نوع الطلب: تعديل صورة'
-                                              : 'Type: Photo update';
-                                        case 'photo_add':
-                                          return isArabic
-                                              ? 'نوع الطلب: إضافة صورة'
-                                              : 'Type: Photo add';
-                                        default:
-                                          return isArabic
-                                              ? 'نوع الطلب: تعديل بيانات'
-                                              : 'Type: Profile update';
-                                      }
-                                    }
-
-                                    return Container(
-                                      margin: const EdgeInsets.only(bottom: 10),
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: scheme.primary
-                                            .withValues(alpha: 0.05),
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: isArabic
-                                            ? CrossAxisAlignment.end
-                                            : CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            isArabic
-                                                ? 'الحالة: $status'
-                                                : 'Status: $status',
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w800,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 6),
-                                          Text(typeLabel()),
-                                          if (createdAt.isNotEmpty) ...[
-                                            const SizedBox(height: 6),
-                                            Text(
-                                              isArabic
-                                                  ? 'تاريخ الطلب: $createdAt'
-                                                  : 'Request date: $createdAt',
-                                            ),
-                                          ],
-                                          if (requestedPhotoUrl.isNotEmpty) ...[
-                                            const SizedBox(height: 6),
-                                            Text(
-                                              isArabic
-                                                  ? 'الصورة المطلوبة: $requestedPhotoUrl'
-                                                  : 'Requested photo: $requestedPhotoUrl',
-                                            ),
-                                          ],
-                                          if (requestedBio.isNotEmpty) ...[
-                                            const SizedBox(height: 6),
-                                            Text(
-                                              isArabic
-                                                  ? 'النبذة المطلوبة: $requestedBio'
-                                                  : 'Requested bio: $requestedBio',
-                                            ),
-                                          ],
-                                          if (adminNote.isNotEmpty) ...[
-                                            const SizedBox(height: 6),
-                                            Text(
-                                              isArabic
-                                                  ? 'ملاحظة الإدارة: $adminNote'
-                                                  : 'Admin note: $adminNote',
-                                            ),
-                                          ],
-                                        ],
-                                      ),
-                                    );
-                                  }),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: [
-                          FilledButton.icon(
-                            onPressed: () => Navigator.of(context)
-                                .pushNamed(Routes.clinicianSessions),
-                            icon: const Icon(Icons.video_call_outlined),
-                            label: Text(isArabic ? 'جلساتي' : 'My Sessions'),
-                          ),
-                          ChoiceChip(
-                            selected: _tab == 'assigned_clinician',
-                            label: Text(isArabic ? 'طلبات جديدة' : 'New'),
-                            onSelected: (_) =>
-                                setState(() => _tab = 'assigned_clinician'),
-                          ),
-                          ChoiceChip(
-                            selected: _tab == 'in_progress',
-                            label:
-                                Text(isArabic ? 'طلبات نشطة' : 'In progress'),
-                            onSelected: (_) =>
-                                setState(() => _tab = 'in_progress'),
-                          ),
-                          ChoiceChip(
-                            selected: _tab == 'completed',
-                            label: Text(isArabic ? 'مكتملة' : 'Completed'),
-                            onSelected: (_) =>
-                                setState(() => _tab = 'completed'),
-                          ),
-                          ChoiceChip(
-                            selected: _tab == 'closed',
-                            label: Text(isArabic ? 'مرفوضة/ملغاة' : 'Closed'),
-                            onSelected: (_) => setState(() => _tab = 'closed'),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      if (docs.isEmpty)
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(32),
-                            child: Text(
-                              isArabic
-                                  ? 'لا توجد طلبات في هذا القسم'
-                                  : 'No requests in this section',
-                            ),
-                          ),
-                        )
-                      else
-                        ...docs.map((doc) {
-                          final data = doc.data();
-                          final requestId = doc.id;
-                          final busy = _busyIds.contains(requestId);
-
-                          final clientName =
-                              (data['clientName'] ?? 'Client').toString();
-                          final clientId = (data['clientId'] ?? '').toString();
-                          final note = (data['note'] ?? '').toString();
-                          final status =
-                              (data['status'] ?? 'assigned_clinician')
-                                  .toString();
-                          final clinicianReviewSubmitted =
-                              (data['clinicianReviewSubmitted'] ?? false) ==
-                                  true;
-                          final createdAt = _dateText(data['createdAt']);
-                          final assignedName =
-                              (data['assignedClinicianName'] ?? '').toString();
-                          final sessionStatus =
-                              (data['sessionStatus'] ?? '').toString();
-                          final reviewStatus =
-                              (data['reviewStatus'] ?? '').toString();
-                          final canReviewSession = !clinicianReviewSubmitted &&
-                              (status == 'session_completed_pending_reviews' ||
-                                  status == 'payout_pending' ||
-                                  (sessionStatus == 'completed' &&
-                                      (reviewStatus == 'pending_reviews' ||
-                                          reviewStatus == 'partial')));
-
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 14),
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: scheme.surface,
-                              borderRadius: BorderRadius.circular(22),
-                              border: Border.all(
-                                color: scheme.outline.withValues(alpha: 0.14),
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: isArabic
-                                  ? CrossAxisAlignment.end
-                                  : CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: isArabic
-                                            ? CrossAxisAlignment.end
-                                            : CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            clientName,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge
-                                                ?.copyWith(
-                                                    fontWeight:
-                                                        FontWeight.w800),
-                                            textAlign: isArabic
-                                                ? TextAlign.right
-                                                : TextAlign.left,
-                                          ),
-                                          const SizedBox(height: 6),
-                                          Text(
-                                            isArabic
-                                                ? 'طلب محول من الإدارة'
-                                                : 'Request assigned by admin',
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: _statusColor(status)
-                                            .withValues(alpha: 0.12),
-                                        borderRadius:
-                                            BorderRadius.circular(999),
-                                      ),
-                                      child: Text(
-                                        _statusLabel(status, isArabic),
-                                        style: TextStyle(
-                                          color: _statusColor(status),
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                if (assignedName.trim().isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 6),
-                                    child: Text(
-                                      isArabic
-                                          ? 'الأخصائي المعين: $assignedName'
-                                          : 'Assigned clinician: $assignedName',
-                                    ),
-                                  ),
-                                if (clientId.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 6),
-                                    child: Text(
-                                      isArabic
-                                          ? 'معرف العميل: $clientId'
-                                          : 'Client ID: $clientId',
-                                    ),
-                                  ),
-                                if (createdAt.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 6),
-                                    child: Text(
-                                      isArabic
-                                          ? 'تاريخ الطلب: $createdAt'
-                                          : 'Request date: $createdAt',
-                                    ),
-                                  ),
-                                if (note.trim().isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 6),
-                                    child: Text(
-                                      isArabic
-                                          ? 'ملاحظة العميل: $note'
-                                          : 'Client note: $note',
-                                    ),
-                                  ),
-                                const SizedBox(height: 14),
-                                Wrap(
-                                  spacing: 10,
-                                  runSpacing: 10,
-                                  children: [
-                                    if (status == 'assigned_clinician')
-                                      FilledButton.icon(
-                                        onPressed: busy
-                                            ? null
-                                            : () => _acceptRequest(requestId),
-                                        icon: const Icon(
-                                            Icons.check_circle_outline),
-                                        label: Text(
-                                          isArabic
-                                              ? 'قبول الطلب'
-                                              : 'Accept request',
-                                        ),
-                                      ),
-                                    if (status == 'assigned_clinician')
-                                      OutlinedButton.icon(
-                                        onPressed: busy
-                                            ? null
-                                            : () => _rejectRequest(requestId),
-                                        icon: const Icon(Icons.cancel_outlined),
-                                        label: Text(
-                                          isArabic
-                                              ? 'رفض الطلب'
-                                              : 'Reject request',
-                                        ),
-                                      ),
-                                    if (status == 'session_scheduled' ||
-                                        status == 'session_in_progress')
-                                      FilledButton.tonalIcon(
-                                        onPressed: busy
-                                            ? null
-                                            : () => _markCompleted(requestId),
-                                        icon:
-                                            const Icon(Icons.task_alt_outlined),
-                                        label: Text(
-                                          isArabic
-                                              ? 'تعليم كمكتمل'
-                                              : 'Mark completed',
-                                        ),
-                                      ),
-                                    if (canReviewSession)
-                                      FilledButton.icon(
-                                        onPressed: busy
-                                            ? null
-                                            : () {
-                                                Navigator.of(context).pushNamed(
-                                                  Routes.sessionReview,
-                                                  arguments: {
-                                                    'requestId': requestId,
-                                                    'reviewerType': 'clinician',
-                                                  },
-                                                );
-                                              },
-                                        icon: const Icon(
-                                          Icons.rate_review_outlined,
-                                        ),
-                                        label: Text(
-                                          isArabic
-                                              ? 'تقييم الجلسة'
-                                              : 'Review session',
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
                     ],
                   );
                 },
