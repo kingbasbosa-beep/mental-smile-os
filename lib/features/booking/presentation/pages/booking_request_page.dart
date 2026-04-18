@@ -236,9 +236,13 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
         'clientId': uid,
         'clientName': clientName,
         'clientEmail': clientEmail,
+        // Canonical ownership field.
+        'assignedClinicianId': widget.args.clinicianId,
+        'assignedClinicianName': widget.args.clinicianName,
         'clinicianId': widget.args.clinicianId,
-        'clinicianUid': widget.args.clinicianId,
         'clinicianName': widget.args.clinicianName,
+        // Legacy compatibility field.
+        'clinicianUid': widget.args.clinicianId,
         'status': 'pending_admin',
         'workflowStage': 'pending_admin',
         'createdAt': now,

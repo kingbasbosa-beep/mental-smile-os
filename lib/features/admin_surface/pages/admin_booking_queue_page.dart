@@ -728,10 +728,12 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         'adminDecisionType': 'returned_to_pending',
         'adminDecisionBy': FirebaseAuth.instance.currentUser?.uid ?? '',
         'adminDecisionAt': FieldValue.serverTimestamp(),
+        // Canonical ownership field.
         'assignedClinicianId': '',
         'assignedClinicianName': '',
         'clinicianId': '',
         'clinicianName': '',
+        // Legacy compatibility field.
         'clinicianUid': '',
         'paymentStatus': 'not_started',
         'sessionStatus': 'not_created',
@@ -859,10 +861,12 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         'sessionStatus': 'not_created',
         'reviewStatus': 'not_started',
         'payoutStatus': 'blocked',
+        // Canonical ownership field.
         'assignedClinicianId': '',
         'assignedClinicianName': '',
         'clinicianId': '',
         'clinicianName': '',
+        // Legacy compatibility field.
         'clinicianUid': '',
       });
 
@@ -1274,10 +1278,12 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         'adminApproved': true,
         'adminRejected': false,
         'adminForwarded': true,
+        // Canonical ownership field.
         'assignedClinicianId': clinicianId,
         'assignedClinicianName': clinicianName,
         'clinicianId': clinicianId,
         'clinicianName': clinicianName,
+        // Legacy compatibility field.
         'clinicianUid': clinicianId,
         'adminAssignedBy': FirebaseAuth.instance.currentUser?.uid ?? '',
         'adminAssignedAt': FieldValue.serverTimestamp(),

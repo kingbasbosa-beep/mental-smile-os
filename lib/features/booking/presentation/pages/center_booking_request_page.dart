@@ -295,10 +295,12 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
         'sessionStatus': 'not_created',
         'reviewStatus': 'not_started',
         'payoutStatus': 'blocked',
+        // Canonical ownership field.
         'assignedClinicianId': '',
         'assignedClinicianName': '',
         'clinicianId': '',
         'clinicianName': '',
+        // Legacy compatibility field.
         'clinicianUid': '',
         'centerAvailabilityStatus': 'pending',
         'centerAvailabilityNote': '',
