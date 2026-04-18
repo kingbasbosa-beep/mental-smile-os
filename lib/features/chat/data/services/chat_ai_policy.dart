@@ -245,4 +245,6 @@ class ChatAiPolicyProvider {
       'critical',
     },
   );
+
+  static const ChatAiPolicy currentLocal = local;
 }

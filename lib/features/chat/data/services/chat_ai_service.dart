@@ -29,7 +29,7 @@ class ChatAiResult {
 class ChatAiService {
   const ChatAiService();
 
-  static const ChatAiPolicy _policy = ChatAiPolicyProvider.local;
+  static const ChatAiPolicy _policy = ChatAiPolicyProvider.currentLocal;
 
   String _responseTemplateOrDefault(String key) {
     return _policy.responseTemplates[key] ??
