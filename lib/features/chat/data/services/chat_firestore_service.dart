@@ -159,16 +159,27 @@ class ChatFirestoreService {
     return thread.sourceType == 'admin_support';
   }
 
-  bool _isLegacyClinicianCaseThread(ChatThreadModel thread) {
+  bool _isMissingThreadType(ChatThreadModel thread) {
     final threadType = thread.threadType?.trim() ?? '';
-    if (threadType.isNotEmpty) return false;
+    return threadType.isEmpty;
+  }
+
+  bool _isLegacyClinicianCaseFallbackThread(ChatThreadModel thread) {
+    if (!_isMissingThreadType(thread)) return false;
     return thread.handoffState == 'clinician_review' ||
         thread.lifecycleState == 'assigned_clinician';
   }
 
-  bool _isClinicianInboxSourceThread(ChatThreadModel thread) {
-    if (thread.threadType == 'clinician_case') return true;
-    return _isLegacyClinicianCaseThread(thread);
+  bool _isTypedClinicianCaseThread(ChatThreadModel thread) {
+    return thread.threadType == 'clinician_case';
+  }
+
+  /// Clinician inbox source-of-truth:
+  /// - Prefer explicit threadType == 'clinician_case'
+  /// - Use legacy fallback only when threadType is missing
+  bool _matchesClinicianInboxThread(ChatThreadModel thread) {
+    if (_isTypedClinicianCaseThread(thread)) return true;
+    return _isLegacyClinicianCaseFallbackThread(thread);
   }
 
   Stream<List<ChatThreadModel>> streamAdminSupportInboxThreads() {
@@ -213,7 +224,7 @@ class ChatFirestoreService {
         final escalation = ChatEscalationModel.fromFirestore(doc);
         final thread = await getThread(escalation.threadId);
         if (thread == null) continue;
-        if (_isClinicianInboxSourceThread(thread)) {
+        if (_matchesClinicianInboxThread(thread)) {
           items.add(escalation);
         }
       }
