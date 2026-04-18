@@ -16,6 +16,10 @@ class ChatController {
   final FirebaseAuth _auth;
   final ChatAiService _aiService = const ChatAiService();
 
+  bool _hasExplicitThreadType(ChatThreadModel thread) {
+    return (thread.threadType?.trim().isNotEmpty ?? false);
+  }
+
   bool _isBookingFollowupThread(ChatThreadModel thread) {
     final threadType = thread.threadType?.trim() ?? '';
     if (threadType.isNotEmpty) {
@@ -26,6 +30,10 @@ class ChatController {
   }
 
   bool _isAdminSupportThread(ChatThreadModel thread) {
+    if (_hasExplicitThreadType(thread)) {
+      return thread.threadType == 'admin_support';
+    }
+
     return thread.sourceType == 'admin_support' ||
         thread.handoffState == 'admin_review' ||
         thread.handoffState == 'admin_replying' ||
