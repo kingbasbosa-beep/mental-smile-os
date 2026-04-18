@@ -17,6 +17,11 @@ class AdminSupportChatPage extends StatelessWidget {
     return Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
   }
 
+  bool _isEscalatedCase(Map<String, dynamic> data) {
+    final sourceType = (data['sourceType'] ?? '').toString();
+    return sourceType == 'client' || sourceType == 'guest';
+  }
+
   String _statusLabel(String value, bool isArabic) {
     switch (value) {
       case 'assigned_admin':
@@ -35,15 +40,15 @@ class AdminSupportChatPage extends StatelessWidget {
     final ownerType = (data['ownerType'] ?? '').toString();
 
     if (ownerType.contains('clinician')) {
-      return 'c5/avatars/avatar_clinician_m.png';
+      return 'assets/c5/avatars/avatar_clinician_m.png';
     }
     if (ownerType.contains('center')) {
-      return 'c5/avatars/avatar_admin_support.png';
+      return 'assets/c5/avatars/avatar_admin_support.png';
     }
     if (sourceType == 'admin_support') {
-      return 'c5/avatars/avatar_admin_support.png';
+      return 'assets/c5/avatars/avatar_admin_support.png';
     }
-    return 'c5/avatars/avatar_client.png';
+    return 'assets/c5/avatars/avatar_client.png';
   }
 
   String _sourceLabel(Map<String, dynamic> data, bool isArabic) {
@@ -63,6 +68,42 @@ class AdminSupportChatPage extends StatelessWidget {
       return isArabic ? 'مركز' : 'Center';
     }
     return isArabic ? 'عميل' : 'Client';
+  }
+
+  String _chatTypeLabel(Map<String, dynamic> data, bool isArabic) {
+    final sourceType = (data['sourceType'] ?? '').toString();
+
+    if (_isEscalatedCase(data)) {
+      return isArabic ? 'حالة مصعّدة' : 'Escalated Case';
+    }
+    if (sourceType == 'admin_support') {
+      return isArabic ? 'دعم بشري' : 'Human Support';
+    }
+    return isArabic ? 'محادثة AI' : 'AI Conversation';
+  }
+
+  Widget _buildIntroCard(BuildContext context, bool isArabic) {
+    return AppSurfaceCard(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic ? 'إشراف بشري على الحالات' : 'Human-supervised cases',
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            isArabic
+                ? 'تم تصعيد هذه المحادثة من نظام الذكاء الاصطناعي وهي الآن تحت إشراف بشري.'
+                : 'This conversation was escalated from the AI system and is now under human supervision.',
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -107,11 +148,15 @@ class AdminSupportChatPage extends StatelessWidget {
 
               return ListView.separated(
                 padding: const EdgeInsets.all(AppSpacing.lg),
-                itemCount: threads.length,
+                itemCount: threads.length + 1,
                 separatorBuilder: (_, __) =>
                     const SizedBox(height: AppSpacing.md),
                 itemBuilder: (context, index) {
-                  final thread = threads[index];
+                  if (index == 0) {
+                    return _buildIntroCard(context, isArabic);
+                  }
+
+                  final thread = threads[index - 1];
                   final data = <String, dynamic>{
                     'sourceType': thread.sourceType,
                     'ownerType': thread.ownerType,
@@ -155,13 +200,28 @@ class AdminSupportChatPage extends StatelessWidget {
                                   ? CrossAxisAlignment.end
                                   : CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  displayName,
-                                  textAlign: isArabic
-                                      ? TextAlign.right
-                                      : TextAlign.left,
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
+                                Row(
+                                  textDirection: isArabic
+                                      ? TextDirection.rtl
+                                      : TextDirection.ltr,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        displayName,
+                                        textAlign: isArabic
+                                            ? TextAlign.right
+                                            : TextAlign.left,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                    ),
+                                    const SizedBox(width: AppSpacing.xs),
+                                    AppStatusBadge(
+                                      label: _chatTypeLabel(data, isArabic),
+                                      color: AppColors.deepTeal,
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: AppSpacing.xs),
                                 Text(
@@ -176,6 +236,25 @@ class AdminSupportChatPage extends StatelessWidget {
                                       ? TextAlign.right
                                       : TextAlign.left,
                                 ),
+                                if (_isEscalatedCase(data)) ...[
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    isArabic
+                                        ? 'تم تمييز هذه الحالة من قبل الذكاء الاصطناعي بسبب إشارات خطر مكتشفة.'
+                                        : 'This case was flagged by the AI due to detected risk signals.',
+                                    textAlign: isArabic
+                                        ? TextAlign.right
+                                        : TextAlign.left,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                          color: AppColors.obsidian
+                                              .withValues(alpha: 0.72),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                  ),
+                                ],
                                 const SizedBox(height: AppSpacing.sm),
                                 Wrap(
                                   spacing: AppSpacing.xs,

@@ -37,7 +37,16 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/c5/
+    - assets/c5/avatars/
+    - assets/c5/icons/
+    - assets/c5/ui/buttons/
+    - assets/c5/ui/badges/
+    - assets/c5/ui/status_dots/
+    - assets/c5/ui/gradients/
+    - assets/c5/ui/ornaments/
+    - assets/c5/sheet/
+    - assets/c5/README.md
+    - assets/c5/ASSETS_C5_MANIFEST.json
     - assets/c6_library/brand/logo_mark.png
     - assets/c6_library/brand/logo_wordmark.png
     - assets/c6_library/hero/library_hero.png

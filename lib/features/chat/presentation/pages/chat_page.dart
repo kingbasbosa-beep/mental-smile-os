@@ -38,8 +38,8 @@ class _ChatPageState extends State<ChatPage> {
 
   String get _avatarAsset {
     final value = widget.adminSupportMode
-        ? 'c5/avatars/avatar_admin_support.png'
-        : 'c5/avatars/avatar_client.png';
+        ? 'assets/c5/avatars/avatar_admin_support.png'
+        : 'assets/c5/avatars/avatar_client.png';
     if (value.startsWith('assets/assets/')) {
       return value.replaceFirst('assets/assets/', 'assets/');
     }

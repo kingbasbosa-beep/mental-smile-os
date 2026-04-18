@@ -377,7 +377,9 @@ class MenuPage extends StatelessWidget {
                                       .withValues(alpha: 0.10),
                                   child: ClipOval(
                                     child: Image.asset(
-                                      'c5/avatars/avatar_admin_support.png',
+                                      normalizeAssetPath(
+                                        'assets/c5/avatars/avatar_admin_support.png',
+                                      ),
                                       width: 72,
                                       height: 72,
                                       fit: BoxFit.cover,
