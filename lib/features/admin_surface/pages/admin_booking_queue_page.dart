@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/features/booking/data/services/booking_health_service.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
@@ -14,6 +15,9 @@ class AdminBookingQueuePage extends StatefulWidget {
 }
 
 class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
+  static const BookingHealthService _bookingHealthService =
+      BookingHealthService();
+
   String _centerTypeLabel(String type, bool isArabic) {
     switch (type.trim()) {
       case 'detox':
@@ -42,6 +46,19 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     super.initState();
     _bookingDocsStreamRef = _bookingDocsStream();
     _cliniciansStreamRef = _cliniciansStream();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _emitBookingHealth();
+    });
+  }
+
+  Future<void> _emitBookingHealth() async {
+    try {
+      await _bookingHealthService.emitHealthSnapshot(
+        sampleType: 'admin_booking_queue_open',
+      );
+    } catch (_) {
+      // Health reporting must stay quiet and never block booking queue usage.
+    }
   }
 
   Map<String, dynamic> _withCanonicalWorkflowStage(

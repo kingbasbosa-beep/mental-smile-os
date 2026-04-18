@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/features/booking/data/services/booking_health_service.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
@@ -13,8 +14,28 @@ class AdminPaymentsPage extends StatefulWidget {
 }
 
 class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
+  static const BookingHealthService _bookingHealthService =
+      BookingHealthService();
   String _tab = 'payment_review';
   final Set<String> _busyIds = {};
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _emitBookingHealth();
+    });
+  }
+
+  Future<void> _emitBookingHealth() async {
+    try {
+      await _bookingHealthService.emitHealthSnapshot(
+        sampleType: 'admin_payments_open',
+      );
+    } catch (_) {
+      // Health reporting must stay quiet and never block payments usage.
+    }
+  }
 
   Map<String, dynamic> _withCanonicalWorkflowStage(
     Map<String, dynamic> updates,
