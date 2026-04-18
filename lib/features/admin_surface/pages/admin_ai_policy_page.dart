@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/dev/ai_policy_seeder.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_ai_service.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
@@ -31,33 +29,6 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
     setState(() {
       _testResult = _chatAiService.processUserMessage(input);
     });
-  }
-
-  Future<void> _seedPolicyDebug(BuildContext context, bool isArabic) async {
-    try {
-      await seedAiPolicyToFirestoreDebug();
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isArabic
-                ? 'تمت زراعة سياسة الذكاء الاصطناعي بنجاح'
-                : 'AI policy seeded successfully',
-          ),
-        ),
-      );
-    } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isArabic
-                ? 'فشل زرع سياسة الذكاء الاصطناعي: $e'
-                : 'Failed to seed AI policy: $e',
-          ),
-        ),
-      );
-    }
   }
 
   String _timestampText(dynamic value) {
@@ -97,6 +68,83 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
     if (raw is Map<String, dynamic>) return raw;
     if (raw is Map) return Map<String, dynamic>.from(raw);
     return const <String, dynamic>{};
+  }
+
+  List<String> _stringList(Map<String, dynamic> data, String key) {
+    final raw = data[key];
+    if (raw is List) {
+      return raw.map((item) => item.toString()).toList();
+    }
+    return const <String>[];
+  }
+
+  String _listSummary(List<String> values) {
+    if (values.isEmpty) return '[]';
+    return values.join(', ');
+  }
+
+  String _thresholdValue(Map<String, dynamic> thresholds, String key) {
+    return '${thresholds[key] ?? '—'}';
+  }
+
+  Widget _buildDocumentLoadingState(BuildContext context, String title) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: Theme.of(context).textTheme.titleLarge),
+        const SizedBox(height: AppSpacing.lg),
+        const Center(child: CircularProgressIndicator()),
+      ],
+    );
+  }
+
+  Widget _buildDocumentErrorState(
+    BuildContext context,
+    bool isArabic,
+    String title,
+    Object? error,
+  ) {
+    return Column(
+      crossAxisAlignment:
+          isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: [
+        Text(title, style: Theme.of(context).textTheme.titleLarge),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
+          isArabic
+              ? 'تعذر تحميل وثيقة السياسة'
+              : 'Unable to load policy document',
+        ),
+        if (error != null) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            error.toString(),
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.obsidian.withValues(alpha: 0.72),
+                ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildDocumentEmptyState(
+    BuildContext context,
+    bool isArabic,
+    String title,
+  ) {
+    return Column(
+      crossAxisAlignment:
+          isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: [
+        Text(title, style: Theme.of(context).textTheme.titleLarge),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
+          isArabic ? 'لا توجد وثيقة بعد' : 'No document yet',
+        ),
+      ],
+    );
   }
 
   Widget _buildMetaChip(String label, String value, Color color) {
@@ -280,31 +328,25 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
       child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         stream: stream,
         builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting &&
+              !snapshot.hasData) {
+            return _buildDocumentLoadingState(context, title);
+          }
+
           if (snapshot.hasError) {
-            return Column(
-              crossAxisAlignment:
-                  isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                Text(title, style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  isArabic
-                      ? 'تعذر تحميل وثيقة السياسة'
-                      : 'Unable to load policy document',
-                ),
-              ],
+            return _buildDocumentErrorState(
+              context,
+              isArabic,
+              title,
+              snapshot.error,
             );
           }
 
           if (!snapshot.hasData) {
-            return Column(
-              crossAxisAlignment:
-                  isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                Text(title, style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: AppSpacing.lg),
-                const Center(child: CircularProgressIndicator()),
-              ],
+            return _buildDocumentEmptyState(
+              context,
+              isArabic,
+              title,
             );
           }
 
@@ -312,16 +354,10 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
           final data = doc.data();
 
           if (!doc.exists || data == null) {
-            return Column(
-              crossAxisAlignment:
-                  isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                Text(title, style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  isArabic ? 'الوثيقة غير موجودة بعد' : 'Document not seeded yet',
-                ),
-              ],
+            return _buildDocumentEmptyState(
+              context,
+              isArabic,
+              title,
             );
           }
 
@@ -469,6 +505,243 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
     );
   }
 
+  Widget _buildComparisonSection(BuildContext context, bool isArabic) {
+    final draftStream = FirebaseFirestore.instance
+        .collection('ai_policies')
+        .doc('draft')
+        .snapshots();
+    final publishedStream = FirebaseFirestore.instance
+        .collection('ai_policies')
+        .doc('published')
+        .snapshots();
+
+    return AppSurfaceCard(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+        stream: draftStream,
+        builder: (context, draftSnapshot) {
+          if (draftSnapshot.connectionState == ConnectionState.waiting &&
+              !draftSnapshot.hasData) {
+            return _buildDocumentLoadingState(
+              context,
+              isArabic
+                  ? 'مقارنة المسودة والمنشور'
+                  : 'Draft vs Published Comparison',
+            );
+          }
+
+          if (draftSnapshot.hasError) {
+            return _buildDocumentErrorState(
+              context,
+              isArabic,
+              isArabic
+                  ? 'مقارنة المسودة والمنشور'
+                  : 'Draft vs Published Comparison',
+              draftSnapshot.error,
+            );
+          }
+
+          return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+            stream: publishedStream,
+            builder: (context, publishedSnapshot) {
+              if (publishedSnapshot.connectionState == ConnectionState.waiting &&
+                  !publishedSnapshot.hasData) {
+                return _buildDocumentLoadingState(
+                  context,
+                  isArabic
+                      ? 'مقارنة المسودة والمنشور'
+                      : 'Draft vs Published Comparison',
+                );
+              }
+
+              if (publishedSnapshot.hasError) {
+                return _buildDocumentErrorState(
+                  context,
+                  isArabic,
+                  isArabic
+                      ? 'مقارنة المسودة والمنشور'
+                      : 'Draft vs Published Comparison',
+                  publishedSnapshot.error,
+                );
+              }
+
+              if (!draftSnapshot.hasData ||
+                  !publishedSnapshot.hasData ||
+                  !draftSnapshot.data!.exists ||
+                  !publishedSnapshot.data!.exists ||
+                  draftSnapshot.data!.data() == null ||
+                  publishedSnapshot.data!.data() == null) {
+                return _buildDocumentEmptyState(
+                  context,
+                  isArabic,
+                  isArabic
+                      ? 'مقارنة المسودة والمنشور'
+                      : 'Draft vs Published Comparison',
+                );
+              }
+
+              final draft = draftSnapshot.data!.data()!;
+              final published = publishedSnapshot.data!.data()!;
+              final draftThresholds = _thresholds(draft);
+              final publishedThresholds = _thresholds(published);
+              final draftStrategy = _strategyMap(draft);
+              final publishedStrategy = _strategyMap(published);
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isArabic
+                        ? 'مقارنة المسودة والمنشور'
+                        : 'Draft vs Published Comparison',
+                    textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    isArabic
+                        ? 'عرض مقارن read-only بين القيم الحالية في draft و published.'
+                        : 'Read-only comparison of the current draft and published values.',
+                    textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  _ComparisonTable(
+                    title: isArabic ? 'Thresholds' : 'Thresholds',
+                    rows: [
+                      _ComparisonRowData(
+                        label: 'mediumRiskThreshold',
+                        draftValue:
+                            _thresholdValue(draftThresholds, 'mediumRiskThreshold'),
+                        publishedValue: _thresholdValue(
+                          publishedThresholds,
+                          'mediumRiskThreshold',
+                        ),
+                      ),
+                      _ComparisonRowData(
+                        label: 'highRiskThreshold',
+                        draftValue:
+                            _thresholdValue(draftThresholds, 'highRiskThreshold'),
+                        publishedValue: _thresholdValue(
+                          publishedThresholds,
+                          'highRiskThreshold',
+                        ),
+                      ),
+                      _ComparisonRowData(
+                        label: 'criticalRiskThreshold',
+                        draftValue: _thresholdValue(
+                          draftThresholds,
+                          'criticalRiskThreshold',
+                        ),
+                        publishedValue: _thresholdValue(
+                          publishedThresholds,
+                          'criticalRiskThreshold',
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  _ComparisonTable(
+                    title: isArabic ? 'Strategy Mapping' : 'Strategy Mapping',
+                    rows: [
+                      _ComparisonRowData(
+                        label: 'low',
+                        draftValue: '${draftStrategy['low'] ?? '—'}',
+                        publishedValue: '${publishedStrategy['low'] ?? '—'}',
+                      ),
+                      _ComparisonRowData(
+                        label: 'medium',
+                        draftValue: '${draftStrategy['medium'] ?? '—'}',
+                        publishedValue:
+                            '${publishedStrategy['medium'] ?? '—'}',
+                      ),
+                      _ComparisonRowData(
+                        label: 'high',
+                        draftValue: '${draftStrategy['high'] ?? '—'}',
+                        publishedValue: '${publishedStrategy['high'] ?? '—'}',
+                      ),
+                      _ComparisonRowData(
+                        label: 'critical',
+                        draftValue: '${draftStrategy['critical'] ?? '—'}',
+                        publishedValue:
+                            '${publishedStrategy['critical'] ?? '—'}',
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  _ComparisonTable(
+                    title: isArabic ? 'Escalation Flags' : 'Escalation Flags',
+                    rows: [
+                      _ComparisonRowData(
+                        label: 'needsHumanSupportLevels',
+                        draftValue:
+                            _listSummary(_stringList(draft, 'needsHumanSupportLevels')),
+                        publishedValue: _listSummary(
+                          _stringList(published, 'needsHumanSupportLevels'),
+                        ),
+                      ),
+                      _ComparisonRowData(
+                        label: 'containsEscalationSignalLevels',
+                        draftValue: _listSummary(
+                          _stringList(draft, 'containsEscalationSignalLevels'),
+                        ),
+                        publishedValue: _listSummary(
+                          _stringList(
+                            published,
+                            'containsEscalationSignalLevels',
+                          ),
+                        ),
+                      ),
+                      _ComparisonRowData(
+                        label: 'safetyTriggeredLevels',
+                        draftValue:
+                            _listSummary(_stringList(draft, 'safetyTriggeredLevels')),
+                        publishedValue: _listSummary(
+                          _stringList(published, 'safetyTriggeredLevels'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  _ComparisonTable(
+                    title: isArabic
+                        ? 'Phrase Pack Summaries'
+                        : 'Phrase Pack Summaries',
+                    rows: [
+                      _ComparisonRowData(
+                        label: 'rolePhrasePacks',
+                        draftValue: '${_mapCount(draft, 'rolePhrasePacks')}',
+                        publishedValue:
+                            '${_mapCount(published, 'rolePhrasePacks')}',
+                      ),
+                      _ComparisonRowData(
+                        label: 'statePhrasePacks',
+                        draftValue: '${_mapCount(draft, 'statePhrasePacks')}',
+                        publishedValue:
+                            '${_mapCount(published, 'statePhrasePacks')}',
+                      ),
+                      _ComparisonRowData(
+                        label: 'lossOfControlPhrases',
+                        draftValue: '${_listCount(draft, 'lossOfControlPhrases')}',
+                        publishedValue:
+                            '${_listCount(published, 'lossOfControlPhrases')}',
+                      ),
+                      _ComparisonRowData(
+                        label: 'selfHarmPhrases',
+                        draftValue: '${_listCount(draft, 'selfHarmPhrases')}',
+                        publishedValue:
+                            '${_listCount(published, 'selfHarmPhrases')}',
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
@@ -506,23 +779,6 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
                           : 'This page is read-only. It inspects the draft and published policy documents without editing or affecting the live chatbot.',
                       textAlign: isArabic ? TextAlign.right : TextAlign.left,
                     ),
-                    if (kDebugMode) ...[
-                      const SizedBox(height: AppSpacing.md),
-                      Align(
-                        alignment: isArabic
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        child: OutlinedButton.icon(
-                          onPressed: () => _seedPolicyDebug(context, isArabic),
-                          icon: const Icon(Icons.bug_report_outlined),
-                          label: Text(
-                            isArabic
-                                ? 'زرع سياسة الذكاء الاصطناعي (Debug)'
-                                : 'Seed AI Policy (Debug)',
-                          ),
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),
@@ -542,6 +798,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
                 documentId: 'draft',
                 accent: AppColors.accentLavender,
               ),
+              const SizedBox(height: AppSpacing.md),
+              _buildComparisonSection(context, isArabic),
               const SizedBox(height: AppSpacing.md),
               _buildTestConsoleCard(context, isArabic),
             ],
@@ -628,6 +886,102 @@ class _KeyValueBlock extends StatelessWidget {
               child: Text(
                 '${entry.key}: ${entry.value}',
                 style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ComparisonRowData {
+  const _ComparisonRowData({
+    required this.label,
+    required this.draftValue,
+    required this.publishedValue,
+  });
+
+  final String label;
+  final String draftValue;
+  final String publishedValue;
+
+  bool get isDifferent => draftValue != publishedValue;
+}
+
+class _ComparisonTable extends StatelessWidget {
+  const _ComparisonTable({
+    required this.title,
+    required this.rows,
+  });
+
+  final String title;
+  final List<_ComparisonRowData> rows;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        border: Border.all(
+          color: AppColors.mist.withValues(alpha: 0.55),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          ...rows.map(
+            (row) => Container(
+              margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: row.isDifferent
+                    ? const Color(0xFFFFF4DD)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(AppRadii.md),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      row.label,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      'Draft: ${row.draftValue}',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      'Published: ${row.publishedValue}',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                  if (row.isDifferent)
+                    AppStatusBadge(
+                      label: 'Different',
+                      color: const Color(0xFFE39B2E),
+                    ),
+                ],
               ),
             ),
           ),
