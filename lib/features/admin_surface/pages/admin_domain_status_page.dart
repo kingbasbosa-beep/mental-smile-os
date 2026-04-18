@@ -127,6 +127,7 @@ class AdminDomainStatusPage extends StatelessWidget {
                     final hasDegradedFeatures =
                         status.degradedFeatures.isNotEmpty;
                     final isAiPolicyDomain = domain.key == DomainKey.aiPolicy;
+                    final isChatDomain = domain.key == DomainKey.chat;
 
                     return AppSurfaceCard(
                       child: Column(
@@ -231,6 +232,36 @@ class AdminDomainStatusPage extends StatelessWidget {
                                   label: 'publishedVersion',
                                   value: _stringText(
                                     status.metadata['publishedVersion'],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                          if (isChatDomain && status.metadata.isNotEmpty) ...[
+                            const SizedBox(height: AppSpacing.sm),
+                            _buildMetadataSection(
+                              context,
+                              title: 'Chat Health',
+                              children: [
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'openEscalationsCount',
+                                  value: _stringText(
+                                    status.metadata['openEscalationsCount'],
+                                  ),
+                                ),
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'openAdminSupportCount',
+                                  value: _stringText(
+                                    status.metadata['openAdminSupportCount'],
+                                  ),
+                                ),
+                                _buildMetadataLine(
+                                  context,
+                                  label: 'lastHealthSampleType',
+                                  value: _stringText(
+                                    status.metadata['lastHealthSampleType'],
                                   ),
                                 ),
                               ],
