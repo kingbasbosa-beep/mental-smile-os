@@ -74,6 +74,54 @@ class ClinicianSessionsPage extends StatelessWidget {
             (reviewStatus == 'pending_reviews' || reviewStatus == 'partial'));
   }
 
+  Widget _buildSessionsIntro(BuildContext context, bool isArabic) {
+    return Align(
+      alignment: isArabic ? Alignment.centerRight : Alignment.centerLeft,
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic ? 'الجلسات والمتابعة' : 'Sessions and follow-up',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            isArabic
+                ? 'هذه الصفحة مخصصة لمتابعة حالة الجلسة وبياناتها، ومنها تنتقل إلى التقييم عندما تصبح الجلسة جاهزة للمراجعة.'
+                : 'This page is for tracking session status and details, and from here you move to review once the session is ready for evaluation.',
+            style: Theme.of(context).textTheme.bodyMedium,
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReviewHandoffAction(
+    BuildContext context, {
+    required bool isArabic,
+    required String requestId,
+  }) {
+    return FilledButton.icon(
+      onPressed: () {
+        Navigator.of(context).pushNamed(
+          Routes.sessionReview,
+          arguments: {
+            'requestId': requestId,
+            'reviewerType': 'clinician',
+          },
+        );
+      },
+      icon: const Icon(Icons.rate_review_outlined),
+      label: Text(
+        isArabic ? 'الانتقال إلى تقييم الجلسة' : 'Continue to session review',
+      ),
+    );
+  }
+
   String _dateText(dynamic value) {
     if (value is Timestamp) {
       final d = value.toDate();
@@ -222,151 +270,142 @@ class ClinicianSessionsPage extends StatelessWidget {
 
                       return ListView(
                         padding: const EdgeInsets.all(16),
-                        children: docs.map((data) {
-                          final requestId = (data['_id'] ?? '').toString();
-                          final status = (data['status'] ?? '').toString();
-                          final clientName =
-                              (data['clientName'] ?? 'Client').toString();
-                          final sessionDate =
-                              (data['sessionDateText'] ?? '').toString();
-                          final sessionLink =
-                              (data['sessionLink'] ?? '').toString();
-                          final sessionCode =
-                              (data['sessionCode'] ?? '').toString();
-                          final adminNotes =
-                              (data['sessionAdminNotes'] ?? '').toString();
-                          final createdAt = _dateText(data['createdAt']);
+                        children: [
+                          _buildSessionsIntro(context, isArabic),
+                          const SizedBox(height: 16),
+                          ...docs.map((data) {
+                            final requestId = (data['_id'] ?? '').toString();
+                            final status = (data['status'] ?? '').toString();
+                            final clientName =
+                                (data['clientName'] ?? 'Client').toString();
+                            final sessionDate =
+                                (data['sessionDateText'] ?? '').toString();
+                            final sessionLink =
+                                (data['sessionLink'] ?? '').toString();
+                            final sessionCode =
+                                (data['sessionCode'] ?? '').toString();
+                            final adminNotes =
+                                (data['sessionAdminNotes'] ?? '').toString();
+                            final createdAt = _dateText(data['createdAt']);
 
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 14),
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: scheme.surface,
-                              borderRadius: BorderRadius.circular(22),
-                              border: Border.all(
-                                color: scheme.outline.withValues(alpha: 0.14),
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 14),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: scheme.surface,
+                                borderRadius: BorderRadius.circular(22),
+                                border: Border.all(
+                                  color: scheme.outline.withValues(alpha: 0.14),
+                                ),
                               ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: isArabic
-                                  ? CrossAxisAlignment.end
-                                  : CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: isArabic
-                                            ? CrossAxisAlignment.end
-                                            : CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            clientName,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.w800,
-                                                ),
-                                          ),
-                                          if (createdAt.isNotEmpty) ...[
-                                            const SizedBox(height: 6),
+                              child: Column(
+                                crossAxisAlignment: isArabic
+                                    ? CrossAxisAlignment.end
+                                    : CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: isArabic
+                                              ? CrossAxisAlignment.end
+                                              : CrossAxisAlignment.start,
+                                          children: [
                                             Text(
-                                              isArabic
-                                                  ? 'تاريخ الطلب: $createdAt'
-                                                  : 'Request date: $createdAt',
+                                              clientName,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
                                             ),
+                                            if (createdAt.isNotEmpty) ...[
+                                              const SizedBox(height: 6),
+                                              Text(
+                                                isArabic
+                                                    ? 'تاريخ الطلب: $createdAt'
+                                                    : 'Request date: $createdAt',
+                                              ),
+                                            ],
                                           ],
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: _statusColor(status)
-                                            .withValues(alpha: 0.12),
-                                        borderRadius:
-                                            BorderRadius.circular(999),
-                                      ),
-                                      child: Text(
-                                        _statusLabel(status, isArabic),
-                                        style: TextStyle(
-                                          color: _statusColor(status),
-                                          fontWeight: FontWeight.w800,
                                         ),
                                       ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: _statusColor(status)
+                                              .withValues(alpha: 0.12),
+                                          borderRadius:
+                                              BorderRadius.circular(999),
+                                        ),
+                                        child: Text(
+                                          _statusLabel(status, isArabic),
+                                          style: TextStyle(
+                                            color: _statusColor(status),
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 14),
+                                  if (sessionDate.trim().isNotEmpty)
+                                    Text(
+                                      isArabic
+                                          ? 'موعد الجلسة: $sessionDate'
+                                          : 'Session date: $sessionDate',
+                                    ),
+                                  if (sessionLink.trim().isNotEmpty) ...[
+                                    const SizedBox(height: 8),
+                                    SelectableText(
+                                      isArabic
+                                          ? 'رابط الجلسة: $sessionLink'
+                                          : 'Session link: $sessionLink',
                                     ),
                                   ],
-                                ),
-                                const SizedBox(height: 14),
-                                if (sessionDate.trim().isNotEmpty)
-                                  Text(
-                                    isArabic
-                                        ? 'موعد الجلسة: $sessionDate'
-                                        : 'Session date: $sessionDate',
-                                  ),
-                                if (sessionLink.trim().isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  SelectableText(
-                                    isArabic
-                                        ? 'رابط الجلسة: $sessionLink'
-                                        : 'Session link: $sessionLink',
-                                  ),
-                                ],
-                                if (sessionCode.trim().isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  SelectableText(
-                                    isArabic
-                                        ? 'كود الجلسة: $sessionCode'
-                                        : 'Session code: $sessionCode',
-                                  ),
-                                ],
-                                if (adminNotes.trim().isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    isArabic
-                                        ? 'ملاحظات الإدارة: $adminNotes'
-                                        : 'Admin notes: $adminNotes',
-                                  ),
-                                ],
-                                if (sessionDate.trim().isEmpty &&
-                                    sessionLink.trim().isEmpty &&
-                                    sessionCode.trim().isEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    isArabic
-                                        ? 'لم يتم تجهيز بيانات الجلسة بعد.'
-                                        : 'Session details are not prepared yet.',
-                                  ),
-                                ],
-                                if (_canClinicianReview(data)) ...[
-                                  const SizedBox(height: 14),
-                                  FilledButton.icon(
-                                    onPressed: () {
-                                      Navigator.of(context).pushNamed(
-                                        Routes.sessionReview,
-                                        arguments: {
-                                          'requestId': requestId,
-                                          'reviewerType': 'clinician',
-                                        },
-                                      );
-                                    },
-                                    icon:
-                                        const Icon(Icons.rate_review_outlined),
-                                    label: Text(
+                                  if (sessionCode.trim().isNotEmpty) ...[
+                                    const SizedBox(height: 8),
+                                    SelectableText(
                                       isArabic
-                                          ? 'تقييم الجلسة'
-                                          : 'Review session',
+                                          ? 'كود الجلسة: $sessionCode'
+                                          : 'Session code: $sessionCode',
                                     ),
-                                  ),
+                                  ],
+                                  if (adminNotes.trim().isNotEmpty) ...[
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      isArabic
+                                          ? 'ملاحظات الإدارة: $adminNotes'
+                                          : 'Admin notes: $adminNotes',
+                                    ),
+                                  ],
+                                  if (sessionDate.trim().isEmpty &&
+                                      sessionLink.trim().isEmpty &&
+                                      sessionCode.trim().isEmpty) ...[
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      isArabic
+                                          ? 'لم يتم تجهيز بيانات الجلسة بعد.'
+                                          : 'Session details are not prepared yet.',
+                                    ),
+                                  ],
+                                  if (_canClinicianReview(data)) ...[
+                                    const SizedBox(height: 14),
+                                    _buildReviewHandoffAction(
+                                      context,
+                                      isArabic: isArabic,
+                                      requestId: requestId,
+                                    ),
+                                  ],
                                 ],
-                              ],
-                            ),
-                          );
-                        }).toList(),
+                              ),
+                            );
+                          }),
+                        ],
                       );
                     },
                   );
