@@ -14,13 +14,140 @@ import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 // ADMIN_SURFACE: SAFE_UI
-class AdminHubPage extends StatelessWidget {
+class AdminHubPage extends StatefulWidget {
   const AdminHubPage({super.key});
 
   static const String _adminBookingQueueRoute = '/admin/booking-queue';
   static const String _adminAlertsReviewRoute = '/admin/alerts-review';
   static const DomainStatusService _domainStatusService = DomainStatusService();
   static const GatewayMonitor _gatewayMonitor = GatewayMonitor();
+
+  @override
+  State<AdminHubPage> createState() => _AdminHubPageState();
+}
+
+class _AdminHubPageState extends State<AdminHubPage> {
+  late final Stream<int> _clinicianPendingStream;
+  late final Stream<int> _clinicianProfileRequestsStream;
+  late final Stream<int> _centersPendingStream;
+  late final Stream<int> _bookingOpenStream;
+  late final Stream<int> _paymentsReviewStream;
+  late final Stream<int> _sessionsActionStream;
+  late final Stream<int> _escalationsOpenStream;
+  late final Stream<int> _pendingApprovalsStream;
+  late final Stream<int> _gatewayAttentionStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _clinicianPendingStream = FirebaseFirestore.instance
+        .collection('clinicians')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.where((doc) {
+              final data = doc.data();
+              final status =
+                  (data['approvalStatus'] ?? 'pending_review').toString();
+              return status == 'pending_review';
+            }).length)
+        .asBroadcastStream();
+
+    _clinicianProfileRequestsStream = _profileChangeRequestsCountStream();
+
+    _centersPendingStream = FirebaseFirestore.instance
+        .collection('centers')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.where((doc) {
+              final data = doc.data();
+              final status =
+                  (data['approvalStatus'] ?? 'pending_admin').toString();
+              return status == 'pending_admin' ||
+                  status == 'pending_review' ||
+                  status == 'center_follow_up';
+            }).length)
+        .asBroadcastStream();
+
+    _bookingOpenStream = FirebaseFirestore.instance
+        .collection('booking_requests')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.where((doc) {
+              final data = doc.data();
+              final archived = (data['archived'] ?? false) == true;
+              final status = (data['status'] ?? 'pending_admin').toString();
+              return !archived && status != 'completed_success';
+            }).length)
+        .asBroadcastStream();
+
+    _paymentsReviewStream = FirebaseFirestore.instance
+        .collection('booking_requests')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.where((doc) {
+              final data = doc.data();
+              final status = (data['status'] ?? '').toString();
+              final paymentStatus = (data['paymentStatus'] ?? '').toString();
+              return status == 'payment_review' ||
+                  paymentStatus == 'submitted_by_client';
+            }).length)
+        .asBroadcastStream();
+
+    _sessionsActionStream = FirebaseFirestore.instance
+        .collection('booking_requests')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.where((doc) {
+              final data = doc.data();
+              final status = (data['status'] ?? '').toString();
+              return status == 'session_setup_pending' ||
+                  status == 'session_scheduled' ||
+                  status == 'session_in_progress' ||
+                  status == 'reschedule_pending' ||
+                  status == 'session_completed_pending_reviews';
+            }).length)
+        .asBroadcastStream();
+
+    _escalationsOpenStream = _openEscalationsStream().asBroadcastStream();
+
+    _pendingApprovalsStream =
+        Stream<int>.multi((controller) {
+          int clinicianPending = 0;
+          int profilePending = 0;
+          int centersPending = 0;
+
+          void emit() {
+            controller.add(clinicianPending + profilePending + centersPending);
+          }
+
+          final clinicianSub = _clinicianPendingStream.listen(
+            (value) {
+              clinicianPending = value;
+              emit();
+            },
+            onError: controller.addError,
+          );
+          final profileSub = _clinicianProfileRequestsStream.listen(
+            (value) {
+              profilePending = value;
+              emit();
+            },
+            onError: controller.addError,
+          );
+          final centersSub = _centersPendingStream.listen(
+            (value) {
+              centersPending = value;
+              emit();
+            },
+            onError: controller.addError,
+          );
+
+          controller.onCancel = () async {
+            await clinicianSub.cancel();
+            await profileSub.cancel();
+            await centersSub.cancel();
+          };
+        }).asBroadcastStream();
+
+    _gatewayAttentionStream =
+        Stream<int>.value(AdminHubPage._gatewayMonitor.attentionCount())
+            .asBroadcastStream();
+  }
 
   Stream<_SystemAdvisorySummary> _systemAdvisoryStream() {
     return Stream<_SystemAdvisorySummary>.multi((controller) {
@@ -66,7 +193,9 @@ class AdminHubPage extends StatelessWidget {
       }
 
       for (final domain in domainRegistry) {
-        final sub = _domainStatusService.watchDomainStatus(domain.key).listen(
+        final sub =
+            AdminHubPage._domainStatusService.watchDomainStatus(domain.key)
+                .listen(
           (status) {
             statuses[domain.key] = status;
             emit();
@@ -102,7 +231,7 @@ class AdminHubPage extends StatelessWidget {
   Stream<int> _profileChangeRequestsCountStream() {
     final db = FirebaseFirestore.instance;
 
-    return Stream.multi((controller) {
+    return Stream<int>.multi((controller) {
       int clinicianCount = 0;
       int centerCount = 0;
 
@@ -138,142 +267,45 @@ class AdminHubPage extends StatelessWidget {
         await clinicianSub.cancel();
         await centerSub.cancel();
       };
-    });
+    }).asBroadcastStream();
   }
 
   @override
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
 
-    final clinicianPendingStream = FirebaseFirestore.instance
-        .collection('clinicians')
-        .snapshots()
-        .map((snapshot) => snapshot.docs.where((doc) {
-              final data = doc.data();
-              final status =
-                  (data['approvalStatus'] ?? 'pending_review').toString();
-              return status == 'pending_review';
-            }).length);
-
-    final clinicianProfileRequestsStream = _profileChangeRequestsCountStream();
-
-    final centersPendingStream = FirebaseFirestore.instance
-        .collection('centers')
-        .snapshots()
-        .map((snapshot) => snapshot.docs.where((doc) {
-              final data = doc.data();
-              final status =
-                  (data['approvalStatus'] ?? 'pending_admin').toString();
-              return status == 'pending_admin' ||
-                  status == 'pending_review' ||
-                  status == 'center_follow_up';
-            }).length);
-
-    final bookingOpenStream = FirebaseFirestore.instance
-        .collection('booking_requests')
-        .snapshots()
-        .map((snapshot) => snapshot.docs.where((doc) {
-              final data = doc.data();
-              final archived = (data['archived'] ?? false) == true;
-              final status = (data['status'] ?? 'pending_admin').toString();
-              return !archived && status != 'completed_success';
-            }).length);
-
-    final paymentsReviewStream = FirebaseFirestore.instance
-        .collection('booking_requests')
-        .snapshots()
-        .map((snapshot) => snapshot.docs.where((doc) {
-              final data = doc.data();
-              final status = (data['status'] ?? '').toString();
-              final paymentStatus = (data['paymentStatus'] ?? '').toString();
-              return status == 'payment_review' ||
-                  paymentStatus == 'submitted_by_client';
-            }).length);
-
-    final sessionsActionStream = FirebaseFirestore.instance
-        .collection('booking_requests')
-        .snapshots()
-        .map((snapshot) => snapshot.docs.where((doc) {
-              final data = doc.data();
-              final status = (data['status'] ?? '').toString();
-              return status == 'session_setup_pending' ||
-                  status == 'session_scheduled' ||
-                  status == 'session_in_progress' ||
-                  status == 'reschedule_pending' ||
-                  status == 'session_completed_pending_reviews';
-            }).length);
-
-    final escalationsOpenStream = _openEscalationsStream();
-    final gatewayStatuses = _gatewayMonitor.familyStatuses();
-
-    final pendingApprovalsStream = Stream<int>.multi((controller) {
-      int clinicianPending = 0;
-      int profilePending = 0;
-      int centersPending = 0;
-
-      void emit() {
-        controller.add(clinicianPending + profilePending + centersPending);
-      }
-
-      final clinicianSub = clinicianPendingStream.listen(
-        (value) {
-          clinicianPending = value;
-          emit();
-        },
-        onError: controller.addError,
-      );
-      final profileSub = clinicianProfileRequestsStream.listen(
-        (value) {
-          profilePending = value;
-          emit();
-        },
-        onError: controller.addError,
-      );
-      final centersSub = centersPendingStream.listen(
-        (value) {
-          centersPending = value;
-          emit();
-        },
-        onError: controller.addError,
-      );
-
-      controller.onCancel = () async {
-        await clinicianSub.cancel();
-        await profileSub.cancel();
-        await centersSub.cancel();
-      };
-    });
+    final gatewayStatuses = AdminHubPage._gatewayMonitor.familyStatuses();
 
     final compactCounters = <_QuickStatItem>[
       _QuickStatItem(
         title: isArabic ? 'طلبات التشغيل المفتوحة' : 'Open workflow',
         color: const Color(0xFF7C6EF6),
-        stream: bookingOpenStream,
+        stream: _bookingOpenStream,
       ),
       _QuickStatItem(
         title: isArabic ? 'السداد تحت المراجعة' : 'Payment review',
         color: const Color(0xFF9A7A6E),
-        stream: paymentsReviewStream,
+        stream: _paymentsReviewStream,
       ),
       _QuickStatItem(
         title: isArabic ? 'جلسات تحتاج إجراء' : 'Sessions need action',
         color: AppColors.info,
-        stream: sessionsActionStream,
+        stream: _sessionsActionStream,
       ),
       _QuickStatItem(
         title: isArabic ? 'تصعيدات غير مغلقة' : 'Open escalations',
         color: const Color(0xFF6C55B3),
-        stream: escalationsOpenStream,
+        stream: _escalationsOpenStream,
       ),
       _QuickStatItem(
         title: isArabic ? 'اعتمادات معلقة' : 'Pending approvals',
         color: const Color(0xFFE2A067),
-        stream: pendingApprovalsStream,
+        stream: _pendingApprovalsStream,
       ),
       _QuickStatItem(
         title: isArabic ? 'بوابات/أجهزة degraded' : 'Gateway/device degraded',
         color: const Color(0xFF4D7C6A),
-        stream: Stream<int>.value(_gatewayMonitor.attentionCount()),
+        stream: _gatewayAttentionStream,
       ),
     ];
 
@@ -378,16 +410,16 @@ class AdminHubPage extends StatelessWidget {
                   const SizedBox(height: AppSpacing.lg),
                   const _ControlRoomIntro(),
                   const SizedBox(height: AppSpacing.md),
-                  _ControlRoomTileGrid(
-                    children: [
-                      const _AdminSystemHealthCard(),
-                      const _OperationalAlertsCard(),
-                      const _CriticalAlertsCard(),
-                      _GatewaySignalsCard(
-                        statuses: gatewayStatuses,
-                        gatewayMonitor: _gatewayMonitor,
-                      ),
+                  _ControlRoomDashboardLayout(
+                    leftCards: const [
+                      _OperationalAlertsCard(),
+                      _AdminSystemHealthCard(),
+                      _CriticalAlertsCard(),
                     ],
+                    supervisoryCard: _GatewaySignalsCard(
+                      statuses: gatewayStatuses,
+                      gatewayMonitor: AdminHubPage._gatewayMonitor,
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   _AdminSectionLaunchpad(
@@ -1137,6 +1169,7 @@ class _GatewaySignalsCard extends StatelessWidget {
     return _ControlRoomCardShell(
       title: 'Gateway Signals',
       subtitle: 'Gateway-layer supervision by family',
+      minHeight: 360,
       child: _ControlRoomBodyFrame(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1304,6 +1337,7 @@ class _AdminSystemHealthCard extends StatelessWidget {
     return _ControlRoomCardShell(
       title: 'System Health',
       subtitle: 'Python QA snapshot',
+      minHeight: 224,
       child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection('system_health')
@@ -1595,6 +1629,7 @@ class _OperationalAlertsCard extends StatelessWidget {
     return _ControlRoomCardShell(
       title: 'Operational Alerts',
       subtitle: 'Python-generated operational signals',
+      minHeight: 224,
       child: _ControlRoomBodyFrame(
         child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
           stream: FirebaseFirestore.instance
@@ -1714,6 +1749,7 @@ class _CriticalAlertsCard extends StatelessWidget {
     return _ControlRoomCardShell(
       title: 'Critical Alerts',
       subtitle: 'Operational warning signals',
+      minHeight: 224,
       child: _ControlRoomBodyFrame(
         child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
           stream: stuckFollowUpsStream,
@@ -1842,32 +1878,58 @@ class _ControlRoomIntro extends StatelessWidget {
   }
 }
 
-class _ControlRoomTileGrid extends StatelessWidget {
-  const _ControlRoomTileGrid({
-    required this.children,
+class _ControlRoomDashboardLayout extends StatelessWidget {
+  const _ControlRoomDashboardLayout({
+    required this.leftCards,
+    required this.supervisoryCard,
   });
 
-  final List<Widget> children;
+  final List<Widget> leftCards;
+  final Widget supervisoryCard;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         const gap = AppSpacing.md;
-        final useTwoColumns = constraints.maxWidth >= 980;
-        final tileWidth = useTwoColumns
-            ? (constraints.maxWidth - gap) / 2
-            : constraints.maxWidth;
+        if (constraints.maxWidth < 1040) {
+          return Column(
+            children: [
+              for (final card in leftCards) ...[
+                card,
+                const SizedBox(height: gap),
+              ],
+              supervisoryCard,
+            ],
+          );
+        }
 
-        return Wrap(
-          spacing: gap,
-          runSpacing: gap,
-          children: children.map((child) {
-            return SizedBox(
-              width: tileWidth,
-              child: child,
-            );
-          }).toList(),
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 3,
+              child: Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: leftCards[0]),
+                      const SizedBox(width: gap),
+                      Expanded(child: leftCards[1]),
+                    ],
+                  ),
+                  const SizedBox(height: gap),
+                  leftCards[2],
+                ],
+              ),
+            ),
+            const SizedBox(width: gap),
+            Expanded(
+              flex: 2,
+              child: supervisoryCard,
+            ),
+          ],
         );
       },
     );
@@ -1879,18 +1941,20 @@ class _ControlRoomCardShell extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.child,
+    this.minHeight = 264,
   });
 
   final String title;
   final String subtitle;
   final Widget child;
+  final double minHeight;
 
   @override
   Widget build(BuildContext context) {
     return AppSurfaceCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 264),
+        constraints: BoxConstraints(minHeight: minHeight),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1912,7 +1976,7 @@ class _ControlRoomCardShell extends StatelessWidget {
                   ),
             ),
             const SizedBox(height: AppSpacing.md),
-            Expanded(child: child),
+            child,
           ],
         ),
       ),
