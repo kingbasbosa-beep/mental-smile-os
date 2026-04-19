@@ -57,6 +57,11 @@ class Routes {
   static const adminAiPolicies = '/admin/ai-policies';
   static const adminDomainStatus = '/admin/system-domains';
   static const adminGrowthLayer = '/admin/growth-layer';
+  static const adminBlueprintHandoff = '/admin/blueprint-handoff';
+  static const adminComplianceCheckpoints = '/admin/compliance-checkpoints';
+  static const adminExposureRules = '/admin/exposure-rules';
+  static const adminActivationReadiness = '/admin/activation-readiness';
+  static const adminSystemActivationPack = '/admin/system-activation-pack';
   static const adminGatewayLayer = '/admin/gateways';
   static const adminCommunicationGateway = '/admin/gateways/communication';
   static const adminEngineeringGateway = '/admin/gateways/engineering';

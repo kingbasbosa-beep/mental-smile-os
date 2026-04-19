@@ -38,14 +38,19 @@ import 'package:flutterprojects/features/centers/presentation/pages/center_detai
 import 'package:flutterprojects/features/admin_surface/pages/admin_centers_page.dart';
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_hub_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_blueprint_handoff_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_ai_policy_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_compliance_checkpoints_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_domain_status_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_exposure_rules_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_gateway_layer_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_growth_layer_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_communication_gateway_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_engineering_gateway_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_device_storage_gateway_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_activation_readiness_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_system_activation_pack_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_operations_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_communications_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_archive_page.dart';
@@ -94,6 +99,11 @@ class AppRouter {
     Routes.adminAiPolicies,
     Routes.adminDomainStatus,
     Routes.adminGrowthLayer,
+    Routes.adminBlueprintHandoff,
+    Routes.adminComplianceCheckpoints,
+    Routes.adminExposureRules,
+    Routes.adminActivationReadiness,
+    Routes.adminSystemActivationPack,
     Routes.adminGatewayLayer,
     Routes.adminCommunicationGateway,
     Routes.adminEngineeringGateway,
@@ -275,6 +285,36 @@ class AppRouter {
       case Routes.adminGrowthLayer:
         return _adminProtectedRoute(
           child: const AdminGrowthLayerPage(),
+          settings: settings,
+        );
+
+      case Routes.adminBlueprintHandoff:
+        return _adminProtectedRoute(
+          child: const AdminBlueprintHandoffPage(),
+          settings: settings,
+        );
+
+      case Routes.adminComplianceCheckpoints:
+        return _adminProtectedRoute(
+          child: const AdminComplianceCheckpointsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminExposureRules:
+        return _adminProtectedRoute(
+          child: const AdminExposureRulesPage(),
+          settings: settings,
+        );
+
+      case Routes.adminActivationReadiness:
+        return _adminProtectedRoute(
+          child: const AdminActivationReadinessPage(),
+          settings: settings,
+        );
+
+      case Routes.adminSystemActivationPack:
+        return _adminProtectedRoute(
+          child: const AdminSystemActivationPackPage(),
           settings: settings,
         );
 
