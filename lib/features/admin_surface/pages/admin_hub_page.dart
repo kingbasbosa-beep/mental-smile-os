@@ -445,6 +445,8 @@ class _AdminSectionLaunchpad extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           Text(
             'Launch the right admin section without turning the home page into a workbench.',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppColors.obsidian.withValues(alpha: 0.70),
                 ),
@@ -483,6 +485,7 @@ class _AdminSectionLaunchCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppRadii.xl),
       onTap: () => Navigator.of(context).pushNamed(item.route),
       child: Container(
+        constraints: const BoxConstraints(minHeight: 240),
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: item.color,
@@ -509,6 +512,8 @@ class _AdminSectionLaunchCard extends StatelessWidget {
                       ),
                       child: Text(
                         'Open section',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w800,
@@ -536,6 +541,8 @@ class _AdminSectionLaunchCard extends StatelessWidget {
             const Spacer(),
             Text(
               item.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 24,
@@ -546,6 +553,8 @@ class _AdminSectionLaunchCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             Text(
               item.subtitle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 15,
@@ -609,11 +618,15 @@ class _SystemAdvisoryCard extends StatelessWidget {
         final color = _severityColor(summary.highestSeverity);
 
         return AppSurfaceCard(
-          child: Row(
-            children: [
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 108),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               Container(
                 width: 12,
                 height: 12,
+                margin: const EdgeInsets.only(top: 6),
                 decoration: BoxDecoration(
                   color: color,
                   shape: BoxShape.circle,
@@ -626,6 +639,8 @@ class _SystemAdvisoryCard extends StatelessWidget {
                   children: [
                     Text(
                       'System Advisory',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w800,
                           ),
@@ -633,11 +648,15 @@ class _SystemAdvisoryCard extends StatelessWidget {
                     const SizedBox(height: AppSpacing.xs),
                     Text(
                       '${summary.affectedCount} domains require attention (highest: ${summary.highestSeverity})',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
                       'This is an informational advisory. No actions are blocked.',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: AppColors.obsidian.withValues(alpha: 0.72),
                           ),
@@ -653,6 +672,7 @@ class _SystemAdvisoryCard extends StatelessWidget {
                 child: const Text('View details'),
               ),
             ],
+            ),
           ),
         );
       },
@@ -1013,6 +1033,8 @@ class _GatewaySummaryStrip extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           Text(
             'Shell-level supervision for channels, tools, devices, and storage boundaries.',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppColors.obsidian.withValues(alpha: 0.70),
                 ),
@@ -1068,6 +1090,7 @@ class _GatewaySummaryPill extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppRadii.pill),
       onTap: () => Navigator.of(context).pushNamed(item.route),
       child: Container(
+        constraints: const BoxConstraints(minHeight: 44),
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.sm,
@@ -1084,6 +1107,8 @@ class _GatewaySummaryPill extends StatelessWidget {
             const SizedBox(width: AppSpacing.xs),
             Text(
               item.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: color,
                 fontWeight: FontWeight.w700,
@@ -1157,6 +1182,7 @@ class _GatewaySignalChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = gatewayHealthColor(level);
     return Container(
+      constraints: const BoxConstraints(minWidth: 180, maxWidth: 240),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.10),
@@ -1169,6 +1195,8 @@ class _GatewaySignalChip extends StatelessWidget {
         children: [
           Text(
             label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -1178,6 +1206,8 @@ class _GatewaySignalChip extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           Text(
             'Boundary signal: $alertType',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.obsidian.withValues(alpha: 0.72),
                 ),
@@ -1859,25 +1889,32 @@ class _ControlRoomCardShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppSurfaceCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            subtitle,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.68),
-                ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          child,
-        ],
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 264),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              subtitle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.obsidian.withValues(alpha: 0.68),
+                  ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Expanded(child: child),
+          ],
+        ),
       ),
     );
   }
@@ -1896,6 +1933,8 @@ class _ControlRoomEmptyState extends StatelessWidget {
       alignment: AlignmentDirectional.topStart,
       child: Text(
         message,
+        maxLines: 3,
+        overflow: TextOverflow.ellipsis,
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: AppColors.obsidian.withValues(alpha: 0.68),
               fontWeight: FontWeight.w500,
@@ -1916,7 +1955,7 @@ class _ControlRoomBodyFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 80),
+      constraints: const BoxConstraints(minHeight: 144),
       child: Align(
         alignment: AlignmentDirectional.topStart,
         child: child,
@@ -2056,6 +2095,7 @@ class _QuickStatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 220,
+      height: 112,
       child: AppSectionPanel(
         color: item.color.withValues(alpha: 0.10),
         borderColor: item.color.withValues(alpha: 0.22),
@@ -2104,6 +2144,8 @@ class _QuickStatCard extends StatelessWidget {
                         isArabic ? Alignment.topRight : Alignment.topLeft,
                     child: Text(
                       statusText,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       textAlign: isArabic ? TextAlign.right : TextAlign.left,
                       style: TextStyle(
                         color: item.color,
