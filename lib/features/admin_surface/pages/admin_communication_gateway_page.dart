@@ -25,24 +25,31 @@ class _AdminCommunicationGatewayPageState
     };
   }
 
-  Future<void> _showWebsiteChatBoundary(BuildContext context) {
+  Future<void> _showBoundaryDialog(
+    BuildContext context, {
+    required String title,
+    required String boundaryType,
+    required String separationNote,
+  }) {
     return showDialog<void>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Website Chat Boundary'),
+          title: Text(title),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text(
-                'This boundary is reserved for website-origin intake and routing awareness.',
+                boundaryType,
               ),
-              SizedBox(height: AppSpacing.sm),
-              Text('Current status: Planned / supervised / not integrated yet.'),
-              SizedBox(height: AppSpacing.sm),
+              const SizedBox(height: AppSpacing.sm),
+              const Text(
+                'Current status: Planned / supervised / not integrated yet.',
+              ),
+              const SizedBox(height: AppSpacing.sm),
               Text(
-                'It is separate from direct human support handling, which remains in the Communications workspace.',
+                separationNote,
               ),
             ],
           ),
@@ -54,43 +61,162 @@ class _AdminCommunicationGatewayPageState
           ],
         );
       },
+    );
+  }
+
+  Future<void> _showWebsiteChatBoundary(BuildContext context) {
+    return _showBoundaryDialog(
+      context,
+      title: 'Website Chat Boundary',
+      boundaryType:
+          'This boundary is reserved for website-origin intake and routing awareness.',
+      separationNote:
+          'It is separate from direct human support handling, which remains in the Communications workspace.',
     );
   }
 
   Future<void> _showWhatsAppBoundary(BuildContext context) {
-    return showDialog<void>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('WhatsApp Boundary'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                'This boundary is reserved for messaging-channel intake and routing awareness.',
-              ),
-              SizedBox(height: AppSpacing.sm),
-              Text('Current status: Planned / supervised / not integrated yet.'),
-              SizedBox(height: AppSpacing.sm),
-              Text(
-                'It remains separate from direct human support handling and does not replace the Communications workspace or escalations.',
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
+    return _showBoundaryDialog(
+      context,
+      title: 'WhatsApp Boundary',
+      boundaryType:
+          'This boundary is reserved for messaging-channel intake and routing awareness.',
+      separationNote:
+          'It remains separate from direct human support handling and does not replace the Communications workspace or escalations.',
     );
+  }
+
+  Future<void> _showTelegramBoundary(BuildContext context) {
+    return _showBoundaryDialog(
+      context,
+      title: 'Telegram Boundary',
+      boundaryType:
+          'This boundary is reserved for Telegram messaging-channel intake and routing awareness.',
+      separationNote:
+          'It remains separate from direct human support handling and does not replace the Communications workspace or escalations.',
+    );
+  }
+
+  Future<void> _showFacebookMessengerBoundary(BuildContext context) {
+    return _showBoundaryDialog(
+      context,
+      title: 'Facebook / Messenger Boundary',
+      boundaryType:
+          'This boundary is reserved for Facebook or Messenger intake and routing awareness.',
+      separationNote:
+          'It remains separate from direct human support handling and does not replace the Communications workspace or escalations.',
+    );
+  }
+
+  Future<void> _showZoomMeetBoundary(BuildContext context) {
+    return _showBoundaryDialog(
+      context,
+      title: 'Zoom / Google Meet Coordination Boundary',
+      boundaryType:
+          'This boundary is reserved for meeting-link coordination and external channel routing awareness.',
+      separationNote:
+          'It remains separate from direct human support handling, Communications workspace case handling, and Operations-owned session scheduling.',
+    );
+  }
+
+  Widget _buildGatewayGroup(
+    BuildContext context, {
+    required String title,
+    required List<GatewayEntry> entries,
+  }) {
+    return AppSurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          ...entries.map(
+            (entry) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+              child: _buildGatewayEntryCard(context, entry),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGatewayEntryCard(BuildContext context, GatewayEntry entry) {
+    if (entry.id == 'support_email') {
+      return InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.xl),
+        onTap: () => CommunicationGatewayActions.openSupportEmail(
+          context,
+          intent: _selectedIntent,
+        ),
+        child: GatewayEntryCard(entry: entry),
+      );
+    }
+
+    if (entry.id == 'website_chat') {
+      return InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.xl),
+        onTap: () => _showWebsiteChatBoundary(context),
+        child: GatewayEntryCard(entry: entry),
+      );
+    }
+
+    if (entry.id == 'whatsapp') {
+      return InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.xl),
+        onTap: () => _showWhatsAppBoundary(context),
+        child: GatewayEntryCard(entry: entry),
+      );
+    }
+
+    if (entry.id == 'telegram') {
+      return InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.xl),
+        onTap: () => _showTelegramBoundary(context),
+        child: GatewayEntryCard(entry: entry),
+      );
+    }
+
+    if (entry.id == 'facebook_messenger') {
+      return InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.xl),
+        onTap: () => _showFacebookMessengerBoundary(context),
+        child: GatewayEntryCard(entry: entry),
+      );
+    }
+
+    if (entry.id == 'zoom_meet') {
+      return InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.xl),
+        onTap: () => _showZoomMeetBoundary(context),
+        child: GatewayEntryCard(entry: entry),
+      );
+    }
+
+    return GatewayEntryCard(entry: entry);
   }
 
   @override
   Widget build(BuildContext context) {
+    final intakeEntries = communicationGatewayEntries
+        .where((entry) => entry.id == 'website_chat' || entry.id == 'support_email')
+        .toList();
+    final messagingEntries = communicationGatewayEntries
+        .where((entry) =>
+            entry.id == 'whatsapp' ||
+            entry.id == 'telegram' ||
+            entry.id == 'facebook_messenger')
+        .toList();
+    final coordinationEntries = communicationGatewayEntries
+        .where((entry) =>
+            entry.id == 'zoom_meet' || entry.id == 'external_intake')
+        .toList();
+
     return Scaffold(
       backgroundColor: AppColors.warmIvory,
       appBar: AppShellActions.buildAppBar(
@@ -152,35 +278,22 @@ class _AdminCommunicationGatewayPageState
               ),
             ),
             const SizedBox(height: AppSpacing.md),
-            ...communicationGatewayEntries.map(
-              (entry) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                child: entry.id == 'support_email'
-                    ? InkWell(
-                        borderRadius: BorderRadius.circular(AppRadii.xl),
-                        onTap: () =>
-                            CommunicationGatewayActions.openSupportEmail(
-                          context,
-                          intent: _selectedIntent,
-                        ),
-                        child: GatewayEntryCard(entry: entry),
-                      )
-                    : entry.id == 'website_chat'
-                        ? InkWell(
-                            borderRadius: BorderRadius.circular(AppRadii.xl),
-                            onTap: () => _showWebsiteChatBoundary(context),
-                            child: GatewayEntryCard(entry: entry),
-                          )
-                        : entry.id == 'whatsapp'
-                            ? InkWell(
-                                borderRadius: BorderRadius.circular(
-                                  AppRadii.xl,
-                                ),
-                                onTap: () => _showWhatsAppBoundary(context),
-                                child: GatewayEntryCard(entry: entry),
-                              )
-                    : GatewayEntryCard(entry: entry),
-              ),
+            _buildGatewayGroup(
+              context,
+              title: 'Intake Channels',
+              entries: intakeEntries,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            _buildGatewayGroup(
+              context,
+              title: 'Messaging Channels',
+              entries: messagingEntries,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            _buildGatewayGroup(
+              context,
+              title: 'Meeting / Coordination',
+              entries: coordinationEntries,
             ),
           ],
         ),
