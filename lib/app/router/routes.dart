@@ -47,6 +47,8 @@ class Routes {
   static const myBookings = '/booking/my';
 
   static const adminHub = '/admin/hub';
+  static const adminOperations = '/admin/operations';
+  static const adminCommunications = '/admin/communications';
   static const adminClients = '/admin/clients';
   static const adminClinicianRequests = '/admin/clinician-requests';
   static const adminClinicianProfileRequests =

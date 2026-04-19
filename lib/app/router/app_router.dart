@@ -45,6 +45,8 @@ import 'package:flutterprojects/features/admin_surface/pages/admin_gateway_layer
 import 'package:flutterprojects/features/admin_surface/pages/admin_communication_gateway_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_engineering_gateway_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_device_storage_gateway_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_operations_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_communications_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_archive_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_alerts_review_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_centers_page.dart';
@@ -80,6 +82,8 @@ const String _roleClient = 'client';
 class AppRouter {
   static const Set<String> _adminOnlyRoutes = {
     Routes.adminHub,
+    Routes.adminOperations,
+    Routes.adminCommunications,
     Routes.adminClinicianRequests,
     Routes.adminClinicianProfileRequests,
     Routes.adminClients,
@@ -221,6 +225,18 @@ class AppRouter {
       case Routes.adminClinicianRequests:
         return _adminProtectedRoute(
           child: const AdminClinicianRequestsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminOperations:
+        return _adminProtectedRoute(
+          child: const AdminOperationsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminCommunications:
+        return _adminProtectedRoute(
+          child: const AdminCommunicationsPage(),
           settings: settings,
         );
 

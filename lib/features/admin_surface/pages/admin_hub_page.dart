@@ -285,7 +285,7 @@ class AdminHubPage extends StatelessWidget {
             : 'Requests, payments, and sessions',
         icon: Icons.assignment_outlined,
         color: const Color(0xFF7C6EF6),
-        route: _adminBookingQueueRoute,
+        route: Routes.adminOperations,
       ),
       _AdminSectionLaunchCardData(
         title: isArabic ? 'الاتصالات' : 'Communications',
@@ -294,7 +294,7 @@ class AdminHubPage extends StatelessWidget {
             : 'Support, conversations, and escalations',
         icon: Icons.support_agent_outlined,
         color: const Color(0xFFE58667),
-        route: Routes.adminSupportChats,
+        route: Routes.adminCommunications,
       ),
       _AdminSectionLaunchCardData(
         title: isArabic ? 'الدليل والاعتمادات' : 'Directory & Approvals',
