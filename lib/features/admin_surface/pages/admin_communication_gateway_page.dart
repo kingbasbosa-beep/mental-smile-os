@@ -5,8 +5,25 @@ import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widg
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
-class AdminCommunicationGatewayPage extends StatelessWidget {
+class AdminCommunicationGatewayPage extends StatefulWidget {
   const AdminCommunicationGatewayPage({super.key});
+
+  @override
+  State<AdminCommunicationGatewayPage> createState() =>
+      _AdminCommunicationGatewayPageState();
+}
+
+class _AdminCommunicationGatewayPageState
+    extends State<AdminCommunicationGatewayPage> {
+  SupportEmailIntent _selectedIntent = SupportEmailIntent.generalSupport;
+
+  String _intentLabel(SupportEmailIntent intent) {
+    return switch (intent) {
+      SupportEmailIntent.generalSupport => 'General Support',
+      SupportEmailIntent.technicalIssue => 'Technical Issue',
+      SupportEmailIntent.accountHelp => 'Account Help',
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +61,29 @@ class AdminCommunicationGatewayPage extends StatelessWidget {
                           color: AppColors.obsidian.withValues(alpha: 0.70),
                         ),
                   ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    'Support Email intent',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Wrap(
+                    spacing: AppSpacing.sm,
+                    runSpacing: AppSpacing.sm,
+                    children: SupportEmailIntent.values.map((intent) {
+                      return ChoiceChip(
+                        label: Text(_intentLabel(intent)),
+                        selected: _selectedIntent == intent,
+                        onSelected: (_) {
+                          setState(() {
+                            _selectedIntent = intent;
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
                 ],
               ),
             ),
@@ -54,8 +94,10 @@ class AdminCommunicationGatewayPage extends StatelessWidget {
                 child: entry.id == 'support_email'
                     ? InkWell(
                         borderRadius: BorderRadius.circular(AppRadii.xl),
-                        onTap: () => CommunicationGatewayActions.openSupportEmail(
+                        onTap: () =>
+                            CommunicationGatewayActions.openSupportEmail(
                           context,
+                          intent: _selectedIntent,
                         ),
                         child: GatewayEntryCard(entry: entry),
                       )
