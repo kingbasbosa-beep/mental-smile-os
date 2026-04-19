@@ -40,7 +40,6 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
   }
 
   String _tab = 'pending_admin';
-  final Map<String, String> _selectedClinicianByRequest = {};
   final Set<String> _busyIds = {};
   late final Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>>
       _bookingDocsStreamRef;
@@ -307,6 +306,18 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     );
   }
 
+  String _debugValue(dynamic value) {
+    if (value is FieldValue) return 'FieldValue';
+    if (value is Timestamp) return value.toDate().toIso8601String();
+    return value?.toString() ?? 'null';
+  }
+
+  Map<String, String> _debugMap(Map<String, dynamic> value) {
+    return {
+      for (final entry in value.entries) entry.key: _debugValue(entry.value),
+    };
+  }
+
   DateTime _docMoment(
     QueryDocumentSnapshot<Map<String, dynamic>> doc,
     String key,
@@ -365,6 +376,14 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       db.collection('booking_requests').doc(requestId),
     ];
 
+    debugPrint(
+      'CENTER_FLOW_ASSIGN_TRACE '
+      'requestId=$requestId '
+      'targets=${refs.map((ref) => ref.path).join(",")} '
+      'legacyMirrorAttempted=false '
+      'finalUpdate=${_debugMap(nowUpdates)}',
+    );
+
     for (final ref in refs) {
       try {
         _logFirestore(
@@ -378,6 +397,28 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         final snap = await ref.get();
         if (snap.exists) {
           final data = snap.data() ?? <String, dynamic>{};
+          debugPrint(
+            'CENTER_FLOW_ASSIGN_RESOURCE_TRACE '
+            'requestId=$requestId '
+            'path=${ref.path} '
+            'resourceSnapshot=${_debugMap({
+              'requestKind': data['requestKind'],
+              'status': data['status'],
+              'workflowStage': data['workflowStage'],
+              'clientId': data['clientId'],
+              'clientName': data['clientName'],
+              'createdAt': data['createdAt'],
+              'note': data['note'],
+              'clinicianId': data['clinicianId'],
+              'clinicianName': data['clinicianName'],
+              'clinicianUid': data['clinicianUid'],
+              'assignedClinicianId': data['assignedClinicianId'],
+              'assignedClinicianName': data['assignedClinicianName'],
+              'adminForwarded': data['adminForwarded'],
+              'adminAssignedBy': data['adminAssignedBy'],
+              'adminAssignedAt': data['adminAssignedAt'],
+            })}',
+          );
           _logFirestore(
             page: 'admin_booking_queue',
             role: 'admin',
@@ -1350,29 +1391,108 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
 
   Future<void> _assignToClinician({
     required String requestId,
-    required String clinicianId,
-    required String clinicianName,
   }) async {
     final isArabic = _isArabic(context);
+    final adminUid = FirebaseAuth.instance.currentUser?.uid ?? '';
     await _setBusy(requestId, true);
     try {
+      if (adminUid.isEmpty) {
+        _logFirestore(
+          page: 'admin_booking_queue',
+          role: 'admin',
+          operation: 'assign_skip_missing_admin_uid',
+          collection: 'booking_requests',
+          documentId: requestId,
+          requestKind: 'clinician',
+          status: 'pending_admin',
+          writeStatus: 'assigned_clinician',
+          error: 'current_admin_uid_empty',
+        );
+        throw Exception('Admin authentication context is unavailable');
+      }
+
+      final snap = await _readPrimaryBookingRequest(requestId);
+      if (!snap.exists) {
+        throw Exception('Booking request not found');
+      }
+      final resourceSnapshot = snap.data() ?? const <String, dynamic>{};
+      final currentStatus = (resourceSnapshot['status'] ?? '').toString().trim();
+      final currentWorkflowStage =
+          (resourceSnapshot['workflowStage'] ?? '').toString().trim();
+      final clinicianId = resourceSnapshot['clinicianId'];
+      final clinicianName = resourceSnapshot['clinicianName'];
+      final clinicianUid = resourceSnapshot['clinicianUid'];
+
+      debugPrint(
+        'CENTER_FLOW_ASSIGN_START '
+        'requestId=$requestId '
+        'adminUid=$adminUid '
+        'clinicianId=$clinicianId '
+        'clinicianName=$clinicianName '
+        'clinicianUid=$clinicianUid',
+      );
+
+      final alreadyAssigned = currentStatus == 'assigned_clinician' ||
+          currentWorkflowStage == 'assigned_clinician';
+
+      if (alreadyAssigned) {
+        _logFirestore(
+          page: 'admin_booking_queue',
+          role: 'admin',
+          operation: 'assign_skip_already_assigned',
+          collection: 'booking_requests',
+          documentId: requestId,
+          requestKind: (resourceSnapshot['requestKind'] ?? '').toString(),
+          status: currentStatus,
+          writeStatus: 'assigned_clinician',
+          error: 'request_already_in_assigned_clinician_state',
+        );
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isArabic
+                  ? 'الطلب مُحوّل بالفعل إلى أخصائي ولا يمكن إعادة التحويل الآن'
+                  : 'This request is already assigned to a clinician and cannot be reassigned right now.',
+            ),
+          ),
+        );
+        return;
+      }
+
+      if (clinicianId is! String ||
+          clinicianName is! String ||
+          clinicianUid is! String ||
+          clinicianId.isEmpty ||
+          clinicianName.isEmpty ||
+          clinicianUid.isEmpty) {
+        _logFirestore(
+          page: 'admin_booking_queue',
+          role: 'admin',
+          operation: 'assign_skip_missing_requested_clinician',
+          collection: 'booking_requests',
+          documentId: requestId,
+          requestKind: (resourceSnapshot['requestKind'] ?? '').toString(),
+          status: currentStatus,
+          writeStatus: 'assigned_clinician',
+          error: 'requested_clinician_target_missing',
+        );
+        throw Exception('Requested clinician target is missing');
+      }
+
       await _updateRequestEverywhere(requestId, {
         'status': 'assigned_clinician',
         'workflowStage': 'assigned_clinician',
         'adminApproved': true,
         'adminRejected': false,
         'adminForwarded': true,
-        // Canonical ownership field.
+        // Actual approved assignment after admin forward.
         'assignedClinicianId': clinicianId,
         'assignedClinicianName': clinicianName,
-        'clinicianId': clinicianId,
-        'clinicianName': clinicianName,
-        // Legacy compatibility field.
-        'clinicianUid': clinicianId,
-        'adminAssignedBy': FirebaseAuth.instance.currentUser?.uid ?? '',
+        'adminAssignedBy': adminUid,
         'adminAssignedAt': FieldValue.serverTimestamp(),
         'adminDecisionType': 'assigned',
-        'adminDecisionBy': FirebaseAuth.instance.currentUser?.uid ?? '',
+        'adminDecisionBy': adminUid,
         'adminDecisionAt': FieldValue.serverTimestamp(),
         'paymentStatus': 'not_started',
         'sessionStatus': 'not_created',
@@ -1622,13 +1742,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final canApproveCenter = isCenterRequest &&
         (status == 'center_recommendation_pending' ||
             (status == 'pending_admin' && clientUpdatedAfterCenterFeedback));
-
-    final selectedClinicianId = _selectedClinicianByRequest[requestId];
-    final selectedClinician =
-        clinicians.cast<Map<String, String>?>().firstWhere(
-              (item) => item?['id'] == selectedClinicianId,
-              orElse: () => null,
-            );
+    final requestedClinicianId = _safeText(data, 'clinicianId');
+    final requestedClinicianName = _safeText(data, 'clinicianName');
     final canReviewPayment = (status == 'payment_review' ||
         paymentStatus == 'submitted_by_client' ||
         (status == 'awaiting_payment' && paymentReceiptFileName.isNotEmpty));
@@ -1961,41 +2076,6 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
               value: accountingReviewNotes,
             ),
               const SizedBox(height: 12),
-              if (canAssignClinician) ...[
-                AppSectionPanel(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  color: const Color(0xFFF8F5FC),
-                  child: DropdownButtonFormField<String>(
-                    initialValue: selectedClinicianId,
-                    isExpanded: true,
-                    decoration: appInputDecoration(
-                      context: context,
-                      label: isArabic
-                          ? 'اختر الأخصائي للتحويل'
-                          : 'Select clinician to assign',
-                      icon: Icons.person_search_outlined,
-                    ),
-                    items: clinicians.map((item) {
-                      return DropdownMenuItem<String>(
-                        value: item['id']!,
-                        child: Text(item['name']!),
-                      );
-                    }).toList(),
-                    onChanged: busy
-                        ? null
-                        : (value) {
-                            setState(() {
-                              if (value == null) {
-                                _selectedClinicianByRequest.remove(requestId);
-                              } else {
-                                _selectedClinicianByRequest[requestId] = value;
-                              }
-                            });
-                          },
-                  ),
-                ),
-                const SizedBox(height: 14),
-              ],
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
@@ -2023,16 +2103,16 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                   ),
                 if (canAssignClinician)
                   FilledButton.tonalIcon(
-                    onPressed: busy || selectedClinician == null
+                    onPressed: busy ||
+                            requestedClinicianId.isEmpty ||
+                            requestedClinicianName.isEmpty
                         ? null
                         : () => _assignToClinician(
                               requestId: requestId,
-                              clinicianId: selectedClinician['id']!,
-                              clinicianName: selectedClinician['name']!,
                             ),
                     icon: const Icon(Icons.forward_to_inbox_outlined),
                     label: Text(
-                      isArabic ? 'تحويل لأخصائي' : 'Assign to clinician',
+                      isArabic ? 'اعتماد وتحويل للأخصائي' : 'Approve and forward',
                     ),
                   ),
                 if (canApproveCenter)

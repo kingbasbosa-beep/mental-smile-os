@@ -282,9 +282,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
         'clientId': uid,
         'clientName': clientName,
         'clientEmail': clientEmail,
-        // Canonical ownership field.
-        'assignedClinicianId': widget.args.clinicianId,
-        'assignedClinicianName': widget.args.clinicianName,
+        // Requested clinician target before admin approval.
         'clinicianId': widget.args.clinicianId,
         'clinicianName': widget.args.clinicianName,
         // Legacy compatibility field.
@@ -301,10 +299,6 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
       };
 
       await requestRef.set(requestData);
-      await firestore
-          .collection('bookingRequests')
-          .doc(requestRef.id)
-          .set(requestData);
 
       final threadId = await _createOrUpdateAdminThread(
         clientId: uid,
@@ -317,10 +311,6 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
       );
 
       await requestRef.update({
-        'threadId': threadId,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-      await firestore.collection('bookingRequests').doc(requestRef.id).update({
         'threadId': threadId,
         'updatedAt': FieldValue.serverTimestamp(),
       });

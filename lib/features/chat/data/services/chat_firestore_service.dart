@@ -237,19 +237,33 @@ class ChatFirestoreService {
         .where('assignedToType', isEqualTo: 'clinician')
         .where('assignedToUid', isEqualTo: clinicianUid)
         .orderBy('createdAt', descending: true)
-        .snapshots()
-        .asyncMap((snapshot) async {
-      final items = <ChatEscalationModel>[];
-      final matchedThreads = <ChatThreadModel>[];
+      .snapshots()
+      .asyncMap((snapshot) async {
+        final items = <ChatEscalationModel>[];
+        final matchedThreads = <ChatThreadModel>[];
 
-      for (final doc in snapshot.docs) {
-        final escalation = ChatEscalationModel.fromFirestore(doc);
-        final thread = await getThread(escalation.threadId);
-        if (thread == null) continue;
-        if (_matchesClinicianInboxThread(thread)) {
-          matchedThreads.add(thread);
-          items.add(escalation);
-        }
+        for (final doc in snapshot.docs) {
+          final escalation = ChatEscalationModel.fromFirestore(doc);
+          ChatThreadModel? thread;
+          try {
+            thread = await getThread(escalation.threadId);
+          } catch (e) {
+            if (kDebugMode) {
+              debugPrint(
+                'CHAT_CLINICIAN_THREAD_READ_SKIP '
+                'clinicianUid=$clinicianUid '
+                'escalationId=${escalation.id} '
+                'threadId=${escalation.threadId} '
+                'error=$e',
+              );
+            }
+            continue;
+          }
+          if (thread == null) continue;
+          if (_matchesClinicianInboxThread(thread)) {
+            matchedThreads.add(thread);
+            items.add(escalation);
+          }
       }
 
       _debugMeasureLegacyClinicianFallbackThreads(

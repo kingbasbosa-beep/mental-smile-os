@@ -344,6 +344,49 @@ service cloud.firestore {
         && request.resource.data.adminAssignedBy == uid();
     }
 
+    function adminClinicianForwardValid() {
+      return isAdmin()
+        && (resource.data.requestKind is string)
+        && resource.data.requestKind == 'clinician'
+        && resource.data.status == 'pending_admin'
+        && request.resource.data.status == 'assigned_clinician'
+        && request.resource.data.workflowStage == 'assigned_clinician'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'adminApproved',
+              'adminRejected',
+              'adminForwarded',
+              'assignedClinicianId',
+              'assignedClinicianName',
+              'adminAssignedBy',
+              'adminAssignedAt',
+              'adminDecisionType',
+              'adminDecisionBy',
+              'adminDecisionAt',
+              'paymentStatus',
+              'sessionStatus',
+              'reviewStatus',
+              'payoutStatus',
+              'updatedAt'
+            ])
+        && request.resource.data.clinicianId == resource.data.clinicianId
+        && request.resource.data.clinicianName == resource.data.clinicianName
+        && request.resource.data.clinicianUid == resource.data.clinicianUid
+        && request.resource.data.assignedClinicianId == resource.data.clinicianId
+        && request.resource.data.adminApproved == true
+        && request.resource.data.adminRejected == false
+        && request.resource.data.adminForwarded == true
+        && request.resource.data.adminDecisionType == 'assigned'
+        && request.resource.data.adminAssignedBy == request.auth.uid
+        && request.resource.data.adminDecisionBy == request.auth.uid
+        && request.resource.data.paymentStatus == 'not_started'
+        && request.resource.data.sessionStatus == 'not_created'
+        && request.resource.data.reviewStatus == 'not_started'
+        && request.resource.data.payoutStatus == 'blocked';
+    }
+
     function adminRejectValid() {
       return isAdmin()
         && request.resource.data.status == 'rejected_admin'
@@ -1956,14 +1999,15 @@ service cloud.firestore {
         || adminArchiveBridgeValid()
         || clientUpdateValid()
         || clientInitialIntakeValid()
-        || centerRecommendationValid()
-        || clientCenterResubmitValid()
-        || clientCenterCheckInValid()
-        || clientPaymentProofUpdateValid()
-        || adminForwardValid()
-        || adminRejectValid()
-        || adminReturnToPendingValid()
-        || adminPaymentUpdateValid()
+          || centerRecommendationValid()
+          || clientCenterResubmitValid()
+          || clientCenterCheckInValid()
+          || clientPaymentProofUpdateValid()
+          || adminClinicianForwardValid()
+          || adminForwardValid()
+          || adminRejectValid()
+          || adminReturnToPendingValid()
+          || adminPaymentUpdateValid()
         || adminSessionUpdateValid()
         || adminPayoutAndArchiveValid()
         || (

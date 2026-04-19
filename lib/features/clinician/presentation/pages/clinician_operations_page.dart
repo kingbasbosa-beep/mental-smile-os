@@ -1032,7 +1032,27 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
       builder: (context, snapshot) {
         final scheme = Theme.of(context).colorScheme;
 
-        if (!snapshot.hasData) {
+        if (snapshot.hasError) {
+          return Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: scheme.outline.withValues(alpha: 0.12),
+              ),
+            ),
+            child: Text(
+              isArabic
+                  ? 'تعذر تحميل التقييمات الآن'
+                  : 'Unable to load ratings right now',
+              textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            ),
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting &&
+            !snapshot.hasData) {
           return Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
@@ -1048,7 +1068,26 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           );
         }
 
-        final docs = snapshot.data!.docs;
+        final docs = snapshot.data?.docs ?? const [];
+        if (docs.isEmpty) {
+          return Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: scheme.outline.withValues(alpha: 0.12),
+              ),
+            ),
+            child: Text(
+              isArabic
+                  ? 'لا توجد تقييمات ظاهرة حتى الآن'
+                  : 'No ratings are visible yet',
+              textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            ),
+          );
+        }
+
         final count = docs.length;
 
         double totalStars = 0;
