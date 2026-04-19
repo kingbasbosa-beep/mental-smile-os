@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_entry.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_health_level.dart';
+import 'gateway_status.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 
 Color gatewayHealthColor(GatewayHealthLevel level) {
