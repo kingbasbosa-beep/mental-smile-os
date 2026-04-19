@@ -57,6 +57,38 @@ class _AdminCommunicationGatewayPageState
     );
   }
 
+  Future<void> _showWhatsAppBoundary(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('WhatsApp Boundary'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text(
+                'This boundary is reserved for messaging-channel intake and routing awareness.',
+              ),
+              SizedBox(height: AppSpacing.sm),
+              Text('Current status: Planned / supervised / not integrated yet.'),
+              SizedBox(height: AppSpacing.sm),
+              Text(
+                'It remains separate from direct human support handling and does not replace the Communications workspace or escalations.',
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,6 +171,14 @@ class _AdminCommunicationGatewayPageState
                             onTap: () => _showWebsiteChatBoundary(context),
                             child: GatewayEntryCard(entry: entry),
                           )
+                        : entry.id == 'whatsapp'
+                            ? InkWell(
+                                borderRadius: BorderRadius.circular(
+                                  AppRadii.xl,
+                                ),
+                                onTap: () => _showWhatsAppBoundary(context),
+                                child: GatewayEntryCard(entry: entry),
+                              )
                     : GatewayEntryCard(entry: entry),
               ),
             ),
