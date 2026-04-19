@@ -1129,9 +1129,9 @@ class _GatewaySignalsCard extends StatelessWidget {
               }).toList(),
             ),
             const SizedBox(height: AppSpacing.md),
-            Text(
-              'Gateway health reflects shell readiness and isolation boundaries, without triggering external integrations.',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          Text(
+            'Gateway health reflects shell readiness and isolation boundaries, without triggering external integrations.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppColors.obsidian.withValues(alpha: 0.72),
                   ),
             ),
@@ -1177,7 +1177,7 @@ class _GatewaySignalChip extends StatelessWidget {
           GatewayHealthBadge(level: level),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'Alert type: $alertType',
+            'Boundary signal: $alertType',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.obsidian.withValues(alpha: 0.72),
                 ),
