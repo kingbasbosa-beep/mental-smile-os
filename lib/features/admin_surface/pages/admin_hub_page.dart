@@ -347,6 +347,15 @@ class _AdminHubPageState extends State<AdminHubPage> {
         route: Routes.adminDomainStatus,
       ),
       _AdminSectionLaunchCardData(
+        title: isArabic ? 'النمو والانتشار' : 'Growth & Awareness',
+        subtitle: isArabic
+            ? 'التوعية، التوزيع، وخطط الظهور المدروسة'
+            : 'Awareness, distribution, and supervised exposure planning',
+        icon: Icons.campaign_outlined,
+        color: const Color(0xFFB86E52),
+        route: Routes.adminGrowthLayer,
+      ),
+      _AdminSectionLaunchCardData(
         title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
         subtitle: isArabic
             ? 'قنوات وتكاملات وأجهزة وصيانة'

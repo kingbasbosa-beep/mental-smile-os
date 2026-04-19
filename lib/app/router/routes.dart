@@ -56,6 +56,7 @@ class Routes {
   static const adminSupportChats = '/admin/support-chats';
   static const adminAiPolicies = '/admin/ai-policies';
   static const adminDomainStatus = '/admin/system-domains';
+  static const adminGrowthLayer = '/admin/growth-layer';
   static const adminGatewayLayer = '/admin/gateways';
   static const adminCommunicationGateway = '/admin/gateways/communication';
   static const adminEngineeringGateway = '/admin/gateways/engineering';

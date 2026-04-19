@@ -42,6 +42,7 @@ import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.
 import 'package:flutterprojects/features/admin_surface/pages/admin_ai_policy_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_domain_status_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_gateway_layer_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_growth_layer_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_communication_gateway_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_engineering_gateway_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_device_storage_gateway_page.dart';
@@ -92,6 +93,7 @@ class AppRouter {
     Routes.adminSupportChats,
     Routes.adminAiPolicies,
     Routes.adminDomainStatus,
+    Routes.adminGrowthLayer,
     Routes.adminGatewayLayer,
     Routes.adminCommunicationGateway,
     Routes.adminEngineeringGateway,
@@ -267,6 +269,12 @@ class AppRouter {
       case Routes.adminDomainStatus:
         return _adminProtectedRoute(
           child: const AdminDomainStatusPage(),
+          settings: settings,
+        );
+
+      case Routes.adminGrowthLayer:
+        return _adminProtectedRoute(
+          child: const AdminGrowthLayerPage(),
           settings: settings,
         );
 
