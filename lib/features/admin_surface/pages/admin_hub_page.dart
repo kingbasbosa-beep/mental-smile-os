@@ -6,6 +6,10 @@ import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/system/domain_registry.dart';
 import 'package:flutterprojects/core/system/domain_status.dart';
 import 'package:flutterprojects/core/system/domain_status_service.dart';
+import 'package:flutterprojects/features/gateway_layer/core/gateway_monitor.dart';
+import 'package:flutterprojects/features/gateway_layer/shared/gateway_health_level.dart';
+import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
+import 'package:flutterprojects/features/gateway_layer/shared/gateway_status.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
@@ -16,6 +20,7 @@ class AdminHubPage extends StatelessWidget {
   static const String _adminBookingQueueRoute = '/admin/booking-queue';
   static const String _adminAlertsReviewRoute = '/admin/alerts-review';
   static const DomainStatusService _domainStatusService = DomainStatusService();
+  static const GatewayMonitor _gatewayMonitor = GatewayMonitor();
 
   Stream<_SystemAdvisorySummary> _systemAdvisoryStream() {
     return Stream<_SystemAdvisorySummary>.multi((controller) {
@@ -198,183 +203,134 @@ class AdminHubPage extends StatelessWidget {
                   status == 'session_completed_pending_reviews';
             }).length);
 
-    final supportChatsStream = FirebaseFirestore.instance
-        .collection('chat_threads')
-        .snapshots()
-        .map((snapshot) => snapshot.docs.where((doc) {
-              final data = doc.data();
-              return (data['needsHumanSupport'] ?? false) == true;
-            }).length);
-
     final escalationsOpenStream = _openEscalationsStream();
+    final gatewayStatuses = _gatewayMonitor.familyStatuses();
 
-    final archivedItemsStream = FirebaseFirestore.instance
-        .collection('booking_requests')
-        .snapshots()
-        .map((snapshot) => snapshot.docs.where((doc) {
-              final data = doc.data();
-              return (data['archived'] ?? false) == true;
-            }).length);
+    final pendingApprovalsStream = Stream<int>.multi((controller) {
+      int clinicianPending = 0;
+      int profilePending = 0;
+      int centersPending = 0;
 
-    final clientsCountStream = FirebaseFirestore.instance
-        .collection('clients')
-        .snapshots()
-        .map((snapshot) => snapshot.docs.length);
+      void emit() {
+        controller.add(clinicianPending + profilePending + centersPending);
+      }
 
-    final quickActions = <_AdminQuickAction>[
-      _AdminQuickAction(
-        label: 'Admin Messages',
-        icon: Icons.support_agent_outlined,
-        route: Routes.adminSupportChats,
-        color: const Color(0xFFE58667),
+      final clinicianSub = clinicianPendingStream.listen(
+        (value) {
+          clinicianPending = value;
+          emit();
+        },
+        onError: controller.addError,
+      );
+      final profileSub = clinicianProfileRequestsStream.listen(
+        (value) {
+          profilePending = value;
+          emit();
+        },
+        onError: controller.addError,
+      );
+      final centersSub = centersPendingStream.listen(
+        (value) {
+          centersPending = value;
+          emit();
+        },
+        onError: controller.addError,
+      );
+
+      controller.onCancel = () async {
+        await clinicianSub.cancel();
+        await profileSub.cancel();
+        await centersSub.cancel();
+      };
+    });
+
+    final compactCounters = <_QuickStatItem>[
+      _QuickStatItem(
+        title: isArabic ? 'طلبات التشغيل المفتوحة' : 'Open workflow',
+        color: const Color(0xFF7C6EF6),
+        stream: bookingOpenStream,
       ),
-      _AdminQuickAction(
-        label: 'AI Policies',
-        icon: Icons.psychology_alt_outlined,
-        route: Routes.adminAiPolicies,
-        color: const Color(0xFF4F7BFF),
+      _QuickStatItem(
+        title: isArabic ? 'السداد تحت المراجعة' : 'Payment review',
+        color: const Color(0xFF9A7A6E),
+        stream: paymentsReviewStream,
       ),
-      _AdminQuickAction(
-        label: 'System Domains',
-        icon: Icons.hub_outlined,
-        route: Routes.adminDomainStatus,
-        color: const Color(0xFF3E8B7B),
+      _QuickStatItem(
+        title: isArabic ? 'جلسات تحتاج إجراء' : 'Sessions need action',
+        color: AppColors.info,
+        stream: sessionsActionStream,
       ),
-      _AdminQuickAction(
-        label: 'Clients',
-        icon: Icons.people_alt_outlined,
-        route: Routes.adminClients,
-        color: const Color(0xFF5D8CFF),
+      _QuickStatItem(
+        title: isArabic ? 'تصعيدات غير مغلقة' : 'Open escalations',
+        color: const Color(0xFF6C55B3),
+        stream: escalationsOpenStream,
       ),
-      _AdminQuickAction(
-        label: 'Clinician Requests',
-        icon: Icons.verified_user_outlined,
-        route: Routes.adminClinicianRequests,
+      _QuickStatItem(
+        title: isArabic ? 'اعتمادات معلقة' : 'Pending approvals',
         color: const Color(0xFFE2A067),
+        stream: pendingApprovalsStream,
       ),
-      _AdminQuickAction(
-        label: 'Profile/Data Requests',
-        icon: Icons.manage_accounts_outlined,
-        route: Routes.adminClinicianProfileRequests,
-        color: AppColors.accentLavender,
-      ),
-      _AdminQuickAction(
-        label: 'Archive',
-        icon: Icons.archive_outlined,
-        route: Routes.adminArchive,
+      _QuickStatItem(
+        title: isArabic ? 'بوابات/أجهزة degraded' : 'Gateway/device degraded',
         color: const Color(0xFF4D7C6A),
+        stream: Stream<int>.value(_gatewayMonitor.attentionCount()),
       ),
     ];
 
-    final items = <_AdminHubItem>[
-      _AdminHubItem(
-        title: isArabic ? 'تسجيل الأخصائيين' : 'Clinician Registrations',
+    final sectionCards = <_AdminSectionLaunchCardData>[
+      _AdminSectionLaunchCardData(
+        title: isArabic ? 'العمليات' : 'Operations',
         subtitle: isArabic
-            ? 'مراجعة الحسابات الجديدة والموافقة عليها'
-            : 'Review new clinician accounts',
-        icon: Icons.verified_user_outlined,
-        route: Routes.adminClinicianRequests,
-        color: const Color(0xFFE2A067),
-        countLabel: isArabic ? 'بانتظار المراجعة' : 'Pending review',
-        countStream: clinicianPendingStream,
-      ),
-      _AdminHubItem(
-        title: isArabic ? 'طلبات تعديل البيانات' : 'Profile/data requests',
-        subtitle: isArabic
-            ? 'مراجعة طلبات تعديل بيانات الأخصائيين والمراكز'
-            : 'Review clinician and center data change requests',
-        icon: Icons.manage_accounts_outlined,
-        route: Routes.adminClinicianProfileRequests,
-        color: AppColors.accentLavender,
-        countLabel: isArabic ? 'طلبات تعديل معلقة' : 'Pending profile changes',
-        countStream: clinicianProfileRequestsStream,
-      ),
-      _AdminHubItem(
-        title: isArabic ? 'إدارة المراكز' : 'Centers Management',
-        subtitle: isArabic
-            ? 'إضافة وتعديل وتفعيل المراكز'
-            : 'Add, edit and activate centers',
-        icon: Icons.apartment_outlined,
-        route: Routes.adminCenters,
-        color: const Color(0xFF37B8B0),
-        countLabel: isArabic ? 'مراكز تنتظر الإدارة' : 'Pending centers',
-        countStream: centersPendingStream,
-      ),
-      _AdminHubItem(
-        title: isArabic ? 'إدارة العملاء' : 'Clients Management',
-        subtitle: isArabic
-            ? 'البحث في حسابات العملاء وحظرها أو إلغاء حظرها'
-            : 'Search, block, and unblock client accounts',
-        icon: Icons.people_alt_outlined,
-        route: Routes.adminClients,
-        color: const Color(0xFF5D8CFF),
-        countLabel: isArabic ? 'إجمالي العملاء' : 'Total clients',
-        countStream: clientsCountStream,
-      ),
-      _AdminHubItem(
-        title: isArabic ? 'طلبات الحجز' : 'Booking Requests',
-        subtitle: isArabic
-            ? 'مراجعة واعتماد وتحويل الطلبات'
-            : 'Review and route booking requests',
+            ? 'الحجوزات والمدفوعات والجلسات'
+            : 'Requests, payments, and sessions',
         icon: Icons.assignment_outlined,
-        route: '/admin/booking-queue',
         color: const Color(0xFF7C6EF6),
-        countLabel: isArabic ? 'طلبات تشغيل مفتوحة' : 'Open workflow requests',
-        countStream: bookingOpenStream,
+        route: _adminBookingQueueRoute,
       ),
-      _AdminHubItem(
-        title: isArabic ? 'المدفوعات والتحويلات' : 'Payments & Transfers',
+      _AdminSectionLaunchCardData(
+        title: isArabic ? 'الاتصالات' : 'Communications',
         subtitle: isArabic
-            ? 'متابعة الدفع والتحويلات المالية'
-            : 'Track payments and transfers',
-        icon: Icons.account_balance_wallet_outlined,
-        route: Routes.adminPayments,
-        color: const Color(0xFF9A7A6E),
-        countLabel: isArabic ? 'تحتاج مراجعة سداد' : 'Awaiting payment review',
-        countStream: paymentsReviewStream,
-      ),
-      _AdminHubItem(
-        title: isArabic ? 'الجلسات والروابط' : 'Sessions & Links',
-        subtitle: isArabic
-            ? 'Zoom / Meet / أكواد الجلسات'
-            : 'Zoom / Meet / session links',
-        icon: Icons.video_call_outlined,
-        route: Routes.adminSessions,
-        color: AppColors.info,
-        countLabel: isArabic ? 'جلسات تحتاج إجراء' : 'Sessions need action',
-        countStream: sessionsActionStream,
-      ),
-      _AdminHubItem(
-        title: isArabic ? 'الرسائل والدعم' : 'Messages & Support',
-        subtitle: isArabic
-            ? 'تواصل مع العملاء والأخصائيين'
-            : 'Client and clinician conversations',
+            ? 'الدعم والمحادثات والتصعيدات'
+            : 'Support, conversations, and escalations',
         icon: Icons.support_agent_outlined,
-        route: Routes.adminSupportChats,
         color: const Color(0xFFE58667),
-        countLabel: isArabic ? 'محادثات تحتاج تدخل' : 'Chats need admin',
-        countStream: supportChatsStream,
+        route: Routes.adminSupportChats,
       ),
-      _AdminHubItem(
-        title: isArabic ? 'تصعيدات الشات' : 'Chat Escalations',
-        subtitle:
-            isArabic ? 'الحالات المصعدة من الشات' : 'Escalated chat cases',
-        icon: Icons.warning_amber_rounded,
-        route: Routes.chatEscalations,
-        color: const Color(0xFF6C55B3),
-        countLabel: isArabic ? 'تصعيدات غير مغلقة' : 'Open escalations',
-        countStream: escalationsOpenStream,
+      _AdminSectionLaunchCardData(
+        title: isArabic ? 'الدليل والاعتمادات' : 'Directory & Approvals',
+        subtitle: isArabic
+            ? 'العملاء والمراكز والاعتمادات'
+            : 'Clients, centers, and approval surfaces',
+        icon: Icons.apartment_outlined,
+        color: const Color(0xFF37B8B0),
+        route: Routes.adminClinicianRequests,
       ),
-      _AdminHubItem(
+      _AdminSectionLaunchCardData(
+        title: isArabic ? 'الحوكمة' : 'Governance',
+        subtitle: isArabic
+            ? 'سياسات الذكاء وحالة النطاقات'
+            : 'Policies, domains, and governance visibility',
+        icon: Icons.policy_outlined,
+        color: const Color(0xFF4F7BFF),
+        route: Routes.adminDomainStatus,
+      ),
+      _AdminSectionLaunchCardData(
+        title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
+        subtitle: isArabic
+            ? 'قنوات وتكاملات وأجهزة وصيانة'
+            : 'Channels, tools, devices, and maintenance',
+        icon: Icons.hub_outlined,
+        color: const Color(0xFF3E8B7B),
+        route: Routes.adminGatewayLayer,
+      ),
+      _AdminSectionLaunchCardData(
         title: isArabic ? 'الأرشيف' : 'Archive',
         subtitle: isArabic
-            ? 'هيكل أرشفة منظم لكل أقسام المشروع'
-            : 'Organized archive structure for all project sections',
+            ? 'مرجع تاريخي وتقارير مؤرشفة'
+            : 'Historical lookup and archived reporting',
         icon: Icons.archive_outlined,
-        route: Routes.adminArchive,
         color: const Color(0xFF4D7C6A),
-        countLabel: isArabic ? 'عناصر مؤرشفة' : 'Archived items',
-        countStream: archivedItemsStream,
+        route: Routes.adminArchive,
       ),
     ];
 
@@ -409,62 +365,195 @@ class AdminHubPage extends StatelessWidget {
                     child: AppLogoWordmark(width: 220, height: 128),
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  _AdminQuickActionsSection(
-                    actions: quickActions,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
                   _SystemAdvisoryCard(
                     advisoryStream: _systemAdvisoryStream(),
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  _AdminQuickStatsSection(
+                  _AdminHomeCountersSection(
                     isArabic: isArabic,
-                    clinicianPendingStream: clinicianPendingStream,
-                    clinicianProfileRequestsStream:
-                        clinicianProfileRequestsStream,
-                    bookingOpenStream: bookingOpenStream,
-                    paymentsReviewStream: paymentsReviewStream,
-                    supportChatsStream: supportChatsStream,
-                    escalationsOpenStream: escalationsOpenStream,
-                    sessionsActionStream: sessionsActionStream,
-                    archivedItemsStream: archivedItemsStream,
-                    centersPendingStream: centersPendingStream,
+                    cards: compactCounters,
                   ),
+                  const SizedBox(height: AppSpacing.md),
+                  _GatewaySummaryStrip(statuses: gatewayStatuses),
                   const SizedBox(height: AppSpacing.lg),
                   const _ControlRoomIntro(),
                   const SizedBox(height: AppSpacing.md),
-                  const _ControlRoomTileGrid(
+                  _ControlRoomTileGrid(
                     children: [
-                      _AdminSystemHealthCard(),
-                      _PendingActionsCard(),
-                      _ActiveConversationsCard(),
-                      _OperationalAlertsCard(),
-                      _CriticalAlertsCard(),
+                      const _AdminSystemHealthCard(),
+                      const _OperationalAlertsCard(),
+                      const _CriticalAlertsCard(),
+                      _GatewaySignalsCard(
+                        statuses: gatewayStatuses,
+                        gatewayMonitor: _gatewayMonitor,
+                      ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: items.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      crossAxisSpacing: AppSpacing.md,
-                      mainAxisSpacing: AppSpacing.md,
-                      childAspectRatio: childAspectRatio,
-                    ),
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      return _AdminHubCard(
-                        item: item,
-                        isArabic: isArabic,
-                      );
-                    },
+                  _AdminSectionLaunchpad(
+                    cards: sectionCards,
+                    crossAxisCount: crossAxisCount,
+                    childAspectRatio: childAspectRatio,
                   ),
                 ],
               );
             },
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AdminSectionLaunchCardData {
+  const _AdminSectionLaunchCardData({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    required this.route,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final String route;
+}
+
+class _AdminSectionLaunchpad extends StatelessWidget {
+  const _AdminSectionLaunchpad({
+    required this.cards,
+    required this.crossAxisCount,
+    required this.childAspectRatio,
+  });
+
+  final List<_AdminSectionLaunchCardData> cards;
+  final int crossAxisCount;
+  final double childAspectRatio;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Admin Sections',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Launch the right admin section without turning the home page into a workbench.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.obsidian.withValues(alpha: 0.70),
+                ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: cards.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: AppSpacing.md,
+              mainAxisSpacing: AppSpacing.md,
+              childAspectRatio: childAspectRatio,
+            ),
+            itemBuilder: (context, index) {
+              return _AdminSectionLaunchCard(item: cards[index]);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AdminSectionLaunchCard extends StatelessWidget {
+  const _AdminSectionLaunchCard({
+    required this.item,
+  });
+
+  final _AdminSectionLaunchCardData item;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(AppRadii.xl),
+      onTap: () => Navigator.of(context).pushNamed(item.route),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        decoration: BoxDecoration(
+          color: item.color,
+          borderRadius: BorderRadius.circular(AppRadii.xl),
+          boxShadow: AppShadows.card,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: 9,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.20),
+                        borderRadius: BorderRadius.circular(AppRadii.pill),
+                      ),
+                      child: Text(
+                        'Open section',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.18),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    item.icon,
+                    color: Colors.white,
+                    size: 32,
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            Text(
+              item.title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                height: 1.08,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              item.subtitle,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                height: 1.2,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -837,96 +926,32 @@ class _AdminHubCard extends StatelessWidget {
   }
 }
 
-class _AdminQuickStatsSection extends StatelessWidget {
-  const _AdminQuickStatsSection({
+class _AdminHomeCountersSection extends StatelessWidget {
+  const _AdminHomeCountersSection({
     required this.isArabic,
-    required this.clinicianPendingStream,
-    required this.clinicianProfileRequestsStream,
-    required this.bookingOpenStream,
-    required this.paymentsReviewStream,
-    required this.supportChatsStream,
-    required this.escalationsOpenStream,
-    required this.sessionsActionStream,
-    required this.archivedItemsStream,
-    required this.centersPendingStream,
+    required this.cards,
   });
 
   final bool isArabic;
-  final Stream<int> clinicianPendingStream;
-  final Stream<int> clinicianProfileRequestsStream;
-  final Stream<int> bookingOpenStream;
-  final Stream<int> paymentsReviewStream;
-  final Stream<int> supportChatsStream;
-  final Stream<int> escalationsOpenStream;
-  final Stream<int> sessionsActionStream;
-  final Stream<int> archivedItemsStream;
-  final Stream<int> centersPendingStream;
+  final List<_QuickStatItem> cards;
 
   @override
   Widget build(BuildContext context) {
-    final cards = <_QuickStatItem>[
-      _QuickStatItem(
-        title: isArabic ? 'طلبات التشغيل المفتوحة' : 'Open workflow',
-        color: const Color(0xFF7C6EF6),
-        stream: bookingOpenStream,
-      ),
-      _QuickStatItem(
-        title: isArabic ? 'السداد تحت المراجعة' : 'Payment review',
-        color: const Color(0xFF9A7A6E),
-        stream: paymentsReviewStream,
-      ),
-      _QuickStatItem(
-        title: isArabic ? 'جلسات تحتاج إجراء' : 'Sessions need action',
-        color: AppColors.info,
-        stream: sessionsActionStream,
-      ),
-      _QuickStatItem(
-        title: isArabic ? 'رسائل تحتاج تدخل' : 'Support waiting',
-        color: const Color(0xFFE58667),
-        stream: supportChatsStream,
-      ),
-      _QuickStatItem(
-        title: isArabic ? 'تصعيدات غير مغلقة' : 'Open escalations',
-        color: const Color(0xFF6C55B3),
-        stream: escalationsOpenStream,
-      ),
-      _QuickStatItem(
-        title: isArabic ? 'أخصائيون بانتظار المراجعة' : 'Clinicians pending',
-        color: const Color(0xFFE2A067),
-        stream: clinicianPendingStream,
-      ),
-      _QuickStatItem(
-        title: isArabic ? 'طلبات تعديل البيانات' : 'Profile/data requests',
-        color: AppColors.accentLavender,
-        stream: clinicianProfileRequestsStream,
-      ),
-      _QuickStatItem(
-        title: isArabic ? 'مراكز بانتظار الإدارة' : 'Centers pending',
-        color: const Color(0xFF37B8B0),
-        stream: centersPendingStream,
-      ),
-      _QuickStatItem(
-        title: isArabic ? 'عناصر مؤرشفة' : 'Archived items',
-        color: const Color(0xFF4D7C6A),
-        stream: archivedItemsStream,
-      ),
-    ];
-
     return AppSurfaceCard(
       child: Column(
         crossAxisAlignment:
             isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
-            isArabic ? 'إحصاءات سريعة' : 'Quick stats',
+            isArabic ? 'عدادات تشغيلية مدمجة' : 'Compact operating counters',
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             isArabic
-                ? 'ملخص سريع للحالات المفتوحة داخل غرفة عمليات الإدارة.'
-                : 'A quick summary of open operational admin queues.',
+                ? 'أرقام سريعة للمتابعة فقط، بدون تحويل الصفحة الرئيسية إلى لوحة تشغيل مزدحمة.'
+                : 'Fast supervisory counts only, without turning the home page into a crowded workbench.',
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
           ),
           const SizedBox(height: AppSpacing.md),
@@ -943,6 +968,219 @@ class _AdminQuickStatsSection extends StatelessWidget {
                 );
               }).toList(),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GatewaySummaryStrip extends StatelessWidget {
+  const _GatewaySummaryStrip({
+    required this.statuses,
+  });
+
+  final List<GatewayStatus> statuses;
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      _GatewaySummaryItem(
+        title: 'Communication Gateway',
+        status: _statusFor('communication'),
+        route: Routes.adminCommunicationGateway,
+      ),
+      _GatewaySummaryItem(
+        title: 'Engineering Gateway',
+        status: _statusFor('engineering'),
+        route: Routes.adminEngineeringGateway,
+      ),
+      _GatewaySummaryItem(
+        title: 'Device / Storage Gateway',
+        status: _statusFor('device_storage'),
+        route: Routes.adminDeviceStorageGateway,
+      ),
+    ];
+
+    return AppSurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Gateway Layer',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Shell-level supervision for channels, tools, devices, and storage boundaries.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.obsidian.withValues(alpha: 0.70),
+                ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children:
+                items.map((item) => _GatewaySummaryPill(item: item)).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  GatewayStatus _statusFor(String key) {
+    return statuses.firstWhere(
+      (status) => status.key == key,
+      orElse: () => const GatewayStatus(
+        key: 'unknown',
+        label: 'Unknown Gateway',
+        level: GatewayHealthLevel.planned,
+        summary: 'Gateway shell is defined.',
+      ),
+    );
+  }
+}
+
+class _GatewaySummaryItem {
+  const _GatewaySummaryItem({
+    required this.title,
+    required this.status,
+    required this.route,
+  });
+
+  final String title;
+  final GatewayStatus status;
+  final String route;
+}
+
+class _GatewaySummaryPill extends StatelessWidget {
+  const _GatewaySummaryPill({
+    required this.item,
+  });
+
+  final _GatewaySummaryItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = gatewayHealthColor(item.status.level);
+    return InkWell(
+      borderRadius: BorderRadius.circular(AppRadii.pill),
+      onTap: () => Navigator.of(context).pushNamed(item.route),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(AppRadii.pill),
+          border: Border.all(color: color.withValues(alpha: 0.24)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.hub_outlined, color: color, size: 18),
+            const SizedBox(width: AppSpacing.xs),
+            Text(
+              item.title,
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.xs),
+            GatewayHealthBadge(level: item.status.level),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GatewaySignalsCard extends StatelessWidget {
+  const _GatewaySignalsCard({
+    required this.statuses,
+    required this.gatewayMonitor,
+  });
+
+  final List<GatewayStatus> statuses;
+  final GatewayMonitor gatewayMonitor;
+
+  @override
+  Widget build(BuildContext context) {
+    return _ControlRoomCardShell(
+      title: 'Gateway Signals',
+      subtitle: 'Gateway-layer supervision by family',
+      child: _ControlRoomBodyFrame(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Wrap(
+              spacing: AppSpacing.md,
+              runSpacing: AppSpacing.md,
+              children: statuses.map((status) {
+                return _GatewaySignalChip(
+                  label: status.label ?? status.key ?? 'Gateway',
+                  alertType:
+                      gatewayMonitor.alertTypeFor(status.key ?? 'unknown'),
+                  level: status.level,
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              'Gateway health reflects shell readiness and isolation boundaries, without triggering external integrations.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.obsidian.withValues(alpha: 0.72),
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GatewaySignalChip extends StatelessWidget {
+  const _GatewaySignalChip({
+    required this.label,
+    required this.alertType,
+    required this.level,
+  });
+
+  final String label;
+  final String alertType;
+  final GatewayHealthLevel level;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = gatewayHealthColor(level);
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        border: Border.all(color: color.withValues(alpha: 0.24)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          GatewayHealthBadge(level: level),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Alert type: $alertType',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.obsidian.withValues(alpha: 0.72),
+                ),
           ),
         ],
       ),
@@ -1046,7 +1284,9 @@ class _AdminSystemHealthCard extends StatelessWidget {
             return _buildSystemHealthFallback("جارٍ التحديث...");
           }
 
-          if (!snapshot.hasData || snapshot.data == null || !snapshot.data!.exists) {
+          if (!snapshot.hasData ||
+              snapshot.data == null ||
+              !snapshot.data!.exists) {
             return _buildSystemHealthFallback("Awaiting QA snapshot");
           }
 
@@ -1080,12 +1320,15 @@ class _PendingActionsCard extends StatelessWidget {
     final bookingRequests =
         FirebaseFirestore.instance.collection('booking_requests');
     final centers = FirebaseFirestore.instance.collection('centers');
-    final clientUpdatesStream =
-        bookingRequests.where('status', isEqualTo: 'client_update_required').snapshots();
-    final centerFollowUpStream =
-        bookingRequests.where('status', isEqualTo: 'center_follow_up').snapshots();
-    final payoutPendingStream =
-        bookingRequests.where('status', isEqualTo: 'payout_pending').snapshots();
+    final clientUpdatesStream = bookingRequests
+        .where('status', isEqualTo: 'client_update_required')
+        .snapshots();
+    final centerFollowUpStream = bookingRequests
+        .where('status', isEqualTo: 'center_follow_up')
+        .snapshots();
+    final payoutPendingStream = bookingRequests
+        .where('status', isEqualTo: 'payout_pending')
+        .snapshots();
     final centersPendingStream =
         centers.where('approvalStatus', isEqualTo: 'pending_admin').snapshots();
 
@@ -1094,108 +1337,109 @@ class _PendingActionsCard extends StatelessWidget {
       subtitle: 'Requests needing attention',
       child: _ControlRoomBodyFrame(
         child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: clientUpdatesStream,
-        builder: (context, clientSnapshot) {
-          return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: centerFollowUpStream,
-            builder: (context, followUpSnapshot) {
-              return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: payoutPendingStream,
-                builder: (context, payoutSnapshot) {
-                  return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                    stream: centersPendingStream,
-                    builder: (context, centersSnapshot) {
-                      final waiting = clientSnapshot.connectionState ==
-                              ConnectionState.waiting ||
-                          followUpSnapshot.connectionState ==
-                              ConnectionState.waiting ||
-                          payoutSnapshot.connectionState ==
-                              ConnectionState.waiting ||
-                          centersSnapshot.connectionState ==
-                              ConnectionState.waiting ||
-                          !clientSnapshot.hasData ||
-                          !followUpSnapshot.hasData ||
-                          !payoutSnapshot.hasData ||
-                          !centersSnapshot.hasData;
+          stream: clientUpdatesStream,
+          builder: (context, clientSnapshot) {
+            return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: centerFollowUpStream,
+              builder: (context, followUpSnapshot) {
+                return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: payoutPendingStream,
+                  builder: (context, payoutSnapshot) {
+                    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                      stream: centersPendingStream,
+                      builder: (context, centersSnapshot) {
+                        final waiting = clientSnapshot.connectionState ==
+                                ConnectionState.waiting ||
+                            followUpSnapshot.connectionState ==
+                                ConnectionState.waiting ||
+                            payoutSnapshot.connectionState ==
+                                ConnectionState.waiting ||
+                            centersSnapshot.connectionState ==
+                                ConnectionState.waiting ||
+                            !clientSnapshot.hasData ||
+                            !followUpSnapshot.hasData ||
+                            !payoutSnapshot.hasData ||
+                            !centersSnapshot.hasData;
 
-                      final clientCount =
-                          clientSnapshot.data?.docs.length ?? 0;
-                      final followUpCount =
-                          followUpSnapshot.data?.docs.length ?? 0;
-                      final payoutCount =
-                          payoutSnapshot.data?.docs.length ?? 0;
-                      final centersCount =
-                          centersSnapshot.data?.docs.length ?? 0;
-                      final totalCount = clientCount +
-                          followUpCount +
-                          payoutCount +
-                          centersCount;
+                        final clientCount =
+                            clientSnapshot.data?.docs.length ?? 0;
+                        final followUpCount =
+                            followUpSnapshot.data?.docs.length ?? 0;
+                        final payoutCount =
+                            payoutSnapshot.data?.docs.length ?? 0;
+                        final centersCount =
+                            centersSnapshot.data?.docs.length ?? 0;
+                        final totalCount = clientCount +
+                            followUpCount +
+                            payoutCount +
+                            centersCount;
 
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (waiting)
-                            Wrap(
-                              spacing: AppSpacing.md,
-                              runSpacing: AppSpacing.md,
-                              children: const [
-                                _StaticInfoChip(label: 'Client Updates: —'),
-                                _StaticInfoChip(label: 'Center Follow-up: —'),
-                                _StaticInfoChip(label: 'Payout Pending: —'),
-                                _StaticInfoChip(
-                                    label: 'Centers Pending Admin: —'),
-                              ],
-                            )
-                          else if (totalCount == 0)
-                            const _ControlRoomEmptyState(
-                              message: 'No pending actions',
-                            )
-                          else
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Wrap(
-                                  spacing: AppSpacing.md,
-                                  runSpacing: AppSpacing.md,
-                                  children: [
-                                    _StaticInfoChip(
-                                      label: 'Client Updates: $clientCount',
-                                    ),
-                                    _StaticInfoChip(
-                                      label: 'Center Follow-up: $followUpCount',
-                                    ),
-                                    _StaticInfoChip(
-                                      label: 'Payout Pending: $payoutCount',
-                                    ),
-                                    _StaticInfoChip(
-                                      label:
-                                          'Centers Pending Admin: $centersCount',
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (waiting)
+                              Wrap(
+                                spacing: AppSpacing.md,
+                                runSpacing: AppSpacing.md,
+                                children: const [
+                                  _StaticInfoChip(label: 'Client Updates: —'),
+                                  _StaticInfoChip(label: 'Center Follow-up: —'),
+                                  _StaticInfoChip(label: 'Payout Pending: —'),
+                                  _StaticInfoChip(
+                                      label: 'Centers Pending Admin: —'),
+                                ],
+                              )
+                            else if (totalCount == 0)
+                              const _ControlRoomEmptyState(
+                                message: 'No pending actions',
+                              )
+                            else
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Wrap(
+                                    spacing: AppSpacing.md,
+                                    runSpacing: AppSpacing.md,
+                                    children: [
+                                      _StaticInfoChip(
+                                        label: 'Client Updates: $clientCount',
+                                      ),
+                                      _StaticInfoChip(
+                                        label:
+                                            'Center Follow-up: $followUpCount',
+                                      ),
+                                      _StaticInfoChip(
+                                        label: 'Payout Pending: $payoutCount',
+                                      ),
+                                      _StaticInfoChip(
+                                        label:
+                                            'Centers Pending Admin: $centersCount',
+                                      ),
+                                    ],
+                                  ),
+                                  if (totalCount > 0) ...[
+                                    const SizedBox(height: AppSpacing.sm),
+                                    _ControlRoomActionButton(
+                                      label: 'Open Requests Queue',
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          AdminHubPage._adminBookingQueueRoute,
+                                        );
+                                      },
                                     ),
                                   ],
-                                ),
-                                if (totalCount > 0) ...[
-                                  const SizedBox(height: AppSpacing.sm),
-                                  _ControlRoomActionButton(
-                                    label: 'Open Requests Queue',
-                                    onPressed: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        AdminHubPage._adminBookingQueueRoute,
-                                      );
-                                    },
-                                  ),
                                 ],
-                              ],
-                            ),
-                        ],
-                      );
-                    },
-                  );
-                },
-              );
-            },
-          );
-        },
+                              ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            );
+          },
         ),
       ),
     );
@@ -1212,79 +1456,81 @@ class _ActiveConversationsCard extends StatelessWidget {
       subtitle: 'Open human-support threads',
       child: _ControlRoomBodyFrame(
         child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance
-            .collection('chat_threads')
-            .where('needsHumanSupport', isEqualTo: true)
-            .snapshots(),
-        builder: (context, snapshot) {
-          final docs = snapshot.data?.docs ?? const [];
-          final humanSupportCount = docs.length;
-          final centerChatsCount = docs.where((doc) {
-            final ownerType = (doc.data()['ownerType'] ?? '').toString().toLowerCase();
-            return ownerType.contains('center');
-          }).length;
-          final clientChatsCount = docs.where((doc) {
-            final ownerType = (doc.data()['ownerType'] ?? '').toString().toLowerCase();
-            return !ownerType.contains('center');
-          }).length;
+          stream: FirebaseFirestore.instance
+              .collection('chat_threads')
+              .where('needsHumanSupport', isEqualTo: true)
+              .snapshots(),
+          builder: (context, snapshot) {
+            final docs = snapshot.data?.docs ?? const [];
+            final humanSupportCount = docs.length;
+            final centerChatsCount = docs.where((doc) {
+              final ownerType =
+                  (doc.data()['ownerType'] ?? '').toString().toLowerCase();
+              return ownerType.contains('center');
+            }).length;
+            final clientChatsCount = docs.where((doc) {
+              final ownerType =
+                  (doc.data()['ownerType'] ?? '').toString().toLowerCase();
+              return !ownerType.contains('center');
+            }).length;
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (snapshot.connectionState == ConnectionState.waiting)
-                Wrap(
-                  spacing: AppSpacing.md,
-                  runSpacing: AppSpacing.md,
-                  children: const [
-                    _StaticInfoChip(label: 'Human Support: —'),
-                    _StaticInfoChip(label: 'Center Chats: —'),
-                    _StaticInfoChip(label: 'Client Chats: —'),
-                  ],
-                )
-              else if (snapshot.connectionState == ConnectionState.active &&
-                  docs.isEmpty)
-                const _ControlRoomEmptyState(
-                  message: 'No active conversations',
-                )
-              else
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: AppSpacing.md,
-                      runSpacing: AppSpacing.md,
-                      children: [
-                        _ConversationCountChip(
-                          label: 'Human Support',
-                          count: '$humanSupportCount',
-                        ),
-                        _ConversationCountChip(
-                          label: 'Center Chats',
-                          count: '$centerChatsCount',
-                        ),
-                        _ConversationCountChip(
-                          label: 'Client Chats',
-                          count: '$clientChatsCount',
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (snapshot.connectionState == ConnectionState.waiting)
+                  Wrap(
+                    spacing: AppSpacing.md,
+                    runSpacing: AppSpacing.md,
+                    children: const [
+                      _StaticInfoChip(label: 'Human Support: —'),
+                      _StaticInfoChip(label: 'Center Chats: —'),
+                      _StaticInfoChip(label: 'Client Chats: —'),
+                    ],
+                  )
+                else if (snapshot.connectionState == ConnectionState.active &&
+                    docs.isEmpty)
+                  const _ControlRoomEmptyState(
+                    message: 'No active conversations',
+                  )
+                else
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        spacing: AppSpacing.md,
+                        runSpacing: AppSpacing.md,
+                        children: [
+                          _ConversationCountChip(
+                            label: 'Human Support',
+                            count: '$humanSupportCount',
+                          ),
+                          _ConversationCountChip(
+                            label: 'Center Chats',
+                            count: '$centerChatsCount',
+                          ),
+                          _ConversationCountChip(
+                            label: 'Client Chats',
+                            count: '$clientChatsCount',
+                          ),
+                        ],
+                      ),
+                      if (humanSupportCount > 0) ...[
+                        const SizedBox(height: AppSpacing.sm),
+                        _ControlRoomActionButton(
+                          label: 'Open Human Support Chats',
+                          onPressed: () {
+                            Navigator.pushNamed(
+                              context,
+                              Routes.adminSupportChats,
+                            );
+                          },
                         ),
                       ],
-                    ),
-                    if (humanSupportCount > 0) ...[
-                      const SizedBox(height: AppSpacing.sm),
-                      _ControlRoomActionButton(
-                        label: 'Open Human Support Chats',
-                        onPressed: () {
-                          Navigator.pushNamed(
-                            context,
-                            Routes.adminSupportChats,
-                          );
-                        },
-                      ),
                     ],
-                  ],
-                ),
-            ],
-          );
-        },
+                  ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -1321,95 +1567,96 @@ class _OperationalAlertsCard extends StatelessWidget {
       subtitle: 'Python-generated operational signals',
       child: _ControlRoomBodyFrame(
         child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance
-            .collection('system_alerts')
-            .doc('latest')
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Wrap(
-              spacing: AppSpacing.md,
-              runSpacing: AppSpacing.md,
-              children: const [
-                _StaticInfoChip(label: 'Center Follow-up: —'),
-                _StaticInfoChip(label: 'Client Update Required: —'),
-                _StaticInfoChip(label: 'Payout Pending: —'),
-              ],
-            );
-          }
-
-          if (!snapshot.hasData || snapshot.data == null || !snapshot.data!.exists) {
-            return const _ControlRoomEmptyState(
-              message: 'No alert snapshot available',
-            );
-          }
-
-          final data = snapshot.data!.data();
-          if (data == null) {
-            return const _ControlRoomEmptyState(
-              message: 'No alert snapshot available',
-            );
-          }
-
-          final status = (data['status'] ?? 'unknown').toString();
-          final summary = (data['summary'] ?? '').toString().trim();
-          final timestamp = _dateText(data['timestamp']);
-          final centerFollowUpCount =
-              (data['centerFollowUpCount'] ?? 0).toString();
-          final clientUpdateRequiredCount =
-              (data['clientUpdateRequiredCount'] ?? 0).toString();
-          final payoutPendingCount =
-              (data['payoutPendingCount'] ?? 0).toString();
-          final alertsCount =
-              (int.tryParse(centerFollowUpCount) ?? 0) +
-              (int.tryParse(clientUpdateRequiredCount) ?? 0) +
-              (int.tryParse(payoutPendingCount) ?? 0);
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AppStatusBadge(
-                label: 'Status: $status',
-                color: _statusColor(status),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Wrap(
+          stream: FirebaseFirestore.instance
+              .collection('system_alerts')
+              .doc('latest')
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Wrap(
                 spacing: AppSpacing.md,
                 runSpacing: AppSpacing.md,
-                children: [
-                  _StaticInfoChip(
-                    label: 'Center Follow-up: $centerFollowUpCount',
-                  ),
-                  _StaticInfoChip(
-                    label:
-                        'Client Update Required: $clientUpdateRequiredCount',
-                  ),
-                  _StaticInfoChip(
-                    label: 'Payout Pending: $payoutPendingCount',
+                children: const [
+                  _StaticInfoChip(label: 'Center Follow-up: —'),
+                  _StaticInfoChip(label: 'Client Update Required: —'),
+                  _StaticInfoChip(label: 'Payout Pending: —'),
+                ],
+              );
+            }
+
+            if (!snapshot.hasData ||
+                snapshot.data == null ||
+                !snapshot.data!.exists) {
+              return const _ControlRoomEmptyState(
+                message: 'No alert snapshot available',
+              );
+            }
+
+            final data = snapshot.data!.data();
+            if (data == null) {
+              return const _ControlRoomEmptyState(
+                message: 'No alert snapshot available',
+              );
+            }
+
+            final status = (data['status'] ?? 'unknown').toString();
+            final summary = (data['summary'] ?? '').toString().trim();
+            final timestamp = _dateText(data['timestamp']);
+            final centerFollowUpCount =
+                (data['centerFollowUpCount'] ?? 0).toString();
+            final clientUpdateRequiredCount =
+                (data['clientUpdateRequiredCount'] ?? 0).toString();
+            final payoutPendingCount =
+                (data['payoutPendingCount'] ?? 0).toString();
+            final alertsCount = (int.tryParse(centerFollowUpCount) ?? 0) +
+                (int.tryParse(clientUpdateRequiredCount) ?? 0) +
+                (int.tryParse(payoutPendingCount) ?? 0);
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppStatusBadge(
+                  label: 'Status: $status',
+                  color: _statusColor(status),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Wrap(
+                  spacing: AppSpacing.md,
+                  runSpacing: AppSpacing.md,
+                  children: [
+                    _StaticInfoChip(
+                      label: 'Center Follow-up: $centerFollowUpCount',
+                    ),
+                    _StaticInfoChip(
+                      label:
+                          'Client Update Required: $clientUpdateRequiredCount',
+                    ),
+                    _StaticInfoChip(
+                      label: 'Payout Pending: $payoutPendingCount',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text('Summary: $summary'),
+                if (timestamp.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  Text('Last Scan: $timestamp'),
+                ],
+                if (alertsCount > 0) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  _ControlRoomActionButton(
+                    label: 'Review Alerts',
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        AdminHubPage._adminAlertsReviewRoute,
+                      );
+                    },
                   ),
                 ],
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text('Summary: $summary'),
-              if (timestamp.isNotEmpty) ...[
-                const SizedBox(height: AppSpacing.sm),
-                Text('Last Scan: $timestamp'),
               ],
-              if (alertsCount > 0) ...[
-                const SizedBox(height: AppSpacing.sm),
-                _ControlRoomActionButton(
-                  label: 'Review Alerts',
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      AdminHubPage._adminAlertsReviewRoute,
-                    );
-                  },
-                ),
-              ],
-            ],
-          );
-        },
+            );
+          },
         ),
       ),
     );
@@ -1425,106 +1672,111 @@ class _CriticalAlertsCard extends StatelessWidget {
         FirebaseFirestore.instance.collection('booking_requests');
     final chatThreads = FirebaseFirestore.instance.collection('chat_threads');
 
-    final stuckFollowUpsStream =
-        bookingRequests.where('status', isEqualTo: 'center_follow_up').snapshots();
+    final stuckFollowUpsStream = bookingRequests
+        .where('status', isEqualTo: 'center_follow_up')
+        .snapshots();
     final unresolvedSupportChatsStream =
         chatThreads.where('needsHumanSupport', isEqualTo: true).snapshots();
-    final pendingPayoutsStream =
-        bookingRequests.where('status', isEqualTo: 'payout_pending').snapshots();
+    final pendingPayoutsStream = bookingRequests
+        .where('status', isEqualTo: 'payout_pending')
+        .snapshots();
 
     return _ControlRoomCardShell(
       title: 'Critical Alerts',
       subtitle: 'Operational warning signals',
       child: _ControlRoomBodyFrame(
         child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: stuckFollowUpsStream,
-        builder: (context, followUpsSnapshot) {
-          return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: unresolvedSupportChatsStream,
-            builder: (context, chatsSnapshot) {
-              return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: pendingPayoutsStream,
-                builder: (context, payoutsSnapshot) {
-                  final waiting =
-                      followUpsSnapshot.connectionState == ConnectionState.waiting ||
-                          chatsSnapshot.connectionState == ConnectionState.waiting ||
-                          payoutsSnapshot.connectionState == ConnectionState.waiting;
+          stream: stuckFollowUpsStream,
+          builder: (context, followUpsSnapshot) {
+            return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: unresolvedSupportChatsStream,
+              builder: (context, chatsSnapshot) {
+                return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: pendingPayoutsStream,
+                  builder: (context, payoutsSnapshot) {
+                    final waiting = followUpsSnapshot.connectionState ==
+                            ConnectionState.waiting ||
+                        chatsSnapshot.connectionState ==
+                            ConnectionState.waiting ||
+                        payoutsSnapshot.connectionState ==
+                            ConnectionState.waiting;
 
-                  final stuckFollowUpsCount =
-                      followUpsSnapshot.data?.docs.length ?? 0;
-                  final unresolvedSupportChatsCount =
-                      chatsSnapshot.data?.docs.length ?? 0;
-                  final pendingPayoutsCount =
-                      payoutsSnapshot.data?.docs.length ?? 0;
-                  final totalCount = stuckFollowUpsCount +
-                      unresolvedSupportChatsCount +
-                      pendingPayoutsCount;
+                    final stuckFollowUpsCount =
+                        followUpsSnapshot.data?.docs.length ?? 0;
+                    final unresolvedSupportChatsCount =
+                        chatsSnapshot.data?.docs.length ?? 0;
+                    final pendingPayoutsCount =
+                        payoutsSnapshot.data?.docs.length ?? 0;
+                    final totalCount = stuckFollowUpsCount +
+                        unresolvedSupportChatsCount +
+                        pendingPayoutsCount;
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (waiting)
-                        Wrap(
-                          spacing: AppSpacing.md,
-                          runSpacing: AppSpacing.md,
-                          children: const [
-                            _StaticInfoChip(label: 'Stuck Follow-ups: —'),
-                            _StaticInfoChip(label: 'Support Alerts: —'),
-                            _StaticInfoChip(label: 'Pending Payouts: —'),
-                          ],
-                        )
-                      else if (followUpsSnapshot.connectionState ==
-                              ConnectionState.active &&
-                          chatsSnapshot.connectionState ==
-                              ConnectionState.active &&
-                          payoutsSnapshot.connectionState ==
-                              ConnectionState.active &&
-                          totalCount == 0)
-                        const _ControlRoomEmptyState(
-                          message: 'No critical alerts',
-                        )
-                      else
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Wrap(
-                              spacing: AppSpacing.md,
-                              runSpacing: AppSpacing.md,
-                              children: [
-                                _StaticInfoChip(
-                                  label:
-                                      'Stuck Follow-ups: $stuckFollowUpsCount',
-                                ),
-                                _StaticInfoChip(
-                                  label:
-                                      'Support Alerts: $unresolvedSupportChatsCount',
-                                ),
-                                _StaticInfoChip(
-                                  label: 'Pending Payouts: $pendingPayoutsCount',
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (waiting)
+                          Wrap(
+                            spacing: AppSpacing.md,
+                            runSpacing: AppSpacing.md,
+                            children: const [
+                              _StaticInfoChip(label: 'Stuck Follow-ups: —'),
+                              _StaticInfoChip(label: 'Support Alerts: —'),
+                              _StaticInfoChip(label: 'Pending Payouts: —'),
+                            ],
+                          )
+                        else if (followUpsSnapshot.connectionState ==
+                                ConnectionState.active &&
+                            chatsSnapshot.connectionState ==
+                                ConnectionState.active &&
+                            payoutsSnapshot.connectionState ==
+                                ConnectionState.active &&
+                            totalCount == 0)
+                          const _ControlRoomEmptyState(
+                            message: 'No critical alerts',
+                          )
+                        else
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Wrap(
+                                spacing: AppSpacing.md,
+                                runSpacing: AppSpacing.md,
+                                children: [
+                                  _StaticInfoChip(
+                                    label:
+                                        'Stuck Follow-ups: $stuckFollowUpsCount',
+                                  ),
+                                  _StaticInfoChip(
+                                    label:
+                                        'Support Alerts: $unresolvedSupportChatsCount',
+                                  ),
+                                  _StaticInfoChip(
+                                    label:
+                                        'Pending Payouts: $pendingPayoutsCount',
+                                  ),
+                                ],
+                              ),
+                              if (totalCount > 0) ...[
+                                const SizedBox(height: AppSpacing.sm),
+                                _ControlRoomActionButton(
+                                  label: 'Review Alerts',
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AdminHubPage._adminAlertsReviewRoute,
+                                    );
+                                  },
                                 ),
                               ],
-                            ),
-                            if (totalCount > 0) ...[
-                              const SizedBox(height: AppSpacing.sm),
-                              _ControlRoomActionButton(
-                                label: 'Review Alerts',
-                                onPressed: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    AdminHubPage._adminAlertsReviewRoute,
-                                  );
-                                },
-                              ),
                             ],
-                          ],
-                        ),
-                    ],
-                  );
-                },
-              );
-            },
-          );
-        },
+                          ),
+                      ],
+                    );
+                  },
+                );
+              },
+            );
+          },
         ),
       ),
     );
@@ -1809,16 +2061,14 @@ class _QuickStatCard extends StatelessWidget {
         borderColor: item.color.withValues(alpha: 0.22),
         padding: const EdgeInsets.all(AppSpacing.md),
         child: StreamBuilder<int>(
-        stream: item.stream,
-        builder: (context, snapshot) {
+          stream: item.stream,
+          builder: (context, snapshot) {
             final waiting =
                 snapshot.connectionState == ConnectionState.waiting &&
                     !snapshot.hasData;
             final hasError = snapshot.hasError;
             final count = snapshot.data;
-            final countText = hasError
-                ? '!'
-                : (count == null ? '—' : '$count');
+            final countText = hasError ? '!' : (count == null ? '—' : '$count');
             final statusText = hasError
                 ? (isArabic ? 'تعذر التحميل' : 'Load failed')
                 : (waiting
@@ -1832,9 +2082,8 @@ class _QuickStatCard extends StatelessWidget {
                 SizedBox(
                   height: 32,
                   child: Align(
-                    alignment: isArabic
-                        ? Alignment.centerRight
-                        : Alignment.centerLeft,
+                    alignment:
+                        isArabic ? Alignment.centerRight : Alignment.centerLeft,
                     child: Text(
                       countText,
                       textAlign: isArabic ? TextAlign.right : TextAlign.left,
@@ -1851,9 +2100,8 @@ class _QuickStatCard extends StatelessWidget {
                 SizedBox(
                   height: 34,
                   child: Align(
-                    alignment: isArabic
-                        ? Alignment.topRight
-                        : Alignment.topLeft,
+                    alignment:
+                        isArabic ? Alignment.topRight : Alignment.topLeft,
                     child: Text(
                       statusText,
                       textAlign: isArabic ? TextAlign.right : TextAlign.left,
@@ -1874,4 +2122,3 @@ class _QuickStatCard extends StatelessWidget {
     );
   }
 }
-
