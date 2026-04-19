@@ -96,7 +96,8 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
           (data['requestKind'] ?? '').toString().trim() == 'center' ||
               (data['centerId'] ?? '').toString().trim().isNotEmpty;
       await _updateRequestEverywhere(requestId, {
-        'status': isCenterRequest ? 'session_scheduled' : 'session_setup_pending',
+        'status':
+            isCenterRequest ? 'session_scheduled' : 'session_setup_pending',
         'paymentStatus': 'approved',
         'paymentApprovedAt': FieldValue.serverTimestamp(),
         'sessionStatus': isCenterRequest ? 'scheduled' : 'not_created',
@@ -537,382 +538,365 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
               }
 
               final docs = _normalizeDocs(
-                    snapshot.data!.docs,
-                    'booking_requests',
-                  ).where(_matchesTab).toList()
-                    ..sort((a, b) {
-                      final aTs = a['archivedAt'] ??
-                          a['payoutTransferredAt'] ??
-                          a['paymentSubmittedAt'] ??
-                          a['createdAt'];
-                      final bTs = b['archivedAt'] ??
-                          b['payoutTransferredAt'] ??
-                          b['paymentSubmittedAt'] ??
-                          b['createdAt'];
+                snapshot.data!.docs,
+                'booking_requests',
+              ).where(_matchesTab).toList()
+                ..sort((a, b) {
+                  final aTs = a['archivedAt'] ??
+                      a['payoutTransferredAt'] ??
+                      a['paymentSubmittedAt'] ??
+                      a['createdAt'];
+                  final bTs = b['archivedAt'] ??
+                      b['payoutTransferredAt'] ??
+                      b['paymentSubmittedAt'] ??
+                      b['createdAt'];
 
-                      DateTime ad = DateTime.fromMillisecondsSinceEpoch(0);
-                      DateTime bd = DateTime.fromMillisecondsSinceEpoch(0);
+                  DateTime ad = DateTime.fromMillisecondsSinceEpoch(0);
+                  DateTime bd = DateTime.fromMillisecondsSinceEpoch(0);
 
-                      if (aTs is Timestamp) ad = aTs.toDate();
-                      if (bTs is Timestamp) bd = bTs.toDate();
+                  if (aTs is Timestamp) ad = aTs.toDate();
+                  if (bTs is Timestamp) bd = bTs.toDate();
 
-                      return bd.compareTo(ad);
-                    });
+                  return bd.compareTo(ad);
+                });
 
               return ListView(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                children: [
+                  AppSurfaceCard(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    children: [
-                      AppSurfaceCard(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        child: Wrap(
-                          spacing: AppSpacing.sm,
-                          runSpacing: AppSpacing.sm,
-                          alignment: WrapAlignment.end,
-                          children: [
-                            ChoiceChip(
-                              selected: _tab == 'payment_review',
-                              label: Text(
-                                isArabic
-                                    ? 'بانتظار مراجعة السداد'
-                                    : 'Payment review',
-                              ),
-                              onSelected: (_) =>
-                                  setState(() => _tab = 'payment_review'),
-                            ),
-                            ChoiceChip(
-                              selected: _tab == 'approved',
-                              label: Text(
-                                isArabic
-                                    ? 'مدفوعات معتمدة'
-                                    : 'Approved payments',
-                              ),
-                              onSelected: (_) =>
-                                  setState(() => _tab = 'approved'),
-                            ),
-                          ],
+                    child: Wrap(
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.sm,
+                      alignment: WrapAlignment.end,
+                      children: [
+                        ChoiceChip(
+                          selected: _tab == 'payment_review',
+                          label: Text(
+                            isArabic
+                                ? 'بانتظار مراجعة السداد'
+                                : 'Payment review',
+                          ),
+                          onSelected: (_) =>
+                              setState(() => _tab = 'payment_review'),
                         ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      if (docs.isEmpty)
-                        AppEmptyState(
-                          message: isArabic
-                              ? 'لا توجد طلبات في هذا القسم'
-                              : 'No requests in this section',
-                        )
-                      else
-                        ...docs.map((data) {
-                          final requestId = (data['_id'] ?? '').toString();
-                          final busy = _busyIds.contains(requestId);
+                        ChoiceChip(
+                          selected: _tab == 'approved',
+                          label: Text(
+                            isArabic ? 'مدفوعات معتمدة' : 'Approved payments',
+                          ),
+                          onSelected: (_) => setState(() => _tab = 'approved'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  if (docs.isEmpty)
+                    AppEmptyState(
+                      message: isArabic
+                          ? 'لا توجد طلبات في هذا القسم'
+                          : 'No requests in this section',
+                    )
+                  else
+                    ...docs.map((data) {
+                      final requestId = (data['_id'] ?? '').toString();
+                      final busy = _busyIds.contains(requestId);
 
-                          final clientName =
-                              (data['clientName'] ?? 'Client').toString();
-                          final clinicianName =
-                              (data['assignedClinicianName'] ??
-                                      data['clinicianName'] ??
-                                      '')
-                                  .toString();
-                          final receiptFile =
-                              (data['paymentReceiptFileName'] ?? '').toString();
-                          final clientNote =
-                              (data['paymentClientNote'] ?? '').toString();
-                          final createdAt = _dateText(data['createdAt']);
-                          final submittedAt =
-                              _dateText(data['paymentSubmittedAt']);
-                          final approvedAt =
-                              _dateText(data['paymentApprovedAt']);
-                          final payoutTransferredAt =
-                              _dateText(data['payoutTransferredAt']);
-                          final archivedAt = _dateText(data['archivedAt']);
-                          final status = (data['status'] ?? '').toString();
-                          final requestKind =
-                              (data['requestKind'] ?? '').toString();
-                          final paymentStatus =
-                              (data['paymentStatus'] ?? '').toString();
-                          final payoutStatus =
-                              (data['payoutStatus'] ?? '').toString();
-                          final accountingReviewStatus =
-                              (data['accountingReviewStatus'] ?? '').toString();
-                          final source = (data['_source'] ?? '').toString();
-                          final finalReviewRaw = data['finalReviewPercentage'];
-                          final finalReviewPercentage =
-                              finalReviewRaw is num
-                                  ? finalReviewRaw.toDouble()
-                                  : 0.0;
-                          final archived = (data['archived'] ?? false) == true;
-                          final archiveSection =
-                              (data['archiveSection'] ?? '').toString();
+                      final clientName =
+                          (data['clientName'] ?? 'Client').toString();
+                      final clinicianName = (data['assignedClinicianName'] ??
+                              data['clinicianName'] ??
+                              '')
+                          .toString();
+                      final receiptFile =
+                          (data['paymentReceiptFileName'] ?? '').toString();
+                      final clientNote =
+                          (data['paymentClientNote'] ?? '').toString();
+                      final createdAt = _dateText(data['createdAt']);
+                      final submittedAt = _dateText(data['paymentSubmittedAt']);
+                      final approvedAt = _dateText(data['paymentApprovedAt']);
+                      final payoutTransferredAt =
+                          _dateText(data['payoutTransferredAt']);
+                      final archivedAt = _dateText(data['archivedAt']);
+                      final status = (data['status'] ?? '').toString();
+                      final requestKind =
+                          (data['requestKind'] ?? '').toString();
+                      final paymentStatus =
+                          (data['paymentStatus'] ?? '').toString();
+                      final payoutStatus =
+                          (data['payoutStatus'] ?? '').toString();
+                      final accountingReviewStatus =
+                          (data['accountingReviewStatus'] ?? '').toString();
+                      final source = (data['_source'] ?? '').toString();
+                      final finalReviewRaw = data['finalReviewPercentage'];
+                      final finalReviewPercentage = finalReviewRaw is num
+                          ? finalReviewRaw.toDouble()
+                          : 0.0;
+                      final archived = (data['archived'] ?? false) == true;
+                      final archiveSection =
+                          (data['archiveSection'] ?? '').toString();
 
-                          return AppSurfaceCard(
-                            padding: const EdgeInsets.all(AppSpacing.md),
-                            color: Colors.white.withValues(alpha: 0.84),
-                            child: Column(
-                              crossAxisAlignment: isArabic
-                                  ? CrossAxisAlignment.end
-                                  : CrossAxisAlignment.start,
+                      return AppSurfaceCard(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        color: Colors.white.withValues(alpha: 0.84),
+                        child: Column(
+                          crossAxisAlignment: isArabic
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              textDirection: isArabic
+                                  ? TextDirection.rtl
+                                  : TextDirection.ltr,
                               children: [
-                                Row(
-                                  textDirection: isArabic
-                                      ? TextDirection.rtl
-                                      : TextDirection.ltr,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: isArabic
-                                            ? CrossAxisAlignment.end
-                                            : CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            clientName,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge
-                                                ?.copyWith(
-                                                    fontWeight:
-                                                        FontWeight.w800),
-                                          ),
-                                          const SizedBox(height: AppSpacing.xs),
-                                          if (clinicianName.trim().isNotEmpty)
-                                            Text(
-                                              isArabic
-                                                  ? 'الأخصائي: $clinicianName'
-                                                  : 'Clinician: $clinicianName',
-                                            ),
-                                        ],
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: isArabic
+                                        ? CrossAxisAlignment.end
+                                        : CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        clientName,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                                fontWeight: FontWeight.w800),
                                       ),
-                                    ),
-                                    AppStatusBadge(
-                                      label: _statusLabel(data, isArabic),
-                                      color: _statusColor(data),
-                                    ),
-                                  ],
+                                      const SizedBox(height: AppSpacing.xs),
+                                      if (clinicianName.trim().isNotEmpty)
+                                        Text(
+                                          isArabic
+                                              ? 'الأخصائي: $clinicianName'
+                                              : 'Clinician: $clinicianName',
+                                        ),
+                                    ],
+                                  ),
                                 ),
-                                const SizedBox(height: AppSpacing.sm),
-                                Text('ID: $requestId'),
-                                Text('source: $source'),
-                                Text('status: $status'),
-                                Text('paymentStatus: $paymentStatus'),
-                                if (payoutStatus.isNotEmpty)
-                                  Text('payoutStatus: $payoutStatus'),
-                                if (accountingReviewStatus.isNotEmpty)
-                                  Text(
-                                    'accountingReviewStatus: $accountingReviewStatus',
-                                  ),
-                                if (archived)
-                                  Text(
-                                    isArabic
-                                        ? 'مؤرشف: نعم ($archiveSection)'
-                                        : 'Archived: yes ($archiveSection)',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w800),
-                                  ),
-                                if (finalReviewPercentage > 0)
-                                  Text(
-                                    isArabic
-                                        ? 'المتوسط النهائي: ${finalReviewPercentage.toStringAsFixed(1)}%'
-                                        : 'Final average: ${finalReviewPercentage.toStringAsFixed(1)}%',
-                                  ),
-                                if (createdAt.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 6),
-                                    child: Text(
-                                      isArabic
-                                          ? 'تاريخ الطلب: $createdAt'
-                                          : 'Request date: $createdAt',
-                                    ),
-                                  ),
-                                if (submittedAt.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 6),
-                                    child: Text(
-                                      isArabic
-                                          ? 'تاريخ إرسال الإثبات: $submittedAt'
-                                          : 'Proof submitted at: $submittedAt',
-                                    ),
-                                  ),
-                                if (approvedAt.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 6),
-                                    child: Text(
-                                      isArabic
-                                          ? 'تاريخ اعتماد السداد: $approvedAt'
-                                          : 'Payment approved at: $approvedAt',
-                                    ),
-                                  ),
-                                if (payoutTransferredAt.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 6),
-                                    child: Text(
-                                      isArabic
-                                          ? 'تاريخ تحويل المستحق: $payoutTransferredAt'
-                                          : 'Payout transferred at: $payoutTransferredAt',
-                                    ),
-                                  ),
-                                if (archivedAt.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 6),
-                                    child: Text(
-                                      isArabic
-                                          ? 'تاريخ الأرشفة: $archivedAt'
-                                          : 'Archived at: $archivedAt',
-                                    ),
-                                  ),
-                                if (receiptFile.trim().isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 6),
-                                    child: Text(
-                                      isArabic
-                                          ? 'اسم الملف: $receiptFile'
-                                          : 'File name: $receiptFile',
-                                    ),
-                                  ),
-                                if (clientNote.trim().isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 6),
-                                    child: Text(
-                                      isArabic
-                                          ? 'ملاحظة العميل: $clientNote'
-                                          : 'Client note: $clientNote',
-                                    ),
-                                  ),
-                                const SizedBox(height: AppSpacing.sm),
-                                Wrap(
-                                  spacing: AppSpacing.sm,
-                                  runSpacing: AppSpacing.sm,
-                                  alignment: WrapAlignment.end,
-                                  children: [
-                                    OutlinedButton.icon(
-                                      onPressed: () {
-                                        Navigator.of(context).pushNamed(
-                                          Routes.adminSessionReport,
-                                          arguments: {
-                                            'requestId': requestId,
-                                          },
-                                        );
-                                      },
-                                      icon:
-                                          const Icon(Icons.assessment_outlined),
-                                      label: Text(
-                                        isArabic
-                                            ? 'عرض التقرير'
-                                            : 'View report',
-                                      ),
-                                    ),
-                                    if (_isInPaymentReview(data))
-                                      FilledButton.icon(
-                                        onPressed: busy
-                                            ? null
-                                            : () => _approvePayment(requestId),
-                                        icon: const Icon(
-                                            Icons.check_circle_outline),
-                                        label: Text(
-                                          isArabic
-                                              ? 'اعتماد السداد'
-                                              : 'Approve payment',
-                                        ),
-                                      ),
-                                    if (_isInPaymentReview(data))
-                                      OutlinedButton.icon(
-                                        onPressed: busy
-                                            ? null
-                                            : () => _rejectPayment(requestId),
-                                        icon: const Icon(Icons.cancel_outlined),
-                                        label: Text(
-                                          isArabic
-                                              ? 'رفض السداد'
-                                              : 'Reject payment',
-                                        ),
-                                        style: appDestructiveButtonStyle(),
-                                      ),
-                                    if (status == 'payout_pending' &&
-                                        requestKind != 'center')
-                                      FilledButton.icon(
-                                        onPressed: busy
-                                            ? null
-                                            : () => _confirmClinicianPayout(
-                                                requestId),
-                                        icon:
-                                            const Icon(Icons.payments_outlined),
-                                        label: Text(
-                                          isArabic
-                                              ? 'تم تحويل مستحق الأخصائي'
-                                              : 'Confirm clinician payout',
-                                        ),
-                                      ),
-                                    if (status == 'payout_pending' &&
-                                        requestKind == 'center' &&
-                                        accountingReviewStatus != 'confirmed')
-                                      FilledButton.icon(
-                                        onPressed: busy
-                                            ? null
-                                            : () =>
-                                                _confirmCenterAccountingReview(
-                                                  context,
-                                                  requestId,
-                                                  data,
-                                                ),
-                                        icon: const Icon(
-                                            Icons.calculate_outlined),
-                                        label: Text(
-                                          isArabic
-                                              ? 'مراجعة محاسبية'
-                                              : 'Accounting review',
-                                        ),
-                                      ),
-                                    if (status == 'payout_pending' &&
-                                        requestKind == 'center' &&
-                                        accountingReviewStatus == 'confirmed')
-                                      FilledButton.icon(
-                                        onPressed: busy
-                                            ? null
-                                            : () => _confirmCenterPayout(
-                                                  requestId,
-                                                ),
-                                        icon: const Icon(Icons
-                                            .account_balance_wallet_outlined),
-                                        label: Text(
-                                          isArabic
-                                              ? 'تم تحويل مستحق المركز'
-                                              : 'Confirm center payout',
-                                        ),
-                                      ),
-                                    if (status == 'completed_success' &&
-                                        !archived)
-                                      FilledButton.tonalIcon(
-                                        onPressed: busy
-                                            ? null
-                                            : () => _sendToSessionArchive(
-                                                requestId),
-                                        icon: const Icon(
-                                            Icons.video_call_outlined),
-                                        label: Text(
-                                          isArabic
-                                              ? 'أرشفة جلسية'
-                                              : 'Session archive',
-                                        ),
-                                      ),
-                                    if (status == 'completed_success' &&
-                                        !archived)
-                                      FilledButton.tonalIcon(
-                                        onPressed: busy
-                                            ? null
-                                            : () => _sendToFinancialArchive(
-                                                requestId),
-                                        icon: const Icon(Icons
-                                            .account_balance_wallet_outlined),
-                                        label: Text(
-                                          isArabic
-                                              ? 'أرشفة مالية'
-                                              : 'Financial archive',
-                                        ),
-                                      ),
-                                  ],
+                                AppStatusBadge(
+                                  label: _statusLabel(data, isArabic),
+                                  color: _statusColor(data),
                                 ),
                               ],
                             ),
-                          );
-                        }),
-                    ],
-                  );
+                            const SizedBox(height: AppSpacing.sm),
+                            Text('ID: $requestId'),
+                            Text('source: $source'),
+                            Text('status: $status'),
+                            Text('paymentStatus: $paymentStatus'),
+                            if (payoutStatus.isNotEmpty)
+                              Text('payoutStatus: $payoutStatus'),
+                            if (accountingReviewStatus.isNotEmpty)
+                              Text(
+                                'accountingReviewStatus: $accountingReviewStatus',
+                              ),
+                            if (archived)
+                              Text(
+                                isArabic
+                                    ? 'مؤرشف: نعم ($archiveSection)'
+                                    : 'Archived: yes ($archiveSection)',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w800),
+                              ),
+                            if (finalReviewPercentage > 0)
+                              Text(
+                                isArabic
+                                    ? 'المتوسط النهائي: ${finalReviewPercentage.toStringAsFixed(1)}%'
+                                    : 'Final average: ${finalReviewPercentage.toStringAsFixed(1)}%',
+                              ),
+                            if (createdAt.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  isArabic
+                                      ? 'تاريخ الطلب: $createdAt'
+                                      : 'Request date: $createdAt',
+                                ),
+                              ),
+                            if (submittedAt.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  isArabic
+                                      ? 'تاريخ إرسال الإثبات: $submittedAt'
+                                      : 'Proof submitted at: $submittedAt',
+                                ),
+                              ),
+                            if (approvedAt.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  isArabic
+                                      ? 'تاريخ اعتماد السداد: $approvedAt'
+                                      : 'Payment approved at: $approvedAt',
+                                ),
+                              ),
+                            if (payoutTransferredAt.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  isArabic
+                                      ? 'تاريخ تحويل المستحق: $payoutTransferredAt'
+                                      : 'Payout transferred at: $payoutTransferredAt',
+                                ),
+                              ),
+                            if (archivedAt.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  isArabic
+                                      ? 'تاريخ الأرشفة: $archivedAt'
+                                      : 'Archived at: $archivedAt',
+                                ),
+                              ),
+                            if (receiptFile.trim().isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  isArabic
+                                      ? 'اسم الملف: $receiptFile'
+                                      : 'File name: $receiptFile',
+                                ),
+                              ),
+                            if (clientNote.trim().isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  isArabic
+                                      ? 'ملاحظة العميل: $clientNote'
+                                      : 'Client note: $clientNote',
+                                ),
+                              ),
+                            const SizedBox(height: AppSpacing.sm),
+                            Wrap(
+                              spacing: AppSpacing.sm,
+                              runSpacing: AppSpacing.sm,
+                              alignment: WrapAlignment.end,
+                              children: [
+                                OutlinedButton.icon(
+                                  onPressed: () {
+                                    Navigator.of(context).pushNamed(
+                                      Routes.adminSessionReport,
+                                      arguments: {
+                                        'requestId': requestId,
+                                      },
+                                    );
+                                  },
+                                  icon: const Icon(Icons.assessment_outlined),
+                                  label: Text(
+                                    isArabic ? 'عرض التقرير' : 'View report',
+                                  ),
+                                ),
+                                if (_isInPaymentReview(data))
+                                  FilledButton.icon(
+                                    onPressed: busy
+                                        ? null
+                                        : () => _approvePayment(requestId),
+                                    icon:
+                                        const Icon(Icons.check_circle_outline),
+                                    label: Text(
+                                      isArabic
+                                          ? 'اعتماد السداد'
+                                          : 'Approve payment',
+                                    ),
+                                  ),
+                                if (_isInPaymentReview(data))
+                                  OutlinedButton.icon(
+                                    onPressed: busy
+                                        ? null
+                                        : () => _rejectPayment(requestId),
+                                    icon: const Icon(Icons.cancel_outlined),
+                                    label: Text(
+                                      isArabic
+                                          ? 'رفض السداد'
+                                          : 'Reject payment',
+                                    ),
+                                    style: appDestructiveButtonStyle(),
+                                  ),
+                                if (status == 'payout_pending' &&
+                                    requestKind != 'center')
+                                  FilledButton.icon(
+                                    onPressed: busy
+                                        ? null
+                                        : () =>
+                                            _confirmClinicianPayout(requestId),
+                                    icon: const Icon(Icons.payments_outlined),
+                                    label: Text(
+                                      isArabic
+                                          ? 'تم تحويل مستحق الأخصائي'
+                                          : 'Confirm clinician payout',
+                                    ),
+                                  ),
+                                if (status == 'payout_pending' &&
+                                    requestKind == 'center' &&
+                                    accountingReviewStatus != 'confirmed')
+                                  FilledButton.icon(
+                                    onPressed: busy
+                                        ? null
+                                        : () => _confirmCenterAccountingReview(
+                                              context,
+                                              requestId,
+                                              data,
+                                            ),
+                                    icon: const Icon(Icons.calculate_outlined),
+                                    label: Text(
+                                      isArabic
+                                          ? 'مراجعة محاسبية'
+                                          : 'Accounting review',
+                                    ),
+                                  ),
+                                if (status == 'payout_pending' &&
+                                    requestKind == 'center' &&
+                                    accountingReviewStatus == 'confirmed')
+                                  FilledButton.icon(
+                                    onPressed: busy
+                                        ? null
+                                        : () => _confirmCenterPayout(
+                                              requestId,
+                                            ),
+                                    icon: const Icon(
+                                        Icons.account_balance_wallet_outlined),
+                                    label: Text(
+                                      isArabic
+                                          ? 'تم تحويل مستحق المركز'
+                                          : 'Confirm center payout',
+                                    ),
+                                  ),
+                                if (status == 'completed_success' && !archived)
+                                  FilledButton.tonalIcon(
+                                    onPressed: busy
+                                        ? null
+                                        : () =>
+                                            _sendToSessionArchive(requestId),
+                                    icon: const Icon(Icons.video_call_outlined),
+                                    label: Text(
+                                      isArabic
+                                          ? 'أرشفة جلسية'
+                                          : 'Session archive',
+                                    ),
+                                  ),
+                                if (status == 'completed_success' && !archived)
+                                  FilledButton.tonalIcon(
+                                    onPressed: busy
+                                        ? null
+                                        : () =>
+                                            _sendToFinancialArchive(requestId),
+                                    icon: const Icon(
+                                        Icons.account_balance_wallet_outlined),
+                                    label: Text(
+                                      isArabic
+                                          ? 'أرشفة مالية'
+                                          : 'Financial archive',
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                ],
+              );
             },
           ),
         ),
@@ -920,4 +904,3 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
     );
   }
 }
-

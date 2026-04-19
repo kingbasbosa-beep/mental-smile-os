@@ -290,9 +290,9 @@ class ClientDashboardPage extends StatelessWidget {
                                     errorBuilder:
                                         (context, error, stackTrace) =>
                                             const AppMissingAssetPlaceholder(
-                                              width: 64,
-                                              height: 64,
-                                            ),
+                                      width: 64,
+                                      height: 64,
+                                    ),
                                   ),
                                 )
                               : Text(
@@ -677,4 +677,3 @@ class _MiniMetricCard extends StatelessWidget {
     );
   }
 }
-

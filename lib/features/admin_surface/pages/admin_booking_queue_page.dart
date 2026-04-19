@@ -30,9 +30,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       case 'hospital':
         return isArabic ? 'مستشفى' : 'Hospital';
       case 'special_needs_care':
-        return isArabic
-            ? 'رعاية ذوي الاحتياجات الخاصة'
-            : 'Special Needs Care';
+        return isArabic ? 'رعاية ذوي الاحتياجات الخاصة' : 'Special Needs Care';
       case 'halfway_house':
       default:
         return isArabic ? 'هاف واي' : 'Halfway House';
@@ -176,7 +174,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
   String _advisoryTitle(bool isArabic, String status) {
     switch (status) {
       case 'disabled':
-        return isArabic ? 'تنبيه: نطاق الحجوزات معطل' : 'Advisory: Booking disabled';
+        return isArabic
+            ? 'تنبيه: نطاق الحجوزات معطل'
+            : 'Advisory: Booking disabled';
       case 'maintenance':
         return isArabic
             ? 'تنبيه: نطاق الحجوزات تحت صيانة مخططة'
@@ -402,22 +402,22 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
             'requestId=$requestId '
             'path=${ref.path} '
             'resourceSnapshot=${_debugMap({
-              'requestKind': data['requestKind'],
-              'status': data['status'],
-              'workflowStage': data['workflowStage'],
-              'clientId': data['clientId'],
-              'clientName': data['clientName'],
-              'createdAt': data['createdAt'],
-              'note': data['note'],
-              'clinicianId': data['clinicianId'],
-              'clinicianName': data['clinicianName'],
-              'clinicianUid': data['clinicianUid'],
-              'assignedClinicianId': data['assignedClinicianId'],
-              'assignedClinicianName': data['assignedClinicianName'],
-              'adminForwarded': data['adminForwarded'],
-              'adminAssignedBy': data['adminAssignedBy'],
-              'adminAssignedAt': data['adminAssignedAt'],
-            })}',
+                  'requestKind': data['requestKind'],
+                  'status': data['status'],
+                  'workflowStage': data['workflowStage'],
+                  'clientId': data['clientId'],
+                  'clientName': data['clientName'],
+                  'createdAt': data['createdAt'],
+                  'note': data['note'],
+                  'clinicianId': data['clinicianId'],
+                  'clinicianName': data['clinicianName'],
+                  'clinicianUid': data['clinicianUid'],
+                  'assignedClinicianId': data['assignedClinicianId'],
+                  'assignedClinicianName': data['assignedClinicianName'],
+                  'adminForwarded': data['adminForwarded'],
+                  'adminAssignedBy': data['adminAssignedBy'],
+                  'adminAssignedAt': data['adminAssignedAt'],
+                })}',
           );
           _logFirestore(
             page: 'admin_booking_queue',
@@ -449,8 +449,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
   Future<DocumentSnapshot<Map<String, dynamic>>> _readPrimaryBookingRequest(
     String requestId,
   ) async {
-    final ref =
-        FirebaseFirestore.instance.collection('booking_requests').doc(requestId);
+    final ref = FirebaseFirestore.instance
+        .collection('booking_requests')
+        .doc(requestId);
     _logFirestore(
       page: 'admin_booking_queue',
       role: 'admin',
@@ -465,8 +466,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     String requestId,
     Map<String, dynamic> updates,
   ) async {
-    final ref =
-        FirebaseFirestore.instance.collection('booking_requests').doc(requestId);
+    final ref = FirebaseFirestore.instance
+        .collection('booking_requests')
+        .doc(requestId);
     final nowUpdates = {
       ..._withCanonicalWorkflowStage(updates),
       'updatedAt': FieldValue.serverTimestamp(),
@@ -1231,7 +1233,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
           (data['requestKind'] ?? '').toString().trim() == 'center' ||
               (data['centerId'] ?? '').toString().trim().isNotEmpty;
       await _updateRequestEverywhere(requestId, {
-        'status': isCenterRequest ? 'session_scheduled' : 'session_setup_pending',
+        'status':
+            isCenterRequest ? 'session_scheduled' : 'session_setup_pending',
         'workflowStage':
             isCenterRequest ? 'session_scheduled' : 'session_setup_pending',
         'paymentStatus': 'approved',
@@ -1416,7 +1419,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         throw Exception('Booking request not found');
       }
       final resourceSnapshot = snap.data() ?? const <String, dynamic>{};
-      final currentStatus = (resourceSnapshot['status'] ?? '').toString().trim();
+      final currentStatus =
+          (resourceSnapshot['status'] ?? '').toString().trim();
       final currentWorkflowStage =
           (resourceSnapshot['workflowStage'] ?? '').toString().trim();
       final clinicianId = resourceSnapshot['clinicianId'];
@@ -1632,9 +1636,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
   }
 
   Color _requestTypeAccent(bool isCenterRequest) {
-    return isCenterRequest
-        ? const Color(0xFF2AA7A1)
-        : const Color(0xFF7C6EF6);
+    return isCenterRequest ? const Color(0xFF2AA7A1) : const Color(0xFF7C6EF6);
   }
 
   String _requestTypeLabel(bool isArabic, bool isCenterRequest) {
@@ -1794,7 +1796,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                       children: [
                         Text(
                           clientName,
-                          textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                          textAlign:
+                              isArabic ? TextAlign.right : TextAlign.left,
                           style:
                               Theme.of(context).textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.w800,
@@ -1830,7 +1833,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                               : (isArabic
                                   ? 'طلب أخصائي'
                                   : 'Specialist booking request'),
-                          textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                          textAlign:
+                              isArabic ? TextAlign.right : TextAlign.left,
                           style:
                               Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: AppColors.mist,
@@ -1843,386 +1847,394 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
               ),
               const SizedBox(height: 12),
               _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'الأخصائي الحالي',
-              enLabel: 'Assigned clinician',
-              value: assignedName,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'معرف العميل',
-              enLabel: 'Client ID',
-              value: clientId,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'تاريخ الإنشاء',
-              enLabel: 'Created at',
-              value: createdAt,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'ملاحظة العميل',
-              enLabel: 'Client note',
-              value: note,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'قرار الإدارة',
-              enLabel: 'Admin note',
-              value: adminDecisionNote,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'رد المركز على التوفر',
-              enLabel: 'Center availability',
-              value: centerAvailabilityStatus,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'نوع الإقامة المختار',
-              enLabel: 'Selected accommodation',
-              value: selectedAccommodationLabelAr,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'نوع المركز',
-              enLabel: 'Center type',
-              value: selectedCenterType.isEmpty
-                  ? ''
-                  : _centerTypeLabel(selectedCenterType, isArabic),
-            ),
-            if (centerHasDetoxUnit && selectedCenterType != 'detox')
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'الأخصائي الحالي',
+                enLabel: 'Assigned clinician',
+                value: assignedName,
+              ),
               _buildDetailLine(
                 context: context,
                 isArabic: isArabic,
-                arLabel: 'قسم أعراض الانسحاب',
-                enLabel: 'Withdrawal unit',
-                value: isArabic ? 'متاح داخليًا' : 'Available internally',
+                arLabel: 'معرف العميل',
+                enLabel: 'Client ID',
+                value: clientId,
               ),
-            if (clientUpdatedAfterCenterFeedback)
               _buildDetailLine(
                 context: context,
                 isArabic: isArabic,
-                arLabel: 'الاعتماد المباشر',
-                enLabel: 'Direct approval',
-                value: isArabic
-                    ? 'مسموح به دون إعادة الإرسال للمركز'
-                    : 'Allowed without returning to center',
+                arLabel: 'تاريخ الإنشاء',
+                enLabel: 'Created at',
+                value: createdAt,
               ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'ملاحظة المركز',
-              enLabel: 'Center note',
-              value: centerAvailabilityNote,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'البديل المقترح من المركز',
-              enLabel: 'Suggested alternative',
-              value: centerSuggestedAlternativeLabelAr,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'آخر ملاحظة محفوظة من المركز',
-              enLabel: 'Latest saved center note',
-              value: lastCenterAvailabilityNote,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'آخر بديل مقترح محفوظ',
-              enLabel: 'Latest saved alternative',
-              value: lastCenterSuggestedAlternativeLabelAr,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'قرار الأخصائي',
-              enLabel: 'Clinician note',
-              value: clinicianDecisionNote,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'سبب الرفض',
-              enLabel: 'Reject reason',
-              value: rejectReason,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'موعد/ملاحظة القبول',
-              enLabel: 'Approval slot/note',
-              value: approvedSlot,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'حالة الدفع',
-              enLabel: 'Payment status',
-              value: paymentStatus,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'مرجع إثبات السداد',
-              enLabel: 'Payment proof',
-              value: paymentReceiptFileName,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'ملاحظة الدفع من العميل',
-              enLabel: 'Client payment note',
-              value: paymentClientNote,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'حالة الجلسة',
-              enLabel: 'Session status',
-              value: sessionStatus,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'موعد الجلسة',
-              enLabel: 'Session date',
-              value: sessionDateText,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'كود الجلسة',
-              enLabel: 'Session code',
-              value: sessionCode,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'رابط الجلسة',
-              enLabel: 'Session link',
-              value: sessionLink.isEmpty
-                  ? ''
-                  : (isArabic ? 'رابط الجلسة متاح' : 'Session link available'),
-              valueOnly: true,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'حالة التقييم',
-              enLabel: 'Review status',
-              value: reviewStatus,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'حالة التحويل',
-              enLabel: 'Payout status',
-              value: payoutStatus,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'حالة المراجعة المحاسبية',
-              enLabel: 'Accounting review status',
-              value: accountingReviewStatus,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'إجمالي المدفوع من العميل',
-              enLabel: 'Gross client-paid amount',
-              value: grossClientPaidAmount,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'نسبة عمولة التطبيق',
-              enLabel: 'App commission percent',
-              value: appCommissionPercent,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'قيمة العمولة',
-              enLabel: 'Commission amount',
-              value: appCommissionAmount,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'الصافي المستحق للمركز',
-              enLabel: 'Net due to center',
-              value: netAmountDueToCenter,
-            ),
-            _buildDetailLine(
-              context: context,
-              isArabic: isArabic,
-              arLabel: 'ملاحظات المحاسبة',
-              enLabel: 'Accounting notes',
-              value: accountingReviewNotes,
-            ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'ملاحظة العميل',
+                enLabel: 'Client note',
+                value: note,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'قرار الإدارة',
+                enLabel: 'Admin note',
+                value: adminDecisionNote,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'رد المركز على التوفر',
+                enLabel: 'Center availability',
+                value: centerAvailabilityStatus,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'نوع الإقامة المختار',
+                enLabel: 'Selected accommodation',
+                value: selectedAccommodationLabelAr,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'نوع المركز',
+                enLabel: 'Center type',
+                value: selectedCenterType.isEmpty
+                    ? ''
+                    : _centerTypeLabel(selectedCenterType, isArabic),
+              ),
+              if (centerHasDetoxUnit && selectedCenterType != 'detox')
+                _buildDetailLine(
+                  context: context,
+                  isArabic: isArabic,
+                  arLabel: 'قسم أعراض الانسحاب',
+                  enLabel: 'Withdrawal unit',
+                  value: isArabic ? 'متاح داخليًا' : 'Available internally',
+                ),
+              if (clientUpdatedAfterCenterFeedback)
+                _buildDetailLine(
+                  context: context,
+                  isArabic: isArabic,
+                  arLabel: 'الاعتماد المباشر',
+                  enLabel: 'Direct approval',
+                  value: isArabic
+                      ? 'مسموح به دون إعادة الإرسال للمركز'
+                      : 'Allowed without returning to center',
+                ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'ملاحظة المركز',
+                enLabel: 'Center note',
+                value: centerAvailabilityNote,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'البديل المقترح من المركز',
+                enLabel: 'Suggested alternative',
+                value: centerSuggestedAlternativeLabelAr,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'آخر ملاحظة محفوظة من المركز',
+                enLabel: 'Latest saved center note',
+                value: lastCenterAvailabilityNote,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'آخر بديل مقترح محفوظ',
+                enLabel: 'Latest saved alternative',
+                value: lastCenterSuggestedAlternativeLabelAr,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'قرار الأخصائي',
+                enLabel: 'Clinician note',
+                value: clinicianDecisionNote,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'سبب الرفض',
+                enLabel: 'Reject reason',
+                value: rejectReason,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'موعد/ملاحظة القبول',
+                enLabel: 'Approval slot/note',
+                value: approvedSlot,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'حالة الدفع',
+                enLabel: 'Payment status',
+                value: paymentStatus,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'مرجع إثبات السداد',
+                enLabel: 'Payment proof',
+                value: paymentReceiptFileName,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'ملاحظة الدفع من العميل',
+                enLabel: 'Client payment note',
+                value: paymentClientNote,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'حالة الجلسة',
+                enLabel: 'Session status',
+                value: sessionStatus,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'موعد الجلسة',
+                enLabel: 'Session date',
+                value: sessionDateText,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'كود الجلسة',
+                enLabel: 'Session code',
+                value: sessionCode,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'رابط الجلسة',
+                enLabel: 'Session link',
+                value: sessionLink.isEmpty
+                    ? ''
+                    : (isArabic
+                        ? 'رابط الجلسة متاح'
+                        : 'Session link available'),
+                valueOnly: true,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'حالة التقييم',
+                enLabel: 'Review status',
+                value: reviewStatus,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'حالة التحويل',
+                enLabel: 'Payout status',
+                value: payoutStatus,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'حالة المراجعة المحاسبية',
+                enLabel: 'Accounting review status',
+                value: accountingReviewStatus,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'إجمالي المدفوع من العميل',
+                enLabel: 'Gross client-paid amount',
+                value: grossClientPaidAmount,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'نسبة عمولة التطبيق',
+                enLabel: 'App commission percent',
+                value: appCommissionPercent,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'قيمة العمولة',
+                enLabel: 'Commission amount',
+                value: appCommissionAmount,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'الصافي المستحق للمركز',
+                enLabel: 'Net due to center',
+                value: netAmountDueToCenter,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'ملاحظات المحاسبة',
+                enLabel: 'Accounting notes',
+                value: accountingReviewNotes,
+              ),
               const SizedBox(height: 12),
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
                 alignment: isArabic ? WrapAlignment.end : WrapAlignment.start,
                 children: [
-                if (status == 'pending_admin')
-                  OutlinedButton.icon(
-                    onPressed: busy
-                        ? null
-                        : () => _rejectRequest(
-                              requestId,
-                              isCenterRequest: isCenterRequest,
-                            ),
-                    icon: const Icon(Icons.cancel_outlined),
-                    label: Text(isArabic ? 'رفض' : 'Reject'),
-                  ),
-                if (canMoveCenterToFollowUp)
-                  FilledButton.icon(
-                    onPressed:
-                        busy ? null : () => _moveCenterToFollowUp(requestId),
-                    icon: const Icon(Icons.fact_check_outlined),
-                    label: Text(
-                      isArabic ? 'نقل للمتابعة' : 'Move to follow-up',
+                  if (status == 'pending_admin')
+                    OutlinedButton.icon(
+                      onPressed: busy
+                          ? null
+                          : () => _rejectRequest(
+                                requestId,
+                                isCenterRequest: isCenterRequest,
+                              ),
+                      icon: const Icon(Icons.cancel_outlined),
+                      label: Text(isArabic ? 'رفض' : 'Reject'),
                     ),
-                  ),
-                if (canAssignClinician)
-                  FilledButton.tonalIcon(
-                    onPressed: busy ||
-                            requestedClinicianId.isEmpty ||
-                            requestedClinicianName.isEmpty
-                        ? null
-                        : () => _assignToClinician(
-                              requestId: requestId,
-                            ),
-                    icon: const Icon(Icons.forward_to_inbox_outlined),
-                    label: Text(
-                      isArabic ? 'اعتماد وتحويل للأخصائي' : 'Approve and forward',
+                  if (canMoveCenterToFollowUp)
+                    FilledButton.icon(
+                      onPressed:
+                          busy ? null : () => _moveCenterToFollowUp(requestId),
+                      icon: const Icon(Icons.fact_check_outlined),
+                      label: Text(
+                        isArabic ? 'نقل للمتابعة' : 'Move to follow-up',
+                      ),
                     ),
-                  ),
-                if (canApproveCenter)
-                  FilledButton.icon(
-                    onPressed:
-                        busy ? null : () => _approveCenterRequest(requestId),
-                    icon: const Icon(Icons.verified_outlined),
-                    label: Text(
-                      isArabic
-                          ? 'اعتماد وفتح الجدولة'
-                          : 'Approve and open scheduling',
+                  if (canAssignClinician)
+                    FilledButton.tonalIcon(
+                      onPressed: busy ||
+                              requestedClinicianId.isEmpty ||
+                              requestedClinicianName.isEmpty
+                          ? null
+                          : () => _assignToClinician(
+                                requestId: requestId,
+                              ),
+                      icon: const Icon(Icons.forward_to_inbox_outlined),
+                      label: Text(
+                        isArabic
+                            ? 'اعتماد وتحويل للأخصائي'
+                            : 'Approve and forward',
+                      ),
                     ),
-                  ),
-                if (canReturnCenterToClient)
-                  OutlinedButton.icon(
-                    onPressed: busy
-                        ? null
-                        : () => _returnCenterRequestToClient(requestId, data),
-                    icon: const Icon(Icons.reply_outlined),
-                    label: Text(
-                      isArabic
-                          ? 'إرجاع للعميل للتعديل'
-                          : 'Return to client for edit',
+                  if (canApproveCenter)
+                    FilledButton.icon(
+                      onPressed:
+                          busy ? null : () => _approveCenterRequest(requestId),
+                      icon: const Icon(Icons.verified_outlined),
+                      label: Text(
+                        isArabic
+                            ? 'اعتماد وفتح الجدولة'
+                            : 'Approve and open scheduling',
+                      ),
                     ),
-                  ),
-                if (canReviewPayment)
-                  FilledButton.icon(
-                    onPressed: busy ? null : () => _approvePayment(requestId),
-                    icon: const Icon(Icons.verified_outlined),
-                    label: Text(
-                      isArabic ? 'اعتماد السداد' : 'Approve payment',
+                  if (canReturnCenterToClient)
+                    OutlinedButton.icon(
+                      onPressed: busy
+                          ? null
+                          : () => _returnCenterRequestToClient(requestId, data),
+                      icon: const Icon(Icons.reply_outlined),
+                      label: Text(
+                        isArabic
+                            ? 'إرجاع للعميل للتعديل'
+                            : 'Return to client for edit',
+                      ),
                     ),
-                  ),
-                if (canReviewPayment)
-                  OutlinedButton.icon(
-                    onPressed: busy ? null : () => _rejectPayment(requestId),
-                    icon: const Icon(Icons.cancel_outlined),
-                    label: Text(
-                      isArabic ? 'رفض السداد' : 'Reject payment',
+                  if (canReviewPayment)
+                    FilledButton.icon(
+                      onPressed: busy ? null : () => _approvePayment(requestId),
+                      icon: const Icon(Icons.verified_outlined),
+                      label: Text(
+                        isArabic ? 'اعتماد السداد' : 'Approve payment',
+                      ),
                     ),
-                  ),
-                if (!isCenterRequest && status == 'payout_pending')
-                  FilledButton.icon(
-                    onPressed:
-                        busy ? null : () => _confirmClinicianPayout(requestId),
-                    icon: const Icon(Icons.payments_outlined),
-                    label: Text(
-                      isArabic
-                          ? 'تم تحويل مستحق الأخصائي'
-                          : 'Confirm clinician payout',
+                  if (canReviewPayment)
+                    OutlinedButton.icon(
+                      onPressed: busy ? null : () => _rejectPayment(requestId),
+                      icon: const Icon(Icons.cancel_outlined),
+                      label: Text(
+                        isArabic ? 'رفض السداد' : 'Reject payment',
+                      ),
                     ),
-                  ),
-                if (canRunAccountingReview)
-                  FilledButton.icon(
-                    onPressed: busy
-                        ? null
-                        : () => _confirmCenterAccountingReview(requestId, data),
-                    icon: const Icon(Icons.calculate_outlined),
-                    label: Text(
-                      isArabic ? 'مراجعة محاسبية' : 'Accounting review',
+                  if (!isCenterRequest && status == 'payout_pending')
+                    FilledButton.icon(
+                      onPressed: busy
+                          ? null
+                          : () => _confirmClinicianPayout(requestId),
+                      icon: const Icon(Icons.payments_outlined),
+                      label: Text(
+                        isArabic
+                            ? 'تم تحويل مستحق الأخصائي'
+                            : 'Confirm clinician payout',
+                      ),
                     ),
-                  ),
-                if (canConfirmCenterPayout)
-                  FilledButton.icon(
-                    onPressed:
-                        busy ? null : () => _confirmCenterPayout(requestId),
-                    icon: const Icon(Icons.account_balance_wallet_outlined),
-                    label: Text(
-                      isArabic
-                          ? 'تم تحويل مستحق المركز'
-                          : 'Confirm center payout',
+                  if (canRunAccountingReview)
+                    FilledButton.icon(
+                      onPressed: busy
+                          ? null
+                          : () =>
+                              _confirmCenterAccountingReview(requestId, data),
+                      icon: const Icon(Icons.calculate_outlined),
+                      label: Text(
+                        isArabic ? 'مراجعة محاسبية' : 'Accounting review',
+                      ),
                     ),
-                  ),
-                if (status == 'completed_success' && !archived)
-                  FilledButton.tonalIcon(
-                    onPressed:
-                        busy ? null : () => _sendToSessionArchive(requestId),
-                    icon: const Icon(Icons.video_call_outlined),
-                    label: Text(
-                      isArabic ? 'أرشفة جلسية' : 'Session archive',
+                  if (canConfirmCenterPayout)
+                    FilledButton.icon(
+                      onPressed:
+                          busy ? null : () => _confirmCenterPayout(requestId),
+                      icon: const Icon(Icons.account_balance_wallet_outlined),
+                      label: Text(
+                        isArabic
+                            ? 'تم تحويل مستحق المركز'
+                            : 'Confirm center payout',
+                      ),
                     ),
-                  ),
-                if (status == 'completed_success' && !archived)
-                  FilledButton.tonalIcon(
-                    onPressed:
-                        busy ? null : () => _sendToFinancialArchive(requestId),
-                    icon: const Icon(Icons.account_balance_wallet_outlined),
-                    label: Text(
-                      isArabic ? 'أرشفة مالية' : 'Financial archive',
+                  if (status == 'completed_success' && !archived)
+                    FilledButton.tonalIcon(
+                      onPressed:
+                          busy ? null : () => _sendToSessionArchive(requestId),
+                      icon: const Icon(Icons.video_call_outlined),
+                      label: Text(
+                        isArabic ? 'أرشفة جلسية' : 'Session archive',
+                      ),
                     ),
-                  ),
-                if (isCenterRequest && status == 'center_follow_up')
-                  OutlinedButton.icon(
-                    onPressed: busy
-                        ? null
-                        : () => _rejectRequest(
-                              requestId,
-                              isCenterRequest: true,
-                            ),
-                    icon: const Icon(Icons.cancel_outlined),
-                    label: Text(isArabic ? 'رفض' : 'Reject'),
-                  ),
-                if (canReturnToPending)
-                  TextButton.icon(
-                    onPressed: busy ? null : () => _returnToPending(requestId),
-                    icon: const Icon(Icons.refresh),
-                    label: Text(
-                      isArabic ? 'إرجاع للبندنج' : 'Return to pending',
+                  if (status == 'completed_success' && !archived)
+                    FilledButton.tonalIcon(
+                      onPressed: busy
+                          ? null
+                          : () => _sendToFinancialArchive(requestId),
+                      icon: const Icon(Icons.account_balance_wallet_outlined),
+                      label: Text(
+                        isArabic ? 'أرشفة مالية' : 'Financial archive',
+                      ),
                     ),
-                  ),
+                  if (isCenterRequest && status == 'center_follow_up')
+                    OutlinedButton.icon(
+                      onPressed: busy
+                          ? null
+                          : () => _rejectRequest(
+                                requestId,
+                                isCenterRequest: true,
+                              ),
+                      icon: const Icon(Icons.cancel_outlined),
+                      label: Text(isArabic ? 'رفض' : 'Reject'),
+                    ),
+                  if (canReturnToPending)
+                    TextButton.icon(
+                      onPressed:
+                          busy ? null : () => _returnToPending(requestId),
+                      icon: const Icon(Icons.refresh),
+                      label: Text(
+                        isArabic ? 'إرجاع للبندنج' : 'Return to pending',
+                      ),
+                    ),
                 ],
               ),
             ],
@@ -2299,9 +2311,11 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                   if (_tab == 'pending_admin') {
                     allDocs.sort((a, b) {
                       final aCenter =
-                          (a.data()['requestKind'] ?? '').toString() == 'center';
+                          (a.data()['requestKind'] ?? '').toString() ==
+                              'center';
                       final bCenter =
-                          (b.data()['requestKind'] ?? '').toString() == 'center';
+                          (b.data()['requestKind'] ?? '').toString() ==
+                              'center';
                       if (aCenter != bCenter) {
                         return aCenter ? -1 : 1;
                       }
@@ -2386,4 +2400,3 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     );
   }
 }
-

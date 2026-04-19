@@ -51,7 +51,8 @@ class AdminAlertsReviewPage extends StatelessWidget {
                       children: [
                         Text(
                           'Alerts Review',
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.w800),
                         ),
                         SizedBox(height: AppSpacing.xs),
                         Text('Python-generated operational alerts'),
@@ -69,7 +70,8 @@ class AdminAlertsReviewPage extends StatelessWidget {
                       children: [
                         Text(
                           'Alerts Review',
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.w800),
                         ),
                         SizedBox(height: AppSpacing.xs),
                         Text('Python-generated operational alerts'),
@@ -86,7 +88,8 @@ class AdminAlertsReviewPage extends StatelessWidget {
                       children: [
                         Text(
                           'Alerts Review',
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.w800),
                         ),
                         SizedBox(height: AppSpacing.xs),
                         Text('Python-generated operational alerts'),
@@ -113,7 +116,8 @@ class AdminAlertsReviewPage extends StatelessWidget {
                     children: [
                       const Text(
                         'Alerts Review',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.w800),
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       Text(

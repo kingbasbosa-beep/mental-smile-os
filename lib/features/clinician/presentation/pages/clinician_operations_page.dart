@@ -389,7 +389,9 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
             isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
-            isArabic ? 'الحالات والطلبات المعينة' : 'Assigned cases and requests',
+            isArabic
+                ? 'الحالات والطلبات المعينة'
+                : 'Assigned cases and requests',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -477,7 +479,9 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
             child: clinicianPhotoUrl.trim().isNotEmpty
                 ? null
                 : Text(
-                    clinicianName.isEmpty ? 'C' : clinicianName.characters.first,
+                    clinicianName.isEmpty
+                        ? 'C'
+                        : clinicianName.characters.first,
                     style: TextStyle(
                       color: scheme.primary,
                       fontWeight: FontWeight.w800,
@@ -638,9 +642,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
               label: Text(
                 _submittingChangeRequest
                     ? (isArabic ? 'جارٍ إرسال الطلب...' : 'Sending request...')
-                    : (isArabic
-                        ? 'إرسال طلب التعديل'
-                        : 'Send change request'),
+                    : (isArabic ? 'إرسال طلب التعديل' : 'Send change request'),
               ),
             ),
           ),
@@ -713,9 +715,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                 isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
               Text(
-                isArabic
-                    ? 'طلبات التعديل السابقة'
-                    : 'Previous change requests',
+                isArabic ? 'طلبات التعديل السابقة' : 'Previous change requests',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -831,7 +831,8 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
       runSpacing: 10,
       children: [
         FilledButton.icon(
-          onPressed: () => Navigator.of(context).pushNamed(Routes.clinicianSessions),
+          onPressed: () =>
+              Navigator.of(context).pushNamed(Routes.clinicianSessions),
           icon: const Icon(Icons.video_call_outlined),
           label: Text(isArabic ? 'جلساتي' : 'My Sessions'),
         ),
@@ -903,8 +904,9 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
             children: [
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                      isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                  crossAxisAlignment: isArabic
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
                   children: [
                     Text(
                       clientName,
@@ -1464,4 +1466,3 @@ class _InfoMiniCard extends StatelessWidget {
     );
   }
 }
-

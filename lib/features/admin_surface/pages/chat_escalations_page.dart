@@ -308,195 +308,208 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
                       return StreamBuilder<List<ChatEscalationModel>>(
                         stream: _service.streamEscalations(),
                         builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Center(
-                          child: Text('فشل تحميل التصعيدات: ${snapshot.error}'),
-                        );
-                      }
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text(
+                                  'فشل تحميل التصعيدات: ${snapshot.error}'),
+                            );
+                          }
 
-                      if (!snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
+                          if (!snapshot.hasData) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
 
-                      final items = _applyFilter(snapshot.data ?? []);
-                      if (items.isEmpty) {
-                        return const Center(
-                          child: Text('لا توجد حالات مطابقة لهذا الفلتر'),
-                        );
-                      }
+                          final items = _applyFilter(snapshot.data ?? []);
+                          if (items.isEmpty) {
+                            return const Center(
+                              child: Text('لا توجد حالات مطابقة لهذا الفلتر'),
+                            );
+                          }
 
-                      return ListView.separated(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: items.length,
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          final e = items[index];
-                          return Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    e.ownerDisplayName,
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Wrap(
-                                    spacing: 8,
-                                    runSpacing: 8,
+                          return ListView.separated(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: items.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 12),
+                            itemBuilder: (context, index) {
+                              final e = items[index];
+                              return Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 6,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: _riskColor(e.riskLevel)
-                                              .withValues(alpha: 0.12),
-                                          borderRadius:
-                                              BorderRadius.circular(999),
-                                        ),
-                                        child: Text(
-                                          'الخطر: ${e.riskLevel}',
-                                          style: TextStyle(
-                                            color: _riskColor(e.riskLevel),
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
+                                      Text(
+                                        e.ownerDisplayName,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
                                       ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 6,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: _statusColor(e.status)
-                                              .withValues(alpha: 0.12),
-                                          borderRadius:
-                                              BorderRadius.circular(999),
-                                        ),
-                                        child: Text(
-                                          _statusLabel(e.status),
-                                          style: TextStyle(
-                                            color: _statusColor(e.status),
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 6,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFF3ECFF),
-                                          borderRadius:
-                                              BorderRadius.circular(999),
-                                        ),
-                                        child: Text(
-                                          'النقاط: ${e.riskScore}',
-                                          style: const TextStyle(
-                                            color: Color(0xFF6C55B3),
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  if (e.assignedToType != null)
-                                    Text(
-                                        'نوع التعيين: ${e.assignedToType == 'admin' ? 'أدمن' : 'أخصائي'}'),
-                                  if (e.assignedToUid != null)
-                                    Text(
-                                        'المعيّن له: ${_assignedLabel(e, cliniciansMap)}'),
-                                  const SizedBox(height: 8),
-                                  if (e.reasonCodes.isNotEmpty)
-                                    Wrap(
-                                      spacing: 8,
-                                      runSpacing: 8,
-                                      children: e.reasonCodes
-                                          .map(
-                                            (r) => Chip(
-                                              label: Text(_reasonLabel(r)),
+                                      const SizedBox(height: 8),
+                                      Wrap(
+                                        spacing: 8,
+                                        runSpacing: 8,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 6,
                                             ),
-                                          )
-                                          .toList(),
-                                    ),
-                                  if (e.summaryText.isNotEmpty) ...[
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      e.summaryText,
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium,
-                                    ),
-                                  ],
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    'Thread ID: ${e.threadId}',
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Wrap(
-                                    spacing: 12,
-                                    runSpacing: 12,
-                                    children: [
-                                      if (isAdminUser)
-                                        OutlinedButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pushNamed(
-                                              Routes.chatEscalationReport,
-                                              arguments: {'escalationId': e.id},
-                                            );
-                                          },
-                                          child: const Text('عرض التقرير'),
-                                        ),
-                                      OutlinedButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pushNamed(
-                                            Routes.chat,
-                                            arguments: {'threadId': e.threadId},
-                                          );
-                                        },
-                                        child: const Text('فتح الشات'),
+                                            decoration: BoxDecoration(
+                                              color: _riskColor(e.riskLevel)
+                                                  .withValues(alpha: 0.12),
+                                              borderRadius:
+                                                  BorderRadius.circular(999),
+                                            ),
+                                            child: Text(
+                                              'الخطر: ${e.riskLevel}',
+                                              style: TextStyle(
+                                                color: _riskColor(e.riskLevel),
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 6,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: _statusColor(e.status)
+                                                  .withValues(alpha: 0.12),
+                                              borderRadius:
+                                                  BorderRadius.circular(999),
+                                            ),
+                                            child: Text(
+                                              _statusLabel(e.status),
+                                              style: TextStyle(
+                                                color: _statusColor(e.status),
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 6,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFF3ECFF),
+                                              borderRadius:
+                                                  BorderRadius.circular(999),
+                                            ),
+                                            child: Text(
+                                              'النقاط: ${e.riskScore}',
+                                              style: const TextStyle(
+                                                color: Color(0xFF6C55B3),
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      if (isAdminUser &&
-                                          (e.status == 'open' ||
-                                              e.status == 'assigned'))
-                                        FilledButton(
-                                          onPressed: () =>
-                                              _assignToMe(context, e),
-                                          child: const Text('تعيين لي'),
+                                      if (e.assignedToType != null)
+                                        Text(
+                                            'نوع التعيين: ${e.assignedToType == 'admin' ? 'أدمن' : 'أخصائي'}'),
+                                      if (e.assignedToUid != null)
+                                        Text(
+                                            'المعيّن له: ${_assignedLabel(e, cliniciansMap)}'),
+                                      const SizedBox(height: 8),
+                                      if (e.reasonCodes.isNotEmpty)
+                                        Wrap(
+                                          spacing: 8,
+                                          runSpacing: 8,
+                                          children: e.reasonCodes
+                                              .map(
+                                                (r) => Chip(
+                                                  label: Text(_reasonLabel(r)),
+                                                ),
+                                              )
+                                              .toList(),
                                         ),
-                                      if (isAdminUser && e.status != 'resolved')
-                                        FilledButton.tonal(
-                                          onPressed: () =>
-                                              _pickClinicianAndForward(
-                                                  context, e),
-                                          child: const Text('تحويل لأخصائي'),
+                                      if (e.summaryText.isNotEmpty) ...[
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          e.summaryText,
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium,
                                         ),
-                                      if (isAdminUser && e.status != 'resolved')
-                                        FilledButton.tonal(
-                                          onPressed: () =>
-                                              _resolveEscalation(context, e),
-                                          child: const Text('إغلاق الحالة'),
-                                        ),
+                                      ],
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        'Thread ID: ${e.threadId}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Wrap(
+                                        spacing: 12,
+                                        runSpacing: 12,
+                                        children: [
+                                          if (isAdminUser)
+                                            OutlinedButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pushNamed(
+                                                  Routes.chatEscalationReport,
+                                                  arguments: {
+                                                    'escalationId': e.id
+                                                  },
+                                                );
+                                              },
+                                              child: const Text('عرض التقرير'),
+                                            ),
+                                          OutlinedButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pushNamed(
+                                                Routes.chat,
+                                                arguments: {
+                                                  'threadId': e.threadId
+                                                },
+                                              );
+                                            },
+                                            child: const Text('فتح الشات'),
+                                          ),
+                                          if (isAdminUser &&
+                                              (e.status == 'open' ||
+                                                  e.status == 'assigned'))
+                                            FilledButton(
+                                              onPressed: () =>
+                                                  _assignToMe(context, e),
+                                              child: const Text('تعيين لي'),
+                                            ),
+                                          if (isAdminUser &&
+                                              e.status != 'resolved')
+                                            FilledButton.tonal(
+                                              onPressed: () =>
+                                                  _pickClinicianAndForward(
+                                                      context, e),
+                                              child:
+                                                  const Text('تحويل لأخصائي'),
+                                            ),
+                                          if (isAdminUser &&
+                                              e.status != 'resolved')
+                                            FilledButton.tonal(
+                                              onPressed: () =>
+                                                  _resolveEscalation(
+                                                      context, e),
+                                              child: const Text('إغلاق الحالة'),
+                                            ),
+                                        ],
+                                      ),
                                     ],
                                   ),
-                                ],
-                              ),
-                            ),
+                                ),
+                              );
+                            },
                           );
                         },
                       );
-                    },
-                  );
                     },
                   );
                 },

@@ -79,8 +79,9 @@ class _AccountRoleBanner extends StatelessWidget {
           builder: (context, accessSnapshot) {
             final access = accessSnapshot.data;
             final role = _roleLabel(isArabic, access?.role);
-            final identity =
-                (user.email ?? '').trim().isNotEmpty ? user.email!.trim() : user.uid;
+            final identity = (user.email ?? '').trim().isNotEmpty
+                ? user.email!.trim()
+                : user.uid;
 
             return Container(
               width: double.infinity,
@@ -104,7 +105,9 @@ class _AccountRoleBanner extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      isArabic ? 'الحساب الحالي: $role' : 'Current account: $role',
+                      isArabic
+                          ? 'الحساب الحالي: $role'
+                          : 'Current account: $role',
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
                             color: AppColors.deepTeal,
                             fontWeight: FontWeight.w700,

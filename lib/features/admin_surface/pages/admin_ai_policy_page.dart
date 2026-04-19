@@ -190,9 +190,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
     if (_loadedDraftVersion == version) return;
 
     _loadedDraftVersion = version;
-    _draftNotesController.text = _stringValue(data, 'notes') == '—'
-        ? ''
-        : _stringValue(data, 'notes');
+    _draftNotesController.text =
+        _stringValue(data, 'notes') == '—' ? '' : _stringValue(data, 'notes');
 
     final templatesRaw = data['responseTemplates'];
     final templates = templatesRaw is Map
@@ -276,7 +275,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
           ),
           contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
           actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
           scrollable: true,
           actionsOverflowAlignment: OverflowBarAlignment.end,
           contentTextStyle: Theme.of(dialogContext).textTheme.bodyMedium,
@@ -287,8 +287,7 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
                 controller: _publishNoteController,
                 minLines: 2,
                 maxLines: 4,
-                textDirection:
-                    isArabic ? TextDirection.rtl : TextDirection.ltr,
+                textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
                 decoration: InputDecoration(
                   labelText: isArabic ? 'ملاحظة النشر' : 'Publish note',
                   hintText: isArabic
@@ -376,9 +375,7 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isArabic
-                ? 'فشل نشر المسودة: $e'
-                : 'Failed to publish draft: $e',
+            isArabic ? 'فشل نشر المسودة: $e' : 'Failed to publish draft: $e',
           ),
         ),
       );
@@ -505,8 +502,7 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
                 controller: entry.value,
                 minLines: 2,
                 maxLines: 5,
-                textDirection:
-                    isArabic ? TextDirection.rtl : TextDirection.ltr,
+                textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
                 decoration: InputDecoration(
                   labelText: 'responseTemplates.${entry.key}',
                 ),
@@ -865,9 +861,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
                 runSpacing: AppSpacing.md,
                 children: [
                   _SummaryChip(
-                    label: isArabic
-                        ? 'مفاتيح القوالب'
-                        : 'Response template keys',
+                    label:
+                        isArabic ? 'مفاتيح القوالب' : 'Response template keys',
                     count: _mapCount(data, 'responseTemplates'),
                   ),
                   _SummaryChip(
@@ -906,7 +901,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
               ),
               const SizedBox(height: AppSpacing.md),
               _KeyValueBlock(
-                title: isArabic ? 'Thresholds / Weights' : 'Thresholds / Weights',
+                title:
+                    isArabic ? 'Thresholds / Weights' : 'Thresholds / Weights',
                 entries: [
                   MapEntry(
                     'mediumRiskThreshold',
@@ -934,8 +930,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
               _KeyValueBlock(
                 title: isArabic ? 'Strategy Mapping' : 'Strategy Mapping',
                 entries: strategyMap.entries
-                    .map((entry) => MapEntry(entry.key.toString(),
-                        entry.value?.toString() ?? '—'))
+                    .map((entry) => MapEntry(
+                        entry.key.toString(), entry.value?.toString() ?? '—'))
                     .toList(),
               ),
             ],
@@ -984,7 +980,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
           return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
             stream: publishedStream,
             builder: (context, publishedSnapshot) {
-              if (publishedSnapshot.connectionState == ConnectionState.waiting &&
+              if (publishedSnapshot.connectionState ==
+                      ConnectionState.waiting &&
                   !publishedSnapshot.hasData) {
                 return _buildDocumentLoadingState(
                   context,
@@ -1050,8 +1047,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
                     rows: [
                       _ComparisonRowData(
                         label: 'mediumRiskThreshold',
-                        draftValue:
-                            _thresholdValue(draftThresholds, 'mediumRiskThreshold'),
+                        draftValue: _thresholdValue(
+                            draftThresholds, 'mediumRiskThreshold'),
                         publishedValue: _thresholdValue(
                           publishedThresholds,
                           'mediumRiskThreshold',
@@ -1059,8 +1056,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
                       ),
                       _ComparisonRowData(
                         label: 'highRiskThreshold',
-                        draftValue:
-                            _thresholdValue(draftThresholds, 'highRiskThreshold'),
+                        draftValue: _thresholdValue(
+                            draftThresholds, 'highRiskThreshold'),
                         publishedValue: _thresholdValue(
                           publishedThresholds,
                           'highRiskThreshold',
@@ -1091,8 +1088,7 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
                       _ComparisonRowData(
                         label: 'medium',
                         draftValue: '${draftStrategy['medium'] ?? '—'}',
-                        publishedValue:
-                            '${publishedStrategy['medium'] ?? '—'}',
+                        publishedValue: '${publishedStrategy['medium'] ?? '—'}',
                       ),
                       _ComparisonRowData(
                         label: 'high',
@@ -1113,8 +1109,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
                     rows: [
                       _ComparisonRowData(
                         label: 'needsHumanSupportLevels',
-                        draftValue:
-                            _listSummary(_stringList(draft, 'needsHumanSupportLevels')),
+                        draftValue: _listSummary(
+                            _stringList(draft, 'needsHumanSupportLevels')),
                         publishedValue: _listSummary(
                           _stringList(published, 'needsHumanSupportLevels'),
                         ),
@@ -1133,8 +1129,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
                       ),
                       _ComparisonRowData(
                         label: 'safetyTriggeredLevels',
-                        draftValue:
-                            _listSummary(_stringList(draft, 'safetyTriggeredLevels')),
+                        draftValue: _listSummary(
+                            _stringList(draft, 'safetyTriggeredLevels')),
                         publishedValue: _listSummary(
                           _stringList(published, 'safetyTriggeredLevels'),
                         ),
@@ -1161,7 +1157,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
                       ),
                       _ComparisonRowData(
                         label: 'lossOfControlPhrases',
-                        draftValue: '${_listCount(draft, 'lossOfControlPhrases')}',
+                        draftValue:
+                            '${_listCount(draft, 'lossOfControlPhrases')}',
                         publishedValue:
                             '${_listCount(published, 'lossOfControlPhrases')}',
                       ),

@@ -108,8 +108,9 @@ class CenterRequestInboxService {
       );
     }
 
-    final ref =
-        FirebaseFirestore.instance.collection('booking_requests').doc(requestId);
+    final ref = FirebaseFirestore.instance
+        .collection('booking_requests')
+        .doc(requestId);
 
     _log(
       operation: 'respond_read',

@@ -265,10 +265,10 @@ class _SessionReviewPageState extends State<SessionReviewPage> {
               : widget.reviewerType == 'clinician'
                   ? percentageScore
                   : (((isCenterRequest
-                                  ? requestData['centerReviewPercentage']
-                                  : null) ??
-                              requestData['clinicianReviewPercentage']) ??
-                          0) as num)
+                              ? requestData['centerReviewPercentage']
+                              : null) ??
+                          requestData['clinicianReviewPercentage']) ??
+                      0) as num)
           .toDouble();
 
       if (alreadyClient && alreadyPartner) {
@@ -356,9 +356,8 @@ class _SessionReviewPageState extends State<SessionReviewPage> {
   }
 
   String _pageTitle() {
-    final isCenterRequest = _requestData == null
-        ? false
-        : _isCenterRequestData(_requestData!);
+    final isCenterRequest =
+        _requestData == null ? false : _isCenterRequestData(_requestData!);
     if (widget.reviewerType == 'center') {
       return _isArabic ? 'تقرير خروج المركز' : 'Center discharge report';
     }
@@ -523,4 +522,3 @@ class _SessionReviewPageState extends State<SessionReviewPage> {
     );
   }
 }
-

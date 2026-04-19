@@ -328,9 +328,7 @@ class CenterDetailsPage extends StatelessWidget {
                       'السعر: ${item.price}',
                       if (item.pricingUnit.isNotEmpty)
                         'الوحدة: ${unitLabel(item.pricingUnit)}',
-                      item.taxIncluded
-                          ? 'الضريبة شاملة'
-                          : 'الضريبة غير شاملة',
+                      item.taxIncluded ? 'الضريبة شاملة' : 'الضريبة غير شاملة',
                     ].join(' • '),
                     textAlign: TextAlign.right,
                   ),
@@ -359,9 +357,7 @@ class CenterDetailsPage extends StatelessWidget {
                       if (item.includesRequiredTests) 'يشمل الفحوصات',
                       if (item.includesAirportPickup) 'استقبال مطار',
                       if (item.includesTourismOrExternalOutings) 'جولات خارجية',
-                      item.taxIncluded
-                          ? 'الضريبة شاملة'
-                          : 'الضريبة غير شاملة',
+                      item.taxIncluded ? 'الضريبة شاملة' : 'الضريبة غير شاملة',
                     ].join(' • '),
                     textAlign: TextAlign.right,
                   ),

@@ -36,6 +36,13 @@ class AdminCommunicationGatewayPage extends StatelessWidget {
                           color: AppColors.obsidian.withValues(alpha: 0.72),
                         ),
                   ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    'This page supervises connector boundaries only. It does not replace the human communications workspace.',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.obsidian.withValues(alpha: 0.70),
+                        ),
+                  ),
                 ],
               ),
             ),

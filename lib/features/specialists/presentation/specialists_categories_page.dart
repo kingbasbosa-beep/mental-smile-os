@@ -215,4 +215,3 @@ class _SpecialistCategoryCard extends StatelessWidget {
     );
   }
 }
-

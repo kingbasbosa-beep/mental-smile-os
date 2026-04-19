@@ -270,7 +270,8 @@ class AdminSessionReportPage extends StatelessWidget {
                             '')
                         .toString()
                         .trim();
-                    final centerName = (data['centerName'] ?? '').toString().trim();
+                    final centerName =
+                        (data['centerName'] ?? '').toString().trim();
                     final isCenterRequest =
                         (data['requestKind'] ?? '').toString() == 'center';
 
@@ -307,20 +308,19 @@ class AdminSessionReportPage extends StatelessWidget {
                         (data['clientReviewSubmitted'] ?? false) == true;
                     final clinicianReviewSubmitted = isCenterRequest
                         ? ((data['centerReviewSubmitted'] ??
-                                        data['clinicianReviewSubmitted']) ??
-                                    false) ==
-                                true
+                                    data['clinicianReviewSubmitted']) ??
+                                false) ==
+                            true
                         : (data['clinicianReviewSubmitted'] ?? false) == true;
                     final clientReviewPercentage =
                         ((data['clientReviewPercentage'] ?? 0) as num)
                             .toDouble();
                     final clinicianReviewPercentage = (((isCenterRequest
-                                        ? (data['centerReviewPercentage'] ??
-                                            data['clinicianReviewPercentage'])
-                                        : data['clinicianReviewPercentage']) ??
-                                    0)
-                                as num)
-                            .toDouble();
+                                ? (data['centerReviewPercentage'] ??
+                                    data['clinicianReviewPercentage'])
+                                : data['clinicianReviewPercentage']) ??
+                            0) as num)
+                        .toDouble();
                     final finalReviewPercentage =
                         ((data['finalReviewPercentage'] ?? 0) as num)
                             .toDouble();
@@ -674,4 +674,3 @@ class AdminSessionReportPage extends StatelessWidget {
     );
   }
 }
-

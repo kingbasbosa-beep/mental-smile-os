@@ -309,7 +309,8 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
                                           ),
                                           const SizedBox(width: AppSpacing.xs),
                                           AppStatusBadge(
-                                            label: _chatTypeLabel(data, isArabic),
+                                            label:
+                                                _chatTypeLabel(data, isArabic),
                                             color: AppColors.deepTeal,
                                           ),
                                         ],
@@ -400,4 +401,3 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
     );
   }
 }
-

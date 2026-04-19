@@ -36,6 +36,13 @@ class AdminEngineeringGatewayPage extends StatelessWidget {
                           color: AppColors.obsidian.withValues(alpha: 0.72),
                         ),
                   ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    'This page is for technical supervision only: what each tool boundary is for, what is merely planned, and what is being monitored as a shell.',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.obsidian.withValues(alpha: 0.70),
+                        ),
+                  ),
                 ],
               ),
             ),

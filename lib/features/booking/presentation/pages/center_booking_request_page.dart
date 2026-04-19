@@ -144,8 +144,9 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
     final currentUser = FirebaseAuth.instance.currentUser;
     final currentUid = currentUser?.uid ?? '';
     final existing = <DocumentSnapshot<Map<String, dynamic>>>[];
-    final ref =
-        FirebaseFirestore.instance.collection('booking_requests').doc(requestId);
+    final ref = FirebaseFirestore.instance
+        .collection('booking_requests')
+        .doc(requestId);
     debugPrint(
       'CENTER_RESUBMIT_READ existingRequestId=$requestId '
       'collection=${ref.parent.id} currentUid=$currentUid',
@@ -171,9 +172,8 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
         .where('active', isEqualTo: true)
         .get();
 
-    final allAdmins = adminsSnap.docs
-        .where((doc) => doc.id.trim().length == 28)
-        .toList();
+    final allAdmins =
+        adminsSnap.docs.where((doc) => doc.id.trim().length == 28).toList();
     if (allAdmins.isEmpty) {
       throw Exception('لم يتم العثور على حسابات إدارة مفعلة');
     }
@@ -255,11 +255,10 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
       final requestGroupId = firestore.collection('booking_requests').doc().id;
 
       final sentToNames = admins
-          .map((adminDoc) =>
-              (adminDoc.data()['displayName'] ??
-                      adminDoc.data()['email'] ??
-                      'Admin')
-                  .toString())
+          .map((adminDoc) => (adminDoc.data()['displayName'] ??
+                  adminDoc.data()['email'] ??
+                  'Admin')
+              .toString())
           .toList();
       final sentToIds = admins.map((adminDoc) => adminDoc.id).toList();
 
@@ -455,7 +454,8 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
         print('CENTER_TRACE after_create_prep');
         print('CENTER_CREATE before_create_request');
         print('CENTER_CREATE requestGroupId=$requestGroupId');
-        print('CENTER_CREATE selectedAccommodationKey=$_selectedAccommodationKey');
+        print(
+            'CENTER_CREATE selectedAccommodationKey=$_selectedAccommodationKey');
         print('CENTER_CREATE noteLength=${note.length}');
         print('CENTER_CREATE targetAdminIds=$sentToIds');
         final requestRef = firestore.collection('booking_requests').doc();
@@ -724,4 +724,3 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
     );
   }
 }
-

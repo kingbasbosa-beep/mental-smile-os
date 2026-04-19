@@ -1168,352 +1168,357 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                             ),
                             const SizedBox(height: AppSpacing.md),
                             if (_currentStep == 0) ...[
-                            TextFormField(
-                              controller: _nameController,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic ? 'اسم المركز' : 'Center name',
-                                icon: Icons.business_outlined,
-                              ),
-                              validator: (v) => (v == null || v.trim().isEmpty)
-                                  ? (_isArabic
-                                      ? 'أدخل اسم المركز'
-                                      : 'Enter center name')
-                                  : null,
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            DropdownButtonFormField<String>(
-                              initialValue: _selectedCategoryKey,
-                              isExpanded: true,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic
-                                    ? 'فئة / تخصص المركز'
-                                    : 'Center category / specialty',
-                                icon: Icons.category_outlined,
-                              ),
-                              items: _centerCategories
-                                  .map(
-                                    (item) => DropdownMenuItem<String>(
-                                      value: item['key'],
-                                      child: Text(
-                                        _isArabic
-                                            ? (item['labelAr'] ?? '')
-                                            : (item['labelEn'] ?? ''),
-                                        textAlign: _isArabic
-                                            ? TextAlign.right
-                                            : TextAlign.left,
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: _loading
-                                  ? null
-                                  : (value) {
-                                      setState(() {
-                                        _selectedCategoryKey = value;
-                                        _selectedCenterTypeKey =
-                                            _defaultCenterTypeForCategory(
-                                                  value,
-                                                ) ??
-                                                _selectedCenterTypeKey;
-                                        if (_selectedCenterTypeKey == 'detox') {
-                                          _hasDetoxUnit = true;
-                                        }
-                                      });
-                                    },
-                              validator: (value) =>
-                                  (value == null || value.trim().isEmpty)
-                                      ? (_isArabic
-                                          ? 'اختر فئة المركز'
-                                          : 'Select the center category')
-                                      : null,
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            DropdownButtonFormField<String>(
-                              initialValue: _selectedCenterTypeKey,
-                              isExpanded: true,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic
-                                    ? 'نوع المركز التشغيلي'
-                                    : 'Operational center type',
-                                icon: Icons.account_tree_outlined,
-                              ),
-                              items: _centerTypes
-                                  .map(
-                                    (item) => DropdownMenuItem<String>(
-                                      value: item['key'],
-                                      child: Text(
-                                        _isArabic
-                                            ? (item['labelAr'] ?? '')
-                                            : (item['labelEn'] ?? ''),
-                                        textAlign: _isArabic
-                                            ? TextAlign.right
-                                            : TextAlign.left,
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: _loading
-                                  ? null
-                                  : (value) {
-                                      setState(() {
-                                        _selectedCenterTypeKey = value;
-                                        if (value == 'detox') {
-                                          _hasDetoxUnit = true;
-                                        }
-                                      });
-                                    },
-                              validator: (value) =>
-                                  (value == null || value.trim().isEmpty)
-                                      ? (_isArabic
-                                          ? 'اختر نوع المركز'
-                                          : 'Select the center type')
-                                      : null,
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            SwitchListTile.adaptive(
-                              value: _selectedCenterTypeKey == 'detox'
-                                  ? true
-                                  : _hasDetoxUnit,
-                              onChanged: _loading
-                                  ? null
-                                  : _selectedCenterTypeKey == 'detox'
-                                      ? null
-                                      : (value) {
-                                          setState(() {
-                                            _hasDetoxUnit = value;
-                                          });
-                                        },
-                              contentPadding: EdgeInsets.zero,
-                              title: Text(
-                                _isArabic
-                                    ? 'يوجد قسم داخلي لأعراض الانسحاب'
-                                    : 'Includes an internal withdrawal unit',
-                                textAlign: _isArabic
-                                    ? TextAlign.right
-                                    : TextAlign.left,
-                              ),
-                              subtitle: Text(
-                                _selectedCenterTypeKey == 'detox'
-                                    ? (_isArabic
-                                        ? 'مراكز الديتوكس تعتبر هذا القسم متاحًا تلقائيًا.'
-                                        : 'Detox centers always include this unit by default.')
-                                    : (_isArabic
-                                        ? 'فعّل هذا الخيار إذا كان المركز يحتوي على وحدة ديتوكس داخلية بجانب خدمته الأساسية.'
-                                        : 'Enable this if the center includes an internal detox/withdrawal unit alongside its main service.'),
-                                textAlign: _isArabic
-                                    ? TextAlign.right
-                                    : TextAlign.left,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _managerNameController,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label:
-                                    _isArabic ? 'اسم المسؤول' : 'Manager name',
-                                icon: Icons.badge_outlined,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _emailController,
-                              keyboardType: TextInputType.emailAddress,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label:
-                                    _isArabic ? 'البريد الإلكتروني' : 'Email',
-                                icon: Icons.alternate_email,
-                              ),
-                              validator: (v) => (v == null || v.trim().isEmpty)
-                                  ? (_isArabic
-                                      ? 'أدخل البريد الإلكتروني'
-                                      : 'Enter email')
-                                  : null,
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _passwordController,
-                              obscureText: _obscurePassword,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic ? 'كلمة المرور' : 'Password',
-                                icon: Icons.lock_outline,
-                                suffixIcon: IconButton(
-                                  onPressed: _loading
-                                      ? null
-                                      : () {
-                                          setState(() {
-                                            _obscurePassword =
-                                                !_obscurePassword;
-                                          });
-                                        },
-                                  icon: Icon(
-                                    _obscurePassword
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_outlined,
-                                  ),
-                                  tooltip: _isArabic
-                                      ? (_obscurePassword
-                                          ? 'إظهار كلمة المرور'
-                                          : 'إخفاء كلمة المرور')
-                                      : (_obscurePassword
-                                          ? 'Show password'
-                                          : 'Hide password'),
+                              TextFormField(
+                                controller: _nameController,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label:
+                                      _isArabic ? 'اسم المركز' : 'Center name',
+                                  icon: Icons.business_outlined,
                                 ),
+                                validator: (v) =>
+                                    (v == null || v.trim().isEmpty)
+                                        ? (_isArabic
+                                            ? 'أدخل اسم المركز'
+                                            : 'Enter center name')
+                                        : null,
                               ),
-                              validator: (v) {
-                                if (v == null || v.isEmpty) {
-                                  return _isArabic
-                                      ? 'أدخل كلمة المرور'
-                                      : 'Enter password';
-                                }
-                                if (v.length < 6) {
-                                  return _isArabic
-                                      ? '6 أحرف على الأقل'
-                                      : 'At least 6 characters';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _confirmPasswordController,
-                              obscureText: _obscureConfirmPassword,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic
-                                    ? 'تأكيد كلمة المرور'
-                                    : 'Confirm password',
-                                icon: Icons.lock_reset_outlined,
-                                suffixIcon: IconButton(
-                                  onPressed: _loading
-                                      ? null
-                                      : () {
-                                          setState(() {
-                                            _obscureConfirmPassword =
-                                                !_obscureConfirmPassword;
-                                          });
-                                        },
-                                  icon: Icon(
-                                    _obscureConfirmPassword
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_outlined,
-                                  ),
-                                  tooltip: _isArabic
-                                      ? (_obscureConfirmPassword
-                                          ? 'إظهار تأكيد كلمة المرور'
-                                          : 'إخفاء تأكيد كلمة المرور')
-                                      : (_obscureConfirmPassword
-                                          ? 'Show confirm password'
-                                          : 'Hide confirm password'),
+                              const SizedBox(height: AppSpacing.md),
+                              DropdownButtonFormField<String>(
+                                initialValue: _selectedCategoryKey,
+                                isExpanded: true,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic
+                                      ? 'فئة / تخصص المركز'
+                                      : 'Center category / specialty',
+                                  icon: Icons.category_outlined,
                                 ),
-                              ),
-                              validator: (v) {
-                                if (v == null || v.isEmpty) {
-                                  return _isArabic
-                                      ? 'أدخل تأكيد كلمة المرور'
-                                      : 'Enter confirm password';
-                                }
-                                if (v != _passwordController.text) {
-                                  return _isArabic
-                                      ? 'كلمتا المرور غير متطابقتين'
-                                      : 'Passwords do not match';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _phoneController,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic ? 'رقم الهاتف' : 'Phone',
-                                icon: Icons.phone_outlined,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _cityController,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic ? 'المدينة' : 'City',
-                                icon: Icons.location_city_outlined,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.sm),
-                            Align(
-                              alignment: _isArabic
-                                  ? Alignment.centerRight
-                                  : Alignment.centerLeft,
-                              child: OutlinedButton.icon(
-                                onPressed: _resolvingLocation
-                                    ? null
-                                    : () {
-                                        if (kIsWeb) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                _isArabic
-                                                    ? 'ميزة تعبئة العنوان من اللوكيشن غير مفعلة على الويب حاليًا. اكتب المدينة والعنوان يدويًا.'
-                                                    : 'Automatic address filling is not enabled on web for now. Please enter city and address manually.',
-                                              ),
-                                            ),
-                                          );
-                                          return;
-                                        }
-
-                                        _fillFromCurrentLocation();
-                                      },
-                                icon: _resolvingLocation
-                                    ? const SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
+                                items: _centerCategories
+                                    .map(
+                                      (item) => DropdownMenuItem<String>(
+                                        value: item['key'],
+                                        child: Text(
+                                          _isArabic
+                                              ? (item['labelAr'] ?? '')
+                                              : (item['labelEn'] ?? ''),
+                                          textAlign: _isArabic
+                                              ? TextAlign.right
+                                              : TextAlign.left,
                                         ),
-                                      )
-                                    : const Icon(Icons.my_location_rounded),
-                                label: Text(
-                                  kIsWeb
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: _loading
+                                    ? null
+                                    : (value) {
+                                        setState(() {
+                                          _selectedCategoryKey = value;
+                                          _selectedCenterTypeKey =
+                                              _defaultCenterTypeForCategory(
+                                                    value,
+                                                  ) ??
+                                                  _selectedCenterTypeKey;
+                                          if (_selectedCenterTypeKey ==
+                                              'detox') {
+                                            _hasDetoxUnit = true;
+                                          }
+                                        });
+                                      },
+                                validator: (value) =>
+                                    (value == null || value.trim().isEmpty)
+                                        ? (_isArabic
+                                            ? 'اختر فئة المركز'
+                                            : 'Select the center category')
+                                        : null,
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              DropdownButtonFormField<String>(
+                                initialValue: _selectedCenterTypeKey,
+                                isExpanded: true,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic
+                                      ? 'نوع المركز التشغيلي'
+                                      : 'Operational center type',
+                                  icon: Icons.account_tree_outlined,
+                                ),
+                                items: _centerTypes
+                                    .map(
+                                      (item) => DropdownMenuItem<String>(
+                                        value: item['key'],
+                                        child: Text(
+                                          _isArabic
+                                              ? (item['labelAr'] ?? '')
+                                              : (item['labelEn'] ?? ''),
+                                          textAlign: _isArabic
+                                              ? TextAlign.right
+                                              : TextAlign.left,
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: _loading
+                                    ? null
+                                    : (value) {
+                                        setState(() {
+                                          _selectedCenterTypeKey = value;
+                                          if (value == 'detox') {
+                                            _hasDetoxUnit = true;
+                                          }
+                                        });
+                                      },
+                                validator: (value) =>
+                                    (value == null || value.trim().isEmpty)
+                                        ? (_isArabic
+                                            ? 'اختر نوع المركز'
+                                            : 'Select the center type')
+                                        : null,
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              SwitchListTile.adaptive(
+                                value: _selectedCenterTypeKey == 'detox'
+                                    ? true
+                                    : _hasDetoxUnit,
+                                onChanged: _loading
+                                    ? null
+                                    : _selectedCenterTypeKey == 'detox'
+                                        ? null
+                                        : (value) {
+                                            setState(() {
+                                              _hasDetoxUnit = value;
+                                            });
+                                          },
+                                contentPadding: EdgeInsets.zero,
+                                title: Text(
+                                  _isArabic
+                                      ? 'يوجد قسم داخلي لأعراض الانسحاب'
+                                      : 'Includes an internal withdrawal unit',
+                                  textAlign: _isArabic
+                                      ? TextAlign.right
+                                      : TextAlign.left,
+                                ),
+                                subtitle: Text(
+                                  _selectedCenterTypeKey == 'detox'
                                       ? (_isArabic
-                                          ? 'اكتب العنوان يدويًا'
-                                          : 'Enter address manually')
-                                      : (_resolvingLocation
-                                          ? (_isArabic
-                                              ? 'جارٍ تحديد موقعك...'
-                                              : 'Detecting location...')
-                                          : (_isArabic
-                                              ? 'استخدم موقعي الحالي'
-                                              : 'Use current location')),
+                                          ? 'مراكز الديتوكس تعتبر هذا القسم متاحًا تلقائيًا.'
+                                          : 'Detox centers always include this unit by default.')
+                                      : (_isArabic
+                                          ? 'فعّل هذا الخيار إذا كان المركز يحتوي على وحدة ديتوكس داخلية بجانب خدمته الأساسية.'
+                                          : 'Enable this if the center includes an internal detox/withdrawal unit alongside its main service.'),
+                                  textAlign: _isArabic
+                                      ? TextAlign.right
+                                      : TextAlign.left,
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _addressController,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic ? 'العنوان' : 'Address',
-                                icon: Icons.location_on_outlined,
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _managerNameController,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic
+                                      ? 'اسم المسؤول'
+                                      : 'Manager name',
+                                  icon: Icons.badge_outlined,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _descriptionController,
-                              maxLines: 4,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic
-                                    ? 'وصف المركز'
-                                    : 'Center description',
-                                icon: Icons.notes_outlined,
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _emailController,
+                                keyboardType: TextInputType.emailAddress,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label:
+                                      _isArabic ? 'البريد الإلكتروني' : 'Email',
+                                  icon: Icons.alternate_email,
+                                ),
+                                validator: (v) =>
+                                    (v == null || v.trim().isEmpty)
+                                        ? (_isArabic
+                                            ? 'أدخل البريد الإلكتروني'
+                                            : 'Enter email')
+                                        : null,
                               ),
-                            ),
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _passwordController,
+                                obscureText: _obscurePassword,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic ? 'كلمة المرور' : 'Password',
+                                  icon: Icons.lock_outline,
+                                  suffixIcon: IconButton(
+                                    onPressed: _loading
+                                        ? null
+                                        : () {
+                                            setState(() {
+                                              _obscurePassword =
+                                                  !_obscurePassword;
+                                            });
+                                          },
+                                    icon: Icon(
+                                      _obscurePassword
+                                          ? Icons.visibility_off_outlined
+                                          : Icons.visibility_outlined,
+                                    ),
+                                    tooltip: _isArabic
+                                        ? (_obscurePassword
+                                            ? 'إظهار كلمة المرور'
+                                            : 'إخفاء كلمة المرور')
+                                        : (_obscurePassword
+                                            ? 'Show password'
+                                            : 'Hide password'),
+                                  ),
+                                ),
+                                validator: (v) {
+                                  if (v == null || v.isEmpty) {
+                                    return _isArabic
+                                        ? 'أدخل كلمة المرور'
+                                        : 'Enter password';
+                                  }
+                                  if (v.length < 6) {
+                                    return _isArabic
+                                        ? '6 أحرف على الأقل'
+                                        : 'At least 6 characters';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _confirmPasswordController,
+                                obscureText: _obscureConfirmPassword,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic
+                                      ? 'تأكيد كلمة المرور'
+                                      : 'Confirm password',
+                                  icon: Icons.lock_reset_outlined,
+                                  suffixIcon: IconButton(
+                                    onPressed: _loading
+                                        ? null
+                                        : () {
+                                            setState(() {
+                                              _obscureConfirmPassword =
+                                                  !_obscureConfirmPassword;
+                                            });
+                                          },
+                                    icon: Icon(
+                                      _obscureConfirmPassword
+                                          ? Icons.visibility_off_outlined
+                                          : Icons.visibility_outlined,
+                                    ),
+                                    tooltip: _isArabic
+                                        ? (_obscureConfirmPassword
+                                            ? 'إظهار تأكيد كلمة المرور'
+                                            : 'إخفاء تأكيد كلمة المرور')
+                                        : (_obscureConfirmPassword
+                                            ? 'Show confirm password'
+                                            : 'Hide confirm password'),
+                                  ),
+                                ),
+                                validator: (v) {
+                                  if (v == null || v.isEmpty) {
+                                    return _isArabic
+                                        ? 'أدخل تأكيد كلمة المرور'
+                                        : 'Enter confirm password';
+                                  }
+                                  if (v != _passwordController.text) {
+                                    return _isArabic
+                                        ? 'كلمتا المرور غير متطابقتين'
+                                        : 'Passwords do not match';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _phoneController,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic ? 'رقم الهاتف' : 'Phone',
+                                  icon: Icons.phone_outlined,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _cityController,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic ? 'المدينة' : 'City',
+                                  icon: Icons.location_city_outlined,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              Align(
+                                alignment: _isArabic
+                                    ? Alignment.centerRight
+                                    : Alignment.centerLeft,
+                                child: OutlinedButton.icon(
+                                  onPressed: _resolvingLocation
+                                      ? null
+                                      : () {
+                                          if (kIsWeb) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  _isArabic
+                                                      ? 'ميزة تعبئة العنوان من اللوكيشن غير مفعلة على الويب حاليًا. اكتب المدينة والعنوان يدويًا.'
+                                                      : 'Automatic address filling is not enabled on web for now. Please enter city and address manually.',
+                                                ),
+                                              ),
+                                            );
+                                            return;
+                                          }
+
+                                          _fillFromCurrentLocation();
+                                        },
+                                  icon: _resolvingLocation
+                                      ? const SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : const Icon(Icons.my_location_rounded),
+                                  label: Text(
+                                    kIsWeb
+                                        ? (_isArabic
+                                            ? 'اكتب العنوان يدويًا'
+                                            : 'Enter address manually')
+                                        : (_resolvingLocation
+                                            ? (_isArabic
+                                                ? 'جارٍ تحديد موقعك...'
+                                                : 'Detecting location...')
+                                            : (_isArabic
+                                                ? 'استخدم موقعي الحالي'
+                                                : 'Use current location')),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _addressController,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic ? 'العنوان' : 'Address',
+                                  icon: Icons.location_on_outlined,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _descriptionController,
+                                maxLines: 4,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic
+                                      ? 'وصف المركز'
+                                      : 'Center description',
+                                  icon: Icons.notes_outlined,
+                                ),
+                              ),
                             ],
                             if (_currentStep == 1) ...[
                               const SizedBox(height: AppSpacing.md),
@@ -1532,8 +1537,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                   _isArabic
                                       ? 'بعد التسجيل سيتم إنشاء الصفحة الشخصية وغرفة العمليات للمركز، ثم لاحقًا نربط الصور والوثائق والاعتماد.'
                                       : 'After registration, the center dashboard and operations room will be created. Images, documents, and approval will be connected next.',
-                                  style:
-                                      Theme.of(context).textTheme.bodyLarge,
+                                  style: Theme.of(context).textTheme.bodyLarge,
                                 ),
                               ),
                             ],
@@ -1556,8 +1560,8 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                                   _currentStep = 0;
                                                 });
                                               },
-                                        icon:
-                                            const Icon(Icons.arrow_back_rounded),
+                                        icon: const Icon(
+                                            Icons.arrow_back_rounded),
                                         label:
                                             Text(_isArabic ? 'رجوع' : 'Back'),
                                       ),
@@ -1714,4 +1718,3 @@ class _StepBadge extends StatelessWidget {
     );
   }
 }
-

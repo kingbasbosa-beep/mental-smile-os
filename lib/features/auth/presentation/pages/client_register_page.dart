@@ -183,9 +183,9 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
                                     child: Image.asset(
                                       normalizeAssetPath(avatar),
                                       fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) =>
-                                              const AppMissingAssetPlaceholder(),
+                                      errorBuilder: (context, error,
+                                              stackTrace) =>
+                                          const AppMissingAssetPlaceholder(),
                                     ),
                                   ),
                                 ),
@@ -281,4 +281,3 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
     );
   }
 }
-

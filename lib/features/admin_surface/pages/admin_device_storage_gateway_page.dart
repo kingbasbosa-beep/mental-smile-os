@@ -36,6 +36,13 @@ class AdminDeviceStorageGatewayPage extends StatelessWidget {
                           color: AppColors.obsidian.withValues(alpha: 0.72),
                         ),
                   ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    'This page clarifies which hardware and storage boundaries are defined, which are planned, and which remain disconnected by design for now.',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.obsidian.withValues(alpha: 0.70),
+                        ),
+                  ),
                 ],
               ),
             ),

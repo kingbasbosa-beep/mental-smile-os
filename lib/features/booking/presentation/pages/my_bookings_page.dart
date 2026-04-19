@@ -64,8 +64,8 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     String uid,
   ) {
     return _query(uid).snapshots().map(
-      (snapshot) => snapshot.docs.toList()..sort(_compareCreatedAt),
-    );
+          (snapshot) => snapshot.docs.toList()..sort(_compareCreatedAt),
+        );
   }
 
   String _fmtTime(dynamic v) {
@@ -121,11 +121,11 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     var needsCompanion = false;
     final selectedCenterType =
         (requestData['selectedCenterType'] ?? '').toString().trim();
-    final centerHasDetoxUnit = (requestData['centerHasDetoxUnit'] ?? false) == true;
+    final centerHasDetoxUnit =
+        (requestData['centerHasDetoxUnit'] ?? false) == true;
     final showDetoxSection =
         selectedCenterType == 'detox' || centerHasDetoxUnit;
-    final showSpecialNeedsSection =
-        selectedCenterType == 'special_needs_care';
+    final showSpecialNeedsSection = selectedCenterType == 'special_needs_care';
 
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
@@ -188,7 +188,8 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                             controller: priorDetoxHistoryController,
                             maxLines: 2,
                             decoration: const InputDecoration(
-                              labelText: 'تاريخ سابق مع الديتوكس أو أعراض الانسحاب',
+                              labelText:
+                                  'تاريخ سابق مع الديتوكس أو أعراض الانسحاب',
                               border: OutlineInputBorder(),
                             ),
                           ),
@@ -289,7 +290,8 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                           controller: nutritionSupportController,
                           maxLines: 2,
                           decoration: const InputDecoration(
-                            labelText: 'احتياجات التغذية أو الحساسية أو الروتين الطبي',
+                            labelText:
+                                'احتياجات التغذية أو الحساسية أو الروتين الطبي',
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -317,7 +319,8 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                     Navigator.of(dialogContext).pop({
                       'intakeReason': reasonController.text.trim(),
                       'intakeHasSubstanceUse': hasSubstanceUse,
-                      'intakeSubstanceType': substanceTypeController.text.trim(),
+                      'intakeSubstanceType':
+                          substanceTypeController.text.trim(),
                       'intakeLastSubstanceUseAt': lastUseController.text.trim(),
                       'intakeWithdrawalSymptomsText':
                           withdrawalSymptomsController.text.trim(),
@@ -552,7 +555,8 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     final stayStartDateText = (data['stayStartDateText'] ?? '').toString();
     final stayEndDateText = (data['stayEndDateText'] ?? '').toString();
     final stayDurationDays = (data['stayDurationDays'] ?? '').toString();
-    final paymentBreakdownText = (data['paymentBreakdownText'] ?? '').toString();
+    final paymentBreakdownText =
+        (data['paymentBreakdownText'] ?? '').toString();
     final stayTotalAmount = (data['stayTotalAmount'] ?? '').toString();
     final sessionDateText = (data['sessionDateText'] ?? '').toString();
     final sessionLink = (data['sessionLink'] ?? '').toString();
@@ -576,8 +580,10 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
       if (intakeSpecialNeedsConditionType.isNotEmpty)
         'نوع الاحتياج الخاص: $intakeSpecialNeedsConditionType',
       if (stayStartDateText.isNotEmpty) 'بداية الإقامة: $stayStartDateText',
-      if (stayEndDateText.isNotEmpty) 'نهاية الإقامة المبدئية: $stayEndDateText',
-      if (stayDurationDays.isNotEmpty) 'مدة الإقامة المبدئية: $stayDurationDays يوم',
+      if (stayEndDateText.isNotEmpty)
+        'نهاية الإقامة المبدئية: $stayEndDateText',
+      if (stayDurationDays.isNotEmpty)
+        'مدة الإقامة المبدئية: $stayDurationDays يوم',
       if (paymentBreakdownText.isNotEmpty) 'بيان الدفع: $paymentBreakdownText',
       if (stayTotalAmount.isNotEmpty) 'الإجمالي المستحق: $stayTotalAmount',
       if (lastCenterAvailabilityNote.isNotEmpty)
@@ -848,25 +854,23 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                               Routes.centerBookingRequest,
                                               arguments:
                                                   CenterBookingRequestArgs(
-                                                    centerId:
-                                                        (d['centerId'] ?? '')
-                                                            .toString(),
-                                                    centerName: centerName,
-                                                    centerType:
-                                                        (d['selectedCenterType'] ??
-                                                                '')
-                                                            .toString(),
-                                                    hasDetoxUnit:
-                                                        (d['centerHasDetoxUnit'] ??
-                                                                false) ==
-                                                            true,
-                                                    existingRequestId:
-                                                        visibleDocs[i].id,
-                                                  ),
+                                                centerId: (d['centerId'] ?? '')
+                                                    .toString(),
+                                                centerName: centerName,
+                                                centerType:
+                                                    (d['selectedCenterType'] ??
+                                                            '')
+                                                        .toString(),
+                                                hasDetoxUnit:
+                                                    (d['centerHasDetoxUnit'] ??
+                                                            false) ==
+                                                        true,
+                                                existingRequestId:
+                                                    visibleDocs[i].id,
+                                              ),
                                             );
                                           },
-                                          icon:
-                                              const Icon(Icons.edit_outlined),
+                                          icon: const Icon(Icons.edit_outlined),
                                           label:
                                               const Text('تعديل نوع الإقامة'),
                                         ),
@@ -902,8 +906,10 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                               Routes.clientPaymentProof,
                                             );
                                           },
-                                          icon: const Icon(Icons.upload_file_outlined),
-                                          label: const Text('رفع إثبات التحويل'),
+                                          icon: const Icon(
+                                              Icons.upload_file_outlined),
+                                          label:
+                                              const Text('رفع إثبات التحويل'),
                                         ),
                                       ),
                                     ],
@@ -922,4 +928,3 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     );
   }
 }
-

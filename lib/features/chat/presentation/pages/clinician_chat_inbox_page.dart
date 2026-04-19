@@ -99,7 +99,8 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
     return AppColors.mist;
   }
 
-  String _identityLabel(ChatEscalationModel escalation, ChatThreadModel? thread) {
+  String _identityLabel(
+      ChatEscalationModel escalation, ChatThreadModel? thread) {
     final displayName = escalation.ownerDisplayName.trim();
     if (displayName.isNotEmpty && displayName != 'مستخدم') {
       return displayName;
@@ -121,7 +122,8 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
     return 'لا توجد معاينة للرسائل بعد';
   }
 
-  String _currentStateLabel(ChatEscalationModel escalation, ChatThreadModel? thread) {
+  String _currentStateLabel(
+      ChatEscalationModel escalation, ChatThreadModel? thread) {
     if (escalation.status == 'resolved') {
       return 'تم التعامل معها';
     }
@@ -212,7 +214,8 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
     );
   }
 
-  Widget _buildCaseCard(ChatEscalationModel escalation, ChatThreadModel? thread) {
+  Widget _buildCaseCard(
+      ChatEscalationModel escalation, ChatThreadModel? thread) {
     final currentState = _currentStateLabel(escalation, thread);
     final preview = _previewText(escalation, thread);
     final identity = _identityLabel(escalation, thread);
@@ -309,7 +312,8 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
               ),
               if (canMarkHandled)
                 FilledButton.tonal(
-                  onPressed: _resolvingCase ? null : () => _markAsHandled(escalation),
+                  onPressed:
+                      _resolvingCase ? null : () => _markAsHandled(escalation),
                   child: const Text('تم التعامل معها'),
                 ),
             ],

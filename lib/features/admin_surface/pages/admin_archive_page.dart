@@ -272,8 +272,9 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
             builder: (context, snap) {
               if (snap.hasError) {
                 return AppEmptyState(
-                  message:
-                      isArabic ? 'تعذر تحميل الأرشيف' : 'Unable to load archive',
+                  message: isArabic
+                      ? 'تعذر تحميل الأرشيف'
+                      : 'Unable to load archive',
                   icon: Icons.error_outline,
                 );
               }
@@ -394,8 +395,8 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
                                       width: 68,
                                       height: 68,
                                       decoration: BoxDecoration(
-                                        color:
-                                            Colors.white.withValues(alpha: 0.18),
+                                        color: Colors.white
+                                            .withValues(alpha: 0.18),
                                         shape: BoxShape.circle,
                                       ),
                                       child: Icon(
@@ -469,4 +470,3 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
     );
   }
 }
-

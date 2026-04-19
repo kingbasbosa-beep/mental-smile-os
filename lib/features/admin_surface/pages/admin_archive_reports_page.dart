@@ -1129,12 +1129,11 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
         (data['requestKind'] ?? '').toString().trim() == 'center';
     final id = (data['_id'] ?? '').toString();
     final clientId = (data['clientId'] ?? '').toString();
-    final clinicianId =
-        ((isCenterRequest
-                    ? (data['centerId'] ?? '')
-                    : (data['assignedClinicianId'] ?? data['clinicianId'])) ??
-                '')
-            .toString();
+    final clinicianId = ((isCenterRequest
+                ? (data['centerId'] ?? '')
+                : (data['assignedClinicianId'] ?? data['clinicianId'])) ??
+            '')
+        .toString();
 
     return [
       isArabic ? 'تقرير مالي مختصر' : 'Accounting Summary',
@@ -1194,13 +1193,12 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
     final clientName = (item['clientName'] ?? '').toString().trim();
     final isCenterRequest =
         (item['requestKind'] ?? '').toString().trim() == 'center';
-    final clinicianName =
-        ((isCenterRequest
-                    ? (item['centerName'] ?? '')
-                    : (item['assignedClinicianName'] ?? item['clinicianName'])) ??
-                '')
-            .toString()
-            .trim();
+    final clinicianName = ((isCenterRequest
+                ? (item['centerName'] ?? '')
+                : (item['assignedClinicianName'] ?? item['clinicianName'])) ??
+            '')
+        .toString()
+        .trim();
     final archiveSection = (item['archiveSection'] ?? '').toString().trim();
     final status = (item['status'] ?? '').toString();
     final createdAt = _dateText(item['createdAt']);
@@ -1594,8 +1592,7 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
                                         initialValue: _sectionFilter,
                                         decoration: appInputDecoration(
                                           context: context,
-                                          label:
-                                              isArabic ? 'القسم' : 'Section',
+                                          label: isArabic ? 'القسم' : 'Section',
                                           icon: Icons.category_outlined,
                                         ),
                                         items: [
@@ -1625,8 +1622,7 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
                                         initialValue: _statusFilter,
                                         decoration: appInputDecoration(
                                           context: context,
-                                          label:
-                                              isArabic ? 'الحالة' : 'Status',
+                                          label: isArabic ? 'الحالة' : 'Status',
                                           icon: Icons.filter_alt_outlined,
                                         ),
                                         items: [
@@ -1694,8 +1690,7 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
                                           label: isArabic
                                               ? 'الأخصائي'
                                               : 'Clinician',
-                                          icon: Icons
-                                              .medical_services_outlined,
+                                          icon: Icons.medical_services_outlined,
                                         ),
                                         items: [
                                           DropdownMenuItem(
@@ -1760,4 +1755,3 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
     );
   }
 }
-

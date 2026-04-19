@@ -29,7 +29,8 @@ class ChatHealthService {
     }
 
     try {
-      final threadSnapshot = await _db.collection('chat_threads').limit(400).get();
+      final threadSnapshot =
+          await _db.collection('chat_threads').limit(400).get();
       openAdminSupportCount = threadSnapshot.docs.where((doc) {
         final data = doc.data();
         final needsHumanSupport = (data['needsHumanSupport'] ?? false) == true;

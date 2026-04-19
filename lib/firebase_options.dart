@@ -71,5 +71,4 @@ class DefaultFirebaseOptions {
     authDomain: 'mental-smile-app-clean.firebaseapp.com',
     storageBucket: 'mental-smile-app-clean.firebasestorage.app',
   );
-
 }

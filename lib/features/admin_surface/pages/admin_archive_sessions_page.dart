@@ -795,4 +795,3 @@ class _AdminArchiveSessionsPageState extends State<AdminArchiveSessionsPage> {
     );
   }
 }
-

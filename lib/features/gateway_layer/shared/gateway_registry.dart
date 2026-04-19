@@ -13,8 +13,12 @@ const gatewayFamilyEntries = <GatewayFamilyEntry>[
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
       summary:
-          'Shell ready. External channel integrations are not connected yet.',
-      note: 'Use Communications for human case handling.',
+          'Defined as a top-level gateway family for channel intake and routing boundaries.',
+      boundaryNote:
+          'Owns channel boundaries and intake routing. Human conversations stay in Communications.',
+      monitoredNote:
+          'Not integrated yet. No external channel connectors are active.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayFamilyEntry(
@@ -25,8 +29,13 @@ const gatewayFamilyEntries = <GatewayFamilyEntry>[
     route: Routes.adminEngineeringGateway,
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Shell ready. Tool supervision only for now.',
-      note: 'No direct tooling actions yet.',
+      summary:
+          'Defined as a top-level gateway family for tooling, diagnostics, and technical maintenance boundaries.',
+      boundaryNote:
+          'Owns technical tool boundaries without mixing them into daily admin workflows.',
+      monitoredNote:
+          'Not integrated yet. No tool actions, repo checks, or diagnostics polling are active.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayFamilyEntry(
@@ -37,8 +46,13 @@ const gatewayFamilyEntries = <GatewayFamilyEntry>[
     route: Routes.adminDeviceStorageGateway,
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Shell ready. Device and storage supervision only.',
-      note: 'No probing or sync automation yet.',
+      summary:
+          'Defined as a top-level gateway family for devices, storage units, backup, and sync boundaries.',
+      boundaryNote:
+          'Owns hardware and storage compartment boundaries without mixing them into archive or operations pages.',
+      monitoredNote:
+          'Not integrated yet. No device probing, storage checks, or sync automation are active.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
 ];
@@ -50,8 +64,10 @@ const communicationGatewayEntries = <GatewayEntry>[
     boundary: 'Website chat intake boundary and routing health.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Not integrated yet.',
-      note: 'Future channel entry for web-origin conversations.',
+      summary: 'Reserved for web-origin conversation intake.',
+      boundaryNote: 'Separates website intake from human support handling.',
+      monitoredNote: 'Not integrated yet.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayEntry(
@@ -60,8 +76,10 @@ const communicationGatewayEntries = <GatewayEntry>[
     boundary: 'Support mailbox intake and routing boundary.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Not integrated yet.',
-      note: 'Keep mailbox handling outside core business queues.',
+      summary: 'Reserved for support mailbox intake supervision.',
+      boundaryNote: 'Keeps email intake outside core business queues.',
+      monitoredNote: 'Not integrated yet.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayEntry(
@@ -70,8 +88,11 @@ const communicationGatewayEntries = <GatewayEntry>[
     boundary: 'WhatsApp connector boundary and intake supervision.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Not integrated yet.',
-      note: 'Future external support intake path.',
+      summary: 'Reserved for WhatsApp intake supervision.',
+      boundaryNote:
+          'Keeps messaging-channel intake outside direct case handling.',
+      monitoredNote: 'Not integrated yet.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayEntry(
@@ -80,8 +101,10 @@ const communicationGatewayEntries = <GatewayEntry>[
     boundary: 'Facebook or Messenger intake supervision.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Not integrated yet.',
-      note: 'Keep social intake separate from case handling.',
+      summary: 'Reserved for social-channel intake supervision.',
+      boundaryNote: 'Keeps social intake separate from case handling.',
+      monitoredNote: 'Not integrated yet.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayEntry(
@@ -90,8 +113,11 @@ const communicationGatewayEntries = <GatewayEntry>[
     boundary: 'Telegram intake routing boundary.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Not integrated yet.',
-      note: 'Placeholder for future channel supervision.',
+      summary: 'Reserved for Telegram intake supervision.',
+      boundaryNote:
+          'Keeps Telegram intake isolated as its own connector boundary.',
+      monitoredNote: 'Not integrated yet.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayEntry(
@@ -101,8 +127,11 @@ const communicationGatewayEntries = <GatewayEntry>[
         'Meeting-link coordination boundary for future external channels.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Not integrated yet.',
-      note: 'Session scheduling remains under Operations.',
+      summary: 'Reserved for external meeting-link coordination boundaries.',
+      boundaryNote:
+          'Operations still owns session scheduling and session state transitions.',
+      monitoredNote: 'Not integrated yet.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayEntry(
@@ -111,8 +140,10 @@ const communicationGatewayEntries = <GatewayEntry>[
     boundary: 'Routing boundary for future external support intake.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Not integrated yet.',
-      note: 'Future normalization point before Communications handling.',
+      summary: 'Reserved as a normalization point for future external intake.',
+      boundaryNote: 'Routes future intake before Communications handling.',
+      monitoredNote: 'Not integrated yet.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
 ];
@@ -124,8 +155,11 @@ const engineeringGatewayEntries = <GatewayEntry>[
     boundary: 'AI-assisted development and maintenance workspace boundary.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Shell only.',
-      note: 'Use for supervision and maintenance visibility later.',
+      summary: 'Reserved for AI-assisted development workspace supervision.',
+      boundaryNote:
+          'Keeps Codex-related maintenance awareness outside business workflows.',
+      monitoredNote: 'Monitored as shell only. No tooling actions are active.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayEntry(
@@ -134,8 +168,12 @@ const engineeringGatewayEntries = <GatewayEntry>[
     boundary: 'AI collaboration and smart maintenance support boundary.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Shell only.',
-      note: 'No direct automation actions yet.',
+      summary: 'Reserved for AI collaboration and smart maintenance support.',
+      boundaryNote:
+          'Keeps assistant tooling visible without mixing it into governance or operations.',
+      monitoredNote:
+          'Monitored as shell only. No automation actions are active.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayEntry(
@@ -144,8 +182,11 @@ const engineeringGatewayEntries = <GatewayEntry>[
     boundary: 'Browser-based admin and development tool boundary.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Shell only.',
-      note: 'Keep browser workflows isolated from core operations.',
+      summary: 'Reserved for browser-based admin and maintenance workspaces.',
+      boundaryNote:
+          'Keeps browser tooling isolated from core business workflows.',
+      monitoredNote: 'Monitored as shell only. No workspace checks are active.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayEntry(
@@ -154,8 +195,12 @@ const engineeringGatewayEntries = <GatewayEntry>[
     boundary: 'Backend console and project maintenance boundary.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Shell only.',
-      note: 'No backend operations executed from this page.',
+      summary:
+          'Reserved for backend console and project maintenance awareness.',
+      boundaryNote:
+          'Keeps backend tooling visible without executing backend operations here.',
+      monitoredNote: 'Monitored as shell only. No backend checks are active.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayEntry(
@@ -164,8 +209,12 @@ const engineeringGatewayEntries = <GatewayEntry>[
     boundary: 'Repository and release-maintenance boundary.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Shell only.',
-      note: 'Future integration awareness surface.',
+      summary: 'Reserved for repository and release-maintenance awareness.',
+      boundaryNote:
+          'Keeps repository tooling separate from daily admin operations.',
+      monitoredNote:
+          'Monitored as shell only. No repository checks are active.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayEntry(
@@ -174,8 +223,12 @@ const engineeringGatewayEntries = <GatewayEntry>[
     boundary: 'Diagnostics and maintenance-observability boundary.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Shell only.',
-      note: 'Keep QA visibility separate from business operations.',
+      summary: 'Reserved for diagnostics and QA observability supervision.',
+      boundaryNote:
+          'Keeps maintenance observability outside business workflow pages.',
+      monitoredNote:
+          'Monitored as shell only. No diagnostics polling is active.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
 ];
@@ -187,8 +240,12 @@ const deviceStorageGatewayEntries = <GatewayEntry>[
     boundary: 'Primary control hub device boundary.',
     status: GatewayStatus(
       level: GatewayHealthLevel.healthy,
-      summary: 'Primary hub defined.',
-      note: 'This device is the central administrative workstation.',
+      summary:
+          'Primary hub is defined as the central administrative workstation.',
+      boundaryNote:
+          'Acts as the central control hub while other technical units remain isolatable.',
+      monitoredNote:
+          'Monitored as declared infrastructure only. No device probing is active.',
     ),
   ),
   GatewayEntry(
@@ -197,8 +254,11 @@ const deviceStorageGatewayEntries = <GatewayEntry>[
     boundary: 'Companion device boundary.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Companion device placeholder.',
-      note: 'Future mobile companion supervision surface.',
+      summary: 'Reserved for the future companion device boundary.',
+      boundaryNote:
+          'Keeps mobile supervision separate from the primary admin laptop.',
+      monitoredNote: 'Not connected yet.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayEntry(
@@ -207,8 +267,10 @@ const deviceStorageGatewayEntries = <GatewayEntry>[
     boundary: 'Future Apple-device boundary.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Future placeholder.',
-      note: 'Reserved for later ecosystem expansion.',
+      summary: 'Reserved for future Apple-device boundaries.',
+      boundaryNote: 'Keeps future platform expansion explicit and isolated.',
+      monitoredNote: 'Not connected yet.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayEntry(
@@ -217,8 +279,11 @@ const deviceStorageGatewayEntries = <GatewayEntry>[
     boundary: 'External storage and drive isolation boundary.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Not connected in software yet.',
-      note: 'Supervision shell only.',
+      summary: 'Reserved for external drive supervision boundaries.',
+      boundaryNote:
+          'Keeps removable storage isolated from the rest of the admin surface.',
+      monitoredNote: 'Not connected yet.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayEntry(
@@ -227,8 +292,10 @@ const deviceStorageGatewayEntries = <GatewayEntry>[
     boundary: 'Backup and archive storage boundary.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Shell only.',
-      note: 'Archive browsing remains outside hardware supervision.',
+      summary: 'Reserved for backup and archive storage boundaries.',
+      boundaryNote: 'Archive browsing remains outside hardware supervision.',
+      monitoredNote: 'Not connected yet.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
   GatewayEntry(
@@ -237,8 +304,12 @@ const deviceStorageGatewayEntries = <GatewayEntry>[
     boundary: 'Sync and transfer boundary between tools and devices.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Shell only.',
-      note: 'Keep transfer boundaries explicit and isolated.',
+      summary:
+          'Reserved for sync and transfer boundaries between tools and devices.',
+      boundaryNote:
+          'Keeps import/export and sync boundaries explicit and isolated.',
+      monitoredNote: 'Not connected yet.',
+      attentionLabel: 'Planned boundary',
     ),
   ),
 ];

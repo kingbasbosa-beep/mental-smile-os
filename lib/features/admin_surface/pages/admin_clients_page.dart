@@ -371,4 +371,3 @@ class _AdminClientsPageState extends State<AdminClientsPage> {
     );
   }
 }
-

@@ -218,13 +218,13 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
                       (selectedData['centerName'] ?? '').toString();
                   final selectedNote = (selectedData['note'] ?? '').toString();
                   final isCenterRequest =
-                      (selectedData['requestKind'] ?? '').toString() == 'center' ||
+                      (selectedData['requestKind'] ?? '').toString() ==
+                              'center' ||
                           selectedCenterName.trim().isNotEmpty;
-                  final stayStart =
-                      (selectedData['stayStartDateText'] ??
-                              selectedData['sessionDateText'] ??
-                              '')
-                          .toString();
+                  final stayStart = (selectedData['stayStartDateText'] ??
+                          selectedData['sessionDateText'] ??
+                          '')
+                      .toString();
                   final stayEnd =
                       (selectedData['stayEndDateText'] ?? '').toString();
                   final stayDurationDays =
@@ -389,8 +389,7 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
                                       : 'Your note: $selectedNote',
                                 ),
                               ),
-                            if (isCenterRequest &&
-                                stayStart.trim().isNotEmpty)
+                            if (isCenterRequest && stayStart.trim().isNotEmpty)
                               Padding(
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
@@ -501,4 +500,3 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
     );
   }
 }
-

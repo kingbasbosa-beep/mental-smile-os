@@ -279,8 +279,7 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                       controller: notesController,
                       maxLines: 4,
                       decoration: InputDecoration(
-                        labelText:
-                            isArabic ? 'ملاحظات الأسرة' : 'Family notes',
+                        labelText: isArabic ? 'ملاحظات الأسرة' : 'Family notes',
                         border: const OutlineInputBorder(),
                       ),
                     ),
@@ -365,13 +364,14 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
         SnackBar(
           content: Text(
             isArabic
-              ? 'تم تأكيد بداية الإقامة بنجاح'
-              : 'Residency start confirmed successfully',
+                ? 'تم تأكيد بداية الإقامة بنجاح'
+                : 'Residency start confirmed successfully',
           ),
         ),
       );
     } catch (e) {
-      debugPrint('CENTER_START_TRACE_ERROR requestId=$requestId role=client error=$e');
+      debugPrint(
+          'CENTER_START_TRACE_ERROR requestId=$requestId role=client error=$e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -432,9 +432,9 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                   }
 
                   final docs = _normalizeDocs(
-                        snapshot.data!.docs,
-                        'booking_requests',
-                      ).where(_isSessionRelated).toList()
+                    snapshot.data!.docs,
+                    'booking_requests',
+                  ).where(_isSessionRelated).toList()
                     ..sort((a, b) {
                       final aTs = a['updatedAt'] ?? a['createdAt'];
                       final bTs = b['updatedAt'] ?? b['createdAt'];
@@ -461,11 +461,10 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                       final requestId = (data['_id'] ?? '').toString();
                       final status = (data['status'] ?? '').toString();
                       final isCenterRequest = _isCenterRequestData(data);
-                      final clinicianName =
-                          (data['assignedClinicianName'] ??
-                                  data['clinicianName'] ??
-                                  '')
-                              .toString();
+                      final clinicianName = (data['assignedClinicianName'] ??
+                              data['clinicianName'] ??
+                              '')
+                          .toString();
                       final centerName = (data['centerName'] ?? '').toString();
                       final titleText = isCenterRequest
                           ? (centerName.trim().isEmpty
@@ -476,16 +475,17 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                               : clinicianName);
                       final sessionDate =
                           (data['sessionDateText'] ?? '').toString();
-                      final sessionLink = (data['sessionLink'] ?? '').toString();
-                      final sessionCode = (data['sessionCode'] ?? '').toString();
+                      final sessionLink =
+                          (data['sessionLink'] ?? '').toString();
+                      final sessionCode =
+                          (data['sessionCode'] ?? '').toString();
                       final adminNotes =
                           (data['sessionAdminNotes'] ?? '').toString();
-                      final stayStartText =
-                          (data['stayStartDateText'] ??
-                                  data['sessionDateText'] ??
-                                  '')
-                              .toString()
-                              .trim();
+                      final stayStartText = (data['stayStartDateText'] ??
+                              data['sessionDateText'] ??
+                              '')
+                          .toString()
+                          .trim();
                       final stayEndText =
                           (data['stayEndDateText'] ?? '').toString().trim();
                       final stayDurationDays =
@@ -613,8 +613,7 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                                     ? '${isCenterRequest ? 'موعد بداية الإقامة' : 'موعد الجلسة'}: $stayStartText'
                                     : '${isCenterRequest ? 'Residency start' : 'Session date'}: $stayStartText',
                               ),
-                            if (isCenterRequest &&
-                                stayEndText.isNotEmpty) ...[
+                            if (isCenterRequest && stayEndText.isNotEmpty) ...[
                               const SizedBox(height: 8),
                               Text(
                                 isArabic
@@ -696,7 +695,8 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                                     ? 'تأكيد الأسرة لبداية الإقامة: ${clientCheckInConfirmed ? 'تم' : 'بانتظار التأكيد'}'
                                     : 'Family check-in confirmation: ${clientCheckInConfirmed ? 'confirmed' : 'pending'}',
                               ),
-                              if (status == 'session_completed_pending_reviews' ||
+                              if (status ==
+                                      'session_completed_pending_reviews' ||
                                   status == 'payout_pending') ...[
                                 const SizedBox(height: 6),
                                 Text(

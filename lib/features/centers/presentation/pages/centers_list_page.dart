@@ -76,9 +76,7 @@ class CentersListPage extends StatelessWidget {
 
   String _fallbackAsset(CenterModel c) {
     if (c.coverImageAsset.trim().isNotEmpty) {
-      return c.coverImageAsset
-          .trim()
-          .replaceFirst('assets/assets/', 'assets/');
+      return c.coverImageAsset.trim().replaceFirst('assets/assets/', 'assets/');
     }
     if (c.category == 'detox') return 'assets/c7_branding/home/home_bg.png';
     if (c.category == 'special_needs') {
@@ -309,7 +307,8 @@ class CentersListPage extends StatelessWidget {
                                         ),
                                       ),
                                       const SizedBox(width: 10),
-                                      const Icon(Icons.phone_outlined, size: 18),
+                                      const Icon(Icons.phone_outlined,
+                                          size: 18),
                                       const SizedBox(width: 6),
                                       const Text('هاتف'),
                                     ],
@@ -515,4 +514,3 @@ class _InfoChip extends StatelessWidget {
     );
   }
 }
-

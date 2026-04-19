@@ -346,4 +346,3 @@ class _CenterCategoryCard extends StatelessWidget {
     );
   }
 }
-

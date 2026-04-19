@@ -112,8 +112,9 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
       'updatedAt': FieldValue.serverTimestamp(),
     };
 
-    final ref =
-        FirebaseFirestore.instance.collection('booking_requests').doc(requestId);
+    final ref = FirebaseFirestore.instance
+        .collection('booking_requests')
+        .doc(requestId);
     final snap = await ref.get();
     if (snap.exists) {
       await ref.update(payload);
@@ -680,8 +681,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                           (data['selectedAccommodationPricingUnit'] ?? '')
                               .toString()
                               .trim();
-                      final enteredDurationDays =
-                          _asInt(durationCtrl.text.trim().isEmpty
+                      final enteredDurationDays = _asInt(
+                          durationCtrl.text.trim().isEmpty
                               ? data['stayDurationDays']
                               : durationCtrl.text.trim());
                       final computedBaseAmount =
@@ -957,8 +958,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                         : '${isCenterRequest ? 'Residency start' : 'Session date'}: ${(data['sessionDateText'] ?? '').toString()}',
                                   ),
                                 ),
-                              if (isCenterRequest &&
-                                  stayEndDateText.isNotEmpty)
+                              if (isCenterRequest && stayEndDateText.isNotEmpty)
                                 Padding(
                                   padding: const EdgeInsets.only(
                                       bottom: AppSpacing.xs),
@@ -990,8 +990,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                         : 'Reason for preliminary duration: $stayDurationReason',
                                   ),
                                 ),
-                              if (isCenterRequest &&
-                                  stayDurationIsPreliminary)
+                              if (isCenterRequest && stayDurationIsPreliminary)
                                 Padding(
                                   padding: const EdgeInsets.only(
                                       bottom: AppSpacing.xs),
@@ -1055,7 +1054,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                 )
                               else
                                 const SizedBox(height: AppSpacing.sm),
-                              if (status == 'session_completed_pending_reviews' ||
+                              if (status ==
+                                      'session_completed_pending_reviews' ||
                                   status == 'payout_pending') ...[
                                 Text(
                                   isArabic
@@ -1070,7 +1070,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                 ),
                                 const SizedBox(height: AppSpacing.sm),
                               ],
-                            ] else if (status == 'session_completed_pending_reviews' ||
+                            ] else if (status ==
+                                    'session_completed_pending_reviews' ||
                                 status == 'payout_pending') ...[
                               Text(
                                 isArabic
@@ -1190,4 +1191,3 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
     );
   }
 }
-

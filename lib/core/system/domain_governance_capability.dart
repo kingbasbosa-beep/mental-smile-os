@@ -18,77 +18,77 @@ class DomainGovernanceCapability {
 
 const Map<DomainKey, DomainGovernanceCapability> domainGovernanceMatrix =
     <DomainKey, DomainGovernanceCapability>{
-      DomainKey.chat: DomainGovernanceCapability(
-        advisoryOnly: true,
-        maintenanceNotice: true,
-        editorDisable: false,
-        entryPointHide: false,
-        protectedRawWrites: true,
-      ),
-      DomainKey.booking: DomainGovernanceCapability(
-        advisoryOnly: true,
-        maintenanceNotice: true,
-        editorDisable: false,
-        entryPointHide: false,
-        protectedRawWrites: true,
-      ),
-      DomainKey.specialistWorkspace: DomainGovernanceCapability(
-        advisoryOnly: true,
-        maintenanceNotice: true,
-        editorDisable: false,
-        entryPointHide: false,
-        protectedRawWrites: true,
-      ),
-      DomainKey.aiPolicy: DomainGovernanceCapability(
-        advisoryOnly: true,
-        maintenanceNotice: true,
-        editorDisable: true,
-        entryPointHide: true,
-        protectedRawWrites: false,
-      ),
-      DomainKey.adminControl: DomainGovernanceCapability(
-        advisoryOnly: true,
-        maintenanceNotice: true,
-        editorDisable: false,
-        entryPointHide: false,
-        protectedRawWrites: false,
-      ),
-      DomainKey.library: DomainGovernanceCapability(
-        advisoryOnly: true,
-        maintenanceNotice: true,
-        editorDisable: true,
-        entryPointHide: true,
-        protectedRawWrites: false,
-      ),
-      DomainKey.reportsInsights: DomainGovernanceCapability(
-        advisoryOnly: true,
-        maintenanceNotice: true,
-        editorDisable: true,
-        entryPointHide: true,
-        protectedRawWrites: false,
-      ),
-      DomainKey.communication: DomainGovernanceCapability(
-        advisoryOnly: true,
-        maintenanceNotice: true,
-        editorDisable: false,
-        entryPointHide: false,
-        protectedRawWrites: true,
-      ),
-      DomainKey.marketing: DomainGovernanceCapability(
-        advisoryOnly: true,
-        maintenanceNotice: true,
-        editorDisable: true,
-        entryPointHide: true,
-        protectedRawWrites: false,
-      ),
-      DomainKey.externalSessions: DomainGovernanceCapability(
-        advisoryOnly: true,
-        maintenanceNotice: true,
-        editorDisable: false,
-        entryPointHide: false,
-        protectedRawWrites: true,
-      ),
-    };
+  DomainKey.chat: DomainGovernanceCapability(
+    advisoryOnly: true,
+    maintenanceNotice: true,
+    editorDisable: false,
+    entryPointHide: false,
+    protectedRawWrites: true,
+  ),
+  DomainKey.booking: DomainGovernanceCapability(
+    advisoryOnly: true,
+    maintenanceNotice: true,
+    editorDisable: false,
+    entryPointHide: false,
+    protectedRawWrites: true,
+  ),
+  DomainKey.specialistWorkspace: DomainGovernanceCapability(
+    advisoryOnly: true,
+    maintenanceNotice: true,
+    editorDisable: false,
+    entryPointHide: false,
+    protectedRawWrites: true,
+  ),
+  DomainKey.aiPolicy: DomainGovernanceCapability(
+    advisoryOnly: true,
+    maintenanceNotice: true,
+    editorDisable: true,
+    entryPointHide: true,
+    protectedRawWrites: false,
+  ),
+  DomainKey.adminControl: DomainGovernanceCapability(
+    advisoryOnly: true,
+    maintenanceNotice: true,
+    editorDisable: false,
+    entryPointHide: false,
+    protectedRawWrites: false,
+  ),
+  DomainKey.library: DomainGovernanceCapability(
+    advisoryOnly: true,
+    maintenanceNotice: true,
+    editorDisable: true,
+    entryPointHide: true,
+    protectedRawWrites: false,
+  ),
+  DomainKey.reportsInsights: DomainGovernanceCapability(
+    advisoryOnly: true,
+    maintenanceNotice: true,
+    editorDisable: true,
+    entryPointHide: true,
+    protectedRawWrites: false,
+  ),
+  DomainKey.communication: DomainGovernanceCapability(
+    advisoryOnly: true,
+    maintenanceNotice: true,
+    editorDisable: false,
+    entryPointHide: false,
+    protectedRawWrites: true,
+  ),
+  DomainKey.marketing: DomainGovernanceCapability(
+    advisoryOnly: true,
+    maintenanceNotice: true,
+    editorDisable: true,
+    entryPointHide: true,
+    protectedRawWrites: false,
+  ),
+  DomainKey.externalSessions: DomainGovernanceCapability(
+    advisoryOnly: true,
+    maintenanceNotice: true,
+    editorDisable: false,
+    entryPointHide: false,
+    protectedRawWrites: true,
+  ),
+};
 
 DomainGovernanceCapability governanceCapabilityFor(DomainKey key) {
   return domainGovernanceMatrix[key] ??

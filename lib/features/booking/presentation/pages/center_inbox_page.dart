@@ -227,7 +227,8 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                       ChoiceChip(
                         label: Text(isArabic ? 'متاح' : 'Available'),
                         selected: _filter == 'available',
-                        onSelected: (_) => setState(() => _filter = 'available'),
+                        onSelected: (_) =>
+                            setState(() => _filter = 'available'),
                       ),
                       ChoiceChip(
                         label: Text(isArabic ? 'غير متاح' : 'Unavailable'),
@@ -422,7 +423,8 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                           Routes.centerResidencies,
                                         );
                                       },
-                                      icon: const Icon(Icons.home_work_outlined),
+                                      icon:
+                                          const Icon(Icons.home_work_outlined),
                                       label: Text(
                                         isArabic
                                             ? 'فتح ملف الإقامة'
@@ -480,4 +482,3 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
     );
   }
 }
-

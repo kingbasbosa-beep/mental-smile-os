@@ -34,7 +34,8 @@ class GatewayMonitor {
         label: gatewayKey,
         level: healthService.evaluateLevel(gatewayKey),
         summary: 'Gateway shell is defined.',
-        monitoredNote: 'Placeholder-only monitoring. No external checks are running.',
+        monitoredNote:
+            'Placeholder-only monitoring. No external checks are running.',
       ),
     );
   }

@@ -249,8 +249,7 @@ class SupportEntryPage extends StatelessWidget {
                         label: isArabic
                             ? 'استعرض الأخصائيين'
                             : 'Browse specialists',
-                        asset:
-                            'c7_branding/buttons/secondary_button.png',
+                        asset: 'c7_branding/buttons/secondary_button.png',
                         onTap: () =>
                             Navigator.of(context).pushNamed(Routes.specialists),
                       ),
@@ -518,4 +517,3 @@ class _HeroActionButton extends StatelessWidget {
     );
   }
 }
-

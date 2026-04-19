@@ -166,9 +166,7 @@ class CenterDashboardPage extends StatelessWidget {
       case 'hospital':
         return isArabic ? 'مستشفى' : 'Hospital';
       case 'special_needs_care':
-        return isArabic
-            ? 'رعاية ذوي الاحتياجات الخاصة'
-            : 'Special Needs Care';
+        return isArabic ? 'رعاية ذوي الاحتياجات الخاصة' : 'Special Needs Care';
       case 'halfway_house':
       default:
         return isArabic ? 'هاف واي' : 'Halfway House';
@@ -274,7 +272,8 @@ class CenterDashboardPage extends StatelessWidget {
                                     color: const Color(0xFF6C55B3),
                                   ),
                                   _MiniBadge(
-                                    label: _centerTypeLabel(centerType, isArabic),
+                                    label:
+                                        _centerTypeLabel(centerType, isArabic),
                                     color: const Color(0xFF2F6B5F),
                                   ),
                                   _MiniBadge(
@@ -315,8 +314,7 @@ class CenterDashboardPage extends StatelessWidget {
                     accent: const Color(0xFF2F6B5F),
                     badgeLabel: isArabic ? 'إقامة' : 'Residency',
                     assetPath: 'c7_branding/home/hero_art.png',
-                    actionLabel:
-                        isArabic ? 'فتح الإقامات' : 'Open residencies',
+                    actionLabel: isArabic ? 'فتح الإقامات' : 'Open residencies',
                     onTap: () => Navigator.of(context)
                         .pushNamed(Routes.centerResidencies),
                   ),
@@ -997,4 +995,3 @@ class _MiniBadge extends StatelessWidget {
     );
   }
 }
-

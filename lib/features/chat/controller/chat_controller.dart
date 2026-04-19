@@ -50,9 +50,8 @@ class ChatController {
   ) {
     if (!kDebugMode) return;
 
-    final legacyFallbackThreads = threads
-        .where(_isLegacyBookingFollowupFallbackThread)
-        .toList();
+    final legacyFallbackThreads =
+        threads.where(_isLegacyBookingFollowupFallbackThread).toList();
 
     if (legacyFallbackThreads.isEmpty) return;
 
@@ -113,8 +112,7 @@ class ChatController {
     _debugMeasureLegacyBookingFollowupThreads(user.uid, existingThreads);
     final aiThreads = existingThreads
         .where((thread) =>
-            !_isAdminSupportThread(thread) &&
-            !_isBookingFollowupThread(thread))
+            !_isAdminSupportThread(thread) && !_isBookingFollowupThread(thread))
         .toList()
       ..sort((a, b) {
         final aDate = a.updatedAt ??

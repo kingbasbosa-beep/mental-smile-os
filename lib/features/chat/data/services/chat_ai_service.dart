@@ -120,8 +120,7 @@ class ChatAiService {
     }
 
     final String riskLevel;
-    if (explicitSelfHarmIntent ||
-        riskScore >= _policy.criticalRiskThreshold) {
+    if (explicitSelfHarmIntent || riskScore >= _policy.criticalRiskThreshold) {
       riskLevel = 'critical';
     } else if (riskScore >= _policy.highRiskThreshold) {
       riskLevel = 'high';
@@ -134,8 +133,7 @@ class ChatAiService {
     final String strategyMode = _strategyForRiskLevel(riskLevel);
 
     final bool safetyTriggered = _safetyTriggeredForRiskLevel(riskLevel);
-    final bool needsHumanSupport =
-        _needsHumanSupportForRiskLevel(riskLevel);
+    final bool needsHumanSupport = _needsHumanSupportForRiskLevel(riskLevel);
     final bool containsEscalationSignal =
         _containsEscalationSignalForRiskLevel(riskLevel);
 

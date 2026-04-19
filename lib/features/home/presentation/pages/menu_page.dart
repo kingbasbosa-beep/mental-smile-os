@@ -18,10 +18,8 @@ class MenuPage extends StatelessWidget {
     if (uid == kKnownPrimaryAdminUid) return true;
 
     try {
-      final adminDoc = await FirebaseFirestore.instance
-          .collection('admins')
-          .doc(uid)
-          .get();
+      final adminDoc =
+          await FirebaseFirestore.instance.collection('admins').doc(uid).get();
       final data = adminDoc.data();
       if (data != null && (data['active'] ?? false) == true) {
         return true;
@@ -493,17 +491,17 @@ class _MenuCard extends StatelessWidget {
             Positioned.fill(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(AppRadii.xl),
-                  child: Opacity(
-                    opacity: 0.14,
-                    child: Image.asset(
-                      normalizeAssetPath(item.assetPath),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const AppMissingAssetPlaceholder(),
-                    ),
+                child: Opacity(
+                  opacity: 0.14,
+                  child: Image.asset(
+                    normalizeAssetPath(item.assetPath),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const AppMissingAssetPlaceholder(),
                   ),
                 ),
               ),
+            ),
             Padding(
               padding: const EdgeInsets.all(AppSpacing.xl),
               child: Row(
@@ -563,23 +561,27 @@ class _MenuCard extends StatelessWidget {
                           ),
                           child: Text(
                             isArabic ? 'مسار رئيسي' : 'Main track',
-                            style:
-                                Theme.of(context).textTheme.labelLarge?.copyWith(
-                                      color: item.accent,
-                                      fontWeight: FontWeight.w800,
-                                    ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(
+                                  color: item.accent,
+                                  fontWeight: FontWeight.w800,
+                                ),
                           ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         Text(
                           item.title,
-                          textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                          textAlign:
+                              isArabic ? TextAlign.right : TextAlign.left,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
                           item.subtitle,
-                          textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                          textAlign:
+                              isArabic ? TextAlign.right : TextAlign.left,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ],
@@ -594,4 +596,3 @@ class _MenuCard extends StatelessWidget {
     );
   }
 }
-

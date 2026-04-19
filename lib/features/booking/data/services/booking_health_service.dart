@@ -24,20 +24,17 @@ class BookingHealthService {
     try {
       final collection = _db.collection('booking_requests');
 
-      pendingRequestsCount =
-          await _countByStatus(collection, 'pending_admin');
+      pendingRequestsCount = await _countByStatus(collection, 'pending_admin');
       awaitingPaymentCount =
           await _countByStatus(collection, 'awaiting_payment');
-      paymentReviewCount =
-          await _countByStatus(collection, 'payment_review');
+      paymentReviewCount = await _countByStatus(collection, 'payment_review');
       sessionSetupPendingCount =
           await _countByStatus(collection, 'session_setup_pending');
       pendingReviewsCount = await _countByStatus(
         collection,
         'session_completed_pending_reviews',
       );
-      payoutPendingCount =
-          await _countByStatus(collection, 'payout_pending');
+      payoutPendingCount = await _countByStatus(collection, 'payout_pending');
     } catch (_) {
       degradedFeatures.add('booking_requests_unreadable');
     }
@@ -67,7 +64,8 @@ class BookingHealthService {
     CollectionReference<Map<String, dynamic>> collection,
     String status,
   ) async {
-    final snapshot = await collection.where('status', isEqualTo: status).count().get();
+    final snapshot =
+        await collection.where('status', isEqualTo: status).count().get();
     return snapshot.count ?? 0;
   }
 }

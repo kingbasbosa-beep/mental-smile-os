@@ -700,4 +700,3 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
     );
   }
 }
-

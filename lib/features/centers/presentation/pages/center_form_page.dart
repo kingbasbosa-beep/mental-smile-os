@@ -253,8 +253,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
             existing?.accommodationCosts ?? defaultAccommodationCostItems(),
         autismCareCosts:
             existing?.autismCareCosts ?? defaultAutismCareCostItems(),
-        capabilities:
-            existing?.capabilities ?? const CenterCapabilityFlags(),
+        capabilities: existing?.capabilities ?? const CenterCapabilityFlags(),
         createdAt: existing?.createdAt,
         updatedAt: existing?.updatedAt,
       );
@@ -513,8 +512,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
                       textDirection: TextDirection.ltr,
                       decoration: const InputDecoration(
                         labelText: 'صورة الغلاف المحلية (coverImageAsset)',
-                        hintText:
-                            'assets/c6_library/hero/library_hero.png',
+                        hintText: 'assets/c6_library/hero/library_hero.png',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -575,8 +573,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
                       textDirection: TextDirection.ltr,
                       decoration: const InputDecoration(
                         labelText: 'صورة معرض محلية 1',
-                        hintText:
-                            'assets/c6_library/hero/library_hero.png',
+                        hintText: 'assets/c6_library/hero/library_hero.png',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -586,8 +583,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
                       textDirection: TextDirection.ltr,
                       decoration: const InputDecoration(
                         labelText: 'صورة معرض محلية 2',
-                        hintText:
-                            'assets/c6_library/hero/library_hero.png',
+                        hintText: 'assets/c6_library/hero/library_hero.png',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -597,8 +593,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
                       textDirection: TextDirection.ltr,
                       decoration: const InputDecoration(
                         labelText: 'صورة معرض محلية 3',
-                        hintText:
-                            'assets/c6_library/hero/library_hero.png',
+                        hintText: 'assets/c6_library/hero/library_hero.png',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -608,8 +603,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
                       textDirection: TextDirection.ltr,
                       decoration: const InputDecoration(
                         labelText: 'صورة معرض محلية 4',
-                        hintText:
-                            'assets/c6_library/hero/library_hero.png',
+                        hintText: 'assets/c6_library/hero/library_hero.png',
                         border: OutlineInputBorder(),
                       ),
                     ),

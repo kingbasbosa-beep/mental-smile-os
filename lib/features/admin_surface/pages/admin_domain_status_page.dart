@@ -169,7 +169,8 @@ class AdminDomainStatusPage extends StatelessWidget {
                   stream: _service.watchDomainStatus(domain.key),
                   builder: (context, snapshot) {
                     final status = snapshot.data ?? DomainStatus.unknown();
-                    final statusText = status.isUnknown ? 'unknown' : status.status;
+                    final statusText =
+                        status.isUnknown ? 'unknown' : status.status;
                     final hasDegradedFeatures =
                         status.degradedFeatures.isNotEmpty;
                     final isAiPolicyDomain = domain.key == DomainKey.aiPolicy;
@@ -177,7 +178,7 @@ class AdminDomainStatusPage extends StatelessWidget {
                     final isBookingDomain = domain.key == DomainKey.booking;
                     final hasGovernanceContext =
                         status.statusSource == 'admin_set' ||
-                        status.statusSource == 'mixed';
+                            status.statusSource == 'mixed';
 
                     return AppSurfaceCard(
                       child: Column(
@@ -357,7 +358,8 @@ class AdminDomainStatusPage extends StatelessWidget {
                               ],
                             ),
                           ],
-                          if (isBookingDomain && status.metadata.isNotEmpty) ...[
+                          if (isBookingDomain &&
+                              status.metadata.isNotEmpty) ...[
                             const SizedBox(height: AppSpacing.sm),
                             _buildMetadataSection(
                               context,
@@ -420,7 +422,8 @@ class AdminDomainStatusPage extends StatelessWidget {
                             Wrap(
                               spacing: AppSpacing.xs,
                               runSpacing: AppSpacing.xs,
-                              children: domain.ownedCollections.map((collection) {
+                              children:
+                                  domain.ownedCollections.map((collection) {
                                 return Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: AppSpacing.sm,

@@ -240,7 +240,9 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
           builder: (context, setState) {
             return AlertDialog(
               title: Text(
-                isArabic ? 'إرسال التوصية الأولية' : 'Submit initial recommendation',
+                isArabic
+                    ? 'إرسال التوصية الأولية'
+                    : 'Submit initial recommendation',
               ),
               content: SingleChildScrollView(
                 child: Column(
@@ -275,13 +277,15 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                         ),
                         DropdownMenuItem(
                           value: 'detox',
-                          child: Text(
-                              isArabic ? 'سحب سموم ومتابعة' : 'Detox and monitoring'),
+                          child: Text(isArabic
+                              ? 'سحب سموم ومتابعة'
+                              : 'Detox and monitoring'),
                         ),
                         DropdownMenuItem(
                           value: 'dual_diagnosis',
-                          child: Text(
-                              isArabic ? 'رعاية مزدوجة' : 'Dual diagnosis care'),
+                          child: Text(isArabic
+                              ? 'رعاية مزدوجة'
+                              : 'Dual diagnosis care'),
                         ),
                         DropdownMenuItem(
                           value: 'diagnostic_observation',
@@ -337,9 +341,7 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                       controller: notesController,
                       maxLines: 4,
                       decoration: InputDecoration(
-                        labelText: isArabic
-                            ? 'ملاحظات المركز'
-                            : 'Center notes',
+                        labelText: isArabic ? 'ملاحظات المركز' : 'Center notes',
                         border: const OutlineInputBorder(),
                       ),
                     ),
@@ -354,7 +356,8 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                 FilledButton(
                   onPressed: () {
                     final recommendation = recommendationController.text.trim();
-                    final days = int.tryParse(stayDaysController.text.trim()) ?? 0;
+                    final days =
+                        int.tryParse(stayDaysController.text.trim()) ?? 0;
                     if (recommendation.isEmpty || days <= 0) {
                       setState(() {
                         validationMessage = recommendation.isEmpty
@@ -438,20 +441,19 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
         SnackBar(
           content: Text(
             isArabic
-              ? 'تم تأكيد وصول الحالة بنجاح'
-              : 'Client arrival confirmed successfully',
+                ? 'تم تأكيد وصول الحالة بنجاح'
+                : 'Client arrival confirmed successfully',
           ),
         ),
       );
     } catch (e) {
-      debugPrint('CENTER_START_TRACE_ERROR requestId=$requestId role=center error=$e');
+      debugPrint(
+          'CENTER_START_TRACE_ERROR requestId=$requestId role=center error=$e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isArabic
-                ? 'فشل تأكيد الوصول: $e'
-                : 'Failed to confirm arrival: $e',
+            isArabic ? 'فشل تأكيد الوصول: $e' : 'Failed to confirm arrival: $e',
           ),
         ),
       );
@@ -531,17 +533,16 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                       .collection('booking_requests')
                       .where('centerId', isEqualTo: centerId)
                       .where(
-                        'status',
-                        whereIn: const [
-                          'center_recommendation_pending',
-                          'session_setup_pending',
-                          'session_scheduled',
-                          'session_in_progress',
-                          'session_completed_pending_reviews',
-                          'reschedule_pending',
-                        ],
-                      )
-                      .snapshots(),
+                    'status',
+                    whereIn: const [
+                      'center_recommendation_pending',
+                      'session_setup_pending',
+                      'session_scheduled',
+                      'session_in_progress',
+                      'session_completed_pending_reviews',
+                      'reschedule_pending',
+                    ],
+                  ).snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       return AppEmptyState(
@@ -564,8 +565,10 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                       return _matchesTab(status);
                     }).toList()
                       ..sort((a, b) {
-                        final aTs = a.data()['updatedAt'] ?? a.data()['createdAt'];
-                        final bTs = b.data()['updatedAt'] ?? b.data()['createdAt'];
+                        final aTs =
+                            a.data()['updatedAt'] ?? a.data()['createdAt'];
+                        final bTs =
+                            b.data()['updatedAt'] ?? b.data()['createdAt'];
                         DateTime ad = DateTime.fromMillisecondsSinceEpoch(0);
                         DateTime bd = DateTime.fromMillisecondsSinceEpoch(0);
                         if (aTs is Timestamp) ad = aTs.toDate();
@@ -626,38 +629,42 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                         else
                           ...docs
                               .where(
-                                (doc) => _isCenterRequestData(
-                                  doc.data(),
-                                  centerId,
-                                ),
-                              )
+                            (doc) => _isCenterRequestData(
+                              doc.data(),
+                              centerId,
+                            ),
+                          )
                               .map((doc) {
                             final data = doc.data();
                             final requestId = doc.id;
                             final clientName =
                                 (data['clientName'] ?? 'Client').toString();
                             final note = (data['note'] ?? '').toString().trim();
-                            final accommodation = (data['selectedAccommodationLabelAr'] ?? '')
-                                .toString()
-                                .trim();
+                            final accommodation =
+                                (data['selectedAccommodationLabelAr'] ?? '')
+                                    .toString()
+                                    .trim();
                             final selectedCenterType =
                                 (data['selectedCenterType'] ?? '')
                                     .toString()
                                     .trim();
                             final centerHasDetoxUnit =
                                 (data['centerHasDetoxUnit'] ?? false) == true;
-                            final sessionDate =
-                                (data['sessionDateText'] ?? '').toString().trim();
-                            final stayStartText =
-                                (data['stayStartDateText'] ??
-                                        data['sessionDateText'] ??
-                                        '')
+                            final sessionDate = (data['sessionDateText'] ?? '')
+                                .toString()
+                                .trim();
+                            final stayStartText = (data['stayStartDateText'] ??
+                                    data['sessionDateText'] ??
+                                    '')
+                                .toString()
+                                .trim();
+                            final stayEndText = (data['stayEndDateText'] ?? '')
+                                .toString()
+                                .trim();
+                            final stayDurationDays =
+                                (data['stayDurationDays'] ?? '')
                                     .toString()
                                     .trim();
-                            final stayEndText =
-                                (data['stayEndDateText'] ?? '').toString().trim();
-                            final stayDurationDays =
-                                (data['stayDurationDays'] ?? '').toString().trim();
                             final stayDurationReason =
                                 (data['stayDurationReason'] ?? '')
                                     .toString()
@@ -733,19 +740,22 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                 (data['sessionLink'] ?? '').toString().trim();
                             final sessionCode =
                                 (data['sessionCode'] ?? '').toString().trim();
-                            final adminNotes =
-                                (data['sessionAdminNotes'] ?? '').toString().trim();
+                            final adminNotes = (data['sessionAdminNotes'] ?? '')
+                                .toString()
+                                .trim();
                             final createdAt = _dateText(data['createdAt']);
                             final status = (data['status'] ?? '').toString();
                             final centerArrivalConfirmed =
-                                (data['centerArrivalConfirmed'] ?? false) == true;
+                                (data['centerArrivalConfirmed'] ?? false) ==
+                                    true;
                             final clientCheckInConfirmed =
-                                (data['clientCheckInConfirmed'] ?? false) == true;
-                            final centerReviewSubmitted = ((data[
-                                                'centerReviewSubmitted'] ??
+                                (data['clientCheckInConfirmed'] ?? false) ==
+                                    true;
+                            final centerReviewSubmitted =
+                                ((data['centerReviewSubmitted'] ??
                                             data['clinicianReviewSubmitted']) ??
                                         false) ==
-                                true;
+                                    true;
                             final awaitingResidencyStart =
                                 _isAwaitingResidencyStart(
                               status,
@@ -799,7 +809,9 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                         .textTheme
                                         .labelMedium
                                         ?.copyWith(
-                                          color: Theme.of(context).colorScheme.primary,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
                                           fontWeight: FontWeight.w700,
                                         ),
                                   ),
@@ -900,7 +912,8 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                           : 'Last substance use: $intakeLastSubstanceUseAt',
                                     ),
                                   ],
-                                  if (intakeWithdrawalSymptomsText.isNotEmpty) ...[
+                                  if (intakeWithdrawalSymptomsText
+                                      .isNotEmpty) ...[
                                     const SizedBox(height: AppSpacing.xs),
                                     Text(
                                       isArabic
@@ -940,7 +953,8 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                           : 'Family notes: $intakeFamilyNotes',
                                     ),
                                   ],
-                                  if (intakeSpecialNeedsConditionType.isNotEmpty) ...[
+                                  if (intakeSpecialNeedsConditionType
+                                      .isNotEmpty) ...[
                                     const SizedBox(height: AppSpacing.xs),
                                     Text(
                                       isArabic
@@ -980,7 +994,8 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                           : 'Special care notes: $intakeSpecialCareNotes',
                                     ),
                                   ],
-                                  if (centerInitialRecommendation.isNotEmpty) ...[
+                                  if (centerInitialRecommendation
+                                      .isNotEmpty) ...[
                                     const SizedBox(height: AppSpacing.xs),
                                     Text(
                                       isArabic
@@ -988,7 +1003,8 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                           : 'Initial recommendation: $centerInitialRecommendation',
                                     ),
                                   ],
-                                  if (centerRecommendedCareLevel.isNotEmpty) ...[
+                                  if (centerRecommendedCareLevel
+                                      .isNotEmpty) ...[
                                     const SizedBox(height: AppSpacing.xs),
                                     Text(
                                       isArabic
@@ -1056,7 +1072,8 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                         ? 'تأكيد الأسرة لبداية الإقامة: ${clientCheckInConfirmed ? 'تم' : 'بانتظار التأكيد'}'
                                         : 'Client check-in confirmation: ${clientCheckInConfirmed ? 'confirmed' : 'pending'}',
                                   ),
-                                  if (status == 'session_completed_pending_reviews' ||
+                                  if (status ==
+                                          'session_completed_pending_reviews' ||
                                       status == 'payout_pending') ...[
                                     const SizedBox(height: AppSpacing.xs),
                                     Text(
@@ -1066,11 +1083,13 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                     ),
                                   ],
                                   if (status == 'session_setup_pending' ||
-                                      status == 'center_recommendation_pending' ||
+                                      status ==
+                                          'center_recommendation_pending' ||
                                       status == 'session_scheduled' ||
                                       status == 'reschedule_pending') ...[
                                     const SizedBox(height: AppSpacing.md),
-                                    if (status == 'center_recommendation_pending')
+                                    if (status ==
+                                        'center_recommendation_pending')
                                       FilledButton.icon(
                                         onPressed: busy
                                             ? null
@@ -1079,7 +1098,8 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                                   requestId,
                                                   isArabic,
                                                 ),
-                                        icon: const Icon(Icons.fact_check_outlined),
+                                        icon: const Icon(
+                                            Icons.fact_check_outlined),
                                         label: Text(
                                           isArabic
                                               ? 'إرسال التوصية الأولية'
@@ -1087,7 +1107,8 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                         ),
                                       ),
                                     if (!centerArrivalConfirmed &&
-                                        status != 'center_recommendation_pending' &&
+                                        status !=
+                                            'center_recommendation_pending' &&
                                         hasPreliminaryResidencyDetails)
                                       FilledButton.icon(
                                         onPressed: busy
@@ -1098,8 +1119,8 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                                   data,
                                                   isArabic,
                                                 ),
-                                        icon:
-                                            const Icon(Icons.how_to_reg_outlined),
+                                        icon: const Icon(
+                                            Icons.how_to_reg_outlined),
                                         label: Text(
                                           isArabic
                                               ? 'تأكيد الوصول والتقييم الأولي'
@@ -1109,10 +1130,12 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                     if (!hasPreliminaryResidencyDetails)
                                       Text(
                                         isArabic
-                                            ? (status == 'center_recommendation_pending'
+                                            ? (status ==
+                                                    'center_recommendation_pending'
                                                 ? 'بعد إرسال التوصية الأولية سيظهر الطلب للإدارة في تجهيز الإقامة.'
                                                 : 'سيظهر تأكيد الوصول بعد إرسال بيانات الإقامة المبدئية كاملة من الإدارة.')
-                                            : (status == 'center_recommendation_pending'
+                                            : (status ==
+                                                    'center_recommendation_pending'
                                                 ? 'After sending the initial recommendation, the admin will receive the request for residency setup.'
                                                 : 'Arrival confirmation will appear after the admin sends the full preliminary residency details.'),
                                       ),
@@ -1129,7 +1152,8 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                           },
                                         );
                                       },
-                                      icon: const Icon(Icons.assignment_outlined),
+                                      icon:
+                                          const Icon(Icons.assignment_outlined),
                                       label: Text(
                                         isArabic
                                             ? 'إرسال تقرير الخروج'
@@ -1150,4 +1174,3 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
     );
   }
 }
-

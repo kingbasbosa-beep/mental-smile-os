@@ -258,11 +258,9 @@ class ClinicianSessionsPage extends StatelessWidget {
                       }
 
                       final docs = _mergeBookingSources(
-                            primarySnapshot: snapA.data,
-                            legacySnapshot: snapB.data,
-                          )
-                          .where(_isSessionRelated)
-                          .toList()
+                        primarySnapshot: snapA.data,
+                        legacySnapshot: snapB.data,
+                      ).where(_isSessionRelated).toList()
                         ..sort((a, b) {
                           final aTs = a['updatedAt'] ?? a['createdAt'];
                           final bTs = b['updatedAt'] ?? b['createdAt'];
