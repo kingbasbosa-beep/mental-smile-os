@@ -25,6 +25,38 @@ class _AdminCommunicationGatewayPageState
     };
   }
 
+  Future<void> _showWebsiteChatBoundary(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Website Chat Boundary'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text(
+                'This boundary is reserved for website-origin intake and routing awareness.',
+              ),
+              SizedBox(height: AppSpacing.sm),
+              Text('Current status: Planned / supervised / not integrated yet.'),
+              SizedBox(height: AppSpacing.sm),
+              Text(
+                'It is separate from direct human support handling, which remains in the Communications workspace.',
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,6 +133,12 @@ class _AdminCommunicationGatewayPageState
                         ),
                         child: GatewayEntryCard(entry: entry),
                       )
+                    : entry.id == 'website_chat'
+                        ? InkWell(
+                            borderRadius: BorderRadius.circular(AppRadii.xl),
+                            onTap: () => _showWebsiteChatBoundary(context),
+                            child: GatewayEntryCard(entry: entry),
+                          )
                     : GatewayEntryCard(entry: entry),
               ),
             ),
