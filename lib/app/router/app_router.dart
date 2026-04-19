@@ -41,6 +41,10 @@ import 'package:flutterprojects/features/admin_surface/pages/admin_hub_page.dart
 import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_ai_policy_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_domain_status_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_gateway_layer_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_communication_gateway_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_engineering_gateway_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_device_storage_gateway_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_archive_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_alerts_review_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_centers_page.dart';
@@ -84,6 +88,10 @@ class AppRouter {
     Routes.adminSupportChats,
     Routes.adminAiPolicies,
     Routes.adminDomainStatus,
+    Routes.adminGatewayLayer,
+    Routes.adminCommunicationGateway,
+    Routes.adminEngineeringGateway,
+    Routes.adminDeviceStorageGateway,
     _adminBookingQueueRoute,
     _adminAlertsReviewRoute,
     Routes.adminArchive,
@@ -243,6 +251,30 @@ class AppRouter {
       case Routes.adminDomainStatus:
         return _adminProtectedRoute(
           child: const AdminDomainStatusPage(),
+          settings: settings,
+        );
+
+      case Routes.adminGatewayLayer:
+        return _adminProtectedRoute(
+          child: const AdminGatewayLayerPage(),
+          settings: settings,
+        );
+
+      case Routes.adminCommunicationGateway:
+        return _adminProtectedRoute(
+          child: const AdminCommunicationGatewayPage(),
+          settings: settings,
+        );
+
+      case Routes.adminEngineeringGateway:
+        return _adminProtectedRoute(
+          child: const AdminEngineeringGatewayPage(),
+          settings: settings,
+        );
+
+      case Routes.adminDeviceStorageGateway:
+        return _adminProtectedRoute(
+          child: const AdminDeviceStorageGatewayPage(),
           settings: settings,
         );
 
