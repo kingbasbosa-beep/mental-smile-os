@@ -40,15 +40,19 @@ import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_hub_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_blueprint_handoff_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_content_care_programs_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_ai_policy_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_compliance_checkpoints_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_domain_status_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_library_governance_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_exposure_rules_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_gateway_layer_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_growth_layer_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_support_messaging_governance_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_communication_gateway_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_engineering_gateway_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_device_storage_gateway_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_followup_care_governance_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_activation_readiness_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_system_activation_pack_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_operations_page.dart';
@@ -98,6 +102,10 @@ class AppRouter {
     Routes.adminSupportChats,
     Routes.adminAiPolicies,
     Routes.adminDomainStatus,
+    Routes.adminContentCarePrograms,
+    Routes.adminLibraryGovernance,
+    Routes.adminSupportMessagingGovernance,
+    Routes.adminFollowupCareGovernance,
     Routes.adminGrowthLayer,
     Routes.adminBlueprintHandoff,
     Routes.adminComplianceCheckpoints,
@@ -279,6 +287,30 @@ class AppRouter {
       case Routes.adminDomainStatus:
         return _adminProtectedRoute(
           child: const AdminDomainStatusPage(),
+          settings: settings,
+        );
+
+      case Routes.adminContentCarePrograms:
+        return _adminProtectedRoute(
+          child: const AdminContentCareProgramsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminLibraryGovernance:
+        return _adminProtectedRoute(
+          child: const AdminLibraryGovernancePage(),
+          settings: settings,
+        );
+
+      case Routes.adminSupportMessagingGovernance:
+        return _adminProtectedRoute(
+          child: const AdminSupportMessagingGovernancePage(),
+          settings: settings,
+        );
+
+      case Routes.adminFollowupCareGovernance:
+        return _adminProtectedRoute(
+          child: const AdminFollowupCareGovernancePage(),
           settings: settings,
         );
 

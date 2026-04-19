@@ -56,6 +56,12 @@ class Routes {
   static const adminSupportChats = '/admin/support-chats';
   static const adminAiPolicies = '/admin/ai-policies';
   static const adminDomainStatus = '/admin/system-domains';
+  static const adminContentCarePrograms = '/admin/content-care-programs';
+  static const adminLibraryGovernance = '/admin/library-governance';
+  static const adminSupportMessagingGovernance =
+      '/admin/support-messaging-governance';
+  static const adminFollowupCareGovernance =
+      '/admin/followup-care-governance';
   static const adminGrowthLayer = '/admin/growth-layer';
   static const adminBlueprintHandoff = '/admin/blueprint-handoff';
   static const adminComplianceCheckpoints = '/admin/compliance-checkpoints';

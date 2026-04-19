@@ -347,6 +347,15 @@ class _AdminHubPageState extends State<AdminHubPage> {
         route: Routes.adminDomainStatus,
       ),
       _AdminSectionLaunchCardData(
+        title: isArabic ? 'برامج المحتوى والرعاية' : 'Content & Care Programs',
+        subtitle: isArabic
+            ? 'حوكمة المحتوى والرسائل والمتابعة الداعمة'
+            : 'Governance for content, support messaging, and follow-up care',
+        icon: Icons.menu_book_outlined,
+        color: const Color(0xFF8D6E63),
+        route: Routes.adminContentCarePrograms,
+      ),
+      _AdminSectionLaunchCardData(
         title: isArabic ? 'النمو والانتشار' : 'Growth & Awareness',
         subtitle: isArabic
             ? 'التوعية، التوزيع، وخطط الظهور المدروسة'
