@@ -17,11 +17,22 @@ Color gatewayHealthColor(GatewayHealthLevel level) {
 String gatewayHealthLabel(GatewayHealthLevel level) {
   switch (level) {
     case GatewayHealthLevel.healthy:
-      return 'Healthy';
+      return 'Monitored';
     case GatewayHealthLevel.attention:
-      return 'Attention';
+      return 'Needs attention';
     case GatewayHealthLevel.planned:
       return 'Planned';
+  }
+}
+
+String gatewayHealthSummaryLabel(GatewayHealthLevel level) {
+  switch (level) {
+    case GatewayHealthLevel.healthy:
+      return 'Monitored boundary';
+    case GatewayHealthLevel.attention:
+      return 'Attention boundary';
+    case GatewayHealthLevel.planned:
+      return 'Planned boundary';
   }
 }
 
@@ -70,47 +81,22 @@ class GatewayFamilyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final status = statusOverride ?? entry.status;
-    final color = gatewayHealthColor(status.level);
     return InkWell(
       borderRadius: BorderRadius.circular(AppRadii.xl),
       onTap: () => Navigator.of(context).pushNamed(entry.route),
       child: AppSurfaceCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                GatewayHealthBadge(level: status.level),
-                const Spacer(),
-                Icon(Icons.open_in_new, color: color),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              entry.title,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(entry.description),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              status.summary,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.obsidian.withValues(alpha: 0.78),
-                  ),
-            ),
-            if ((status.note ?? '').trim().isNotEmpty) ...[
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                status.note!.trim(),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.obsidian.withValues(alpha: 0.70),
-                    ),
-              ),
-            ],
-          ],
+        child: GatewayStatusBlock(
+          title: entry.title,
+          level: status.level,
+          roleText: entry.description,
+          summary: status.summary,
+          boundaryNote: status.boundaryNote,
+          monitoredNote: status.monitoredNote,
+          attentionLabel: status.attentionLabel,
+          trailing: Icon(
+            Icons.open_in_new,
+            color: gatewayHealthColor(status.level),
+          ),
         ),
       ),
     );
@@ -129,42 +115,158 @@ class GatewayEntryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppSectionPanel(
       padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  entry.title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                ),
-              ),
-              GatewayHealthBadge(level: entry.status.level),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(entry.boundary),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            entry.status.summary,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.82),
-                ),
-          ),
-          if ((entry.status.note ?? '').trim().isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              entry.status.note!.trim(),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.obsidian.withValues(alpha: 0.70),
+      child: GatewayStatusBlock(
+        title: entry.title,
+        level: entry.status.level,
+        summary: entry.status.summary,
+        boundaryNote: entry.status.boundaryNote ?? entry.boundary,
+        monitoredNote: entry.status.monitoredNote,
+        attentionLabel: entry.status.attentionLabel,
+      ),
+    );
+  }
+}
+
+class GatewayStatusBlock extends StatelessWidget {
+  const GatewayStatusBlock({
+    super.key,
+    required this.title,
+    required this.level,
+    required this.summary,
+    this.roleText,
+    this.boundaryNote,
+    this.monitoredNote,
+    this.attentionLabel,
+    this.trailing,
+  });
+
+  final String title;
+  final GatewayHealthLevel level;
+  final String summary;
+  final String? roleText;
+  final String? boundaryNote;
+  final String? monitoredNote;
+  final String? attentionLabel;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = gatewayHealthColor(level);
+    final sectionLabel = gatewayHealthSummaryLabel(level);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
                   ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    sectionLabel,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: color,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                GatewayHealthBadge(level: level),
+                if (trailing != null) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  trailing!,
+                ],
+              ],
             ),
           ],
+        ),
+        if ((roleText ?? '').trim().isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            roleText!.trim(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.obsidian.withValues(alpha: 0.74),
+                ),
+          ),
         ],
-      ),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
+          summary,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.obsidian.withValues(alpha: 0.84),
+              ),
+        ),
+        if ((boundaryNote ?? '').trim().isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.sm),
+          _GatewayMetaLine(
+            label: 'Boundary',
+            value: boundaryNote!,
+          ),
+        ],
+        if ((monitoredNote ?? '').trim().isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.xs),
+          _GatewayMetaLine(
+            label: 'Monitoring',
+            value: monitoredNote!,
+          ),
+        ],
+        if ((attentionLabel ?? '').trim().isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.sm),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(AppRadii.pill),
+              border: Border.all(color: color.withValues(alpha: 0.20)),
+            ),
+            child: Text(
+              attentionLabel!,
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _GatewayMetaLine extends StatelessWidget {
+  const _GatewayMetaLine({
+    required this.label,
+    required this.value,
+  });
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      '$label: $value',
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: AppColors.obsidian.withValues(alpha: 0.70),
+            height: 1.35,
+          ),
     );
   }
 }

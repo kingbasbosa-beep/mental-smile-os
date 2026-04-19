@@ -42,6 +42,13 @@ class AdminGatewayLayerPage extends StatelessWidget {
                           color: AppColors.obsidian.withValues(alpha: 0.72),
                         ),
                   ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    'Each gateway family is a technical compartment. It exists to make supervision, isolation, and later integration safer.',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.obsidian.withValues(alpha: 0.70),
+                        ),
+                  ),
                 ],
               ),
             ),
