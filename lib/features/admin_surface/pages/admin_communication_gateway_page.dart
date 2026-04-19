@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/features/gateway_layer/core/communication_gateway_actions.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_registry.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
@@ -50,7 +51,15 @@ class AdminCommunicationGatewayPage extends StatelessWidget {
             ...communicationGatewayEntries.map(
               (entry) => Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                child: GatewayEntryCard(entry: entry),
+                child: entry.id == 'support_email'
+                    ? InkWell(
+                        borderRadius: BorderRadius.circular(AppRadii.xl),
+                        onTap: () => CommunicationGatewayActions.openSupportEmail(
+                          context,
+                        ),
+                        child: GatewayEntryCard(entry: entry),
+                      )
+                    : GatewayEntryCard(entry: entry),
               ),
             ),
           ],
