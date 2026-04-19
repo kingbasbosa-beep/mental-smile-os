@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/features/gateway_layer/core/communication_gateway_actions.dart';
+import 'package:flutterprojects/features/gateway_layer/shared/gateway_entry.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_registry.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
@@ -122,27 +123,20 @@ class _AdminCommunicationGatewayPageState
   Widget _buildGatewayGroup(
     BuildContext context, {
     required String title,
+    String? description,
     required List<GatewayEntry> entries,
   }) {
-    return AppSurfaceCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          ...entries.map(
+    return GatewaySectionCard(
+      title: title,
+      description: description,
+      children: entries
+          .map(
             (entry) => Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.md),
               child: _buildGatewayEntryCard(context, entry),
             ),
-          ),
-        ],
-      ),
+          )
+          .toList(),
     );
   }
 
@@ -227,31 +221,20 @@ class _AdminCommunicationGatewayPageState
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
+            const GatewayPageIntroCard(
+              title: 'Communication Gateway',
+              summary:
+                  'Supervise channel intake boundaries and routing readiness without turning this page into a live communications workspace.',
+              boundaryNote:
+                  'Human case handling remains in Communications. This page stays focused on supervised connector boundaries only.',
+              emphasis:
+                  'No external channel integrations are active yet. This gateway remains a monitored shell.',
+            ),
+            const SizedBox(height: AppSpacing.md),
             AppSurfaceCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Communication Gateway',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'A gateway shell for future external communication channels and intake routing. Human case handling remains in Communications.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.obsidian.withValues(alpha: 0.72),
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'This page supervises connector boundaries only. It does not replace the human communications workspace.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.obsidian.withValues(alpha: 0.70),
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
                   Text(
                     'Support Email intent',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -281,18 +264,24 @@ class _AdminCommunicationGatewayPageState
             _buildGatewayGroup(
               context,
               title: 'Intake Channels',
+              description:
+                  'Entry boundaries for web and email-origin support intake before any human handling begins.',
               entries: intakeEntries,
             ),
             const SizedBox(height: AppSpacing.md),
             _buildGatewayGroup(
               context,
               title: 'Messaging Channels',
+              description:
+                  'Messaging-boundary placeholders that remain supervised and separate from direct support handling.',
               entries: messagingEntries,
             ),
             const SizedBox(height: AppSpacing.md),
             _buildGatewayGroup(
               context,
               title: 'Meeting / Coordination',
+              description:
+                  'Coordination boundaries for meetings and external intake routing, kept separate from Operations scheduling.',
               entries: coordinationEntries,
             ),
           ],

@@ -35,15 +35,7 @@ class AdminDeviceStorageGatewayPage extends StatelessWidget {
         children: [
           GatewayEntryCard(entry: entry),
           const SizedBox(height: AppSpacing.xs),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-            child: Text(
-              _supervisionNote(entry.id),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.obsidian.withValues(alpha: 0.70),
-                  ),
-            ),
-          ),
+          GatewaySupervisionNote(text: _supervisionNote(entry.id)),
         ],
       ),
     );
@@ -55,27 +47,10 @@ class AdminDeviceStorageGatewayPage extends StatelessWidget {
     required String description,
     required List<GatewayEntry> entries,
   }) {
-    return AppSurfaceCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            description,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.70),
-                ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          ...entries.map((entry) => _buildEntryBlock(context, entry)),
-        ],
-      ),
+    return GatewaySectionCard(
+      title: title,
+      description: description,
+      children: entries.map((entry) => _buildEntryBlock(context, entry)).toList(),
     );
   }
 
@@ -106,40 +81,14 @@ class AdminDeviceStorageGatewayPage extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
-            AppSurfaceCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Device / Storage Gateway',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'A shell for device, storage, backup, and sync boundaries around the admin laptop as the primary control hub.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.obsidian.withValues(alpha: 0.72),
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'This page clarifies which hardware and storage boundaries are defined, which are planned, and which remain disconnected by design for now.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.obsidian.withValues(alpha: 0.70),
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'Business workflows remain in Operations and Communications. This page only supervises hardware, storage, and sync compartments.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.obsidian.withValues(alpha: 0.70),
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                ],
-              ),
+            const GatewayPageIntroCard(
+              title: 'Device / Storage Gateway',
+              summary:
+                  'Supervise device, storage, backup, and sync boundaries around the admin laptop as the primary control hub.',
+              boundaryNote:
+                  'This page clarifies monitored, planned, and disconnected hardware or storage boundaries only.',
+              emphasis:
+                  'Business workflows remain in Operations and Communications. Device / Storage Gateway stays focused on supervised infrastructure compartments.',
             ),
             const SizedBox(height: AppSpacing.md),
             _buildGatewayGroup(

@@ -35,15 +35,7 @@ class AdminEngineeringGatewayPage extends StatelessWidget {
         children: [
           GatewayEntryCard(entry: entry),
           const SizedBox(height: AppSpacing.xs),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-            child: Text(
-              _supervisionNote(entry.id),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.obsidian.withValues(alpha: 0.70),
-                  ),
-            ),
-          ),
+          GatewaySupervisionNote(text: _supervisionNote(entry.id)),
         ],
       ),
     );
@@ -55,27 +47,10 @@ class AdminEngineeringGatewayPage extends StatelessWidget {
     required String description,
     required List<GatewayEntry> entries,
   }) {
-    return AppSurfaceCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            description,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.70),
-                ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          ...entries.map((entry) => _buildEntryBlock(context, entry)),
-        ],
-      ),
+    return GatewaySectionCard(
+      title: title,
+      description: description,
+      children: entries.map((entry) => _buildEntryBlock(context, entry)).toList(),
     );
   }
 
@@ -104,40 +79,14 @@ class AdminEngineeringGatewayPage extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
-            AppSurfaceCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Engineering / Maintenance Gateway',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'A shell for technical tools, maintenance boundaries, and smart development support surfaces.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.obsidian.withValues(alpha: 0.72),
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'This page is for technical supervision only: what each tool boundary is for, what is merely planned, and what is being monitored as a shell.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.obsidian.withValues(alpha: 0.70),
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'Business workflows remain in Operations and Communications. This page only clarifies technical compartments and maintenance boundaries.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.obsidian.withValues(alpha: 0.70),
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                ],
-              ),
+            const GatewayPageIntroCard(
+              title: 'Engineering / Maintenance Gateway',
+              summary:
+                  'Supervise AI tools, workspaces, backend consoles, and maintenance surfaces without turning this page into an active engineering console.',
+              boundaryNote:
+                  'This page clarifies technical compartments, shell monitoring, and planned boundaries only.',
+              emphasis:
+                  'Business workflows remain in Operations and Communications. Engineering Gateway stays separate from direct workflow handling.',
             ),
             const SizedBox(height: AppSpacing.md),
             _buildGatewayGroup(

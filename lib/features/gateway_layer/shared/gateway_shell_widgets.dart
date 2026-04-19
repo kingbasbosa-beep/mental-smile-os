@@ -69,6 +69,125 @@ class GatewayHealthBadge extends StatelessWidget {
   }
 }
 
+class GatewayPageIntroCard extends StatelessWidget {
+  const GatewayPageIntroCard({
+    super.key,
+    required this.title,
+    required this.summary,
+    required this.boundaryNote,
+    this.emphasis,
+  });
+
+  final String title;
+  final String summary;
+  final String boundaryNote;
+  final String? emphasis;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            summary,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.obsidian.withValues(alpha: 0.72),
+                ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            boundaryNote,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.obsidian.withValues(alpha: 0.70),
+                ),
+          ),
+          if ((emphasis ?? '').trim().isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              emphasis!.trim(),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.obsidian.withValues(alpha: 0.70),
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class GatewaySectionCard extends StatelessWidget {
+  const GatewaySectionCard({
+    super.key,
+    required this.title,
+    this.description,
+    required this.children,
+  });
+
+  final String title;
+  final String? description;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+          if ((description ?? '').trim().isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              description!.trim(),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.obsidian.withValues(alpha: 0.70),
+                  ),
+            ),
+          ],
+          const SizedBox(height: AppSpacing.md),
+          ...children,
+        ],
+      ),
+    );
+  }
+}
+
+class GatewaySupervisionNote extends StatelessWidget {
+  const GatewaySupervisionNote({
+    super.key,
+    required this.text,
+  });
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.obsidian.withValues(alpha: 0.70),
+            ),
+      ),
+    );
+  }
+}
+
 class GatewayFamilyCard extends StatelessWidget {
   const GatewayFamilyCard({
     super.key,

@@ -25,32 +25,14 @@ class AdminGatewayLayerPage extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
-            AppSurfaceCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Gateway Layer',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'Connect, isolate, and maintain channels, tools, devices, and storage without mixing them into business workflows.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.obsidian.withValues(alpha: 0.72),
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'Each gateway family is a technical compartment. It exists to make supervision, isolation, and later integration safer.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.obsidian.withValues(alpha: 0.70),
-                        ),
-                  ),
-                ],
-              ),
+            const GatewayPageIntroCard(
+              title: 'Gateway Layer',
+              summary:
+                  'Connect, isolate, and supervise channels, tools, devices, and storage without mixing them into business workflows.',
+              boundaryNote:
+                  'Each gateway family is a technical compartment that keeps future integration, supervision, and isolation safer.',
+              emphasis:
+                  'Business workflows remain in Operations and Communications. Gateway Layer stays focused on supervised technical boundaries.',
             ),
             const SizedBox(height: AppSpacing.md),
             ...gatewayFamilyEntries.map(
