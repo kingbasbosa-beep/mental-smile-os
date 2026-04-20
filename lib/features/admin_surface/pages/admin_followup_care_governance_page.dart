@@ -4,8 +4,67 @@ import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widg
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
-class AdminFollowupCareGovernancePage extends StatelessWidget {
+class AdminFollowupCareGovernancePage extends StatefulWidget {
   const AdminFollowupCareGovernancePage({super.key});
+
+  @override
+  State<AdminFollowupCareGovernancePage> createState() =>
+      _AdminFollowupCareGovernancePageState();
+}
+
+class _AdminFollowupCareGovernancePageState
+    extends State<AdminFollowupCareGovernancePage> {
+  final GlobalKey _rulesKey = GlobalKey();
+  final GlobalKey _boundariesKey = GlobalKey();
+  final GlobalKey _examplesKey = GlobalKey();
+
+  Future<void> _jumpToSection(GlobalKey key) async {
+    final targetContext = key.currentContext;
+    if (targetContext == null) return;
+    await Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+      alignment: 0.08,
+    );
+  }
+
+  Widget _buildAnchorBar(BuildContext context) {
+    Widget buildAnchorButton(String label, GlobalKey key) {
+      return Padding(
+        padding: const EdgeInsetsDirectional.only(end: AppSpacing.sm),
+        child: OutlinedButton(
+          onPressed: () => _jumpToSection(key),
+          child: Text(label),
+        ),
+      );
+    }
+
+    return AppSurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'الانتقال السريع داخل الصفحة',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                buildAnchorButton('Rules', _rulesKey),
+                buildAnchorButton('Boundaries', _boundariesKey),
+                buildAnchorButton('Examples', _examplesKey),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildGovernanceCard(
     BuildContext context, {
@@ -101,6 +160,8 @@ class AdminFollowupCareGovernancePage extends StatelessWidget {
               emphasis:
                   'أي متابعة هنا يجب أن تبقى غير علاجية، غير تشخيصية، وآمنة أخلاقيًا، مع احترام حدود الدعم وعدم التدخل في سياقات الحساسية أو الأزمة.',
             ),
+            const SizedBox(height: AppSpacing.md),
+            _buildAnchorBar(context),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
               title: 'نموذج المتابعة',
@@ -216,7 +277,9 @@ class AdminFollowupCareGovernancePage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.md),
-            GatewaySectionCard(
+            KeyedSubtree(
+              key: _examplesKey,
+              child: GatewaySectionCard(
               title: 'أمثلة نبرة متابعة معتمدة',
               description:
                   'هذه أمثلة ثابتة ومرجعية فقط لاستخدام يدوي من الإدارة خارج النظام، دون إنشاء أي تدفق متابعة فعلي داخل التطبيق.',
@@ -271,8 +334,11 @@ class AdminFollowupCareGovernancePage extends StatelessWidget {
                 ),
               ],
             ),
+            ),
             const SizedBox(height: AppSpacing.md),
-            GatewaySectionCard(
+            KeyedSubtree(
+              key: _rulesKey,
+              child: GatewaySectionCard(
               title: 'شروط بدء المتابعة',
               description:
                   'المتابعة لا تبدأ إلا داخل سياقات مستقرة وآمنة ومناسبة لوظيفتها الداعمة فقط.',
@@ -295,7 +361,7 @@ class AdminFollowupCareGovernancePage extends StatelessWidget {
                   boundaryNote:
                       'أي رعاية مهنية حالية تتقدم على المتابعة الخفيفة داخل التطبيق.',
                   supervisionNote:
-                      'هذا الشرط يحفظ وضوح الأدوار وعدم التضارب.',
+                  'هذا الشرط يحفظ وضوح الأدوار وعدم التضارب.',
                 ),
                 _buildGovernanceCard(
                   context,
@@ -305,9 +371,10 @@ class AdminFollowupCareGovernancePage extends StatelessWidget {
                   boundaryNote:
                       'السلامة تتقدم على الاستمرارية أو الرسائل أو المحتوى أو أي nudges.',
                   supervisionNote:
-                      'هذا شرط أخلاقي ثابت وليس مجرد تفضيل تنظيمي.',
+                  'هذا شرط أخلاقي ثابت وليس مجرد تفضيل تنظيمي.',
                 ),
               ],
+            ),
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
@@ -358,7 +425,9 @@ class AdminFollowupCareGovernancePage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.md),
-            GatewaySectionCard(
+            KeyedSubtree(
+              key: _boundariesKey,
+              child: GatewaySectionCard(
               title: 'حدود المتابعة',
               description:
                   'هذه الحدود تحفظ الفرق بين المتابعة الداعمة وبين أي تدخل علاجي أو حسّاس أو ضاغط.',
@@ -411,9 +480,10 @@ class AdminFollowupCareGovernancePage extends StatelessWidget {
                   boundaryNote:
                       'تحافظ هذه القاعدة على الفصل الواضح بين الدعم الإداري وبين الرعاية المتخصصة.',
                   supervisionNote:
-                      'هذه الطبقة مملوكة للإدارة فقط وليست أداة للمختصين أو المراكز.',
+                  'هذه الطبقة مملوكة للإدارة فقط وليست أداة للمختصين أو المراكز.',
                 ),
               ],
+            ),
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(

@@ -4,8 +4,67 @@ import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widg
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
-class AdminSupportMessagingGovernancePage extends StatelessWidget {
+class AdminSupportMessagingGovernancePage extends StatefulWidget {
   const AdminSupportMessagingGovernancePage({super.key});
+
+  @override
+  State<AdminSupportMessagingGovernancePage> createState() =>
+      _AdminSupportMessagingGovernancePageState();
+}
+
+class _AdminSupportMessagingGovernancePageState
+    extends State<AdminSupportMessagingGovernancePage> {
+  final GlobalKey _rulesKey = GlobalKey();
+  final GlobalKey _boundariesKey = GlobalKey();
+  final GlobalKey _examplesKey = GlobalKey();
+
+  Future<void> _jumpToSection(GlobalKey key) async {
+    final targetContext = key.currentContext;
+    if (targetContext == null) return;
+    await Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+      alignment: 0.08,
+    );
+  }
+
+  Widget _buildAnchorBar(BuildContext context) {
+    Widget buildAnchorButton(String label, GlobalKey key) {
+      return Padding(
+        padding: const EdgeInsetsDirectional.only(end: AppSpacing.sm),
+        child: OutlinedButton(
+          onPressed: () => _jumpToSection(key),
+          child: Text(label),
+        ),
+      );
+    }
+
+    return AppSurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'الانتقال السريع داخل الصفحة',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                buildAnchorButton('Rules', _rulesKey),
+                buildAnchorButton('Boundaries', _boundariesKey),
+                buildAnchorButton('Examples', _examplesKey),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildGovernanceCard(
     BuildContext context, {
@@ -101,6 +160,8 @@ class AdminSupportMessagingGovernancePage extends StatelessWidget {
               emphasis:
                   'الرسائل الداعمة هنا ليست علاجًا، وليست مسارًا خاصًا بالمراكز أو الأخصائيين، بل طبقة دعم واستمرارية تحت حوكمة الإدارة فقط.',
             ),
+            const SizedBox(height: AppSpacing.md),
+            _buildAnchorBar(context),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
               title: 'نموذج الحوكمة',
@@ -216,7 +277,9 @@ class AdminSupportMessagingGovernancePage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.md),
-            GatewaySectionCard(
+            KeyedSubtree(
+              key: _examplesKey,
+              child: GatewaySectionCard(
               title: 'أمثلة رسائل يدوية معتمدة',
               description:
                   'هذه الأمثلة ثابتة ومرجعية فقط، ويمكن استخدامها يدويًا خارج النظام دون إنشاء أي تدفق إرسال فعلي داخل التطبيق.',
@@ -271,8 +334,11 @@ class AdminSupportMessagingGovernancePage extends StatelessWidget {
                 ),
               ],
             ),
+            ),
             const SizedBox(height: AppSpacing.md),
-            GatewaySectionCard(
+            KeyedSubtree(
+              key: _rulesKey,
+              child: GatewaySectionCard(
               title: 'قواعد الإرسال',
               description:
                   'الإرسال يجب أن يبقى محدودًا وآمنًا ومنضبطًا بسياقات واضحة.',
@@ -335,9 +401,10 @@ class AdminSupportMessagingGovernancePage extends StatelessWidget {
                   boundaryNote:
                       'الفصل هنا يحمي تركيز المستخدم ويحافظ على وضوح الأدوار.',
                   supervisionNote:
-                      'الرسائل ليست امتدادًا للجلسات.',
+                  'الرسائل ليست امتدادًا للجلسات.',
                 ),
               ],
+            ),
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
@@ -368,7 +435,9 @@ class AdminSupportMessagingGovernancePage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.md),
-            GatewaySectionCard(
+            KeyedSubtree(
+              key: _boundariesKey,
+              child: GatewaySectionCard(
               title: 'الحدود الأخلاقية',
               description:
                   'هذه الحدود تحكم tone الرسائل ووظيفتها بحيث تبقى آمنة ومناسبة للمنصة.',
@@ -431,9 +500,10 @@ class AdminSupportMessagingGovernancePage extends StatelessWidget {
                   boundaryNote:
                       'النبرة يجب أن تبقى محترمة، هادئة، وغير استغلالية.',
                   supervisionNote:
-                      'هذا حد أخلاقي مباشر في الرسائل الداعمة.',
+                  'هذا حد أخلاقي مباشر في الرسائل الداعمة.',
                 ),
               ],
+            ),
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(

@@ -4,8 +4,66 @@ import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widg
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
-class AdminLibraryGovernancePage extends StatelessWidget {
+class AdminLibraryGovernancePage extends StatefulWidget {
   const AdminLibraryGovernancePage({super.key});
+
+  @override
+  State<AdminLibraryGovernancePage> createState() =>
+      _AdminLibraryGovernancePageState();
+}
+
+class _AdminLibraryGovernancePageState extends State<AdminLibraryGovernancePage> {
+  final GlobalKey _rulesKey = GlobalKey();
+  final GlobalKey _boundariesKey = GlobalKey();
+  final GlobalKey _examplesKey = GlobalKey();
+
+  Future<void> _jumpToSection(GlobalKey key) async {
+    final targetContext = key.currentContext;
+    if (targetContext == null) return;
+    await Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+      alignment: 0.08,
+    );
+  }
+
+  Widget _buildAnchorBar(BuildContext context) {
+    Widget buildAnchorButton(String label, GlobalKey key) {
+      return Padding(
+        padding: const EdgeInsetsDirectional.only(end: AppSpacing.sm),
+        child: OutlinedButton(
+          onPressed: () => _jumpToSection(key),
+          child: Text(label),
+        ),
+      );
+    }
+
+    return AppSurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'الانتقال السريع داخل الصفحة',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                buildAnchorButton('Rules', _rulesKey),
+                buildAnchorButton('Boundaries', _boundariesKey),
+                buildAnchorButton('Examples', _examplesKey),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildGovernanceCard(
     BuildContext context, {
@@ -102,6 +160,8 @@ class AdminLibraryGovernancePage extends StatelessWidget {
                   'المكتبة هنا مصدر دعم ومحتوى آمن، وليست نقطة رفع مفتوحة. الإدارة فقط تملك قرار النشر النهائي.',
             ),
             const SizedBox(height: AppSpacing.md),
+            _buildAnchorBar(context),
+            const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
               title: 'نموذج النشر',
               description:
@@ -148,7 +208,9 @@ class AdminLibraryGovernancePage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.md),
-            GatewaySectionCard(
+            KeyedSubtree(
+              key: _examplesKey,
+              child: GatewaySectionCard(
               title: 'أمثلة قرارات intake معتمدة',
               description:
                   'هذه أمثلة ثابتة ومرجعية فقط لقرارات المراجعة اليدوية، ويمكن استخدامها إداريًا خارج النظام دون إنشاء workflow نشر فعلي.',
@@ -203,8 +265,11 @@ class AdminLibraryGovernancePage extends StatelessWidget {
                 ),
               ],
             ),
+            ),
             const SizedBox(height: AppSpacing.md),
-            GatewaySectionCard(
+            KeyedSubtree(
+              key: _rulesKey,
+              child: GatewaySectionCard(
               title: 'قائمة التحقق قبل النشر',
               description:
                   'هذه هي العناصر التي يجب مراجعتها قبل اعتماد أي محتوى داخل المكتبة.',
@@ -267,12 +332,15 @@ class AdminLibraryGovernancePage extends StatelessWidget {
                   boundaryNote:
                       'المحتوى الذي يصطدم مع سياسة المنصة يجب ألا يصل إلى النشر.',
                   supervisionNote:
-                      'هذه قاعدة حوكمة مرجعية للموافقة.',
+                  'هذه قاعدة حوكمة مرجعية للموافقة.',
                 ),
               ],
             ),
+            ),
             const SizedBox(height: AppSpacing.md),
-            GatewaySectionCard(
+            KeyedSubtree(
+              key: _boundariesKey,
+              child: GatewaySectionCard(
               title: 'شروط المنع المباشر',
               description:
                   'هذه الحالات تمنع النشر مباشرة حتى قبل أي تفكير في الاعتماد.',
@@ -335,9 +403,10 @@ class AdminLibraryGovernancePage extends StatelessWidget {
                   boundaryNote:
                       'سياسات المنصة تسبق جاذبية المحتوى أو فائدته الجزئية.',
                   supervisionNote:
-                      'لا نشر خارج السياسة المعتمدة.',
+                  'لا نشر خارج السياسة المعتمدة.',
                 ),
               ],
+            ),
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
