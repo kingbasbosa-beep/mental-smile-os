@@ -40,6 +40,7 @@ import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_hub_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_blueprint_handoff_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_workspace_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_content_care_programs_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_ai_followup_boundaries_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_ai_policy_page.dart';
@@ -96,6 +97,7 @@ class AppRouter {
     Routes.adminOperations,
     Routes.adminCommunications,
     Routes.adminClinicianRequests,
+    Routes.adminClinicianWorkspace,
     Routes.adminClinicianProfileRequests,
     Routes.adminClients,
     Routes.adminPayments,
@@ -247,6 +249,12 @@ class AppRouter {
       case Routes.adminClinicianRequests:
         return _adminProtectedRoute(
           child: const AdminClinicianRequestsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminClinicianWorkspace:
+        return _adminProtectedRoute(
+          child: const AdminClinicianWorkspacePage(),
           settings: settings,
         );
 

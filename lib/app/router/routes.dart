@@ -51,6 +51,7 @@ class Routes {
   static const adminCommunications = '/admin/communications';
   static const adminClients = '/admin/clients';
   static const adminClinicianRequests = '/admin/clinician-requests';
+  static const adminClinicianWorkspace = '/admin/clinician-workspace';
   static const adminClinicianProfileRequests =
       '/admin/clinician-profile-requests';
   static const adminSupportChats = '/admin/support-chats';

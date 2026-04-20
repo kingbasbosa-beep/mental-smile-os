@@ -413,6 +413,48 @@ class _AdminClinicianRequestsPageState
                   const SizedBox(height: AppSpacing.md),
                   AppSurfaceCard(
                     padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Preview Clean Workspace',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                'Open the new parallel clinician workspace shell for controlled preview only. This does not replace or activate the frozen layer.',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      color: AppColors.obsidian
+                                          .withValues(alpha: 0.72),
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        OutlinedButton(
+                          onPressed: () => Navigator.of(context).pushNamed(
+                            Routes.adminClinicianWorkspace,
+                          ),
+                          child: const Text('Open New Clinician Workspace'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppSurfaceCard(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
                     child: Wrap(
                       spacing: AppSpacing.sm,
                       runSpacing: AppSpacing.sm,
