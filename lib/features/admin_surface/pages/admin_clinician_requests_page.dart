@@ -306,6 +306,62 @@ class _AdminClinicianRequestsPageState
                   const SizedBox(height: AppSpacing.md),
                   AppSurfaceCard(
                     padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Clinician Freeze Rules',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          'This compact section makes the current freeze status explicit without changing any workflow.',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: AppColors.obsidian.withValues(alpha: 0.72),
+                              ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(
+                          'Currently not allowed: no active assignment, no live scheduling, no workflow expansion, and no new integration into other layers.',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          'What must not be assumed: this layer is not production-ready, not user-facing active care, and not an approved orchestration layer.',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          'Before any future unfreeze: explicit readiness review, policy and compliance review, activation boundaries, and ownership clarification must exist first.',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          decoration: BoxDecoration(
+                            color: AppColors.warning.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(AppRadii.lg),
+                            border: Border.all(
+                              color: AppColors.warning.withValues(alpha: 0.18),
+                            ),
+                          ),
+                          child: Text(
+                            'Supervision note: frozen by design, safety-sensitive, and any change requires deliberate approval.',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  height: 1.35,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppSurfaceCard(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
                     child: Wrap(
                       spacing: AppSpacing.sm,
                       runSpacing: AppSpacing.sm,
