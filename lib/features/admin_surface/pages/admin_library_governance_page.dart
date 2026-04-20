@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
@@ -13,6 +14,7 @@ class AdminLibraryGovernancePage extends StatelessWidget {
     required String boundaryNote,
     required String supervisionNote,
     String statusLabel = 'حوكمة المكتبة',
+    bool enableCopyMessage = false,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -42,6 +44,26 @@ class AdminLibraryGovernancePage extends StatelessWidget {
                     color: AppColors.obsidian.withValues(alpha: 0.84),
                   ),
             ),
+            if (enableCopyMessage) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: TextButton.icon(
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: summary));
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Copied'),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.copy_outlined, size: 18),
+                  label: const Text('Copy Message'),
+                ),
+              ),
+            ],
             const SizedBox(height: AppSpacing.sm),
             Text(
               'Boundary: $boundaryNote',
@@ -122,6 +144,62 @@ class AdminLibraryGovernancePage extends StatelessWidget {
                       'وجود هذه البيانات يساعد الإدارة على المراجعة المنضبطة قبل أي قرار نشر.',
                   supervisionNote:
                       'هذه قائمة توجيهية داخلية، لا form backend ولا نظام إدخال فعلي.',
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            GatewaySectionCard(
+              title: 'أمثلة قرارات intake معتمدة',
+              description:
+                  'هذه أمثلة ثابتة ومرجعية فقط لقرارات المراجعة اليدوية، ويمكن استخدامها إداريًا خارج النظام دون إنشاء workflow نشر فعلي.',
+              children: [
+                _buildGovernanceCard(
+                  context,
+                  title: 'Accept for Review',
+                  summary:
+                      'شكرًا على الاقتراح. تم استلامه وسيدخل في مراجعة داخلية قبل أي قرار لاحق. لا يعني ذلك اعتماد النشر في هذه المرحلة.',
+                  boundaryNote:
+                      'قرار إداري هادئ ومحترم، بلا وعد بالنشر أو الموافقة قبل اكتمال الفحص والمراجعة.',
+                  supervisionNote:
+                      'قرار intake يدوي مملوك للإدارة فقط، غير طبي، وغير تشخيصي، وبدون أي publishing promise.',
+                  statusLabel: 'مثال قرار معتمد',
+                  enableCopyMessage: true,
+                ),
+                _buildGovernanceCard(
+                  context,
+                  title: 'Request Clarification',
+                  summary:
+                      'شكرًا على الاقتراح. نحتاج إلى توضيح إضافي بشأن المصدر أو الرابط أو الفئة المستهدفة قبل استكمال المراجعة الداخلية.',
+                  boundaryNote:
+                      'طلب توضيح محترم وهادئ، بلا لوم أو ضغط أو افتراض اعتماد مسبق للمحتوى.',
+                  supervisionNote:
+                      'هذا القرار يساعد الإدارة على استكمال التحقق دون أي وعود بالنشر أو القبول النهائي.',
+                  statusLabel: 'مثال قرار معتمد',
+                  enableCopyMessage: true,
+                ),
+                _buildGovernanceCard(
+                  context,
+                  title: 'Reject for Safety',
+                  summary:
+                      'شكرًا على الاقتراح. لن نتابع هذا المحتوى في الوقت الحالي لأنه لا ينسجم مع حدود السلامة أو الملاءمة المعتمدة داخل المنصة.',
+                  boundaryNote:
+                      'رفض محترم وواضح، بلا harsh tone أو claims قانونية أو طبية أو تصعيد غير لازم.',
+                  supervisionNote:
+                      'قرار إداري يدوي يقدّم السلامة على أي قيمة محتملة للمحتوى.',
+                  statusLabel: 'مثال قرار معتمد',
+                  enableCopyMessage: true,
+                ),
+                _buildGovernanceCard(
+                  context,
+                  title: 'Reject for Quality / Rights',
+                  summary:
+                      'شكرًا على الاقتراح. لن نتابع هذا المحتوى في الوقت الحالي لعدم كفاية الجودة أو لعدم وضوح الحقوق والاستخدام المسموح.',
+                  boundaryNote:
+                      'رفض هادئ ومحترم، دون blame أو legal overclaim، ودون أي وعد بإعادة النشر قبل مراجعة مكتملة.',
+                  supervisionNote:
+                      'هذا القرار يؤكد أن الجودة والحقوق شرط سابق لأي تفكير في الاعتماد أو النشر.',
+                  statusLabel: 'مثال قرار معتمد',
+                  enableCopyMessage: true,
                 ),
               ],
             ),
