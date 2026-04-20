@@ -248,6 +248,7 @@ class _AdminCommunicationGatewayPageState
                     children: SupportEmailIntent.values.map((intent) {
                       return ChoiceChip(
                         label: Text(_intentLabel(intent)),
+                        showCheckmark: true,
                         selected: _selectedIntent == intent,
                         onSelected: (_) {
                           setState(() {
@@ -256,6 +257,14 @@ class _AdminCommunicationGatewayPageState
                         },
                       );
                     }).toList(),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'Selected: ${_intentLabel(_selectedIntent)}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: const Color(0xFF2E5AAC),
+                          fontWeight: FontWeight.w700,
+                        ),
                   ),
                 ],
               ),
