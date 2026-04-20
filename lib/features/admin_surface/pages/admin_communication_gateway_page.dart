@@ -248,6 +248,33 @@ class _AdminCommunicationGatewayPageState
                   'No external channel integrations are active yet. This gateway remains a monitored shell.',
             ),
             const SizedBox(height: AppSpacing.md),
+            const GatewaySectionCard(
+              title: 'Gateway Boundary Definition',
+              description:
+                  'This compact section defines what the Communication Gateway is responsible for and where its boundaries stop.',
+              children: [
+                GatewaySupervisionNote(
+                  text:
+                      'Does: manual support initiation, email-based communication, and intent-based contact preparation.',
+                ),
+                SizedBox(height: AppSpacing.sm),
+                GatewaySupervisionNote(
+                  text:
+                      'Does not do: messaging system behavior, live chat handling, automation, or follow-up execution.',
+                ),
+                SizedBox(height: AppSpacing.sm),
+                GatewaySupervisionNote(
+                  text:
+                      'Boundaries: admin-triggered only, requires an external email client, and does not store internal messages.',
+                ),
+                SizedBox(height: AppSpacing.sm),
+                GatewaySupervisionNote(
+                  text:
+                      'Supervision note: non-medical, non-diagnostic, support-first, and not a crisis-handling layer.',
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
             AppSurfaceCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
