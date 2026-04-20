@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -12,6 +13,14 @@ class CommunicationGatewayActions {
   const CommunicationGatewayActions._();
 
   static const String supportEmailAddress = 'support@mentalsmile.app';
+
+  static String _intentDebugValue(SupportEmailIntent intent) {
+    return switch (intent) {
+      SupportEmailIntent.generalSupport => 'general_support',
+      SupportEmailIntent.technicalIssue => 'technical_issue',
+      SupportEmailIntent.accountHelp => 'account_help',
+    };
+  }
 
   static Future<void> openSupportEmail(
     BuildContext context, {
@@ -59,6 +68,14 @@ class CommunicationGatewayActions {
         ),
     };
 
+    if (kDebugMode) {
+      debugPrint(
+        'COMM_GATEWAY support_email_prepared '
+        'selectedIntent=${_intentDebugValue(intent)} '
+        'subject="${emailTemplate.subject}"',
+      );
+    }
+
     final uri = Uri(
       scheme: 'mailto',
       path: supportEmailAddress,
@@ -69,9 +86,17 @@ class CommunicationGatewayActions {
     );
 
     final ok = await launchUrl(uri, mode: LaunchMode.platformDefault);
+    if (kDebugMode) {
+      debugPrint(
+        'COMM_GATEWAY support_email_launch_result success=$ok',
+      );
+    }
     if (!context.mounted) return;
     if (ok) return;
 
+    if (kDebugMode) {
+      debugPrint('COMM_GATEWAY support_email_fallback_opened=true');
+    }
     await _showEmailFallbackDialog(
       context,
       subject: emailTemplate.subject,

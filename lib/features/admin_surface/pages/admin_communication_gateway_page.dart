@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/features/gateway_layer/core/communication_gateway_actions.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_entry.dart';
@@ -23,6 +24,14 @@ class _AdminCommunicationGatewayPageState
       SupportEmailIntent.generalSupport => 'General Support',
       SupportEmailIntent.technicalIssue => 'Technical Issue',
       SupportEmailIntent.accountHelp => 'Account Help',
+    };
+  }
+
+  String _intentDebugValue(SupportEmailIntent intent) {
+    return switch (intent) {
+      SupportEmailIntent.generalSupport => 'general_support',
+      SupportEmailIntent.technicalIssue => 'technical_issue',
+      SupportEmailIntent.accountHelp => 'account_help',
     };
   }
 
@@ -144,10 +153,18 @@ class _AdminCommunicationGatewayPageState
     if (entry.id == 'support_email') {
       return InkWell(
         borderRadius: BorderRadius.circular(AppRadii.xl),
-        onTap: () => CommunicationGatewayActions.openSupportEmail(
-          context,
-          intent: _selectedIntent,
-        ),
+        onTap: () {
+          if (kDebugMode) {
+            debugPrint(
+              'COMM_GATEWAY support_email_tap '
+              'selectedIntent=${_intentDebugValue(_selectedIntent)}',
+            );
+          }
+          CommunicationGatewayActions.openSupportEmail(
+            context,
+            intent: _selectedIntent,
+          );
+        },
         child: GatewayEntryCard(entry: entry),
       );
     }
@@ -251,6 +268,12 @@ class _AdminCommunicationGatewayPageState
                         showCheckmark: true,
                         selected: _selectedIntent == intent,
                         onSelected: (_) {
+                          if (kDebugMode) {
+                            debugPrint(
+                              'COMM_GATEWAY intent_selected='
+                              '${_intentDebugValue(intent)}',
+                            );
+                          }
                           setState(() {
                             _selectedIntent = intent;
                           });
