@@ -11,7 +11,9 @@ class AdminContentCareProgramsPage extends StatelessWidget {
     BuildContext context, {
     required String title,
     required String summary,
+    required String boundaryNote,
     required String route,
+    String statusLabel = 'مدخل حوكمة',
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -29,6 +31,14 @@ class AdminContentCareProgramsPage extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                     ),
               ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                statusLabel,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: const Color(0xFF2E5AAC),
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 summary,
@@ -37,8 +47,36 @@ class AdminContentCareProgramsPage extends StatelessWidget {
                     ),
               ),
               const SizedBox(height: AppSpacing.sm),
+              Text(
+                'Boundary: $boundaryNote',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.obsidian.withValues(alpha: 0.70),
+                      height: 1.35,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
               const GatewaySupervisionNote(
-                text: 'مدخل إشرافي فقط لفتح صفحة الحوكمة المرتبطة.',
+                text:
+                    'مدخل إشرافي فقط لفتح صفحة الحوكمة أو الحدود المرتبطة، بدون أي تفعيل تشغيلي مباشر.',
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    'فتح الصفحة',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: const Color(0xFF2E5AAC),
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  const Icon(
+                    Icons.open_in_new,
+                    size: 18,
+                    color: Color(0xFF2E5AAC),
+                  ),
+                ],
               ),
             ],
           ),
@@ -79,6 +117,8 @@ class AdminContentCareProgramsPage extends StatelessWidget {
                   title: 'Library Governance',
                   summary:
                       'حوكمة المكتبة والمحتوى التوعوي والحدود المتعلقة باستخدامه داخل النظام.',
+                  boundaryNote:
+                      'مرجع نشر ومراجعة ومنع مباشر للمحتوى داخل المكتبة، مع تثبيت أن النشر مملوك للإدارة فقط.',
                   route: Routes.adminLibraryGovernance,
                 ),
                 _buildEntryCard(
@@ -86,6 +126,8 @@ class AdminContentCareProgramsPage extends StatelessWidget {
                   title: 'Support Messaging Governance',
                   summary:
                       'حوكمة الرسائل الداعمة وحدود استخدامها بما لا يتعارض مع الدعم أو السلامة.',
+                  boundaryNote:
+                      'مرجع يضبط الرسائل الداعمة باعتبارها Admin-governed only وبعيدة عن أي تدخل علاجي.',
                   route: Routes.adminSupportMessagingGovernance,
                 ),
                 _buildEntryCard(
@@ -93,7 +135,18 @@ class AdminContentCareProgramsPage extends StatelessWidget {
                   title: 'Follow-Up Care Governance',
                   summary:
                       'حوكمة المتابعة الداعمة الخفيفة داخل التطبيق كطبقة مملوكة للإدارة فقط.',
+                  boundaryNote:
+                      'مرجع يحدد أن المتابعة داخل التطبيق دعم خفيف واستمرارية فقط وليست علاجًا أو جلسات.',
                   route: Routes.adminFollowupCareGovernance,
+                ),
+                _buildEntryCard(
+                  context,
+                  title: 'AI Follow-Up Boundaries',
+                  summary:
+                      'حدود دور الذكاء الاصطناعي داخل المتابعة المستمرة باعتباره مساعدًا اقتراحيًا فقط تحت إشراف الإدارة.',
+                  boundaryNote:
+                      'مرجع يحدد ما يمكن للذكاء اقتراحه وما لا يمكنه فعله داخل المتابعة، مع بقاء القرار النهائي للإدارة.',
+                  route: Routes.adminAiFollowupBoundaries,
                 ),
               ],
             ),

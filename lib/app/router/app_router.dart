@@ -41,6 +41,7 @@ import 'package:flutterprojects/features/admin_surface/pages/admin_hub_page.dart
 import 'package:flutterprojects/features/admin_surface/pages/admin_blueprint_handoff_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_content_care_programs_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_ai_followup_boundaries_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_ai_policy_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_compliance_checkpoints_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_domain_status_page.dart';
@@ -106,6 +107,7 @@ class AppRouter {
     Routes.adminLibraryGovernance,
     Routes.adminSupportMessagingGovernance,
     Routes.adminFollowupCareGovernance,
+    Routes.adminAiFollowupBoundaries,
     Routes.adminGrowthLayer,
     Routes.adminBlueprintHandoff,
     Routes.adminComplianceCheckpoints,
@@ -311,6 +313,12 @@ class AppRouter {
       case Routes.adminFollowupCareGovernance:
         return _adminProtectedRoute(
           child: const AdminFollowupCareGovernancePage(),
+          settings: settings,
+        );
+
+      case Routes.adminAiFollowupBoundaries:
+        return _adminProtectedRoute(
+          child: const AdminAiFollowupBoundariesPage(),
           settings: settings,
         );
 

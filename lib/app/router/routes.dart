@@ -62,6 +62,8 @@ class Routes {
       '/admin/support-messaging-governance';
   static const adminFollowupCareGovernance =
       '/admin/followup-care-governance';
+  static const adminAiFollowupBoundaries =
+      '/admin/ai-followup-boundaries';
   static const adminGrowthLayer = '/admin/growth-layer';
   static const adminBlueprintHandoff = '/admin/blueprint-handoff';
   static const adminComplianceCheckpoints = '/admin/compliance-checkpoints';
