@@ -516,15 +516,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
                         : 'Fast access to frequently used admin pages.',
                     actions: quickActions,
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                  _AdminQuickActionsStrip(
-                    title: isArabic ? 'مراجع أساسية' : 'Key References',
-                    subtitle: isArabic
-                        ? 'وصول سريع للصفحات المرجعية والإرشادية المهمة.'
-                        : 'Fast access to important guidance and reference pages.',
-                    actions: keyReferences,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacing.lg),
                   _AdminGuidedWorkflowsSection(
                     title: isArabic ? 'مسارات موجهة' : 'Guided Workflows',
                     subtitle: isArabic
@@ -532,7 +524,15 @@ class _AdminHubPageState extends State<AdminHubPage> {
                         : 'Compact route groupings to move through related admin tasks without creating a new workflow engine.',
                     workflows: guidedWorkflows,
                   ),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacing.lg),
+                  _AdminQuickActionsStrip(
+                    title: isArabic ? 'مراجع أساسية' : 'Key References',
+                    subtitle: isArabic
+                        ? 'وصول سريع للصفحات المرجعية والإرشادية المهمة.'
+                        : 'Fast access to important guidance and reference pages.',
+                    actions: keyReferences,
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
                   _GatewaySummaryStrip(statuses: gatewayStatuses),
                   const SizedBox(height: AppSpacing.lg),
                   const _ControlRoomIntro(),
@@ -624,12 +624,15 @@ class _AdminQuickActionsStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppSurfaceCard(
+      padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: Theme.of(context).textTheme.titleLarge,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
@@ -679,12 +682,15 @@ class _AdminGuidedWorkflowsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppSurfaceCard(
+      padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: Theme.of(context).textTheme.titleLarge,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
@@ -741,7 +747,7 @@ class _AdminGuidedWorkflowCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppSectionPanel(
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
