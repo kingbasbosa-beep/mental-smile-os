@@ -18,35 +18,42 @@ class CommunicationGatewayActions {
   }) async {
     final emailTemplate = switch (intent) {
       SupportEmailIntent.generalSupport => (
-          subject: '[General Support] Mental Smile Support',
-          body: 'Hello Mental Smile Support,\n\n'
+          subject: 'Mental Smile Support | General Support',
+          body: 'Hello Mental Smile Support team,\n\n'
+              'I would like help with the following:\n\n'
               'Name:\n'
-              'Contact email:\n'
+              'Preferred contact email:\n'
               'Support topic:\n'
-              'Summary:\n'
+              'Short summary:\n'
               'Details:\n\n'
+              'This request is for support only and does not include medical or diagnostic evaluation.\n\n'
               'Thank you.'
         ),
       SupportEmailIntent.technicalIssue => (
-          subject: '[Technical Issue] Mental Smile Support',
-          body: 'Hello Mental Smile Support,\n\n'
+          subject: 'Mental Smile Support | Technical Issue',
+          body: 'Hello Mental Smile Support team,\n\n'
+              'I would like to report a technical issue:\n\n'
               'Name:\n'
-              'Contact email:\n'
+              'Preferred contact email:\n'
               'Device / Browser:\n'
               'Issue summary:\n'
               'Steps to reproduce:\n'
               'What happened:\n'
-              'What you expected:\n\n'
+              'What I expected:\n'
+              'When this happened:\n\n'
+              'This request is for technical support only and does not include medical or diagnostic evaluation.\n\n'
               'Thank you.'
         ),
       SupportEmailIntent.accountHelp => (
-          subject: '[Account Help] Mental Smile Support',
-          body: 'Hello Mental Smile Support,\n\n'
+          subject: 'Mental Smile Support | Account Help',
+          body: 'Hello Mental Smile Support team,\n\n'
+              'I would like help with my account:\n\n'
               'Name:\n'
               'Account email:\n'
               'Account help needed:\n'
-              'Summary:\n'
+              'Short summary:\n'
               'Details:\n\n'
+              'This request is for account support only and does not include medical or diagnostic evaluation.\n\n'
               'Thank you.'
         ),
     };
