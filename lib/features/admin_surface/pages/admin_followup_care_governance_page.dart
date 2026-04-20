@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
@@ -13,6 +14,7 @@ class AdminFollowupCareGovernancePage extends StatelessWidget {
     required String boundaryNote,
     required String supervisionNote,
     String statusLabel = 'حوكمة إشرافية',
+    bool enableCopyMessage = false,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -42,6 +44,26 @@ class AdminFollowupCareGovernancePage extends StatelessWidget {
                     color: AppColors.obsidian.withValues(alpha: 0.84),
                   ),
             ),
+            if (enableCopyMessage) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: TextButton.icon(
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: summary));
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Copied'),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.copy_outlined, size: 18),
+                  label: const Text('Copy Message'),
+                ),
+              ),
+            ],
             const SizedBox(height: AppSpacing.sm),
             Text(
               'Boundary: $boundaryNote',
@@ -190,6 +212,62 @@ class AdminFollowupCareGovernancePage extends StatelessWidget {
                       'يبقى هذا الربط داعمًا فقط ولا يتحول إلى intervention flow أو برنامج علاجي.',
                   supervisionNote:
                       'المحتوى هنا امتداد للدعم الخفيف لا أكثر.',
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            GatewaySectionCard(
+              title: 'أمثلة نبرة متابعة معتمدة',
+              description:
+                  'هذه أمثلة ثابتة ومرجعية فقط لاستخدام يدوي من الإدارة خارج النظام، دون إنشاء أي تدفق متابعة فعلي داخل التطبيق.',
+              children: [
+                _buildGovernanceCard(
+                  context,
+                  title: 'Gentle Check-in',
+                  summary:
+                      'مرحبًا، هذه رسالة تفقد لطيفة فقط. إذا كان الوقت مناسبًا لك، يمكنك العودة لاحقًا إلى المساحة الداعمة أو إلى محتوى مناسب داخل التطبيق.',
+                  boundaryNote:
+                      'غير طبي، غير تشخيصي، وغير مناسب للأزمة أو أثناء الجلسات النشطة أو الحالات الحساسة.',
+                  supervisionNote:
+                      'دعم يدوي مملوك للإدارة فقط، بهدوء وبدون ضغط أو إلحاح أو مسار علاجي.',
+                  statusLabel: 'مثال متابعة معتمد',
+                  enableCopyMessage: true,
+                ),
+                _buildGovernanceCard(
+                  context,
+                  title: 'Light Encouragement',
+                  summary:
+                      'خطواتك الهادئة مهمة، حتى لو بدت بسيطة. خذ وقتك، ويمكنك الاستفادة من الدعم أو المحتوى المناسب عندما يكون ذلك ملائمًا لك.',
+                  boundaryNote:
+                      'رسالة دعم خفيف فقط، بلا claims علاجية، وبلا نبرة ذنب أو urgency أو دفع نفسي.',
+                  supervisionNote:
+                      'نبرة مشجعة وfamily-safe ضمن متابعة يدوية غير علاجية.',
+                  statusLabel: 'مثال متابعة معتمد',
+                  enableCopyMessage: true,
+                ),
+                _buildGovernanceCard(
+                  context,
+                  title: 'Calm Continuity Reminder',
+                  summary:
+                      'عندما يكون الوقت مناسبًا لك، يمكنك العودة بهدوء إلى التطبيق أو إلى مادة داعمة مناسبة كجزء من الاستمرارية والاحتواء فقط.',
+                  boundaryNote:
+                      'تذكير هادئ غير ضاغط، لا يتحول إلى pressure flow أو تدخل علاجي أو تشخيصي.',
+                  supervisionNote:
+                      'هذا المثال يحافظ على الاستمرارية دون إزعاج أو إلحاح.',
+                  statusLabel: 'مثال متابعة معتمد',
+                  enableCopyMessage: true,
+                ),
+                _buildGovernanceCard(
+                  context,
+                  title: 'Pause / Respectful Stop Message',
+                  summary:
+                      'سنوقف رسائل المتابعة في الوقت الحالي احترامًا لطلبك أو لظروفك الحالية. يمكنك العودة لاحقًا متى رغبت إلى المساحة الداعمة داخل التطبيق.',
+                  boundaryNote:
+                      'رسالة احترام وإيقاف فقط، ليست للأزمة، وليست للجلسات النشطة، ولا تحمل أي ضغط أو guilt-based nudging.',
+                  supervisionNote:
+                      'هذا مثال يدعم الاختيار الشخصي والسلامة ويؤكد أن المتابعة تظل يدوية ومملوكة للإدارة فقط.',
+                  statusLabel: 'مثال متابعة معتمد',
+                  enableCopyMessage: true,
                 ),
               ],
             ),
