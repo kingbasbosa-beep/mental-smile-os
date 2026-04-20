@@ -163,6 +163,33 @@ class _AdminSupportMessagingGovernancePageState
             const SizedBox(height: AppSpacing.md),
             _buildAnchorBar(context),
             const SizedBox(height: AppSpacing.md),
+            const GatewaySectionCard(
+              title: 'Support Messaging Subsystem Definition',
+              description:
+                  'This compact section defines support messaging as an isolated governed subsystem with clear scope and limits.',
+              children: [
+                GatewaySupervisionNote(
+                  text:
+                      'Does: admin-owned support messaging guidance, approved message language, manual support wording, and safe communication boundaries.',
+                ),
+                SizedBox(height: AppSpacing.sm),
+                GatewaySupervisionNote(
+                  text:
+                      'Does not do: campaign engine behavior, automated outreach, chat system behavior, or any therapeutic messaging system.',
+                ),
+                SizedBox(height: AppSpacing.sm),
+                GatewaySupervisionNote(
+                  text:
+                      'Boundaries: admin-owned only, manual and supervised use only, not during crisis, not during active sessions, and support-first only.',
+                ),
+                SizedBox(height: AppSpacing.sm),
+                GatewaySupervisionNote(
+                  text:
+                      'Supervision note: non-medical, non-diagnostic, calm, family-aware, and safety-first.',
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
               title: 'نموذج الحوكمة',
               description:
