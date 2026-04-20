@@ -430,6 +430,45 @@ class _AdminHubPageState extends State<AdminHubPage> {
       ),
     ];
 
+    final guidedWorkflows = <_AdminGuidedWorkflowCardData>[
+      _AdminGuidedWorkflowCardData(
+        title: isArabic ? 'معالجة الدعم' : 'Support Handling',
+        subtitle: isArabic
+            ? 'ابدأ من حدود القناة ثم راجع حوكمة الرسائل الداعمة.'
+            : 'Start with channel boundaries, then review support messaging governance.',
+        primaryActionLabel:
+            isArabic ? 'Communication Gateway' : 'Communication Gateway',
+        primaryRoute: Routes.adminCommunicationGateway,
+        secondaryActionLabel:
+            isArabic ? 'Messaging Governance' : 'Messaging Governance',
+        secondaryRoute: Routes.adminSupportMessagingGovernance,
+      ),
+      _AdminGuidedWorkflowCardData(
+        title: isArabic ? 'جاهزية المتابعة' : 'Follow-Up Readiness',
+        subtitle: isArabic
+            ? 'راجع حوكمة المتابعة ثم حدود الذكاء قبل أي توسع لاحق.'
+            : 'Review follow-up governance, then AI boundaries before any later expansion.',
+        primaryActionLabel:
+            isArabic ? 'Follow-Up Care Governance' : 'Follow-Up Care Governance',
+        primaryRoute: Routes.adminFollowupCareGovernance,
+        secondaryActionLabel:
+            isArabic ? 'AI Follow-Up Boundaries' : 'AI Follow-Up Boundaries',
+        secondaryRoute: Routes.adminAiFollowupBoundaries,
+      ),
+      _AdminGuidedWorkflowCardData(
+        title: isArabic ? 'مراجعة إدخال المحتوى' : 'Content Intake Review',
+        subtitle: isArabic
+            ? 'راجع حوكمة المكتبة ثم ارجع إلى سطح برامج المحتوى والرعاية.'
+            : 'Review library governance, then return to the content and care surface.',
+        primaryActionLabel:
+            isArabic ? 'Library Governance' : 'Library Governance',
+        primaryRoute: Routes.adminLibraryGovernance,
+        secondaryActionLabel:
+            isArabic ? 'Content & Care Programs' : 'Content & Care Programs',
+        secondaryRoute: Routes.adminContentCarePrograms,
+      ),
+    ];
+
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
@@ -484,6 +523,14 @@ class _AdminHubPageState extends State<AdminHubPage> {
                         ? 'وصول سريع للصفحات المرجعية والإرشادية المهمة.'
                         : 'Fast access to important guidance and reference pages.',
                     actions: keyReferences,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  _AdminGuidedWorkflowsSection(
+                    title: isArabic ? 'مسارات موجهة' : 'Guided Workflows',
+                    subtitle: isArabic
+                        ? 'تجميعات تنقل خفيفة تساعد على التحرك بين الصفحات المرتبطة دون إنشاء workflow جديد.'
+                        : 'Compact route groupings to move through related admin tasks without creating a new workflow engine.',
+                    workflows: guidedWorkflows,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   _GatewaySummaryStrip(statuses: gatewayStatuses),
@@ -545,6 +592,24 @@ class _AdminQuickActionItem {
   final String route;
 }
 
+class _AdminGuidedWorkflowCardData {
+  const _AdminGuidedWorkflowCardData({
+    required this.title,
+    required this.subtitle,
+    required this.primaryActionLabel,
+    required this.primaryRoute,
+    required this.secondaryActionLabel,
+    required this.secondaryRoute,
+  });
+
+  final String title;
+  final String subtitle;
+  final String primaryActionLabel;
+  final String primaryRoute;
+  final String secondaryActionLabel;
+  final String secondaryRoute;
+}
+
 class _AdminQuickActionsStrip extends StatelessWidget {
   const _AdminQuickActionsStrip({
     required this.title,
@@ -593,6 +658,124 @@ class _AdminQuickActionsStrip extends StatelessWidget {
                   ),
                 )
                 .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AdminGuidedWorkflowsSection extends StatelessWidget {
+  const _AdminGuidedWorkflowsSection({
+    required this.title,
+    required this.subtitle,
+    required this.workflows,
+  });
+
+  final String title;
+  final String subtitle;
+  final List<_AdminGuidedWorkflowCardData> workflows;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            subtitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.obsidian.withValues(alpha: 0.70),
+                ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isNarrow = constraints.maxWidth < 980;
+              if (isNarrow) {
+                return Column(
+                  children: [
+                    for (int i = 0; i < workflows.length; i++) ...[
+                      _AdminGuidedWorkflowCard(item: workflows[i]),
+                      if (i != workflows.length - 1)
+                        const SizedBox(height: AppSpacing.md),
+                    ],
+                  ],
+                );
+              }
+
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (int i = 0; i < workflows.length; i++) ...[
+                    Expanded(
+                      child: _AdminGuidedWorkflowCard(item: workflows[i]),
+                    ),
+                    if (i != workflows.length - 1)
+                      const SizedBox(width: AppSpacing.md),
+                  ],
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AdminGuidedWorkflowCard extends StatelessWidget {
+  const _AdminGuidedWorkflowCard({
+    required this.item,
+  });
+
+  final _AdminGuidedWorkflowCardData item;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSectionPanel(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            item.title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            item.subtitle,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.obsidian.withValues(alpha: 0.72),
+                  height: 1.3,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              OutlinedButton(
+                onPressed: () => Navigator.of(context).pushNamed(item.primaryRoute),
+                child: Text(item.primaryActionLabel),
+              ),
+              OutlinedButton(
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(item.secondaryRoute),
+                child: Text(item.secondaryActionLabel),
+              ),
+            ],
           ),
         ],
       ),
