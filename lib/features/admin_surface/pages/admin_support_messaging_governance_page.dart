@@ -195,6 +195,58 @@ class AdminSupportMessagingGovernancePage extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
+              title: 'أمثلة رسائل يدوية معتمدة',
+              description:
+                  'هذه الأمثلة ثابتة ومرجعية فقط، ويمكن استخدامها يدويًا خارج النظام دون إنشاء أي تدفق إرسال فعلي داخل التطبيق.',
+              children: [
+                _buildGovernanceCard(
+                  context,
+                  title: 'Check-in',
+                  summary:
+                      'مرحبًا، نرسل لك هذه الرسالة كتفقد لطيف فقط. إذا كان هذا الوقت مناسبًا لك، يمكنك العودة متى أحببت إلى المحتوى الداعم داخل التطبيق.',
+                  boundaryNote:
+                      'غير طبي، غير تشخيصي، وغير مناسب لحالات الأزمة أو أثناء الجلسات النشطة.',
+                  supervisionNote:
+                      'دعم يدوي مملوك للإدارة فقط، بدون ضغط أو إلحاح أو مسار علاجي.',
+                  statusLabel: 'مثال رسالة معتمد',
+                ),
+                _buildGovernanceCard(
+                  context,
+                  title: 'Encouragement',
+                  summary:
+                      'خطواتك الهادئة لها قيمة، حتى لو كانت بسيطة. يمكنك الاستفادة من المساحة الداعمة داخل التطبيق بالوتيرة التي تناسبك.',
+                  boundaryNote:
+                      'رسالة داعمة فقط، بلا claims علاجية، وبلا نبرة ذنب أو استعجال.',
+                  supervisionNote:
+                      'الهدف هنا التشجيع الهادئ family-safe ضمن دعم يدوي خفيف.',
+                  statusLabel: 'مثال رسالة معتمد',
+                ),
+                _buildGovernanceCard(
+                  context,
+                  title: 'Awareness',
+                  summary:
+                      'قد يفيدك الاطلاع على محتوى توعوي مناسب داخل المكتبة عندما يكون الوقت مناسبًا لك، كجزء من الدعم الخفيف والاستمرارية.',
+                  boundaryNote:
+                      'إحالة توعوية فقط، لا تتحول إلى تدخل علاجي أو pressure flow أو تشخيص.',
+                  supervisionNote:
+                      'هذا المثال يربط الرسالة بالمحتوى بشكل داعم فقط وتحت إشراف الإدارة.',
+                  statusLabel: 'مثال رسالة معتمد',
+                ),
+                _buildGovernanceCard(
+                  context,
+                  title: 'Congratulations / Light Nudge',
+                  summary:
+                      'أحسنت على استمرارك الهادئ. إذا رغبت، يمكنك العودة لاحقًا إلى التطبيق أو إلى مادة داعمة مناسبة لك، دون أي استعجال.',
+                  boundaryNote:
+                      'رسالة لطيفة وغير متطفلة، وليست مناسبة للأزمة أو للجلسات النشطة أو للحالات الحساسة.',
+                  supervisionNote:
+                      'نبرة داعمة وغير ضاغطة، بدون إلحاح أو urgency language أو guilt-based nudging.',
+                  statusLabel: 'مثال رسالة معتمد',
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            GatewaySectionCard(
               title: 'قواعد الإرسال',
               description:
                   'الإرسال يجب أن يبقى محدودًا وآمنًا ومنضبطًا بسياقات واضحة.',
