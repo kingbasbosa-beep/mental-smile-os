@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
@@ -5,6 +6,13 @@ import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class AdminClinicianWorkspacePage extends StatelessWidget {
   const AdminClinicianWorkspacePage({super.key});
+
+  String _dateText(dynamic value) {
+    if (value is Timestamp) {
+      return value.toDate().toLocal().toString().split('.').first;
+    }
+    return (value ?? '').toString().trim();
+  }
 
   Widget _buildWorkspaceCard(
     BuildContext context, {
@@ -93,6 +101,142 @@ class AdminClinicianWorkspacePage extends StatelessWidget {
                 GatewaySupervisionNote(
                   text:
                       'Does not belong here yet: live assignment, booking orchestration, scheduling engine behavior, or any user-facing activation.',
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            GatewaySectionCard(
+              title: 'Incoming Requests Preview',
+              description:
+                  'A read-only preview of clinician-related requests using the existing clinician collection without activating any assignment or workflow behavior.',
+              children: [
+                StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection('clinicians')
+                      .orderBy('createdAt', descending: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return const GatewaySupervisionNote(
+                        text:
+                            'Preview unavailable right now. The workspace shell remains read-only and inactive until a later approved activation path exists.',
+                      );
+                    }
+
+                    if (!snapshot.hasData) {
+                      return const GatewaySupervisionNote(
+                        text:
+                            'Loading a read-only preview of incoming clinician-side requests.',
+                      );
+                    }
+
+                    final pendingDocs = snapshot.data!.docs.where((doc) {
+                      final data = doc.data();
+                      final isBlocked = (data['isBlocked'] ?? false) == true;
+                      if (isBlocked) return false;
+                      final status =
+                          (data['approvalStatus'] ?? 'pending_review')
+                              .toString();
+                      return status == 'pending_review';
+                    }).toList();
+
+                    final previewDocs = pendingDocs.take(3).toList();
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Pending preview count: ${pendingDocs.length}',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        if (previewDocs.isEmpty)
+                          const GatewaySupervisionNote(
+                            text:
+                                'No pending clinician-side requests are being previewed right now. This surface stays read-only and does not activate any workflow.',
+                          )
+                        else
+                          ...previewDocs.map(
+                            (doc) {
+                              final data = doc.data();
+                              final name =
+                                  (data['displayName'] ?? data['name'] ?? '')
+                                      .toString()
+                                      .trim();
+                              final email =
+                                  (data['email'] ?? '').toString().trim();
+                              final createdAt = _dateText(data['createdAt']);
+
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.only(bottom: AppSpacing.md),
+                                child: AppSectionPanel(
+                                  padding: const EdgeInsets.all(AppSpacing.md),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        name.isEmpty ? 'Unnamed clinician' : name,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                      ),
+                                      const SizedBox(height: AppSpacing.xs),
+                                      Text(
+                                        'Status: Pending review',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color: const Color(0xFF2E5AAC),
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                      ),
+                                      const SizedBox(height: AppSpacing.sm),
+                                      Text(
+                                        email.isEmpty
+                                            ? 'Email not available'
+                                            : email,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.copyWith(
+                                              color: AppColors.obsidian
+                                                  .withValues(alpha: 0.84),
+                                            ),
+                                      ),
+                                      if (createdAt.isNotEmpty) ...[
+                                        const SizedBox(height: AppSpacing.xs),
+                                        Text(
+                                          'Created: $createdAt',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(
+                                                color: AppColors.obsidian
+                                                    .withValues(alpha: 0.70),
+                                              ),
+                                        ),
+                                      ],
+                                      const SizedBox(height: AppSpacing.xs),
+                                      const GatewaySupervisionNote(
+                                        text:
+                                            'Read-only preview only. No assignment, approval, scheduling, or state transition is available from this shell.',
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
