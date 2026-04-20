@@ -163,6 +163,33 @@ class _AdminFollowupCareGovernancePageState
             const SizedBox(height: AppSpacing.md),
             _buildAnchorBar(context),
             const SizedBox(height: AppSpacing.md),
+            const GatewaySectionCard(
+              title: 'Follow-Up Care Subsystem Definition',
+              description:
+                  'This compact section defines follow-up care as an isolated governed subsystem with clear scope and limits.',
+              children: [
+                GatewaySupervisionNote(
+                  text:
+                      'Does: admin-owned follow-up guidance, approved continuity language, manual supervised follow-up support, and safe boundaries for light continuity support.',
+                ),
+                SizedBox(height: AppSpacing.sm),
+                GatewaySupervisionNote(
+                  text:
+                      'Does not do: therapy engine behavior, live care orchestration, clinician replacement, or any automated follow-up system.',
+                ),
+                SizedBox(height: AppSpacing.sm),
+                GatewaySupervisionNote(
+                  text:
+                      'Boundaries: admin-owned only, manual and supervised use only, not during crisis, not during active sessions, and light continuity support only.',
+                ),
+                SizedBox(height: AppSpacing.sm),
+                GatewaySupervisionNote(
+                  text:
+                      'Supervision note: non-medical, non-diagnostic, calm, family-aware, and safety-first.',
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
               title: 'نموذج المتابعة',
               description:
