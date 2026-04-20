@@ -407,6 +407,29 @@ class _AdminHubPageState extends State<AdminHubPage> {
       ),
     ];
 
+    final keyReferences = <_AdminQuickActionItem>[
+      _AdminQuickActionItem(
+        label: isArabic ? 'System Activation Pack' : 'System Activation Pack',
+        icon: Icons.inventory_2_outlined,
+        route: Routes.adminSystemActivationPack,
+      ),
+      _AdminQuickActionItem(
+        label: isArabic ? 'Blueprint Handoff' : 'Blueprint Handoff',
+        icon: Icons.map_outlined,
+        route: Routes.adminBlueprintHandoff,
+      ),
+      _AdminQuickActionItem(
+        label: isArabic ? 'Compliance Checkpoints' : 'Compliance Checkpoints',
+        icon: Icons.verified_outlined,
+        route: Routes.adminComplianceCheckpoints,
+      ),
+      _AdminQuickActionItem(
+        label: isArabic ? 'Exposure Rules' : 'Exposure Rules',
+        icon: Icons.visibility_outlined,
+        route: Routes.adminExposureRules,
+      ),
+    ];
+
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
@@ -453,6 +476,14 @@ class _AdminHubPageState extends State<AdminHubPage> {
                         ? 'وصول سريع للصفحات الإدارية كثيرة الاستخدام.'
                         : 'Fast access to frequently used admin pages.',
                     actions: quickActions,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  _AdminQuickActionsStrip(
+                    title: isArabic ? 'مراجع أساسية' : 'Key References',
+                    subtitle: isArabic
+                        ? 'وصول سريع للصفحات المرجعية والإرشادية المهمة.'
+                        : 'Fast access to important guidance and reference pages.',
+                    actions: keyReferences,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   _GatewaySummaryStrip(statuses: gatewayStatuses),
