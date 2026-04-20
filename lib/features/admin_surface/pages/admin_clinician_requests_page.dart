@@ -362,6 +362,57 @@ class _AdminClinicianRequestsPageState
                   const SizedBox(height: AppSpacing.md),
                   AppSurfaceCard(
                     padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Clinician Unfreeze Preconditions',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          'This compact section clarifies what must be true before any future clinician-layer unfreeze is even considered.',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: AppColors.obsidian.withValues(alpha: 0.72),
+                              ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(
+                          'Preconditions before any future unfreeze: readiness review completed, policy and compliance review completed, subsystem boundaries confirmed, ownership clearly assigned, and activation sequence explicitly approved.',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          'What unfreeze does not mean: not immediate launch, not full workflow activation, and not automatic integration into other layers.',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          decoration: BoxDecoration(
+                            color: AppColors.success.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(AppRadii.lg),
+                            border: Border.all(
+                              color: AppColors.success.withValues(alpha: 0.18),
+                            ),
+                          ),
+                          child: Text(
+                            'Supervision note: unfreeze must be deliberate, staged activation only, and this safety-sensitive layer requires explicit approval.',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  height: 1.35,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppSurfaceCard(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
                     child: Wrap(
                       spacing: AppSpacing.sm,
                       runSpacing: AppSpacing.sm,
