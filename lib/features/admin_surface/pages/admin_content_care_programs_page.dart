@@ -107,6 +107,33 @@ class AdminContentCareProgramsPage extends StatelessWidget {
                   'استخدم هذه الصفحة كطبقة تنظيمية تربط بين الحوكمة المرتبطة بالمحتوى والرعاية الداعمة.',
             ),
             const SizedBox(height: AppSpacing.md),
+            const GatewaySectionCard(
+              title: 'Program Boundary Definition',
+              description:
+                  'This compact section defines the scope and limits of the Content & Care Programs layer as a supervised subsystem.',
+              children: [
+                GatewaySupervisionNote(
+                  text:
+                      'Does: governance for content and support surfaces, approved guidance language, manual support guidance, and supervised follow-up boundaries.',
+                ),
+                SizedBox(height: AppSpacing.sm),
+                GatewaySupervisionNote(
+                  text:
+                      'Does not do: therapy engine behavior, live care orchestration, clinician replacement, or any automated follow-up system.',
+                ),
+                SizedBox(height: AppSpacing.sm),
+                GatewaySupervisionNote(
+                  text:
+                      'Boundaries: admin-owned, policy-aligned, support-first, manual and supervised use only, and not for crisis handling.',
+                ),
+                SizedBox(height: AppSpacing.sm),
+                GatewaySupervisionNote(
+                  text:
+                      'Supervision note: non-medical, non-diagnostic, family-aware, and safety-first.',
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
               title: 'مداخل الحوكمة',
               description:
