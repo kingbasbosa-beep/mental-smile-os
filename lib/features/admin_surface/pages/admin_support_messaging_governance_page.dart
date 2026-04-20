@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
@@ -13,6 +14,7 @@ class AdminSupportMessagingGovernancePage extends StatelessWidget {
     required String boundaryNote,
     required String supervisionNote,
     String statusLabel = 'حوكمة الرسائل الداعمة',
+    bool enableCopyMessage = false,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -42,6 +44,26 @@ class AdminSupportMessagingGovernancePage extends StatelessWidget {
                     color: AppColors.obsidian.withValues(alpha: 0.84),
                   ),
             ),
+            if (enableCopyMessage) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: TextButton.icon(
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: summary));
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Copied'),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.copy_outlined, size: 18),
+                  label: const Text('Copy Message'),
+                ),
+              ),
+            ],
             const SizedBox(height: AppSpacing.sm),
             Text(
               'Boundary: $boundaryNote',
@@ -209,6 +231,7 @@ class AdminSupportMessagingGovernancePage extends StatelessWidget {
                   supervisionNote:
                       'دعم يدوي مملوك للإدارة فقط، بدون ضغط أو إلحاح أو مسار علاجي.',
                   statusLabel: 'مثال رسالة معتمد',
+                  enableCopyMessage: true,
                 ),
                 _buildGovernanceCard(
                   context,
@@ -220,6 +243,7 @@ class AdminSupportMessagingGovernancePage extends StatelessWidget {
                   supervisionNote:
                       'الهدف هنا التشجيع الهادئ family-safe ضمن دعم يدوي خفيف.',
                   statusLabel: 'مثال رسالة معتمد',
+                  enableCopyMessage: true,
                 ),
                 _buildGovernanceCard(
                   context,
@@ -231,6 +255,7 @@ class AdminSupportMessagingGovernancePage extends StatelessWidget {
                   supervisionNote:
                       'هذا المثال يربط الرسالة بالمحتوى بشكل داعم فقط وتحت إشراف الإدارة.',
                   statusLabel: 'مثال رسالة معتمد',
+                  enableCopyMessage: true,
                 ),
                 _buildGovernanceCard(
                   context,
@@ -242,6 +267,7 @@ class AdminSupportMessagingGovernancePage extends StatelessWidget {
                   supervisionNote:
                       'نبرة داعمة وغير ضاغطة، بدون إلحاح أو urgency language أو guilt-based nudging.',
                   statusLabel: 'مثال رسالة معتمد',
+                  enableCopyMessage: true,
                 ),
               ],
             ),
