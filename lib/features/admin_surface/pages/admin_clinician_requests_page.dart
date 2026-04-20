@@ -245,6 +245,67 @@ class _AdminClinicianRequestsPageState
                 children: [
                   AppSurfaceCard(
                     padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Clinician Layer Definition',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          'This compact section defines the clinician layer as a separate, currently frozen subsystem.',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: AppColors.obsidian.withValues(alpha: 0.72),
+                              ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(
+                          'What it is: clinician coordination layer, session-based care layer (future), and specialist involvement boundary.',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          'What it does not do currently: no active booking system, no live session orchestration, no automated matching, and no active clinician assignment.',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          'Current state: frozen, not active, not exposed to users, and not connected to other layers.',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          'Boundaries: isolated from Content & Care, isolated from Gateway, and will require strict activation rules later.',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          decoration: BoxDecoration(
+                            color: AppColors.info.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(AppRadii.lg),
+                            border: Border.all(
+                              color: AppColors.info.withValues(alpha: 0.18),
+                            ),
+                          ),
+                          child: Text(
+                            'Supervision note: medical-adjacent but not a medical system, must follow strict compliance later, and remains a safety-critical layer.',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  height: 1.35,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppSurfaceCard(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
                     child: Wrap(
                       spacing: AppSpacing.sm,
                       runSpacing: AppSpacing.sm,
