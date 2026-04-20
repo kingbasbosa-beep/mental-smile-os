@@ -162,6 +162,33 @@ class _AdminLibraryGovernancePageState extends State<AdminLibraryGovernancePage>
             const SizedBox(height: AppSpacing.md),
             _buildAnchorBar(context),
             const SizedBox(height: AppSpacing.md),
+            const GatewaySectionCard(
+              title: 'Library Subsystem Definition',
+              description:
+                  'This compact section defines the library as an isolated governed subsystem with clear scope and limits.',
+              children: [
+                GatewaySupervisionNote(
+                  text:
+                      'Does: admin-only publishing governance, intake and review guidance, approval and rejection boundaries, and manual decision support.',
+                ),
+                SizedBox(height: AppSpacing.sm),
+                GatewaySupervisionNote(
+                  text:
+                      'Does not do: open publishing, user-generated live publishing, auto-approval, or any content automation engine.',
+                ),
+                SizedBox(height: AppSpacing.sm),
+                GatewaySupervisionNote(
+                  text:
+                      'Boundaries: admin-owned only, policy-aligned, review-first, quality/rights/safety constrained, and no publishing promise before checks.',
+                ),
+                SizedBox(height: AppSpacing.sm),
+                GatewaySupervisionNote(
+                  text:
+                      'Supervision note: safety-first, quality-aware, rights-aware, non-medical, and non-diagnostic.',
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
               title: 'نموذج النشر',
               description:
