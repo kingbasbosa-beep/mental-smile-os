@@ -384,6 +384,29 @@ class _AdminHubPageState extends State<AdminHubPage> {
       ),
     ];
 
+    final quickActions = <_AdminQuickActionItem>[
+      _AdminQuickActionItem(
+        label: isArabic ? 'Support Email' : 'Support Email',
+        icon: Icons.email_outlined,
+        route: Routes.adminCommunicationGateway,
+      ),
+      _AdminQuickActionItem(
+        label: isArabic ? 'Messaging Governance' : 'Messaging Governance',
+        icon: Icons.mark_chat_read_outlined,
+        route: Routes.adminSupportMessagingGovernance,
+      ),
+      _AdminQuickActionItem(
+        label: isArabic ? 'Follow-up Governance' : 'Follow-up Governance',
+        icon: Icons.volunteer_activism_outlined,
+        route: Routes.adminFollowupCareGovernance,
+      ),
+      _AdminQuickActionItem(
+        label: isArabic ? 'Library Governance' : 'Library Governance',
+        icon: Icons.local_library_outlined,
+        route: Routes.adminLibraryGovernance,
+      ),
+    ];
+
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
@@ -422,6 +445,14 @@ class _AdminHubPageState extends State<AdminHubPage> {
                   _AdminHomeCountersSection(
                     isArabic: isArabic,
                     cards: compactCounters,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  _AdminQuickActionsStrip(
+                    title: isArabic ? 'إجراءات سريعة' : 'Quick Actions',
+                    subtitle: isArabic
+                        ? 'وصول سريع للصفحات الإدارية كثيرة الاستخدام.'
+                        : 'Fast access to frequently used admin pages.',
+                    actions: quickActions,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   _GatewaySummaryStrip(statuses: gatewayStatuses),
@@ -469,6 +500,73 @@ class _AdminSectionLaunchCardData {
   final IconData icon;
   final Color color;
   final String route;
+}
+
+class _AdminQuickActionItem {
+  const _AdminQuickActionItem({
+    required this.label,
+    required this.icon,
+    required this.route,
+  });
+
+  final String label;
+  final IconData icon;
+  final String route;
+}
+
+class _AdminQuickActionsStrip extends StatelessWidget {
+  const _AdminQuickActionsStrip({
+    required this.title,
+    required this.subtitle,
+    required this.actions,
+  });
+
+  final String title;
+  final String subtitle;
+  final List<_AdminQuickActionItem> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppSurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            subtitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.obsidian.withValues(alpha: 0.70),
+                ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: actions
+                .map(
+                  (action) => ActionChip(
+                    avatar: Icon(
+                      action.icon,
+                      size: 18,
+                      color: AppColors.info,
+                    ),
+                    label: Text(action.label),
+                    onPressed: () =>
+                        Navigator.of(context).pushNamed(action.route),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _AdminSectionLaunchpad extends StatelessWidget {
