@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 enum SupportEmailIntent {
@@ -68,13 +69,105 @@ class CommunicationGatewayActions {
     );
 
     final ok = await launchUrl(uri, mode: LaunchMode.platformDefault);
-    if (!context.mounted || ok) return;
+    if (!context.mounted) return;
+    if (ok) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Unable to open the default email client.'),
-        behavior: SnackBarBehavior.floating,
-      ),
+    await _showEmailFallbackDialog(
+      context,
+      subject: emailTemplate.subject,
+      body: emailTemplate.body,
+    );
+  }
+
+  static Future<void> _showEmailFallbackDialog(
+    BuildContext context, {
+    required String subject,
+    required String body,
+  }) async {
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        Future<void> copyText(String value, String label) async {
+          await Clipboard.setData(ClipboardData(text: value));
+          if (!dialogContext.mounted) return;
+          ScaffoldMessenger.of(dialogContext).showSnackBar(
+            SnackBar(
+              content: Text('$label copied.'),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+
+        Widget buildReadOnlyField(String label, String value, {int maxLines = 6}) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: Theme.of(dialogContext).textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+              const SizedBox(height: 6),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.black.withValues(alpha: 0.08),
+                  ),
+                ),
+                child: Text(
+                  value,
+                  maxLines: maxLines,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          );
+        }
+
+        return AlertDialog(
+          title: const Text('Email fallback'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Unable to open the default email client. You can still copy the support details below.',
+                ),
+                const SizedBox(height: 16),
+                buildReadOnlyField('Support email', supportEmailAddress, maxLines: 2),
+                const SizedBox(height: 12),
+                buildReadOnlyField('Subject', subject, maxLines: 3),
+                const SizedBox(height: 12),
+                buildReadOnlyField('Message', body, maxLines: 10),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => copyText(supportEmailAddress, 'Email'),
+              child: const Text('Copy email'),
+            ),
+            TextButton(
+              onPressed: () => copyText(subject, 'Subject'),
+              child: const Text('Copy subject'),
+            ),
+            TextButton(
+              onPressed: () => copyText(body, 'Message'),
+              child: const Text('Copy message'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
