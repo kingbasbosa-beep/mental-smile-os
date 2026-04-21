@@ -22,8 +22,7 @@ class ClinicianSessionsPage extends StatelessWidget {
         status == 'session_in_progress' ||
         status == 'session_completed_pending_reviews' ||
         status == 'completed_success' ||
-        status == 'reschedule_pending' ||
-        status == 'payout_pending';
+        status == 'reschedule_pending';
   }
 
   String _statusLabel(String status, bool isArabic) {
@@ -36,8 +35,6 @@ class ClinicianSessionsPage extends StatelessWidget {
         return isArabic ? 'الجلسة جارية' : 'Session in progress';
       case 'session_completed_pending_reviews':
         return isArabic ? 'بانتظار التقييمات' : 'Pending reviews';
-      case 'payout_pending':
-        return isArabic ? 'بانتظار التحويل المالي' : 'Payout pending';
       case 'completed_success':
         return isArabic ? 'منتهية بنجاح' : 'Completed successfully';
       case 'reschedule_pending':
@@ -55,7 +52,6 @@ class ClinicianSessionsPage extends StatelessWidget {
       case 'session_in_progress':
         return const Color(0xFF2E5AAC);
       case 'session_completed_pending_reviews':
-      case 'payout_pending':
       case 'completed_success':
         return const Color(0xFF1F9D63);
       case 'reschedule_pending':
@@ -75,7 +71,6 @@ class ClinicianSessionsPage extends StatelessWidget {
     if (clinicianReviewSubmitted) return false;
 
     return status == 'session_completed_pending_reviews' ||
-        status == 'payout_pending' ||
         (sessionStatus == 'completed' &&
             (reviewStatus == 'pending_reviews' || reviewStatus == 'partial'));
   }
@@ -308,7 +303,7 @@ class ClinicianSessionsPage extends StatelessWidget {
                                 (data['sessionLink'] ?? '').toString();
                             final sessionCode =
                                 (data['sessionCode'] ?? '').toString();
-                            final adminNotes =
+                            final sessionNotes =
                                 (data['sessionAdminNotes'] ?? '').toString();
                             final createdAt = _dateText(data['createdAt']);
 
@@ -399,12 +394,12 @@ class ClinicianSessionsPage extends StatelessWidget {
                                           : 'Session code: $sessionCode',
                                     ),
                                   ],
-                                  if (adminNotes.trim().isNotEmpty) ...[
+                                  if (sessionNotes.trim().isNotEmpty) ...[
                                     const SizedBox(height: 8),
                                     Text(
                                       isArabic
-                                          ? 'ملاحظات الإدارة: $adminNotes'
-                                          : 'Admin notes: $adminNotes',
+                                          ? 'ملاحظات الجلسة: $sessionNotes'
+                                          : 'Session notes: $sessionNotes',
                                     ),
                                   ],
                                   if (sessionDate.trim().isEmpty &&

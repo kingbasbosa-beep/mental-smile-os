@@ -242,6 +242,93 @@ class AdminClinicianWorkspacePage extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
+              title: 'Assignment Readiness Preview',
+              description:
+                  'A lightweight read-only view of the same pending clinician-side requests from a readiness perspective, without introducing any assignment logic.',
+              children: [
+                StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection('clinicians')
+                      .orderBy('createdAt', descending: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return const GatewaySupervisionNote(
+                        text:
+                            'Readiness preview is unavailable right now. Read-only visibility remains limited until a later approved activation path exists.',
+                      );
+                    }
+
+                    if (!snapshot.hasData) {
+                      return const GatewaySupervisionNote(
+                        text:
+                            'Loading a read-only readiness summary for pending clinician-side requests.',
+                      );
+                    }
+
+                    final pendingDocs = snapshot.data!.docs.where((doc) {
+                      final data = doc.data();
+                      final isBlocked = (data['isBlocked'] ?? false) == true;
+                      if (isBlocked) return false;
+                      final status =
+                          (data['approvalStatus'] ?? 'pending_review')
+                              .toString();
+                      return status == 'pending_review';
+                    }).toList();
+
+                    bool hasBasicInfo(Map<String, dynamic> data) {
+                      final name =
+                          (data['displayName'] ?? data['name'] ?? '')
+                              .toString()
+                              .trim();
+                      final email = (data['email'] ?? '').toString().trim();
+                      return name.isNotEmpty && email.isNotEmpty;
+                    }
+
+                    final basicInfoPresentCount = pendingDocs.where((doc) {
+                      return hasBasicInfo(doc.data());
+                    }).length;
+                    final missingInfoCount =
+                        pendingDocs.length - basicInfoPresentCount;
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Pending review total: ${pendingDocs.length}',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Wrap(
+                          spacing: AppSpacing.md,
+                          runSpacing: AppSpacing.md,
+                          children: [
+                            _ReadOnlySummaryChip(
+                              label: 'Basic info present',
+                              value: '$basicInfoPresentCount',
+                            ),
+                            _ReadOnlySummaryChip(
+                              label: 'Missing info',
+                              value: '$missingInfoCount',
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        const GatewaySupervisionNote(
+                          text:
+                              'Read-only visibility only. This preview uses only simple presence checks for basic fields and does not mean assignment logic is active yet.',
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            GatewaySectionCard(
               title: 'Workspace Blocks',
               description:
                   'These blocks define the clean shell structure for the future clinician workspace without turning it into a live operational surface yet.',
@@ -290,6 +377,40 @@ class AdminClinicianWorkspacePage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ReadOnlySummaryChip extends StatelessWidget {
+  const _ReadOnlySummaryChip({
+    required this.label,
+    required this.value,
+  });
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.md,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.mist,
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        border: Border.all(
+          color: AppColors.info.withValues(alpha: 0.20),
+        ),
+      ),
+      child: Text(
+        '$label: $value',
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              height: 1.2,
+            ),
       ),
     );
   }

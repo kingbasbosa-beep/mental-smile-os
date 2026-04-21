@@ -107,6 +107,7 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
         'status': 'payment_review',
         'workflowStage': 'payment_review',
         'paymentStatus': 'submitted_by_client',
+        'payment_confirmed': false,
         'paymentReceiptFileName': receiptFileName,
         'paymentReceiptUrl': '',
         'paymentSubmittedAt': FieldValue.serverTimestamp(),

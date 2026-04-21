@@ -22,6 +22,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
   static const BookingHealthService _bookingHealthService =
       BookingHealthService();
   static const DomainStatusService _domainStatusService = DomainStatusService();
+  static const bool _adminBridgeShadowModeEnabled = true;
 
   String _centerTypeLabel(String type, bool isArabic) {
     switch (type.trim()) {
@@ -810,6 +811,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         'adminAssignedBy': FirebaseAuth.instance.currentUser?.uid ?? '',
         'adminAssignedAt': FieldValue.serverTimestamp(),
         'paymentStatus': 'blocked',
+        'payment_confirmed': false,
         'sessionStatus': 'cancelled',
         'reviewStatus': 'blocked',
         'payoutStatus': 'blocked',
@@ -863,6 +865,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         // Legacy compatibility field.
         'clinicianUid': '',
         'paymentStatus': 'not_started',
+        'payment_confirmed': false,
         'sessionStatus': 'not_created',
         'reviewStatus': 'not_started',
         'payoutStatus': 'blocked',
@@ -1238,6 +1241,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         'workflowStage':
             isCenterRequest ? 'session_scheduled' : 'session_setup_pending',
         'paymentStatus': 'approved',
+        'payment_confirmed': true,
         'paymentApprovedAt': FieldValue.serverTimestamp(),
         'sessionStatus': isCenterRequest ? 'scheduled' : 'not_created',
       });
@@ -1280,6 +1284,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         'status': 'awaiting_payment',
         'workflowStage': 'awaiting_payment',
         'paymentStatus': 'rejected',
+        'payment_confirmed': false,
         'paymentRejectedAt': FieldValue.serverTimestamp(),
       });
 
@@ -1395,6 +1400,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
   Future<void> _assignToClinician({
     required String requestId,
   }) async {
+    // Temporary compatibility bridge only; new clinician direct-entry requests
+    // are created clinician-visible without requiring admin forward.
     final isArabic = _isArabic(context);
     final adminUid = FirebaseAuth.instance.currentUser?.uid ?? '';
     await _setBusy(requestId, true);
@@ -1499,6 +1506,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         'adminDecisionBy': adminUid,
         'adminDecisionAt': FieldValue.serverTimestamp(),
         'paymentStatus': 'not_started',
+        'payment_confirmed': false,
         'sessionStatus': 'not_created',
         'reviewStatus': 'not_started',
         'payoutStatus': 'blocked',
@@ -1696,7 +1704,11 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       return const SizedBox.shrink();
     }
     final isCenterRequest = requestKind == 'center';
-    final canAssignClinician = status == 'pending_admin' && !isCenterRequest;
+    final hasDirectClinicianAssignment =
+        _safeText(data, 'assignedClinicianId').isNotEmpty;
+    final canAssignClinician = status == 'pending_admin' &&
+        !isCenterRequest &&
+        (!hasDirectClinicianAssignment || !_adminBridgeShadowModeEnabled);
     final clientUpdatedAfterCenterFeedback =
         (data['clientUpdatedAfterCenterFeedback'] ?? false) == true;
     final canMoveCenterToFollowUp = isCenterRequest &&
@@ -2119,8 +2131,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                       icon: const Icon(Icons.forward_to_inbox_outlined),
                       label: Text(
                         isArabic
-                            ? 'اعتماد وتحويل للأخصائي'
-                            : 'Approve and forward',
+                            ? 'استعادة توافق: تحويل للأخصائي'
+                            : 'Compatibility forward',
                       ),
                     ),
                   if (canApproveCenter)
@@ -2362,8 +2374,27 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                             color: const Color(0xFFF8FAFC),
                             child: Text(
                               isArabic
-                                  ? 'تظهر طلبات المراكز أولًا داخل هذه المرحلة، مع شارة ولون مخصصين لتمييزها عن طلبات الأخصائيين.'
-                                  : 'Center requests appear first in this stage, with a dedicated badge and accent color to distinguish them from clinician requests.',
+                                  ? 'تعرض هذه المرحلة طلبات المراكز وحالات الأخصائي القديمة فقط. طلبات الأخصائي الجديدة تظهر مباشرة في تبويب بانتظار رد الأخصائي.'
+                                  : 'This stage shows center requests and legacy clinician fallback records only. New clinician requests appear directly under Awaiting clinician.',
+                              textAlign:
+                                  isArabic ? TextAlign.right : TextAlign.left,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(color: AppColors.obsidian),
+                            ),
+                          ),
+                        ),
+                      if (_tab == 'assigned_clinician')
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: AppSectionPanel(
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            color: const Color(0xFFF8FAFC),
+                            child: Text(
+                              isArabic
+                                  ? 'هذا هو المسار الطبيعي لطلبات الأخصائي الجديدة. مسار التحويل الإداري باقٍ فقط لاستعادة التوافق مع السجلات القديمة.'
+                                  : 'This is the normal path for new clinician requests. Admin forwarding remains only as a compatibility fallback for older records.',
                               textAlign:
                                   isArabic ? TextAlign.right : TextAlign.left,
                               style: Theme.of(context)

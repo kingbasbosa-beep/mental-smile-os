@@ -9,6 +9,10 @@ import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 // Rollback remains trivial if bookingRequests compatibility must be restored.
 const bool _legacyBookingRequestsWriteEnabled = false;
 
+// Controlled freeze: clinician home actions stay visible but inactive for now.
+// Rollback remains trivial by re-enabling this local guard.
+const bool _clinicianHomeActionsEnabled = false;
+
 class ClinicianOperationsPage extends StatefulWidget {
   const ClinicianOperationsPage({super.key});
 
@@ -70,15 +74,13 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     await _setBusy(requestId, true);
     try {
       await _updateRequestEverywhere(requestId, {
-        'status': 'awaiting_payment',
         'clinicianAccepted': true,
         'clinicianRejected': false,
         'clinicianCompleted': false,
         'clinicianRespondedAt': FieldValue.serverTimestamp(),
-        'paymentStatus': 'pending_client_transfer',
+        'payment_confirmed': false,
         'sessionStatus': 'not_created',
         'reviewStatus': 'not_started',
-        'payoutStatus': 'blocked',
       });
 
       if (!mounted) return;
@@ -86,8 +88,8 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'تمت الموافقة، والطلب الآن بانتظار التحويل المالي'
-                : 'Accepted. Request is now awaiting payment.',
+                ? 'تمت الموافقة، والطلب الآن بانتظار الجاهزية'
+                : 'Accepted. Request is now awaiting readiness.',
           ),
         ),
       );
@@ -105,10 +107,8 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
         'clinicianRejected': true,
         'clinicianCompleted': false,
         'clinicianRespondedAt': FieldValue.serverTimestamp(),
-        'paymentStatus': 'not_applicable',
         'sessionStatus': 'not_created',
         'reviewStatus': 'not_started',
-        'payoutStatus': 'blocked',
       });
 
       if (!mounted) return;
@@ -134,7 +134,6 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
         'clinicianCompleted': true,
         'completedAt': FieldValue.serverTimestamp(),
         'reviewStatus': 'pending_reviews',
-        'payoutStatus': 'blocked',
       });
 
       if (!mounted) return;
@@ -155,13 +154,10 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
   bool _matchesTab(String status) {
     switch (_tab) {
       case 'in_progress':
-        return status == 'awaiting_payment' ||
-            status == 'payment_review' ||
-            status == 'session_setup_pending' ||
+        return status == 'session_setup_pending' ||
             status == 'session_scheduled' ||
             status == 'session_in_progress' ||
-            status == 'reschedule_pending' ||
-            status == 'payout_pending';
+            status == 'reschedule_pending';
       case 'completed':
         return status == 'session_completed_pending_reviews' ||
             status == 'completed' ||
@@ -175,18 +171,20 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     }
   }
 
+  bool _paymentConfirmedFrom(Map<String, dynamic> data) {
+    final explicitGate =
+        data['payment_confirmed'] ?? data['paymentConfirmed'];
+    if (explicitGate is bool) return explicitGate;
+
+    return false;
+  }
+
   String _statusLabel(String status, bool isArabic) {
     switch (status) {
-      case 'awaiting_payment':
-        return isArabic ? 'بانتظار التحويل المالي' : 'Awaiting payment';
-      case 'payment_review':
-        return isArabic ? 'مراجعة السداد' : 'Payment review';
       case 'session_setup_pending':
         return isArabic ? 'بانتظار تجهيز الجلسة' : 'Session setup pending';
       case 'reschedule_pending':
         return isArabic ? 'إعادة جدولة' : 'Reschedule';
-      case 'payout_pending':
-        return isArabic ? 'بانتظار التحويل' : 'Payout pending';
       case 'session_scheduled':
         return isArabic ? 'جلسة مجدولة' : 'Scheduled';
       case 'session_in_progress':
@@ -199,7 +197,9 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
       case 'clinician_rejected':
         return isArabic ? 'مرفوض من الأخصائي' : 'Rejected by clinician';
       case 'rejected_admin':
-        return isArabic ? 'مرفوض من الإدارة' : 'Rejected by admin';
+        return isArabic
+            ? 'مرفوض خارج مسار الأخصائي'
+            : 'Rejected outside clinician flow';
       case 'cancelled':
         return isArabic ? 'ملغي' : 'Cancelled';
       default:
@@ -209,11 +209,8 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
 
   Color _statusColor(String status) {
     switch (status) {
-      case 'awaiting_payment':
-      case 'payment_review':
       case 'session_setup_pending':
       case 'reschedule_pending':
-      case 'payout_pending':
         return const Color(0xFFE39B2E);
       case 'session_scheduled':
       case 'session_in_progress':
@@ -325,11 +322,13 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           isArabic: isArabic,
         ),
         const SizedBox(height: 12),
-        _buildAdminChatSummaryCard(
-          context: context,
-          isArabic: isArabic,
-        ),
-        const SizedBox(height: 12),
+        if (_clinicianHomeActionsEnabled) ...[
+          _buildAdminChatSummaryCard(
+            context: context,
+            isArabic: isArabic,
+          ),
+          const SizedBox(height: 12),
+        ],
         _buildRatingsSummary(isArabic),
         const SizedBox(height: 12),
         _buildProfileWorkspaceSection(
@@ -542,12 +541,14 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
               : 'Open conversations with admin: $count',
           icon: Icons.chat_bubble_outline_rounded,
           actionLabel: isArabic ? 'فتح الشات' : 'Open chat',
-          onTap: () {
-            Navigator.of(context).pushNamed(
-              Routes.chat,
-              arguments: const {'mode': 'admin_support'},
-            );
-          },
+          onTap: _clinicianHomeActionsEnabled
+              ? () {
+                  Navigator.of(context).pushNamed(
+                    Routes.chat,
+                    arguments: const {'mode': 'admin_support'},
+                  );
+                }
+              : null,
         );
       },
     );
@@ -568,9 +569,11 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
               : 'Escalated or referred chat cases that need clinician involvement: $count',
           icon: Icons.forum_outlined,
           actionLabel: isArabic ? 'فتح الحالات' : 'Open cases',
-          onTap: () {
-            Navigator.of(context).pushNamed(Routes.clinicianChatInbox);
-          },
+          onTap: _clinicianHomeActionsEnabled
+              ? () {
+                  Navigator.of(context).pushNamed(Routes.clinicianChatInbox);
+                }
+              : null,
         );
       },
     );
@@ -607,8 +610,8 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           const SizedBox(height: 8),
           Text(
             isArabic
-                ? 'أي تعديل على الصورة الشخصية أو النبذة يذهب للإدارة أولًا للمراجعة والموافقة. الاسم والوثائق غير قابلة للتعديل من هنا.'
-                : 'Any update to the profile photo or bio is sent to admin for approval first. Name and documents cannot be edited here.',
+                ? 'أي تعديل على الصورة الشخصية أو النبذة يذهب للمراجعة أولًا. الاسم والوثائق غير قابلة للتعديل من هنا.'
+                : 'Any update to the profile photo or bio is sent for review first. Name and documents cannot be edited here.',
           ),
           const SizedBox(height: 14),
           TextField(
@@ -632,7 +635,8 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
             width: double.infinity,
             height: 52,
             child: FilledButton.icon(
-              onPressed: _submittingChangeRequest
+              onPressed: !_clinicianHomeActionsEnabled ||
+                      _submittingChangeRequest
                   ? null
                   : () => _submitProfileChangeRequest(context, clinicianData),
               icon: _submittingChangeRequest
@@ -812,8 +816,8 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                           const SizedBox(height: 6),
                           Text(
                             isArabic
-                                ? 'ملاحظة الإدارة: $adminNote'
-                                : 'Admin note: $adminNote',
+                                ? 'ملاحظة المراجعة: $adminNote'
+                                : 'Review note: $adminNote',
                           ),
                         ],
                       ],
@@ -884,12 +888,15 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     final assignedName = (data['assignedClinicianName'] ?? '').toString();
     final sessionStatus = (data['sessionStatus'] ?? '').toString();
     final reviewStatus = (data['reviewStatus'] ?? '').toString();
+    final clinicianAccepted = (data['clinicianAccepted'] ?? false) == true;
+    final paymentConfirmed = _paymentConfirmedFrom(data);
     final canReviewSession = !clinicianReviewSubmitted &&
         (status == 'session_completed_pending_reviews' ||
-            status == 'payout_pending' ||
             (sessionStatus == 'completed' &&
                 (reviewStatus == 'pending_reviews' ||
                     reviewStatus == 'partial')));
+    final canMarkCompleted =
+        paymentConfirmed && status == 'session_in_progress';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -923,8 +930,8 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                     const SizedBox(height: 6),
                     Text(
                       isArabic
-                          ? 'طلب محول من الإدارة'
-                          : 'Request assigned by admin',
+                          ? 'طلب مخصص لك'
+                          : 'Request assigned to you',
                     ),
                   ],
                 ),
@@ -986,24 +993,23 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
             spacing: 10,
             runSpacing: 10,
             children: [
-              if (status == 'assigned_clinician')
+              if (status == 'assigned_clinician' && !clinicianAccepted)
                 FilledButton.icon(
                   onPressed: busy ? null : () => _acceptRequest(requestId),
                   icon: const Icon(Icons.check_circle_outline),
                   label: Text(isArabic ? 'قبول الطلب' : 'Accept request'),
                 ),
-              if (status == 'assigned_clinician')
+              if (status == 'assigned_clinician' && !clinicianAccepted)
                 OutlinedButton.icon(
                   onPressed: busy ? null : () => _rejectRequest(requestId),
                   icon: const Icon(Icons.cancel_outlined),
                   label: Text(isArabic ? 'رفض الطلب' : 'Reject request'),
                 ),
-              if (status == 'session_scheduled' ||
-                  status == 'session_in_progress')
+              if (canMarkCompleted)
                 FilledButton.tonalIcon(
                   onPressed: busy ? null : () => _markCompleted(requestId),
                   icon: const Icon(Icons.task_alt_outlined),
-                  label: Text(isArabic ? 'تعليم كمكتمل' : 'Mark completed'),
+                  label: Text(isArabic ? 'إنهاء الجلسة' : 'End session'),
                 ),
               if (canReviewSession)
                 FilledButton.icon(
@@ -1225,8 +1231,8 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'تم إرسال طلب تعديل البيانات للإدارة'
-                : 'Profile change request sent to admin',
+                ? 'تم إرسال طلب تعديل البيانات للمراجعة'
+                : 'Profile change request sent for review',
           ),
         ),
       );
@@ -1355,7 +1361,7 @@ class _SectionCard extends StatelessWidget {
   final String subtitle;
   final IconData icon;
   final String actionLabel;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const _SectionCard({
     required this.title,

@@ -13,6 +13,10 @@ const bool _legacyBookingRequestsWriteEnabled = false;
 // Rollback remains possible by enabling this local guard.
 const bool _legacyClinicianUidReadEnabled = false;
 
+// Legacy clinician inbox is demoted during structural decoupling.
+// Rollback remains trivial by re-enabling this local guard.
+const bool _legacyClinicianInboxEnabled = false;
+
 class ClinicianInboxPage extends StatefulWidget {
   final String clinicianId;
   final String clinicianName;
@@ -271,6 +275,26 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_legacyClinicianInboxEnabled) {
+      return Directionality(
+        textDirection: TextDirection.rtl,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('وارد الأخصائي'),
+          ),
+          body: Center(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Text(
+                'تم إيقاف صندوق الوارد القديم مؤقتًا. استخدم غرفة عمليات الأخصائي.',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     final q = _query(_statusFilter);
 
     return Directionality(

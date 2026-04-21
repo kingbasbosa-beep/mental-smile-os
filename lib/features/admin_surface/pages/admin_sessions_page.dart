@@ -292,6 +292,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
         'status': 'awaiting_payment',
         'workflowStage': 'awaiting_payment',
         'paymentStatus': 'pending_client_transfer',
+        'payment_confirmed': false,
         'sessionStatus': 'not_created',
         'stayStartDateText': startText,
         'stayEndDateText': endText,

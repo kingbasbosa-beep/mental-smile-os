@@ -285,10 +285,12 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
         // Requested clinician target before admin approval.
         'clinicianId': widget.args.clinicianId,
         'clinicianName': widget.args.clinicianName,
+        'assignedClinicianId': widget.args.clinicianId,
+        'assignedClinicianName': widget.args.clinicianName,
         // Legacy compatibility field.
         'clinicianUid': widget.args.clinicianId,
-        'status': 'pending_admin',
-        'workflowStage': 'pending_admin',
+        'status': 'assigned_clinician',
+        'workflowStage': 'assigned_clinician',
         'createdAt': now,
         'updatedAt': now,
         'note': note,

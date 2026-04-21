@@ -99,6 +99,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
         'status':
             isCenterRequest ? 'session_scheduled' : 'session_setup_pending',
         'paymentStatus': 'approved',
+        'payment_confirmed': true,
         'paymentApprovedAt': FieldValue.serverTimestamp(),
         'sessionStatus': isCenterRequest ? 'scheduled' : 'not_created',
       });
@@ -128,6 +129,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
       await _updateRequestEverywhere(requestId, {
         'status': 'awaiting_payment',
         'paymentStatus': 'rejected',
+        'payment_confirmed': false,
         'paymentRejectedAt': FieldValue.serverTimestamp(),
       });
 

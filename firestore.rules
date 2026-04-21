@@ -278,6 +278,7 @@ service cloud.firestore {
               'status',
               'workflowStage',
               'paymentStatus',
+              'payment_confirmed',
               'paymentReceiptFileName',
               'paymentReceiptUrl',
               'paymentSubmittedAt',
@@ -324,6 +325,7 @@ service cloud.firestore {
               'adminDecisionBy',
               'adminDecisionAt',
               'paymentStatus',
+              'payment_confirmed',
               'sessionStatus',
               'reviewStatus',
               'payoutStatus',
@@ -366,6 +368,7 @@ service cloud.firestore {
               'adminDecisionBy',
               'adminDecisionAt',
               'paymentStatus',
+              'payment_confirmed',
               'sessionStatus',
               'reviewStatus',
               'payoutStatus',
@@ -403,6 +406,7 @@ service cloud.firestore {
               'adminAssignedBy',
               'adminAssignedAt',
               'paymentStatus',
+              'payment_confirmed',
               'sessionStatus',
               'reviewStatus',
               'payoutStatus',
@@ -435,6 +439,7 @@ service cloud.firestore {
               'clinicianName',
               'clinicianUid',
               'paymentStatus',
+              'payment_confirmed',
               'sessionStatus',
               'reviewStatus',
               'payoutStatus',
@@ -469,6 +474,7 @@ service cloud.firestore {
                   'status',
                   'workflowStage',
                   'paymentStatus',
+                  'payment_confirmed',
                   'paymentApprovedAt',
                   'sessionStatus',
                   'updatedAt'
@@ -484,6 +490,7 @@ service cloud.firestore {
                   'status',
                   'workflowStage',
                   'paymentStatus',
+                  'payment_confirmed',
                   'paymentApprovedAt',
                   'sessionStatus',
                   'updatedAt'
@@ -514,6 +521,7 @@ service cloud.firestore {
               'status',
               'workflowStage',
               'paymentStatus',
+              'payment_confirmed',
               'paymentRejectedAt',
               'updatedAt'
             ])
@@ -545,6 +553,7 @@ service cloud.firestore {
                   'status',
                   'workflowStage',
                   'paymentStatus',
+                  'payment_confirmed',
                   'sessionStatus',
                   'sessionDateText',
                   'stayStartDateText',
@@ -932,8 +941,18 @@ service cloud.firestore {
         && request.resource.data.requestKind == 'clinician'
         && (request.resource.data.clientId is string)
         && request.resource.data.clientId == uid()
-        && request.resource.data.status == 'pending_admin'
-        && request.resource.data.workflowStage == 'pending_admin'
+        && (
+          (
+            request.resource.data.status == 'pending_admin'
+            && request.resource.data.workflowStage == 'pending_admin'
+          )
+          || (
+            request.resource.data.status == 'assigned_clinician'
+            && request.resource.data.workflowStage == 'assigned_clinician'
+            && request.resource.data.assignedClinicianId == request.resource.data.clinicianId
+            && request.resource.data.assignedClinicianName == request.resource.data.clinicianName
+          )
+        )
         && (request.resource.data.clinicianId is string)
         && request.resource.data.clinicianId.size() > 0
         && (request.resource.data.clinicianName is string)
@@ -1186,6 +1205,7 @@ service cloud.firestore {
               'status',
               'workflowStage',
               'paymentStatus',
+              'payment_confirmed',
               'sessionStatus',
               'sessionDateText',
               'stayStartDateText',
@@ -1236,6 +1256,7 @@ service cloud.firestore {
               'status',
               'workflowStage',
               'paymentStatus',
+              'payment_confirmed',
               'paymentApprovedAt',
               'sessionStatus',
               'updatedAt'
@@ -1635,6 +1656,7 @@ service cloud.firestore {
                   'clinicianRejected',
                   'clinicianCompleted',
                   'clinicianRespondedAt',
+                  'payment_confirmed',
                   'paymentStatus',
                   'sessionStatus',
                   'reviewStatus',
