@@ -266,6 +266,26 @@ service cloud.firestore {
         && request.resource.data.adminAssignedAt == resource.data.adminAssignedAt;
     }
 
+    function clientDirectClinicianThreadLinkValid() {
+      return isClientDoc()
+        && (resource.data.requestKind is string)
+        && resource.data.requestKind == 'clinician'
+        && resource.data.status == 'assigned_clinician'
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.workflowStage == resource.data.workflowStage
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly(['threadId', 'updatedAt'])
+        && (request.resource.data.threadId is string)
+        && request.resource.data.threadId.size() > 0
+        && (
+          !resource.data.keys().hasAny(['threadId'])
+          || resource.data.threadId == ''
+        )
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clinicianId == resource.data.clinicianId
+        && request.resource.data.assignedClinicianId == resource.data.assignedClinicianId;
+    }
+
     function clientPaymentProofUpdateValid() {
       return request.auth != null
         && request.auth.uid == resource.data.clientId
@@ -306,6 +326,10 @@ service cloud.firestore {
     function adminForwardValid() {
       return isAdmin()
         && (resource.data.status == 'pending_admin')
+        && (
+          !(resource.data.requestKind is string)
+          || resource.data.requestKind != 'clinician'
+        )
         && (request.resource.data.status == 'assigned_clinician')
         && request.resource.data.diff(resource.data).changedKeys()
             .hasOnly([
@@ -1647,7 +1671,7 @@ service cloud.firestore {
         && (
           (
             resource.data.status == 'assigned_clinician'
-            && request.resource.data.status == 'awaiting_payment'
+            && request.resource.data.status == resource.data.status
             && request.resource.data.diff(resource.data).changedKeys()
                 .hasOnly([
                   'status',
@@ -2025,7 +2049,7 @@ service cloud.firestore {
           || clientCenterResubmitValid()
           || clientCenterCheckInValid()
           || clientPaymentProofUpdateValid()
-          || adminClinicianForwardValid()
+          || clientDirectClinicianThreadLinkValid()
           || adminForwardValid()
           || adminRejectValid()
           || adminReturnToPendingValid()

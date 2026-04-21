@@ -22,7 +22,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
   static const BookingHealthService _bookingHealthService =
       BookingHealthService();
   static const DomainStatusService _domainStatusService = DomainStatusService();
-  static const bool _adminBridgeShadowModeEnabled = true;
+  static const bool _adminClinicianForwardBridgeEnabled = false;
 
   String _centerTypeLabel(String type, bool isArabic) {
     switch (type.trim()) {
@@ -1704,11 +1704,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       return const SizedBox.shrink();
     }
     final isCenterRequest = requestKind == 'center';
-    final hasDirectClinicianAssignment =
-        _safeText(data, 'assignedClinicianId').isNotEmpty;
     final canAssignClinician = status == 'pending_admin' &&
         !isCenterRequest &&
-        (!hasDirectClinicianAssignment || !_adminBridgeShadowModeEnabled);
+        _adminClinicianForwardBridgeEnabled;
     final clientUpdatedAfterCenterFeedback =
         (data['clientUpdatedAfterCenterFeedback'] ?? false) == true;
     final canMoveCenterToFollowUp = isCenterRequest &&
