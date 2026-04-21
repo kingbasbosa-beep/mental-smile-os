@@ -9,6 +9,10 @@ const String kDevClinicianId =
 // Rollback remains trivial if bookingRequests compatibility must be restored.
 const bool _legacyBookingRequestsWriteEnabled = false;
 
+// clinicianUid is legacy compatibility only; assignedClinicianId is canonical.
+// Rollback remains possible by enabling this local guard.
+const bool _legacyClinicianUidReadEnabled = false;
+
 class ClinicianInboxPage extends StatefulWidget {
   final String clinicianId;
   final String clinicianName;
@@ -47,7 +51,12 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
 
     return FirebaseFirestore.instance
         .collection('booking_requests')
-        .where('clinicianUid', isEqualTo: uid)
+        .where(
+          _legacyClinicianUidReadEnabled
+              ? 'clinicianUid'
+              : 'assignedClinicianId',
+          isEqualTo: uid,
+        )
         .where('status', isEqualTo: status)
         .orderBy('createdAt', descending: true)
         .limit(100);
