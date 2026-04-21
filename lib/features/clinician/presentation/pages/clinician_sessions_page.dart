@@ -8,6 +8,9 @@ class ClinicianSessionsPage extends StatelessWidget {
 
   static const String _primaryBookingSource = 'booking_requests';
   static const String _legacyBookingSource = 'bookingRequests';
+  // Clinician-domain structural decoupling: keep legacy reads disabled.
+  // Rollback remains trivial if bookingRequests compatibility must be restored.
+  static const bool _legacyBookingRequestsReadEnabled = false;
 
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
@@ -238,12 +241,16 @@ class ClinicianSessionsPage extends StatelessWidget {
                     .snapshots(),
                 builder: (context, snapA) {
                   return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                    stream: FirebaseFirestore.instance
-                        .collection(_legacyBookingSource)
-                        .where('assignedClinicianId', isEqualTo: uid)
-                        .snapshots(),
+                    stream: _legacyBookingRequestsReadEnabled
+                        ? FirebaseFirestore.instance
+                            .collection(_legacyBookingSource)
+                            .where('assignedClinicianId', isEqualTo: uid)
+                            .snapshots()
+                        : null,
                     builder: (context, snapB) {
-                      if (snapA.hasError && snapB.hasError) {
+                      if (snapA.hasError &&
+                          (!_legacyBookingRequestsReadEnabled ||
+                              snapB.hasError)) {
                         return Center(
                           child: Text(
                             isArabic
@@ -253,13 +260,17 @@ class ClinicianSessionsPage extends StatelessWidget {
                         );
                       }
 
-                      if (!snapA.hasData && !snapB.hasData) {
+                      if (!snapA.hasData &&
+                          (!_legacyBookingRequestsReadEnabled ||
+                              !snapB.hasData)) {
                         return const Center(child: CircularProgressIndicator());
                       }
 
                       final docs = _mergeBookingSources(
                         primarySnapshot: snapA.data,
-                        legacySnapshot: snapB.data,
+                        legacySnapshot: _legacyBookingRequestsReadEnabled
+                            ? snapB.data
+                            : null,
                       ).where(_isSessionRelated).toList()
                         ..sort((a, b) {
                           final aTs = a['updatedAt'] ?? a['createdAt'];

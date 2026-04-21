@@ -5,6 +5,10 @@ import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
+// Clinician-domain structural decoupling: keep legacy mirror writes disabled.
+// Rollback remains trivial if bookingRequests compatibility must be restored.
+const bool _legacyBookingRequestsWriteEnabled = false;
+
 class ClinicianOperationsPage extends StatefulWidget {
   const ClinicianOperationsPage({super.key});
 
@@ -50,7 +54,8 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
 
     final refs = [
       db.collection('booking_requests').doc(requestId),
-      db.collection('bookingRequests').doc(requestId),
+      if (_legacyBookingRequestsWriteEnabled)
+        db.collection('bookingRequests').doc(requestId),
     ];
 
     for (final ref in refs) {

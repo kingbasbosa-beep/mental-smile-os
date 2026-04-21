@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 const String kDevClinicianId =
     String.fromEnvironment('MK_DEV_CLINICIAN_ID', defaultValue: '');
 
+// Clinician-domain structural decoupling: keep legacy mirror writes disabled.
+// Rollback remains trivial if bookingRequests compatibility must be restored.
+const bool _legacyBookingRequestsWriteEnabled = false;
+
 class ClinicianInboxPage extends StatefulWidget {
   final String clinicianId;
   final String clinicianName;
@@ -61,7 +65,8 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
     final db = FirebaseFirestore.instance;
     final refs = [
       db.collection('booking_requests').doc(requestId),
-      db.collection('bookingRequests').doc(requestId),
+      if (_legacyBookingRequestsWriteEnabled)
+        db.collection('bookingRequests').doc(requestId),
     ];
 
     for (final ref in refs) {
