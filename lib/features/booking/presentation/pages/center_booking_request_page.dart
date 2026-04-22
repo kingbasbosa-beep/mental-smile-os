@@ -268,6 +268,27 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
       final selectedPrice = (selection?['price'] is num)
           ? (selection!['price'] as num).toDouble()
           : 0.0;
+      final contractDraft = {
+        'status': 'draft',
+        'version': 1,
+        'room': {
+          'key': _selectedAccommodationKey,
+          'label': selectedLabelAr,
+          'price': selectedPrice,
+          'pricingUnit': selectedPricingUnit,
+          'snapshot': selection?['snapshot'] ?? const <String, dynamic>{},
+        },
+        'duration': {
+          'basis': 'external_diagnosis',
+        },
+        'pricing': {
+          'baseAmount': selectedPrice,
+        },
+        'meta': {
+          'source': 'center_request_v1',
+          'createdAt': createdAt,
+        },
+      };
       final payload = <String, dynamic>{
         'requestKind': 'center',
         'requestGroupId': requestGroupId,
@@ -313,6 +334,13 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
             selection?['snapshot'] ?? const <String, dynamic>{},
         'selectedAccommodationPrice': selectedPrice,
         'selectedAccommodationPricingUnit': selectedPricingUnit,
+        // PHASE 1: Center Contract Draft (Structured, Passive)
+        // - No behavior change
+        // - No acceptance yet
+        // - No admin flow change
+        // - No free-text fields allowed
+        // - Future phases will activate contract lifecycle
+        'contract': contractDraft,
         'lastCenterAvailabilityStatus': '',
         'lastCenterAvailabilityNote': _lastCenterNote,
         'lastCenterSuggestedAlternativeKey': _lastSuggestedAlternativeKey,
@@ -398,6 +426,7 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
               selection?['snapshot'] ?? const <String, dynamic>{},
           'selectedAccommodationPrice': selectedPrice,
           'selectedAccommodationPricingUnit': selectedPricingUnit,
+          'contract': contractDraft,
           'selectedCenterType': _centerType,
           'centerHasDetoxUnit': _centerHasDetoxUnit,
           'clientRevisionNumber': clientRevisionNumber + 1,

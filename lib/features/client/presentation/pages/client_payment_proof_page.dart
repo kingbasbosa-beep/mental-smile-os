@@ -30,6 +30,142 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
     return DateTime.fromMillisecondsSinceEpoch(0);
   }
 
+  Map<String, dynamic> _asStringMap(dynamic value) {
+    if (value is Map<String, dynamic>) {
+      return Map<String, dynamic>.from(value);
+    }
+    if (value is Map) {
+      return value.map((key, item) => MapEntry(key.toString(), item));
+    }
+    return <String, dynamic>{};
+  }
+
+  bool _isCenterRequestData(Map<String, dynamic> data) {
+    return (data['requestKind'] ?? '').toString() == 'center' ||
+        (data['centerId'] ?? '').toString().trim().isNotEmpty;
+  }
+
+  bool _contractConfirmed(Map<String, dynamic> data) {
+    final contract = _asStringMap(data['contract']);
+    return contract['status'] == 'confirmed' &&
+        contract['snapshotLocked'] == true &&
+        _asStringMap(contract['quoteSnapshot']).isNotEmpty;
+  }
+
+  String _displayValue(dynamic value) {
+    final text = (value ?? '').toString();
+    return text.trim().isEmpty ? '-' : text;
+  }
+
+  Map<String, dynamic> _quoteSnapshotFrom(Map<String, dynamic> data) {
+    return <String, dynamic>{
+      'stayStartDateText': data['stayStartDateText'],
+      'stayEndDateText': data['stayEndDateText'],
+      'stayDurationDays': data['stayDurationDays'],
+      'pricingUnit': data['stayPricingUnit'],
+      'baseAmount': data['stayBaseAmount'],
+      'taxPercent': data['stayTaxPercent'],
+      'taxAmount': data['stayTaxAmount'],
+      'totalAmount': data['stayTotalAmount'],
+      'grossClientPaidAmount': data['grossClientPaidAmount'],
+    };
+  }
+
+  Map<String, dynamic> _contractForConfirmation(Map<String, dynamic> data) {
+    final contract = _asStringMap(data['contract']);
+    final quoteSnapshot = _quoteSnapshotFrom(data);
+    return <String, dynamic>{
+      ...contract,
+      'status': 'confirmed',
+      'confirmedAt': FieldValue.serverTimestamp(),
+      'confirmedBy': FirebaseAuth.instance.currentUser?.uid ?? '',
+      'snapshotLocked': true,
+      'quoteSnapshot': quoteSnapshot,
+    };
+  }
+
+  Future<bool> _confirmCenterContractIfNeeded(
+    DocumentReference<Map<String, dynamic>> requestRef,
+    Map<String, dynamic> data,
+  ) async {
+    if (!_isCenterRequestData(data) || _contractConfirmed(data)) {
+      return true;
+    }
+
+    final quoteSnapshot = _quoteSnapshotFrom(data);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            _isArabic ? 'تأكيد عرض المركز' : 'Confirm center quote',
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _isArabic
+                    ? 'يرجى تأكيد بيانات العرض قبل إرسال إثبات التحويل.'
+                    : 'Please confirm the quote details before submitting payment proof.',
+              ),
+              const SizedBox(height: 12),
+              Text(
+                _isArabic
+                    ? 'بداية الإقامة: ${_displayValue(quoteSnapshot['stayStartDateText'])}'
+                    : 'Residency start: ${_displayValue(quoteSnapshot['stayStartDateText'])}',
+              ),
+              Text(
+                _isArabic
+                    ? 'نهاية الإقامة: ${_displayValue(quoteSnapshot['stayEndDateText'])}'
+                    : 'Residency end: ${_displayValue(quoteSnapshot['stayEndDateText'])}',
+              ),
+              Text(
+                _isArabic
+                    ? 'عدد الأيام: ${_displayValue(quoteSnapshot['stayDurationDays'])}'
+                    : 'Duration days: ${_displayValue(quoteSnapshot['stayDurationDays'])}',
+              ),
+              Text(
+                _isArabic
+                    ? 'وحدة التسعير: ${_displayValue(quoteSnapshot['pricingUnit'])}'
+                    : 'Pricing unit: ${_displayValue(quoteSnapshot['pricingUnit'])}',
+              ),
+              Text(
+                _isArabic
+                    ? 'الإجمالي: ${_displayValue(quoteSnapshot['totalAmount'])}'
+                    : 'Total: ${_displayValue(quoteSnapshot['totalAmount'])}',
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(_isArabic ? 'إلغاء' : 'Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(_isArabic ? 'تأكيد' : 'Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) {
+      return false;
+    }
+
+    if (!mounted) {
+      return false;
+    }
+
+    await requestRef.update(<String, dynamic>{
+      'contract': _contractForConfirmation(data),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+    return true;
+  }
+
   Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>>
       _awaitingPaymentRequests(String uid) {
     return FirebaseFirestore.instance
@@ -84,17 +220,17 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
       }
 
       final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-      final eligibleRefs = <DocumentReference<Map<String, dynamic>>>[];
+      final eligibleDocs = <DocumentSnapshot<Map<String, dynamic>>>[];
       for (final doc in requestDocs) {
         final data = doc.data() ?? const <String, dynamic>{};
         final status = (data['status'] ?? '').toString();
         final clientId = (data['clientId'] ?? '').toString();
         if (status == 'awaiting_payment' && clientId == uid) {
-          eligibleRefs.add(doc.reference);
+          eligibleDocs.add(doc);
         }
       }
 
-      if (eligibleRefs.isEmpty) {
+      if (eligibleDocs.isEmpty) {
         throw Exception(
           _isArabic
               ? 'لا توجد نسخة مؤهلة من الطلب لرفع إثبات الدفع'
@@ -102,7 +238,17 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
         );
       }
 
-      final targetRef = eligibleRefs.first;
+      final targetDoc = eligibleDocs.first;
+      final targetData = targetDoc.data() ?? const <String, dynamic>{};
+      final targetRef = targetDoc.reference;
+      final contractConfirmed = await _confirmCenterContractIfNeeded(
+        targetRef,
+        targetData,
+      );
+      if (!contractConfirmed) {
+        return;
+      }
+
       final dataToUpdate = <String, dynamic>{
         'status': 'payment_review',
         'workflowStage': 'payment_review',

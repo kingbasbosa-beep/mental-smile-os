@@ -537,6 +537,30 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     final rejectReason = (data['rejectReason'] ?? '').toString();
     final selectedAccommodationLabelAr =
         (data['selectedAccommodationLabelAr'] ?? '').toString();
+    final contract = data['contract'];
+    final contractRoom = contract is Map ? contract['room'] : null;
+    final contractDuration = contract is Map ? contract['duration'] : null;
+    final contractPricing = contract is Map ? contract['pricing'] : null;
+    final contractMeta = contract is Map ? contract['meta'] : null;
+    final contractStatus =
+        contract is Map ? (contract['status'] ?? '').toString() : '';
+    final contractVersion =
+        contract is Map ? (contract['version'] ?? '').toString() : '';
+    final contractRoomLabel =
+        contractRoom is Map ? (contractRoom['label'] ?? '').toString() : '';
+    final contractRoomPrice =
+        contractRoom is Map ? (contractRoom['price'] ?? '').toString() : '';
+    final contractPricingUnit = contractRoom is Map
+        ? (contractRoom['pricingUnit'] ?? '').toString()
+        : '';
+    final contractDurationBasis = contractDuration is Map
+        ? (contractDuration['basis'] ?? '').toString()
+        : '';
+    final contractBaseAmount = contractPricing is Map
+        ? (contractPricing['baseAmount'] ?? '').toString()
+        : '';
+    final contractSource =
+        contractMeta is Map ? (contractMeta['source'] ?? '').toString() : '';
     final selectedCenterType =
         (data['selectedCenterType'] ?? '').toString().trim();
     final centerHasDetoxUnit = (data['centerHasDetoxUnit'] ?? false) == true;
@@ -570,6 +594,22 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
       if (approvedSlot.isNotEmpty) 'الموعد المعتمد: $approvedSlot',
       if (selectedAccommodationLabelAr.isNotEmpty)
         'نوع الإقامة: $selectedAccommodationLabelAr',
+      if (isCenter && contractStatus.isNotEmpty)
+        'مسودة العقد: $contractStatus',
+      if (isCenter && contractRoomLabel.isNotEmpty)
+        'غرفة العقد: $contractRoomLabel',
+      if (isCenter && contractRoomPrice.isNotEmpty)
+        'سعر غرفة العقد: $contractRoomPrice',
+      if (isCenter && contractPricingUnit.isNotEmpty)
+        'وحدة التسعير: $contractPricingUnit',
+      if (isCenter && contractDurationBasis.isNotEmpty)
+        'أساس المدة: $contractDurationBasis',
+      if (isCenter && contractBaseAmount.isNotEmpty)
+        'المبلغ الأساسي للعقد: $contractBaseAmount',
+      if (isCenter && contractVersion.isNotEmpty)
+        'إصدار العقد: $contractVersion',
+      if (isCenter && contractSource.isNotEmpty)
+        'مصدر العقد: $contractSource',
       if (selectedCenterType.isNotEmpty)
         'نوع المركز: ${_centerTypeLabel(selectedCenterType)}',
       if (centerHasDetoxUnit && selectedCenterType != 'detox')

@@ -1739,6 +1739,33 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         _safeText(data, 'centerSuggestedAlternativeLabelAr');
     final selectedAccommodationLabelAr =
         _safeText(data, 'selectedAccommodationLabelAr');
+    final contract = data['contract'];
+    final contractRoom = contract is Map ? contract['room'] : null;
+    final contractDuration = contract is Map ? contract['duration'] : null;
+    final contractPricing = contract is Map ? contract['pricing'] : null;
+    final contractMeta = contract is Map ? contract['meta'] : null;
+    final contractStatus =
+        contract is Map ? (contract['status'] ?? '').toString().trim() : '';
+    final contractVersion =
+        contract is Map ? (contract['version'] ?? '').toString().trim() : '';
+    final contractRoomLabel = contractRoom is Map
+        ? (contractRoom['label'] ?? '').toString().trim()
+        : '';
+    final contractRoomPrice = contractRoom is Map
+        ? (contractRoom['price'] ?? '').toString().trim()
+        : '';
+    final contractPricingUnit = contractRoom is Map
+        ? (contractRoom['pricingUnit'] ?? '').toString().trim()
+        : '';
+    final contractDurationBasis = contractDuration is Map
+        ? (contractDuration['basis'] ?? '').toString().trim()
+        : '';
+    final contractBaseAmount = contractPricing is Map
+        ? (contractPricing['baseAmount'] ?? '').toString().trim()
+        : '';
+    final contractSource = contractMeta is Map
+        ? (contractMeta['source'] ?? '').toString().trim()
+        : '';
     final selectedCenterType = _safeText(data, 'selectedCenterType');
     final centerHasDetoxUnit = (data['centerHasDetoxUnit'] ?? false) == true;
     final lastCenterAvailabilityNote =
@@ -1904,6 +1931,62 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                 arLabel: 'نوع الإقامة المختار',
                 enLabel: 'Selected accommodation',
                 value: selectedAccommodationLabelAr,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'حالة مسودة العقد',
+                enLabel: 'Contract draft status',
+                value: contractStatus,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'غرفة العقد',
+                enLabel: 'Contract room',
+                value: contractRoomLabel,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'سعر غرفة العقد',
+                enLabel: 'Contract room price',
+                value: contractRoomPrice,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'وحدة التسعير',
+                enLabel: 'Pricing unit',
+                value: contractPricingUnit,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'أساس المدة',
+                enLabel: 'Duration basis',
+                value: contractDurationBasis,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'المبلغ الأساسي للعقد',
+                enLabel: 'Contract base amount',
+                value: contractBaseAmount,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'إصدار العقد',
+                enLabel: 'Contract version',
+                value: contractVersion,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'مصدر العقد',
+                enLabel: 'Contract source',
+                value: contractSource,
               ),
               _buildDetailLine(
                 context: context,

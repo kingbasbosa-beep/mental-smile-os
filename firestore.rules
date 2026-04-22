@@ -286,6 +286,46 @@ service cloud.firestore {
         && request.resource.data.assignedClinicianId == resource.data.assignedClinicianId;
     }
 
+    function clientCenterContractConfirmValid() {
+      return request.auth != null
+        && request.auth.uid == resource.data.clientId
+        && resource.data.requestKind == 'center'
+        && resource.data.status == 'awaiting_payment'
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.workflowStage == resource.data.workflowStage
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly(['contract', 'updatedAt'])
+        && request.resource.data.contract.status == 'confirmed'
+        && request.resource.data.contract.confirmedBy == request.auth.uid
+        && (request.resource.data.contract.confirmedAt is timestamp)
+        && request.resource.data.contract.snapshotLocked == true
+        && request.resource.data.contract.quoteSnapshot.keys()
+            .hasOnly([
+              'stayStartDateText',
+              'stayEndDateText',
+              'stayDurationDays',
+              'pricingUnit',
+              'baseAmount',
+              'taxPercent',
+              'taxAmount',
+              'totalAmount',
+              'grossClientPaidAmount'
+            ])
+        && request.resource.data.contract.quoteSnapshot.stayStartDateText == resource.data.stayStartDateText
+        && request.resource.data.contract.quoteSnapshot.stayEndDateText == resource.data.stayEndDateText
+        && request.resource.data.contract.quoteSnapshot.stayDurationDays == resource.data.stayDurationDays
+        && request.resource.data.contract.quoteSnapshot.pricingUnit == resource.data.stayPricingUnit
+        && request.resource.data.contract.quoteSnapshot.baseAmount == resource.data.stayBaseAmount
+        && request.resource.data.contract.quoteSnapshot.taxPercent == resource.data.stayTaxPercent
+        && request.resource.data.contract.quoteSnapshot.taxAmount == resource.data.stayTaxAmount
+        && request.resource.data.contract.quoteSnapshot.totalAmount == resource.data.stayTotalAmount
+        && request.resource.data.contract.quoteSnapshot.grossClientPaidAmount == resource.data.grossClientPaidAmount
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
     function clientPaymentProofUpdateValid() {
       return request.auth != null
         && request.auth.uid == resource.data.clientId
@@ -1642,6 +1682,7 @@ service cloud.firestore {
               'selectedAccommodationPricingSnapshot',
               'selectedAccommodationPrice',
               'selectedAccommodationPricingUnit',
+              'contract',
               'centerAvailabilityStatus',
               'centerAvailabilityNote',
               'centerAvailabilityRespondedAt',
@@ -2048,6 +2089,7 @@ service cloud.firestore {
           || centerRecommendationValid()
           || clientCenterResubmitValid()
           || clientCenterCheckInValid()
+          || clientCenterContractConfirmValid()
           || clientPaymentProofUpdateValid()
           || clientDirectClinicianThreadLinkValid()
           || adminForwardValid()
