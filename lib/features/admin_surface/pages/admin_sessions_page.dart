@@ -292,6 +292,39 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
         ? 'سعر ${pricingUnit == 'month' ? 'شهري' : 'يومي'} ${unitPrice.toStringAsFixed(unitPrice.truncateToDouble() == unitPrice ? 0 : 2)} × $durationDays يوم + ضريبة ${taxPercent.toStringAsFixed(0)}%'
         : '${pricingUnit == 'month' ? 'Monthly' : 'Daily'} price ${unitPrice.toStringAsFixed(unitPrice.truncateToDouble() == unitPrice ? 0 : 2)} × $durationDays day(s) + ${taxPercent.toStringAsFixed(0)}% tax';
 
+    final shouldOpenPayment = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(
+            isArabic
+                ? 'تأكيد مراجعة التجهيز وفتح الدفع'
+                : 'Confirm setup review and open payment',
+          ),
+          content: Text(
+            isArabic
+                ? 'سيتم حفظ بيانات التجهيز وإرسال بيان الدفع للعميل. هذا لا يعني اعتماد الدفع بعد.'
+                : 'Setup values will be saved and the payment quote will be opened for the client. Payment is not approved yet.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(isArabic ? 'إلغاء' : 'Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(
+                isArabic
+                    ? 'تأكيد وفتح الدفع'
+                    : 'Confirm and open payment',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+    if (shouldOpenPayment != true) return;
+
     await _setBusy(requestId, true);
     try {
       debugPrint(
@@ -922,6 +955,14 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                             const SizedBox(height: AppSpacing.sm),
                             if (status == 'session_setup_pending' ||
                                 status == 'reschedule_pending') ...[
+                              Text(
+                                isArabic ? 'مراجعة التجهيز' : 'Setup review',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleSmall
+                                    ?.copyWith(fontWeight: FontWeight.w800),
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
                               TextField(
                                 controller: dateCtrl,
                                 decoration: appInputDecoration(
@@ -1095,6 +1136,20 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                 ],
                                 if (selectedAccommodationPrice > 0 &&
                                     enteredDurationDays > 0) ...[
+                                  const SizedBox(height: AppSpacing.sm),
+                                  Text(
+                                    isArabic ? 'فتح الدفع' : 'Payment opening',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(fontWeight: FontWeight.w800),
+                                  ),
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    isArabic
+                                        ? 'سيؤدي التأكيد إلى إرسال بيان الدفع للعميل، وليس اعتماد الدفع.'
+                                        : 'Confirming sends the payment quote to the client; it does not approve payment.',
+                                  ),
                                   const SizedBox(height: AppSpacing.sm),
                                   Text(
                                     isArabic
@@ -1328,10 +1383,10 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                     label: Text(
                                       isArabic
                                           ? (isCenterRequest
-                                              ? 'تأكيد التجهيز وفتح الدفع'
+                                              ? 'تأكيد مراجعة التجهيز وفتح الدفع'
                                               : 'إنشاء/جدولة الجلسة')
                                           : (isCenterRequest
-                                              ? 'Confirm setup and open payment'
+                                              ? 'Confirm setup review and open payment'
                                               : 'Schedule session'),
                                     ),
                                   ),
