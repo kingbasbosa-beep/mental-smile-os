@@ -972,6 +972,34 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     }
   }
 
+  Future<void> _openCenterIntakeStep(String requestId) async {
+    final isArabic = _isArabic(context);
+    await _setBusy(requestId, true);
+    try {
+      await _updatePrimaryCenterRequest(requestId, {
+        'status': 'center_intake_pending',
+        'workflowStage': 'center_intake_pending',
+        'adminDecisionType': 'center_intake_opened',
+        'adminDecisionBy': FirebaseAuth.instance.currentUser?.uid ?? '',
+        'adminDecisionAt': FieldValue.serverTimestamp(),
+      });
+
+      if (!mounted) return;
+      setState(() => _tab = 'center_intake_pending');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'تم فتح خطوة التقييم الأولي للعميل'
+                : 'Initial intake step opened for the client',
+          ),
+        ),
+      );
+    } finally {
+      await _setBusy(requestId, false);
+    }
+  }
+
   Future<void> _approveCenterRequest(String requestId) async {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
@@ -1557,7 +1585,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       case 'payment_review':
         return isArabic ? 'مراجعة السداد' : 'Payment review';
       case 'session_setup_pending':
-        return isArabic ? 'بانتظار تجهيز الجلسة' : 'Session setup pending';
+        return isArabic
+            ? 'تجهيز إقامة بعد توصية المركز'
+            : 'Setup after center recommendation';
       case 'session_scheduled':
         return isArabic ? 'جلسة مجدولة' : 'Session scheduled';
       case 'session_in_progress':
@@ -1611,6 +1641,58 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         return const Color(0xFFD84B4B);
       default:
         return const Color(0xFF6C55B3);
+    }
+  }
+
+  String _centerAvailabilityOutcomeLabel(String value, bool isArabic) {
+    switch (value.trim()) {
+      case 'available':
+        return isArabic
+            ? 'متاح: جاهز لمراجعة التقييم الأولي'
+            : 'Available: ready for intake review';
+      case 'unavailable':
+        return isArabic
+            ? 'رد المركز: غير متاح'
+            : 'Center responded: unavailable';
+      case 'pending':
+      case '':
+        return isArabic
+            ? 'بانتظار رد المركز'
+            : 'Pending, no center response yet';
+      default:
+        return isArabic
+            ? 'بانتظار رد المركز'
+            : 'Pending, no center response yet';
+    }
+  }
+
+  Color _centerAvailabilityOutcomeColor(String value) {
+    switch (value.trim()) {
+      case 'available':
+        return const Color(0xFF1F9D63);
+      case 'unavailable':
+        return const Color(0xFFD84B4B);
+      default:
+        return const Color(0xFFE39B2E);
+    }
+  }
+
+  String _centerCareLevelLabel(String value, bool isArabic) {
+    switch (value.trim()) {
+      case 'residential_psych':
+        return isArabic
+            ? 'إقامة نفسية داخلية'
+            : 'Residential psychiatric care';
+      case 'detox':
+        return isArabic ? 'سحب سموم ومتابعة' : 'Detox and monitoring';
+      case 'dual_diagnosis':
+        return isArabic ? 'رعاية مزدوجة' : 'Dual diagnosis care';
+      case 'diagnostic_observation':
+        return isArabic
+            ? 'ملاحظة تشخيصية داخلية'
+            : 'Diagnostic observation';
+      default:
+        return value.trim();
     }
   }
 
@@ -1734,11 +1816,21 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final clinicianDecisionNote = _safeText(data, 'clinicianDecisionNote');
     final centerAvailabilityStatus =
         _safeText(data, 'centerAvailabilityStatus');
+    final centerAvailabilityRespondedAt =
+        _dateText(data['centerAvailabilityRespondedAt']);
+    final centerAvailabilityRespondedBy =
+        _safeText(data, 'centerAvailabilityRespondedBy');
     final centerAvailabilityNote = _safeText(data, 'centerAvailabilityNote');
     final centerSuggestedAlternativeLabelAr =
         _safeText(data, 'centerSuggestedAlternativeLabelAr');
+    final selectedAccommodationKey =
+        _safeText(data, 'selectedAccommodationKey');
     final selectedAccommodationLabelAr =
         _safeText(data, 'selectedAccommodationLabelAr');
+    final selectedAccommodationPrice =
+        _safeText(data, 'selectedAccommodationPrice');
+    final selectedAccommodationPricingUnit =
+        _safeText(data, 'selectedAccommodationPricingUnit');
     final contract = data['contract'];
     final contractRoom = contract is Map ? contract['room'] : null;
     final contractDuration = contract is Map ? contract['duration'] : null;
@@ -1772,8 +1864,19 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         _safeText(data, 'lastCenterAvailabilityNote');
     final lastCenterSuggestedAlternativeLabelAr =
         _safeText(data, 'lastCenterSuggestedAlternativeLabelAr');
+    final centerRecommendedCareLevel =
+        _safeText(data, 'centerRecommendedCareLevel');
+    final centerRecommendedStayDays =
+        _safeText(data, 'centerRecommendedStayDays');
+    final centerNeedsInternalAssessment =
+        (data['centerNeedsInternalAssessment'] ?? false) == true;
+    final centerRecommendationSubmittedAt =
+        _dateText(data['centerRecommendationSubmittedAt']);
+    final centerRecommendationSubmittedBy =
+        _safeText(data, 'centerRecommendationSubmittedBy');
     final accountingReviewStatus = _safeText(data, 'accountingReviewStatus');
     final grossClientPaidAmount = _safeText(data, 'grossClientPaidAmount');
+    final paymentQuotePreparedAt = data['paymentQuotePreparedAt'];
     final appCommissionPercent = _safeText(data, 'appCommissionPercent');
     final appCommissionAmount = _safeText(data, 'appCommissionAmount');
     final netAmountDueToCenter = _safeText(data, 'netAmountDueToCenter');
@@ -1789,6 +1892,21 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final canReturnCenterToClient = isCenterRequest &&
         status == 'center_follow_up' &&
         centerAvailabilityStatus == 'unavailable';
+    final noQuoteOrPaymentStarted =
+        (paymentStatus.isEmpty || paymentStatus == 'not_started') &&
+            paymentReceiptFileName.isEmpty &&
+            grossClientPaidAmount.isEmpty &&
+            paymentQuotePreparedAt == null;
+    final canOpenCenterIntake = isCenterRequest &&
+        centerAvailabilityStatus == 'available' &&
+        (status == 'pending_admin' || status == 'center_follow_up') &&
+        !archived &&
+        noQuoteOrPaymentStarted &&
+        contractStatus == 'draft' &&
+        selectedAccommodationKey.isNotEmpty &&
+        selectedAccommodationLabelAr.isNotEmpty &&
+        selectedAccommodationPrice.isNotEmpty &&
+        selectedAccommodationPricingUnit.isNotEmpty;
     final canRunAccountingReview = isCenterRequest &&
         status == 'payout_pending' &&
         accountingReviewStatus != 'confirmed';
@@ -1859,6 +1977,16 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                               label: _statusLabel(status, isArabic),
                               color: _statusColor(status),
                             ),
+                            if (isCenterRequest)
+                              AppStatusBadge(
+                                label: _centerAvailabilityOutcomeLabel(
+                                  centerAvailabilityStatus,
+                                  isArabic,
+                                ),
+                                color: _centerAvailabilityOutcomeColor(
+                                  centerAvailabilityStatus,
+                                ),
+                              ),
                           ],
                         ),
                         const SizedBox(height: 8),
@@ -1923,7 +2051,26 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                 isArabic: isArabic,
                 arLabel: 'رد المركز على التوفر',
                 enLabel: 'Center availability',
-                value: centerAvailabilityStatus,
+                value: isCenterRequest
+                    ? _centerAvailabilityOutcomeLabel(
+                        centerAvailabilityStatus,
+                        isArabic,
+                      )
+                    : centerAvailabilityStatus,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'وقت رد المركز',
+                enLabel: 'Center responded at',
+                value: centerAvailabilityRespondedAt,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'معرف المركز صاحب الرد',
+                enLabel: 'Center responded by',
+                value: centerAvailabilityRespondedBy,
               ),
               _buildDetailLine(
                 context: context,
@@ -2015,6 +2162,72 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                       ? 'مسموح به دون إعادة الإرسال للمركز'
                       : 'Allowed without returning to center',
                 ),
+              if (centerRecommendedCareLevel.isNotEmpty ||
+                  centerRecommendedStayDays.isNotEmpty)
+                _buildDetailLine(
+                  context: context,
+                  isArabic: isArabic,
+                  arLabel: 'حدود المرحلة',
+                  enLabel: 'Stage boundary',
+                  value: isArabic
+                      ? 'توصية المركز مستلمة؛ الخطوة التالية تجهيز إداري فقط وليست اعتماد دفع.'
+                      : 'Center recommendation received; next step is admin setup, not payment approval.',
+                ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'مصدر التوصية',
+                enLabel: 'Recommendation source',
+                value: centerRecommendedCareLevel.isEmpty &&
+                        centerRecommendedStayDays.isEmpty
+                    ? ''
+                    : (isArabic ? 'المركز' : 'Center'),
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'مستوى الرعاية الموصى به',
+                enLabel: 'Recommended care level',
+                value: centerRecommendedCareLevel.isEmpty
+                    ? ''
+                    : _centerCareLevelLabel(
+                        centerRecommendedCareLevel,
+                        isArabic,
+                      ),
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'مدة الإقامة الموصى بها',
+                enLabel: 'Recommended stay days',
+                value: centerRecommendedStayDays,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'يحتاج تقييمًا داخليًا',
+                enLabel: 'Needs internal assessment',
+                value: centerRecommendedCareLevel.isEmpty &&
+                        centerRecommendedStayDays.isEmpty
+                    ? ''
+                    : (centerNeedsInternalAssessment
+                        ? (isArabic ? 'نعم' : 'Yes')
+                        : (isArabic ? 'لا' : 'No')),
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'وقت إرسال توصية المركز',
+                enLabel: 'Recommendation submitted at',
+                value: centerRecommendationSubmittedAt,
+              ),
+              _buildDetailLine(
+                context: context,
+                isArabic: isArabic,
+                arLabel: 'مرسل توصية المركز',
+                enLabel: 'Recommendation submitted by',
+                value: centerRecommendationSubmittedBy,
+              ),
               _buildDetailLine(
                 context: context,
                 isArabic: isArabic,
@@ -2225,6 +2438,17 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                         isArabic
                             ? 'اعتماد وفتح الجدولة'
                             : 'Approve and open scheduling',
+                      ),
+                    ),
+                  if (canOpenCenterIntake)
+                    FilledButton.tonalIcon(
+                      onPressed:
+                          busy ? null : () => _openCenterIntakeStep(requestId),
+                      icon: const Icon(Icons.assignment_turned_in_outlined),
+                      label: Text(
+                        isArabic
+                            ? 'فتح التقييم الأولي'
+                            : 'Open intake review',
                       ),
                     ),
                   if (canReturnCenterToClient)

@@ -39,6 +39,8 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
 
   String _statusLabel(String status, bool isArabic) {
     switch (status) {
+      case 'pending_admin':
+        return isArabic ? 'مرئي للمركز' : 'Visible to center';
       case 'center_follow_up':
         return isArabic ? 'بانتظار رد المركز' : 'Pending center response';
       case 'session_setup_pending':
@@ -89,13 +91,6 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
     required String availabilityStatus,
   }) async {
     final isArabic = _isArabic(context);
-    final controller = TextEditingController(
-      text: (request.data['centerAvailabilityNote'] ?? '').toString(),
-    );
-    final suggestedAlternativeController = TextEditingController(
-      text:
-          (request.data['centerSuggestedAlternativeLabelAr'] ?? '').toString(),
-    );
     final shouldSubmit = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
@@ -107,28 +102,10 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                   ? (isArabic ? 'تأكيد التوفر' : 'Confirm availability')
                   : (isArabic ? 'تأكيد عدم التوفر' : 'Confirm unavailability'),
             ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: controller,
-                  decoration: InputDecoration(
-                    labelText: isArabic ? 'ملاحظة اختيارية' : 'Optional note',
-                    border: const OutlineInputBorder(),
-                  ),
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: suggestedAlternativeController,
-                  decoration: InputDecoration(
-                    labelText: isArabic
-                        ? 'بديل مقترح اختياري'
-                        : 'Optional suggested alternative',
-                    border: const OutlineInputBorder(),
-                  ),
-                ),
-              ],
+            content: Text(
+              isArabic
+                  ? 'سيتم إرسال رد توفر منظم فقط دون تغيير حالة الطلب.'
+                  : 'Only a structured availability signal will be sent; request status will not change.',
             ),
             actions: [
               TextButton(
@@ -155,8 +132,6 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
         requestId: request.id,
         centerId: uid,
         availabilityStatus: availabilityStatus,
-        note: controller.text.trim(),
-        suggestedAlternativeLabelAr: suggestedAlternativeController.text.trim(),
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -364,7 +339,8 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                       ),
                                       Chip(
                                         label: Text(
-                                          status == 'center_follow_up'
+                                          status == 'pending_admin' ||
+                                                  status == 'center_follow_up'
                                               ? _availabilityLabel(
                                                   availability,
                                                   isArabic,
@@ -433,7 +409,8 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                     ),
                                   ],
                                   const SizedBox(height: 12),
-                                  if (status == 'center_follow_up')
+                                  if (status == 'pending_admin' ||
+                                      status == 'center_follow_up')
                                     Wrap(
                                       spacing: 10,
                                       runSpacing: 10,

@@ -16,6 +16,7 @@ class CenterRequestInboxService {
   const CenterRequestInboxService();
 
   static const List<String> _actionableStatuses = <String>[
+    'pending_admin',
     'center_follow_up',
     'session_setup_pending',
     'session_scheduled',
@@ -96,8 +97,6 @@ class CenterRequestInboxService {
     required String requestId,
     required String centerId,
     required String availabilityStatus,
-    required String note,
-    required String suggestedAlternativeLabelAr,
   }) async {
     final normalizedAvailabilityStatus =
         availabilityStatus.trim().toLowerCase();
@@ -136,19 +135,7 @@ class CenterRequestInboxService {
       );
 
       await ref.update({
-        'status': normalizedAvailabilityStatus == 'available'
-            ? 'center_intake_pending'
-            : (data['status'] ?? 'center_follow_up'),
-        'workflowStage': normalizedAvailabilityStatus == 'available'
-            ? 'center_intake_pending'
-            : (data['workflowStage'] ?? data['status'] ?? 'center_follow_up'),
         'centerAvailabilityStatus': normalizedAvailabilityStatus,
-        'centerAvailabilityNote': note.trim(),
-        'centerSuggestedAlternativeKey':
-            suggestedAlternativeLabelAr.trim().isEmpty
-                ? ''
-                : suggestedAlternativeLabelAr.trim(),
-        'centerSuggestedAlternativeLabelAr': suggestedAlternativeLabelAr.trim(),
         'centerAvailabilityRespondedAt': FieldValue.serverTimestamp(),
         'centerAvailabilityRespondedBy': centerId,
         'updatedAt': FieldValue.serverTimestamp(),

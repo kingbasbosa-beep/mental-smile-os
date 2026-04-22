@@ -65,7 +65,8 @@ service cloud.firestore {
         && resource != null
         && (resource.data.status is string)
         && (
-          resource.data.status == 'center_follow_up'
+          resource.data.status == 'pending_admin'
+          || resource.data.status == 'center_follow_up'
           || resource.data.status == 'center_recommendation_pending'
           || resource.data.status == 'session_setup_pending'
           || resource.data.status == 'session_scheduled'
@@ -1283,6 +1284,67 @@ service cloud.firestore {
         && request.resource.data.adminDecisionBy == uid();
     }
 
+    function adminCenterOpenIntakeBridgeValid() {
+      return isCenterCycleAdmin()
+        && resource.data.requestKind == 'center'
+        && (
+          resource.data.status == 'pending_admin'
+          || resource.data.status == 'center_follow_up'
+        )
+        && (
+          !resource.data.keys().hasAny(['archived'])
+          || resource.data.archived == false
+        )
+        && resource.data.centerAvailabilityStatus == 'available'
+        && (resource.data.centerId is string)
+        && resource.data.centerId.size() > 0
+        && (resource.data.selectedAccommodationKey is string)
+        && resource.data.selectedAccommodationKey.size() > 0
+        && (resource.data.selectedAccommodationLabelAr is string)
+        && resource.data.selectedAccommodationLabelAr.size() > 0
+        && resource.data.selectedAccommodationPrice != null
+        && (resource.data.selectedAccommodationPricingUnit is string)
+        && resource.data.selectedAccommodationPricingUnit.size() > 0
+        && (resource.data.contract is map)
+        && resource.data.contract.status == 'draft'
+        && (
+          !resource.data.keys().hasAny(['paymentStatus'])
+          || resource.data.paymentStatus == ''
+          || resource.data.paymentStatus == 'not_started'
+        )
+        && (
+          !resource.data.keys().hasAny(['paymentQuotePreparedAt'])
+          || resource.data.paymentQuotePreparedAt == null
+        )
+        && (
+          !resource.data.keys().hasAny(['paymentReceiptFileName'])
+          || resource.data.paymentReceiptFileName == null
+          || resource.data.paymentReceiptFileName == ''
+        )
+        && (
+          !resource.data.keys().hasAny(['grossClientPaidAmount'])
+          || resource.data.grossClientPaidAmount == null
+          || resource.data.grossClientPaidAmount == ''
+        )
+        && request.resource.data.requestKind == resource.data.requestKind
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.status == 'center_intake_pending'
+        && request.resource.data.workflowStage == 'center_intake_pending'
+        && request.resource.data.adminDecisionType == 'center_intake_opened'
+        && (request.resource.data.adminDecisionBy is string)
+        && request.resource.data.adminDecisionBy == uid()
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'adminDecisionType',
+              'adminDecisionBy',
+              'adminDecisionAt',
+              'updatedAt'
+            ]);
+    }
+
     function adminCenterScheduleBridgeValid() {
       return isAdmin()
         && isLegacyOrCanonicalCenterBooking()
@@ -1534,7 +1596,10 @@ service cloud.firestore {
         && resource.data.requestKind == 'center'
         && (resource.data.centerId is string)
         && resource.data.centerId == uid()
-        && resource.data.status == 'center_follow_up'
+        && (
+          resource.data.status == 'pending_admin'
+          || resource.data.status == 'center_follow_up'
+        )
         && request.resource.data.clientId == resource.data.clientId
         && request.resource.data.clientName == resource.data.clientName
         && request.resource.data.centerId == resource.data.centerId
@@ -1549,31 +1614,16 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).changedKeys()
             .hasOnly([
               'centerAvailabilityStatus',
-              'centerAvailabilityNote',
-              'centerSuggestedAlternativeKey',
-              'centerSuggestedAlternativeLabelAr',
               'centerAvailabilityRespondedAt',
               'centerAvailabilityRespondedBy',
-              'status',
-              'workflowStage',
               'updatedAt'
             ])
         && (
           request.resource.data.centerAvailabilityStatus == 'available'
           || request.resource.data.centerAvailabilityStatus == 'unavailable'
         )
-        && (
-          (
-            request.resource.data.centerAvailabilityStatus == 'available'
-            && request.resource.data.status == 'center_intake_pending'
-            && request.resource.data.workflowStage == 'center_intake_pending'
-          )
-          || (
-            request.resource.data.centerAvailabilityStatus == 'unavailable'
-            && request.resource.data.status == resource.data.status
-            && request.resource.data.workflowStage == resource.data.workflowStage
-          )
-        )
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.workflowStage == resource.data.workflowStage
         && (
           request.resource.data.centerAvailabilityNote == null
           || request.resource.data.centerAvailabilityNote is string
@@ -1587,38 +1637,26 @@ service cloud.firestore {
         && resource.data.requestKind == 'center'
         && (resource.data.centerId is string)
         && resource.data.centerId == uid()
-        && resource.data.status == 'center_follow_up'
+        && (
+          resource.data.status == 'pending_admin'
+          || resource.data.status == 'center_follow_up'
+        )
         && request.resource.data.requestKind == resource.data.requestKind
         && request.resource.data.clientId == resource.data.clientId
         && request.resource.data.centerId == resource.data.centerId
         && request.resource.data.diff(resource.data).changedKeys()
             .hasOnly([
               'centerAvailabilityStatus',
-              'centerAvailabilityNote',
-              'centerSuggestedAlternativeKey',
-              'centerSuggestedAlternativeLabelAr',
               'centerAvailabilityRespondedAt',
               'centerAvailabilityRespondedBy',
-              'status',
-              'workflowStage',
               'updatedAt'
             ])
         && (
           request.resource.data.centerAvailabilityStatus == 'available'
           || request.resource.data.centerAvailabilityStatus == 'unavailable'
         )
-        && (
-          (
-            request.resource.data.centerAvailabilityStatus == 'available'
-            && request.resource.data.status == 'center_intake_pending'
-            && request.resource.data.workflowStage == 'center_intake_pending'
-          )
-          || (
-            request.resource.data.centerAvailabilityStatus == 'unavailable'
-            && request.resource.data.status == resource.data.status
-            && request.resource.data.workflowStage == resource.data.workflowStage
-          )
-        )
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.workflowStage == resource.data.workflowStage
         && (request.resource.data.centerAvailabilityRespondedBy is string)
         && request.resource.data.centerAvailabilityRespondedBy == uid();
     }
@@ -2104,6 +2142,7 @@ service cloud.firestore {
         adminCenterFollowUpBridgeValid()
         || adminCenterReturnToClientBridgeValid()
         || adminCenterApproveBridgeValid()
+        || adminCenterOpenIntakeBridgeValid()
         || adminCenterScheduleBridgeValid()
         || adminPaymentApproveBridgeValid()
         || centerArrivalBridgeValid()

@@ -571,7 +571,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
         case 'payment_review':
           return 'إثبات الدفع قيد المراجعة';
         case 'session_setup_pending':
-          return 'بانتظار تأكيد الحجز والإقامة';
+          return 'الإدارة تجهز الإقامة بعد توصية المركز';
         case 'session_scheduled':
           return 'تم تأكيد الحجز والإقامة';
         case 'session_in_progress':
@@ -667,6 +667,35 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     return _statusLabel(requestKind, status);
   }
 
+  String _centerAvailabilityOutcomeLabel(String value) {
+    switch (value.trim()) {
+      case 'available':
+        return 'رد المركز: متاح';
+      case 'unavailable':
+        return 'رد المركز: غير متاح';
+      case 'pending':
+      case '':
+        return 'رد المركز: لم يرد بعد';
+      default:
+        return 'رد المركز: لم يرد بعد';
+    }
+  }
+
+  String _centerCareLevelLabel(String value) {
+    switch (value.trim()) {
+      case 'residential_psych':
+        return 'إقامة نفسية داخلية';
+      case 'detox':
+        return 'سحب سموم ومتابعة';
+      case 'dual_diagnosis':
+        return 'رعاية مزدوجة';
+      case 'diagnostic_observation':
+        return 'ملاحظة تشخيصية داخلية';
+      default:
+        return value.trim();
+    }
+  }
+
   String _requestTypeLabel(bool isCenter) {
     return isCenter ? 'طلب مركز' : 'طلب أخصائي';
   }
@@ -708,6 +737,8 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     final selectedCenterType =
         (data['selectedCenterType'] ?? '').toString().trim();
     final centerHasDetoxUnit = (data['centerHasDetoxUnit'] ?? false) == true;
+    final centerAvailabilityStatus =
+        (data['centerAvailabilityStatus'] ?? 'pending').toString();
     final intakeReason = (data['intakeReason'] ?? '').toString();
     final intakeWithdrawalSymptomsText =
         (data['intakeWithdrawalSymptomsText'] ?? '').toString();
@@ -726,6 +757,14 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     final paymentBreakdownText =
         (data['paymentBreakdownText'] ?? '').toString();
     final stayTotalAmount = (data['stayTotalAmount'] ?? '').toString();
+    final centerRecommendedCareLevel =
+        (data['centerRecommendedCareLevel'] ?? '').toString();
+    final centerRecommendedStayDays =
+        (data['centerRecommendedStayDays'] ?? '').toString();
+    final centerNeedsInternalAssessment =
+        (data['centerNeedsInternalAssessment'] ?? false) == true;
+    final centerRecommendationSubmittedAt =
+        _fmtTime(data['centerRecommendationSubmittedAt']);
     final sessionDateText = (data['sessionDateText'] ?? '').toString();
     final sessionLink = (data['sessionLink'] ?? '').toString();
     final sessionCode = (data['sessionCode'] ?? '').toString();
@@ -738,6 +777,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
       if (approvedSlot.isNotEmpty) 'الموعد المعتمد: $approvedSlot',
       if (selectedAccommodationLabelAr.isNotEmpty)
         'نوع الإقامة: $selectedAccommodationLabelAr',
+      if (isCenter) _centerAvailabilityOutcomeLabel(centerAvailabilityStatus),
       if (isCenter && contractStatus.isNotEmpty)
         'مسودة العقد: $contractStatus',
       if (isCenter && contractRoomLabel.isNotEmpty)
@@ -770,6 +810,14 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
         'مدة الإقامة المبدئية: $stayDurationDays يوم',
       if (paymentBreakdownText.isNotEmpty) 'بيان الدفع: $paymentBreakdownText',
       if (stayTotalAmount.isNotEmpty) 'الإجمالي المستحق: $stayTotalAmount',
+      if (isCenter && centerRecommendedCareLevel.isNotEmpty)
+        'توصية المركز: ${_centerCareLevelLabel(centerRecommendedCareLevel)}',
+      if (isCenter && centerRecommendedStayDays.isNotEmpty)
+        'مدة مقترحة من المركز: $centerRecommendedStayDays يوم',
+      if (isCenter && centerRecommendationSubmittedAt.isNotEmpty)
+        'تم استلام توصية المركز: $centerRecommendationSubmittedAt',
+      if (isCenter && centerNeedsInternalAssessment)
+        'قد يحتاج المركز تقييمًا داخليًا عند الوصول',
       if (lastCenterAvailabilityNote.isNotEmpty)
         'ملاحظة المركز الأخيرة: $lastCenterAvailabilityNote',
       if (lastCenterSuggestedAlternativeLabelAr.isNotEmpty)
@@ -947,6 +995,14 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                             final centerName =
                                 (d['centerName'] ?? '').toString();
                             final status = (d['status'] ?? '').toString();
+                            final centerAvailabilityStatus =
+                                (d['centerAvailabilityStatus'] ?? '')
+                                    .toString()
+                                    .trim();
+                            final centerAvailable = isCenter &&
+                                centerAvailabilityStatus == 'available';
+                            final centerUnavailable = isCenter &&
+                                centerAvailabilityStatus == 'unavailable';
 
                             final title = isCenter
                                 ? (centerName.isEmpty ? 'طلب مركز' : centerName)
@@ -1098,27 +1154,93 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                         ),
                                       ),
                                     ],
+                                    if (centerAvailable) ...[
+                                      const SizedBox(height: 12),
+                                      Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: Colors.green
+                                              .withValues(alpha: 0.10),
+                                          border: Border.all(
+                                            color: Colors.green
+                                                .withValues(alpha: 0.30),
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(14),
+                                        ),
+                                        child: const Text(
+                                          'المركز متاح لهذا الطلب. يتم تجهيز الطلب للخطوة التالية دون الحاجة إلى إجراء منك الآن.',
+                                          style: TextStyle(height: 1.5),
+                                        ),
+                                      ),
+                                    ],
+                                    if (centerUnavailable) ...[
+                                      const SizedBox(height: 12),
+                                      Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: Colors.orange
+                                              .withValues(alpha: 0.10),
+                                          border: Border.all(
+                                            color: Colors.orange
+                                                .withValues(alpha: 0.30),
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(14),
+                                        ),
+                                        child: const Text(
+                                          'المركز المختار غير متاح لهذا الطلب. يمكنك إنشاء طلب جديد بنفس البيانات لاختيار مسار مناسب دون تعديل الطلب الحالي.',
+                                          style: TextStyle(height: 1.5),
+                                        ),
+                                      ),
+                                    ],
                                     if (isCenter) ...[
                                       const SizedBox(height: 12),
                                       Align(
                                         alignment: Alignment.centerRight,
-                                        child: OutlinedButton.icon(
-                                          onPressed: centerId.trim().isEmpty ||
-                                                  centerName.trim().isEmpty
-                                              ? null
-                                              : () =>
-                                                  _createCenterRequestFromExisting(
-                                                    context,
-                                                    visibleDocs[i].id,
-                                                    d,
-                                                  ),
-                                          icon: const Icon(
-                                            Icons.copy_all_outlined,
-                                          ),
-                                          label: const Text(
-                                            'إنشاء طلب جديد من هذا الطلب',
-                                          ),
-                                        ),
+                                        child: centerUnavailable
+                                            ? FilledButton.icon(
+                                                onPressed:
+                                                    centerId.trim().isEmpty ||
+                                                            centerName
+                                                                .trim()
+                                                                .isEmpty
+                                                        ? null
+                                                        : () =>
+                                                            _createCenterRequestFromExisting(
+                                                              context,
+                                                              visibleDocs[i].id,
+                                                              d,
+                                                            ),
+                                                icon: const Icon(
+                                                  Icons.copy_all_outlined,
+                                                ),
+                                                label: const Text(
+                                                  'إنشاء طلب جديد من هذا الطلب',
+                                                ),
+                                              )
+                                            : OutlinedButton.icon(
+                                                onPressed:
+                                                    centerId.trim().isEmpty ||
+                                                            centerName
+                                                                .trim()
+                                                                .isEmpty
+                                                        ? null
+                                                        : () =>
+                                                            _createCenterRequestFromExisting(
+                                                              context,
+                                                              visibleDocs[i].id,
+                                                              d,
+                                                            ),
+                                                icon: const Icon(
+                                                  Icons.copy_all_outlined,
+                                                ),
+                                                label: const Text(
+                                                  'إنشاء طلب جديد من هذا الطلب',
+                                                ),
+                                              ),
                                       ),
                                     ],
                                   ],
