@@ -609,45 +609,77 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                 children: [
                   AppSurfaceCard(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Wrap(
-                      spacing: AppSpacing.sm,
-                      runSpacing: AppSpacing.sm,
-                      alignment: WrapAlignment.end,
+                    child: Column(
+                      crossAxisAlignment: isArabic
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
                       children: [
-                        ChoiceChip(
-                          selected: _tab == 'session_setup_pending',
-                          label: Text(
-                            isArabic ? 'بانتظار التجهيز' : 'Setup pending',
-                          ),
-                          onSelected: (_) =>
-                              setState(() => _tab = 'session_setup_pending'),
+                        Text(
+                          isArabic
+                              ? 'متابعة الجاهزية من غرفة التحكم'
+                              : 'Control-room readiness monitoring',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                  ),
                         ),
-                        ChoiceChip(
-                          selected: _tab == 'session_scheduled',
-                          label: Text(
-                            isArabic ? 'مجدولة' : 'Scheduled',
-                          ),
-                          onSelected: (_) =>
-                              setState(() => _tab = 'session_scheduled'),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          isArabic
+                              ? 'استخدم هذه الفلاتر لتتبع التجهيز، الجدولة، التقييمات، وحالات الاسترداد دون اعتبار الصفحة مسار تشغيل يومي.'
+                              : 'Use these filters to track setup, scheduling, reviews, and recovery states without treating this page as the daily execution path.',
+                          textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: AppColors.obsidian
+                                        .withValues(alpha: 0.72),
+                                    fontWeight: FontWeight.w600,
+                                  ),
                         ),
-                        ChoiceChip(
-                          selected: _tab == 'session_completed_pending_reviews',
-                          label: Text(
-                            isArabic
-                                ? 'بانتظار التقارير/التقييمات'
-                                : 'Pending reviews',
-                          ),
-                          onSelected: (_) => setState(
-                            () => _tab = 'session_completed_pending_reviews',
-                          ),
-                        ),
-                        ChoiceChip(
-                          selected: _tab == 'reschedule_pending',
-                          label: Text(
-                            isArabic ? 'إعادة جدولة' : 'Reschedule',
-                          ),
-                          onSelected: (_) =>
-                              setState(() => _tab = 'reschedule_pending'),
+                        const SizedBox(height: AppSpacing.md),
+                        Wrap(
+                          spacing: AppSpacing.sm,
+                          runSpacing: AppSpacing.sm,
+                          alignment: WrapAlignment.end,
+                          children: [
+                            ChoiceChip(
+                              selected: _tab == 'session_setup_pending',
+                              label: Text(
+                                isArabic ? 'بانتظار التجهيز' : 'Setup pending',
+                              ),
+                              onSelected: (_) => setState(
+                                  () => _tab = 'session_setup_pending'),
+                            ),
+                            ChoiceChip(
+                              selected: _tab == 'session_scheduled',
+                              label: Text(
+                                isArabic ? 'مجدولة' : 'Scheduled',
+                              ),
+                              onSelected: (_) =>
+                                  setState(() => _tab = 'session_scheduled'),
+                            ),
+                            ChoiceChip(
+                              selected:
+                                  _tab == 'session_completed_pending_reviews',
+                              label: Text(
+                                isArabic
+                                    ? 'بانتظار التقارير/التقييمات'
+                                    : 'Pending reviews',
+                              ),
+                              onSelected: (_) => setState(
+                                () =>
+                                    _tab = 'session_completed_pending_reviews',
+                              ),
+                            ),
+                            ChoiceChip(
+                              selected: _tab == 'reschedule_pending',
+                              label: Text(
+                                isArabic ? 'إعادة جدولة' : 'Reschedule',
+                              ),
+                              onSelected: (_) =>
+                                  setState(() => _tab = 'reschedule_pending'),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -752,6 +784,32 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                         centerArrivalConfirmed,
                         clientCheckInConfirmed,
                       );
+                      final canOpenPaymentGate = isCenterRequest &&
+                          (status == 'session_setup_pending' ||
+                              status == 'reschedule_pending');
+                      final canScheduleSessionFallback = !isCenterRequest &&
+                          (status == 'session_setup_pending' ||
+                              status == 'reschedule_pending');
+                      final canMarkInProgressAction =
+                          status == 'session_scheduled' &&
+                              (!isCenterRequest ||
+                                  (centerArrivalConfirmed &&
+                                      clientCheckInConfirmed));
+                      final canShowResidencyStartHint = isCenterRequest &&
+                          awaitingResidencyStart &&
+                          (!centerArrivalConfirmed || !clientCheckInConfirmed);
+                      final canMarkCompletedAction =
+                          (status == 'session_scheduled' ||
+                                  status == 'session_in_progress') &&
+                              (!isCenterRequest || !awaitingResidencyStart);
+                      final canRescheduleAction =
+                          status == 'session_scheduled' ||
+                              status == 'session_in_progress';
+                      final hasFallbackActions = canScheduleSessionFallback ||
+                          canMarkInProgressAction ||
+                          canShowResidencyStartHint ||
+                          canMarkCompletedAction ||
+                          canRescheduleAction;
 
                       final dateCtrl = _controllerFor(
                         _dateControllers,
@@ -1391,115 +1449,157 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                               ),
                               const SizedBox(height: AppSpacing.sm),
                             ],
-                            if (status == 'session_scheduled' ||
-                                status == 'session_in_progress') ...[
-                              Text(
-                                isArabic
-                                    ? 'أوامر التنفيذ هنا مخصصة للتصحيح أو الاسترداد من غرفة التحكم، وليست المسار التشغيلي الطبيعي.'
-                                    : 'Execution actions here are for control-room correction or recovery, not the normal operational path.',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                      color: AppColors.obsidian
-                                          .withValues(alpha: 0.72),
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                              ),
-                              const SizedBox(height: AppSpacing.sm),
-                            ],
-                            Wrap(
-                              spacing: AppSpacing.sm,
-                              runSpacing: AppSpacing.sm,
-                              alignment: WrapAlignment.end,
-                              children: [
-                                if (status == 'session_setup_pending' ||
-                                    status == 'reschedule_pending')
+                            if (canOpenPaymentGate) ...[
+                              Wrap(
+                                spacing: AppSpacing.sm,
+                                runSpacing: AppSpacing.sm,
+                                alignment: WrapAlignment.end,
+                                children: [
                                   FilledButton.icon(
                                     onPressed: busy
                                         ? null
-                                        : () => isCenterRequest
-                                            ? _scheduleCenterResidency(
-                                                requestId,
-                                                data,
-                                              )
-                                            : _scheduleSession(requestId),
-                                    icon: const Icon(Icons.video_call_outlined),
+                                        : () => _scheduleCenterResidency(
+                                              requestId,
+                                              data,
+                                            ),
+                                    icon: const Icon(Icons.payments_outlined),
                                     label: Text(
                                       isArabic
-                                          ? (isCenterRequest
-                                              ? 'تأكيد مراجعة التجهيز وفتح الدفع'
-                                              : 'إنشاء/جدولة الجلسة')
-                                          : (isCenterRequest
-                                              ? 'Confirm setup review and open payment'
-                                              : 'Schedule session'),
+                                          ? 'تأكيد مراجعة التجهيز وفتح الدفع'
+                                          : 'Confirm setup review and open payment',
                                     ),
                                   ),
-                                if (status == 'session_scheduled' &&
-                                    (!isCenterRequest ||
-                                        (centerArrivalConfirmed &&
-                                            clientCheckInConfirmed)))
-                                  FilledButton.tonalIcon(
-                                    onPressed: busy
-                                        ? null
-                                        : () => _markInProgress(requestId),
-                                    icon: const Icon(Icons.play_circle_outline),
-                                    label: Text(
-                                      isArabic
-                                          ? (isCenterRequest
-                                              ? 'تعليم كإقامة جارية'
-                                              : 'تعليم كجلسة جارية')
-                                          : (isCenterRequest
-                                              ? 'Mark residency in progress'
-                                              : 'Mark in progress'),
-                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                            ],
+                            if (hasFallbackActions)
+                              AppSectionPanel(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHighest
+                                    .withValues(alpha: 0.34),
+                                padding: EdgeInsets.zero,
+                                child: ExpansionTile(
+                                  initiallyExpanded: false,
+                                  tilePadding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.md,
                                   ),
-                                if (isCenterRequest &&
-                                    awaitingResidencyStart &&
-                                    (!centerArrivalConfirmed ||
-                                        !clientCheckInConfirmed))
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: AppSpacing.xs,
-                                    ),
-                                    child: Text(
-                                      isArabic
-                                          ? 'سيظهر بدء الإقامة بعد تأكيد الوصول من المركز وتأكيد البداية من الأسرة.'
-                                          : 'Residency start will appear after center arrival and family check-in confirmations.',
-                                    ),
+                                  childrenPadding: const EdgeInsets.fromLTRB(
+                                    AppSpacing.md,
+                                    0,
+                                    AppSpacing.md,
+                                    AppSpacing.md,
                                   ),
-                                if ((status == 'session_scheduled' ||
-                                        status == 'session_in_progress') &&
-                                    (!isCenterRequest ||
-                                        !awaitingResidencyStart))
-                                  FilledButton.tonalIcon(
-                                    onPressed: busy
-                                        ? null
-                                        : () => _markCompleted(requestId),
-                                    icon: const Icon(Icons.task_alt_outlined),
-                                    label: Text(
-                                      isArabic
-                                          ? (isCenterRequest
-                                              ? 'تعليم كإقامة مكتملة'
-                                              : 'تعليم كمكتملة')
-                                          : (isCenterRequest
-                                              ? 'Mark residency completed'
-                                              : 'Mark completed'),
-                                    ),
+                                  title: Text(
+                                    isArabic
+                                        ? 'إجراءات استثنائية / استرداد المسار'
+                                        : 'Fallback / Recovery Actions',
+                                    textAlign:
+                                        isArabic ? TextAlign.right : TextAlign.left,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                        ),
                                   ),
-                                if (status == 'session_scheduled' ||
-                                    status == 'session_in_progress')
-                                  OutlinedButton.icon(
-                                    onPressed: busy
-                                        ? null
-                                        : () => _moveToReschedule(requestId),
-                                    icon: const Icon(Icons.update_outlined),
-                                    label: Text(
-                                      isArabic ? 'إعادة جدولة' : 'Reschedule',
-                                    ),
+                                  subtitle: Text(
+                                    isArabic
+                                        ? 'تُستخدم هذه الإجراءات فقط عند الحاجة إلى تصحيح إداري أو استرداد المسار، وليست المسار التشغيلي المعتاد.'
+                                        : 'These actions are for admin correction or flow recovery only, not the normal operational path.',
+                                    textAlign:
+                                        isArabic ? TextAlign.right : TextAlign.left,
                                   ),
-                              ],
-                            ),
+                                  children: [
+                                    Wrap(
+                                      spacing: AppSpacing.sm,
+                                      runSpacing: AppSpacing.sm,
+                                      alignment: WrapAlignment.end,
+                                      children: [
+                                        if (canScheduleSessionFallback)
+                                          FilledButton.icon(
+                                            onPressed: busy
+                                                ? null
+                                                : () =>
+                                                    _scheduleSession(requestId),
+                                            icon: const Icon(
+                                              Icons.video_call_outlined,
+                                            ),
+                                            label: Text(
+                                              isArabic
+                                                  ? 'إنشاء/جدولة الجلسة'
+                                                  : 'Schedule session',
+                                            ),
+                                          ),
+                                        if (canMarkInProgressAction)
+                                          FilledButton.tonalIcon(
+                                            onPressed: busy
+                                                ? null
+                                                : () =>
+                                                    _markInProgress(requestId),
+                                            icon: const Icon(
+                                              Icons.play_circle_outline,
+                                            ),
+                                            label: Text(
+                                              isArabic
+                                                  ? (isCenterRequest
+                                                      ? 'تعليم كإقامة جارية'
+                                                      : 'تعليم كجلسة جارية')
+                                                  : (isCenterRequest
+                                                      ? 'Mark residency in progress'
+                                                      : 'Mark in progress'),
+                                            ),
+                                          ),
+                                        if (canShowResidencyStartHint)
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: AppSpacing.xs,
+                                            ),
+                                            child: Text(
+                                              isArabic
+                                                  ? 'سيظهر بدء الإقامة بعد تأكيد الوصول من المركز وتأكيد البداية من الأسرة.'
+                                                  : 'Residency start will appear after center arrival and family check-in confirmations.',
+                                            ),
+                                          ),
+                                        if (canMarkCompletedAction)
+                                          FilledButton.tonalIcon(
+                                            onPressed: busy
+                                                ? null
+                                                : () =>
+                                                    _markCompleted(requestId),
+                                            icon: const Icon(
+                                              Icons.task_alt_outlined,
+                                            ),
+                                            label: Text(
+                                              isArabic
+                                                  ? (isCenterRequest
+                                                      ? 'تعليم كإقامة مكتملة'
+                                                      : 'تعليم كمكتملة')
+                                                  : (isCenterRequest
+                                                      ? 'Mark residency completed'
+                                                      : 'Mark completed'),
+                                            ),
+                                          ),
+                                        if (canRescheduleAction)
+                                          OutlinedButton.icon(
+                                            onPressed: busy
+                                                ? null
+                                                : () =>
+                                                    _moveToReschedule(requestId),
+                                            icon:
+                                                const Icon(Icons.update_outlined),
+                                            label: Text(
+                                              isArabic
+                                                  ? 'إعادة جدولة'
+                                                  : 'Reschedule',
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
                           ],
                         ),
                       );
