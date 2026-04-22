@@ -103,6 +103,25 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
     return unitPrice * durationDays;
   }
 
+  String _centerCareLevelLabel(String value, bool isArabic) {
+    switch (value.trim()) {
+      case 'residential_psych':
+        return isArabic
+            ? 'إقامة نفسية داخلية'
+            : 'Residential psychiatric care';
+      case 'detox':
+        return isArabic ? 'سحب سموم ومتابعة' : 'Detox and monitoring';
+      case 'dual_diagnosis':
+        return isArabic ? 'رعاية مزدوجة' : 'Dual diagnosis care';
+      case 'diagnostic_observation':
+        return isArabic
+            ? 'ملاحظة تشخيصية داخلية'
+            : 'Diagnostic observation';
+      default:
+        return value.trim();
+    }
+  }
+
   Future<void> _updateRequestEverywhere(
     String requestId,
     Map<String, dynamic> updates,
@@ -638,6 +657,51 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                           (data['stayDurationReason'] ?? '').toString().trim();
                       final stayDurationIsPreliminary =
                           (data['stayDurationIsPreliminary'] ?? false) == true;
+                      final centerRecommendedCareLevel =
+                          (data['centerRecommendedCareLevel'] ?? '')
+                              .toString()
+                              .trim();
+                      final centerRecommendedStayDays =
+                          _asInt(data['centerRecommendedStayDays']);
+                      final centerNeedsInternalAssessment =
+                          (data['centerNeedsInternalAssessment'] ?? false) ==
+                              true;
+                      final selectedAccommodationLabel =
+                          (data['selectedAccommodationLabelAr'] ?? '')
+                              .toString()
+                              .trim();
+                      final selectedAccommodationPrice =
+                          _asDouble(data['selectedAccommodationPrice']);
+                      final selectedAccommodationPricingUnit =
+                          (data['selectedAccommodationPricingUnit'] ?? '')
+                              .toString()
+                              .trim();
+                      final contract = data['contract'];
+                      final rawContractRoom =
+                          contract is Map ? contract['room'] : null;
+                      final contractRoom =
+                          rawContractRoom is Map ? rawContractRoom : null;
+                      final contractRoomLabel = contractRoom == null
+                          ? ''
+                          : (contractRoom['label'] ?? '').toString().trim();
+                      final contractRoomPrice = contractRoom == null
+                          ? 0.0
+                          : _asDouble(contractRoom['price']);
+                      final contractPricingUnit = contractRoom == null
+                          ? ''
+                          : (contractRoom['pricingUnit'] ?? '')
+                              .toString()
+                              .trim();
+                      final existingQuoteAlready =
+                          (data['paymentQuotePreparedAt'] != null) ||
+                              (data['stayBaseAmount'] != null) ||
+                              (data['stayTaxAmount'] != null) ||
+                              (data['stayTotalAmount'] != null) ||
+                              (data['grossClientPaidAmount'] != null) ||
+                              ((data['paymentBreakdownText'] ?? '')
+                                  .toString()
+                                  .trim()
+                                  .isNotEmpty);
                       final clientReviewSubmitted =
                           (data['clientReviewSubmitted'] ?? false) == true;
                       final centerReviewSubmitted =
@@ -669,19 +733,25 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                       final durationCtrl = _controllerFor(
                         _durationControllers,
                         requestId,
-                        initial: (data['stayDurationDays'] ?? '').toString(),
+                        initial: stayDurationDays.isNotEmpty
+                            ? stayDurationDays
+                            : (!existingQuoteAlready &&
+                                    centerRecommendedStayDays > 0)
+                                ? centerRecommendedStayDays.toString()
+                                : '',
                       );
+                      if (isCenterRequest &&
+                          !existingQuoteAlready &&
+                          stayDurationDays.isEmpty &&
+                          durationCtrl.text.trim().isEmpty &&
+                          centerRecommendedStayDays > 0) {
+                        durationCtrl.text = centerRecommendedStayDays.toString();
+                      }
                       final durationReasonCtrl = _controllerFor(
                         _durationReasonControllers,
                         requestId,
                         initial: (data['stayDurationReason'] ?? '').toString(),
                       );
-                      final selectedAccommodationPrice =
-                          _asDouble(data['selectedAccommodationPrice']);
-                      final selectedAccommodationPricingUnit =
-                          (data['selectedAccommodationPricingUnit'] ?? '')
-                              .toString()
-                              .trim();
                       final enteredDurationDays = _asInt(
                           durationCtrl.text.trim().isEmpty
                               ? data['stayDurationDays']
@@ -691,6 +761,48 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                       final computedTaxAmount = computedBaseAmount * 0.10;
                       final computedTotalAmount =
                           computedBaseAmount + computedTaxAmount;
+                      final setupWarnings = <String>[
+                        if (isCenterRequest &&
+                            centerRecommendedStayDays <= 0)
+                          isArabic
+                              ? 'لا توجد مدة موصى بها من المركز.'
+                              : 'No center-recommended duration is available.',
+                        if (isCenterRequest &&
+                            centerRecommendedStayDays > 0 &&
+                            enteredDurationDays > 0 &&
+                            enteredDurationDays != centerRecommendedStayDays)
+                          isArabic
+                              ? 'مدة التجهيز تختلف عن مدة توصية المركز.'
+                              : 'Setup duration differs from the center recommendation.',
+                        if (isCenterRequest &&
+                            (selectedAccommodationPrice <= 0 ||
+                                selectedAccommodationPricingUnit.isEmpty))
+                          isArabic
+                              ? 'بيانات تسعير الإقامة غير مكتملة.'
+                              : 'Accommodation pricing data is incomplete.',
+                        if (isCenterRequest &&
+                            contractRoom != null &&
+                            ((contractRoomLabel.isNotEmpty &&
+                                    selectedAccommodationLabel.isNotEmpty &&
+                                    contractRoomLabel !=
+                                        selectedAccommodationLabel) ||
+                                (contractRoomPrice > 0 &&
+                                    selectedAccommodationPrice > 0 &&
+                                    contractRoomPrice !=
+                                        selectedAccommodationPrice) ||
+                                (contractPricingUnit.isNotEmpty &&
+                                    selectedAccommodationPricingUnit
+                                        .isNotEmpty &&
+                                    contractPricingUnit !=
+                                        selectedAccommodationPricingUnit)))
+                          isArabic
+                              ? 'بيانات الإقامة المختارة تختلف عن مسودة العقد.'
+                              : 'Selected accommodation differs from the contract draft.',
+                        if (isCenterRequest && existingQuoteAlready)
+                          isArabic
+                              ? 'يوجد تجهيز سابق محفوظ؛ لن يتم استخدام الملء التلقائي.'
+                              : 'Existing setup already exists; pre-fill is not applied.',
+                      ];
                       final linkCtrl = _controllerFor(
                         _linkControllers,
                         requestId,
@@ -829,6 +941,78 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                               ),
                               const SizedBox(height: AppSpacing.sm),
                               if (isCenterRequest) ...[
+                                Container(
+                                  width: double.infinity,
+                                  padding:
+                                      const EdgeInsets.all(AppSpacing.sm),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .surfaceContainerHighest
+                                        .withValues(alpha: 0.45),
+                                    borderRadius: BorderRadius.circular(
+                                      AppRadii.md,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: isArabic
+                                        ? CrossAxisAlignment.end
+                                        : CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        isArabic
+                                            ? 'سياق التجهيز المقترح'
+                                            : 'Suggested setup context',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelLarge
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                      ),
+                                      if (centerRecommendedCareLevel.isNotEmpty)
+                                        Text(
+                                          isArabic
+                                              ? 'توصية المركز: ${_centerCareLevelLabel(centerRecommendedCareLevel, isArabic)}'
+                                              : 'Center recommendation: ${_centerCareLevelLabel(centerRecommendedCareLevel, isArabic)}',
+                                        ),
+                                      if (centerRecommendedStayDays > 0)
+                                        Text(
+                                          isArabic
+                                              ? 'مدة موصى بها: $centerRecommendedStayDays يوم'
+                                              : 'Recommended duration: $centerRecommendedStayDays day(s)',
+                                        ),
+                                      Text(
+                                        isArabic
+                                            ? 'يحتاج تقييمًا داخليًا: ${centerNeedsInternalAssessment ? 'نعم' : 'لا'}'
+                                            : 'Needs internal assessment: ${centerNeedsInternalAssessment ? 'Yes' : 'No'}',
+                                      ),
+                                      if (selectedAccommodationLabel.isNotEmpty)
+                                        Text(
+                                          isArabic
+                                              ? 'الإقامة المختارة: $selectedAccommodationLabel'
+                                              : 'Selected accommodation: $selectedAccommodationLabel',
+                                        ),
+                                      if (selectedAccommodationPrice > 0 ||
+                                          selectedAccommodationPricingUnit
+                                              .isNotEmpty)
+                                        Text(
+                                          isArabic
+                                              ? 'تسعير الإقامة: ${selectedAccommodationPrice.toStringAsFixed(selectedAccommodationPrice.truncateToDouble() == selectedAccommodationPrice ? 0 : 2)} / $selectedAccommodationPricingUnit'
+                                              : 'Accommodation pricing: ${selectedAccommodationPrice.toStringAsFixed(selectedAccommodationPrice.truncateToDouble() == selectedAccommodationPrice ? 0 : 2)} / $selectedAccommodationPricingUnit',
+                                        ),
+                                      if (contractRoomLabel.isNotEmpty ||
+                                          contractRoomPrice > 0 ||
+                                          contractPricingUnit.isNotEmpty)
+                                        Text(
+                                          isArabic
+                                              ? 'مسودة العقد: ${contractRoomLabel.isEmpty ? '-' : contractRoomLabel} | ${contractRoomPrice.toStringAsFixed(contractRoomPrice.truncateToDouble() == contractRoomPrice ? 0 : 2)} / $contractPricingUnit'
+                                              : 'Contract draft: ${contractRoomLabel.isEmpty ? '-' : contractRoomLabel} | ${contractRoomPrice.toStringAsFixed(contractRoomPrice.truncateToDouble() == contractRoomPrice ? 0 : 2)} / $contractPricingUnit',
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.sm),
                                 TextField(
                                   controller: endDateCtrl,
                                   decoration: appInputDecoration(
@@ -872,6 +1056,43 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                       ? 'هذه المدة مبدئية حتى تقييم الحالة عند الاستقبال داخل المركز.'
                                       : 'This duration is preliminary until the intake assessment at the center.',
                                 ),
+                                if (setupWarnings.isNotEmpty) ...[
+                                  const SizedBox(height: AppSpacing.sm),
+                                  Container(
+                                    width: double.infinity,
+                                    padding:
+                                        const EdgeInsets.all(AppSpacing.sm),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFFF3CD),
+                                      border: Border.all(
+                                        color: const Color(0xFFE0A800),
+                                      ),
+                                      borderRadius: BorderRadius.circular(
+                                        AppRadii.md,
+                                      ),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: isArabic
+                                          ? CrossAxisAlignment.end
+                                          : CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          isArabic
+                                              ? 'تنبيهات غير مانعة'
+                                              : 'Non-blocking warnings',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelLarge
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                        ),
+                                        for (final warning in setupWarnings)
+                                          Text('- $warning'),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                                 if (selectedAccommodationPrice > 0 &&
                                     enteredDurationDays > 0) ...[
                                   const SizedBox(height: AppSpacing.sm),
@@ -895,8 +1116,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     isArabic
-                                        ? 'الإجمالي المستحق: ${computedTotalAmount.toStringAsFixed(2)}'
-                                        : 'Total due: ${computedTotalAmount.toStringAsFixed(2)}',
+                                        ? 'المبلغ المطلوب من العميل: ${computedTotalAmount.toStringAsFixed(2)}'
+                                        : 'Gross client-paid amount: ${computedTotalAmount.toStringAsFixed(2)}',
                                   ),
                                 ],
                                 const SizedBox(height: AppSpacing.sm),
@@ -1107,10 +1328,10 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                     label: Text(
                                       isArabic
                                           ? (isCenterRequest
-                                              ? 'حفظ الجدولة وإرسال بيان الدفع'
+                                              ? 'تأكيد التجهيز وفتح الدفع'
                                               : 'إنشاء/جدولة الجلسة')
                                           : (isCenterRequest
-                                              ? 'Save schedule & send payment quote'
+                                              ? 'Confirm setup and open payment'
                                               : 'Schedule session'),
                                     ),
                                   ),
