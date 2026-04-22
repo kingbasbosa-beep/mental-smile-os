@@ -193,6 +193,17 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
                 : 'This conversation was escalated from the AI system and is now under human supervision.',
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
           ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            isArabic
+                ? 'يرجى الرد للإرشاد فقط، وتحويل أي طلب تغييري إلى الإجراءات داخل النظام.'
+                : 'Respond for guidance only. Redirect operational requests to system actions.',
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.obsidian.withValues(alpha: 0.72),
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
         ],
       ),
     );

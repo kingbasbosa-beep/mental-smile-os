@@ -962,6 +962,20 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                     .titleSmall
                                     ?.copyWith(fontWeight: FontWeight.w800),
                               ),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                isArabic
+                                    ? 'مراجعة التجهيز خطوة تحقق قبل فتح الدفع، وليست ملكية تشغيلية عادية للإدارة.'
+                                    : 'Setup review is a verification step before payment opening, not normal admin operational ownership.',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: AppColors.obsidian
+                                          .withValues(alpha: 0.72),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
                               const SizedBox(height: AppSpacing.sm),
                               TextField(
                                 controller: dateCtrl,
@@ -1149,6 +1163,20 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                     isArabic
                                         ? 'سيؤدي التأكيد إلى إرسال بيان الدفع للعميل، وليس اعتماد الدفع.'
                                         : 'Confirming sends the payment quote to the client; it does not approve payment.',
+                                  ),
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    isArabic
+                                        ? 'هذه بوابة مالية تحت إشراف الإدارة، وليست اعتمادًا للدفع أو تنفيذًا للرعاية.'
+                                        : 'This is an admin-supervised financial gate, not payment approval or care execution.',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                          color: AppColors.obsidian
+                                              .withValues(alpha: 0.72),
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                   ),
                                   const SizedBox(height: AppSpacing.sm),
                                   Text(
@@ -1360,6 +1388,23 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                 isArabic
                                     ? 'تقييم الأخصائي: ${clinicianReviewSubmitted ? 'تم' : 'بانتظار الإرسال'}'
                                     : 'Clinician review: ${clinicianReviewSubmitted ? 'submitted' : 'pending'}',
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                            ],
+                            if (status == 'session_scheduled' ||
+                                status == 'session_in_progress') ...[
+                              Text(
+                                isArabic
+                                    ? 'أوامر التنفيذ هنا مخصصة للتصحيح أو الاسترداد من غرفة التحكم، وليست المسار التشغيلي الطبيعي.'
+                                    : 'Execution actions here are for control-room correction or recovery, not the normal operational path.',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: AppColors.obsidian
+                                          .withValues(alpha: 0.72),
+                                      fontWeight: FontWeight.w700,
+                                    ),
                               ),
                               const SizedBox(height: AppSpacing.sm),
                             ],

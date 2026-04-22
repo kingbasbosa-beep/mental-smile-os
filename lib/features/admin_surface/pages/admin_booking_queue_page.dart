@@ -2388,6 +2388,47 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                 value: accountingReviewNotes,
               ),
               const SizedBox(height: 12),
+              if (canMoveCenterToFollowUp ||
+                  canOpenCenterIntake ||
+                  canApproveCenter) ...[
+                Text(
+                  isArabic
+                      ? 'إجراءات المركز هنا جسور خفيفة من غرفة التحكم لتقليل التعطل، وليست ملكية تشغيلية دائمة للإدارة.'
+                      : 'Center actions here are admin-light control-room bridges to prevent stalls, not permanent admin operational ownership.',
+                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.obsidian.withValues(alpha: 0.72),
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                const SizedBox(height: 8),
+              ],
+              if (canReturnCenterToClient || canReturnToPending) ...[
+                Text(
+                  isArabic
+                      ? 'إجراءات الإرجاع مخصصة للاستثناء أو الاسترداد فقط عند تعذر استمرار المسار المنظم.'
+                      : 'Return actions are exception/recovery controls only when the structured path cannot continue.',
+                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.obsidian.withValues(alpha: 0.72),
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(height: 8),
+              ],
+              if (canAssignClinician) ...[
+                Text(
+                  isArabic
+                      ? 'تحويل الأخصائي هنا مسار توافق قديم فقط؛ المسار الطبيعي الجديد يدخل مباشرة للأخصائي.'
+                      : 'Clinician forwarding here is legacy compatibility only; the normal path now enters directly to the clinician.',
+                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.obsidian.withValues(alpha: 0.72),
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                const SizedBox(height: 8),
+              ],
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
