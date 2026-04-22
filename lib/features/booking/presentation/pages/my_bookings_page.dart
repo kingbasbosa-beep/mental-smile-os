@@ -96,6 +96,150 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     return null;
   }
 
+  Map<String, dynamic> _asStringMap(dynamic value) {
+    if (value is Map<String, dynamic>) {
+      return Map<String, dynamic>.from(value);
+    }
+    if (value is Map) {
+      return value.map((key, item) => MapEntry(key.toString(), item));
+    }
+    return <String, dynamic>{};
+  }
+
+  Future<void> _createCenterRequestFromExisting(
+    BuildContext context,
+    String oldRequestId,
+    Map<String, dynamic> source,
+  ) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user?.uid ?? '';
+    if (uid.isEmpty) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('إنشاء طلب جديد من هذا الطلب'),
+        content: const Text(
+          'سيتم إنشاء طلب جديد بنفس بيانات المركز والإقامة، ولن يتم تعديل الطلب الحالي.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('إلغاء'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('إنشاء طلب جديد'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    final firestore = FirebaseFirestore.instance;
+    final createdAt = Timestamp.now();
+    final requestGroupId = firestore.collection('booking_requests').doc().id;
+    final selectedAccommodationPricingSnapshot =
+        _asStringMap(source['selectedAccommodationPricingSnapshot']);
+    final selectedAccommodationKey =
+        (source['selectedAccommodationKey'] ?? '').toString();
+    final selectedAccommodationLabelAr =
+        (source['selectedAccommodationLabelAr'] ?? '').toString();
+    final selectedAccommodationPricingUnit =
+        (source['selectedAccommodationPricingUnit'] ?? '').toString();
+    final selectedAccommodationPrice =
+        (source['selectedAccommodationPrice'] is num)
+            ? (source['selectedAccommodationPrice'] as num).toDouble()
+            : 0.0;
+    final centerId = (source['centerId'] ?? '').toString();
+    final centerName = (source['centerName'] ?? '').toString();
+    if (centerId.trim().isEmpty || centerName.trim().isEmpty) return;
+    final contractDraft = <String, dynamic>{
+      'status': 'draft',
+      'version': 1,
+      'room': {
+        'key': selectedAccommodationKey,
+        'label': selectedAccommodationLabelAr,
+        'price': selectedAccommodationPrice,
+        'pricingUnit': selectedAccommodationPricingUnit,
+        'snapshot': selectedAccommodationPricingSnapshot,
+      },
+      'duration': {
+        'basis': 'external_diagnosis',
+      },
+      'pricing': {
+        'baseAmount': selectedAccommodationPrice,
+      },
+      'meta': {
+        'source': 'center_request_copy_v1',
+        'createdAt': createdAt,
+      },
+    };
+
+    final requestRef = firestore.collection('booking_requests').doc();
+    await requestRef.set(<String, dynamic>{
+      'requestKind': 'center',
+      'requestGroupId': requestGroupId,
+      'clientId': uid,
+      'clientName': (user?.displayName ?? user?.email ?? 'Client').trim(),
+      'centerId': centerId,
+      'centerName': centerName,
+      'selectedCenterType': (source['selectedCenterType'] ?? '').toString(),
+      'centerHasDetoxUnit': (source['centerHasDetoxUnit'] ?? false) == true,
+      'status': 'pending_admin',
+      'workflowStage': 'pending_admin',
+      'createdAt': createdAt,
+      'updatedAt': createdAt,
+      'note': (source['note'] ?? '').toString(),
+      'adminApproved': false,
+      'adminRejected': false,
+      'adminForwarded': false,
+      'adminDecisionType': '',
+      'adminDecisionBy': '',
+      'adminDecisionAt': null,
+      'adminAssignedBy': '',
+      'adminAssignedAt': null,
+      'paymentStatus': 'not_started',
+      'sessionStatus': 'not_created',
+      'reviewStatus': 'not_started',
+      'payoutStatus': 'blocked',
+      'assignedClinicianId': '',
+      'assignedClinicianName': '',
+      'clinicianId': '',
+      'clinicianName': '',
+      'clinicianUid': '',
+      'centerAvailabilityStatus': 'pending',
+      'centerAvailabilityNote': '',
+      'centerAvailabilityRespondedAt': null,
+      'centerAvailabilityRespondedBy': '',
+      'centerSuggestedAlternativeKey': '',
+      'centerSuggestedAlternativeLabelAr': '',
+      'selectedAccommodationKey': selectedAccommodationKey,
+      'selectedAccommodationLabelAr': selectedAccommodationLabelAr,
+      'selectedAccommodationPricingSnapshot':
+          selectedAccommodationPricingSnapshot,
+      'selectedAccommodationPrice': selectedAccommodationPrice,
+      'selectedAccommodationPricingUnit': selectedAccommodationPricingUnit,
+      'contract': contractDraft,
+      'lastCenterAvailabilityStatus': '',
+      'lastCenterAvailabilityNote': '',
+      'lastCenterSuggestedAlternativeKey': '',
+      'lastCenterSuggestedAlternativeLabelAr': '',
+      'clientRevisionNumber': 0,
+      'lastCenterFeedbackRevisionNumber': 0,
+      'clientUpdatedAfterCenterFeedback': false,
+      'adminCanApproveWithoutCenterRecheck': false,
+      'targetAdminIds': source['targetAdminIds'] ?? const <String>[],
+      'targetAdminNames': source['targetAdminNames'] ?? const <String>[],
+      'replacesRequestId': oldRequestId,
+    });
+
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('تم إنشاء طلب مركز جديد')),
+    );
+  }
+
   Future<Map<String, dynamic>?> _showIntakeDialog(
     BuildContext context,
     Map<String, dynamic> requestData,
@@ -799,6 +943,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                     d['clinicianName'] ??
                                     '')
                                 .toString();
+                            final centerId = (d['centerId'] ?? '').toString();
                             final centerName =
                                 (d['centerName'] ?? '').toString();
                             final status = (d['status'] ?? '').toString();
@@ -950,6 +1095,29 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                               Icons.upload_file_outlined),
                                           label:
                                               const Text('رفع إثبات التحويل'),
+                                        ),
+                                      ),
+                                    ],
+                                    if (isCenter) ...[
+                                      const SizedBox(height: 12),
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: OutlinedButton.icon(
+                                          onPressed: centerId.trim().isEmpty ||
+                                                  centerName.trim().isEmpty
+                                              ? null
+                                              : () =>
+                                                  _createCenterRequestFromExisting(
+                                                    context,
+                                                    visibleDocs[i].id,
+                                                    d,
+                                                  ),
+                                          icon: const Icon(
+                                            Icons.copy_all_outlined,
+                                          ),
+                                          label: const Text(
+                                            'إنشاء طلب جديد من هذا الطلب',
+                                          ),
                                         ),
                                       ),
                                     ],
