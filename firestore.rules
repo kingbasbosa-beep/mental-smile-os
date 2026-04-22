@@ -326,6 +326,36 @@ service cloud.firestore {
         && request.resource.data.createdAt == resource.data.createdAt;
     }
 
+    function centerQuoteFrozenGuardValid() {
+      return !(
+          resource.data.keys().hasAny(['contract'])
+          && resource.data.contract.snapshotLocked == true
+        )
+        || (
+          request.resource.data.keys().hasAny(['contract'])
+          && request.resource.data.contract == resource.data.contract
+          && quoteFieldUnchanged('stayStartDateText')
+          && quoteFieldUnchanged('stayEndDateText')
+          && quoteFieldUnchanged('stayDurationDays')
+          && quoteFieldUnchanged('stayUnitPrice')
+          && quoteFieldUnchanged('stayPricingUnit')
+          && quoteFieldUnchanged('stayBaseAmount')
+          && quoteFieldUnchanged('stayTaxPercent')
+          && quoteFieldUnchanged('stayTaxAmount')
+          && quoteFieldUnchanged('stayTotalAmount')
+          && quoteFieldUnchanged('grossClientPaidAmount')
+          && quoteFieldUnchanged('paymentBreakdownText')
+        );
+    }
+
+    function quoteFieldUnchanged(fieldName) {
+      return !resource.data.keys().hasAny([fieldName])
+        || (
+          request.resource.data.keys().hasAny([fieldName])
+          && request.resource.data[fieldName] == resource.data[fieldName]
+        );
+    }
+
     function clientPaymentProofUpdateValid() {
       return request.auth != null
         && request.auth.uid == resource.data.clientId
@@ -2070,7 +2100,8 @@ service cloud.firestore {
       allow create: if clinicianBookingCreateValid()
         || centerBookingCreateValid();
 
-      allow update: if adminCenterFollowUpBridgeValid()
+      allow update: if centerQuoteFrozenGuardValid() && (
+        adminCenterFollowUpBridgeValid()
         || adminCenterReturnToClientBridgeValid()
         || adminCenterApproveBridgeValid()
         || adminCenterScheduleBridgeValid()
@@ -2117,7 +2148,8 @@ service cloud.firestore {
         || clinicianUpdateValid()
         || clientReviewUpdateValid()
         || clinicianReviewUpdateValid()
-        || centerReviewUpdateValid();
+        || centerReviewUpdateValid()
+      );
 
       allow delete: if false;
     }
