@@ -2,8 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/ui/app_design_system.dart';
-import 'package:flutterprojects/core/ui/app_shell_actions.dart';
+import 'package:flutterprojects/shared/contracts/role_names.dart';
+import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
+import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class ClientDashboardPage extends StatelessWidget {
   const ClientDashboardPage({super.key});
@@ -190,8 +193,9 @@ class ClientDashboardPage extends StatelessWidget {
   }
 
   String _readAccountType(bool isArabic, Map<String, dynamic>? data) {
-    final role = (data?['role'] ?? 'client').toString().trim().toLowerCase();
-    if (role == 'client') {
+    final role =
+        (data?['role'] ?? RoleNames.client).toString().trim().toLowerCase();
+    if (role == RoleNames.client) {
       return isArabic ? 'عميل' : 'Client';
     }
     return role;
@@ -200,6 +204,15 @@ class ClientDashboardPage extends StatelessWidget {
   String _readPhone(Map<String, dynamic>? data) {
     if (data == null) return '';
     return (data['phone'] ?? data['phoneNumber'] ?? '').toString().trim();
+  }
+
+  String _readAvatarAsset(Map<String, dynamic>? data) {
+    if (data == null) return '';
+    final value = (data['avatarAsset'] ?? '').toString().trim();
+    if (value.startsWith('assets/assets/')) {
+      return value.replaceFirst('assets/assets/', 'assets/');
+    }
+    return value;
   }
 
   String _readCity(Map<String, dynamic>? data) {
@@ -244,11 +257,15 @@ class ClientDashboardPage extends StatelessWidget {
               final name = _readName(data);
               final email = _readEmail(data);
               final phone = _readPhone(data);
+              final avatarAsset = _readAvatarAsset(data);
               final city = _readCity(data);
               final statusLabel = _readStatusLabel(isArabic, data);
               final accountType = _readAccountType(isArabic, data);
               final notes = _readNotes(data, isArabic);
               final isActive = _readIsActive(data);
+              debugPrint('CLIENT_DASHBOARD avatarAsset=$avatarAsset');
+              debugPrint('CLIENT_DASHBOARD name=$name');
+              debugPrint('CLIENT_DASHBOARD data=$data');
 
               return ListView(
                 padding: const EdgeInsets.all(AppSpacing.lg),
@@ -263,14 +280,29 @@ class ClientDashboardPage extends StatelessWidget {
                           radius: 32,
                           backgroundColor:
                               AppColors.deepTeal.withValues(alpha: 0.12),
-                          child: Text(
-                            _initials(name),
-                            style: TextStyle(
-                              color: AppColors.deepTeal,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 20,
-                            ),
-                          ),
+                          child: avatarAsset.isNotEmpty
+                              ? ClipOval(
+                                  child: Image.asset(
+                                    normalizeAssetPath(avatarAsset),
+                                    width: 64,
+                                    height: 64,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const AppMissingAssetPlaceholder(
+                                      width: 64,
+                                      height: 64,
+                                    ),
+                                  ),
+                                )
+                              : Text(
+                                  _initials(name),
+                                  style: TextStyle(
+                                    color: AppColors.deepTeal,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 20,
+                                  ),
+                                ),
                         ),
                         const SizedBox(width: 14),
                         Expanded(

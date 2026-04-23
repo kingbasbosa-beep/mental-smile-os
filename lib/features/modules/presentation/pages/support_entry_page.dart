@@ -1,110 +1,125 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/ui/app_shell_actions.dart';
+import 'package:flutterprojects/shared/analytics/app_analytics.dart';
+import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
+import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class SupportEntryPage extends StatelessWidget {
   const SupportEntryPage.addiction({super.key})
-      : _titleAr = 'دعم المدمن المتعافي',
-        _titleEn = 'Recovered Addict Support',
+      : _titleAr = 'ابدأ مسار دعم التعافي',
+        _titleEn = 'Start Recovery Support',
         _subtitleAr =
-            'مسار هادئ وآمن للدعم اليومي، طلب المساندة، والوصول إلى المختصين والمراكز بدون وصم أو تهويل.',
+            'نقطة بداية هادئة لاختيار الدعم المناسب: مختص، مركز، مواد مفيدة، أو شات عند الحاجة.',
         _subtitleEn =
-            'A calm, safe path for daily support, asking for help, and reaching specialists and centers without shame or alarm.',
+            'A calm starting point to choose support: specialist, center, helpful materials, or chat when needed.',
+        _chatEntryContext = 'recovery_support',
         _accent = const Color(0xFFE58667),
-        _heroAsset = 'assets/c7_branding/home/hero_art.png',
+        _heroAsset = 'c7_branding/home/hero_art.png',
         _cards = const [
           _SupportPathCard(
-            titleAr: 'أخصائي السلوكيات الإدمانية',
-            titleEn: 'Addiction counselor',
-            bodyAr: 'ابدأ بطلب جلسة مع مختص مناسب لحالتك وخطتك الحالية.',
+            titleAr: 'ابحث عن مختص',
+            titleEn: 'Find a specialist',
+            bodyAr: 'استعرض مختصين مناسبين واختر ما يلائم احتياجك الحالي.',
             bodyEn:
-                'Start by requesting a session with a specialist suited to your current recovery stage.',
+                'Browse suitable specialists and choose what fits your current need.',
             icon: Icons.healing_outlined,
             route: Routes.specialistsList,
+            analyticsPath: 'specialist',
             arguments: {
               'category': 'addiction',
               'title': 'علاج السلوكيات الإدمانية',
             },
           ),
           _SupportPathCard(
-            titleAr: 'المراكز وبرامج المتابعة',
-            titleEn: 'Centers and follow-up',
+            titleAr: 'استكشف المراكز',
+            titleEn: 'Explore centers',
             bodyAr:
-                'استعرض المراكز المتاحة وخدمات الدعم أو الإقامة عند الحاجة.',
+                'استعرض المراكز المتاحة وخيارات الدعم أو الإقامة عند الحاجة.',
             bodyEn:
-                'Browse available centers and support or residential care when needed.',
+                'Browse available centers and support or residential options when needed.',
             icon: Icons.apartment_outlined,
             route: Routes.centers,
+            analyticsPath: 'center',
           ),
           _SupportPathCard(
-            titleAr: 'مكتبة التعافي',
-            titleEn: 'Recovery library',
-            bodyAr: 'مواد توعوية وتمارين تساعد على الاستمرار واستعادة الاتزان.',
+            titleAr: 'مواد مفيدة',
+            titleEn: 'Helpful materials',
+            bodyAr: 'مواد توعوية وتمارين بسيطة تساعدك على الفهم والاتزان.',
             bodyEn:
-                'Guides and exercises to support stability and steady recovery.',
+                'Guides and simple exercises that support clarity and stability.',
             icon: Icons.auto_stories_outlined,
             route: Routes.library,
+            analyticsPath: 'library',
           ),
           _SupportPathCard(
-            titleAr: 'شات الدعم الهادئ',
-            titleEn: 'Support chat',
+            titleAr: 'تحدث مع الدعم عند الحاجة',
+            titleEn: 'Talk to support when needed',
             bodyAr:
-                'ابدأ محادثة داعمة وآمنة، ومع ارتفاع الخطر يتم التصعيد للمراجعة البشرية.',
+                'ابدأ محادثة داعمة وآمنة إذا احتجت إلى توجيه أو مساندة.',
             bodyEn:
-                'Start a safe supportive conversation, with human escalation when risk rises.',
+                'Start a safe supportive conversation if you need guidance or help.',
             icon: Icons.chat_bubble_outline_rounded,
             route: Routes.chat,
+            analyticsPath: 'chat',
+            arguments: {'entryContext': 'recovery_support'},
           ),
         ];
 
   const SupportEntryPage.specialNeeds({super.key})
-      : _titleAr = 'رعاية أسر ذوي الاحتياجات الخاصة',
-        _titleEn = 'Special Needs Family Care',
+      : _titleAr = 'ابدأ مسار دعم الأسرة',
+        _titleEn = 'Start Family Support',
         _subtitleAr =
-            'مسار أسري داعم يساعد على الفهم، التنظيم، وطلب المساندة المناسبة للأسرة والطفل خطوة بخطوة.',
+            'نقطة بداية للأسرة لاختيار الدعم المناسب: مختص، مركز، مواد مفيدة، أو شات عند الحاجة.',
         _subtitleEn =
-            'A family-aware support path for understanding, organizing, and requesting the right help for both family and child.',
+            'A starting point for families to choose support: specialist, center, helpful materials, or chat when needed.',
+        _chatEntryContext = 'family_support',
         _accent = const Color(0xFF37B8B0),
-        _heroAsset = 'assets/c7_branding/home/hero_art.png',
+        _heroAsset = 'c7_branding/home/hero_art.png',
         _cards = const [
           _SupportPathCard(
-            titleAr: 'ابدأ مع الأخصائيين',
-            titleEn: 'Start with specialists',
+            titleAr: 'ابحث عن مختص',
+            titleEn: 'Find a specialist',
             bodyAr:
-                'استعرض الأخصائيين المناسبين واختر المسار الأقرب لاحتياج الأسرة.',
+                'استعرض مختصين مناسبين واختر ما يلائم احتياج الأسرة الآن.',
             bodyEn:
-                'Browse suitable specialists and choose the path closest to your family needs.',
+                'Browse suitable specialists and choose what fits your family needs now.',
             icon: Icons.psychology_alt_outlined,
             route: Routes.specialists,
+            analyticsPath: 'specialist',
           ),
           _SupportPathCard(
-            titleAr: 'مراكز وخدمات مساندة',
-            titleEn: 'Centers and support services',
+            titleAr: 'استكشف المراكز',
+            titleEn: 'Explore centers',
             bodyAr:
-                'اعرض المراكز والخدمات المتاحة للحالات التي تحتاج رعاية أوسع.',
+                'استعرض المراكز والخدمات المتاحة إذا كانت الأسرة تحتاج خيارات أوسع.',
             bodyEn:
-                'Explore centers and services for cases that need broader support.',
+                'Explore centers and services when the family needs broader options.',
             icon: Icons.local_hospital_outlined,
             route: Routes.centers,
+            analyticsPath: 'center',
           ),
           _SupportPathCard(
-            titleAr: 'مواد إرشادية للأسرة',
-            titleEn: 'Family guidance library',
-            bodyAr: 'محتوى داعم يساعد الأسرة على الفهم والاتزان اليومي.',
+            titleAr: 'مواد مفيدة',
+            titleEn: 'Helpful materials',
+            bodyAr: 'محتوى داعم يساعد الأسرة على الفهم والاتزان.',
             bodyEn:
-                'Supportive content that helps families build clarity and daily stability.',
+                'Supportive content that helps families build clarity and stability.',
             icon: Icons.menu_book_outlined,
             route: Routes.library,
+            analyticsPath: 'library',
           ),
           _SupportPathCard(
-            titleAr: 'شات للدعم والمتابعة',
-            titleEn: 'Support and follow-up chat',
+            titleAr: 'تحدث مع الدعم عند الحاجة',
+            titleEn: 'Talk to support when needed',
             bodyAr:
-                'ابدأ محادثة داعمة لفهم الخطوة التالية وطلب المتابعة عند الحاجة.',
+                'ابدأ محادثة داعمة لفهم الخطوة التالية أو طلب مساندة بسيطة.',
             bodyEn:
-                'Start a supportive chat to clarify your next step and request follow-up when needed.',
+                'Start a supportive chat to clarify your next step or ask for simple help.',
             icon: Icons.support_agent_outlined,
             route: Routes.chat,
+            analyticsPath: 'chat',
+            arguments: {'entryContext': 'family_support'},
           ),
         ];
 
@@ -112,9 +127,14 @@ class SupportEntryPage extends StatelessWidget {
   final String _titleEn;
   final String _subtitleAr;
   final String _subtitleEn;
+  final String _chatEntryContext;
   final Color _accent;
   final String _heroAsset;
   final List<_SupportPathCard> _cards;
+
+  Map<String, dynamic> get _chatEntryArguments => {
+        'entryContext': _chatEntryContext,
+      };
 
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
@@ -134,7 +154,7 @@ class SupportEntryPage extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             Image.asset(
-              'assets/c7_branding/home/home_bg.png',
+              normalizeAssetPath('assets/c7_branding/home/home_bg.png'),
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(color: const Color(0xFFF4EFF6));
@@ -144,6 +164,7 @@ class SupportEntryPage extends StatelessWidget {
             ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                _ModuleEntryLogger(module: _chatEntryContext),
                 _ModuleHero(
                   title: title,
                   subtitle: subtitle,
@@ -191,8 +212,8 @@ class SupportEntryPage extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         isArabic
-                            ? 'يمكنك البدء من الشات، المختصين، المراكز، أو المواد الإرشادية حسب احتياجك الحالي.'
-                            : 'You can begin from chat, specialists, centers, or guidance content depending on your current need.',
+                            ? 'اختر المسار الأنسب الآن: شات، مختص، مركز، أو مواد مفيدة.'
+                            : 'Choose the most helpful path now: chat, specialist, center, or helpful materials.',
                         textAlign: isArabic ? TextAlign.right : TextAlign.left,
                       ),
                     ],
@@ -223,6 +244,7 @@ class SupportEntryPage extends StatelessWidget {
                         final item = _cards[index];
                         return _PathCardTile(
                           item: item,
+                          module: _chatEntryContext,
                           isArabic: isArabic,
                           accent: _accent,
                         );
@@ -236,9 +258,18 @@ class SupportEntryPage extends StatelessWidget {
                     Expanded(
                       child: _HeroActionButton(
                         label: isArabic ? 'فتح الشات' : 'Open chat',
-                        asset: 'assets/c7_branding/buttons/primary_button.png',
-                        onTap: () =>
-                            Navigator.of(context).pushNamed(Routes.chat),
+                        asset: 'c7_branding/buttons/primary_button.png',
+                        onTap: () {
+                          AppAnalytics.logPathSelected(
+                            _chatEntryContext,
+                            'chat',
+                          );
+                          AppAnalytics.logChatOpened(_chatEntryContext);
+                          Navigator.of(context).pushNamed(
+                            Routes.chat,
+                            arguments: _chatEntryArguments,
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -247,8 +278,7 @@ class SupportEntryPage extends StatelessWidget {
                         label: isArabic
                             ? 'استعرض الأخصائيين'
                             : 'Browse specialists',
-                        asset:
-                            'assets/c7_branding/buttons/secondary_button.png',
+                        asset: 'c7_branding/buttons/secondary_button.png',
                         onTap: () =>
                             Navigator.of(context).pushNamed(Routes.specialists),
                       ),
@@ -272,6 +302,7 @@ class _SupportPathCard {
     required this.bodyEn,
     required this.icon,
     required this.route,
+    required this.analyticsPath,
     this.arguments,
   });
 
@@ -281,7 +312,28 @@ class _SupportPathCard {
   final String bodyEn;
   final IconData icon;
   final String route;
+  final String analyticsPath;
   final Map<String, dynamic>? arguments;
+}
+
+class _ModuleEntryLogger extends StatefulWidget {
+  const _ModuleEntryLogger({required this.module});
+
+  final String module;
+
+  @override
+  State<_ModuleEntryLogger> createState() => _ModuleEntryLoggerState();
+}
+
+class _ModuleEntryLoggerState extends State<_ModuleEntryLogger> {
+  @override
+  void initState() {
+    super.initState();
+    AppAnalytics.logModuleEntry(widget.module);
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 class _ModuleHero extends StatelessWidget {
@@ -307,7 +359,7 @@ class _ModuleHero extends StatelessWidget {
             height: 270,
             width: double.infinity,
             child: Image.asset(
-              heroAsset,
+              normalizeAssetPath(heroAsset),
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(
@@ -373,11 +425,13 @@ class _ModuleHero extends StatelessWidget {
 class _PathCardTile extends StatelessWidget {
   const _PathCardTile({
     required this.item,
+    required this.module,
     required this.isArabic,
     required this.accent,
   });
 
   final _SupportPathCard item;
+  final String module;
   final bool isArabic;
   final Color accent;
 
@@ -389,10 +443,16 @@ class _PathCardTile extends StatelessWidget {
 
     return InkWell(
       borderRadius: BorderRadius.circular(24),
-      onTap: () => Navigator.of(context).pushNamed(
-        item.route,
-        arguments: item.arguments,
-      ),
+      onTap: () {
+        AppAnalytics.logPathSelected(module, item.analyticsPath);
+        if (item.route == Routes.chat) {
+          AppAnalytics.logChatOpened(module);
+        }
+        Navigator.of(context).pushNamed(
+          item.route,
+          arguments: item.arguments,
+        );
+      },
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
@@ -492,7 +552,7 @@ class _HeroActionButton extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Image.asset(
-                    asset,
+                    normalizeAssetPath(asset),
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(

@@ -90,7 +90,7 @@ class _ChatEscalationReportPageState extends State<ChatEscalationReportPage> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('تقرير التصعيد'),
+          title: const Text('تقرير حالة دعم مصعّدة'),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new),
             onPressed: () => Navigator.of(context).pop(),
@@ -158,7 +158,7 @@ class _ChatEscalationReportPageState extends State<ChatEscalationReportPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'لم يُنشأ تقرير تصعيد أمان لهذه التصعيد بعد.',
+              'لم يُنشأ تقرير تنبيه أمان لهذه الحالة المصعّدة بعد.',
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
@@ -290,7 +290,7 @@ class _ChatEscalationReportPageState extends State<ChatEscalationReportPage> {
     final riskPath = _get(report, 'riskEscalationPath');
     if (riskPath is Map<String, dynamic>) {
       section(
-        'مسار تصعيد الخطر',
+        'مسار تنبيه الأمان / الحالة العاجلة',
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

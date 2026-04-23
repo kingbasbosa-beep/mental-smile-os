@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/shared/analytics/app_analytics.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 /// C6 Library UI (Hero + Categories + Buttons + States)
 /// DEV hooks are hidden behind: --dart-define=MK_DEV=true
@@ -25,37 +27,37 @@ class LibraryPage extends StatelessWidget {
         keyName: 'articles',
         titleAr: 'مقالات',
         titleEn: 'Articles',
-        asset: 'assets/c6_library/categories/cat_articles.png',
+        asset: 'c6_library/categories/cat_articles.png',
       ),
       const _LibCat(
         keyName: 'exercises',
         titleAr: 'تمارين',
         titleEn: 'Exercises',
-        asset: 'assets/c6_library/categories/cat_exercises.png',
+        asset: 'c6_library/categories/cat_exercises.png',
       ),
       const _LibCat(
         keyName: 'audio',
         titleAr: 'صوتيات',
         titleEn: 'Audio',
-        asset: 'assets/c6_library/categories/cat_audio.png',
+        asset: 'c6_library/categories/cat_audio.png',
       ),
       const _LibCat(
         keyName: 'videos',
         titleAr: 'فيديو',
         titleEn: 'Videos',
-        asset: 'assets/c6_library/categories/cat_videos.png',
+        asset: 'c6_library/categories/cat_videos.png',
       ),
       const _LibCat(
         keyName: 'tools',
         titleAr: 'أدوات',
         titleEn: 'Tools',
-        asset: 'assets/c6_library/categories/cat_tools.png',
+        asset: 'c6_library/categories/cat_tools.png',
       ),
       const _LibCat(
         keyName: 'saved',
         titleAr: 'المحفوظات',
         titleEn: 'Saved',
-        asset: 'assets/c6_library/categories/cat_saved.png',
+        asset: 'c6_library/categories/cat_saved.png',
       ),
     ];
 
@@ -67,7 +69,7 @@ class LibraryPage extends StatelessWidget {
           title: Row(
             children: [
               Image.asset(
-                'assets/c6_library/brand/logo_mark.png',
+                normalizeAssetPath('c6_library/brand/logo_mark.png'),
                 height: 26,
                 errorBuilder: (context, error, stackTrace) =>
                     const SizedBox(height: 26, width: 26),
@@ -82,6 +84,7 @@ class LibraryPage extends StatelessWidget {
         body: ListView(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
           children: [
+            const _ModuleEntryLogger(module: 'library'),
             _HeroCard(title: title, subtitle: subtitle, isAr: isAr),
             const SizedBox(height: 14),
 
@@ -91,7 +94,7 @@ class LibraryPage extends StatelessWidget {
                 Expanded(
                   child: _ImageButton(
                     label: isAr ? 'ابدأ الآن' : 'Start Now',
-                    asset: 'assets/c6_library/ui/buttons/btn_primary.png',
+                    asset: 'c6_library/ui/buttons/btn_primary.png',
                     onTap: () =>
                         _showSnack(context, isAr ? 'قريباً…' : 'Coming soon…'),
                   ),
@@ -100,9 +103,14 @@ class LibraryPage extends StatelessWidget {
                 Expanded(
                   child: _ImageButton(
                     label: isAr ? 'استكشف' : 'Explore',
-                    asset: 'assets/c6_library/ui/buttons/btn_secondary.png',
-                    onTap: () =>
-                        _showSnack(context, isAr ? 'قريباً…' : 'Coming soon…'),
+                    asset: 'c6_library/ui/buttons/btn_secondary.png',
+                    onTap: () {
+                      AppAnalytics.logPathSelected('library', 'browse');
+                      _showSnack(
+                        context,
+                        isAr ? 'قريباً…' : 'Coming soon…',
+                      );
+                    },
                   ),
                 ),
               ],
@@ -113,7 +121,9 @@ class LibraryPage extends StatelessWidget {
             // Ornament divider
             Center(
               child: Image.asset(
-                'assets/c6_library/ui/ornaments/ornament_divider_1.png',
+                normalizeAssetPath(
+                  'c6_library/ui/ornaments/ornament_divider_1.png',
+                ),
                 height: 46,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) =>
@@ -135,13 +145,13 @@ class LibraryPage extends StatelessWidget {
                 const _Badge(
                   labelAr: 'جديد',
                   labelEn: 'New',
-                  asset: 'assets/c6_library/ui/badges/badge_new.png',
+                  asset: 'c6_library/ui/badges/badge_new.png',
                 ),
                 const SizedBox(width: 8),
                 const _Badge(
                   labelAr: 'برو',
                   labelEn: 'Pro',
-                  asset: 'assets/c6_library/ui/badges/badge_pro.png',
+                  asset: 'c6_library/ui/badges/badge_pro.png',
                 ),
               ],
             ),
@@ -169,10 +179,16 @@ class LibraryPage extends StatelessWidget {
                     return _CategoryTile(
                       title: isAr ? cat.titleAr : cat.titleEn,
                       asset: cat.asset,
-                      onTap: () => _showSnack(
-                        context,
-                        isAr ? 'فتح: ${cat.titleAr}' : 'Open: ${cat.titleEn}',
-                      ),
+                      onTap: () {
+                        AppAnalytics.logPathSelected(
+                          'library',
+                          'open_content',
+                        );
+                        _showSnack(
+                          context,
+                          isAr ? 'فتح: ${cat.titleAr}' : 'Open: ${cat.titleEn}',
+                        );
+                      },
                     );
                   },
                 );
@@ -193,13 +209,13 @@ class LibraryPage extends StatelessWidget {
               const _StatePreview(
                 titleAr: 'مكتبة فارغة',
                 titleEn: 'Empty library',
-                asset: 'assets/c6_library/states/empty_library.png',
+                asset: 'c6_library/states/empty_library.png',
               ),
               const SizedBox(height: 12),
               const _StatePreview(
                 titleAr: 'الأطباء مقفولين',
                 titleEn: 'Locked clinicians',
-                asset: 'assets/c6_library/states/locked_clinicians.png',
+                asset: 'c6_library/states/locked_clinicians.png',
               ),
             ],
           ],
@@ -211,6 +227,26 @@ class LibraryPage extends StatelessWidget {
   static void _showSnack(BuildContext context, String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
+}
+
+class _ModuleEntryLogger extends StatefulWidget {
+  const _ModuleEntryLogger({required this.module});
+
+  final String module;
+
+  @override
+  State<_ModuleEntryLogger> createState() => _ModuleEntryLoggerState();
+}
+
+class _ModuleEntryLoggerState extends State<_ModuleEntryLogger> {
+  @override
+  void initState() {
+    super.initState();
+    AppAnalytics.logModuleEntry(widget.module);
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 class _HeroCard extends StatelessWidget {
@@ -238,7 +274,7 @@ class _HeroCard extends StatelessWidget {
               return SizedBox(
                 height: h,
                 child: Image.asset(
-                  'assets/c6_library/hero/library_hero.png',
+                  normalizeAssetPath('c6_library/hero/library_hero.png'),
                   fit: BoxFit.cover,
                   alignment: Alignment.topCenter,
                   errorBuilder: (context, error, stackTrace) => Container(
@@ -323,7 +359,7 @@ class _CategoryTile extends StatelessWidget {
               Expanded(
                 child: Center(
                   child: Image.asset(
-                    asset,
+                    normalizeAssetPath(asset),
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) =>
                         const Icon(Icons.image_not_supported),
@@ -374,7 +410,7 @@ class _ImageButton extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(14),
                   child: Image.asset(
-                    asset,
+                    normalizeAssetPath(asset),
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
                       color: Theme.of(
@@ -425,7 +461,7 @@ class _Badge extends StatelessWidget {
     return Tooltip(
       message: label,
       child: Image.asset(
-        asset,
+        normalizeAssetPath(asset),
         height: 26,
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) =>
@@ -472,7 +508,7 @@ class _StatePreview extends StatelessWidget {
               width: 140,
               height: 80,
               child: Image.asset(
-                asset,
+                normalizeAssetPath(asset),
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) =>
                     const Icon(Icons.image),

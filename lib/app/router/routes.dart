@@ -23,6 +23,7 @@ class Routes {
   static const centerDashboard = '/center/dashboard';
   static const centerOperations = '/center/operations';
   static const centerInbox = '/center/inbox';
+  static const centerResidencies = '/center/residencies';
 
   static const chat = '/chat';
   static const chatEscalations = '/chat/escalations';
@@ -46,11 +47,34 @@ class Routes {
   static const myBookings = '/booking/my';
 
   static const adminHub = '/admin/hub';
+  static const adminOperations = '/admin/operations';
+  static const adminCommunications = '/admin/communications';
   static const adminClients = '/admin/clients';
   static const adminClinicianRequests = '/admin/clinician-requests';
+  static const adminClinicianWorkspace = '/admin/clinician-workspace';
   static const adminClinicianProfileRequests =
       '/admin/clinician-profile-requests';
   static const adminSupportChats = '/admin/support-chats';
+  static const adminAiPolicies = '/admin/ai-policies';
+  static const adminDomainStatus = '/admin/system-domains';
+  static const adminContentCarePrograms = '/admin/content-care-programs';
+  static const adminLibraryGovernance = '/admin/library-governance';
+  static const adminSupportMessagingGovernance =
+      '/admin/support-messaging-governance';
+  static const adminFollowupCareGovernance =
+      '/admin/followup-care-governance';
+  static const adminAiFollowupBoundaries =
+      '/admin/ai-followup-boundaries';
+  static const adminGrowthLayer = '/admin/growth-layer';
+  static const adminBlueprintHandoff = '/admin/blueprint-handoff';
+  static const adminComplianceCheckpoints = '/admin/compliance-checkpoints';
+  static const adminExposureRules = '/admin/exposure-rules';
+  static const adminActivationReadiness = '/admin/activation-readiness';
+  static const adminSystemActivationPack = '/admin/system-activation-pack';
+  static const adminGatewayLayer = '/admin/gateways';
+  static const adminCommunicationGateway = '/admin/gateways/communication';
+  static const adminEngineeringGateway = '/admin/gateways/engineering';
+  static const adminDeviceStorageGateway = '/admin/gateways/device-storage';
   static const adminCenters = '/admin/centers';
   static const adminArchive = '/admin/archive';
   static const adminArchiveSessions = '/admin/archive/sessions';

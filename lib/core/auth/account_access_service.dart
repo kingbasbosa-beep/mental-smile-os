@@ -1,5 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutterprojects/shared/contracts/role_names.dart';
+
+const String kKnownPrimaryAdminUid = '1p1UEwzwXFYCHExp22bc0xGSjJj2';
 
 class SignedInAccessState {
   const SignedInAccessState({
@@ -16,7 +20,7 @@ class SignedInAccessState {
   final String? collection;
   final String? docId;
 
-  bool get isAdmin => role == 'admin';
+  bool get isAdmin => role == RoleNames.admin;
 }
 
 class AccountAccessService {
@@ -25,33 +29,58 @@ class AccountAccessService {
 
   final FirebaseFirestore _firestore;
 
-  static const Set<String> knownAdminEmails = {
-    'kingbasbosa@gmail.com',
-    'kingbasbosa@hotmail.com',
-  };
+  bool _isKnownPrimaryAdmin(String uid) => uid == kKnownPrimaryAdminUid;
 
   Future<SignedInAccessState> resolve(User user) async {
     final uid = user.uid;
     final email = (user.email ?? '').trim().toLowerCase();
 
-    if (knownAdminEmails.contains(email)) {
-      return const SignedInAccessState(role: 'admin');
-    }
-
+    debugPrint('ACCESS_TRACE admin_check_start currentAuthUid=$uid');
     final adminDoc = await _safeGet('admins', uid);
+    final adminExists = adminDoc?.exists == true;
+    final adminActive =
+        adminExists && ((adminDoc?.data()?['active'] ?? false) == true);
+    debugPrint(
+      'ACCESS_TRACE admin_check_result '
+      'currentAuthUid=$uid '
+      'adminDocExists=$adminExists '
+      'adminActive=$adminActive',
+    );
     if (adminDoc?.exists == true) {
       final data = adminDoc?.data() ?? const <String, dynamic>{};
       if ((data['active'] ?? false) == true) {
+        debugPrint(
+          'ACCESS_TRACE admin_check_decision '
+          'currentAuthUid=$uid '
+          'reason=admins_doc_active_true',
+        );
         return const SignedInAccessState(role: 'admin');
       }
+      debugPrint(
+        'ACCESS_TRACE admin_check_decision '
+        'currentAuthUid=$uid '
+        'reason=admins_doc_found_but_active_false',
+      );
+    } else {
+      debugPrint(
+        'ACCESS_TRACE admin_check_decision '
+        'currentAuthUid=$uid '
+        'reason=no_admins_doc_for_uid',
+      );
+    }
+
+    if (_isKnownPrimaryAdmin(uid)) {
+      debugPrint(
+        'ACCESS_TRACE admin_check_decision '
+        'currentAuthUid=$uid '
+        'reason=known_primary_admin_fallback',
+      );
+      return const SignedInAccessState(role: 'admin');
     }
 
     final clinicianDoc = await _safeGet('clinicians', uid);
     if (clinicianDoc?.exists == true) {
       final data = clinicianDoc?.data() ?? const <String, dynamic>{};
-      if ((data['isAdmin'] ?? false) == true) {
-        return const SignedInAccessState(role: 'admin');
-      }
       if (_normalizedRole(data['role']) == 'clinician') {
         return _stateForDoc(
           role: 'clinician',
@@ -63,21 +92,9 @@ class AccountAccessService {
     }
 
     if (email.isNotEmpty) {
-      final adminClinicianByEmail = await _safeQueryByEmail(
-        'clinicians',
-        email,
-        filters: const {'isAdmin': true},
-      );
-      if (adminClinicianByEmail != null) {
-        return const SignedInAccessState(role: 'admin');
-      }
-
       final clinicianByEmail = await _safeQueryByEmail('clinicians', email);
       if (clinicianByEmail != null) {
         final data = clinicianByEmail.data();
-        if ((data['isAdmin'] ?? false) == true) {
-          return const SignedInAccessState(role: 'admin');
-        }
         if (_normalizedRole(data['role']) == 'clinician') {
           return _stateForDoc(
             role: 'clinician',

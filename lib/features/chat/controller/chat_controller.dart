@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_message_model.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_ai_service.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_firestore_service.dart';
+import 'package:flutterprojects/shared/gateways/role_access_gateway.dart';
 
 class ChatController {
   ChatController({
@@ -14,12 +16,60 @@ class ChatController {
   final ChatFirestoreService _firestoreService;
   final FirebaseAuth _auth;
   final ChatAiService _aiService = const ChatAiService();
+  static const bool _enableLegacyBookingFollowupFallback = false;
+
+  bool _hasExplicitThreadType(ChatThreadModel thread) {
+    return (thread.threadType?.trim().isNotEmpty ?? false);
+  }
+
+  bool _isMissingThreadType(ChatThreadModel thread) {
+    final threadType = thread.threadType?.trim() ?? '';
+    return threadType.isEmpty;
+  }
+
+  bool _isTypedBookingFollowupThread(ChatThreadModel thread) {
+    return thread.threadType == 'booking_followup';
+  }
+
+  bool _isLegacyBookingFollowupFallbackThread(ChatThreadModel thread) {
+    // Soft-cut disabled after repeated zero-usage measurement in real flows.
+    // Keep this rollback trivial until broader stability is confirmed.
+    if (!_enableLegacyBookingFollowupFallback) return false;
+    if (!_isMissingThreadType(thread)) return false;
+    return thread.sourceType == 'booking_flow' || thread.bookingLinked;
+  }
+
+  bool _isBookingFollowupThread(ChatThreadModel thread) {
+    if (_isTypedBookingFollowupThread(thread)) return true;
+    return _isLegacyBookingFollowupFallbackThread(thread);
+  }
+
+  void _debugMeasureLegacyBookingFollowupThreads(
+    String ownerUid,
+    List<ChatThreadModel> threads,
+  ) {
+    if (!kDebugMode) return;
+
+    final legacyFallbackThreads =
+        threads.where(_isLegacyBookingFollowupFallbackThread).toList();
+
+    if (legacyFallbackThreads.isEmpty) return;
+
+    debugPrint(
+      'CHAT_BOOKING_FALLBACK_MEASURE '
+      'ownerUid=$ownerUid '
+      'legacyBookingFallbackCount=${legacyFallbackThreads.length} '
+      'totalActiveThreads=${threads.length} '
+      'sampleThreadIds=${legacyFallbackThreads.take(5).map((t) => t.id).join(",")}',
+    );
+  }
 
   bool _isAdminSupportThread(ChatThreadModel thread) {
-    return thread.sourceType == 'admin_support' ||
-        thread.handoffState == 'admin_review' ||
-        thread.handoffState == 'admin_replying' ||
-        thread.lifecycleState == 'assigned_admin';
+    if (_hasExplicitThreadType(thread)) {
+      return thread.threadType == 'admin_support';
+    }
+
+    return thread.sourceType == 'admin_support';
   }
 
   Future<void> _maybeCreateEscalation({
@@ -59,8 +109,10 @@ class ChatController {
 
     final existingThreads =
         await _firestoreService.getThreadsForOwner(user.uid);
+    _debugMeasureLegacyBookingFollowupThreads(user.uid, existingThreads);
     final aiThreads = existingThreads
-        .where((thread) => !_isAdminSupportThread(thread))
+        .where((thread) =>
+            !_isAdminSupportThread(thread) && !_isBookingFollowupThread(thread))
         .toList()
       ..sort((a, b) {
         final aDate = a.updatedAt ??
@@ -78,6 +130,7 @@ class ChatController {
     return _firestoreService.createThread(
       ownerUid: user.uid,
       ownerType: isAnonymous ? 'anonymous_client' : 'registered_client',
+      threadType: 'ai_support',
       displayName: user.email ?? 'مستخدم',
       sourceType: isAnonymous ? 'guest' : 'client',
       isTemporary: isAnonymous,
@@ -99,13 +152,16 @@ class ChatController {
       }
     }
 
+    final isCenter = await RoleAccessGateway().isCenter();
+
     final thread = await _firestoreService.createThread(
       ownerUid: user.uid,
-      ownerType: 'registered_client',
+      ownerType: isCenter ? 'registered_center' : 'registered_client',
+      threadType: 'admin_support',
       displayName: user.email ?? 'مستخدم',
       sourceType: 'admin_support',
       isTemporary: false,
-      identityState: 'registered_client',
+      identityState: isCenter ? 'registered_center' : 'registered_client',
     );
 
     await _firestoreService.updateThreadState(
@@ -142,6 +198,7 @@ class ChatController {
     return _firestoreService.createThread(
       ownerUid: user.uid,
       ownerType: isAnonymous ? 'anonymous_client' : 'registered_client',
+      threadType: 'ai_support',
       displayName: user.email ?? 'مستخدم',
       sourceType: isAnonymous ? 'guest' : 'client',
       isTemporary: isAnonymous,

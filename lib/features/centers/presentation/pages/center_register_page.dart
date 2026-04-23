@@ -3,7 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/ui/app_design_system.dart';
+import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
+import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -38,6 +40,28 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
       'labelEn': 'Hospitals',
     },
   ];
+  static const List<Map<String, String>> _centerTypes = [
+    {
+      'key': 'halfway_house',
+      'labelAr': 'هاف واي',
+      'labelEn': 'Halfway House',
+    },
+    {
+      'key': 'detox',
+      'labelAr': 'ديتوكس / أعراض انسحاب',
+      'labelEn': 'Detox / Withdrawal Unit',
+    },
+    {
+      'key': 'hospital',
+      'labelAr': 'مستشفى',
+      'labelEn': 'Hospital',
+    },
+    {
+      'key': 'special_needs_care',
+      'labelAr': 'رعاية ذوي الاحتياجات الخاصة',
+      'labelEn': 'Special Needs Care',
+    },
+  ];
 
   final _formKey = GlobalKey<FormState>();
 
@@ -50,6 +74,8 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
   final _addressController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _managerNameController = TextEditingController();
+  final _coverImageUrlController = TextEditingController();
+  final _coverImageAssetController = TextEditingController();
   final Map<String, TextEditingController> _accommodationPriceControllers = {};
   final Map<String, TextEditingController> _autismPriceControllers = {};
 
@@ -57,8 +83,11 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
   String? _error;
   bool _resolvingLocation = false;
   String? _selectedCategoryKey;
+  String? _selectedCenterTypeKey;
+  bool _hasDetoxUnit = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  int _currentStep = 0;
   late List<AccommodationCostItem> _accommodationCosts;
   late List<AutismCareCostItem> _autismCareCosts;
   CenterCapabilityFlags _capabilities = const CenterCapabilityFlags();
@@ -91,6 +120,33 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
     final match = _centerCategories.where((e) => e['key'] == key);
     if (match.isEmpty) return '';
     return match.first['labelEn'] ?? '';
+  }
+
+  String _centerTypeLabelAr(String key) {
+    final match = _centerTypes.where((e) => e['key'] == key);
+    if (match.isEmpty) return '';
+    return match.first['labelAr'] ?? '';
+  }
+
+  String _centerTypeLabelEn(String key) {
+    final match = _centerTypes.where((e) => e['key'] == key);
+    if (match.isEmpty) return '';
+    return match.first['labelEn'] ?? '';
+  }
+
+  String? _defaultCenterTypeForCategory(String? categoryKey) {
+    switch ((categoryKey ?? '').trim()) {
+      case 'detox':
+        return 'detox';
+      case 'hospital':
+        return 'hospital';
+      case 'special_needs':
+        return 'special_needs_care';
+      case 'recovery':
+        return 'halfway_house';
+      default:
+        return null;
+    }
   }
 
   bool get _usesAutismPricing =>
@@ -151,6 +207,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
       final categoryKey = (_selectedCategoryKey ?? '').trim();
       final categoryLabelAr = _categoryLabelAr(categoryKey);
       final categoryLabelEn = _categoryLabelEn(categoryKey);
+      final centerTypeKey = (_selectedCenterTypeKey ?? '').trim();
 
       await firestore.collection('centers').doc(user.uid).set({
         'name': _nameController.text.trim(),
@@ -160,6 +217,9 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
         'displayName': _nameController.text.trim(),
         'centerName': _nameController.text.trim(),
         'category': categoryKey,
+        'centerType': centerTypeKey,
+        'centerTypeLabelAr': _centerTypeLabelAr(centerTypeKey),
+        'centerTypeLabelEn': _centerTypeLabelEn(centerTypeKey),
         'categoryLabelAr': categoryLabelAr,
         'categoryLabelEn': categoryLabelEn,
         'email': _emailController.text.trim(),
@@ -167,8 +227,12 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
         'city': _cityController.text.trim(),
         'address': _addressController.text.trim(),
         'description': _descriptionController.text.trim(),
+        'hasDetoxUnit': centerTypeKey == 'detox' ? true : _hasDetoxUnit,
         'managerName': _managerNameController.text.trim(),
         'sortOrder': 999,
+        'imageUrl': _coverImageUrlController.text.trim(),
+        'coverImageUrl': _coverImageUrlController.text.trim(),
+        'coverImageAsset': _coverImageAssetController.text.trim(),
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
         'approvalStatus': 'pending_admin',
@@ -376,6 +440,8 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
     _addressController.dispose();
     _descriptionController.dispose();
     _managerNameController.dispose();
+    _coverImageUrlController.dispose();
+    _coverImageAssetController.dispose();
     for (final controller in _accommodationPriceControllers.values) {
       controller.dispose();
     }
@@ -811,6 +877,248 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
     );
   }
 
+  bool _validateStepOne() {
+    return _formKey.currentState?.validate() ?? false;
+  }
+
+  String _stepTitle(int step) {
+    if (step == 0) {
+      return _isArabic ? 'البيانات الأساسية' : 'Core details';
+    }
+    return _isArabic ? 'الهوية والتسعير' : 'Brand and pricing';
+  }
+
+  String _stepSubtitle(int step) {
+    if (step == 0) {
+      return _isArabic
+          ? 'الاسم، الحساب، التواصل، والعنوان الرئيسي للمركز'
+          : 'Name, account, contact, and main address details';
+    }
+    return _isArabic
+        ? 'صورة كارت المركز، قدرات المركز، وفئات التسعير'
+        : 'Center card image, capabilities, and pricing bands';
+  }
+
+  Widget _buildStepperHeader(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _StepBadge(
+            index: 1,
+            title: _isArabic ? 'الخطوة الأولى' : 'Step 1',
+            subtitle: _isArabic ? 'البيانات الأساسية' : 'Core details',
+            active: _currentStep == 0,
+            done: _currentStep > 0,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          child: _StepBadge(
+            index: 2,
+            title: _isArabic ? 'الخطوة الثانية' : 'Step 2',
+            subtitle: _isArabic ? 'الهوية والتسعير' : 'Brand and pricing',
+            active: _currentStep == 1,
+            done: false,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _imageFallback() {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Image.asset(
+          normalizeAssetPath('assets/c7_branding/home/hero_art.png'),
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) =>
+              const AppMissingAssetPlaceholder(),
+        ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.deepTeal.withValues(alpha: 0.14),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildImageSection(BuildContext context) {
+    final imageUrl = _coverImageUrlController.text.trim();
+    final assetPath = _coverImageAssetController.text.trim();
+
+    Widget preview;
+    if (imageUrl.isNotEmpty) {
+      preview = Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _imageFallback(),
+      );
+    } else if (assetPath.isNotEmpty) {
+      preview = Image.asset(
+        normalizeAssetPath(assetPath),
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _imageFallback(),
+      );
+    } else {
+      preview = _imageFallback();
+    }
+
+    return AppSectionPanel(
+      color: AppColors.mutedGold.withValues(alpha: 0.06),
+      borderColor: AppColors.mutedGold.withValues(alpha: 0.14),
+      child: Column(
+        crossAxisAlignment:
+            _isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            _isArabic ? 'صورة كارت المركز' : 'Center card image',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            _isArabic
+                ? 'يمكنك ربط صورة غلاف أو لوجو يظهر في كارت المركز وصفحة التفاصيل. استخدم رابط صورة أو مسار أصل محلي داخل المشروع.'
+                : 'Link a cover image or logo that appears on the center card and details page. Use an image URL or a local asset path.',
+            textAlign: _isArabic ? TextAlign.right : TextAlign.left,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadii.lg),
+            child: SizedBox(
+              height: 190,
+              width: double.infinity,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  preview,
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.08),
+                          Colors.black.withValues(alpha: 0.38),
+                        ],
+                      ),
+                    ),
+                  ),
+                  PositionedDirectional(
+                    top: 14,
+                    start: 14,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(AppRadii.pill),
+                      ),
+                      child: Text(
+                        _isArabic ? 'معاينة الكارت' : 'Card preview',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                  PositionedDirectional(
+                    bottom: 16,
+                    end: 16,
+                    child: Container(
+                      width: 68,
+                      height: 68,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.92),
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(
+                          color: AppColors.mutedGold.withValues(alpha: 0.26),
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: preview,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          TextFormField(
+            controller: _coverImageUrlController,
+            onChanged: (_) => setState(() {}),
+            decoration: appInputDecoration(
+              context: context,
+              label: _isArabic ? 'رابط صورة الغلاف' : 'Cover image URL',
+              icon: Icons.image_outlined,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          TextFormField(
+            controller: _coverImageAssetController,
+            onChanged: (_) => setState(() {}),
+            decoration: appInputDecoration(
+              context: context,
+              label: _isArabic ? 'مسار أصل محلي للصورة' : 'Local asset path',
+              icon: Icons.photo_library_outlined,
+              hintText: 'assets/images/centers/covers/center_1.jpg',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepOne(BuildContext context) {
+    return Column(
+      crossAxisAlignment:
+          _isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: [
+        Text(
+          _isArabic ? 'بيانات المركز' : 'Center information',
+          textAlign: _isArabic ? TextAlign.right : TextAlign.left,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          _isArabic
+              ? 'أدخل بيانات المركز الأساسية لإعداد الصفحة الشخصية ولوحة التشغيل لاحقًا.'
+              : 'Enter the core center information to prepare the profile and dashboard.',
+          textAlign: _isArabic ? TextAlign.right : TextAlign.left,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStepTwo(BuildContext context) {
+    return Column(
+      crossAxisAlignment:
+          _isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: [
+        Text(
+          _isArabic ? 'هوية المركز وتسعيره' : 'Center identity and pricing',
+          textAlign: _isArabic ? TextAlign.right : TextAlign.left,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          _isArabic
+              ? 'هذه الخطوة تضبط صورة الكارت، قدرات المركز، وفئات التسعير التي ستظهر لاحقًا.'
+              : 'This step prepares the card image, capabilities, and pricing bands that will appear later.',
+          textAlign: _isArabic ? TextAlign.right : TextAlign.left,
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -832,6 +1140,9 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                       title: _isArabic
                           ? 'تسجيل مركز جديد'
                           : 'Create center account',
+                      subtitle: _isArabic
+                          ? 'تسجيل أوضح على خطوتين مع معاينة مبكرة لصورة كارت المركز.'
+                          : 'A clearer two-step registration flow with an early center card preview.',
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     AppSurfaceCard(
@@ -842,327 +1153,469 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                               ? CrossAxisAlignment.end
                               : CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              _isArabic
-                                  ? 'بيانات المركز'
-                                  : 'Center information',
-                              textAlign:
-                                  _isArabic ? TextAlign.right : TextAlign.left,
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: AppSpacing.xs),
-                            Text(
-                              _isArabic
-                                  ? 'أدخل بيانات المركز الأساسية لإعداد الصفحة الشخصية ولوحة التشغيل لاحقًا.'
-                                  : 'Enter the core center information to prepare the profile and dashboard.',
-                              textAlign:
-                                  _isArabic ? TextAlign.right : TextAlign.left,
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _nameController,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic ? 'اسم المركز' : 'Center name',
-                                icon: Icons.business_outlined,
-                              ),
-                              validator: (v) => (v == null || v.trim().isEmpty)
-                                  ? (_isArabic
-                                      ? 'أدخل اسم المركز'
-                                      : 'Enter center name')
-                                  : null,
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            DropdownButtonFormField<String>(
-                              initialValue: _selectedCategoryKey,
-                              isExpanded: true,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic
-                                    ? 'فئة / تخصص المركز'
-                                    : 'Center category / specialty',
-                                icon: Icons.category_outlined,
-                              ),
-                              items: _centerCategories
-                                  .map(
-                                    (item) => DropdownMenuItem<String>(
-                                      value: item['key'],
-                                      child: Text(
-                                        _isArabic
-                                            ? (item['labelAr'] ?? '')
-                                            : (item['labelEn'] ?? ''),
-                                        textAlign: _isArabic
-                                            ? TextAlign.right
-                                            : TextAlign.left,
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: _loading
-                                  ? null
-                                  : (value) {
-                                      setState(
-                                          () => _selectedCategoryKey = value);
-                                    },
-                              validator: (value) =>
-                                  (value == null || value.trim().isEmpty)
-                                      ? (_isArabic
-                                          ? 'اختر فئة المركز'
-                                          : 'Select the center category')
-                                      : null,
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _managerNameController,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label:
-                                    _isArabic ? 'اسم المسؤول' : 'Manager name',
-                                icon: Icons.badge_outlined,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _emailController,
-                              keyboardType: TextInputType.emailAddress,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label:
-                                    _isArabic ? 'البريد الإلكتروني' : 'Email',
-                                icon: Icons.alternate_email,
-                              ),
-                              validator: (v) => (v == null || v.trim().isEmpty)
-                                  ? (_isArabic
-                                      ? 'أدخل البريد الإلكتروني'
-                                      : 'Enter email')
-                                  : null,
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _passwordController,
-                              obscureText: _obscurePassword,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic ? 'كلمة المرور' : 'Password',
-                                icon: Icons.lock_outline,
-                                suffixIcon: IconButton(
-                                  onPressed: _loading
-                                      ? null
-                                      : () {
-                                          setState(() {
-                                            _obscurePassword =
-                                                !_obscurePassword;
-                                          });
-                                        },
-                                  icon: Icon(
-                                    _obscurePassword
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_outlined,
-                                  ),
-                                  tooltip: _isArabic
-                                      ? (_obscurePassword
-                                          ? 'إظهار كلمة المرور'
-                                          : 'إخفاء كلمة المرور')
-                                      : (_obscurePassword
-                                          ? 'Show password'
-                                          : 'Hide password'),
-                                ),
-                              ),
-                              validator: (v) {
-                                if (v == null || v.isEmpty) {
-                                  return _isArabic
-                                      ? 'أدخل كلمة المرور'
-                                      : 'Enter password';
-                                }
-                                if (v.length < 6) {
-                                  return _isArabic
-                                      ? '6 أحرف على الأقل'
-                                      : 'At least 6 characters';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _confirmPasswordController,
-                              obscureText: _obscureConfirmPassword,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic
-                                    ? 'تأكيد كلمة المرور'
-                                    : 'Confirm password',
-                                icon: Icons.lock_reset_outlined,
-                                suffixIcon: IconButton(
-                                  onPressed: _loading
-                                      ? null
-                                      : () {
-                                          setState(() {
-                                            _obscureConfirmPassword =
-                                                !_obscureConfirmPassword;
-                                          });
-                                        },
-                                  icon: Icon(
-                                    _obscureConfirmPassword
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_outlined,
-                                  ),
-                                  tooltip: _isArabic
-                                      ? (_obscureConfirmPassword
-                                          ? 'إظهار تأكيد كلمة المرور'
-                                          : 'إخفاء تأكيد كلمة المرور')
-                                      : (_obscureConfirmPassword
-                                          ? 'Show confirm password'
-                                          : 'Hide confirm password'),
-                                ),
-                              ),
-                              validator: (v) {
-                                if (v == null || v.isEmpty) {
-                                  return _isArabic
-                                      ? 'أدخل تأكيد كلمة المرور'
-                                      : 'Enter confirm password';
-                                }
-                                if (v != _passwordController.text) {
-                                  return _isArabic
-                                      ? 'كلمتا المرور غير متطابقتين'
-                                      : 'Passwords do not match';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _phoneController,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic ? 'رقم الهاتف' : 'Phone',
-                                icon: Icons.phone_outlined,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _cityController,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic ? 'المدينة' : 'City',
-                                icon: Icons.location_city_outlined,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.sm),
-                            Align(
-                              alignment: _isArabic
-                                  ? Alignment.centerRight
-                                  : Alignment.centerLeft,
-                              child: OutlinedButton.icon(
-                                onPressed: _resolvingLocation
-                                    ? null
-                                    : () {
-                                        if (kIsWeb) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                _isArabic
-                                                    ? 'ميزة تعبئة العنوان من اللوكيشن غير مفعلة على الويب حاليًا. اكتب المدينة والعنوان يدويًا.'
-                                                    : 'Automatic address filling is not enabled on web for now. Please enter city and address manually.',
-                                              ),
-                                            ),
-                                          );
-                                          return;
-                                        }
-
-                                        _fillFromCurrentLocation();
-                                      },
-                                icon: _resolvingLocation
-                                    ? const SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      )
-                                    : const Icon(Icons.my_location_rounded),
-                                label: Text(
-                                  kIsWeb
-                                      ? (_isArabic
-                                          ? 'اكتب العنوان يدويًا'
-                                          : 'Enter address manually')
-                                      : (_resolvingLocation
-                                          ? (_isArabic
-                                              ? 'جارٍ تحديد موقعك...'
-                                              : 'Detecting location...')
-                                          : (_isArabic
-                                              ? 'استخدم موقعي الحالي'
-                                              : 'Use current location')),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _addressController,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic ? 'العنوان' : 'Address',
-                                icon: Icons.location_on_outlined,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _descriptionController,
-                              maxLines: 4,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: _isArabic
-                                    ? 'وصف المركز'
-                                    : 'Center description',
-                                icon: Icons.notes_outlined,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            _buildCapabilitySection(context),
-                            const SizedBox(height: AppSpacing.md),
-                            _buildPricingSection(context),
+                            _buildStepperHeader(context),
                             const SizedBox(height: AppSpacing.md),
                             AppSectionPanel(
-                              color: AppColors.deepTeal.withValues(alpha: 0.08),
-                              borderColor:
-                                  AppColors.deepTeal.withValues(alpha: 0.10),
-                              child: Text(
-                                _isArabic
-                                    ? 'بعد التسجيل سيتم إنشاء الصفحة الشخصية وغرفة العمليات للمركز، ثم لاحقًا نربط الصور والوثائق والاعتماد.'
-                                    : 'After registration, the center dashboard and operations room will be created. Images, documents, and approval will be connected next.',
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
+                              color: _currentStep == 0
+                                  ? AppColors.mutedGold.withValues(alpha: 0.05)
+                                  : AppColors.deepTeal.withValues(alpha: 0.05),
+                              borderColor: _currentStep == 0
+                                  ? AppColors.mutedGold.withValues(alpha: 0.12)
+                                  : AppColors.deepTeal.withValues(alpha: 0.12),
+                              child: _currentStep == 0
+                                  ? _buildStepOne(context)
+                                  : _buildStepTwo(context),
                             ),
+                            const SizedBox(height: AppSpacing.md),
+                            if (_currentStep == 0) ...[
+                              TextFormField(
+                                controller: _nameController,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label:
+                                      _isArabic ? 'اسم المركز' : 'Center name',
+                                  icon: Icons.business_outlined,
+                                ),
+                                validator: (v) =>
+                                    (v == null || v.trim().isEmpty)
+                                        ? (_isArabic
+                                            ? 'أدخل اسم المركز'
+                                            : 'Enter center name')
+                                        : null,
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              DropdownButtonFormField<String>(
+                                initialValue: _selectedCategoryKey,
+                                isExpanded: true,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic
+                                      ? 'فئة / تخصص المركز'
+                                      : 'Center category / specialty',
+                                  icon: Icons.category_outlined,
+                                ),
+                                items: _centerCategories
+                                    .map(
+                                      (item) => DropdownMenuItem<String>(
+                                        value: item['key'],
+                                        child: Text(
+                                          _isArabic
+                                              ? (item['labelAr'] ?? '')
+                                              : (item['labelEn'] ?? ''),
+                                          textAlign: _isArabic
+                                              ? TextAlign.right
+                                              : TextAlign.left,
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: _loading
+                                    ? null
+                                    : (value) {
+                                        setState(() {
+                                          _selectedCategoryKey = value;
+                                          _selectedCenterTypeKey =
+                                              _defaultCenterTypeForCategory(
+                                                    value,
+                                                  ) ??
+                                                  _selectedCenterTypeKey;
+                                          if (_selectedCenterTypeKey ==
+                                              'detox') {
+                                            _hasDetoxUnit = true;
+                                          }
+                                        });
+                                      },
+                                validator: (value) =>
+                                    (value == null || value.trim().isEmpty)
+                                        ? (_isArabic
+                                            ? 'اختر فئة المركز'
+                                            : 'Select the center category')
+                                        : null,
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              DropdownButtonFormField<String>(
+                                initialValue: _selectedCenterTypeKey,
+                                isExpanded: true,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic
+                                      ? 'نوع المركز التشغيلي'
+                                      : 'Operational center type',
+                                  icon: Icons.account_tree_outlined,
+                                ),
+                                items: _centerTypes
+                                    .map(
+                                      (item) => DropdownMenuItem<String>(
+                                        value: item['key'],
+                                        child: Text(
+                                          _isArabic
+                                              ? (item['labelAr'] ?? '')
+                                              : (item['labelEn'] ?? ''),
+                                          textAlign: _isArabic
+                                              ? TextAlign.right
+                                              : TextAlign.left,
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: _loading
+                                    ? null
+                                    : (value) {
+                                        setState(() {
+                                          _selectedCenterTypeKey = value;
+                                          if (value == 'detox') {
+                                            _hasDetoxUnit = true;
+                                          }
+                                        });
+                                      },
+                                validator: (value) =>
+                                    (value == null || value.trim().isEmpty)
+                                        ? (_isArabic
+                                            ? 'اختر نوع المركز'
+                                            : 'Select the center type')
+                                        : null,
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              SwitchListTile.adaptive(
+                                value: _selectedCenterTypeKey == 'detox'
+                                    ? true
+                                    : _hasDetoxUnit,
+                                onChanged: _loading
+                                    ? null
+                                    : _selectedCenterTypeKey == 'detox'
+                                        ? null
+                                        : (value) {
+                                            setState(() {
+                                              _hasDetoxUnit = value;
+                                            });
+                                          },
+                                contentPadding: EdgeInsets.zero,
+                                title: Text(
+                                  _isArabic
+                                      ? 'يوجد قسم داخلي لأعراض الانسحاب'
+                                      : 'Includes an internal withdrawal unit',
+                                  textAlign: _isArabic
+                                      ? TextAlign.right
+                                      : TextAlign.left,
+                                ),
+                                subtitle: Text(
+                                  _selectedCenterTypeKey == 'detox'
+                                      ? (_isArabic
+                                          ? 'مراكز الديتوكس تعتبر هذا القسم متاحًا تلقائيًا.'
+                                          : 'Detox centers always include this unit by default.')
+                                      : (_isArabic
+                                          ? 'فعّل هذا الخيار إذا كان المركز يحتوي على وحدة ديتوكس داخلية بجانب خدمته الأساسية.'
+                                          : 'Enable this if the center includes an internal detox/withdrawal unit alongside its main service.'),
+                                  textAlign: _isArabic
+                                      ? TextAlign.right
+                                      : TextAlign.left,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _managerNameController,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic
+                                      ? 'اسم المسؤول'
+                                      : 'Manager name',
+                                  icon: Icons.badge_outlined,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _emailController,
+                                keyboardType: TextInputType.emailAddress,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label:
+                                      _isArabic ? 'البريد الإلكتروني' : 'Email',
+                                  icon: Icons.alternate_email,
+                                ),
+                                validator: (v) =>
+                                    (v == null || v.trim().isEmpty)
+                                        ? (_isArabic
+                                            ? 'أدخل البريد الإلكتروني'
+                                            : 'Enter email')
+                                        : null,
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _passwordController,
+                                obscureText: _obscurePassword,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic ? 'كلمة المرور' : 'Password',
+                                  icon: Icons.lock_outline,
+                                  suffixIcon: IconButton(
+                                    onPressed: _loading
+                                        ? null
+                                        : () {
+                                            setState(() {
+                                              _obscurePassword =
+                                                  !_obscurePassword;
+                                            });
+                                          },
+                                    icon: Icon(
+                                      _obscurePassword
+                                          ? Icons.visibility_off_outlined
+                                          : Icons.visibility_outlined,
+                                    ),
+                                    tooltip: _isArabic
+                                        ? (_obscurePassword
+                                            ? 'إظهار كلمة المرور'
+                                            : 'إخفاء كلمة المرور')
+                                        : (_obscurePassword
+                                            ? 'Show password'
+                                            : 'Hide password'),
+                                  ),
+                                ),
+                                validator: (v) {
+                                  if (v == null || v.isEmpty) {
+                                    return _isArabic
+                                        ? 'أدخل كلمة المرور'
+                                        : 'Enter password';
+                                  }
+                                  if (v.length < 6) {
+                                    return _isArabic
+                                        ? '6 أحرف على الأقل'
+                                        : 'At least 6 characters';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _confirmPasswordController,
+                                obscureText: _obscureConfirmPassword,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic
+                                      ? 'تأكيد كلمة المرور'
+                                      : 'Confirm password',
+                                  icon: Icons.lock_reset_outlined,
+                                  suffixIcon: IconButton(
+                                    onPressed: _loading
+                                        ? null
+                                        : () {
+                                            setState(() {
+                                              _obscureConfirmPassword =
+                                                  !_obscureConfirmPassword;
+                                            });
+                                          },
+                                    icon: Icon(
+                                      _obscureConfirmPassword
+                                          ? Icons.visibility_off_outlined
+                                          : Icons.visibility_outlined,
+                                    ),
+                                    tooltip: _isArabic
+                                        ? (_obscureConfirmPassword
+                                            ? 'إظهار تأكيد كلمة المرور'
+                                            : 'إخفاء تأكيد كلمة المرور')
+                                        : (_obscureConfirmPassword
+                                            ? 'Show confirm password'
+                                            : 'Hide confirm password'),
+                                  ),
+                                ),
+                                validator: (v) {
+                                  if (v == null || v.isEmpty) {
+                                    return _isArabic
+                                        ? 'أدخل تأكيد كلمة المرور'
+                                        : 'Enter confirm password';
+                                  }
+                                  if (v != _passwordController.text) {
+                                    return _isArabic
+                                        ? 'كلمتا المرور غير متطابقتين'
+                                        : 'Passwords do not match';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _phoneController,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic ? 'رقم الهاتف' : 'Phone',
+                                  icon: Icons.phone_outlined,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _cityController,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic ? 'المدينة' : 'City',
+                                  icon: Icons.location_city_outlined,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              Align(
+                                alignment: _isArabic
+                                    ? Alignment.centerRight
+                                    : Alignment.centerLeft,
+                                child: OutlinedButton.icon(
+                                  onPressed: _resolvingLocation
+                                      ? null
+                                      : () {
+                                          if (kIsWeb) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  _isArabic
+                                                      ? 'ميزة تعبئة العنوان من اللوكيشن غير مفعلة على الويب حاليًا. اكتب المدينة والعنوان يدويًا.'
+                                                      : 'Automatic address filling is not enabled on web for now. Please enter city and address manually.',
+                                                ),
+                                              ),
+                                            );
+                                            return;
+                                          }
+
+                                          _fillFromCurrentLocation();
+                                        },
+                                  icon: _resolvingLocation
+                                      ? const SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : const Icon(Icons.my_location_rounded),
+                                  label: Text(
+                                    kIsWeb
+                                        ? (_isArabic
+                                            ? 'اكتب العنوان يدويًا'
+                                            : 'Enter address manually')
+                                        : (_resolvingLocation
+                                            ? (_isArabic
+                                                ? 'جارٍ تحديد موقعك...'
+                                                : 'Detecting location...')
+                                            : (_isArabic
+                                                ? 'استخدم موقعي الحالي'
+                                                : 'Use current location')),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _addressController,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic ? 'العنوان' : 'Address',
+                                  icon: Icons.location_on_outlined,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              TextFormField(
+                                controller: _descriptionController,
+                                maxLines: 4,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: _isArabic
+                                      ? 'وصف المركز'
+                                      : 'Center description',
+                                  icon: Icons.notes_outlined,
+                                ),
+                              ),
+                            ],
+                            if (_currentStep == 1) ...[
+                              const SizedBox(height: AppSpacing.md),
+                              _buildImageSection(context),
+                              const SizedBox(height: AppSpacing.md),
+                              _buildCapabilitySection(context),
+                              const SizedBox(height: AppSpacing.md),
+                              _buildPricingSection(context),
+                              const SizedBox(height: AppSpacing.md),
+                              AppSectionPanel(
+                                color:
+                                    AppColors.deepTeal.withValues(alpha: 0.08),
+                                borderColor:
+                                    AppColors.deepTeal.withValues(alpha: 0.10),
+                                child: Text(
+                                  _isArabic
+                                      ? 'بعد التسجيل سيتم إنشاء الصفحة الشخصية وغرفة العمليات للمركز، ثم لاحقًا نربط الصور والوثائق والاعتماد.'
+                                      : 'After registration, the center dashboard and operations room will be created. Images, documents, and approval will be connected next.',
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ),
+                            ],
                             if (_error != null) ...[
                               const SizedBox(height: AppSpacing.md),
                               AppMessageBanner(message: _error!),
                             ],
                             const SizedBox(height: AppSpacing.md),
-                            SizedBox(
-                              width: double.infinity,
-                              height: 56,
-                              child: FilledButton.icon(
-                                onPressed: _loading ? null : _submit,
-                                icon: _loading
-                                    ? const SizedBox(
-                                        width: 18,
-                                        height: 18,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                    : const Icon(Icons.app_registration),
-                                label: Text(
-                                  _loading
-                                      ? (_isArabic
-                                          ? 'جارٍ الإنشاء...'
-                                          : 'Creating...')
-                                      : (_isArabic
-                                          ? 'إنشاء حساب المركز'
-                                          : 'Create center account'),
+                            Row(
+                              children: [
+                                if (_currentStep == 1) ...[
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: 56,
+                                      child: OutlinedButton.icon(
+                                        onPressed: _loading
+                                            ? null
+                                            : () {
+                                                setState(() {
+                                                  _currentStep = 0;
+                                                });
+                                              },
+                                        icon: const Icon(
+                                            Icons.arrow_back_rounded),
+                                        label:
+                                            Text(_isArabic ? 'رجوع' : 'Back'),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: AppSpacing.sm),
+                                ],
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 56,
+                                    child: FilledButton.icon(
+                                      onPressed: _loading
+                                          ? null
+                                          : () {
+                                              if (_currentStep == 0) {
+                                                if (!_validateStepOne()) return;
+                                                setState(() {
+                                                  _currentStep = 1;
+                                                });
+                                                return;
+                                              }
+                                              _submit();
+                                            },
+                                      icon: _loading
+                                          ? const SizedBox(
+                                              width: 18,
+                                              height: 18,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : Icon(
+                                              _currentStep == 0
+                                                  ? Icons.arrow_forward_rounded
+                                                  : Icons.app_registration,
+                                            ),
+                                      label: Text(
+                                        _loading
+                                            ? (_isArabic
+                                                ? 'جارٍ الإنشاء...'
+                                                : 'Creating...')
+                                            : (_currentStep == 0
+                                                ? (_isArabic
+                                                    ? 'التالي'
+                                                    : 'Next')
+                                                : (_isArabic
+                                                    ? 'إنشاء حساب المركز'
+                                                    : 'Create center account')),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
                             const SizedBox(height: AppSpacing.sm),
                             Align(
@@ -1187,6 +1640,80 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _StepBadge extends StatelessWidget {
+  const _StepBadge({
+    required this.index,
+    required this.title,
+    required this.subtitle,
+    required this.active,
+    required this.done,
+  });
+
+  final int index;
+  final String title;
+  final String subtitle;
+  final bool active;
+  final bool done;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = done
+        ? AppColors.success
+        : (active ? AppColors.deepTeal : AppColors.mist);
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: active ? 0.12 : 0.07),
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        border: Border.all(
+          color: color.withValues(alpha: 0.18),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.14),
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              '$index',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.w900,
+                  ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: color,
+                        fontWeight: FontWeight.w800,
+                      ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

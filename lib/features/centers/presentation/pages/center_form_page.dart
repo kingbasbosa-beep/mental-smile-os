@@ -214,6 +214,21 @@ class _CenterFormPageState extends State<CenterFormPage> {
         id: id,
         name: _nameCtrl.text.trim(),
         category: _categoryCtrl.text.trim(),
+        centerType: existing?.centerType ??
+            (() {
+              switch (_categoryCtrl.text.trim()) {
+                case 'detox':
+                  return 'detox';
+                case 'hospital':
+                case 'hospitals':
+                  return 'hospital';
+                case 'special_needs':
+                  return 'special_needs_care';
+                case 'recovery':
+                default:
+                  return 'halfway_house';
+              }
+            })(),
         categoryLabelAr: _categoryLabelArCtrl.text.trim(),
         categoryLabelEn: _categoryLabelEnCtrl.text.trim(),
         city: _cityCtrl.text.trim(),
@@ -222,6 +237,9 @@ class _CenterFormPageState extends State<CenterFormPage> {
         phone: _phoneCtrl.text.trim(),
         whatsapp: _whatsappCtrl.text.trim(),
         address: _addressCtrl.text.trim(),
+        hasDetoxUnit: existing?.hasDetoxUnit == true ||
+            (existing?.centerType == 'detox') ||
+            _categoryCtrl.text.trim() == 'detox',
         services: _parseServices(_servicesCtrl.text),
         isActive: _isActive,
         sortOrder: _parseSortOrder(_sortOrderCtrl.text),
@@ -235,8 +253,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
             existing?.accommodationCosts ?? defaultAccommodationCostItems(),
         autismCareCosts:
             existing?.autismCareCosts ?? defaultAutismCareCostItems(),
-        capabilities:
-            existing?.capabilities ?? const CenterCapabilityFlags(),
+        capabilities: existing?.capabilities ?? const CenterCapabilityFlags(),
         createdAt: existing?.createdAt,
         updatedAt: existing?.updatedAt,
       );
@@ -495,8 +512,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
                       textDirection: TextDirection.ltr,
                       decoration: const InputDecoration(
                         labelText: 'صورة الغلاف المحلية (coverImageAsset)',
-                        hintText:
-                            'assets/c6_library/hero/center_placeholder.png',
+                        hintText: 'assets/c6_library/hero/library_hero.png',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -557,8 +573,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
                       textDirection: TextDirection.ltr,
                       decoration: const InputDecoration(
                         labelText: 'صورة معرض محلية 1',
-                        hintText:
-                            'assets/c6_library/hero/center_placeholder.png',
+                        hintText: 'assets/c6_library/hero/library_hero.png',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -568,8 +583,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
                       textDirection: TextDirection.ltr,
                       decoration: const InputDecoration(
                         labelText: 'صورة معرض محلية 2',
-                        hintText:
-                            'assets/c6_library/hero/center_placeholder.png',
+                        hintText: 'assets/c6_library/hero/library_hero.png',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -579,8 +593,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
                       textDirection: TextDirection.ltr,
                       decoration: const InputDecoration(
                         labelText: 'صورة معرض محلية 3',
-                        hintText:
-                            'assets/c6_library/hero/center_placeholder.png',
+                        hintText: 'assets/c6_library/hero/library_hero.png',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -590,8 +603,7 @@ class _CenterFormPageState extends State<CenterFormPage> {
                       textDirection: TextDirection.ltr,
                       decoration: const InputDecoration(
                         labelText: 'صورة معرض محلية 4',
-                        hintText:
-                            'assets/c6_library/hero/center_placeholder.png',
+                        hintText: 'assets/c6_library/hero/library_hero.png',
                         border: OutlineInputBorder(),
                       ),
                     ),

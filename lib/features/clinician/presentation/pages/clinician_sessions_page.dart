@@ -6,6 +6,12 @@ import 'package:flutterprojects/app/router/routes.dart';
 class ClinicianSessionsPage extends StatelessWidget {
   const ClinicianSessionsPage({super.key});
 
+  static const String _primaryBookingSource = 'booking_requests';
+  static const String _legacyBookingSource = 'bookingRequests';
+  // Clinician-domain structural decoupling: keep legacy reads disabled.
+  // Rollback remains trivial if bookingRequests compatibility must be restored.
+  static const bool _legacyBookingRequestsReadEnabled = false;
+
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
@@ -16,8 +22,7 @@ class ClinicianSessionsPage extends StatelessWidget {
         status == 'session_in_progress' ||
         status == 'session_completed_pending_reviews' ||
         status == 'completed_success' ||
-        status == 'reschedule_pending' ||
-        status == 'payout_pending';
+        status == 'reschedule_pending';
   }
 
   String _statusLabel(String status, bool isArabic) {
@@ -30,8 +35,6 @@ class ClinicianSessionsPage extends StatelessWidget {
         return isArabic ? 'الجلسة جارية' : 'Session in progress';
       case 'session_completed_pending_reviews':
         return isArabic ? 'بانتظار التقييمات' : 'Pending reviews';
-      case 'payout_pending':
-        return isArabic ? 'بانتظار التحويل المالي' : 'Payout pending';
       case 'completed_success':
         return isArabic ? 'منتهية بنجاح' : 'Completed successfully';
       case 'reschedule_pending':
@@ -49,7 +52,6 @@ class ClinicianSessionsPage extends StatelessWidget {
       case 'session_in_progress':
         return const Color(0xFF2E5AAC);
       case 'session_completed_pending_reviews':
-      case 'payout_pending':
       case 'completed_success':
         return const Color(0xFF1F9D63);
       case 'reschedule_pending':
@@ -69,9 +71,56 @@ class ClinicianSessionsPage extends StatelessWidget {
     if (clinicianReviewSubmitted) return false;
 
     return status == 'session_completed_pending_reviews' ||
-        status == 'payout_pending' ||
         (sessionStatus == 'completed' &&
             (reviewStatus == 'pending_reviews' || reviewStatus == 'partial'));
+  }
+
+  Widget _buildSessionsIntro(BuildContext context, bool isArabic) {
+    return Align(
+      alignment: isArabic ? Alignment.centerRight : Alignment.centerLeft,
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic ? 'الجلسات والمتابعة' : 'Sessions and follow-up',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            isArabic
+                ? 'هذه الصفحة مخصصة لمتابعة حالة الجلسة وبياناتها، ومنها تنتقل إلى التقييم عندما تصبح الجلسة جاهزة للمراجعة.'
+                : 'This page is for tracking session status and details, and from here you move to review once the session is ready for evaluation.',
+            style: Theme.of(context).textTheme.bodyMedium,
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReviewHandoffAction(
+    BuildContext context, {
+    required bool isArabic,
+    required String requestId,
+  }) {
+    return FilledButton.icon(
+      onPressed: () {
+        Navigator.of(context).pushNamed(
+          Routes.sessionReview,
+          arguments: {
+            'requestId': requestId,
+            'reviewerType': 'clinician',
+          },
+        );
+      },
+      icon: const Icon(Icons.rate_review_outlined),
+      label: Text(
+        isArabic ? 'الانتقال إلى تقييم الجلسة' : 'Continue to session review',
+      ),
+    );
   }
 
   String _dateText(dynamic value) {
@@ -110,6 +159,36 @@ class ClinicianSessionsPage extends StatelessWidget {
     return DateTime.fromMillisecondsSinceEpoch(0);
   }
 
+  List<Map<String, dynamic>> _mergeBookingSources({
+    required QuerySnapshot<Map<String, dynamic>>? primarySnapshot,
+    required QuerySnapshot<Map<String, dynamic>>? legacySnapshot,
+  }) {
+    // Canonical specialist booking source.
+    final primaryDocs = primarySnapshot == null
+        ? const <Map<String, dynamic>>[]
+        : _normalizeDocs(primarySnapshot.docs, _primaryBookingSource);
+
+    // Legacy compatibility mirror kept temporarily to avoid hiding older data.
+    final legacyDocs = legacySnapshot == null
+        ? const <Map<String, dynamic>>[]
+        : _normalizeDocs(legacySnapshot.docs, _legacyBookingSource);
+
+    final all = <Map<String, dynamic>>[
+      ...primaryDocs,
+      ...legacyDocs,
+    ];
+
+    final unique = <String, Map<String, dynamic>>{};
+    for (final item in all) {
+      final id = (item['_id'] ?? '').toString();
+      if (id.isEmpty) continue;
+      final existing = unique[id];
+      unique[id] = existing == null ? item : _preferredDoc(existing, item);
+    }
+
+    return unique.values.toList();
+  }
+
   Map<String, dynamic> _preferredDoc(
     Map<String, dynamic> current,
     Map<String, dynamic> incoming,
@@ -121,8 +200,8 @@ class ClinicianSessionsPage extends StatelessWidget {
 
     final currentSource = (current['_source'] ?? '').toString();
     final incomingSource = (incoming['_source'] ?? '').toString();
-    if (incomingSource == 'booking_requests' &&
-        currentSource != 'booking_requests') {
+    if (incomingSource == _primaryBookingSource &&
+        currentSource != _primaryBookingSource) {
       return incoming;
     }
     return current;
@@ -152,17 +231,21 @@ class ClinicianSessionsPage extends StatelessWidget {
               )
             : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                 stream: FirebaseFirestore.instance
-                    .collection('booking_requests')
+                    .collection(_primaryBookingSource)
                     .where('assignedClinicianId', isEqualTo: uid)
                     .snapshots(),
                 builder: (context, snapA) {
                   return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                    stream: FirebaseFirestore.instance
-                        .collection('bookingRequests')
-                        .where('assignedClinicianId', isEqualTo: uid)
-                        .snapshots(),
+                    stream: _legacyBookingRequestsReadEnabled
+                        ? FirebaseFirestore.instance
+                            .collection(_legacyBookingSource)
+                            .where('assignedClinicianId', isEqualTo: uid)
+                            .snapshots()
+                        : null,
                     builder: (context, snapB) {
-                      if (snapA.hasError && snapB.hasError) {
+                      if (snapA.hasError &&
+                          (!_legacyBookingRequestsReadEnabled ||
+                              snapB.hasError)) {
                         return Center(
                           child: Text(
                             isArabic
@@ -172,34 +255,18 @@ class ClinicianSessionsPage extends StatelessWidget {
                         );
                       }
 
-                      if (!snapA.hasData && !snapB.hasData) {
+                      if (!snapA.hasData &&
+                          (!_legacyBookingRequestsReadEnabled ||
+                              !snapB.hasData)) {
                         return const Center(child: CircularProgressIndicator());
                       }
 
-                      final all = <Map<String, dynamic>>[];
-
-                      if (snapA.hasData) {
-                        all.addAll(_normalizeDocs(
-                            snapA.data!.docs, 'booking_requests'));
-                      }
-                      if (snapB.hasData) {
-                        all.addAll(_normalizeDocs(
-                            snapB.data!.docs, 'bookingRequests'));
-                      }
-
-                      final unique = <String, Map<String, dynamic>>{};
-                      for (final item in all) {
-                        final id = (item['_id'] ?? '').toString();
-                        if (id.isEmpty) continue;
-                        final existing = unique[id];
-                        unique[id] = existing == null
-                            ? item
-                            : _preferredDoc(existing, item);
-                      }
-
-                      final docs = unique.values
-                          .where(_isSessionRelated)
-                          .toList()
+                      final docs = _mergeBookingSources(
+                        primarySnapshot: snapA.data,
+                        legacySnapshot: _legacyBookingRequestsReadEnabled
+                            ? snapB.data
+                            : null,
+                      ).where(_isSessionRelated).toList()
                         ..sort((a, b) {
                           final aTs = a['updatedAt'] ?? a['createdAt'];
                           final bTs = b['updatedAt'] ?? b['createdAt'];
@@ -222,151 +289,142 @@ class ClinicianSessionsPage extends StatelessWidget {
 
                       return ListView(
                         padding: const EdgeInsets.all(16),
-                        children: docs.map((data) {
-                          final requestId = (data['_id'] ?? '').toString();
-                          final status = (data['status'] ?? '').toString();
-                          final clientName =
-                              (data['clientName'] ?? 'Client').toString();
-                          final sessionDate =
-                              (data['sessionDateText'] ?? '').toString();
-                          final sessionLink =
-                              (data['sessionLink'] ?? '').toString();
-                          final sessionCode =
-                              (data['sessionCode'] ?? '').toString();
-                          final adminNotes =
-                              (data['sessionAdminNotes'] ?? '').toString();
-                          final createdAt = _dateText(data['createdAt']);
+                        children: [
+                          _buildSessionsIntro(context, isArabic),
+                          const SizedBox(height: 16),
+                          ...docs.map((data) {
+                            final requestId = (data['_id'] ?? '').toString();
+                            final status = (data['status'] ?? '').toString();
+                            final clientName =
+                                (data['clientName'] ?? 'Client').toString();
+                            final sessionDate =
+                                (data['sessionDateText'] ?? '').toString();
+                            final sessionLink =
+                                (data['sessionLink'] ?? '').toString();
+                            final sessionCode =
+                                (data['sessionCode'] ?? '').toString();
+                            final sessionNotes =
+                                (data['sessionAdminNotes'] ?? '').toString();
+                            final createdAt = _dateText(data['createdAt']);
 
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 14),
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: scheme.surface,
-                              borderRadius: BorderRadius.circular(22),
-                              border: Border.all(
-                                color: scheme.outline.withValues(alpha: 0.14),
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 14),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: scheme.surface,
+                                borderRadius: BorderRadius.circular(22),
+                                border: Border.all(
+                                  color: scheme.outline.withValues(alpha: 0.14),
+                                ),
                               ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: isArabic
-                                  ? CrossAxisAlignment.end
-                                  : CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: isArabic
-                                            ? CrossAxisAlignment.end
-                                            : CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            clientName,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.w800,
-                                                ),
-                                          ),
-                                          if (createdAt.isNotEmpty) ...[
-                                            const SizedBox(height: 6),
+                              child: Column(
+                                crossAxisAlignment: isArabic
+                                    ? CrossAxisAlignment.end
+                                    : CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: isArabic
+                                              ? CrossAxisAlignment.end
+                                              : CrossAxisAlignment.start,
+                                          children: [
                                             Text(
-                                              isArabic
-                                                  ? 'تاريخ الطلب: $createdAt'
-                                                  : 'Request date: $createdAt',
+                                              clientName,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
                                             ),
+                                            if (createdAt.isNotEmpty) ...[
+                                              const SizedBox(height: 6),
+                                              Text(
+                                                isArabic
+                                                    ? 'تاريخ الطلب: $createdAt'
+                                                    : 'Request date: $createdAt',
+                                              ),
+                                            ],
                                           ],
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: _statusColor(status)
-                                            .withValues(alpha: 0.12),
-                                        borderRadius:
-                                            BorderRadius.circular(999),
-                                      ),
-                                      child: Text(
-                                        _statusLabel(status, isArabic),
-                                        style: TextStyle(
-                                          color: _statusColor(status),
-                                          fontWeight: FontWeight.w800,
                                         ),
                                       ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: _statusColor(status)
+                                              .withValues(alpha: 0.12),
+                                          borderRadius:
+                                              BorderRadius.circular(999),
+                                        ),
+                                        child: Text(
+                                          _statusLabel(status, isArabic),
+                                          style: TextStyle(
+                                            color: _statusColor(status),
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 14),
+                                  if (sessionDate.trim().isNotEmpty)
+                                    Text(
+                                      isArabic
+                                          ? 'موعد الجلسة: $sessionDate'
+                                          : 'Session date: $sessionDate',
+                                    ),
+                                  if (sessionLink.trim().isNotEmpty) ...[
+                                    const SizedBox(height: 8),
+                                    SelectableText(
+                                      isArabic
+                                          ? 'رابط الجلسة: $sessionLink'
+                                          : 'Session link: $sessionLink',
                                     ),
                                   ],
-                                ),
-                                const SizedBox(height: 14),
-                                if (sessionDate.trim().isNotEmpty)
-                                  Text(
-                                    isArabic
-                                        ? 'موعد الجلسة: $sessionDate'
-                                        : 'Session date: $sessionDate',
-                                  ),
-                                if (sessionLink.trim().isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  SelectableText(
-                                    isArabic
-                                        ? 'رابط الجلسة: $sessionLink'
-                                        : 'Session link: $sessionLink',
-                                  ),
-                                ],
-                                if (sessionCode.trim().isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  SelectableText(
-                                    isArabic
-                                        ? 'كود الجلسة: $sessionCode'
-                                        : 'Session code: $sessionCode',
-                                  ),
-                                ],
-                                if (adminNotes.trim().isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    isArabic
-                                        ? 'ملاحظات الإدارة: $adminNotes'
-                                        : 'Admin notes: $adminNotes',
-                                  ),
-                                ],
-                                if (sessionDate.trim().isEmpty &&
-                                    sessionLink.trim().isEmpty &&
-                                    sessionCode.trim().isEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    isArabic
-                                        ? 'لم يتم تجهيز بيانات الجلسة بعد.'
-                                        : 'Session details are not prepared yet.',
-                                  ),
-                                ],
-                                if (_canClinicianReview(data)) ...[
-                                  const SizedBox(height: 14),
-                                  FilledButton.icon(
-                                    onPressed: () {
-                                      Navigator.of(context).pushNamed(
-                                        Routes.sessionReview,
-                                        arguments: {
-                                          'requestId': requestId,
-                                          'reviewerType': 'clinician',
-                                        },
-                                      );
-                                    },
-                                    icon:
-                                        const Icon(Icons.rate_review_outlined),
-                                    label: Text(
+                                  if (sessionCode.trim().isNotEmpty) ...[
+                                    const SizedBox(height: 8),
+                                    SelectableText(
                                       isArabic
-                                          ? 'تقييم الجلسة'
-                                          : 'Review session',
+                                          ? 'كود الجلسة: $sessionCode'
+                                          : 'Session code: $sessionCode',
                                     ),
-                                  ),
+                                  ],
+                                  if (sessionNotes.trim().isNotEmpty) ...[
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      isArabic
+                                          ? 'ملاحظات الجلسة: $sessionNotes'
+                                          : 'Session notes: $sessionNotes',
+                                    ),
+                                  ],
+                                  if (sessionDate.trim().isEmpty &&
+                                      sessionLink.trim().isEmpty &&
+                                      sessionCode.trim().isEmpty) ...[
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      isArabic
+                                          ? 'لم يتم تجهيز بيانات الجلسة بعد.'
+                                          : 'Session details are not prepared yet.',
+                                    ),
+                                  ],
+                                  if (_canClinicianReview(data)) ...[
+                                    const SizedBox(height: 14),
+                                    _buildReviewHandoffAction(
+                                      context,
+                                      isArabic: isArabic,
+                                      requestId: requestId,
+                                    ),
+                                  ],
                                 ],
-                              ],
-                            ),
-                          );
-                        }).toList(),
+                              ),
+                            );
+                          }),
+                        ],
                       );
                     },
                   );

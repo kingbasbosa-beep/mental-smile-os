@@ -1,16 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
 
 class CenterBookingRequestArgs {
   final String centerId;
   final String centerName;
+  final String centerType;
+  final bool hasDetoxUnit;
   final String? existingRequestId;
 
   const CenterBookingRequestArgs({
     required this.centerId,
     required this.centerName,
+    this.centerType = '',
+    this.hasDetoxUnit = false,
     this.existingRequestId,
   });
 }
@@ -26,11 +31,6 @@ class CenterBookingRequestPage extends StatefulWidget {
 }
 
 class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
-  static const Set<String> _requiredAdminDocIds = {
-    '4Seip1WPWJOymxzgr4QrVsQASmk2',
-    'w4WyLNutDrhQaoXtkLFGMhys1EI3',
-  };
-
   final TextEditingController _noteCtrl = TextEditingController();
 
   bool _submitting = false;
@@ -41,6 +41,8 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
   String _lastSuggestedAlternativeKey = '';
   String _lastSuggestedAlternativeLabelAr = '';
   String _categoryKey = '';
+  String _centerType = '';
+  bool _centerHasDetoxUnit = false;
   List<AccommodationCostItem> _accommodationCosts =
       defaultAccommodationCostItems();
   List<AutismCareCostItem> _autismCareCosts = defaultAutismCareCostItems();
@@ -68,6 +70,12 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
           .get();
       final centerData = centerDoc.data() ?? const <String, dynamic>{};
       _categoryKey = (centerData['category'] ?? '').toString().trim();
+      _centerType = (centerData['centerType'] ?? widget.args.centerType)
+          .toString()
+          .trim();
+      _centerHasDetoxUnit =
+          ((centerData['hasDetoxUnit'] ?? widget.args.hasDetoxUnit) == true) ||
+              _centerType == 'detox';
       _accommodationCosts =
           mergeAccommodationCostItems(centerData['accommodationCosts']);
       _autismCareCosts =
@@ -133,14 +141,26 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
   Future<List<DocumentSnapshot<Map<String, dynamic>>>> _existingRequestDocs(
     String requestId,
   ) async {
-    final refs = [
-      FirebaseFirestore.instance.collection('booking_requests').doc(requestId),
-      FirebaseFirestore.instance.collection('bookingRequests').doc(requestId),
-    ];
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final currentUid = currentUser?.uid ?? '';
     final existing = <DocumentSnapshot<Map<String, dynamic>>>[];
-    for (final ref in refs) {
+    final ref = FirebaseFirestore.instance
+        .collection('booking_requests')
+        .doc(requestId);
+    debugPrint(
+      'CENTER_RESUBMIT_READ existingRequestId=$requestId '
+      'collection=${ref.parent.id} currentUid=$currentUid',
+    );
+    try {
       final snap = await ref.get();
+      debugPrint(
+        'READ_SUCCESS collection=${ref.parent.id} docId=$requestId',
+      );
       if (snap.exists) existing.add(snap);
+    } catch (e) {
+      debugPrint(
+        'READ_ERROR collection=${ref.parent.id} error=$e',
+      );
     }
     return existing;
   }
@@ -148,41 +168,40 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
   Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>>
       _resolveCenterAdmins() async {
     final adminsSnap = await FirebaseFirestore.instance
-        .collection('clinicians')
-        .where('isActive', isEqualTo: true)
-        .where('isAdmin', isEqualTo: true)
-        .where('role', isEqualTo: 'clinician')
+        .collection('admins')
+        .where('active', isEqualTo: true)
         .get();
 
-    final allAdmins = adminsSnap.docs;
+    final allAdmins =
+        adminsSnap.docs.where((doc) => doc.id.trim().length == 28).toList();
     if (allAdmins.isEmpty) {
       throw Exception('لم يتم العثور على حسابات إدارة مفعلة');
     }
-
-    final matched = allAdmins
-        .where((doc) => _requiredAdminDocIds.contains(doc.id))
-        .toList();
-
-    final foundIds = matched.map((e) => e.id).toSet();
-    if (foundIds.length != _requiredAdminDocIds.length) {
-      final missing = _requiredAdminDocIds.difference(foundIds).toList()
-        ..sort();
-      throw Exception(
-        'حسابات إدارة المراكز المطلوبة غير موجودة أو غير مفعلة: ${missing.join(' / ')}',
-      );
-    }
-
-    matched.sort((a, b) => a.id.compareTo(b.id));
-    return matched;
+    allAdmins.sort((a, b) => a.id.compareTo(b.id));
+    debugPrint(
+      'CENTER_CREATE admins_resolved count=${allAdmins.length} '
+      'ids=${allAdmins.map((doc) => doc.id).join(',')}',
+    );
+    return allAdmins;
   }
 
   Future<void> _submit() async {
-    if (_submitting) return;
+    print('CENTER_DIAG entered_submit_v2');
+    if (_submitting) {
+      debugPrint('CENTER_CREATE early_return reason=already_submitting');
+      return;
+    }
 
     final user = FirebaseAuth.instance.currentUser;
-    final uid = user?.uid;
-    if (uid == null) {
-      setState(() => _result = 'يجب تسجيل الدخول أولًا');
+    final uid = user?.uid ?? '';
+    final isAnonymous = user?.isAnonymous == true;
+    final email = user?.email ?? '';
+    debugPrint(
+      'CENTER_SUBMIT auth_check uid=$uid isAnonymous=$isAnonymous email=$email',
+    );
+    if (user == null || isAnonymous) {
+      debugPrint('BLOCK_SUBMIT: user not authenticated properly');
+      setState(() => _result = 'Session expired. Please log in again.');
       return;
     }
 
@@ -192,10 +211,28 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
     });
 
     final messenger = ScaffoldMessenger.of(context);
+    final firebaseApp = Firebase.app();
+    final firebaseOptions = firebaseApp.options;
+
+    debugPrint('CENTER_SUBMIT submit_uid=$uid');
+    debugPrint('CENTER_SUBMIT submit_email=$email');
+    debugPrint('CENTER_SUBMIT submit_isAnonymous=$isAnonymous');
+    debugPrint(
+      'CENTER_SUBMIT existingRequestId=${widget.args.existingRequestId ?? ''}',
+    );
+    debugPrint(
+      'CENTER_SUBMIT firebase_binding '
+      'projectId=${firebaseOptions.projectId} '
+      'appId=${firebaseOptions.appId} '
+      'authDomain=${firebaseOptions.authDomain ?? ''}',
+    );
 
     try {
+      print('CENTER_TRACE before_admin_lookup');
       final admins = await _resolveCenterAdmins();
+      print('CENTER_TRACE after_admin_lookup count=${admins.length}');
 
+      print('CENTER_TRACE before_prepare_payload');
       final note = _noteCtrl.text.trim();
       final options = _availableAccommodationOptions();
       final selection = options.cast<Map<String, dynamic>?>().firstWhere(
@@ -204,15 +241,24 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
             orElse: () => null,
           );
       if (options.isNotEmpty && selection == null) {
+        debugPrint(
+          'CENTER_CREATE early_return reason=missing_accommodation_selection',
+        );
         throw Exception('اختر نوع الإقامة أولًا');
       }
       final firestore = FirebaseFirestore.instance;
+      debugPrint(
+        'CENTER_SUBMIT firestore_instance app=${firebaseApp.name} '
+        'projectId=${firebaseOptions.projectId}',
+      );
       final createdAt = Timestamp.now();
       final requestGroupId = firestore.collection('booking_requests').doc().id;
 
       final sentToNames = admins
-          .map((adminDoc) =>
-              (adminDoc.data()['displayName'] ?? 'Admin').toString())
+          .map((adminDoc) => (adminDoc.data()['displayName'] ??
+                  adminDoc.data()['email'] ??
+                  'Admin')
+              .toString())
           .toList();
       final sentToIds = admins.map((adminDoc) => adminDoc.id).toList();
 
@@ -222,6 +268,27 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
       final selectedPrice = (selection?['price'] is num)
           ? (selection!['price'] as num).toDouble()
           : 0.0;
+      final contractDraft = {
+        'status': 'draft',
+        'version': 1,
+        'room': {
+          'key': _selectedAccommodationKey,
+          'label': selectedLabelAr,
+          'price': selectedPrice,
+          'pricingUnit': selectedPricingUnit,
+          'snapshot': selection?['snapshot'] ?? const <String, dynamic>{},
+        },
+        'duration': {
+          'basis': 'external_diagnosis',
+        },
+        'pricing': {
+          'baseAmount': selectedPrice,
+        },
+        'meta': {
+          'source': 'center_request_v1',
+          'createdAt': createdAt,
+        },
+      };
       final payload = <String, dynamic>{
         'requestKind': 'center',
         'requestGroupId': requestGroupId,
@@ -229,14 +296,32 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
         'clientName': (user?.displayName ?? user?.email ?? 'Client').trim(),
         'centerId': widget.args.centerId,
         'centerName': widget.args.centerName,
+        'selectedCenterType': _centerType,
+        'centerHasDetoxUnit': _centerHasDetoxUnit,
         'status': 'pending_admin',
         'workflowStage': 'pending_admin',
         'createdAt': createdAt,
         'updatedAt': createdAt,
         'note': note,
+        'adminApproved': false,
+        'adminRejected': false,
         'adminForwarded': false,
+        'adminDecisionType': '',
+        'adminDecisionBy': '',
+        'adminDecisionAt': null,
         'adminAssignedBy': '',
         'adminAssignedAt': null,
+        'paymentStatus': 'not_started',
+        'sessionStatus': 'not_created',
+        'reviewStatus': 'not_started',
+        'payoutStatus': 'blocked',
+        // Canonical ownership field.
+        'assignedClinicianId': '',
+        'assignedClinicianName': '',
+        'clinicianId': '',
+        'clinicianName': '',
+        // Legacy compatibility field.
+        'clinicianUid': '',
         'centerAvailabilityStatus': 'pending',
         'centerAvailabilityNote': '',
         'centerAvailabilityRespondedAt': null,
@@ -249,6 +334,13 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
             selection?['snapshot'] ?? const <String, dynamic>{},
         'selectedAccommodationPrice': selectedPrice,
         'selectedAccommodationPricingUnit': selectedPricingUnit,
+        // PHASE 1: Center Contract Draft (Structured, Passive)
+        // - No behavior change
+        // - No acceptance yet
+        // - No admin flow change
+        // - No free-text fields allowed
+        // - Future phases will activate contract lifecycle
+        'contract': contractDraft,
         'lastCenterAvailabilityStatus': '',
         'lastCenterAvailabilityNote': _lastCenterNote,
         'lastCenterSuggestedAlternativeKey': _lastSuggestedAlternativeKey,
@@ -261,10 +353,54 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
         'targetAdminIds': sentToIds,
         'targetAdminNames': sentToNames,
       };
+      print(
+        'CENTER_TRACE after_prepare_payload '
+        'requestGroupId=$requestGroupId '
+        'selectedAccommodationKey=$_selectedAccommodationKey '
+        'targetAdmins=${sentToIds.length}',
+      );
 
       final existingId = widget.args.existingRequestId;
-      if (existingId != null && existingId.trim().isNotEmpty) {
+      var shouldCreate = existingId == null || existingId.trim().isEmpty;
+      print(
+        'CENTER_TRACE before_existing_check '
+        'existingId=${existingId ?? ''} '
+        'initialShouldCreate=$shouldCreate',
+      );
+      debugPrint('CENTER_CREATE existingId=${existingId ?? ''}');
+      debugPrint('CENTER_CREATE shouldCreate=$shouldCreate');
+      if (!shouldCreate) {
+        print(
+          'CENTER_TRACE before_existing_query '
+          'existingId=${existingId ?? ''} '
+          'collection=booking_requests',
+        );
         final requestDocs = await _existingRequestDocs(existingId);
+        print(
+          'CENTER_TRACE after_existing_query '
+          'existingId=${existingId ?? ''} '
+          'docsFound=${requestDocs.length}',
+        );
+        debugPrint(
+          'CENTER_RESUBMIT existingRequestId=$existingId '
+          'currentUserUid=${user?.uid ?? ''} '
+          'docsFound=${requestDocs.length}',
+        );
+        if (requestDocs.isEmpty) {
+          shouldCreate = true;
+        }
+        for (final doc in requestDocs) {
+          final data = doc.data() ?? const <String, dynamic>{};
+          debugPrint(
+            'CENTER_RESUBMIT doc_found '
+            'docId=${doc.id} '
+            'collection=${doc.reference.parent.id} '
+            'status=${(data['status'] ?? '').toString()} '
+            'clientId=${(data['clientId'] ?? '').toString()} '
+            'centerId=${(data['centerId'] ?? '').toString()} '
+            'currentUserUid=${user?.uid ?? ''}',
+          );
+        }
         var clientRevisionNumber = 0;
         if (requestDocs.isNotEmpty) {
           final current = requestDocs.first.data() ?? const <String, dynamic>{};
@@ -290,6 +426,9 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
               selection?['snapshot'] ?? const <String, dynamic>{},
           'selectedAccommodationPrice': selectedPrice,
           'selectedAccommodationPricingUnit': selectedPricingUnit,
+          'contract': contractDraft,
+          'selectedCenterType': _centerType,
+          'centerHasDetoxUnit': _centerHasDetoxUnit,
           'clientRevisionNumber': clientRevisionNumber + 1,
           'clientUpdatedAfterCenterFeedback': true,
           'adminCanApproveWithoutCenterRecheck':
@@ -297,14 +436,82 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
                   _lastSuggestedAlternativeKey == _selectedAccommodationKey,
         };
         for (final doc in requestDocs) {
-          await doc.reference.update(updatePayload);
+          final data = doc.data() ?? const <String, dynamic>{};
+          debugPrint(
+            'CENTER_RESUBMIT update_attempt '
+            'docId=${doc.id} '
+            'collection=${doc.reference.parent.id} '
+            'statusBefore=${(data['status'] ?? '').toString()} '
+            'clientId=${(data['clientId'] ?? '').toString()} '
+            'centerId=${(data['centerId'] ?? '').toString()} '
+            'currentUserUid=${user?.uid ?? ''}',
+          );
+          try {
+            await doc.reference.update(updatePayload);
+            debugPrint(
+              'CENTER_RESUBMIT update_success '
+              'docId=${doc.id} '
+              'collection=${doc.reference.parent.id}',
+            );
+          } catch (e) {
+            debugPrint(
+              'CENTER_RESUBMIT update_error '
+              'docId=${doc.id} '
+              'collection=${doc.reference.parent.id} '
+              'statusBefore=${(data['status'] ?? '').toString()} '
+              'clientId=${(data['clientId'] ?? '').toString()} '
+              'centerId=${(data['centerId'] ?? '').toString()} '
+              'currentUserUid=${user?.uid ?? ''} '
+              'error=$e',
+            );
+            rethrow;
+          }
         }
-      } else {
+      }
+      print(
+        'CENTER_TRACE after_existing_check '
+        'existingId=${existingId ?? ''} '
+        'finalShouldCreate=$shouldCreate',
+      );
+      if (shouldCreate) {
+        print('CENTER_TRACE before_create_prep');
+        debugPrint('CENTER_CREATE branch=create');
+        debugPrint(
+          'CENTER_CREATE payload_ready centerId=${widget.args.centerId} centerName=${widget.args.centerName}',
+        );
+        print('CENTER_DIAG skipped_diag_write_v3');
+        print('CENTER_TRACE after_create_prep');
+        print('CENTER_CREATE before_create_request');
+        print('CENTER_CREATE requestGroupId=$requestGroupId');
+        print(
+            'CENTER_CREATE selectedAccommodationKey=$_selectedAccommodationKey');
+        print('CENTER_CREATE noteLength=${note.length}');
+        print('CENTER_CREATE targetAdminIds=$sentToIds');
         final requestRef = firestore.collection('booking_requests').doc();
-        await requestRef.set(payload);
+        debugPrint(
+          'CENTER_CREATE create_request '
+          'docId=${requestRef.id} '
+          'collection=booking_requests '
+          'status=pending_admin '
+          'clientId=$uid '
+          'centerId=${widget.args.centerId}',
+        );
+        print('CENTER_CREATE payload_clientId=${payload['clientId']}');
+        print('CENTER_CREATE payload_centerId=${payload['centerId']}');
+        print('CENTER_CREATE payload_centerName=${payload['centerName']}');
+        debugPrint('CENTER_CREATE write_attempt');
+        try {
+          await requestRef.set(payload);
+          debugPrint('CENTER_CREATE write_success docId=${requestRef.id}');
+        } catch (e) {
+          debugPrint('CENTER_CREATE write_error error=$e');
+          rethrow;
+        }
       }
 
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       final routedNames = sentToNames.toSet().join(' / ');
       setState(() => _result = 'تم إرسال طلب المركز إلى الإدارة بنجاح');
@@ -319,6 +526,7 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
         ),
       );
     } catch (e) {
+      debugPrint('CENTER_CREATE submit_error error=$e');
       if (!mounted) return;
       setState(() => _result = 'تعذر إرسال الطلب');
       messenger.showSnackBar(

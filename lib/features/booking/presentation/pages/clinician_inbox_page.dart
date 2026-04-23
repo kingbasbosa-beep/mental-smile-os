@@ -5,6 +5,18 @@ import 'package:flutter/material.dart';
 const String kDevClinicianId =
     String.fromEnvironment('MK_DEV_CLINICIAN_ID', defaultValue: '');
 
+// Clinician-domain structural decoupling: keep legacy mirror writes disabled.
+// Rollback remains trivial if bookingRequests compatibility must be restored.
+const bool _legacyBookingRequestsWriteEnabled = false;
+
+// clinicianUid is legacy compatibility only; assignedClinicianId is canonical.
+// Rollback remains possible by enabling this local guard.
+const bool _legacyClinicianUidReadEnabled = false;
+
+// Legacy clinician inbox is demoted during structural decoupling.
+// Rollback remains trivial by re-enabling this local guard.
+const bool _legacyClinicianInboxEnabled = false;
+
 class ClinicianInboxPage extends StatefulWidget {
   final String clinicianId;
   final String clinicianName;
@@ -43,7 +55,12 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
 
     return FirebaseFirestore.instance
         .collection('booking_requests')
-        .where('clinicianUid', isEqualTo: uid)
+        .where(
+          _legacyClinicianUidReadEnabled
+              ? 'clinicianUid'
+              : 'assignedClinicianId',
+          isEqualTo: uid,
+        )
         .where('status', isEqualTo: status)
         .orderBy('createdAt', descending: true)
         .limit(100);
@@ -61,7 +78,8 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
     final db = FirebaseFirestore.instance;
     final refs = [
       db.collection('booking_requests').doc(requestId),
-      db.collection('bookingRequests').doc(requestId),
+      if (_legacyBookingRequestsWriteEnabled)
+        db.collection('bookingRequests').doc(requestId),
     ];
 
     for (final ref in refs) {
@@ -126,6 +144,45 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
               selected: _statusFilter == it['key'],
               onSelected: (value) => setState(() => _statusFilter = it['key']!),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegacyInboxIntro(BuildContext context) {
+    final isArabic =
+        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: scheme.outline.withValues(alpha: 0.14),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic ? 'صندوق وارد توافق/legacy' : 'Legacy compatibility inbox',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            isArabic
+                ? 'هذه الصفحة ما زالت متاحة للتوافق والمتابعة، لكن المساحة الأساسية لطلبات الأخصائي داخل Specialist Workspace أصبحت غرفة عمليات الأخصائي.'
+                : 'This page remains available for compatibility and follow-up, but the primary specialist workspace for assignments is now Clinician Operations.',
+            style: Theme.of(context).textTheme.bodyMedium,
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+          ),
         ],
       ),
     );
@@ -218,6 +275,26 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_legacyClinicianInboxEnabled) {
+      return Directionality(
+        textDirection: TextDirection.rtl,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('وارد الأخصائي'),
+          ),
+          body: Center(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Text(
+                'تم إيقاف صندوق الوارد القديم مؤقتًا. استخدم غرفة عمليات الأخصائي.',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     final q = _query(_statusFilter);
 
     return Directionality(
@@ -228,6 +305,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
         ),
         body: Column(
           children: [
+            _buildLegacyInboxIntro(context),
             _statusTabs(context),
             if (_statusFilter == 'assigned_clinician')
               Padding(

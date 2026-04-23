@@ -13,7 +13,7 @@ import 'package:flutterprojects/features/booking/presentation/pages/center_booki
 import 'package:flutterprojects/features/booking/presentation/pages/my_bookings_page.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/clinician_inbox_page.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/center_inbox_page.dart';
-import 'package:flutterprojects/features/booking/presentation/pages/admin_booking_queue_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_booking_queue_page.dart';
 
 import 'package:flutterprojects/features/library/presentation/pages/library_page.dart';
 import 'package:flutterprojects/features/splash/presentation/pages/splash_page.dart';
@@ -29,40 +29,63 @@ import 'package:flutterprojects/features/auth/presentation/pages/login_page.dart
 import 'package:flutterprojects/features/auth/presentation/pages/client_register_page.dart';
 import 'package:flutterprojects/features/auth/presentation/pages/clinician_register_page.dart';
 import 'package:flutterprojects/features/chat/presentation/pages/chat_page.dart';
-import 'package:flutterprojects/features/chat/presentation/pages/chat_escalations_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/chat_escalations_page.dart';
 import 'package:flutterprojects/features/chat/presentation/pages/chat_escalation_report_page.dart';
 import 'package:flutterprojects/features/chat/presentation/pages/clinician_chat_inbox_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/centers_landing_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/centers_list_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_details_page.dart';
-import 'package:flutterprojects/features/centers/presentation/pages/admin_centers_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_centers_page.dart';
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_hub_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_clients_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_hub_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_blueprint_handoff_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_workspace_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_content_care_programs_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_ai_followup_boundaries_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_ai_policy_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_compliance_checkpoints_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_domain_status_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_library_governance_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_exposure_rules_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_gateway_layer_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_growth_layer_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_support_messaging_governance_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_communication_gateway_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_engineering_gateway_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_device_storage_gateway_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_followup_care_governance_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_activation_readiness_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_system_activation_pack_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_operations_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_communications_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_archive_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_alerts_review_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_centers_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_clinicians_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_support_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_archive_support_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_accounting_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_sessions_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_payments_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_reports_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_session_report_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_clinician_profile_requests_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_archive_sessions_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_archive_payments_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_archive_reports_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_session_report_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_profile_requests_page.dart';
 import 'package:flutterprojects/features/reviews/presentation/pages/session_review_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_payments_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_sessions_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_payments_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_sessions_page.dart';
 import 'package:flutterprojects/features/client/presentation/pages/client_payment_proof_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_clinician_requests_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_support_chat_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_requests_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_support_chat_page.dart';
 import 'package:flutterprojects/features/clinician/presentation/pages/clinician_operations_page.dart';
 import 'package:flutterprojects/features/client/presentation/pages/client_dashboard_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_register_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_dashboard_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_operations_page.dart';
+import 'package:flutterprojects/features/centers/presentation/pages/center_residencies_page.dart';
 import 'package:flutterprojects/features/client/presentation/pages/client_sessions_page.dart';
 
 const String _adminBookingQueueRoute = '/admin/booking-queue';
+const String _adminAlertsReviewRoute = '/admin/alerts-review';
 const String _roleAdmin = 'admin';
 const String _roleClinician = 'clinician';
 const String _roleCenter = 'center';
@@ -71,13 +94,34 @@ const String _roleClient = 'client';
 class AppRouter {
   static const Set<String> _adminOnlyRoutes = {
     Routes.adminHub,
+    Routes.adminOperations,
+    Routes.adminCommunications,
     Routes.adminClinicianRequests,
+    Routes.adminClinicianWorkspace,
     Routes.adminClinicianProfileRequests,
     Routes.adminClients,
     Routes.adminPayments,
     Routes.adminSessions,
     Routes.adminSupportChats,
+    Routes.adminAiPolicies,
+    Routes.adminDomainStatus,
+    Routes.adminContentCarePrograms,
+    Routes.adminLibraryGovernance,
+    Routes.adminSupportMessagingGovernance,
+    Routes.adminFollowupCareGovernance,
+    Routes.adminAiFollowupBoundaries,
+    Routes.adminGrowthLayer,
+    Routes.adminBlueprintHandoff,
+    Routes.adminComplianceCheckpoints,
+    Routes.adminExposureRules,
+    Routes.adminActivationReadiness,
+    Routes.adminSystemActivationPack,
+    Routes.adminGatewayLayer,
+    Routes.adminCommunicationGateway,
+    Routes.adminEngineeringGateway,
+    Routes.adminDeviceStorageGateway,
     _adminBookingQueueRoute,
+    _adminAlertsReviewRoute,
     Routes.adminArchive,
     Routes.adminArchiveSessions,
     Routes.adminArchivePayments,
@@ -104,6 +148,7 @@ class AppRouter {
     Routes.centerDashboard,
     Routes.centerOperations,
     Routes.centerInbox,
+    Routes.centerResidencies,
   };
 
   static const Set<String> _clientOnlyRoutes = {
@@ -115,26 +160,21 @@ class AppRouter {
     Routes.centerBookingRequest,
   };
 
+  static bool _isAdminRoute(String? routeName) {
+    if (routeName == null) return false;
+    return _adminOnlyRoutes.contains(routeName);
+  }
+
   static bool _requiresSignedInNonAnonymous(RouteSettings settings) {
+    if (_isAdminRoute(settings.name)) {
+      return true;
+    }
+
     switch (settings.name) {
-      case Routes.adminHub:
-      case Routes.adminClinicianRequests:
-      case Routes.adminClinicianProfileRequests:
-      case Routes.adminClients:
-      case Routes.adminPayments:
-      case Routes.adminSessions:
-      case Routes.adminSupportChats:
-      case _adminBookingQueueRoute:
-      case Routes.adminArchive:
-      case Routes.adminArchiveSessions:
-      case Routes.adminArchivePayments:
-      case Routes.adminSessionReport:
-      case Routes.adminCenters:
-      case Routes.chatEscalations:
-      case Routes.chatEscalationReport:
       case Routes.centerDashboard:
       case Routes.centerOperations:
       case Routes.centerInbox:
+      case Routes.centerResidencies:
       case Routes.clinicianOperations:
       case Routes.clinicianInbox:
       case Routes.clinicianChatInbox:
@@ -156,7 +196,7 @@ class AppRouter {
 
   static Set<String>? _requiredRoles(String? routeName) {
     if (routeName == null) return null;
-    if (_adminOnlyRoutes.contains(routeName)) return {_roleAdmin};
+    if (_isAdminRoute(routeName)) return {_roleAdmin};
     if (_clinicianOnlyRoutes.contains(routeName)) return {_roleClinician};
     if (_centerOnlyRoutes.contains(routeName)) return {_roleCenter};
     if (_clientOnlyRoutes.contains(routeName)) return {_roleClient};
@@ -174,21 +214,239 @@ class AppRouter {
     required Widget child,
     required RouteSettings settings,
   }) {
-    String? qaRoleOverride;
-    final args = settings.arguments;
-    if (args is Map && args['qaRoleOverride'] != null) {
-      qaRoleOverride = args['qaRoleOverride'].toString().trim().toLowerCase();
-    }
-
     return MaterialPageRoute(
       builder: (_) => _RouteAccessGate(
         routeName: settings.name,
         allowedRoles: _requiredRoles(settings.name),
-        qaRoleOverride: qaRoleOverride,
         child: child,
       ),
       settings: settings,
     );
+  }
+
+  static Route<dynamic> _adminProtectedRoute({
+    required Widget child,
+    required RouteSettings settings,
+  }) {
+    return MaterialPageRoute(
+      builder: (_) => _RouteAccessGate(
+        routeName: settings.name,
+        allowedRoles: const {_roleAdmin},
+        child: child,
+      ),
+      settings: settings,
+    );
+  }
+
+  static Route<dynamic>? adminSurfaceRoutes(RouteSettings settings) {
+    switch (settings.name) {
+      case Routes.adminHub:
+        return _adminProtectedRoute(
+          child: const AdminHubPage(),
+          settings: settings,
+        );
+
+      case Routes.adminClinicianRequests:
+        return _adminProtectedRoute(
+          child: const AdminClinicianRequestsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminClinicianWorkspace:
+        return _adminProtectedRoute(
+          child: const AdminClinicianWorkspacePage(),
+          settings: settings,
+        );
+
+      case Routes.adminOperations:
+        return _adminProtectedRoute(
+          child: const AdminOperationsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminCommunications:
+        return _adminProtectedRoute(
+          child: const AdminCommunicationsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminClinicianProfileRequests:
+        return _adminProtectedRoute(
+          child: const AdminClinicianProfileRequestsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminClients:
+        return _adminProtectedRoute(
+          child: const AdminClientsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminSupportChats:
+        return _adminProtectedRoute(
+          child: const AdminSupportChatPage(),
+          settings: settings,
+        );
+
+      case Routes.adminAiPolicies:
+        return _adminProtectedRoute(
+          child: const AdminAiPolicyPage(),
+          settings: settings,
+        );
+
+      case Routes.adminDomainStatus:
+        return _adminProtectedRoute(
+          child: const AdminDomainStatusPage(),
+          settings: settings,
+        );
+
+      case Routes.adminContentCarePrograms:
+        return _adminProtectedRoute(
+          child: const AdminContentCareProgramsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminLibraryGovernance:
+        return _adminProtectedRoute(
+          child: const AdminLibraryGovernancePage(),
+          settings: settings,
+        );
+
+      case Routes.adminSupportMessagingGovernance:
+        return _adminProtectedRoute(
+          child: const AdminSupportMessagingGovernancePage(),
+          settings: settings,
+        );
+
+      case Routes.adminFollowupCareGovernance:
+        return _adminProtectedRoute(
+          child: const AdminFollowupCareGovernancePage(),
+          settings: settings,
+        );
+
+      case Routes.adminAiFollowupBoundaries:
+        return _adminProtectedRoute(
+          child: const AdminAiFollowupBoundariesPage(),
+          settings: settings,
+        );
+
+      case Routes.adminGrowthLayer:
+        return _adminProtectedRoute(
+          child: const AdminGrowthLayerPage(),
+          settings: settings,
+        );
+
+      case Routes.adminBlueprintHandoff:
+        return _adminProtectedRoute(
+          child: const AdminBlueprintHandoffPage(),
+          settings: settings,
+        );
+
+      case Routes.adminComplianceCheckpoints:
+        return _adminProtectedRoute(
+          child: const AdminComplianceCheckpointsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminExposureRules:
+        return _adminProtectedRoute(
+          child: const AdminExposureRulesPage(),
+          settings: settings,
+        );
+
+      case Routes.adminActivationReadiness:
+        return _adminProtectedRoute(
+          child: const AdminActivationReadinessPage(),
+          settings: settings,
+        );
+
+      case Routes.adminSystemActivationPack:
+        return _adminProtectedRoute(
+          child: const AdminSystemActivationPackPage(),
+          settings: settings,
+        );
+
+      case Routes.adminGatewayLayer:
+        return _adminProtectedRoute(
+          child: const AdminGatewayLayerPage(),
+          settings: settings,
+        );
+
+      case Routes.adminCommunicationGateway:
+        return _adminProtectedRoute(
+          child: const AdminCommunicationGatewayPage(),
+          settings: settings,
+        );
+
+      case Routes.adminEngineeringGateway:
+        return _adminProtectedRoute(
+          child: const AdminEngineeringGatewayPage(),
+          settings: settings,
+        );
+
+      case Routes.adminDeviceStorageGateway:
+        return _adminProtectedRoute(
+          child: const AdminDeviceStorageGatewayPage(),
+          settings: settings,
+        );
+
+      case _adminAlertsReviewRoute:
+        return _adminProtectedRoute(
+          child: const AdminAlertsReviewPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchivePayments:
+        return _adminProtectedRoute(
+          child: const AdminArchivePaymentsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchiveClinicians:
+        return _adminProtectedRoute(
+          child: const AdminArchiveCliniciansPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchiveCenters:
+        return _adminProtectedRoute(
+          child: const AdminArchiveCentersPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchiveSupport:
+        return _adminProtectedRoute(
+          child: const AdminArchiveSupportPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchiveAccounting:
+        return _adminProtectedRoute(
+          child: const AdminArchiveAccountingPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchiveReports:
+        return _adminProtectedRoute(
+          child: const AdminArchiveReportsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchiveSessions:
+        return _adminProtectedRoute(
+          child: const AdminArchiveSessionsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminArchive:
+        return _adminProtectedRoute(
+          child: const AdminArchivePage(),
+          settings: settings,
+        );
+
+      default:
+        return null;
+    }
   }
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -198,6 +456,11 @@ class AppRouter {
       return _redirectToLogin(settings);
     }
 
+    final adminSurfaceRoute = adminSurfaceRoutes(settings);
+    if (adminSurfaceRoute != null) {
+      return adminSurfaceRoute;
+    }
+
     switch (settings.name) {
       case Routes.menu:
         return MaterialPageRoute(
@@ -205,45 +468,15 @@ class AppRouter {
           settings: settings,
         );
 
-      case Routes.adminHub:
-        return _protectedRoute(
-          child: const AdminHubPage(),
-          settings: settings,
-        );
-
-      case Routes.adminClinicianRequests:
-        return _protectedRoute(
-          child: const AdminClinicianRequestsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminClinicianProfileRequests:
-        return _protectedRoute(
-          child: const AdminClinicianProfileRequestsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminClients:
-        return _protectedRoute(
-          child: const AdminClientsPage(),
-          settings: settings,
-        );
-
       case Routes.adminPayments:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminPaymentsPage(),
           settings: settings,
         );
 
       case Routes.adminSessions:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminSessionsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminSupportChats:
-        return _protectedRoute(
-          child: const AdminSupportChatPage(),
           settings: settings,
         );
 
@@ -260,7 +493,7 @@ class AppRouter {
         );
 
       case _adminBookingQueueRoute:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminBookingQueuePage(),
           settings: settings,
         );
@@ -303,6 +536,12 @@ class AppRouter {
           settings: settings,
         );
 
+      case Routes.centerResidencies:
+        return _protectedRoute(
+          child: const CenterResidenciesPage(),
+          settings: settings,
+        );
+
       case Routes.clientRegister:
         return MaterialPageRoute(
           builder: (_) => const ClientRegisterPage(),
@@ -318,6 +557,7 @@ class AppRouter {
       case Routes.chat:
         final args = settings.arguments;
         String? threadId;
+        String? entryContext;
         bool adminSupportMode = false;
         if (args is Map && args['threadId'] != null) {
           threadId = args['threadId'].toString();
@@ -328,11 +568,18 @@ class AppRouter {
         if (args is Map && args['adminSupport'] == true) {
           adminSupportMode = true;
         }
+        if (!adminSupportMode && threadId == null && args is Map) {
+          final value = args['entryContext']?.toString();
+          if (value == 'family_support' || value == 'recovery_support') {
+            entryContext = value;
+          }
+        }
 
         return MaterialPageRoute(
           builder: (_) => ChatPage(
             initialThreadId: threadId,
             adminSupportMode: adminSupportMode,
+            entryContext: entryContext,
           ),
           settings: settings,
         );
@@ -452,56 +699,8 @@ class AppRouter {
           settings: settings,
         );
 
-      case Routes.adminArchivePayments:
-        return _protectedRoute(
-          child: const AdminArchivePaymentsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveClinicians:
-        return _protectedRoute(
-          child: const AdminArchiveCliniciansPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveCenters:
-        return _protectedRoute(
-          child: const AdminArchiveCentersPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveSupport:
-        return _protectedRoute(
-          child: const AdminArchiveSupportPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveAccounting:
-        return _protectedRoute(
-          child: const AdminArchiveAccountingPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveReports:
-        return _protectedRoute(
-          child: const AdminArchiveReportsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveSessions:
-        return _protectedRoute(
-          child: const AdminArchiveSessionsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchive:
-        return _protectedRoute(
-          child: const AdminArchivePage(),
-          settings: settings,
-        );
-
       case Routes.adminSessionReport:
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminSessionReportPage(),
           settings: settings,
         );
@@ -516,6 +715,8 @@ class AppRouter {
           allowedRoles = {_roleClient};
         } else if (reviewerType == _roleClinician) {
           allowedRoles = {_roleClinician, _roleCenter};
+        } else if (reviewerType == _roleCenter) {
+          allowedRoles = {_roleCenter};
         }
         final requestId = (args['requestId'] ?? '').toString();
         if (requestId.isEmpty || reviewerType.isEmpty) {
@@ -708,7 +909,7 @@ class AppRouter {
             settings: settings,
           );
         }
-        return _protectedRoute(
+        return _adminProtectedRoute(
           child: const AdminCentersPage(),
           settings: settings,
         );
@@ -737,12 +938,10 @@ class _RouteAccessGate extends StatelessWidget {
     required this.routeName,
     required this.allowedRoles,
     required this.child,
-    this.qaRoleOverride,
   });
 
   final String? routeName;
   final Set<String>? allowedRoles;
-  final String? qaRoleOverride;
   final Widget child;
 
   @override
@@ -759,6 +958,14 @@ class _RouteAccessGate extends StatelessWidget {
         }
 
         final decision = snapshot.data!;
+        debugPrint(
+          'ADMIN_GUARD route=$routeName '
+          'isAdminRoute=${AppRouter._isAdminRoute(routeName)} '
+          'signedIn=${FirebaseAuth.instance.currentUser != null && !FirebaseAuth.instance.currentUser!.isAnonymous} '
+          'isAdmin=${decision.isAdmin} '
+          'allowed=${decision.allowed} '
+          'redirect=${decision.redirectTarget}',
+        );
         if (decision.redirectToLogin) {
           return const LoginPage();
         }
@@ -813,39 +1020,58 @@ class _RouteAccessGate extends StatelessWidget {
 
   Future<_RouteAccessDecision> _resolveRouteAccess() async {
     final user = FirebaseAuth.instance.currentUser;
+    final isAdminRoute = AppRouter._isAdminRoute(routeName);
     if (user == null || user.isAnonymous) {
+      debugPrint(
+        'ADMIN_GUARD route=$routeName '
+        'isAdminRoute=$isAdminRoute '
+        'signedIn=false '
+        'isAdmin=false '
+        'allowed=false '
+        'redirect=${Routes.login}',
+      );
       return const _RouteAccessDecision(
         allowed: false,
         redirectToLogin: true,
+        redirectTarget: Routes.login,
       );
     }
 
     final access = await AccountAccessService().resolve(user);
+    final isAdmin = access.isAdmin;
     if (access.isBlocked && !access.isAdmin) {
+      debugPrint(
+        'ADMIN_GUARD route=$routeName '
+        'isAdminRoute=$isAdminRoute '
+        'signedIn=true '
+        'isAdmin=$isAdmin '
+        'allowed=false '
+        'redirect=blocked_account',
+      );
       return _RouteAccessDecision(
         allowed: false,
         isBlocked: true,
         blockReason: access.blockReason,
+        isAdmin: isAdmin,
+        redirectTarget: 'blocked_account',
       );
     }
 
     if (allowedRoles == null || allowedRoles!.isEmpty) {
-      return const _RouteAccessDecision(allowed: true);
+      return _RouteAccessDecision(
+        allowed: true,
+        isAdmin: isAdmin,
+        redirectTarget: 'none',
+      );
     }
 
     final role = access.role;
-    final isAllowed = (role != null && allowedRoles!.contains(role)) ||
-        _canUseQaRoleOverride(user, access);
-    return _RouteAccessDecision(allowed: isAllowed);
-  }
-
-  bool _canUseQaRoleOverride(User user, SignedInAccessState access) {
-    if (!access.isAdmin) return false;
-    final override = (qaRoleOverride ?? '').trim().toLowerCase();
-    if (override.isEmpty) return false;
-    if (allowedRoles == null || !allowedRoles!.contains(override)) return false;
-    final email = (user.email ?? '').trim().toLowerCase();
-    return AccountAccessService.knownAdminEmails.contains(email);
+    final isAllowed = role != null && allowedRoles!.contains(role);
+    return _RouteAccessDecision(
+      allowed: isAllowed,
+      isAdmin: isAdmin,
+      redirectTarget: isAllowed ? 'none' : Routes.menu,
+    );
   }
 }
 
@@ -855,10 +1081,14 @@ class _RouteAccessDecision {
     this.redirectToLogin = false,
     this.isBlocked = false,
     this.blockReason = '',
+    this.isAdmin = false,
+    this.redirectTarget = 'none',
   });
 
   final bool allowed;
   final bool redirectToLogin;
   final bool isBlocked;
   final String blockReason;
+  final bool isAdmin;
+  final String redirectTarget;
 }

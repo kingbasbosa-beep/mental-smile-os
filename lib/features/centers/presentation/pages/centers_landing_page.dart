@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/ui/app_shell_actions.dart';
+import 'package:flutterprojects/shared/analytics/app_analytics.dart';
+import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
+import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
+import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class CentersLandingPage extends StatelessWidget {
   const CentersLandingPage({super.key});
@@ -20,7 +24,9 @@ class CentersLandingPage extends StatelessWidget {
             ? 'اعرض مراكز التعافي والدعم'
             : 'Browse recovery and support centers',
         icon: Icons.volunteer_activism_outlined,
-        color: const Color(0xFF56C3B3),
+        color: const Color(0xFF2F6B5F),
+        accent: const Color(0xFFE2B65B),
+        assetPath: 'c7_branding/home/hero_art.png',
         route: Routes.centersList,
         arguments: {'category': 'recovery'},
       ),
@@ -29,7 +35,9 @@ class CentersLandingPage extends StatelessWidget {
         subtitle:
             isArabic ? 'مراكز متخصصة لسحب السموم' : 'Specialized detox centers',
         icon: Icons.auto_awesome_mosaic_outlined,
-        color: const Color(0xFF7C6EF6),
+        color: const Color(0xFF6D5542),
+        accent: const Color(0xFFD4AF37),
+        assetPath: 'c7_branding/home/home_bg.png',
         route: Routes.centersList,
         arguments: {'category': 'detox'},
       ),
@@ -41,7 +49,9 @@ class CentersLandingPage extends StatelessWidget {
             ? 'رعاية ومتابعة للحالات الخاصة'
             : 'Care and support for special needs',
         icon: Icons.accessibility_new_outlined,
-        color: const Color(0xFF7FA8D1),
+        color: const Color(0xFF4E6A7D),
+        accent: const Color(0xFFCBB88A),
+        assetPath: 'c7_branding/logo/logo_mark.png',
         route: Routes.centersList,
         arguments: {'category': 'special_needs'},
       ),
@@ -51,7 +61,9 @@ class CentersLandingPage extends StatelessWidget {
             ? 'مستشفيات ومؤسسات علاجية'
             : 'Hospitals and treatment institutions',
         icon: Icons.local_hospital_outlined,
-        color: const Color(0xFFE4A76D),
+        color: const Color(0xFF7B5C41),
+        accent: const Color(0xFFE0B97B),
+        assetPath: 'c7_branding/home/hero_art.png',
         route: Routes.centersList,
         arguments: {'category': 'hospital'},
       ),
@@ -64,82 +76,108 @@ class CentersLandingPage extends StatelessWidget {
           context,
           title: isArabic ? 'المراكز' : 'Centers',
         ),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            final width = constraints.maxWidth;
-            int crossAxisCount = 2;
-            double childAspectRatio = 1.55;
+        body: Stack(
+          children: [
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                int crossAxisCount = 2;
+                double childAspectRatio = 1.55;
 
-            if (width < 760) {
-              crossAxisCount = 1;
-              childAspectRatio = 1.30;
-            }
+                if (width < 760) {
+                  crossAxisCount = 1;
+                  childAspectRatio = 1.30;
+                }
 
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .outline
-                          .withValues(alpha: 0.12),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: isArabic
-                        ? CrossAxisAlignment.end
-                        : CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isArabic
-                            ? 'اختر فئة المراكز'
-                            : 'Choose a center category',
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                return ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.84),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: AppColors.mutedGold.withValues(alpha: 0.14),
+                        ),
+                        boxShadow: AppShadows.card,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: isArabic
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isArabic
+                                ? 'اختر فئة المراكز'
+                                : 'Choose a center category',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
                                   fontWeight: FontWeight.w800,
                                 ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            isArabic
+                                ? 'اضغط مباشرة على أي بطاقة لفتح الجريد الخاص بالمراكز داخل هذه الفئة.'
+                                : 'Tap any card directly to open centers in that category.',
+                            textAlign:
+                                isArabic ? TextAlign.right : TextAlign.left,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        isArabic
-                            ? 'اضغط مباشرة على أي بطاقة لفتح الجريد الخاص بالمراكز داخل هذه الفئة.'
-                            : 'Tap any card directly to open centers in that category.',
-                        textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                    ),
+                    const SizedBox(height: 16),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: items.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: childAspectRatio,
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: items.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossAxisCount,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: childAspectRatio,
-                  ),
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    return _CenterCategoryCard(
-                      item: item,
-                      isArabic: isArabic,
-                    );
-                  },
-                ),
-              ],
-            );
-          },
+                      itemBuilder: (context, index) {
+                        final item = items[index];
+                        return _CenterCategoryCard(
+                          item: item,
+                          isArabic: isArabic,
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+            const _ModuleEntryLogger(module: 'centers'),
+          ],
         ),
       ),
     );
   }
+}
+
+class _ModuleEntryLogger extends StatefulWidget {
+  const _ModuleEntryLogger({required this.module});
+
+  final String module;
+
+  @override
+  State<_ModuleEntryLogger> createState() => _ModuleEntryLoggerState();
+}
+
+class _ModuleEntryLoggerState extends State<_ModuleEntryLogger> {
+  @override
+  void initState() {
+    super.initState();
+    AppAnalytics.logModuleEntry(widget.module);
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 class _CenterCategoryItem {
@@ -147,6 +185,8 @@ class _CenterCategoryItem {
   final String subtitle;
   final IconData icon;
   final Color color;
+  final Color accent;
+  final String assetPath;
   final String route;
   final Map<String, dynamic> arguments;
 
@@ -155,6 +195,8 @@ class _CenterCategoryItem {
     required this.subtitle,
     required this.icon,
     required this.color,
+    required this.accent,
+    required this.assetPath,
     required this.route,
     required this.arguments,
   });
@@ -182,28 +224,86 @@ class _CenterCategoryCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: item.color,
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [
+              item.color,
+              Color.lerp(item.color, Colors.black, 0.12)!,
+            ],
+          ),
           borderRadius: BorderRadius.circular(28),
+          boxShadow: AppShadows.card,
         ),
         child: Column(
           crossAxisAlignment:
               isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            Align(
-              alignment: isArabic ? Alignment.topLeft : Alignment.topRight,
-              child: Container(
-                width: 76,
-                height: 76,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.18),
-                  shape: BoxShape.circle,
+            Row(
+              children: [
+                Expanded(
+                  child: Align(
+                    alignment:
+                        isArabic ? Alignment.topRight : Alignment.topLeft,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: item.accent.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.18),
+                        ),
+                      ),
+                      child: Text(
+                        isArabic ? 'فئة علاجية' : 'Care Track',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                child: Icon(
-                  item.icon,
-                  color: Colors.white,
-                  size: 36,
+                const SizedBox(width: 12),
+                Container(
+                  width: 84,
+                  height: 84,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.16),
+                    ),
+                  ),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: Opacity(
+                          opacity: 0.22,
+                          child: Image.asset(
+                            normalizeAssetPath(item.assetPath),
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const AppMissingAssetPlaceholder(),
+                          ),
+                        ),
+                      ),
+                      Center(
+                        child: Icon(
+                          item.icon,
+                          color: Colors.white,
+                          size: 34,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
             const Spacer(),
             Text(
@@ -228,17 +328,44 @@ class _CenterCategoryCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.20),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Text(
-                isArabic ? 'فتح الفئة' : 'Open category',
-                style: const TextStyle(
+            Row(
+              mainAxisAlignment:
+                  isArabic ? MainAxisAlignment.start : MainAxisAlignment.end,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.20),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    isArabic ? 'افتح الفئة' : 'Open category',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Icon(
+                  isArabic ? Icons.arrow_back_rounded : Icons.arrow_forward,
                   color: Colors.white,
-                  fontWeight: FontWeight.w800,
+                  size: 20,
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: Opacity(
+                opacity: 0.18,
+                child: Image.asset(
+                  normalizeAssetPath(item.assetPath),
+                  height: 56,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const AppMissingAssetPlaceholder(height: 56),
                 ),
               ),
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -126,7 +127,9 @@ class _SplashPageState extends State<SplashPage>
                               child: FractionallySizedBox(
                                 widthFactor: 0.78,
                                 child: Image.asset(
-                                  'assets/c6_library/brand/logo_wordmark.png',
+                                  normalizeAssetPath(
+                                    'c6_library/brand/logo_wordmark.png',
+                                  ),
                                   fit: BoxFit.contain,
                                   errorBuilder: (context, error, stackTrace) {
                                     return Text(

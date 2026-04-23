@@ -2,7 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
-import 'package:flutterprojects/core/ui/app_design_system.dart';
+import 'package:flutterprojects/shared/contracts/role_names.dart';
+import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,14 +19,6 @@ class _LoginPageState extends State<LoginPage> {
   bool _loading = false;
   bool _obscurePassword = true;
   String? _error;
-
-  static const String kClinicianQuickEmail =
-      'qa.clinician.01@mental-smile.test';
-  static const String kClinicianQuickPassword = '1@clinician';
-  static const String kClientQuickEmail = 'qa.client.01@mental-smile.test';
-  static const String kClientQuickPassword = '1@client';
-  static const String kCenterQuickEmail = 'qa.center.01@mental-smile.test';
-  static const String kCenterQuickPassword = '1@center';
   String _normalizeEmail(String value) => value.trim().toLowerCase();
 
   String _translateAuthError(FirebaseAuthException e) {
@@ -58,13 +51,13 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     switch (access.role) {
-      case 'admin':
+      case RoleNames.admin:
         return Routes.adminHub;
-      case 'clinician':
+      case RoleNames.clinician:
         return Routes.clinicianOperations;
-      case 'center':
+      case RoleNames.center:
         return Routes.centerDashboard;
-      case 'client':
+      case RoleNames.client:
         return Routes.clientDashboard;
     }
 
@@ -113,48 +106,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _fillAdmin1() {
-    _emailController.text = 'kingbasbosa@gmail.com';
-    _passwordController.text = '1@admin';
-    setState(() {});
-  }
-
-  void _fillAdmin3() {
-    _emailController.text = 'kingbasbosa@hotmail.com';
-    _passwordController.text = '3@admin';
-    setState(() {});
-  }
-
-  void _fillClient() {
-    _emailController.text = kClientQuickEmail;
-    _passwordController.text = kClientQuickPassword;
-    setState(() {});
-  }
-
-  void _fillClinician() {
-    _emailController.text = kClinicianQuickEmail;
-    _passwordController.text = kClinicianQuickPassword;
-    setState(() {});
-  }
-
-  void _fillCenter() {
-    _emailController.text = kCenterQuickEmail;
-    _passwordController.text = kCenterQuickPassword;
-    setState(() {});
-  }
-
-  Widget _quickFillButton({
-    required String label,
-    required VoidCallback onTap,
-    required IconData icon,
-  }) {
-    return OutlinedButton.icon(
-      onPressed: onTap,
-      icon: Icon(icon, size: 18),
-      label: Text(label),
-    );
-  }
-
   Widget _registerNavButton({
     required String label,
     required IconData icon,
@@ -198,7 +149,11 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   children: [
                     const SizedBox(height: AppSpacing.lg),
-                    const AppHeroHeader(title: 'تسجيل الدخول'),
+                    const AppHeroHeader(
+                      title: 'تسجيل الدخول',
+                      subtitle:
+                          'بوابة واحدة هادئة وواضحة للوصول إلى حسابات العميل والأخصائي والمركز بنفس الهوية البصرية للمشروع.',
+                    ),
                     const SizedBox(height: AppSpacing.lg),
                     AppSurfaceCard(
                       child: Column(
@@ -295,51 +250,6 @@ class _LoginPageState extends State<LoginPage> {
                               Navigator.of(context)
                                   .pushNamed(Routes.centerRegister);
                             },
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    AppSectionPanel(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Quick fill',
-                            style: Theme.of(context).textTheme.titleSmall,
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          Wrap(
-                            spacing: AppSpacing.sm,
-                            runSpacing: AppSpacing.sm,
-                            children: [
-                              _quickFillButton(
-                                label: 'Admin 1',
-                                icon: Icons.admin_panel_settings_outlined,
-                                onTap: _fillAdmin1,
-                              ),
-                              _quickFillButton(
-                                label: 'Admin 3',
-                                icon: Icons.admin_panel_settings_outlined,
-                                onTap: _fillAdmin3,
-                              ),
-                              _quickFillButton(
-                                label: 'Clinician',
-                                icon: Icons.medical_services_outlined,
-                                onTap: _fillClinician,
-                              ),
-                              _quickFillButton(
-                                label: 'Client',
-                                icon: Icons.person_outline,
-                                onTap: _fillClient,
-                              ),
-                              _quickFillButton(
-                                label: 'Center',
-                                icon: Icons.business_outlined,
-                                onTap: _fillCenter,
-                              ),
-                            ],
                           ),
                         ],
                       ),

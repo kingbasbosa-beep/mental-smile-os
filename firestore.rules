@@ -12,17 +12,12 @@ service cloud.firestore {
 
     function isAdmin() {
       return signedIn()
-        && (
-          (
-            exists(/databases/$(database)/documents/admins/$(uid()))
-            && get(/databases/$(database)/documents/admins/$(uid())).data.active == true
-          )
-          ||
-          (
-            exists(/databases/$(database)/documents/clinicians/$(uid()))
-            && get(/databases/$(database)/documents/clinicians/$(uid())).data.isAdmin == true
-          )
-        );
+        && exists(/databases/$(database)/documents/admins/$(uid()))
+        && get(/databases/$(database)/documents/admins/$(uid())).data.active == true;
+    }
+
+    function isCenterCycleAdmin() {
+      return isAdmin();
     }
 
     function isClientDoc() {
@@ -68,12 +63,39 @@ service cloud.firestore {
     function centerCanReadBooking() {
       return signedIn()
         && resource != null
-        && (resource.data.requestKind is string)
-        && resource.data.requestKind == 'center'
         && (resource.data.status is string)
-        && resource.data.status == 'center_follow_up'
+        && (
+          resource.data.status == 'pending_admin'
+          || resource.data.status == 'center_follow_up'
+          || resource.data.status == 'center_recommendation_pending'
+          || resource.data.status == 'session_setup_pending'
+          || resource.data.status == 'session_scheduled'
+          || resource.data.status == 'session_in_progress'
+          || resource.data.status == 'session_completed_pending_reviews'
+          || resource.data.status == 'reschedule_pending'
+        )
         && (resource.data.centerId is string)
         && resource.data.centerId == uid();
+    }
+
+    function isLegacyOrCanonicalCenterBooking() {
+      return resource != null
+        && (resource.data.centerId is string)
+        && resource.data.centerId.size() > 0
+        && (
+          (
+            resource.data.requestKind is string
+            && resource.data.requestKind == 'center'
+          )
+          || (
+            !(resource.data.requestKind is string)
+            && (
+              (resource.data.centerName is string && resource.data.centerName.size() > 0)
+              || resource.data.keys().hasAny(['selectedAccommodationKey'])
+              || resource.data.keys().hasAny(['centerAvailabilityStatus'])
+            )
+          )
+        );
     }
 
     function isOwnClientResource(uidDoc) {
@@ -217,6 +239,10 @@ service cloud.firestore {
               && resource.data.clinicianId == uid()
             )
             || (
+              resource.data.centerId is string
+              && resource.data.centerId == uid()
+            )
+            || (
               resource.data.reviewerUid is string
               && resource.data.reviewerUid == uid()
             )
@@ -241,14 +267,120 @@ service cloud.firestore {
         && request.resource.data.adminAssignedAt == resource.data.adminAssignedAt;
     }
 
+    function clientDirectClinicianThreadLinkValid() {
+      return isClientDoc()
+        && (resource.data.requestKind is string)
+        && resource.data.requestKind == 'clinician'
+        && resource.data.status == 'assigned_clinician'
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.workflowStage == resource.data.workflowStage
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly(['threadId', 'updatedAt'])
+        && (request.resource.data.threadId is string)
+        && request.resource.data.threadId.size() > 0
+        && (
+          !resource.data.keys().hasAny(['threadId'])
+          || resource.data.threadId == ''
+        )
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clinicianId == resource.data.clinicianId
+        && request.resource.data.assignedClinicianId == resource.data.assignedClinicianId;
+    }
+
+    function clientCenterContractConfirmValid() {
+      return request.auth != null
+        && request.auth.uid == resource.data.clientId
+        && resource.data.requestKind == 'center'
+        && resource.data.status == 'awaiting_payment'
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.workflowStage == resource.data.workflowStage
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly(['contract', 'updatedAt'])
+        && request.resource.data.contract.status == 'confirmed'
+        && request.resource.data.contract.confirmedBy == request.auth.uid
+        && (request.resource.data.contract.confirmedAt is timestamp)
+        && request.resource.data.contract.snapshotLocked == true
+        && request.resource.data.contract.quoteSnapshot.keys()
+            .hasOnly([
+              'stayStartDateText',
+              'stayEndDateText',
+              'stayDurationDays',
+              'pricingUnit',
+              'baseAmount',
+              'taxPercent',
+              'taxAmount',
+              'totalAmount',
+              'grossClientPaidAmount'
+            ])
+        && request.resource.data.contract.quoteSnapshot.stayStartDateText == resource.data.stayStartDateText
+        && request.resource.data.contract.quoteSnapshot.stayEndDateText == resource.data.stayEndDateText
+        && request.resource.data.contract.quoteSnapshot.stayDurationDays == resource.data.stayDurationDays
+        && request.resource.data.contract.quoteSnapshot.pricingUnit == resource.data.stayPricingUnit
+        && request.resource.data.contract.quoteSnapshot.baseAmount == resource.data.stayBaseAmount
+        && request.resource.data.contract.quoteSnapshot.taxPercent == resource.data.stayTaxPercent
+        && request.resource.data.contract.quoteSnapshot.taxAmount == resource.data.stayTaxAmount
+        && request.resource.data.contract.quoteSnapshot.totalAmount == resource.data.stayTotalAmount
+        && request.resource.data.contract.quoteSnapshot.grossClientPaidAmount == resource.data.grossClientPaidAmount
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    function centerQuoteFrozenGuardValid() {
+      return !(
+          resource.data.keys().hasAny(['contract'])
+          && resource.data.contract.snapshotLocked == true
+        )
+        || (
+          request.resource.data.keys().hasAny(['contract'])
+          && request.resource.data.contract == resource.data.contract
+          && quoteFieldUnchanged('stayStartDateText')
+          && quoteFieldUnchanged('stayEndDateText')
+          && quoteFieldUnchanged('stayDurationDays')
+          && quoteFieldUnchanged('stayUnitPrice')
+          && quoteFieldUnchanged('stayPricingUnit')
+          && quoteFieldUnchanged('stayBaseAmount')
+          && quoteFieldUnchanged('stayTaxPercent')
+          && quoteFieldUnchanged('stayTaxAmount')
+          && quoteFieldUnchanged('stayTotalAmount')
+          && quoteFieldUnchanged('grossClientPaidAmount')
+          && quoteFieldUnchanged('paymentBreakdownText')
+        );
+    }
+
+    function quoteFieldUnchanged(fieldName) {
+      return !resource.data.keys().hasAny([fieldName])
+        || (
+          request.resource.data.keys().hasAny([fieldName])
+          && request.resource.data[fieldName] == resource.data[fieldName]
+        );
+    }
+
     function clientPaymentProofUpdateValid() {
       return request.auth != null
         && request.auth.uid == resource.data.clientId
         && resource.data.status == 'awaiting_payment'
         && request.resource.data.status == 'payment_review'
+        && request.resource.data.workflowStage == 'payment_review'
         && request.resource.data.paymentStatus == 'submitted_by_client'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'paymentStatus',
+              'payment_confirmed',
+              'paymentReceiptFileName',
+              'paymentReceiptUrl',
+              'paymentSubmittedAt',
+              'paymentClientNote',
+              'updatedAt'
+            ])
         && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
         && request.resource.data.clinicianId == resource.data.clinicianId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note
         && (
           (
             !resource.data.keys().hasAny(['centerId'])
@@ -265,6 +397,10 @@ service cloud.firestore {
     function adminForwardValid() {
       return isAdmin()
         && (resource.data.status == 'pending_admin')
+        && (
+          !(resource.data.requestKind is string)
+          || resource.data.requestKind != 'clinician'
+        )
         && (request.resource.data.status == 'assigned_clinician')
         && request.resource.data.diff(resource.data).changedKeys()
             .hasOnly([
@@ -284,6 +420,7 @@ service cloud.firestore {
               'adminDecisionBy',
               'adminDecisionAt',
               'paymentStatus',
+              'payment_confirmed',
               'sessionStatus',
               'reviewStatus',
               'payoutStatus',
@@ -304,6 +441,50 @@ service cloud.firestore {
         && request.resource.data.adminAssignedBy == uid();
     }
 
+    function adminClinicianForwardValid() {
+      return isAdmin()
+        && (resource.data.requestKind is string)
+        && resource.data.requestKind == 'clinician'
+        && resource.data.status == 'pending_admin'
+        && request.resource.data.status == 'assigned_clinician'
+        && request.resource.data.workflowStage == 'assigned_clinician'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'adminApproved',
+              'adminRejected',
+              'adminForwarded',
+              'assignedClinicianId',
+              'assignedClinicianName',
+              'adminAssignedBy',
+              'adminAssignedAt',
+              'adminDecisionType',
+              'adminDecisionBy',
+              'adminDecisionAt',
+              'paymentStatus',
+              'payment_confirmed',
+              'sessionStatus',
+              'reviewStatus',
+              'payoutStatus',
+              'updatedAt'
+            ])
+        && request.resource.data.clinicianId == resource.data.clinicianId
+        && request.resource.data.clinicianName == resource.data.clinicianName
+        && request.resource.data.clinicianUid == resource.data.clinicianUid
+        && request.resource.data.assignedClinicianId == resource.data.clinicianId
+        && request.resource.data.adminApproved == true
+        && request.resource.data.adminRejected == false
+        && request.resource.data.adminForwarded == true
+        && request.resource.data.adminDecisionType == 'assigned'
+        && request.resource.data.adminAssignedBy == request.auth.uid
+        && request.resource.data.adminDecisionBy == request.auth.uid
+        && request.resource.data.paymentStatus == 'not_started'
+        && request.resource.data.sessionStatus == 'not_created'
+        && request.resource.data.reviewStatus == 'not_started'
+        && request.resource.data.payoutStatus == 'blocked';
+    }
+
     function adminRejectValid() {
       return isAdmin()
         && request.resource.data.status == 'rejected_admin'
@@ -320,6 +501,7 @@ service cloud.firestore {
               'adminAssignedBy',
               'adminAssignedAt',
               'paymentStatus',
+              'payment_confirmed',
               'sessionStatus',
               'reviewStatus',
               'payoutStatus',
@@ -352,6 +534,7 @@ service cloud.firestore {
               'clinicianName',
               'clinicianUid',
               'paymentStatus',
+              'payment_confirmed',
               'sessionStatus',
               'reviewStatus',
               'payoutStatus',
@@ -374,17 +557,41 @@ service cloud.firestore {
             && resource.data.paymentReceiptFileName.size() > 0
           )
         )
-        && request.resource.data.status == 'session_setup_pending'
         && request.resource.data.paymentStatus == 'approved'
-        && request.resource.data.diff(resource.data).changedKeys()
-            .hasOnly([
-              'status',
-              'workflowStage',
-              'paymentStatus',
-              'paymentApprovedAt',
-              'sessionStatus',
-              'updatedAt'
-            ])
+        && (
+          (
+            isLegacyOrCanonicalCenterBooking()
+            && request.resource.data.status == 'session_scheduled'
+            && request.resource.data.workflowStage == 'session_scheduled'
+            && request.resource.data.sessionStatus == 'scheduled'
+            && request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly([
+                  'status',
+                  'workflowStage',
+                  'paymentStatus',
+                  'payment_confirmed',
+                  'paymentApprovedAt',
+                  'sessionStatus',
+                  'updatedAt'
+                ])
+          )
+          || (
+            !isLegacyOrCanonicalCenterBooking()
+            && request.resource.data.status == 'session_setup_pending'
+            && request.resource.data.workflowStage == 'session_setup_pending'
+            && request.resource.data.sessionStatus == 'not_created'
+            && request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly([
+                  'status',
+                  'workflowStage',
+                  'paymentStatus',
+                  'payment_confirmed',
+                  'paymentApprovedAt',
+                  'sessionStatus',
+                  'updatedAt'
+                ])
+          )
+        )
         && request.resource.data.clientId == resource.data.clientId
         && request.resource.data.clientName == resource.data.clientName
         && request.resource.data.createdAt == resource.data.createdAt
@@ -409,6 +616,7 @@ service cloud.firestore {
               'status',
               'workflowStage',
               'paymentStatus',
+              'payment_confirmed',
               'paymentRejectedAt',
               'updatedAt'
             ])
@@ -428,19 +636,61 @@ service cloud.firestore {
           resource.data.status == 'session_setup_pending'
           || resource.data.status == 'reschedule_pending'
         )
-        && request.resource.data.status == 'session_scheduled'
-        && request.resource.data.sessionStatus == 'scheduled'
-        && request.resource.data.diff(resource.data).changedKeys()
-            .hasOnly([
-              'status',
-              'sessionStatus',
-              'sessionDateText',
-              'sessionLink',
-              'sessionCode',
-              'sessionAdminNotes',
-              'sessionCreatedAt',
-              'updatedAt'
-            ])
+        && (
+          (
+            isLegacyOrCanonicalCenterBooking()
+            && request.resource.data.status == 'awaiting_payment'
+            && request.resource.data.workflowStage == 'awaiting_payment'
+            && request.resource.data.paymentStatus == 'pending_client_transfer'
+            && request.resource.data.sessionStatus == 'not_created'
+            && request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly([
+                  'status',
+                  'workflowStage',
+                  'paymentStatus',
+                  'payment_confirmed',
+                  'sessionStatus',
+                  'sessionDateText',
+                  'stayStartDateText',
+                  'stayEndDateText',
+                  'stayDurationDays',
+                  'stayDurationReason',
+                  'stayDurationIsPreliminary',
+                  'sessionLink',
+                  'sessionCode',
+                  'sessionAdminNotes',
+                  'stayUnitPrice',
+                  'stayPricingUnit',
+                  'stayBaseAmount',
+                  'stayTaxPercent',
+                  'stayTaxAmount',
+                  'stayTotalAmount',
+                  'grossClientPaidAmount',
+                  'paymentBreakdownText',
+                  'paymentQuotePreparedAt',
+                  'paymentQuotePreparedBy',
+                  'updatedAt'
+                ])
+          )
+          || (
+            !isLegacyOrCanonicalCenterBooking()
+            && request.resource.data.status == 'session_scheduled'
+            && request.resource.data.workflowStage == 'session_scheduled'
+            && request.resource.data.sessionStatus == 'scheduled'
+            && request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly([
+                  'status',
+                  'workflowStage',
+                  'sessionStatus',
+                  'sessionDateText',
+                  'sessionLink',
+                  'sessionCode',
+                  'sessionAdminNotes',
+                  'sessionCreatedAt',
+                  'updatedAt'
+                ])
+          )
+        )
         && request.resource.data.clientId == resource.data.clientId
         && request.resource.data.clientName == resource.data.clientName
         && request.resource.data.createdAt == resource.data.createdAt
@@ -451,10 +701,12 @@ service cloud.firestore {
       return isAdmin()
         && resource.data.status == 'session_scheduled'
         && request.resource.data.status == 'session_in_progress'
+        && request.resource.data.workflowStage == 'session_in_progress'
         && request.resource.data.sessionStatus == 'in_progress'
         && request.resource.data.diff(resource.data).changedKeys()
             .hasOnly([
               'status',
+              'workflowStage',
               'sessionStatus',
               'updatedAt'
             ])
@@ -471,11 +723,13 @@ service cloud.firestore {
           || resource.data.status == 'session_in_progress'
         )
         && request.resource.data.status == 'session_completed_pending_reviews'
+        && request.resource.data.workflowStage == 'session_completed_pending_reviews'
         && request.resource.data.sessionStatus == 'completed'
         && request.resource.data.reviewStatus == 'pending_reviews'
         && request.resource.data.diff(resource.data).changedKeys()
             .hasOnly([
               'status',
+              'workflowStage',
               'sessionStatus',
               'reviewStatus',
               'updatedAt'
@@ -493,10 +747,12 @@ service cloud.firestore {
           || resource.data.status == 'session_in_progress'
         )
         && request.resource.data.status == 'reschedule_pending'
+        && request.resource.data.workflowStage == 'reschedule_pending'
         && request.resource.data.sessionStatus == 'reschedule_pending'
         && request.resource.data.diff(resource.data).changedKeys()
             .hasOnly([
               'status',
+              'workflowStage',
               'sessionStatus',
               'updatedAt'
             ])
@@ -511,6 +767,134 @@ service cloud.firestore {
         || adminSessionInProgressValid()
         || adminSessionCompleteValid()
         || adminSessionRescheduleValid();
+    }
+
+    function centerResidencyBaseUnchanged() {
+      return (
+          (
+            request.resource.data.requestKind == resource.data.requestKind
+          )
+          || (
+            !(resource.data.requestKind is string)
+            && (
+              !(request.resource.data.requestKind is string)
+              || request.resource.data.requestKind == 'center'
+            )
+          )
+        )
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.centerName == resource.data.centerName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note;
+    }
+
+    function centerArrivalConfirmationValid() {
+      return signedIn()
+        && isLegacyOrCanonicalCenterBooking()
+        && resource.data.centerId == uid()
+        && (
+          resource.data.status == 'session_setup_pending'
+          || resource.data.status == 'session_scheduled'
+          || resource.data.status == 'reschedule_pending'
+        )
+        && request.resource.data.centerArrivalConfirmed == true
+        && request.resource.data.centerArrivalConfirmedBy == uid()
+        && centerResidencyBaseUnchanged()
+        && (
+          (
+            (resource.data.clientCheckInConfirmed != true)
+            && request.resource.data.status == resource.data.status
+            && request.resource.data.sessionStatus == resource.data.sessionStatus
+            && request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly([
+                  'centerArrivalConfirmed',
+                  'centerArrivalConfirmedAt',
+                  'centerArrivalConfirmedBy',
+                  'centerArrivalNotes',
+                  'centerRoomDeliveredAsBooked',
+                  'updatedAt'
+                ])
+          )
+          || (
+            resource.data.clientCheckInConfirmed == true
+            && request.resource.data.status == 'session_in_progress'
+            && request.resource.data.workflowStage == 'session_in_progress'
+            && request.resource.data.sessionStatus == 'in_progress'
+            && request.resource.data.residencyStartedBy == 'center'
+            && request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly([
+                  'centerArrivalConfirmed',
+                  'centerArrivalConfirmedAt',
+                  'centerArrivalConfirmedBy',
+                  'centerArrivalNotes',
+                  'centerRoomDeliveredAsBooked',
+                  'status',
+                  'workflowStage',
+                  'sessionStatus',
+                  'residencyStartedAt',
+                  'residencyStartedBy',
+                  'residencyStatus',
+                  'updatedAt'
+                ])
+          )
+        );
+    }
+
+    function clientCenterCheckInValid() {
+      return signedIn()
+        && isLegacyOrCanonicalCenterBooking()
+        && request.auth.uid == resource.data.clientId
+        && (
+          resource.data.status == 'session_setup_pending'
+          || resource.data.status == 'session_scheduled'
+          || resource.data.status == 'reschedule_pending'
+        )
+        && request.resource.data.clientCheckInConfirmed == true
+        && centerResidencyBaseUnchanged()
+        && (
+          (
+            (resource.data.centerArrivalConfirmed != true)
+            && request.resource.data.status == resource.data.status
+            && request.resource.data.sessionStatus == resource.data.sessionStatus
+            && request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly([
+                  'clientCheckInConfirmed',
+                  'clientCheckInConfirmedAt',
+                  'clientCheckInNotes',
+                  'clientArrivalPlaceMatched',
+                  'clientArrivalRightsExplained',
+                  'clientArrivalSpecialistMet',
+                  'clientArrivalReceptionRating',
+                  'updatedAt'
+                ])
+          )
+          || (
+            resource.data.centerArrivalConfirmed == true
+            && request.resource.data.status == 'session_in_progress'
+            && request.resource.data.workflowStage == 'session_in_progress'
+            && request.resource.data.sessionStatus == 'in_progress'
+            && request.resource.data.residencyStartedBy == 'client'
+            && request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly([
+                  'clientCheckInConfirmed',
+                  'clientCheckInConfirmedAt',
+                  'clientCheckInNotes',
+                  'clientArrivalPlaceMatched',
+                  'clientArrivalRightsExplained',
+                  'clientArrivalSpecialistMet',
+                  'clientArrivalReceptionRating',
+                  'status',
+                  'workflowStage',
+                  'sessionStatus',
+                  'residencyStartedAt',
+                  'residencyStartedBy',
+                  'residencyStatus',
+                  'updatedAt'
+                ])
+          )
+        );
     }
 
     function adminPayoutConfirmValid() {
@@ -545,6 +929,27 @@ service cloud.firestore {
         && request.resource.data.note == resource.data.note;
     }
 
+    function adminPayoutConfirmBridgeValid() {
+      return isAdmin()
+        && resource.data.status == 'payout_pending'
+        && request.resource.data.status == 'completed_success'
+        && request.resource.data.workflowStage == 'completed_success'
+        && request.resource.data.sessionStatus == 'completed'
+        && request.resource.data.reviewStatus == 'completed'
+        && (
+          (
+            resource.data.requestKind == 'center'
+            && request.resource.data.payoutStatus == 'paid_to_center'
+          )
+          || (
+            resource.data.requestKind != 'center'
+            && request.resource.data.payoutStatus == 'paid_to_clinician'
+          )
+        )
+        && request.resource.data.requestKind == resource.data.requestKind
+        && request.resource.data.clientId == resource.data.clientId;
+    }
+
     function adminCenterAccountingReviewValid() {
       return isAdmin()
         && resource.data.requestKind == 'center'
@@ -563,6 +968,19 @@ service cloud.firestore {
               'accountingConfirmedAt',
               'updatedAt'
             ])
+        && request.resource.data.accountingConfirmedBy == uid();
+    }
+
+    function adminCenterAccountingReviewBridgeValid() {
+      return isAdmin()
+        && resource.data.requestKind == 'center'
+        && resource.data.status == 'payout_pending'
+        && request.resource.data.status == 'payout_pending'
+        && request.resource.data.workflowStage == 'payout_pending'
+        && request.resource.data.accountingReviewStatus == 'confirmed'
+        && request.resource.data.requestKind == resource.data.requestKind
+        && request.resource.data.clientId == resource.data.clientId
+        && (request.resource.data.accountingConfirmedBy is string)
         && request.resource.data.accountingConfirmedBy == uid();
     }
 
@@ -588,17 +1006,48 @@ service cloud.firestore {
         && request.resource.data.note == resource.data.note;
     }
 
+    function adminArchiveBridgeValid() {
+      return isAdmin()
+        && resource.data.status == 'completed_success'
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.workflowStage == resource.data.workflowStage
+        && request.resource.data.archived == true
+        && request.resource.data.archiveReady == true
+        && (
+          request.resource.data.archiveSection == 'sessions'
+          || request.resource.data.archiveSection == 'payments'
+        )
+        && request.resource.data.requestKind == resource.data.requestKind
+        && request.resource.data.clientId == resource.data.clientId;
+    }
+
     function adminPayoutAndArchiveValid() {
       return adminPayoutConfirmValid()
+        || adminPayoutConfirmBridgeValid()
         || adminCenterAccountingReviewValid()
-        || adminArchiveValid();
+        || adminCenterAccountingReviewBridgeValid()
+        || adminArchiveValid()
+        || adminArchiveBridgeValid();
     }
 
     function clinicianBookingCreateValid() {
       return signedIn()
+        && (request.resource.data.requestKind is string)
+        && request.resource.data.requestKind == 'clinician'
         && (request.resource.data.clientId is string)
         && request.resource.data.clientId == uid()
-        && request.resource.data.status == 'pending_admin'
+        && (
+          (
+            request.resource.data.status == 'pending_admin'
+            && request.resource.data.workflowStage == 'pending_admin'
+          )
+          || (
+            request.resource.data.status == 'assigned_clinician'
+            && request.resource.data.workflowStage == 'assigned_clinician'
+            && request.resource.data.assignedClinicianId == request.resource.data.clinicianId
+            && request.resource.data.assignedClinicianName == request.resource.data.clinicianName
+          )
+        )
         && (request.resource.data.clinicianId is string)
         && request.resource.data.clinicianId.size() > 0
         && (request.resource.data.clinicianName is string)
@@ -607,7 +1056,15 @@ service cloud.firestore {
         && request.resource.data.clinicianUid.size() > 0
         && request.resource.data.adminForwarded == false
         && request.resource.data.adminAssignedBy == ''
-        && request.resource.data.adminAssignedAt == null;
+        && request.resource.data.adminAssignedAt == null
+        && (
+          !request.resource.data.keys().hasAny(['centerId'])
+          || request.resource.data.centerId == ''
+        )
+        && (
+          !request.resource.data.keys().hasAny(['centerName'])
+          || request.resource.data.centerName == ''
+        );
     }
 
     function centerBookingCreateValid() {
@@ -621,71 +1078,29 @@ service cloud.firestore {
         && (request.resource.data.centerName is string)
         && request.resource.data.centerName.size() > 0
         && request.resource.data.status == 'pending_admin'
+        && request.resource.data.workflowStage == 'pending_admin'
+        && request.resource.data.adminApproved == false
+        && request.resource.data.adminRejected == false
         && request.resource.data.adminForwarded == false
+        && request.resource.data.adminDecisionType == ''
+        && request.resource.data.adminDecisionBy == ''
+        && request.resource.data.adminDecisionAt == null
         && request.resource.data.adminAssignedBy == ''
         && request.resource.data.adminAssignedAt == null
-        && (
-          !request.resource.data.keys().hasAny(['clinicianId'])
-          || request.resource.data.clinicianId == ''
-        )
-        && (
-          !request.resource.data.keys().hasAny(['clinicianName'])
-          || request.resource.data.clinicianName == ''
-        )
-        && (
-          !request.resource.data.keys().hasAny(['clinicianUid'])
-          || request.resource.data.clinicianUid == ''
-        );
+        && request.resource.data.paymentStatus == 'not_started'
+        && request.resource.data.sessionStatus == 'not_created'
+        && request.resource.data.reviewStatus == 'not_started'
+        && request.resource.data.payoutStatus == 'blocked'
+        && request.resource.data.assignedClinicianId == ''
+        && request.resource.data.assignedClinicianName == ''
+        && request.resource.data.centerAvailabilityStatus == 'pending'
+        && request.resource.data.centerAvailabilityNote == ''
+        && request.resource.data.clinicianId == ''
+        && request.resource.data.clinicianName == ''
+        && request.resource.data.clinicianUid == '';
     }
 
     function centerBaseFieldsUnchanged() {
-      let adminForwardedUnchanged =
-        (
-          !resource.data.keys().hasAny(['adminForwarded'])
-          && (
-            !request.resource.data.keys().hasAny(['adminForwarded'])
-            || request.resource.data.adminForwarded == false
-          )
-        )
-        || (
-          resource.data.keys().hasAny(['adminForwarded'])
-          && request.resource.data.keys().hasAny(['adminForwarded'])
-          && request.resource.data.adminForwarded == resource.data.adminForwarded
-        );
-
-      let adminAssignedByUnchanged =
-        (
-          !resource.data.keys().hasAny(['adminAssignedBy'])
-          && (
-            !request.resource.data.keys().hasAny(['adminAssignedBy'])
-            || request.resource.data.adminAssignedBy == ''
-          )
-        )
-        || (
-          resource.data.keys().hasAny(['adminAssignedBy'])
-          && (
-            (
-              request.resource.data.keys().hasAny(['adminAssignedBy'])
-              && request.resource.data.adminAssignedBy == resource.data.adminAssignedBy
-            )
-            || (
-              resource.data.adminAssignedBy == ''
-              && !request.resource.data.keys().hasAny(['adminAssignedBy'])
-            )
-          )
-        );
-
-      let adminAssignedAtUnchanged =
-        (
-          !resource.data.keys().hasAny(['adminAssignedAt'])
-          && !request.resource.data.keys().hasAny(['adminAssignedAt'])
-        )
-        || (
-          resource.data.keys().hasAny(['adminAssignedAt'])
-          && request.resource.data.keys().hasAny(['adminAssignedAt'])
-          && request.resource.data.adminAssignedAt == resource.data.adminAssignedAt
-        );
-
       let requestGroupIdUnchanged =
         (
           !resource.data.keys().hasAny(['requestGroupId'])
@@ -697,115 +1112,127 @@ service cloud.firestore {
           && request.resource.data.requestGroupId == resource.data.requestGroupId
         );
 
-      let clinicianIdUnchanged =
-        (
-          !resource.data.keys().hasAny(['clinicianId'])
-          && (
-            !request.resource.data.keys().hasAny(['clinicianId'])
-            || request.resource.data.clinicianId == ''
-          )
-        )
-        || (
-          resource.data.keys().hasAny(['clinicianId'])
-          && (
-            (
-              request.resource.data.keys().hasAny(['clinicianId'])
-              && request.resource.data.clinicianId == resource.data.clinicianId
-            )
-            || (
-              resource.data.clinicianId == ''
-              && !request.resource.data.keys().hasAny(['clinicianId'])
-            )
-          )
-        );
-
-      let clinicianNameUnchanged =
-        (
-          !resource.data.keys().hasAny(['clinicianName'])
-          && (
-            !request.resource.data.keys().hasAny(['clinicianName'])
-            || request.resource.data.clinicianName == ''
-          )
-        )
-        || (
-          resource.data.keys().hasAny(['clinicianName'])
-          && (
-            (
-              request.resource.data.keys().hasAny(['clinicianName'])
-              && request.resource.data.clinicianName == resource.data.clinicianName
-            )
-            || (
-              resource.data.clinicianName == ''
-              && !request.resource.data.keys().hasAny(['clinicianName'])
-            )
-          )
-        );
-
-      let clinicianUidUnchanged =
-        (
-          !resource.data.keys().hasAny(['clinicianUid'])
-          && (
-            !request.resource.data.keys().hasAny(['clinicianUid'])
-            || request.resource.data.clinicianUid == ''
-          )
-        )
-        || (
-          resource.data.keys().hasAny(['clinicianUid'])
-          && (
-            (
-              request.resource.data.keys().hasAny(['clinicianUid'])
-              && request.resource.data.clinicianUid == resource.data.clinicianUid
-            )
-            || (
-              resource.data.clinicianUid == ''
-              && !request.resource.data.keys().hasAny(['clinicianUid'])
-            )
-          )
-        );
-
       return request.resource.data.requestKind == resource.data.requestKind
         && request.resource.data.clientId == resource.data.clientId
         && request.resource.data.clientName == resource.data.clientName
         && request.resource.data.centerId == resource.data.centerId
         && request.resource.data.centerName == resource.data.centerName
-        && clinicianIdUnchanged
-        && clinicianNameUnchanged
-        && clinicianUidUnchanged
         && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.note == resource.data.note
-        && adminForwardedUnchanged
-        && adminAssignedByUnchanged
-        && adminAssignedAtUnchanged
         && requestGroupIdUnchanged;
     }
 
+    function centerSelectionFieldsUnchanged() {
+      return request.resource.data.selectedAccommodationKey == resource.data.selectedAccommodationKey
+        && request.resource.data.selectedAccommodationLabelAr == resource.data.selectedAccommodationLabelAr
+        && request.resource.data.selectedAccommodationPricingSnapshot == resource.data.selectedAccommodationPricingSnapshot
+        && request.resource.data.selectedAccommodationPrice == resource.data.selectedAccommodationPrice
+        && request.resource.data.selectedAccommodationPricingUnit == resource.data.selectedAccommodationPricingUnit;
+    }
+
+    function centerAvailabilityFieldsUnchanged() {
+      return request.resource.data.centerAvailabilityStatus == resource.data.centerAvailabilityStatus
+        && request.resource.data.centerAvailabilityNote == resource.data.centerAvailabilityNote
+        && request.resource.data.centerAvailabilityRespondedAt == resource.data.centerAvailabilityRespondedAt
+        && request.resource.data.centerAvailabilityRespondedBy == resource.data.centerAvailabilityRespondedBy
+        && request.resource.data.centerSuggestedAlternativeKey == resource.data.centerSuggestedAlternativeKey
+        && request.resource.data.centerSuggestedAlternativeLabelAr == resource.data.centerSuggestedAlternativeLabelAr;
+    }
+
+    function centerClientRevisionFieldsUnchanged() {
+      return request.resource.data.clientRevisionNumber == resource.data.clientRevisionNumber
+        && request.resource.data.lastCenterFeedbackRevisionNumber == resource.data.lastCenterFeedbackRevisionNumber
+        && request.resource.data.clientUpdatedAfterCenterFeedback == resource.data.clientUpdatedAfterCenterFeedback
+        && request.resource.data.adminCanApproveWithoutCenterRecheck == resource.data.adminCanApproveWithoutCenterRecheck
+        && request.resource.data.lastCenterAvailabilityStatus == resource.data.lastCenterAvailabilityStatus
+        && request.resource.data.lastCenterAvailabilityNote == resource.data.lastCenterAvailabilityNote
+        && request.resource.data.lastCenterSuggestedAlternativeKey == resource.data.lastCenterSuggestedAlternativeKey
+        && request.resource.data.lastCenterSuggestedAlternativeLabelAr == resource.data.lastCenterSuggestedAlternativeLabelAr;
+    }
+
     function adminCenterFollowUpValid() {
-      return isAdmin()
+      return isCenterCycleAdmin()
         && resource.data.requestKind == 'center'
-        && (
-          resource.data.status == 'pending_admin'
-          || resource.data.status == 'center_follow_up'
-        )
+        && resource.data.status == 'pending_admin'
         && request.resource.data.status == 'center_follow_up'
-        && request.resource.data.diff(resource.data).changedKeys()
-            .hasOnly([
-              'status',
-              'adminFollowUpNote',
-              'adminDecisionNote',
-              'rejectReason',
-              'updatedAt',
-              'centerAdminHandledBy',
-              'centerAdminHandledAt'
-            ])
+        && request.resource.data.workflowStage == 'center_follow_up'
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.adminDecisionType == 'center_follow_up'
+        && (request.resource.data.centerAdminHandledBy is string)
+        && request.resource.data.centerAdminHandledBy == uid();
+    }
+
+    function adminCenterFollowUpBridgeValid() {
+      return isCenterCycleAdmin()
+        && resource.data.requestKind == 'center'
+        && resource.data.status == 'pending_admin'
+        && request.resource.data.status == 'center_follow_up'
+        && request.resource.data.workflowStage == 'center_follow_up'
+        && request.resource.data.requestKind == resource.data.requestKind
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.adminDecisionType == 'center_follow_up'
         && (request.resource.data.centerAdminHandledBy is string)
         && request.resource.data.centerAdminHandledBy == uid();
     }
 
     function adminCenterReturnToClientValid() {
-      return isAdmin()
+      return isCenterCycleAdmin()
         && resource.data.requestKind == 'center'
         && resource.data.status == 'center_follow_up'
         && request.resource.data.status == 'client_update_required'
+        && request.resource.data.workflowStage == 'client_update_required'
+        && request.resource.data.adminDecisionType == 'returned_to_client'
+        && (request.resource.data.adminDecisionBy is string)
+        && request.resource.data.adminDecisionBy == uid();
+    }
+
+    /**
+     * ADMIN CENTER RETURN → CLIENT (BRIDGE RULE)
+     *
+     * السبب:
+     * بعض الطلبات القديمة كانت تحتوي على قيم غير صحيحة في:
+     * centerAvailabilityStatus (مثل 300 بدل 'unavailable')
+     *
+     * مما أدى إلى فشل rule الأساسية:
+     * adminCenterReturnToClientValid()
+     *
+     * لأن هذه rule تشترط:
+     * resource.data.centerAvailabilityStatus == 'unavailable'
+     *
+     * الحل:
+     * - تم إصلاح المصدر (center_request_inbox_service) لمنع القيم الخاطئة مستقبلًا
+     * - لكن الطلبات القديمة قد تظل غير متوافقة
+     *
+     * لذلك:
+     * تم إنشاء bridge rule مطابقة تمامًا للـ payload الفعلي لزر:
+     * "إرجاع للعميل للتعديل"
+     *
+     * الشروط:
+     * - requestKind == center
+     * - status → client_update_required
+     * - workflowStage → client_update_required
+     * - adminDecisionType == returned_to_client
+     * - adminDecisionBy == uid()
+     * - changedKeys محدودة جدًا لضمان الأمان
+     *
+     * ملاحظة:
+     * هذه rule transitional safety layer
+     * يمكن مراجعتها أو حذفها لاحقًا بعد التأكد أن كل البيانات أصبحت نظيفة
+     */
+    function adminCenterReturnToClientBridgeValid() {
+      return isCenterCycleAdmin()
+        && resource.data.requestKind == 'center'
+        && resource.data.status == 'center_follow_up'
+        && request.resource.data.requestKind == resource.data.requestKind
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.status == 'client_update_required'
+        && request.resource.data.workflowStage == 'client_update_required'
+        && request.resource.data.adminDecisionType == 'returned_to_client'
+        && (request.resource.data.adminDecisionBy is string)
+        && request.resource.data.adminDecisionBy == uid()
         && request.resource.data.diff(resource.data).changedKeys()
             .hasOnly([
               'status',
@@ -816,83 +1243,345 @@ service cloud.firestore {
               'lastCenterSuggestedAlternativeLabelAr',
               'lastCenterFeedbackRevisionNumber',
               'adminCanApproveWithoutCenterRecheck',
+              'adminDecisionType',
+              'adminDecisionBy',
+              'adminDecisionAt',
+              'updatedAt'
+            ]);
+    }
+
+    function adminCenterApproveValid() {
+      return isCenterCycleAdmin()
+        && resource.data.requestKind == 'center'
+        && (
+          resource.data.status == 'center_follow_up'
+          || (
+            resource.data.status == 'pending_admin'
+            && resource.data.clientUpdatedAfterCenterFeedback == true
+          )
+        )
+        && request.resource.data.status == 'session_setup_pending'
+        && request.resource.data.workflowStage == 'session_setup_pending';
+    }
+
+    function adminCenterApproveBridgeValid() {
+      return isCenterCycleAdmin()
+        && resource.data.requestKind == 'center'
+        && (
+          resource.data.status == 'center_follow_up'
+          || (
+            resource.data.status == 'pending_admin'
+            && resource.data.clientUpdatedAfterCenterFeedback == true
+          )
+        )
+        && request.resource.data.requestKind == resource.data.requestKind
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.status == 'session_setup_pending'
+        && request.resource.data.workflowStage == 'session_setup_pending'
+        && request.resource.data.adminDecisionType == 'approved'
+        && (request.resource.data.adminDecisionBy is string)
+        && request.resource.data.adminDecisionBy == uid();
+    }
+
+    function adminCenterOpenIntakeBridgeValid() {
+      return isCenterCycleAdmin()
+        && resource.data.requestKind == 'center'
+        && (
+          resource.data.status == 'pending_admin'
+          || resource.data.status == 'center_follow_up'
+        )
+        && (
+          !resource.data.keys().hasAny(['archived'])
+          || resource.data.archived == false
+        )
+        && resource.data.centerAvailabilityStatus == 'available'
+        && (resource.data.centerId is string)
+        && resource.data.centerId.size() > 0
+        && (resource.data.selectedAccommodationKey is string)
+        && resource.data.selectedAccommodationKey.size() > 0
+        && (resource.data.selectedAccommodationLabelAr is string)
+        && resource.data.selectedAccommodationLabelAr.size() > 0
+        && resource.data.selectedAccommodationPrice != null
+        && (resource.data.selectedAccommodationPricingUnit is string)
+        && resource.data.selectedAccommodationPricingUnit.size() > 0
+        && (resource.data.contract is map)
+        && resource.data.contract.status == 'draft'
+        && (
+          !resource.data.keys().hasAny(['paymentStatus'])
+          || resource.data.paymentStatus == ''
+          || resource.data.paymentStatus == 'not_started'
+        )
+        && (
+          !resource.data.keys().hasAny(['paymentQuotePreparedAt'])
+          || resource.data.paymentQuotePreparedAt == null
+        )
+        && (
+          !resource.data.keys().hasAny(['paymentReceiptFileName'])
+          || resource.data.paymentReceiptFileName == null
+          || resource.data.paymentReceiptFileName == ''
+        )
+        && (
+          !resource.data.keys().hasAny(['grossClientPaidAmount'])
+          || resource.data.grossClientPaidAmount == null
+          || resource.data.grossClientPaidAmount == ''
+        )
+        && request.resource.data.requestKind == resource.data.requestKind
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.status == 'center_intake_pending'
+        && request.resource.data.workflowStage == 'center_intake_pending'
+        && request.resource.data.adminDecisionType == 'center_intake_opened'
+        && (request.resource.data.adminDecisionBy is string)
+        && request.resource.data.adminDecisionBy == uid()
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'adminDecisionType',
+              'adminDecisionBy',
+              'adminDecisionAt',
+              'updatedAt'
+            ]);
+    }
+
+    function adminCenterScheduleBridgeValid() {
+      return isAdmin()
+        && isLegacyOrCanonicalCenterBooking()
+        && (
+          resource.data.status == 'session_setup_pending'
+          || resource.data.status == 'reschedule_pending'
+        )
+        && request.resource.data.status == 'awaiting_payment'
+        && request.resource.data.workflowStage == 'awaiting_payment'
+        && request.resource.data.paymentStatus == 'pending_client_transfer'
+        && request.resource.data.sessionStatus == 'not_created'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'paymentStatus',
+              'payment_confirmed',
+              'sessionStatus',
+              'sessionDateText',
+              'stayStartDateText',
+              'stayEndDateText',
+              'stayDurationDays',
+              'stayDurationReason',
+              'stayDurationIsPreliminary',
+              'sessionLink',
+              'sessionCode',
+              'sessionAdminNotes',
+              'stayUnitPrice',
+              'stayPricingUnit',
+              'stayBaseAmount',
+              'stayTaxPercent',
+              'stayTaxAmount',
+              'stayTotalAmount',
+              'grossClientPaidAmount',
+              'paymentBreakdownText',
+              'paymentQuotePreparedAt',
+              'paymentQuotePreparedBy',
               'updatedAt'
             ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && (request.resource.data.paymentQuotePreparedBy is string)
+        && request.resource.data.paymentQuotePreparedBy == uid();
+    }
+
+    function adminPaymentApproveBridgeValid() {
+      return isAdmin()
+        && isLegacyOrCanonicalCenterBooking()
+        && (
+          resource.data.status == 'payment_review'
+          || resource.data.paymentStatus == 'submitted_by_client'
+          || (
+            resource.data.status == 'awaiting_payment'
+            && (resource.data.paymentReceiptFileName is string)
+            && resource.data.paymentReceiptFileName.size() > 0
+          )
+        )
+        && request.resource.data.status == 'session_scheduled'
+        && request.resource.data.workflowStage == 'session_scheduled'
+        && request.resource.data.paymentStatus == 'approved'
+        && request.resource.data.sessionStatus == 'scheduled'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'paymentStatus',
+              'payment_confirmed',
+              'paymentApprovedAt',
+              'sessionStatus',
+              'updatedAt'
+            ]);
+    }
+
+    function centerArrivalBridgeValid() {
+      return signedIn()
+        && resource.data.centerId == uid()
+        && (
+          resource.data.status == 'session_setup_pending'
+          || resource.data.status == 'session_scheduled'
+          || resource.data.status == 'reschedule_pending'
+        )
+        && (
+          (
+            request.resource.data.status == resource.data.status
+            && request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly([
+                  'centerArrivalConfirmed',
+                  'centerArrivalConfirmedAt',
+                  'centerArrivalConfirmedBy',
+                  'centerArrivalNotes',
+                  'centerRoomDeliveredAsBooked',
+                  'updatedAt'
+                ])
+          )
+          || (
+            request.resource.data.status == 'session_in_progress'
+            && request.resource.data.workflowStage == 'session_in_progress'
+            && request.resource.data.sessionStatus == 'in_progress'
+            && request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly([
+                  'centerArrivalConfirmed',
+                  'centerArrivalConfirmedAt',
+                  'centerArrivalConfirmedBy',
+                  'centerArrivalNotes',
+                  'centerRoomDeliveredAsBooked',
+                  'status',
+                  'workflowStage',
+                  'sessionStatus',
+                  'residencyStartedAt',
+                  'residencyStartedBy',
+                  'residencyStatus',
+                  'updatedAt'
+                ])
+          )
+        );
+    }
+
+    function clientCenterCheckInBridgeValid() {
+      return signedIn()
+        && request.auth.uid == resource.data.clientId
+        && (
+          resource.data.status == 'session_setup_pending'
+          || resource.data.status == 'session_scheduled'
+          || resource.data.status == 'reschedule_pending'
+        )
+        && (
+          (
+            request.resource.data.status == resource.data.status
+            && request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly([
+                  'clientCheckInConfirmed',
+                  'clientCheckInConfirmedAt',
+                  'clientCheckInNotes',
+                  'clientArrivalPlaceMatched',
+                  'clientArrivalRightsExplained',
+                  'clientArrivalSpecialistMet',
+                  'clientArrivalReceptionRating',
+                  'updatedAt'
+                ])
+          )
+          || (
+            request.resource.data.status == 'session_in_progress'
+            && request.resource.data.workflowStage == 'session_in_progress'
+            && request.resource.data.sessionStatus == 'in_progress'
+            && request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly([
+                  'clientCheckInConfirmed',
+                  'clientCheckInConfirmedAt',
+                  'clientCheckInNotes',
+                  'clientArrivalPlaceMatched',
+                  'clientArrivalRightsExplained',
+                  'clientArrivalSpecialistMet',
+                  'clientArrivalReceptionRating',
+                  'status',
+                  'workflowStage',
+                  'sessionStatus',
+                  'residencyStartedAt',
+                  'residencyStartedBy',
+                  'residencyStatus',
+                  'updatedAt'
+                ])
+          )
+        );
+    }
+
+    function adminSessionCompleteBridgeValid() {
+      return isAdmin()
+        && (
+          resource.data.status == 'session_scheduled'
+          || resource.data.status == 'session_in_progress'
+        )
+        && request.resource.data.status == 'session_completed_pending_reviews'
+        && request.resource.data.workflowStage == 'session_completed_pending_reviews'
+        && request.resource.data.sessionStatus == 'completed'
+        && request.resource.data.reviewStatus == 'pending_reviews'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'sessionStatus',
+              'reviewStatus',
+              'updatedAt'
+            ]);
+    }
+
+    function adminCenterRejectValid() {
+      return isCenterCycleAdmin()
+        && resource.data.requestKind == 'center'
+        && (
+          resource.data.status == 'pending_admin'
+          || resource.data.status == 'center_follow_up'
+        )
         && request.resource.data.clientId == resource.data.clientId
         && request.resource.data.clientName == resource.data.clientName
         && request.resource.data.centerId == resource.data.centerId
         && request.resource.data.centerName == resource.data.centerName
         && request.resource.data.createdAt == resource.data.createdAt
-        && request.resource.data.note == resource.data.note;
-    }
-
-    function adminCenterApproveValid() {
-      return isAdmin()
-        && resource.data.requestKind == 'center'
-        && (
-          resource.data.status == 'pending_admin'
-          || resource.data.status == 'center_follow_up'
-        )
-        && request.resource.data.status == 'awaiting_payment'
-        && request.resource.data.paymentStatus == 'pending_client_transfer'
-        && request.resource.data.sessionStatus == 'not_created'
-        && request.resource.data.reviewStatus == 'not_started'
+        && request.resource.data.note == resource.data.note
+        && request.resource.data.selectedAccommodationKey == resource.data.selectedAccommodationKey
+        && request.resource.data.selectedAccommodationLabelAr == resource.data.selectedAccommodationLabelAr
+        && request.resource.data.selectedAccommodationPricingSnapshot == resource.data.selectedAccommodationPricingSnapshot
+        && request.resource.data.selectedAccommodationPrice == resource.data.selectedAccommodationPrice
+        && request.resource.data.selectedAccommodationPricingUnit == resource.data.selectedAccommodationPricingUnit
+        && request.resource.data.status == 'rejected_admin'
+        && request.resource.data.workflowStage == 'rejected_admin'
+        && request.resource.data.adminApproved == false
+        && request.resource.data.adminRejected == true
+        && request.resource.data.adminForwarded == false
+        && request.resource.data.adminDecisionType == 'rejected'
+        && (request.resource.data.adminDecisionBy is string)
+        && request.resource.data.adminDecisionBy == uid()
+        && (request.resource.data.adminAssignedBy is string)
+        && request.resource.data.adminAssignedBy == uid()
+        && request.resource.data.paymentStatus == 'blocked'
+        && request.resource.data.sessionStatus == 'cancelled'
+        && request.resource.data.reviewStatus == 'blocked'
         && request.resource.data.payoutStatus == 'blocked'
-        && request.resource.data.diff(resource.data).changedKeys()
-            .hasOnly([
-              'status',
-              'workflowStage',
-              'adminApproved',
-              'adminRejected',
-              'adminForwarded',
-              'adminDecisionType',
-              'adminDecisionBy',
-              'adminDecisionAt',
-              'adminAssignedBy',
-              'adminAssignedAt',
-              'assignedClinicianId',
-              'assignedClinicianName',
-              'clinicianId',
-              'clinicianName',
-              'clinicianUid',
-              'paymentStatus',
-              'sessionStatus',
-              'reviewStatus',
-              'payoutStatus',
-              'adminDecisionNote',
-              'adminFollowUpNote',
-              'rejectReason',
-              'updatedAt',
-              'centerAdminHandledBy',
-              'centerAdminHandledAt'
-            ])
-        && (
-          !request.resource.data.keys().hasAny(['centerAdminHandledBy'])
-          || request.resource.data.centerAdminHandledBy is string
-        );
-    }
-
-    function adminCenterRejectValid() {
-      return isAdmin()
-        && resource.data.requestKind == 'center'
-        && (
-          resource.data.status == 'pending_admin'
-          || resource.data.status == 'center_follow_up'
-        )
-        && request.resource.data.status == 'rejected'
-        && request.resource.data.diff(resource.data).changedKeys()
-            .hasOnly([
-              'status',
-              'rejectReason',
-              'adminDecisionNote',
-              'adminFollowUpNote',
-              'updatedAt',
-              'centerAdminHandledBy',
-              'centerAdminHandledAt'
-            ])
-        && centerBaseFieldsUnchanged()
-        && (request.resource.data.centerAdminHandledBy is string)
-        && request.resource.data.centerAdminHandledBy == uid();
+        && request.resource.data.centerAvailabilityStatus == resource.data.centerAvailabilityStatus
+        && request.resource.data.centerAvailabilityNote == resource.data.centerAvailabilityNote
+        && request.resource.data.centerAvailabilityRespondedAt == resource.data.centerAvailabilityRespondedAt
+        && request.resource.data.centerAvailabilityRespondedBy == resource.data.centerAvailabilityRespondedBy
+        && request.resource.data.centerSuggestedAlternativeKey == resource.data.centerSuggestedAlternativeKey
+        && request.resource.data.centerSuggestedAlternativeLabelAr == resource.data.centerSuggestedAlternativeLabelAr
+        && request.resource.data.clientRevisionNumber == resource.data.clientRevisionNumber
+        && request.resource.data.lastCenterFeedbackRevisionNumber == resource.data.lastCenterFeedbackRevisionNumber
+        && request.resource.data.clientUpdatedAfterCenterFeedback == resource.data.clientUpdatedAfterCenterFeedback
+        && request.resource.data.adminCanApproveWithoutCenterRecheck == resource.data.adminCanApproveWithoutCenterRecheck
+        && request.resource.data.lastCenterAvailabilityStatus == resource.data.lastCenterAvailabilityStatus
+        && request.resource.data.lastCenterAvailabilityNote == resource.data.lastCenterAvailabilityNote
+        && request.resource.data.lastCenterSuggestedAlternativeKey == resource.data.lastCenterSuggestedAlternativeKey
+        && request.resource.data.lastCenterSuggestedAlternativeLabelAr == resource.data.lastCenterSuggestedAlternativeLabelAr
+        && request.resource.data.assignedClinicianId == resource.data.assignedClinicianId
+        && request.resource.data.assignedClinicianName == resource.data.assignedClinicianName
+        && request.resource.data.clinicianId == resource.data.clinicianId
+        && request.resource.data.clinicianName == resource.data.clinicianName
+        && request.resource.data.clinicianUid == resource.data.clinicianUid;
     }
 
     function adminCenterUpdateValid() {
@@ -907,14 +1596,24 @@ service cloud.firestore {
         && resource.data.requestKind == 'center'
         && (resource.data.centerId is string)
         && resource.data.centerId == uid()
-        && resource.data.status == 'center_follow_up'
-        && request.resource.data.status == resource.data.status
+        && (
+          resource.data.status == 'pending_admin'
+          || resource.data.status == 'center_follow_up'
+        )
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.clientName == resource.data.clientName
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.centerName == resource.data.centerName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.note == resource.data.note
+        && request.resource.data.selectedAccommodationKey == resource.data.selectedAccommodationKey
+        && request.resource.data.selectedAccommodationLabelAr == resource.data.selectedAccommodationLabelAr
+        && request.resource.data.selectedAccommodationPricingSnapshot == resource.data.selectedAccommodationPricingSnapshot
+        && request.resource.data.selectedAccommodationPrice == resource.data.selectedAccommodationPrice
+        && request.resource.data.selectedAccommodationPricingUnit == resource.data.selectedAccommodationPricingUnit
         && request.resource.data.diff(resource.data).changedKeys()
             .hasOnly([
               'centerAvailabilityStatus',
-              'centerAvailabilityNote',
-              'centerSuggestedAlternativeKey',
-              'centerSuggestedAlternativeLabelAr',
               'centerAvailabilityRespondedAt',
               'centerAvailabilityRespondedBy',
               'updatedAt'
@@ -923,12 +1622,116 @@ service cloud.firestore {
           request.resource.data.centerAvailabilityStatus == 'available'
           || request.resource.data.centerAvailabilityStatus == 'unavailable'
         )
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.workflowStage == resource.data.workflowStage
         && (
           request.resource.data.centerAvailabilityNote == null
           || request.resource.data.centerAvailabilityNote is string
         )
         && (request.resource.data.centerAvailabilityRespondedBy is string)
         && request.resource.data.centerAvailabilityRespondedBy == uid();
+    }
+
+    function centerAvailabilityBridgeValid() {
+      return signedIn()
+        && resource.data.requestKind == 'center'
+        && (resource.data.centerId is string)
+        && resource.data.centerId == uid()
+        && (
+          resource.data.status == 'pending_admin'
+          || resource.data.status == 'center_follow_up'
+        )
+        && request.resource.data.requestKind == resource.data.requestKind
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'centerAvailabilityStatus',
+              'centerAvailabilityRespondedAt',
+              'centerAvailabilityRespondedBy',
+              'updatedAt'
+            ])
+        && (
+          request.resource.data.centerAvailabilityStatus == 'available'
+          || request.resource.data.centerAvailabilityStatus == 'unavailable'
+        )
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.workflowStage == resource.data.workflowStage
+        && (request.resource.data.centerAvailabilityRespondedBy is string)
+        && request.resource.data.centerAvailabilityRespondedBy == uid();
+    }
+
+    function clientInitialIntakeValid() {
+      return isClientDoc()
+        && isLegacyOrCanonicalCenterBooking()
+        && resource.data.status == 'center_intake_pending'
+        && request.resource.data.status == 'center_recommendation_pending'
+        && request.resource.data.workflowStage == 'center_recommendation_pending'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'intakeFormSubmitted',
+              'intakeSubmittedAt',
+              'intakeReason',
+              'intakeHasSubstanceUse',
+              'intakeSubstanceType',
+              'intakeLastSubstanceUseAt',
+              'intakeWithdrawalSymptomsText',
+              'intakePriorDetoxHistory',
+              'intakeHasPriorDiagnosis',
+              'intakePriorDiagnosisText',
+              'intakeHasPriorTreatment',
+              'intakeCurrentMedications',
+              'intakeSymptomsText',
+              'intakeRiskNotes',
+              'intakeFamilyNotes',
+              'intakeSpecialNeedsConditionType',
+              'intakeNeedsCompanion',
+              'intakeMobilitySupport',
+              'intakeNutritionSupport',
+              'intakeSpecialCareNotes',
+              'updatedAt'
+            ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.intakeFormSubmitted == true;
+    }
+
+    function centerRecommendationValid() {
+      return signedIn()
+        && isLegacyOrCanonicalCenterBooking()
+        && (resource.data.centerId is string)
+        && resource.data.centerId == uid()
+        && resource.data.status == 'center_recommendation_pending'
+        && request.resource.data.status == 'session_setup_pending'
+        && request.resource.data.workflowStage == 'session_setup_pending'
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'status',
+              'workflowStage',
+              'centerInitialRecommendation',
+              'centerRecommendedCareLevel',
+              'centerRecommendedStayDays',
+              'centerNeedsInternalAssessment',
+              'centerRecommendationNotes',
+              'centerRecommendationSubmittedAt',
+              'centerRecommendationSubmittedBy',
+              'updatedAt'
+            ])
+        && request.resource.data.clientId == resource.data.clientId
+        && request.resource.data.centerId == resource.data.centerId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && (request.resource.data.centerInitialRecommendation is string)
+        && request.resource.data.centerInitialRecommendation.size() > 0
+        && (request.resource.data.centerRecommendedCareLevel is string)
+        && request.resource.data.centerRecommendedCareLevel.size() > 0
+        && (request.resource.data.centerRecommendedStayDays is int)
+        && request.resource.data.centerRecommendedStayDays > 0
+        && (request.resource.data.centerNeedsInternalAssessment is bool)
+        && (request.resource.data.centerRecommendationSubmittedBy is string)
+        && request.resource.data.centerRecommendationSubmittedBy == uid();
     }
 
     function clientCenterResubmitValid() {
@@ -947,12 +1750,17 @@ service cloud.firestore {
               'selectedAccommodationPricingSnapshot',
               'selectedAccommodationPrice',
               'selectedAccommodationPricingUnit',
+              'contract',
               'centerAvailabilityStatus',
               'centerAvailabilityNote',
               'centerAvailabilityRespondedAt',
               'centerAvailabilityRespondedBy',
               'centerSuggestedAlternativeKey',
               'centerSuggestedAlternativeLabelAr',
+              'lastCenterAvailabilityStatus',
+              'lastCenterAvailabilityNote',
+              'lastCenterSuggestedAlternativeKey',
+              'lastCenterSuggestedAlternativeLabelAr',
               'clientRevisionNumber',
               'clientUpdatedAfterCenterFeedback',
               'adminCanApproveWithoutCenterRecheck',
@@ -972,7 +1780,7 @@ service cloud.firestore {
         && (
           (
             resource.data.status == 'assigned_clinician'
-            && request.resource.data.status == 'awaiting_payment'
+            && request.resource.data.status == resource.data.status
             && request.resource.data.diff(resource.data).changedKeys()
                 .hasOnly([
                   'status',
@@ -981,6 +1789,7 @@ service cloud.firestore {
                   'clinicianRejected',
                   'clinicianCompleted',
                   'clinicianRespondedAt',
+                  'payment_confirmed',
                   'paymentStatus',
                   'sessionStatus',
                   'reviewStatus',
@@ -1135,12 +1944,44 @@ service cloud.firestore {
         );
     }
 
+    function clientReviewBridgeValid() {
+      return request.auth != null
+        && request.auth.uid == resource.data.clientId
+        && (
+          resource.data.status == 'session_completed_pending_reviews'
+          || resource.data.status == 'payout_pending'
+        )
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'clientReviewSubmitted',
+              'clientReviewSubmittedAt',
+              'clientReviewTotalScore',
+              'clientReviewPercentage',
+              'clientReviewDerivedStars',
+              'status',
+              'reviewStatus',
+              'sessionStatus',
+              'finalReviewPercentage',
+              'updatedAt'
+            ])
+        && request.resource.data.clientReviewSubmitted == true
+        && request.resource.data.sessionStatus == 'completed'
+        && (
+          request.resource.data.status == 'session_completed_pending_reviews'
+          || request.resource.data.status == 'payout_pending'
+        )
+        && (
+          request.resource.data.reviewStatus == 'partial'
+          || request.resource.data.reviewStatus == 'completed'
+        );
+    }
+
     function clinicianReviewUpdateValid() {
       return (
           isAssignedClinicianDoc()
           || (
             signedIn()
-            && resource.data.requestKind == 'center'
+            && isLegacyOrCanonicalCenterBooking()
             && (resource.data.centerId is string)
             && resource.data.centerId == uid()
           )
@@ -1163,6 +2004,74 @@ service cloud.firestore {
               'updatedAt'
             ])
         && request.resource.data.clinicianReviewSubmitted == true
+        && request.resource.data.sessionStatus == 'completed'
+        && (
+          request.resource.data.status == 'session_completed_pending_reviews'
+          || request.resource.data.status == 'payout_pending'
+        )
+        && (
+          request.resource.data.reviewStatus == 'partial'
+          || request.resource.data.reviewStatus == 'completed'
+        );
+    }
+
+    function centerDischargeReviewBridgeValid() {
+      return signedIn()
+        && isLegacyOrCanonicalCenterBooking()
+        && (resource.data.centerId is string)
+        && resource.data.centerId == uid()
+        && (
+          resource.data.status == 'session_completed_pending_reviews'
+          || resource.data.status == 'payout_pending'
+        )
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'clinicianReviewSubmitted',
+              'clinicianReviewSubmittedAt',
+              'clinicianReviewTotalScore',
+              'clinicianReviewPercentage',
+              'clinicianReviewDerivedStars',
+              'status',
+              'reviewStatus',
+              'sessionStatus',
+              'finalReviewPercentage',
+              'updatedAt'
+            ])
+        && request.resource.data.clinicianReviewSubmitted == true
+        && request.resource.data.sessionStatus == 'completed'
+        && (
+          request.resource.data.status == 'session_completed_pending_reviews'
+          || request.resource.data.status == 'payout_pending'
+        )
+        && (
+          request.resource.data.reviewStatus == 'partial'
+          || request.resource.data.reviewStatus == 'completed'
+        );
+    }
+
+    function centerReviewUpdateValid() {
+      return signedIn()
+        && isLegacyOrCanonicalCenterBooking()
+        && (resource.data.centerId is string)
+        && resource.data.centerId == uid()
+        && (
+          resource.data.status == 'session_completed_pending_reviews'
+          || resource.data.status == 'payout_pending'
+        )
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'centerReviewSubmitted',
+              'centerReviewSubmittedAt',
+              'centerReviewTotalScore',
+              'centerReviewPercentage',
+              'centerReviewDerivedStars',
+              'status',
+              'reviewStatus',
+              'sessionStatus',
+              'finalReviewPercentage',
+              'updatedAt'
+            ])
+        && request.resource.data.centerReviewSubmitted == true
         && request.resource.data.sessionStatus == 'completed'
         && (
           request.resource.data.status == 'session_completed_pending_reviews'
@@ -1229,46 +2138,63 @@ service cloud.firestore {
       allow create: if clinicianBookingCreateValid()
         || centerBookingCreateValid();
 
-      allow update: if clientUpdateValid()
-        || clientCenterResubmitValid()
-        || clientPaymentProofUpdateValid()
-        || adminForwardValid()
-        || adminRejectValid()
-        || adminReturnToPendingValid()
-        || adminPaymentUpdateValid()
+      allow update: if centerQuoteFrozenGuardValid() && (
+        adminCenterFollowUpBridgeValid()
+        || adminCenterReturnToClientBridgeValid()
+        || adminCenterApproveBridgeValid()
+        || adminCenterOpenIntakeBridgeValid()
+        || adminCenterScheduleBridgeValid()
+        || adminPaymentApproveBridgeValid()
+        || centerArrivalBridgeValid()
+        || clientCenterCheckInBridgeValid()
+        || adminSessionCompleteBridgeValid()
+        || centerAvailabilityBridgeValid()
+        || centerDischargeReviewBridgeValid()
+        || clientReviewBridgeValid()
+        || adminCenterAccountingReviewBridgeValid()
+        || adminPayoutConfirmBridgeValid()
+        || adminArchiveBridgeValid()
+        || clientUpdateValid()
+        || clientInitialIntakeValid()
+          || centerRecommendationValid()
+          || clientCenterResubmitValid()
+          || clientCenterCheckInValid()
+          || clientCenterContractConfirmValid()
+          || clientPaymentProofUpdateValid()
+          || clientDirectClinicianThreadLinkValid()
+          || adminForwardValid()
+          || adminRejectValid()
+          || adminReturnToPendingValid()
+          || adminPaymentUpdateValid()
         || adminSessionUpdateValid()
         || adminPayoutAndArchiveValid()
+        || (
+          isCenterCycleAdmin()
+          && resource.data.requestKind == 'center'
+          && (
+            resource.data.status == 'center_follow_up'
+            || (
+              resource.data.status == 'pending_admin'
+              && resource.data.clientUpdatedAfterCenterFeedback == true
+            )
+          )
+          && request.resource.data.status == 'session_setup_pending'
+          && request.resource.data.workflowStage == 'session_setup_pending'
+        )
         || adminCenterUpdateValid()
+        || centerArrivalConfirmationValid()
         || centerAvailabilityUpdateValid()
         || clinicianUpdateValid()
         || clientReviewUpdateValid()
-        || clinicianReviewUpdateValid();
+        || clinicianReviewUpdateValid()
+        || centerReviewUpdateValid()
+      );
 
       allow delete: if false;
     }
 
     match /bookingRequests/{docId} {
-      allow read: if clientCanReadBooking() || clinicianCanReadBooking() || centerCanReadBooking() || isAdmin();
-
-      allow create: if clinicianBookingCreateValid()
-        || centerBookingCreateValid();
-
-      allow update: if clientUpdateValid()
-        || clientCenterResubmitValid()
-        || clientPaymentProofUpdateValid()
-        || adminForwardValid()
-        || adminRejectValid()
-        || adminReturnToPendingValid()
-        || adminPaymentUpdateValid()
-        || adminSessionUpdateValid()
-        || adminPayoutAndArchiveValid()
-        || adminCenterUpdateValid()
-        || centerAvailabilityUpdateValid()
-        || clinicianUpdateValid()
-        || clientReviewUpdateValid()
-        || clinicianReviewUpdateValid();
-
-      allow delete: if false;
+      allow read, create, update, delete: if false;
     }
 
     match /chat_threads/{threadId} {
@@ -1358,6 +2284,7 @@ service cloud.firestore {
         && (
           request.resource.data.reviewerType == 'client'
           || request.resource.data.reviewerType == 'clinician'
+          || request.resource.data.reviewerType == 'center'
         );
       allow update: if signedIn()
         && resource != null
@@ -1371,7 +2298,7 @@ service cloud.firestore {
     }
 
     match /admins/{uidDoc} {
-      allow read: if signedIn() && uid() == uidDoc;
+      allow read: if resource.data.active == true;
       allow write: if false;
     }
 
@@ -1411,8 +2338,35 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    match /system_health/{docId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /ai_policies/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+      allow delete: if false;
+    }
+
+    match /system_domains/{domainId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+      allow delete: if false;
+    }
+
+    match /analytics_summaries/{docId} {
+      allow read: if isAdmin();
+      allow write: if false;
+      allow delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
   }
 }
+
+
+
+

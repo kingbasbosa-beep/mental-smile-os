@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/core/ui/app_shell_actions.dart';
+import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class ClientPaymentProofPage extends StatefulWidget {
   const ClientPaymentProofPage({super.key});
@@ -30,88 +30,166 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
     return DateTime.fromMillisecondsSinceEpoch(0);
   }
 
+  Map<String, dynamic> _asStringMap(dynamic value) {
+    if (value is Map<String, dynamic>) {
+      return Map<String, dynamic>.from(value);
+    }
+    if (value is Map) {
+      return value.map((key, item) => MapEntry(key.toString(), item));
+    }
+    return <String, dynamic>{};
+  }
+
+  bool _isCenterRequestData(Map<String, dynamic> data) {
+    return (data['requestKind'] ?? '').toString() == 'center' ||
+        (data['centerId'] ?? '').toString().trim().isNotEmpty;
+  }
+
+  bool _contractConfirmed(Map<String, dynamic> data) {
+    final contract = _asStringMap(data['contract']);
+    return contract['status'] == 'confirmed' &&
+        contract['snapshotLocked'] == true &&
+        _asStringMap(contract['quoteSnapshot']).isNotEmpty;
+  }
+
+  String _displayValue(dynamic value) {
+    final text = (value ?? '').toString();
+    return text.trim().isEmpty ? '-' : text;
+  }
+
+  Map<String, dynamic> _quoteSnapshotFrom(Map<String, dynamic> data) {
+    return <String, dynamic>{
+      'stayStartDateText': data['stayStartDateText'],
+      'stayEndDateText': data['stayEndDateText'],
+      'stayDurationDays': data['stayDurationDays'],
+      'pricingUnit': data['stayPricingUnit'],
+      'baseAmount': data['stayBaseAmount'],
+      'taxPercent': data['stayTaxPercent'],
+      'taxAmount': data['stayTaxAmount'],
+      'totalAmount': data['stayTotalAmount'],
+      'grossClientPaidAmount': data['grossClientPaidAmount'],
+    };
+  }
+
+  Map<String, dynamic> _contractForConfirmation(Map<String, dynamic> data) {
+    final contract = _asStringMap(data['contract']);
+    final quoteSnapshot = _quoteSnapshotFrom(data);
+    return <String, dynamic>{
+      ...contract,
+      'status': 'confirmed',
+      'confirmedAt': FieldValue.serverTimestamp(),
+      'confirmedBy': FirebaseAuth.instance.currentUser?.uid ?? '',
+      'snapshotLocked': true,
+      'quoteSnapshot': quoteSnapshot,
+    };
+  }
+
+  Future<bool> _confirmCenterContractIfNeeded(
+    DocumentReference<Map<String, dynamic>> requestRef,
+    Map<String, dynamic> data,
+  ) async {
+    if (!_isCenterRequestData(data) || _contractConfirmed(data)) {
+      return true;
+    }
+
+    final quoteSnapshot = _quoteSnapshotFrom(data);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            _isArabic ? 'تأكيد عرض المركز' : 'Confirm center quote',
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _isArabic
+                    ? 'يرجى تأكيد بيانات العرض قبل إرسال إثبات التحويل.'
+                    : 'Please confirm the quote details before submitting payment proof.',
+              ),
+              const SizedBox(height: 12),
+              Text(
+                _isArabic
+                    ? 'بداية الإقامة: ${_displayValue(quoteSnapshot['stayStartDateText'])}'
+                    : 'Residency start: ${_displayValue(quoteSnapshot['stayStartDateText'])}',
+              ),
+              Text(
+                _isArabic
+                    ? 'نهاية الإقامة: ${_displayValue(quoteSnapshot['stayEndDateText'])}'
+                    : 'Residency end: ${_displayValue(quoteSnapshot['stayEndDateText'])}',
+              ),
+              Text(
+                _isArabic
+                    ? 'عدد الأيام: ${_displayValue(quoteSnapshot['stayDurationDays'])}'
+                    : 'Duration days: ${_displayValue(quoteSnapshot['stayDurationDays'])}',
+              ),
+              Text(
+                _isArabic
+                    ? 'وحدة التسعير: ${_displayValue(quoteSnapshot['pricingUnit'])}'
+                    : 'Pricing unit: ${_displayValue(quoteSnapshot['pricingUnit'])}',
+              ),
+              Text(
+                _isArabic
+                    ? 'الإجمالي: ${_displayValue(quoteSnapshot['totalAmount'])}'
+                    : 'Total: ${_displayValue(quoteSnapshot['totalAmount'])}',
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(_isArabic ? 'إلغاء' : 'Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(_isArabic ? 'تأكيد' : 'Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) {
+      return false;
+    }
+
+    if (!mounted) {
+      return false;
+    }
+
+    await requestRef.update(<String, dynamic>{
+      'contract': _contractForConfirmation(data),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+    return true;
+  }
+
   Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>>
       _awaitingPaymentRequests(String uid) {
-    final primary = FirebaseFirestore.instance
+    return FirebaseFirestore.instance
         .collection('booking_requests')
         .where('clientId', isEqualTo: uid)
-        .snapshots();
-    final legacy = FirebaseFirestore.instance
-        .collection('bookingRequests')
-        .where('clientId', isEqualTo: uid)
-        .snapshots();
-
-    return Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>>.multi(
-      (controller) {
-        QuerySnapshot<Map<String, dynamic>>? primarySnapshot;
-        QuerySnapshot<Map<String, dynamic>>? legacySnapshot;
-
-        void emitMerged() {
-          final merged =
-              <String, QueryDocumentSnapshot<Map<String, dynamic>>>{};
-
-          if (legacySnapshot != null) {
-            for (final doc in legacySnapshot!.docs) {
-              merged[doc.id] = doc;
-            }
-          }
-
-          if (primarySnapshot != null) {
-            for (final doc in primarySnapshot!.docs) {
-              merged[doc.id] = doc;
-            }
-          }
-
-          final docs = merged.values
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
               .where((doc) =>
                   (doc.data()['status'] ?? '').toString() == 'awaiting_payment')
               .toList()
             ..sort((a, b) => _asDateTime(b.data()['createdAt'])
-                .compareTo(_asDateTime(a.data()['createdAt'])));
-          controller.add(docs);
-        }
-
-        final primarySub = primary.listen(
-          (snapshot) {
-            primarySnapshot = snapshot;
-            emitMerged();
-          },
-          onError: controller.addError,
+                .compareTo(_asDateTime(a.data()['createdAt']))),
         );
-
-        final legacySub = legacy.listen(
-          (snapshot) {
-            legacySnapshot = snapshot;
-            emitMerged();
-          },
-          onError: controller.addError,
-        );
-
-        controller.onCancel = () async {
-          await primarySub.cancel();
-          await legacySub.cancel();
-        };
-      },
-    );
   }
 
   Future<List<DocumentSnapshot<Map<String, dynamic>>>> _existingRequestDocs(
     String requestId,
   ) async {
-    final db = FirebaseFirestore.instance;
-    final refs = [
-      db.collection('booking_requests').doc(requestId),
-      db.collection('bookingRequests').doc(requestId),
-    ];
-
-    final existing = <DocumentSnapshot<Map<String, dynamic>>>[];
-    for (final ref in refs) {
-      final snap = await ref.get();
-      if (snap.exists) {
-        existing.add(snap);
-      }
-    }
-    return existing;
+    final snap = await FirebaseFirestore.instance
+        .collection('booking_requests')
+        .doc(requestId)
+        .get();
+    return snap.exists ? [snap] : [];
   }
 
   Future<void> _submit(String requestId) async {
@@ -142,17 +220,17 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
       }
 
       final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-      final eligibleRefs = <DocumentReference<Map<String, dynamic>>>[];
+      final eligibleDocs = <DocumentSnapshot<Map<String, dynamic>>>[];
       for (final doc in requestDocs) {
         final data = doc.data() ?? const <String, dynamic>{};
         final status = (data['status'] ?? '').toString();
         final clientId = (data['clientId'] ?? '').toString();
         if (status == 'awaiting_payment' && clientId == uid) {
-          eligibleRefs.add(doc.reference);
+          eligibleDocs.add(doc);
         }
       }
 
-      if (eligibleRefs.isEmpty) {
+      if (eligibleDocs.isEmpty) {
         throw Exception(
           _isArabic
               ? 'لا توجد نسخة مؤهلة من الطلب لرفع إثبات الدفع'
@@ -160,15 +238,22 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
         );
       }
 
-      eligibleRefs.sort((a, b) {
-        final aPrimary = a.parent.id == 'booking_requests' ? 0 : 1;
-        final bPrimary = b.parent.id == 'booking_requests' ? 0 : 1;
-        return aPrimary.compareTo(bPrimary);
-      });
-      final targetRef = eligibleRefs.first;
+      final targetDoc = eligibleDocs.first;
+      final targetData = targetDoc.data() ?? const <String, dynamic>{};
+      final targetRef = targetDoc.reference;
+      final contractConfirmed = await _confirmCenterContractIfNeeded(
+        targetRef,
+        targetData,
+      );
+      if (!contractConfirmed) {
+        return;
+      }
+
       final dataToUpdate = <String, dynamic>{
         'status': 'payment_review',
+        'workflowStage': 'payment_review',
         'paymentStatus': 'submitted_by_client',
+        'payment_confirmed': false,
         'paymentReceiptFileName': receiptFileName,
         'paymentReceiptUrl': '',
         'paymentSubmittedAt': FieldValue.serverTimestamp(),
@@ -276,7 +361,25 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
                               selectedData['clinicianName'] ??
                               '')
                           .toString();
+                  final selectedCenterName =
+                      (selectedData['centerName'] ?? '').toString();
                   final selectedNote = (selectedData['note'] ?? '').toString();
+                  final isCenterRequest =
+                      (selectedData['requestKind'] ?? '').toString() ==
+                              'center' ||
+                          selectedCenterName.trim().isNotEmpty;
+                  final stayStart = (selectedData['stayStartDateText'] ??
+                          selectedData['sessionDateText'] ??
+                          '')
+                      .toString();
+                  final stayEnd =
+                      (selectedData['stayEndDateText'] ?? '').toString();
+                  final stayDurationDays =
+                      (selectedData['stayDurationDays'] ?? '').toString();
+                  final stayTotalAmount =
+                      (selectedData['stayTotalAmount'] ?? '').toString();
+                  final paymentBreakdownText =
+                      (selectedData['paymentBreakdownText'] ?? '').toString();
 
                   return ListView(
                     padding: const EdgeInsets.all(16),
@@ -316,6 +419,12 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
                                               data['clinicianName'] ??
                                               '')
                                           .toString();
+                                  final centerName =
+                                      (data['centerName'] ?? '').toString();
+                                  final isCenterRequest =
+                                      (data['requestKind'] ?? '').toString() ==
+                                              'center' ||
+                                          centerName.trim().isNotEmpty;
                                   final note =
                                       (data['note'] ?? '').toString().trim();
                                   final isSelected =
@@ -351,11 +460,17 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
                                             : Icons.radio_button_off,
                                       ),
                                       title: Text(
-                                        clinicianName.trim().isNotEmpty
-                                            ? clinicianName
-                                            : (_isArabic
-                                                ? 'طلب بدون اسم أخصائي'
-                                                : 'Request without clinician name'),
+                                        isCenterRequest
+                                            ? (centerName.trim().isNotEmpty
+                                                ? centerName
+                                                : (_isArabic
+                                                    ? 'طلب مركز'
+                                                    : 'Center request'))
+                                            : (clinicianName.trim().isNotEmpty
+                                                ? clinicianName
+                                                : (_isArabic
+                                                    ? 'طلب بدون اسم أخصائي'
+                                                    : 'Request without clinician name')),
                                       ),
                                       subtitle: note.isNotEmpty
                                           ? Text(
@@ -402,6 +517,16 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
                                     ? 'الأخصائي: $selectedClinicianName'
                                     : 'Clinician: $selectedClinicianName',
                               ),
+                            if (isCenterRequest &&
+                                selectedCenterName.trim().isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  _isArabic
+                                      ? 'المركز: $selectedCenterName'
+                                      : 'Center: $selectedCenterName',
+                                ),
+                              ),
                             if (selectedNote.trim().isNotEmpty)
                               Padding(
                                 padding: const EdgeInsets.only(top: 6),
@@ -409,6 +534,54 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
                                   _isArabic
                                       ? 'ملاحظتك: $selectedNote'
                                       : 'Your note: $selectedNote',
+                                ),
+                              ),
+                            if (isCenterRequest && stayStart.trim().isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  _isArabic
+                                      ? 'بداية الإقامة: $stayStart'
+                                      : 'Residency start: $stayStart',
+                                ),
+                              ),
+                            if (isCenterRequest && stayEnd.trim().isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  _isArabic
+                                      ? 'نهاية الإقامة المبدئية: $stayEnd'
+                                      : 'Preliminary residency end: $stayEnd',
+                                ),
+                              ),
+                            if (isCenterRequest &&
+                                stayDurationDays.trim().isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  _isArabic
+                                      ? 'عدد الأيام: $stayDurationDays'
+                                      : 'Duration days: $stayDurationDays',
+                                ),
+                              ),
+                            if (isCenterRequest &&
+                                paymentBreakdownText.trim().isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  _isArabic
+                                      ? 'بيان الدفع: $paymentBreakdownText'
+                                      : 'Payment quote: $paymentBreakdownText',
+                                ),
+                              ),
+                            if (isCenterRequest &&
+                                stayTotalAmount.trim().isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  _isArabic
+                                      ? 'الإجمالي المستحق: $stayTotalAmount'
+                                      : 'Total due: $stayTotalAmount',
                                 ),
                               ),
                             const SizedBox(height: 18),

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_escalation_model.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_message_model.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
@@ -24,6 +25,7 @@ class ChatFirestoreService {
     required String ownerUid,
     required String ownerType,
     required String displayName,
+    String? threadType,
     String sourceType = 'guest',
     String language = 'ar',
     bool isTemporary = true,
@@ -35,6 +37,7 @@ class ChatFirestoreService {
       id: doc.id,
       ownerUid: ownerUid,
       ownerType: ownerType,
+      threadType: threadType,
       displayName: displayName,
       status: 'active',
       sourceType: sourceType,
@@ -121,11 +124,107 @@ class ChatFirestoreService {
   }
 
   Stream<List<ChatEscalationModel>> streamEscalations() {
-    return _escalations.orderBy('createdAt', descending: true).snapshots().map(
-          (snapshot) => snapshot.docs
-              .map((doc) => ChatEscalationModel.fromFirestore(doc))
-              .toList(),
-        );
+    return _escalations
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .asyncMap((snapshot) async {
+      final items = <ChatEscalationModel>[];
+
+      for (final doc in snapshot.docs) {
+        final escalation = ChatEscalationModel.fromFirestore(doc);
+        final thread = await getThread(escalation.threadId);
+        if (thread == null) continue;
+        if (_isEscalationSourceThread(thread)) {
+          items.add(escalation);
+        }
+      }
+
+      return items;
+    });
+  }
+
+  bool _isLegacyAiSupportThread(ChatThreadModel thread) {
+    final threadType = thread.threadType?.trim() ?? '';
+    if (threadType.isNotEmpty) return false;
+    return thread.sourceType == 'client' || thread.sourceType == 'guest';
+  }
+
+  bool _isEscalationSourceThread(ChatThreadModel thread) {
+    if (thread.threadType == 'ai_support') return true;
+    return _isLegacyAiSupportThread(thread);
+  }
+
+  bool _isLegacyAdminSupportThread(ChatThreadModel thread) {
+    final threadType = thread.threadType?.trim() ?? '';
+    if (threadType.isNotEmpty) return false;
+    return thread.sourceType == 'admin_support';
+  }
+
+  bool _isMissingThreadType(ChatThreadModel thread) {
+    final threadType = thread.threadType?.trim() ?? '';
+    return threadType.isEmpty;
+  }
+
+  bool _isLegacyClinicianCaseFallbackThread(ChatThreadModel thread) {
+    if (!_isMissingThreadType(thread)) return false;
+    return thread.handoffState == 'clinician_review' ||
+        thread.lifecycleState == 'assigned_clinician';
+  }
+
+  bool _isTypedClinicianCaseThread(ChatThreadModel thread) {
+    return thread.threadType == 'clinician_case';
+  }
+
+  /// Clinician inbox source-of-truth:
+  /// - Prefer explicit threadType == 'clinician_case'
+  /// - Use legacy fallback only when threadType is missing
+  bool _matchesClinicianInboxThread(ChatThreadModel thread) {
+    if (_isTypedClinicianCaseThread(thread)) return true;
+    return _isLegacyClinicianCaseFallbackThread(thread);
+  }
+
+  void _debugMeasureLegacyClinicianFallbackThreads(
+    String clinicianUid,
+    List<ChatThreadModel> threads,
+  ) {
+    if (!kDebugMode) return;
+
+    final legacyFallbackThreads =
+        threads.where(_isLegacyClinicianCaseFallbackThread).toList();
+
+    if (legacyFallbackThreads.isEmpty) return;
+
+    debugPrint(
+      'CHAT_CLINICIAN_FALLBACK_MEASURE '
+      'clinicianUid=$clinicianUid '
+      'legacyClinicianFallbackCount=${legacyFallbackThreads.length} '
+      'sampleThreadIds=${legacyFallbackThreads.take(5).map((t) => t.id).join(",")}',
+    );
+  }
+
+  Stream<List<ChatThreadModel>> streamAdminSupportInboxThreads() {
+    return _threads.orderBy('updatedAt', descending: true).snapshots().map(
+      (snapshot) {
+        final typed = <ChatThreadModel>[];
+        final legacyFallback = <ChatThreadModel>[];
+
+        for (final doc in snapshot.docs) {
+          final thread = ChatThreadModel.fromFirestore(doc);
+          if (thread.archived) continue;
+
+          if (thread.threadType == 'admin_support') {
+            typed.add(thread);
+            continue;
+          }
+
+          if (_isLegacyAdminSupportThread(thread)) {
+            legacyFallback.add(thread);
+          }
+        }
+
+        return [...typed, ...legacyFallback];
+      },
+    );
   }
 
   /// Streams escalated chat cases assigned to a specific clinician.
@@ -138,11 +237,41 @@ class ChatFirestoreService {
         .where('assignedToUid', isEqualTo: clinicianUid)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => ChatEscalationModel.fromFirestore(doc))
-              .toList(),
-        );
+        .asyncMap((snapshot) async {
+      final items = <ChatEscalationModel>[];
+      final matchedThreads = <ChatThreadModel>[];
+
+      for (final doc in snapshot.docs) {
+        final escalation = ChatEscalationModel.fromFirestore(doc);
+        ChatThreadModel? thread;
+        try {
+          thread = await getThread(escalation.threadId);
+        } catch (e) {
+          if (kDebugMode) {
+            debugPrint(
+              'CHAT_CLINICIAN_THREAD_READ_SKIP '
+              'clinicianUid=$clinicianUid '
+              'escalationId=${escalation.id} '
+              'threadId=${escalation.threadId} '
+              'error=$e',
+            );
+          }
+          continue;
+        }
+        if (thread == null) continue;
+        if (_matchesClinicianInboxThread(thread)) {
+          matchedThreads.add(thread);
+          items.add(escalation);
+        }
+      }
+
+      _debugMeasureLegacyClinicianFallbackThreads(
+        clinicianUid,
+        matchedThreads,
+      );
+
+      return items;
+    });
   }
 
   Stream<List<ClinicianOptionModel>> streamClinicians() {
@@ -275,6 +404,7 @@ class ChatFirestoreService {
     required String officialClientUid,
   }) async {
     await _threads.doc(threadId).update({
+      'threadType': 'booking_followup',
       'bookingLinked': true,
       'bookingRequestId': bookingRequestId,
       'convertedToOfficialClient': true,
@@ -324,6 +454,7 @@ class ChatFirestoreService {
 
       tx.update(_threads.doc(threadId), {
         'assignedClinicianUid': clinicianUid,
+        'threadType': 'clinician_case',
         'handoffState': 'clinician_review',
         'lifecycleState': 'assigned_clinician',
         'needsHumanSupport': true,

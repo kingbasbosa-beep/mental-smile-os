@@ -89,6 +89,13 @@ flutter_*.log
 # -----------------------------
 android/app/google-services.json
 **/GoogleService-Info.plist
+tools/qa_bot/.env
+tools/qa_bot/.venv/
+tools/qa_bot/reports/
+tools/qa_bot/*.json
+functions/.env
+functions/.env.*
+functions/node_modules/
 
 # -----------------------------
 # Local generated reports / manifests

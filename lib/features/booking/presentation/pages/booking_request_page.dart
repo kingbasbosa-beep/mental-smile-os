@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 const String kDevClinicianUid =
     String.fromEnvironment('MK_DEV_CLINICIAN_UID', defaultValue: '');
@@ -78,6 +79,49 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
     return 2;
   }
 
+  bool _isMissingThreadType(Map<String, dynamic> data) {
+    final threadType = (data['threadType'] ?? '').toString().trim();
+    return threadType.isEmpty;
+  }
+
+  bool _isTypedBookingFollowupThread(Map<String, dynamic> data) {
+    return (data['threadType'] ?? '').toString().trim() == 'booking_followup';
+  }
+
+  QueryDocumentSnapshot<Map<String, dynamic>>? _pickReusableBookingThread(
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+  ) {
+    QueryDocumentSnapshot<Map<String, dynamic>>? typed;
+    QueryDocumentSnapshot<Map<String, dynamic>>? legacyMissingType;
+    DateTime typedUpdatedAt = DateTime.fromMillisecondsSinceEpoch(0);
+    DateTime legacyUpdatedAt = DateTime.fromMillisecondsSinceEpoch(0);
+
+    for (final doc in docs) {
+      final data = doc.data();
+      final rawUpdatedAt = data['updatedAt'];
+      final updatedAt = rawUpdatedAt is Timestamp
+          ? rawUpdatedAt.toDate()
+          : DateTime.fromMillisecondsSinceEpoch(0);
+
+      if (_isTypedBookingFollowupThread(data)) {
+        if (typed == null || updatedAt.isAfter(typedUpdatedAt)) {
+          typed = doc;
+          typedUpdatedAt = updatedAt;
+        }
+        continue;
+      }
+
+      if (_isMissingThreadType(data)) {
+        if (legacyMissingType == null || updatedAt.isAfter(legacyUpdatedAt)) {
+          legacyMissingType = doc;
+          legacyUpdatedAt = updatedAt;
+        }
+      }
+    }
+
+    return typed ?? legacyMissingType;
+  }
+
   Future<String> _createOrUpdateAdminThread({
     required String clientId,
     required String clientName,
@@ -93,7 +137,6 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
         .collection('chat_threads')
         .where('ownerUid', isEqualTo: clientId)
         .where('archived', isEqualTo: false)
-        .limit(1)
         .get();
 
     final now = FieldValue.serverTimestamp();
@@ -105,9 +148,12 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
 
     DocumentReference<Map<String, dynamic>> threadRef;
 
-    if (existing.docs.isNotEmpty) {
-      threadRef = existing.docs.first.reference;
+    final reusableThread = _pickReusableBookingThread(existing.docs);
+
+    if (reusableThread != null) {
+      threadRef = reusableThread.reference;
       await threadRef.update({
+        'threadType': 'booking_followup',
         'updatedAt': now,
         'lastMessageAt': now,
         'lastMessagePreview': preview,
@@ -124,6 +170,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
         'ownerType': 'registered_client',
         'displayName': clientEmail.isNotEmpty ? clientEmail : clientName,
         'status': 'active',
+        'threadType': 'booking_followup',
         'sourceType': 'booking_flow',
         'createdAt': now,
         'updatedAt': now,
@@ -231,13 +278,19 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
 
       final requestData = {
         'requestId': requestRef.id,
+        'requestKind': 'clinician',
         'clientId': uid,
         'clientName': clientName,
         'clientEmail': clientEmail,
+        // Requested clinician target before admin approval.
         'clinicianId': widget.args.clinicianId,
-        'clinicianUid': widget.args.clinicianId,
         'clinicianName': widget.args.clinicianName,
-        'status': 'pending_admin',
+        'assignedClinicianId': widget.args.clinicianId,
+        'assignedClinicianName': widget.args.clinicianName,
+        // Legacy compatibility field.
+        'clinicianUid': widget.args.clinicianId,
+        'status': 'assigned_clinician',
+        'workflowStage': 'assigned_clinician',
         'createdAt': now,
         'updatedAt': now,
         'note': note,
@@ -248,10 +301,6 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
       };
 
       await requestRef.set(requestData);
-      await firestore
-          .collection('bookingRequests')
-          .doc(requestRef.id)
-          .set(requestData);
 
       final threadId = await _createOrUpdateAdminThread(
         clientId: uid,
@@ -264,10 +313,6 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
       );
 
       await requestRef.update({
-        'threadId': threadId,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-      await firestore.collection('bookingRequests').doc(requestRef.id).update({
         'threadId': threadId,
         'updatedAt': FieldValue.serverTimestamp(),
       });
@@ -347,7 +392,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
         backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: ClipOval(
           child: Image.asset(
-            asset,
+            normalizeAssetPath(asset),
             width: 56,
             height: 56,
             fit: BoxFit.cover,

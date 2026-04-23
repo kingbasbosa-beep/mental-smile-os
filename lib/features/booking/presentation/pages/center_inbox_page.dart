@@ -13,6 +13,8 @@ class CenterInboxPage extends StatefulWidget {
 
 class _CenterInboxPageState extends State<CenterInboxPage> {
   String _filter = 'all';
+  String _activeCenterId = '';
+  Stream<List<CenterInboxRequest>>? _activeRequestsStream;
 
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
@@ -26,6 +28,29 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
       case 'pending':
       default:
         return isArabic ? 'بانتظار رد المركز' : 'Pending center response';
+    }
+  }
+
+  bool _isResidencyStage(String status) {
+    return status == 'session_setup_pending' ||
+        status == 'session_scheduled' ||
+        status == 'reschedule_pending';
+  }
+
+  String _statusLabel(String status, bool isArabic) {
+    switch (status) {
+      case 'pending_admin':
+        return isArabic ? 'مرئي للمركز' : 'Visible to center';
+      case 'center_follow_up':
+        return isArabic ? 'بانتظار رد المركز' : 'Pending center response';
+      case 'session_setup_pending':
+        return isArabic ? 'بانتظار تجهيز الإقامة' : 'Residency setup pending';
+      case 'session_scheduled':
+        return isArabic ? 'إقامة مجدولة' : 'Residency scheduled';
+      case 'reschedule_pending':
+        return isArabic ? 'بانتظار إعادة الجدولة' : 'Reschedule pending';
+      default:
+        return status;
     }
   }
 
@@ -43,52 +68,22 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
     return '${dt.year}-${two(dt.month)}-${two(dt.day)} ${two(dt.hour)}:${two(dt.minute)}';
   }
 
-  Future<void> _updateRequestEverywhere(
-    String requestId,
-    Map<String, dynamic> updates,
-  ) async {
-    final refs = [
-      FirebaseFirestore.instance.collection('booking_requests').doc(requestId),
-      FirebaseFirestore.instance.collection('bookingRequests').doc(requestId),
-    ];
+  Stream<List<CenterInboxRequest>> _requestsStream(String centerId) {
+    return const CenterRequestInboxService().watchRequestsForCenter(centerId);
+  }
 
-    for (final ref in refs) {
-      final snap = await ref.get();
-      if (snap.exists) {
-        await ref.update({
-          ...updates,
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
-      }
+  void _ensureRequestsStream(String centerId) {
+    if (centerId.isEmpty) return;
+    if (_activeRequestsStream == null || _activeCenterId != centerId) {
+      _activeCenterId = centerId;
+      _activeRequestsStream = _requestsStream(centerId);
     }
   }
 
-  Stream<List<CenterInboxRequest>> _requestsStream(String centerId) {
-    return FirebaseFirestore.instance
-        .collection('booking_requests')
-        .where('centerId', isEqualTo: centerId)
-        .where('requestKind', isEqualTo: 'center')
-        .snapshots()
-        .map((snap) {
-      final docs = snap.docs.where((doc) {
-        final status = (doc.data()['status'] ?? '').toString().trim();
-        return status == 'center_follow_up' ||
-            status == 'session_completed_pending_reviews' ||
-            status == 'payout_pending';
-      }).toList()
-        ..sort((a, b) {
-          final av = a.data()['updatedAt'] ?? a.data()['createdAt'];
-          final bv = b.data()['updatedAt'] ?? b.data()['createdAt'];
-          DateTime ad = DateTime.fromMillisecondsSinceEpoch(0);
-          DateTime bd = DateTime.fromMillisecondsSinceEpoch(0);
-          if (av is Timestamp) ad = av.toDate();
-          if (bv is Timestamp) bd = bv.toDate();
-          return bd.compareTo(ad);
-        });
-      return docs
-          .map((doc) => CenterInboxRequest(id: doc.id, data: doc.data()))
-          .toList();
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _ensureRequestsStream(FirebaseAuth.instance.currentUser?.uid ?? '');
   }
 
   Future<void> _respond({
@@ -96,13 +91,6 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
     required String availabilityStatus,
   }) async {
     final isArabic = _isArabic(context);
-    final controller = TextEditingController(
-      text: (request.data['centerAvailabilityNote'] ?? '').toString(),
-    );
-    final suggestedAlternativeController = TextEditingController(
-      text:
-          (request.data['centerSuggestedAlternativeLabelAr'] ?? '').toString(),
-    );
     final shouldSubmit = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
@@ -114,28 +102,10 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                   ? (isArabic ? 'تأكيد التوفر' : 'Confirm availability')
                   : (isArabic ? 'تأكيد عدم التوفر' : 'Confirm unavailability'),
             ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: controller,
-                  decoration: InputDecoration(
-                    labelText: isArabic ? 'ملاحظة اختيارية' : 'Optional note',
-                    border: const OutlineInputBorder(),
-                  ),
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: suggestedAlternativeController,
-                  decoration: InputDecoration(
-                    labelText: isArabic
-                        ? 'بديل مقترح اختياري'
-                        : 'Optional suggested alternative',
-                    border: const OutlineInputBorder(),
-                  ),
-                ),
-              ],
+            content: Text(
+              isArabic
+                  ? 'سيتم إرسال رد توفر منظم فقط دون تغيير حالة الطلب.'
+                  : 'Only a structured availability signal will be sent; request status will not change.',
             ),
             actions: [
               TextButton(
@@ -158,18 +128,11 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
     if (uid.isEmpty) return;
 
     try {
-      await _updateRequestEverywhere(request.id, {
-        'centerAvailabilityStatus': availabilityStatus,
-        'centerAvailabilityNote': controller.text.trim(),
-        'centerSuggestedAlternativeKey':
-            suggestedAlternativeController.text.trim().isEmpty
-                ? ''
-                : suggestedAlternativeController.text.trim(),
-        'centerSuggestedAlternativeLabelAr':
-            suggestedAlternativeController.text.trim(),
-        'centerAvailabilityRespondedAt': FieldValue.serverTimestamp(),
-        'centerAvailabilityRespondedBy': uid,
-      });
+      await const CenterRequestInboxService().respondToAvailability(
+        requestId: request.id,
+        centerId: uid,
+        availabilityStatus: availabilityStatus,
+      );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -206,17 +169,17 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
         appBar: AppBar(
           title: Text(isArabic ? 'وارد المركز' : 'Center inbox'),
         ),
-        body: StreamBuilder<User?>(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (context, authSnapshot) {
-            final centerId = authSnapshot.data?.uid ?? '';
-            if (!authSnapshot.hasData || centerId.isEmpty) {
+        body: Builder(
+          builder: (context) {
+            final centerId = FirebaseAuth.instance.currentUser?.uid ?? '';
+            if (centerId.isEmpty) {
               return Center(
                 child: Text(
                   isArabic ? 'يجب تسجيل الدخول أولًا' : 'Please sign in first',
                 ),
               );
             }
+            _ensureRequestsStream(centerId);
 
             return Column(
               children: [
@@ -253,7 +216,7 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                 ),
                 Expanded(
                   child: StreamBuilder<List<CenterInboxRequest>>(
-                    stream: _requestsStream(centerId),
+                    stream: _activeRequestsStream,
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
                         return Center(
@@ -276,17 +239,59 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                     'pending')
                                 .toString()
                                 .trim();
+                        final status =
+                            (request.data['status'] ?? '').toString().trim();
+                        if (_isResidencyStage(status)) {
+                          return _filter == 'all' || _filter == 'pending';
+                        }
                         if (_filter == 'all') return true;
                         return availability == _filter;
                       }).toList();
 
                       if (visible.isEmpty) {
                         return Center(
-                          child: Text(
-                            isArabic
-                                ? 'لا توجد طلبات موجهة إلى هذا المركز حاليًا'
-                                : 'No center-routed requests for this center right now',
-                            textAlign: TextAlign.center,
+                          child: Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  isArabic
+                                      ? 'لا توجد طلبات موجهة إلى هذا المركز حاليًا'
+                                      : 'No center-routed requests for this center right now',
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  isArabic
+                                      ? 'وارد المركز يعرض طلبات رد التوفر وبدايات الإقامة التي تحتاج متابعة من المركز.'
+                                      : 'Center inbox shows availability requests and residency-start actions that still need center follow-up.',
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                      ),
+                                ),
+                                const SizedBox(height: 16),
+                                OutlinedButton.icon(
+                                  onPressed: () {
+                                    Navigator.of(context).pushNamed(
+                                      Routes.centerResidencies,
+                                    );
+                                  },
+                                  icon: const Icon(Icons.home_work_outlined),
+                                  label: Text(
+                                    isArabic
+                                        ? 'فتح الإقامات والمتابعة'
+                                        : 'Open residencies',
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       }
@@ -311,9 +316,6 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                   .trim();
                           final status =
                               (data['status'] ?? '').toString().trim();
-                          final centerReviewSubmitted =
-                              (data['clinicianReviewSubmitted'] ?? false) ==
-                                  true;
                           final availabilityNote =
                               (data['centerAvailabilityNote'] ?? '')
                                   .toString()
@@ -337,8 +339,16 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                       ),
                                       Chip(
                                         label: Text(
-                                          _availabilityLabel(
-                                              availability, isArabic),
+                                          status == 'pending_admin' ||
+                                                  status == 'center_follow_up'
+                                              ? _availabilityLabel(
+                                                  availability,
+                                                  isArabic,
+                                                )
+                                              : _statusLabel(
+                                                  status,
+                                                  isArabic,
+                                                ),
                                         ),
                                       ),
                                     ],
@@ -375,8 +385,32 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                           : 'Center note: $availabilityNote',
                                     ),
                                   ],
+                                  if (_isResidencyStage(status)) ...[
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      isArabic
+                                          ? 'هذا الطلب في مرحلة الإقامة وما زال يحتاج متابعة من المركز.'
+                                          : 'This request is now in the residency stage and still needs center follow-up.',
+                                    ),
+                                    const SizedBox(height: 12),
+                                    OutlinedButton.icon(
+                                      onPressed: () {
+                                        Navigator.of(context).pushNamed(
+                                          Routes.centerResidencies,
+                                        );
+                                      },
+                                      icon:
+                                          const Icon(Icons.home_work_outlined),
+                                      label: Text(
+                                        isArabic
+                                            ? 'فتح ملف الإقامة'
+                                            : 'Open residency file',
+                                      ),
+                                    ),
+                                  ],
                                   const SizedBox(height: 12),
-                                  if (status == 'center_follow_up')
+                                  if (status == 'pending_admin' ||
+                                      status == 'center_follow_up')
                                     Wrap(
                                       spacing: 10,
                                       runSpacing: 10,
@@ -407,28 +441,6 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                           ),
                                         ),
                                       ],
-                                    ),
-                                  if ((status ==
-                                              'session_completed_pending_reviews' ||
-                                          status == 'payout_pending') &&
-                                      !centerReviewSubmitted)
-                                    FilledButton.icon(
-                                      onPressed: () {
-                                        Navigator.of(context).pushNamed(
-                                          Routes.sessionReview,
-                                          arguments: {
-                                            'requestId': request.id,
-                                            'reviewerType': 'clinician',
-                                          },
-                                        );
-                                      },
-                                      icon: const Icon(
-                                          Icons.rate_review_outlined),
-                                      label: Text(
-                                        isArabic
-                                            ? 'إرسال تقييم المركز'
-                                            : 'Submit center review',
-                                      ),
                                     ),
                                 ],
                               ),

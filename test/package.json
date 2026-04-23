@@ -1,0 +1,14 @@
+{
+  "name": "mental-smile-firestore-rules-tests",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Minimal Firestore security rules tests for center cycle transitions.",
+  "scripts": {
+    "test:center-cycle": "node center_cycle.rules.test.js"
+  },
+  "dependencies": {
+    "@firebase/rules-unit-testing": "^4.0.1",
+    "firebase": "^11.9.1",
+    "firebase-admin": "^13.0.0"
+  }
+}

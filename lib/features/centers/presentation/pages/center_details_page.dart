@@ -4,6 +4,7 @@ import 'package:flutterprojects/features/booking/presentation/pages/center_booki
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
 import 'package:flutterprojects/features/centers/data/services/centers_firestore_service.dart';
+import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CenterDetailsPage extends StatelessWidget {
@@ -32,6 +33,20 @@ class CenterDetailsPage extends StatelessWidget {
         return 'مراكز رعاية ذوي الاحتياجات الخاصة';
       default:
         return 'مركز';
+    }
+  }
+
+  String _centerTypeLabelAr(CenterModel c) {
+    switch (c.centerType.trim()) {
+      case 'detox':
+        return 'ديتوكس / أعراض انسحاب';
+      case 'hospital':
+        return 'مستشفى';
+      case 'special_needs_care':
+        return 'رعاية ذوي الاحتياجات الخاصة';
+      case 'halfway_house':
+      default:
+        return 'هاف واي';
     }
   }
 
@@ -80,7 +95,7 @@ class CenterDetailsPage extends StatelessWidget {
     BoxFit fit = BoxFit.cover,
     BorderRadius? borderRadius,
   }) {
-    final v = value.trim();
+    final v = value.trim().replaceFirst('assets/assets/', 'assets/');
     if (v.isEmpty) return const SizedBox.shrink();
 
     final bool isAsset = v.startsWith('assets/');
@@ -314,9 +329,7 @@ class CenterDetailsPage extends StatelessWidget {
                       'السعر: ${item.price}',
                       if (item.pricingUnit.isNotEmpty)
                         'الوحدة: ${unitLabel(item.pricingUnit)}',
-                      item.taxIncluded
-                          ? 'الضريبة شاملة'
-                          : 'الضريبة غير شاملة',
+                      item.taxIncluded ? 'الضريبة شاملة' : 'الضريبة غير شاملة',
                     ].join(' • '),
                     textAlign: TextAlign.right,
                   ),
@@ -345,14 +358,42 @@ class CenterDetailsPage extends StatelessWidget {
                       if (item.includesRequiredTests) 'يشمل الفحوصات',
                       if (item.includesAirportPickup) 'استقبال مطار',
                       if (item.includesTourismOrExternalOutings) 'جولات خارجية',
-                      item.taxIncluded
-                          ? 'الضريبة شاملة'
-                          : 'الضريبة غير شاملة',
+                      item.taxIncluded ? 'الضريبة شاملة' : 'الضريبة غير شاملة',
                     ].join(' • '),
                     textAlign: TextAlign.right,
                   ),
                   const SizedBox(height: 10),
                 ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+      ],
+    );
+  }
+
+  Widget _serviceTypeSection(BuildContext context, CenterModel c) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        _sectionCard(
+          context: context,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              _sectionTitle(context, 'نوع المركز وخدمته'),
+              const SizedBox(height: 10),
+              Text(
+                'النوع التشغيلي: ${_centerTypeLabelAr(c)}',
+                textAlign: TextAlign.right,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                c.hasDetoxUnit
+                    ? 'يوجد قسم داخلي لأعراض الانسحاب.'
+                    : 'لا يوجد قسم داخلي مستقل لأعراض الانسحاب.',
+                textAlign: TextAlign.right,
+              ),
             ],
           ),
         ),
@@ -512,11 +553,17 @@ class CenterDetailsPage extends StatelessWidget {
                 width: double.infinity,
                 child: FilledButton.icon(
                   onPressed: () {
+                    AppAnalytics.logPathSelected(
+                      'centers',
+                      'start_booking',
+                    );
                     Navigator.of(context).pushNamed(
                       Routes.centerBookingRequest,
                       arguments: CenterBookingRequestArgs(
                         centerId: c.id,
                         centerName: name,
+                        centerType: c.centerType,
+                        hasDetoxUnit: c.hasDetoxUnit,
                       ),
                     );
                   },
@@ -637,6 +684,7 @@ class CenterDetailsPage extends StatelessWidget {
           ),
         ],
         _gallerySection(context, galleryValues),
+        _serviceTypeSection(context, c),
         _pricingSection(context, c),
         _capabilitiesSection(context, c),
         const SizedBox(height: 24),

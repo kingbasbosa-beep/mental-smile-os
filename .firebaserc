@@ -3,7 +3,8 @@
     "mk": "mental-key-v2",
     "dev": "mental-key-v2",
     "firebase deploy --only \"storage\"": "mental-key-v2",
-    "default": "mental-key-v2"
+    "default": "mental-key-v2",
+    "clean": "mental-smile-app-clean"
   },
   "targets": {},
   "etags": {}

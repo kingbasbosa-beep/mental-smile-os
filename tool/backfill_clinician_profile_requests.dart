@@ -27,7 +27,8 @@ Future<void> main() async {
     final clinicianId = (data['clinicianId'] ?? '').toString().trim();
     final requestType = (data['requestType'] ?? '').toString().trim();
     final requestedBio = (data['requestedBio'] ?? '').toString().trim();
-    final requestedPhotoUrl = (data['requestedPhotoUrl'] ?? '').toString().trim();
+    final requestedPhotoUrl =
+        (data['requestedPhotoUrl'] ?? '').toString().trim();
 
     if (clinicianId.isEmpty) {
       failed++;
@@ -42,7 +43,8 @@ Future<void> main() async {
 
     final normalizedType = requestType.isEmpty ? 'profile_update' : requestType;
 
-    if ((normalizedType == 'bio_update' || normalizedType == 'profile_update') &&
+    if ((normalizedType == 'bio_update' ||
+            normalizedType == 'profile_update') &&
         requestedBio.isNotEmpty) {
       updates['bio'] = requestedBio;
     }

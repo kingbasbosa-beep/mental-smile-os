@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/core/ui/app_design_system.dart';
+import 'package:flutterprojects/core/auth/account_access_service.dart';
+import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:flutterprojects/shared/gateways/role_access_gateway.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 import 'package:flutterprojects/features/chat/controller/chat_controller.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_message_model.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
@@ -11,10 +14,12 @@ class ChatPage extends StatefulWidget {
     super.key,
     this.initialThreadId,
     this.adminSupportMode = false,
+    this.entryContext,
   });
 
   final String? initialThreadId;
   final bool adminSupportMode;
+  final String? entryContext;
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -33,9 +38,15 @@ class _ChatPageState extends State<ChatPage> {
   bool _isArabic() =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
-  String get _avatarAsset => widget.adminSupportMode
-      ? 'assets/c5/avatars/avatar_admin_support.png'
-      : 'assets/c5/avatars/avatar_client.png';
+  String get _avatarAsset {
+    final value = widget.adminSupportMode
+        ? 'assets/c5/avatars/avatar_admin_support.png'
+        : 'assets/c5/avatars/avatar_client.png';
+    if (value.startsWith('assets/assets/')) {
+      return value.replaceFirst('assets/assets/', 'assets/');
+    }
+    return value;
+  }
 
   String _pageSubtitle(bool isArabic) {
     if (widget.adminSupportMode) {
@@ -48,29 +59,100 @@ class _ChatPageState extends State<ChatPage> {
         : 'Safe first-line support with human escalation when risk rises';
   }
 
+  String? _entryContextHelper(bool isArabic) {
+    if (widget.adminSupportMode || widget.initialThreadId != null) return null;
+
+    switch (widget.entryContext) {
+      case 'family_support':
+        return isArabic
+            ? 'يمكنك التحدث هنا للحصول على دعم عام وإرشاد مناسب لاحتياجات الأسرة.'
+            : 'You can talk here for general support and guidance for family needs.';
+      case 'recovery_support':
+        return isArabic
+            ? 'يمكنك التحدث هنا للحصول على دعم عام وإرشاد مرتبط بالتعافي.'
+            : 'You can talk here for general support and guidance related to recovery.';
+      default:
+        return null;
+    }
+  }
+
+  bool get _isRequestLinkedThread {
+    final thread = _thread;
+    if (thread == null) return false;
+    return thread.threadType == 'booking_followup' || thread.bookingLinked;
+  }
+
+  Widget _buildBoundaryBanner(bool isArabic, TextDirection textDirection) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        0,
+        AppSpacing.md,
+        AppSpacing.sm,
+      ),
+      child: AppSurfaceCard(
+        color: const Color(0xFFFFF7E8),
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment:
+              isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
+            Row(
+              textDirection: textDirection,
+              children: [
+                const Icon(
+                  Icons.info_outline_rounded,
+                  color: Color(0xFF8A5A1F),
+                  size: 20,
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Expanded(
+                  child: Text(
+                    isArabic
+                        ? 'هذه المحادثة مخصصة للدعم والإرشاد فقط، ولا يتم من خلالها تعديل الطلبات أو الأسعار أو العقود أو الدفع.'
+                        : 'This chat is for support and guidance only. Requests, pricing, contracts, and payments cannot be changed through chat.',
+                    textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.obsidian,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+            if (_isRequestLinkedThread) ...[
+              const SizedBox(height: AppSpacing.xs),
+              AppStatusBadge(
+                label: isArabic
+                    ? 'محادثة مرتبطة بالطلب (للعرض فقط)'
+                    : 'Request-linked thread (informational only)',
+                color: const Color(0xFF8A5A1F),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRedirectHint(bool isArabic) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+      child: Text(
+        isArabic
+            ? 'لتعديل الطلب أو البيانات، يرجى استخدام الخطوات المتاحة داخل النظام.'
+            : 'To modify your request or details, please use the available actions in the system.',
+        textAlign: isArabic ? TextAlign.right : TextAlign.left,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.obsidian.withValues(alpha: 0.72),
+              fontWeight: FontWeight.w600,
+            ),
+      ),
+    );
+  }
+
   Future<bool> _isAdminUser() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null || uid.isEmpty) return false;
-
-    final adminDoc =
-        await FirebaseFirestore.instance.collection('admins').doc(uid).get();
-
-    if (adminDoc.exists) {
-      final data = adminDoc.data() ?? <String, dynamic>{};
-      if ((data['active'] ?? false) == true) return true;
-    }
-
-    final clinicianDoc = await FirebaseFirestore.instance
-        .collection('clinicians')
-        .doc(uid)
-        .get();
-
-    if (clinicianDoc.exists) {
-      final data = clinicianDoc.data() ?? <String, dynamic>{};
-      if ((data['isAdmin'] ?? false) == true) return true;
-    }
-
-    return false;
+    return RoleAccessGateway().isAdmin();
   }
 
   @override
@@ -364,6 +446,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     final isArabic = _isArabic();
     final textDirection = isArabic ? TextDirection.rtl : TextDirection.ltr;
+    final entryContextHelper = _entryContextHelper(isArabic);
 
     return Directionality(
       textDirection: textDirection,
@@ -447,6 +530,27 @@ class _ChatPageState extends State<ChatPage> {
                                                   ? TextAlign.right
                                                   : TextAlign.left,
                                             ),
+                                            if (entryContextHelper != null) ...[
+                                              const SizedBox(
+                                                  height: AppSpacing.xxs),
+                                              Text(
+                                                entryContextHelper,
+                                                textAlign: isArabic
+                                                    ? TextAlign.right
+                                                    : TextAlign.left,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      color: AppColors.obsidian
+                                                          .withValues(
+                                                        alpha: 0.72,
+                                                      ),
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                              ),
+                                            ],
                                           ],
                                         ),
                                       ),
@@ -457,7 +561,7 @@ class _ChatPageState extends State<ChatPage> {
                                             .withValues(alpha: 0.10),
                                         child: ClipOval(
                                           child: Image.asset(
-                                            _avatarAsset,
+                                            normalizeAssetPath(_avatarAsset),
                                             width: 52,
                                             height: 52,
                                             fit: BoxFit.cover,
@@ -487,6 +591,7 @@ class _ChatPageState extends State<ChatPage> {
                                   ),
                                 ),
                               ),
+                              _buildBoundaryBanner(isArabic, textDirection),
                               Expanded(
                                 child: StreamBuilder<List<ChatMessageModel>>(
                                   stream:
@@ -549,42 +654,53 @@ class _ChatPageState extends State<ChatPage> {
                                     AppSpacing.sm,
                                     AppSpacing.sm,
                                   ),
-                                  child: Row(
-                                    textDirection: textDirection,
+                                  child: Column(
+                                    crossAxisAlignment: isArabic
+                                        ? CrossAxisAlignment.end
+                                        : CrossAxisAlignment.start,
                                     children: [
-                                      Expanded(
-                                        child: TextField(
-                                          controller: _textController,
-                                          minLines: 1,
-                                          maxLines: 4,
-                                          textDirection: textDirection,
-                                          decoration: InputDecoration(
-                                            hintText: isArabic
-                                                ? 'اكتب رسالتك هنا...'
-                                                : 'Type your message here...',
+                                      _buildRedirectHint(isArabic),
+                                      Row(
+                                        textDirection: textDirection,
+                                        children: [
+                                          Expanded(
+                                            child: TextField(
+                                              controller: _textController,
+                                              minLines: 1,
+                                              maxLines: 4,
+                                              textDirection: textDirection,
+                                              decoration: InputDecoration(
+                                                hintText: isArabic
+                                                    ? 'اكتب رسالتك هنا...'
+                                                    : 'Type your message here...',
+                                              ),
+                                              onSubmitted: (_) => _send(),
+                                            ),
                                           ),
-                                          onSubmitted: (_) => _send(),
-                                        ),
-                                      ),
-                                      const SizedBox(width: AppSpacing.sm),
-                                      SizedBox(
-                                        height: 50,
-                                        child: FilledButton(
-                                          onPressed: _sending ? null : _send,
-                                          child: _sending
-                                              ? const SizedBox(
-                                                  width: 18,
-                                                  height: 18,
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    strokeWidth: 2,
-                                                    color: Colors.white,
-                                                  ),
-                                                )
-                                              : Text(
-                                                  isArabic ? 'إرسال' : 'Send',
-                                                ),
-                                        ),
+                                          const SizedBox(width: AppSpacing.sm),
+                                          SizedBox(
+                                            height: 50,
+                                            child: FilledButton(
+                                              onPressed:
+                                                  _sending ? null : _send,
+                                              child: _sending
+                                                  ? const SizedBox(
+                                                      width: 18,
+                                                      height: 18,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                        color: Colors.white,
+                                                      ),
+                                                    )
+                                                  : Text(
+                                                      isArabic
+                                                          ? 'إرسال'
+                                                          : 'Send',
+                                                    ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),

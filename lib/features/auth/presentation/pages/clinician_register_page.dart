@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/core/ui/app_design_system.dart';
+import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 
 class ClinicianRegisterPage extends StatefulWidget {
   const ClinicianRegisterPage({super.key});
@@ -426,7 +426,11 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                   ),
                   children: [
                     const SizedBox(height: AppSpacing.lg),
-                    const AppHeroHeader(title: 'تسجيل أخصائي جديد'),
+                    const AppHeroHeader(
+                      title: 'تسجيل أخصائي جديد',
+                      subtitle:
+                          'ملف مهني أوضح وأهدأ بنفس الهوية الدافئة للمشروع، مع تقسيم بصري أنظف للبيانات والمستندات والمعاينة.',
+                    ),
                     const SizedBox(height: AppSpacing.lg),
                     AppSurfaceCard(
                       child: Column(
