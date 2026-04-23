@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
@@ -75,80 +76,108 @@ class CentersLandingPage extends StatelessWidget {
           context,
           title: isArabic ? 'المراكز' : 'Centers',
         ),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            final width = constraints.maxWidth;
-            int crossAxisCount = 2;
-            double childAspectRatio = 1.55;
+        body: Stack(
+          children: [
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                int crossAxisCount = 2;
+                double childAspectRatio = 1.55;
 
-            if (width < 760) {
-              crossAxisCount = 1;
-              childAspectRatio = 1.30;
-            }
+                if (width < 760) {
+                  crossAxisCount = 1;
+                  childAspectRatio = 1.30;
+                }
 
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.84),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: AppColors.mutedGold.withValues(alpha: 0.14),
-                    ),
-                    boxShadow: AppShadows.card,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: isArabic
-                        ? CrossAxisAlignment.end
-                        : CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isArabic
-                            ? 'اختر فئة المراكز'
-                            : 'Choose a center category',
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                return ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.84),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: AppColors.mutedGold.withValues(alpha: 0.14),
+                        ),
+                        boxShadow: AppShadows.card,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: isArabic
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isArabic
+                                ? 'اختر فئة المراكز'
+                                : 'Choose a center category',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
                                   fontWeight: FontWeight.w800,
                                 ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            isArabic
+                                ? 'اضغط مباشرة على أي بطاقة لفتح الجريد الخاص بالمراكز داخل هذه الفئة.'
+                                : 'Tap any card directly to open centers in that category.',
+                            textAlign:
+                                isArabic ? TextAlign.right : TextAlign.left,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        isArabic
-                            ? 'اضغط مباشرة على أي بطاقة لفتح الجريد الخاص بالمراكز داخل هذه الفئة.'
-                            : 'Tap any card directly to open centers in that category.',
-                        textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                    ),
+                    const SizedBox(height: 16),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: items.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: childAspectRatio,
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: items.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossAxisCount,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: childAspectRatio,
-                  ),
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    return _CenterCategoryCard(
-                      item: item,
-                      isArabic: isArabic,
-                    );
-                  },
-                ),
-              ],
-            );
-          },
+                      itemBuilder: (context, index) {
+                        final item = items[index];
+                        return _CenterCategoryCard(
+                          item: item,
+                          isArabic: isArabic,
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+            const _ModuleEntryLogger(module: 'centers'),
+          ],
         ),
       ),
     );
   }
+}
+
+class _ModuleEntryLogger extends StatefulWidget {
+  const _ModuleEntryLogger({required this.module});
+
+  final String module;
+
+  @override
+  State<_ModuleEntryLogger> createState() => _ModuleEntryLoggerState();
+}
+
+class _ModuleEntryLoggerState extends State<_ModuleEntryLogger> {
+  @override
+  void initState() {
+    super.initState();
+    AppAnalytics.logModuleEntry(widget.module);
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 class _CenterCategoryItem {

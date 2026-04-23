@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/booking_request_page.dart';
+import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class SpecialistDetailsPage extends StatelessWidget {
@@ -525,6 +526,10 @@ class SpecialistDetailsPage extends StatelessWidget {
           onPressed: uid.isEmpty
               ? null
               : () {
+                  AppAnalytics.logPathSelected(
+                    'specialists',
+                    'start_booking',
+                  );
                   Navigator.of(context).pushNamed(
                     Routes.bookingRequest,
                     arguments: BookingRequestArgs(

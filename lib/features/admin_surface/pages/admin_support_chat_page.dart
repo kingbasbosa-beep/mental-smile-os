@@ -86,10 +86,12 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
     final ownerType = (data['ownerType'] ?? '').toString();
 
     if (sourceType == 'admin_support') {
-      return isArabic ? 'شات إداري مباشر' : 'Direct admin support';
+      return isArabic ? 'دعم مباشر من الإدارة' : 'Direct Admin Support';
     }
     if (sourceType == 'client' || sourceType == 'guest') {
-      return isArabic ? 'شات AI مصعّد' : 'Escalated AI chat';
+      return isArabic
+          ? 'تصعيد تم اكتشافه بواسطة النظام'
+          : 'AI-Detected Escalation';
     }
     if (ownerType.contains('clinician')) {
       return isArabic ? 'أخصائي' : 'Clinician';
@@ -104,10 +106,10 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
     final sourceType = (data['sourceType'] ?? '').toString();
 
     if (_isEscalatedCase(data)) {
-      return isArabic ? 'حالة مصعّدة' : 'Escalated Case';
+      return isArabic ? 'حالة دعم مصعّدة' : 'Escalated Support Case';
     }
     if (sourceType == 'admin_support') {
-      return isArabic ? 'دعم بشري' : 'Human Support';
+      return isArabic ? 'مراجعة بشرية مطلوبة' : 'Human Review Needed';
     }
     return isArabic ? 'محادثة AI' : 'AI Conversation';
   }
@@ -182,15 +184,15 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
             isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
-            isArabic ? 'إشراف بشري على الحالات' : 'Human-supervised cases',
+            isArabic ? 'مراجعة بشرية مطلوبة' : 'Human Review Needed',
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             isArabic
-                ? 'تم تصعيد هذه المحادثة من نظام الذكاء الاصطناعي وهي الآن تحت إشراف بشري.'
-                : 'This conversation was escalated from the AI system and is now under human supervision.',
+                ? 'يعرض هذا السطح محادثات تحتاج مراجعة بشرية، مع تمييز الدعم المباشر من الإدارة عن التصعيد المكتشف بواسطة النظام.'
+                : 'This surface shows conversations needing human review, separating direct admin support from AI-detected escalation.',
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -243,8 +245,8 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
               if (threads.isEmpty) {
                 return AppEmptyState(
                   message: isArabic
-                      ? 'لا توجد محادثات بانتظار الإدارة'
-                      : 'No chats waiting for admin',
+                      ? 'لا توجد محادثات تتطلب مراجعة بشرية'
+                      : 'No chats needing human review',
                   icon: Icons.support_agent_outlined,
                 );
               }

@@ -557,6 +557,7 @@ class AppRouter {
       case Routes.chat:
         final args = settings.arguments;
         String? threadId;
+        String? entryContext;
         bool adminSupportMode = false;
         if (args is Map && args['threadId'] != null) {
           threadId = args['threadId'].toString();
@@ -567,11 +568,18 @@ class AppRouter {
         if (args is Map && args['adminSupport'] == true) {
           adminSupportMode = true;
         }
+        if (!adminSupportMode && threadId == null && args is Map) {
+          final value = args['entryContext']?.toString();
+          if (value == 'family_support' || value == 'recovery_support') {
+            entryContext = value;
+          }
+        }
 
         return MaterialPageRoute(
           builder: (_) => ChatPage(
             initialThreadId: threadId,
             adminSupportMode: adminSupportMode,
+            entryContext: entryContext,
           ),
           settings: settings,
         );

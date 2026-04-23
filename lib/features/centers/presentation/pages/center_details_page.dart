@@ -4,6 +4,7 @@ import 'package:flutterprojects/features/booking/presentation/pages/center_booki
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
 import 'package:flutterprojects/features/centers/data/services/centers_firestore_service.dart';
+import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CenterDetailsPage extends StatelessWidget {
@@ -552,6 +553,10 @@ class CenterDetailsPage extends StatelessWidget {
                 width: double.infinity,
                 child: FilledButton.icon(
                   onPressed: () {
+                    AppAnalytics.logPathSelected(
+                      'centers',
+                      'start_booking',
+                    );
                     Navigator.of(context).pushNamed(
                       Routes.centerBookingRequest,
                       arguments: CenterBookingRequestArgs(

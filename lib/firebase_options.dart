@@ -53,6 +53,7 @@ class DefaultFirebaseOptions {
     projectId: 'mental-smile-app-clean',
     authDomain: 'mental-smile-app-clean.firebaseapp.com',
     storageBucket: 'mental-smile-app-clean.firebasestorage.app',
+    measurementId: 'G-W8J5CYY84P',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -70,5 +71,7 @@ class DefaultFirebaseOptions {
     projectId: 'mental-smile-app-clean',
     authDomain: 'mental-smile-app-clean.firebaseapp.com',
     storageBucket: 'mental-smile-app-clean.firebasestorage.app',
+    measurementId: 'G-FCTE266FRR',
   );
+
 }

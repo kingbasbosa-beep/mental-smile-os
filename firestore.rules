@@ -2355,6 +2355,12 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    match /analytics_summaries/{docId} {
+      allow read: if isAdmin();
+      allow write: if false;
+      allow delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

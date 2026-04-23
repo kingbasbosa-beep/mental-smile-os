@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class SpecialistsCategoriesPage extends StatelessWidget {
@@ -88,42 +89,67 @@ class SpecialistsCategoriesPage extends StatelessWidget {
           context,
           title: isArabic ? 'الأخصائيون' : 'Specialists',
         ),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            final width = constraints.maxWidth;
-            int crossAxisCount = 2;
-            double childAspectRatio = 1.35;
+        body: Stack(
+          children: [
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                int crossAxisCount = 2;
+                double childAspectRatio = 1.35;
 
-            if (width < 760) {
-              crossAxisCount = 1;
-              childAspectRatio = 1.12;
-            } else if (width > 1500) {
-              crossAxisCount = 3;
-              childAspectRatio = 1.45;
-            }
+                if (width < 760) {
+                  crossAxisCount = 1;
+                  childAspectRatio = 1.12;
+                } else if (width > 1500) {
+                  crossAxisCount = 3;
+                  childAspectRatio = 1.45;
+                }
 
-            return GridView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: items.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                crossAxisSpacing: 18,
-                mainAxisSpacing: 18,
-                childAspectRatio: childAspectRatio,
-              ),
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return _SpecialistCategoryCard(
-                  item: item,
-                  isArabic: isArabic,
+                return GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: items.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 18,
+                    mainAxisSpacing: 18,
+                    childAspectRatio: childAspectRatio,
+                  ),
+                  itemBuilder: (context, index) {
+                    final item = items[index];
+                    return _SpecialistCategoryCard(
+                      item: item,
+                      isArabic: isArabic,
+                    );
+                  },
                 );
               },
-            );
-          },
+            ),
+            const _ModuleEntryLogger(module: 'specialists'),
+          ],
         ),
       ),
     );
   }
+}
+
+class _ModuleEntryLogger extends StatefulWidget {
+  const _ModuleEntryLogger({required this.module});
+
+  final String module;
+
+  @override
+  State<_ModuleEntryLogger> createState() => _ModuleEntryLoggerState();
+}
+
+class _ModuleEntryLoggerState extends State<_ModuleEntryLogger> {
+  @override
+  void initState() {
+    super.initState();
+    AppAnalytics.logModuleEntry(widget.module);
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 class _SpecialistCategoryItem {

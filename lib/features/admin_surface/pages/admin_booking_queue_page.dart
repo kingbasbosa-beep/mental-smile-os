@@ -1736,6 +1736,226 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     return isArabic ? 'طلب أخصائي' : 'Clinician request';
   }
 
+  String _whyHereLabel({
+    required bool isArabic,
+    required bool isCenterRequest,
+    required String status,
+    required String centerAvailabilityStatus,
+    required String paymentReceiptFileName,
+    required String accountingReviewStatus,
+  }) {
+    switch (status) {
+      case 'pending_admin':
+        if (isCenterRequest &&
+            centerAvailabilityStatus.trim() != 'available' &&
+            centerAvailabilityStatus.trim() != 'unavailable') {
+          return isArabic
+              ? 'بانتظار رد المركز على التوفر'
+              : 'Waiting for center availability response';
+        }
+        return isArabic
+            ? 'بانتظار مراجعة أو استثناء إداري'
+            : 'Waiting for admin review or exception handling';
+      case 'center_follow_up':
+        return centerAvailabilityStatus.trim() == 'unavailable'
+            ? (isArabic
+                ? 'رد المركز بعدم التوفر ويحتاج مسار استرداد'
+                : 'Center unavailable response needs recovery path')
+            : (isArabic
+                ? 'بانتظار متابعة توفر المركز'
+                : 'Waiting for center availability follow-up');
+      case 'center_intake_pending':
+        return isArabic
+            ? 'بانتظار العميل لإرسال بيانات التقييم الأولي'
+            : 'Waiting for client intake submission';
+      case 'center_recommendation_pending':
+        return isArabic
+            ? 'بانتظار توصية المركز'
+            : 'Waiting for center recommendation';
+      case 'client_update_required':
+        return isArabic
+            ? 'بانتظار تعديل العميل للطلب'
+            : 'Waiting for client request update';
+      case 'assigned_clinician':
+        return isArabic
+            ? 'الطلب ظاهر للأخصائي وبانتظار استجابته'
+            : 'Request is clinician-visible and waiting for clinician response';
+      case 'awaiting_payment':
+        return paymentReceiptFileName.isNotEmpty
+            ? (isArabic
+                ? 'تم رفع إثبات السداد وبانتظار المراجعة'
+                : 'Payment proof uploaded and awaiting review')
+            : (isArabic
+                ? 'بانتظار رفع إثبات السداد من العميل'
+                : 'Waiting for client payment proof');
+      case 'payment_review':
+        return isArabic ? 'بانتظار مراجعة السداد' : 'Waiting for payment review';
+      case 'session_setup_pending':
+        return isArabic
+            ? 'بانتظار تجهيز ما قبل فتح الدفع أو الجلسة'
+            : 'Waiting for pre-payment/session setup';
+      case 'session_scheduled':
+      case 'session_in_progress':
+        return isArabic
+            ? 'متابعة تشغيلية للمراقبة أو الاسترداد'
+            : 'Operational tracking for monitoring or recovery';
+      case 'session_completed_pending_reviews':
+        return isArabic
+            ? 'بانتظار التقييمات أو تقارير الخروج'
+            : 'Waiting for reviews or discharge reports';
+      case 'payout_pending':
+        return accountingReviewStatus == 'confirmed'
+            ? (isArabic
+                ? 'بانتظار تحويل المستحق'
+                : 'Waiting for payout transfer')
+            : (isArabic
+                ? 'بانتظار المراجعة المحاسبية'
+                : 'Waiting for accounting review');
+      case 'completed_success':
+        return isArabic ? 'جاهز للأرشفة أو المراجعة' : 'Ready for archive or review';
+      case 'rejected_admin':
+      case 'clinician_rejected':
+      case 'reschedule_pending':
+      case 'cancellation_pending':
+      case 'dispute_pending':
+        return isArabic ? 'حالة استثناء أو استرداد' : 'Exception or recovery state';
+      default:
+        return isArabic ? 'بانتظار متابعة إدارية' : 'Waiting for admin monitoring';
+    }
+  }
+
+  String _nextStepLabel({
+    required bool isArabic,
+    required bool isCenterRequest,
+    required String status,
+    required String centerAvailabilityStatus,
+    required String paymentReceiptFileName,
+    required String accountingReviewStatus,
+  }) {
+    switch (status) {
+      case 'pending_admin':
+        if (isCenterRequest && centerAvailabilityStatus == 'available') {
+          return isArabic
+              ? 'فتح التقييم الأولي عند تحقق الشروط'
+              : 'Open intake review when guard conditions pass';
+        }
+        if (isCenterRequest && centerAvailabilityStatus == 'unavailable') {
+          return isArabic
+              ? 'إرجاع العميل لمسار طلب جديد أو استرداد'
+              : 'Return client to new-request/recovery path';
+        }
+        return isCenterRequest
+            ? (isArabic
+                ? 'انتظار رد المركز أو تدخل استثنائي'
+                : 'Wait for center response or exception handling')
+            : (isArabic
+                ? 'الأخصائي يستلم الطلب مباشرة في المسار الطبيعي'
+                : 'Clinician receives the request directly in the normal path');
+      case 'center_follow_up':
+        return centerAvailabilityStatus == 'available'
+            ? (isArabic
+                ? 'فتح التقييم الأولي'
+                : 'Open intake review')
+            : (isArabic
+                ? 'إرجاع للعميل عند عدم التوفر'
+                : 'Return to client when unavailable');
+      case 'center_intake_pending':
+        return isArabic ? 'العميل يرسل بيانات التقييم' : 'Client submits intake';
+      case 'center_recommendation_pending':
+        return isArabic
+            ? 'المركز يرسل التوصية'
+            : 'Center submits recommendation';
+      case 'client_update_required':
+        return isArabic ? 'العميل يحدث الطلب' : 'Client updates the request';
+      case 'assigned_clinician':
+        return isArabic
+            ? 'الأخصائي يقبل أو يرفض'
+            : 'Clinician accepts or rejects';
+      case 'awaiting_payment':
+        return paymentReceiptFileName.isNotEmpty
+            ? (isArabic
+                ? 'مراجعة السداد'
+                : 'Review payment proof')
+            : (isArabic
+                ? 'العميل يرفع إثبات السداد'
+                : 'Client uploads payment proof');
+      case 'payment_review':
+        return isArabic ? 'اعتماد أو رفض السداد' : 'Approve or reject payment';
+      case 'session_setup_pending':
+        return isArabic
+            ? 'مراجعة التجهيز أو فتح الدفع'
+            : 'Review setup or open payment';
+      case 'session_scheduled':
+      case 'session_in_progress':
+        return isArabic
+            ? 'المتابعة من السطح التشغيلي أو إجراء استرداد'
+            : 'Continue from operational surface or recovery action';
+      case 'session_completed_pending_reviews':
+        return isArabic
+            ? 'استكمال التقييمات ثم المراجعة المالية'
+            : 'Complete reviews, then financial review';
+      case 'payout_pending':
+        return accountingReviewStatus == 'confirmed'
+            ? (isArabic ? 'تحويل المستحق' : 'Confirm payout')
+            : (isArabic ? 'مراجعة محاسبية' : 'Accounting review');
+      case 'completed_success':
+        return isArabic ? 'الأرشفة المناسبة' : 'Archive in the proper section';
+      case 'rejected_admin':
+      case 'clinician_rejected':
+      case 'reschedule_pending':
+      case 'cancellation_pending':
+      case 'dispute_pending':
+        return isArabic ? 'معالجة استثنائية فقط' : 'Exception handling only';
+      default:
+        return isArabic ? 'متابعة الحالة' : 'Monitor the state';
+    }
+  }
+
+  String _ownershipCueLabel({
+    required bool isArabic,
+    required bool isCenterRequest,
+    required String status,
+  }) {
+    switch (status) {
+      case 'center_intake_pending':
+      case 'client_update_required':
+      case 'awaiting_payment':
+        return isArabic ? 'المالك الحالي: العميل' : 'Current owner: client';
+      case 'center_follow_up':
+      case 'center_recommendation_pending':
+        return isArabic ? 'المالك الحالي: المركز' : 'Current owner: center';
+      case 'assigned_clinician':
+      case 'session_scheduled':
+      case 'session_in_progress':
+      case 'session_completed_pending_reviews':
+        return isCenterRequest
+            ? (isArabic
+                ? 'المالك الحالي: المركز / العميل'
+                : 'Current owner: center / client')
+            : (isArabic
+                ? 'المالك الحالي: الأخصائي / العميل'
+                : 'Current owner: clinician / client');
+      case 'payment_review':
+      case 'payout_pending':
+        return isArabic
+            ? 'المالك الحالي: بوابة مالية إدارية'
+            : 'Current owner: admin financial gate';
+      case 'pending_admin':
+      case 'rejected_admin':
+      case 'clinician_rejected':
+      case 'reschedule_pending':
+      case 'cancellation_pending':
+      case 'dispute_pending':
+        return isArabic
+            ? 'المالك الحالي: استثناء إداري'
+            : 'Current owner: admin exception';
+      default:
+        return isArabic
+            ? 'المالك الحالي: متابعة من غرفة التحكم'
+            : 'Current owner: control-room monitoring';
+    }
+  }
+
   Widget _buildDetailLine({
     required BuildContext context,
     required bool isArabic,
@@ -1924,6 +2144,40 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
             status == 'reschedule_pending' ||
             status == 'clinician_rejected');
     final requestAccent = _requestTypeAccent(isCenterRequest);
+    final whyHere = _whyHereLabel(
+      isArabic: isArabic,
+      isCenterRequest: isCenterRequest,
+      status: status,
+      centerAvailabilityStatus: centerAvailabilityStatus,
+      paymentReceiptFileName: paymentReceiptFileName,
+      accountingReviewStatus: accountingReviewStatus,
+    );
+    final nextStructuredStep = _nextStepLabel(
+      isArabic: isArabic,
+      isCenterRequest: isCenterRequest,
+      status: status,
+      centerAvailabilityStatus: centerAvailabilityStatus,
+      paymentReceiptFileName: paymentReceiptFileName,
+      accountingReviewStatus: accountingReviewStatus,
+    );
+    final ownershipCue = _ownershipCueLabel(
+      isArabic: isArabic,
+      isCenterRequest: isCenterRequest,
+      status: status,
+    );
+    final hasRequiredAdminGate = status == 'pending_admin' ||
+        canReviewPayment ||
+        (!isCenterRequest && status == 'payout_pending') ||
+        canRunAccountingReview ||
+        canConfirmCenterPayout ||
+        (status == 'completed_success' && !archived) ||
+        (isCenterRequest && status == 'center_follow_up');
+    final hasFallbackActions = canMoveCenterToFollowUp ||
+        canAssignClinician ||
+        canApproveCenter ||
+        canOpenCenterIntake ||
+        canReturnCenterToClient ||
+        canReturnToPending;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -2009,6 +2263,49 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 12),
+              AppSectionPanel(
+                color: Colors.white.withValues(alpha: 0.70),
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  crossAxisAlignment: isArabic
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isArabic
+                          ? 'مراقبة / عوائق / الخطوة التالية'
+                          : 'Monitoring / Blockers / Next Step',
+                      textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    _buildDetailLine(
+                      context: context,
+                      isArabic: isArabic,
+                      arLabel: 'سبب وجود الطلب هنا',
+                      enLabel: 'Why this is here',
+                      value: whyHere,
+                    ),
+                    _buildDetailLine(
+                      context: context,
+                      isArabic: isArabic,
+                      arLabel: 'الخطوة المنظمة التالية',
+                      enLabel: 'Next structured step',
+                      value: nextStructuredStep,
+                    ),
+                    _buildDetailLine(
+                      context: context,
+                      isArabic: isArabic,
+                      arLabel: 'إشارة الملكية',
+                      enLabel: 'Ownership cue',
+                      value: ownershipCue,
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 12),
               _buildDetailLine(
@@ -2387,214 +2684,250 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                 enLabel: 'Accounting notes',
                 value: accountingReviewNotes,
               ),
-              const SizedBox(height: 12),
-              if (canMoveCenterToFollowUp ||
-                  canOpenCenterIntake ||
-                  canApproveCenter) ...[
+              if (hasRequiredAdminGate) ...[
+                const SizedBox(height: 12),
                 Text(
-                  isArabic
-                      ? 'إجراءات المركز هنا جسور خفيفة من غرفة التحكم لتقليل التعطل، وليست ملكية تشغيلية دائمة للإدارة.'
-                      : 'Center actions here are admin-light control-room bridges to prevent stalls, not permanent admin operational ownership.',
+                  isArabic ? 'بوابة إدارية مطلوبة' : 'Required Admin Gate',
                   textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.obsidian.withValues(alpha: 0.72),
-                        fontWeight: FontWeight.w700,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
                       ),
                 ),
                 const SizedBox(height: 8),
-              ],
-              if (canReturnCenterToClient || canReturnToPending) ...[
-                Text(
-                  isArabic
-                      ? 'إجراءات الإرجاع مخصصة للاستثناء أو الاسترداد فقط عند تعذر استمرار المسار المنظم.'
-                      : 'Return actions are exception/recovery controls only when the structured path cannot continue.',
-                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.obsidian.withValues(alpha: 0.72),
-                        fontWeight: FontWeight.w600,
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  alignment:
+                      isArabic ? WrapAlignment.end : WrapAlignment.start,
+                  children: [
+                    if (status == 'pending_admin')
+                      OutlinedButton.icon(
+                        onPressed: busy
+                            ? null
+                            : () => _rejectRequest(
+                                  requestId,
+                                  isCenterRequest: isCenterRequest,
+                                ),
+                        icon: const Icon(Icons.cancel_outlined),
+                        label: Text(isArabic ? 'رفض' : 'Reject'),
                       ),
+                    if (canReviewPayment)
+                      FilledButton.icon(
+                        onPressed:
+                            busy ? null : () => _approvePayment(requestId),
+                        icon: const Icon(Icons.verified_outlined),
+                        label: Text(
+                          isArabic ? 'اعتماد السداد' : 'Approve payment',
+                        ),
+                      ),
+                    if (canReviewPayment)
+                      OutlinedButton.icon(
+                        onPressed:
+                            busy ? null : () => _rejectPayment(requestId),
+                        icon: const Icon(Icons.cancel_outlined),
+                        label: Text(
+                          isArabic ? 'رفض السداد' : 'Reject payment',
+                        ),
+                      ),
+                    if (!isCenterRequest && status == 'payout_pending')
+                      FilledButton.icon(
+                        onPressed: busy
+                            ? null
+                            : () => _confirmClinicianPayout(requestId),
+                        icon: const Icon(Icons.payments_outlined),
+                        label: Text(
+                          isArabic
+                              ? 'تم تحويل مستحق الأخصائي'
+                              : 'Confirm clinician payout',
+                        ),
+                      ),
+                    if (canRunAccountingReview)
+                      FilledButton.icon(
+                        onPressed: busy
+                            ? null
+                            : () =>
+                                _confirmCenterAccountingReview(requestId, data),
+                        icon: const Icon(Icons.calculate_outlined),
+                        label: Text(
+                          isArabic ? 'مراجعة محاسبية' : 'Accounting review',
+                        ),
+                      ),
+                    if (canConfirmCenterPayout)
+                      FilledButton.icon(
+                        onPressed:
+                            busy ? null : () => _confirmCenterPayout(requestId),
+                        icon:
+                            const Icon(Icons.account_balance_wallet_outlined),
+                        label: Text(
+                          isArabic
+                              ? 'تم تحويل مستحق المركز'
+                              : 'Confirm center payout',
+                        ),
+                      ),
+                    if (status == 'completed_success' && !archived)
+                      FilledButton.tonalIcon(
+                        onPressed: busy
+                            ? null
+                            : () => _sendToSessionArchive(requestId),
+                        icon: const Icon(Icons.video_call_outlined),
+                        label: Text(
+                          isArabic ? 'أرشفة جلسية' : 'Session archive',
+                        ),
+                      ),
+                    if (status == 'completed_success' && !archived)
+                      FilledButton.tonalIcon(
+                        onPressed: busy
+                            ? null
+                            : () => _sendToFinancialArchive(requestId),
+                        icon:
+                            const Icon(Icons.account_balance_wallet_outlined),
+                        label: Text(
+                          isArabic ? 'أرشفة مالية' : 'Financial archive',
+                        ),
+                      ),
+                    if (isCenterRequest && status == 'center_follow_up')
+                      OutlinedButton.icon(
+                        onPressed: busy
+                            ? null
+                            : () => _rejectRequest(
+                                  requestId,
+                                  isCenterRequest: true,
+                                ),
+                        icon: const Icon(Icons.cancel_outlined),
+                        label: Text(isArabic ? 'رفض' : 'Reject'),
+                      ),
+                  ],
                 ),
-                const SizedBox(height: 8),
               ],
-              if (canAssignClinician) ...[
-                Text(
-                  isArabic
-                      ? 'تحويل الأخصائي هنا مسار توافق قديم فقط؛ المسار الطبيعي الجديد يدخل مباشرة للأخصائي.'
-                      : 'Clinician forwarding here is legacy compatibility only; the normal path now enters directly to the clinician.',
-                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.obsidian.withValues(alpha: 0.72),
-                        fontWeight: FontWeight.w700,
+              if (hasFallbackActions) ...[
+                const SizedBox(height: 12),
+                AppSectionPanel(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainerHighest
+                      .withValues(alpha: 0.34),
+                  padding: EdgeInsets.zero,
+                  child: ExpansionTile(
+                    initiallyExpanded: false,
+                    tilePadding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                    ),
+                    childrenPadding: const EdgeInsets.fromLTRB(
+                      AppSpacing.md,
+                      0,
+                      AppSpacing.md,
+                      AppSpacing.md,
+                    ),
+                    title: Text(
+                      isArabic
+                          ? 'إجراءات الاسترداد / التوافق'
+                          : 'Fallback / Compatibility Actions',
+                      textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                    ),
+                    subtitle: Text(
+                      isArabic
+                          ? 'تُستخدم فقط للاستثناءات، استرداد المسار، أو سجلات التوافق القديمة؛ وليست المسار التشغيلي الطبيعي.'
+                          : 'Use only for exceptions, flow recovery, or legacy compatibility records; not the normal operational path.',
+                      textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                    ),
+                    children: [
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        alignment:
+                            isArabic ? WrapAlignment.end : WrapAlignment.start,
+                        children: [
+                          if (canMoveCenterToFollowUp)
+                            FilledButton.icon(
+                              onPressed: busy
+                                  ? null
+                                  : () => _moveCenterToFollowUp(requestId),
+                              icon: const Icon(Icons.fact_check_outlined),
+                              label: Text(
+                                isArabic
+                                    ? 'نقل للمتابعة'
+                                    : 'Move to follow-up',
+                              ),
+                            ),
+                          if (canAssignClinician)
+                            FilledButton.tonalIcon(
+                              onPressed: busy ||
+                                      requestedClinicianId.isEmpty ||
+                                      requestedClinicianName.isEmpty
+                                  ? null
+                                  : () => _assignToClinician(
+                                        requestId: requestId,
+                                      ),
+                              icon:
+                                  const Icon(Icons.forward_to_inbox_outlined),
+                              label: Text(
+                                isArabic
+                                    ? 'استعادة توافق: تحويل للأخصائي'
+                                    : 'Compatibility forward',
+                              ),
+                            ),
+                          if (canApproveCenter)
+                            FilledButton.icon(
+                              onPressed: busy
+                                  ? null
+                                  : () => _approveCenterRequest(requestId),
+                              icon: const Icon(Icons.verified_outlined),
+                              label: Text(
+                                isArabic
+                                    ? 'اعتماد وفتح الجدولة'
+                                    : 'Approve and open scheduling',
+                              ),
+                            ),
+                          if (canOpenCenterIntake)
+                            FilledButton.tonalIcon(
+                              onPressed: busy
+                                  ? null
+                                  : () => _openCenterIntakeStep(requestId),
+                              icon: const Icon(
+                                Icons.assignment_turned_in_outlined,
+                              ),
+                              label: Text(
+                                isArabic
+                                    ? 'فتح التقييم الأولي'
+                                    : 'Open intake review',
+                              ),
+                            ),
+                          if (canReturnCenterToClient)
+                            OutlinedButton.icon(
+                              onPressed: busy
+                                  ? null
+                                  : () => _returnCenterRequestToClient(
+                                        requestId,
+                                        data,
+                                      ),
+                              icon: const Icon(Icons.reply_outlined),
+                              label: Text(
+                                isArabic
+                                    ? 'إرجاع للعميل للتعديل'
+                                    : 'Return to client for edit',
+                              ),
+                            ),
+                          if (canReturnToPending)
+                            TextButton.icon(
+                              onPressed: busy
+                                  ? null
+                                  : () => _returnToPending(requestId),
+                              icon: const Icon(Icons.refresh),
+                              label: Text(
+                                isArabic
+                                    ? 'إرجاع للبندنج'
+                                    : 'Return to pending',
+                              ),
+                            ),
+                        ],
                       ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 8),
               ],
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                alignment: isArabic ? WrapAlignment.end : WrapAlignment.start,
-                children: [
-                  if (status == 'pending_admin')
-                    OutlinedButton.icon(
-                      onPressed: busy
-                          ? null
-                          : () => _rejectRequest(
-                                requestId,
-                                isCenterRequest: isCenterRequest,
-                              ),
-                      icon: const Icon(Icons.cancel_outlined),
-                      label: Text(isArabic ? 'رفض' : 'Reject'),
-                    ),
-                  if (canMoveCenterToFollowUp)
-                    FilledButton.icon(
-                      onPressed:
-                          busy ? null : () => _moveCenterToFollowUp(requestId),
-                      icon: const Icon(Icons.fact_check_outlined),
-                      label: Text(
-                        isArabic ? 'نقل للمتابعة' : 'Move to follow-up',
-                      ),
-                    ),
-                  if (canAssignClinician)
-                    FilledButton.tonalIcon(
-                      onPressed: busy ||
-                              requestedClinicianId.isEmpty ||
-                              requestedClinicianName.isEmpty
-                          ? null
-                          : () => _assignToClinician(
-                                requestId: requestId,
-                              ),
-                      icon: const Icon(Icons.forward_to_inbox_outlined),
-                      label: Text(
-                        isArabic
-                            ? 'استعادة توافق: تحويل للأخصائي'
-                            : 'Compatibility forward',
-                      ),
-                    ),
-                  if (canApproveCenter)
-                    FilledButton.icon(
-                      onPressed:
-                          busy ? null : () => _approveCenterRequest(requestId),
-                      icon: const Icon(Icons.verified_outlined),
-                      label: Text(
-                        isArabic
-                            ? 'اعتماد وفتح الجدولة'
-                            : 'Approve and open scheduling',
-                      ),
-                    ),
-                  if (canOpenCenterIntake)
-                    FilledButton.tonalIcon(
-                      onPressed:
-                          busy ? null : () => _openCenterIntakeStep(requestId),
-                      icon: const Icon(Icons.assignment_turned_in_outlined),
-                      label: Text(
-                        isArabic
-                            ? 'فتح التقييم الأولي'
-                            : 'Open intake review',
-                      ),
-                    ),
-                  if (canReturnCenterToClient)
-                    OutlinedButton.icon(
-                      onPressed: busy
-                          ? null
-                          : () => _returnCenterRequestToClient(requestId, data),
-                      icon: const Icon(Icons.reply_outlined),
-                      label: Text(
-                        isArabic
-                            ? 'إرجاع للعميل للتعديل'
-                            : 'Return to client for edit',
-                      ),
-                    ),
-                  if (canReviewPayment)
-                    FilledButton.icon(
-                      onPressed: busy ? null : () => _approvePayment(requestId),
-                      icon: const Icon(Icons.verified_outlined),
-                      label: Text(
-                        isArabic ? 'اعتماد السداد' : 'Approve payment',
-                      ),
-                    ),
-                  if (canReviewPayment)
-                    OutlinedButton.icon(
-                      onPressed: busy ? null : () => _rejectPayment(requestId),
-                      icon: const Icon(Icons.cancel_outlined),
-                      label: Text(
-                        isArabic ? 'رفض السداد' : 'Reject payment',
-                      ),
-                    ),
-                  if (!isCenterRequest && status == 'payout_pending')
-                    FilledButton.icon(
-                      onPressed: busy
-                          ? null
-                          : () => _confirmClinicianPayout(requestId),
-                      icon: const Icon(Icons.payments_outlined),
-                      label: Text(
-                        isArabic
-                            ? 'تم تحويل مستحق الأخصائي'
-                            : 'Confirm clinician payout',
-                      ),
-                    ),
-                  if (canRunAccountingReview)
-                    FilledButton.icon(
-                      onPressed: busy
-                          ? null
-                          : () =>
-                              _confirmCenterAccountingReview(requestId, data),
-                      icon: const Icon(Icons.calculate_outlined),
-                      label: Text(
-                        isArabic ? 'مراجعة محاسبية' : 'Accounting review',
-                      ),
-                    ),
-                  if (canConfirmCenterPayout)
-                    FilledButton.icon(
-                      onPressed:
-                          busy ? null : () => _confirmCenterPayout(requestId),
-                      icon: const Icon(Icons.account_balance_wallet_outlined),
-                      label: Text(
-                        isArabic
-                            ? 'تم تحويل مستحق المركز'
-                            : 'Confirm center payout',
-                      ),
-                    ),
-                  if (status == 'completed_success' && !archived)
-                    FilledButton.tonalIcon(
-                      onPressed:
-                          busy ? null : () => _sendToSessionArchive(requestId),
-                      icon: const Icon(Icons.video_call_outlined),
-                      label: Text(
-                        isArabic ? 'أرشفة جلسية' : 'Session archive',
-                      ),
-                    ),
-                  if (status == 'completed_success' && !archived)
-                    FilledButton.tonalIcon(
-                      onPressed: busy
-                          ? null
-                          : () => _sendToFinancialArchive(requestId),
-                      icon: const Icon(Icons.account_balance_wallet_outlined),
-                      label: Text(
-                        isArabic ? 'أرشفة مالية' : 'Financial archive',
-                      ),
-                    ),
-                  if (isCenterRequest && status == 'center_follow_up')
-                    OutlinedButton.icon(
-                      onPressed: busy
-                          ? null
-                          : () => _rejectRequest(
-                                requestId,
-                                isCenterRequest: true,
-                              ),
-                      icon: const Icon(Icons.cancel_outlined),
-                      label: Text(isArabic ? 'رفض' : 'Reject'),
-                    ),
-                  if (canReturnToPending)
-                    TextButton.icon(
-                      onPressed:
-                          busy ? null : () => _returnToPending(requestId),
-                      icon: const Icon(Icons.refresh),
-                      label: Text(
-                        isArabic ? 'إرجاع للبندنج' : 'Return to pending',
-                      ),
-                    ),
-                ],
-              ),
             ],
           ),
         ),
@@ -2693,22 +3026,59 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                       _buildDomainAdvisoryBanner(context, isArabic),
                       AppSurfaceCard(
                         padding: const EdgeInsets.all(AppSpacing.lg),
-                        child: Wrap(
-                          spacing: 10,
-                          runSpacing: 10,
-                          alignment: isArabic
-                              ? WrapAlignment.end
-                              : WrapAlignment.start,
-                          children: _tabs.map((item) {
-                            final key = item['key']!;
-                            return ChoiceChip(
-                              selected: _tab == key,
-                              label: Text(
-                                isArabic ? item['labelAr']! : item['labelEn']!,
-                              ),
-                              onSelected: (_) => setState(() => _tab = key),
-                            );
-                          }).toList(),
+                        child: Column(
+                          crossAxisAlignment: isArabic
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isArabic
+                                  ? 'لوحة مراقبة الطلبات والاستثناءات'
+                                  : 'Request Monitoring & Exception Board',
+                              textAlign:
+                                  isArabic ? TextAlign.right : TextAlign.left,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.w800),
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              isArabic
+                                  ? 'هذه الصفحة لمراقبة الطلبات والعوائق والبوابات المالية والاستثناءات؛ وليست ملكية تشغيل يومية للمسارات المنظمة.'
+                                  : 'This page monitors requests, blockers, financial gates, and exceptions; it is not daily operational ownership of structured flows.',
+                              textAlign:
+                                  isArabic ? TextAlign.right : TextAlign.left,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: AppColors.obsidian
+                                        .withValues(alpha: 0.72),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            Wrap(
+                              spacing: 10,
+                              runSpacing: 10,
+                              alignment: isArabic
+                                  ? WrapAlignment.end
+                                  : WrapAlignment.start,
+                              children: _tabs.map((item) {
+                                final key = item['key']!;
+                                return ChoiceChip(
+                                  selected: _tab == key,
+                                  label: Text(
+                                    isArabic
+                                        ? item['labelAr']!
+                                        : item['labelEn']!,
+                                  ),
+                                  onSelected: (_) => setState(() => _tab = key),
+                                );
+                              }).toList(),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 16),

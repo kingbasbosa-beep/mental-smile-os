@@ -51,6 +51,13 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
     }
   }
 
+  String _riskLabel(String riskLevel) {
+    if (riskLevel == 'critical') {
+      return 'تنبيه أمان / حالة عاجلة';
+    }
+    return 'الخطر: $riskLevel';
+  }
+
   Color _statusColor(String status) {
     switch (status) {
       case 'resolved':
@@ -256,7 +263,7 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('حالات الشات الخطرة'),
+          title: const Text('حالات دعم مصعّدة'),
         ),
         body: Column(
           children: [
@@ -311,7 +318,7 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
                           if (snapshot.hasError) {
                             return Center(
                               child: Text(
-                                  'فشل تحميل التصعيدات: ${snapshot.error}'),
+                                  'فشل تحميل حالات الدعم المصعّدة: ${snapshot.error}'),
                             );
                           }
 
@@ -364,7 +371,7 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
                                                   BorderRadius.circular(999),
                                             ),
                                             child: Text(
-                                              'الخطر: ${e.riskLevel}',
+                                              _riskLabel(e.riskLevel),
                                               style: TextStyle(
                                                 color: _riskColor(e.riskLevel),
                                                 fontWeight: FontWeight.w800,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 /// C6 Library UI (Hero + Categories + Buttons + States)
@@ -83,6 +84,7 @@ class LibraryPage extends StatelessWidget {
         body: ListView(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
           children: [
+            const _ModuleEntryLogger(module: 'library'),
             _HeroCard(title: title, subtitle: subtitle, isAr: isAr),
             const SizedBox(height: 14),
 
@@ -102,8 +104,13 @@ class LibraryPage extends StatelessWidget {
                   child: _ImageButton(
                     label: isAr ? 'استكشف' : 'Explore',
                     asset: 'c6_library/ui/buttons/btn_secondary.png',
-                    onTap: () =>
-                        _showSnack(context, isAr ? 'قريباً…' : 'Coming soon…'),
+                    onTap: () {
+                      AppAnalytics.logPathSelected('library', 'browse');
+                      _showSnack(
+                        context,
+                        isAr ? 'قريباً…' : 'Coming soon…',
+                      );
+                    },
                   ),
                 ),
               ],
@@ -172,10 +179,16 @@ class LibraryPage extends StatelessWidget {
                     return _CategoryTile(
                       title: isAr ? cat.titleAr : cat.titleEn,
                       asset: cat.asset,
-                      onTap: () => _showSnack(
-                        context,
-                        isAr ? 'فتح: ${cat.titleAr}' : 'Open: ${cat.titleEn}',
-                      ),
+                      onTap: () {
+                        AppAnalytics.logPathSelected(
+                          'library',
+                          'open_content',
+                        );
+                        _showSnack(
+                          context,
+                          isAr ? 'فتح: ${cat.titleAr}' : 'Open: ${cat.titleEn}',
+                        );
+                      },
                     );
                   },
                 );
@@ -214,6 +227,26 @@ class LibraryPage extends StatelessWidget {
   static void _showSnack(BuildContext context, String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
+}
+
+class _ModuleEntryLogger extends StatefulWidget {
+  const _ModuleEntryLogger({required this.module});
+
+  final String module;
+
+  @override
+  State<_ModuleEntryLogger> createState() => _ModuleEntryLoggerState();
+}
+
+class _ModuleEntryLoggerState extends State<_ModuleEntryLogger> {
+  @override
+  void initState() {
+    super.initState();
+    AppAnalytics.logModuleEntry(widget.module);
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 class _HeroCard extends StatelessWidget {

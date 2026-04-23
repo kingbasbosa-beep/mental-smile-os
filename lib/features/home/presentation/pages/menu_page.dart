@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
+import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
@@ -332,8 +333,10 @@ class MenuPage extends StatelessWidget {
                         const SizedBox(height: AppSpacing.md),
                         InkWell(
                           borderRadius: BorderRadius.circular(AppRadii.xl),
-                          onTap: () =>
-                              Navigator.of(context).pushNamed(Routes.chat),
+                          onTap: () {
+                            AppAnalytics.logChatOpened('general');
+                            Navigator.of(context).pushNamed(Routes.chat);
+                          },
                           child: AppSurfaceCard(
                             color: Colors.white.withValues(alpha: 0.84),
                             child: Row(

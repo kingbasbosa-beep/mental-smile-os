@@ -527,6 +527,222 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
         (!centerArrivalConfirmed || !clientCheckInConfirmed);
   }
 
+  String _whyHereLabel({
+    required bool isArabic,
+    required bool isCenterRequest,
+    required String status,
+    required bool awaitingResidencyStart,
+  }) {
+    switch (status) {
+      case 'session_setup_pending':
+        return isCenterRequest
+            ? (isArabic
+                ? 'بانتظار مراجعة تجهيز الإقامة قبل فتح الدفع'
+                : 'Waiting for residency setup review before payment opening')
+            : (isArabic
+                ? 'بانتظار تجهيز جلسة أخصائي'
+                : 'Waiting for clinician session setup');
+      case 'reschedule_pending':
+        return isArabic
+            ? 'بانتظار معالجة إعادة الجدولة'
+            : 'Waiting for reschedule handling';
+      case 'session_scheduled':
+        if (awaitingResidencyStart) {
+          return isArabic
+              ? 'الإقامة مجدولة وتنتظر تأكيدات البداية'
+              : 'Residency is scheduled and waiting for start confirmations';
+        }
+        return isCenterRequest
+            ? (isArabic
+                ? 'الإقامة مجدولة للمتابعة'
+                : 'Residency is scheduled for monitoring')
+            : (isArabic
+                ? 'الجلسة مجدولة للمتابعة'
+                : 'Session is scheduled for monitoring');
+      case 'session_in_progress':
+        return isCenterRequest
+            ? (isArabic
+                ? 'الإقامة جارية وتحت المتابعة'
+                : 'Residency is in progress and under monitoring')
+            : (isArabic
+                ? 'الجلسة جارية وتحت المتابعة'
+                : 'Session is in progress and under monitoring');
+      case 'session_completed_pending_reviews':
+        return isCenterRequest
+            ? (isArabic
+                ? 'بانتظار تقييم الأسرة وتقرير خروج المركز'
+                : 'Waiting for family review and center discharge report')
+            : (isArabic
+                ? 'بانتظار تقييم العميل والأخصائي'
+                : 'Waiting for client and clinician reviews');
+      case 'payout_pending':
+        return isArabic
+            ? 'بانتظار بوابة مالية أو مراجعة مستحقات'
+            : 'Waiting for financial gate or payout review';
+      default:
+        return isArabic
+            ? 'متابعة حالة من غرفة التحكم'
+            : 'Control-room state monitoring';
+    }
+  }
+
+  String _nextStepLabel({
+    required bool isArabic,
+    required bool isCenterRequest,
+    required String status,
+    required bool awaitingResidencyStart,
+    required bool clientReviewSubmitted,
+    required bool providerReviewSubmitted,
+  }) {
+    switch (status) {
+      case 'session_setup_pending':
+        return isCenterRequest
+            ? (isArabic
+                ? 'مراجعة التجهيز ثم فتح بيان الدفع'
+                : 'Review setup, then open payment quote')
+            : (isArabic
+                ? 'استخدام إجراء الاسترداد عند الحاجة فقط'
+                : 'Use recovery action only if needed');
+      case 'reschedule_pending':
+        return isArabic
+            ? 'إعادة الجدولة كاسترداد مسار'
+            : 'Reschedule as flow recovery';
+      case 'session_scheduled':
+        if (awaitingResidencyStart) {
+          return isArabic
+              ? 'انتظار تأكيد المركز والأسرة'
+              : 'Wait for center and family confirmations';
+        }
+        return isArabic ? 'متابعة التشغيل' : 'Monitor operation';
+      case 'session_in_progress':
+        return isArabic
+            ? 'متابعة حتى الاكتمال'
+            : 'Monitor until completion';
+      case 'session_completed_pending_reviews':
+        if (!clientReviewSubmitted || !providerReviewSubmitted) {
+          return isArabic
+              ? 'استكمال التقييمات المطلوبة'
+              : 'Complete required reviews';
+        }
+        return isArabic
+            ? 'الانتقال للمراجعة المالية عند اكتمالها'
+            : 'Move toward financial review when complete';
+      case 'payout_pending':
+        return isArabic
+            ? 'مراجعة أو تأكيد المستحقات المالية'
+            : 'Review or confirm financial payout';
+      default:
+        return isArabic ? 'متابعة الحالة' : 'Monitor the state';
+    }
+  }
+
+  String _ownershipCueLabel({
+    required bool isArabic,
+    required bool isCenterRequest,
+    required String status,
+  }) {
+    switch (status) {
+      case 'session_setup_pending':
+        return isCenterRequest
+            ? (isArabic
+                ? 'بوابة إدارية مالية قبل الدفع'
+                : 'Admin financial gate before payment')
+            : (isArabic
+                ? 'استرداد إداري لجلسة أخصائي'
+                : 'Admin recovery for clinician session');
+      case 'reschedule_pending':
+        return isArabic
+            ? 'استرداد إداري فقط'
+            : 'Admin recovery only';
+      case 'session_scheduled':
+      case 'session_in_progress':
+        return isCenterRequest
+            ? (isArabic
+                ? 'المسار التشغيلي: المركز / الأسرة'
+                : 'Operational path: center / family')
+            : (isArabic
+                ? 'المسار التشغيلي: الأخصائي / العميل'
+                : 'Operational path: clinician / client');
+      case 'session_completed_pending_reviews':
+        return isCenterRequest
+            ? (isArabic
+                ? 'التقييمات: الأسرة / المركز'
+                : 'Reviews: family / center')
+            : (isArabic
+                ? 'التقييمات: العميل / الأخصائي'
+                : 'Reviews: client / clinician');
+      case 'payout_pending':
+        return isArabic
+            ? 'بوابة مالية إدارية'
+            : 'Admin financial gate';
+      default:
+        return isArabic
+            ? 'متابعة من غرفة التحكم'
+            : 'Control-room monitoring';
+    }
+  }
+
+  String? _blockingReasonLabel({
+    required bool isArabic,
+    required bool isCenterRequest,
+    required String status,
+    required bool awaitingResidencyStart,
+    required bool centerArrivalConfirmed,
+    required bool clientCheckInConfirmed,
+    required bool clientReviewSubmitted,
+    required bool providerReviewSubmitted,
+    required List<String> setupWarnings,
+  }) {
+    if (status == 'session_setup_pending' ||
+        status == 'reschedule_pending') {
+      if (setupWarnings.isNotEmpty) {
+        return setupWarnings.first;
+      }
+      return null;
+    }
+    if (awaitingResidencyStart) {
+      if (!centerArrivalConfirmed && !clientCheckInConfirmed) {
+        return isArabic
+            ? 'بانتظار تأكيد المركز والأسرة لبداية الإقامة'
+            : 'Waiting for center and family start confirmations';
+      }
+      if (!centerArrivalConfirmed) {
+        return isArabic
+            ? 'بانتظار تأكيد المركز للوصول'
+            : 'Waiting for center arrival confirmation';
+      }
+      return isArabic
+          ? 'بانتظار تأكيد الأسرة لبداية الإقامة'
+          : 'Waiting for family check-in confirmation';
+    }
+    if (status == 'session_completed_pending_reviews') {
+      if (!clientReviewSubmitted && !providerReviewSubmitted) {
+        return isCenterRequest
+            ? (isArabic
+                ? 'بانتظار تقييم الأسرة وتقرير المركز'
+                : 'Waiting for family review and center report')
+            : (isArabic
+                ? 'بانتظار تقييم العميل والأخصائي'
+                : 'Waiting for client and clinician reviews');
+      }
+      if (!clientReviewSubmitted) {
+        return isArabic
+            ? 'بانتظار تقييم العميل / الأسرة'
+            : 'Waiting for client / family review';
+      }
+      if (!providerReviewSubmitted) {
+        return isCenterRequest
+            ? (isArabic
+                ? 'بانتظار تقرير المركز'
+                : 'Waiting for center report')
+            : (isArabic
+                ? 'بانتظار تقييم الأخصائي'
+                : 'Waiting for clinician review');
+      }
+    }
+    return null;
+  }
+
   String _dateText(dynamic value) {
     if (value is Timestamp) {
       final d = value.toDate();
@@ -616,8 +832,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                       children: [
                         Text(
                           isArabic
-                              ? 'متابعة الجاهزية من غرفة التحكم'
-                              : 'Control-room readiness monitoring',
+                              ? 'متابعة الجاهزية والاستثناءات للجلسات'
+                              : 'Sessions Readiness & Exception Control',
                           style:
                               Theme.of(context).textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.w800,
@@ -626,8 +842,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                         const SizedBox(height: AppSpacing.xs),
                         Text(
                           isArabic
-                              ? 'استخدم هذه الفلاتر لتتبع التجهيز، الجدولة، التقييمات، وحالات الاسترداد دون اعتبار الصفحة مسار تشغيل يومي.'
-                              : 'Use these filters to track setup, scheduling, reviews, and recovery states without treating this page as the daily execution path.',
+                              ? 'هذه الصفحة تتابع الجاهزية والعوائق والبوابات المالية وإشارات المراجعة أو الاكتمال وحالات الاسترداد الاستثنائية؛ وليست سطح الملكية التشغيلية اليومية.'
+                              : 'This page tracks readiness, blockers, financial gates, review/completion signals, and exceptional recovery cases; it is not the normal operational ownership surface.',
                           textAlign: isArabic ? TextAlign.right : TextAlign.left,
                           style:
                               Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -776,6 +992,9 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                               true;
                       final clinicianReviewSubmitted =
                           (data['clinicianReviewSubmitted'] ?? false) == true;
+                      final providerReviewSubmitted = isCenterRequest
+                          ? centerReviewSubmitted
+                          : clinicianReviewSubmitted;
                       final residencyStartedBy =
                           (data['residencyStartedBy'] ?? '').toString();
                       final awaitingResidencyStart = _isAwaitingResidencyStart(
@@ -894,6 +1113,36 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                               ? 'يوجد تجهيز سابق محفوظ؛ لن يتم استخدام الملء التلقائي.'
                               : 'Existing setup already exists; pre-fill is not applied.',
                       ];
+                      final whyHere = _whyHereLabel(
+                        isArabic: isArabic,
+                        isCenterRequest: isCenterRequest,
+                        status: status,
+                        awaitingResidencyStart: awaitingResidencyStart,
+                      );
+                      final nextStructuredStep = _nextStepLabel(
+                        isArabic: isArabic,
+                        isCenterRequest: isCenterRequest,
+                        status: status,
+                        awaitingResidencyStart: awaitingResidencyStart,
+                        clientReviewSubmitted: clientReviewSubmitted,
+                        providerReviewSubmitted: providerReviewSubmitted,
+                      );
+                      final ownershipCue = _ownershipCueLabel(
+                        isArabic: isArabic,
+                        isCenterRequest: isCenterRequest,
+                        status: status,
+                      );
+                      final blockingReason = _blockingReasonLabel(
+                        isArabic: isArabic,
+                        isCenterRequest: isCenterRequest,
+                        status: status,
+                        awaitingResidencyStart: awaitingResidencyStart,
+                        centerArrivalConfirmed: centerArrivalConfirmed,
+                        clientCheckInConfirmed: clientCheckInConfirmed,
+                        clientReviewSubmitted: clientReviewSubmitted,
+                        providerReviewSubmitted: providerReviewSubmitted,
+                        setupWarnings: setupWarnings,
+                      );
                       final linkCtrl = _controllerFor(
                         _linkControllers,
                         requestId,
@@ -1010,6 +1259,76 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                       : 'Client note: $note',
                                 ),
                               ),
+                            AppSectionPanel(
+                              color: Colors.white.withValues(alpha: 0.70),
+                              padding: const EdgeInsets.all(AppSpacing.md),
+                              child: Column(
+                                crossAxisAlignment: isArabic
+                                    ? CrossAxisAlignment.end
+                                    : CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    isArabic
+                                        ? 'مراقبة / عوائق / الخطوة التالية'
+                                        : 'Monitoring / Blockers / Next Step',
+                                    textAlign: isArabic
+                                        ? TextAlign.right
+                                        : TextAlign.left,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    isArabic
+                                        ? 'سبب وجود الطلب هنا: $whyHere'
+                                        : 'Why this is here: $whyHere',
+                                    textAlign: isArabic
+                                        ? TextAlign.right
+                                        : TextAlign.left,
+                                  ),
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    isArabic
+                                        ? 'الخطوة المنظمة التالية: $nextStructuredStep'
+                                        : 'Next structured step: $nextStructuredStep',
+                                    textAlign: isArabic
+                                        ? TextAlign.right
+                                        : TextAlign.left,
+                                  ),
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    isArabic
+                                        ? 'إشارة الملكية: $ownershipCue'
+                                        : 'Ownership cue: $ownershipCue',
+                                    textAlign: isArabic
+                                        ? TextAlign.right
+                                        : TextAlign.left,
+                                  ),
+                                  if (blockingReason != null) ...[
+                                    const SizedBox(height: AppSpacing.xs),
+                                    Text(
+                                      isArabic
+                                          ? 'سبب التعطيل: $blockingReason'
+                                          : 'Blocking reason: $blockingReason',
+                                      textAlign: isArabic
+                                          ? TextAlign.right
+                                          : TextAlign.left,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: const Color(0xFF9A6A00),
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
                             const SizedBox(height: AppSpacing.sm),
                             if (status == 'session_setup_pending' ||
                                 status == 'reschedule_pending') ...[

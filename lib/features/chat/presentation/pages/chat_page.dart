@@ -14,10 +14,12 @@ class ChatPage extends StatefulWidget {
     super.key,
     this.initialThreadId,
     this.adminSupportMode = false,
+    this.entryContext,
   });
 
   final String? initialThreadId;
   final bool adminSupportMode;
+  final String? entryContext;
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -55,6 +57,23 @@ class _ChatPageState extends State<ChatPage> {
     return isArabic
         ? 'دعم أولي آمن مع تصعيد بشري عند ارتفاع مستوى الخطر'
         : 'Safe first-line support with human escalation when risk rises';
+  }
+
+  String? _entryContextHelper(bool isArabic) {
+    if (widget.adminSupportMode || widget.initialThreadId != null) return null;
+
+    switch (widget.entryContext) {
+      case 'family_support':
+        return isArabic
+            ? 'يمكنك التحدث هنا للحصول على دعم عام وإرشاد مناسب لاحتياجات الأسرة.'
+            : 'You can talk here for general support and guidance for family needs.';
+      case 'recovery_support':
+        return isArabic
+            ? 'يمكنك التحدث هنا للحصول على دعم عام وإرشاد مرتبط بالتعافي.'
+            : 'You can talk here for general support and guidance related to recovery.';
+      default:
+        return null;
+    }
   }
 
   bool get _isRequestLinkedThread {
@@ -427,6 +446,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     final isArabic = _isArabic();
     final textDirection = isArabic ? TextDirection.rtl : TextDirection.ltr;
+    final entryContextHelper = _entryContextHelper(isArabic);
 
     return Directionality(
       textDirection: textDirection,
@@ -510,6 +530,27 @@ class _ChatPageState extends State<ChatPage> {
                                                   ? TextAlign.right
                                                   : TextAlign.left,
                                             ),
+                                            if (entryContextHelper != null) ...[
+                                              const SizedBox(
+                                                  height: AppSpacing.xxs),
+                                              Text(
+                                                entryContextHelper,
+                                                textAlign: isArabic
+                                                    ? TextAlign.right
+                                                    : TextAlign.left,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      color: AppColors.obsidian
+                                                          .withValues(
+                                                        alpha: 0.72,
+                                                      ),
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                              ),
+                                            ],
                                           ],
                                         ),
                                       ),
