@@ -2303,8 +2303,8 @@ service cloud.firestore {
     }
 
     match /resources/{docId} {
-      allow read, write: if true;
-      allow delete: if false;
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     match /centers/{docId} {
@@ -2334,8 +2334,7 @@ service cloud.firestore {
     }
 
     match /debug/{docId} {
-      allow read, write: if true;
-      allow delete: if false;
+      allow read, write: if false;
     }
 
     match /system_health/{docId} {
