@@ -6,6 +6,7 @@ import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/system/domain_registry.dart';
 import 'package:flutterprojects/core/system/domain_status.dart';
 import 'package:flutterprojects/core/system/domain_status_service.dart';
+import 'package:flutterprojects/features/chat/data/services/chat_firestore_service.dart';
 import 'package:flutterprojects/features/gateway_layer/core/gateway_monitor.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_health_level.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
@@ -130,7 +131,10 @@ class _AdminHubPageState extends State<AdminHubPage> {
             }).length)
         .asBroadcastStream();
 
-    _escalationsOpenStream = _openEscalationsStream().asBroadcastStream();
+    _escalationsOpenStream = ChatFirestoreService()
+        .streamAdminSupportInboxThreads()
+        .map((threads) => threads.length)
+        .asBroadcastStream();
 
     _pendingApprovalsStream =
         Stream<int>.multi((controller) {
@@ -3756,6 +3760,7 @@ class _QuickStatCard extends StatelessWidget {
         stream: item.stream,
         builder: (context, snapshot) {
           final isOpenRequestsCounter = item.group == AdminVisualGroup.requests;
+          final isHumanReviewCounter = item.group == AdminVisualGroup.support;
           final waiting =
               snapshot.connectionState == ConnectionState.waiting &&
                   !snapshot.hasData;
@@ -3764,6 +3769,8 @@ class _QuickStatCard extends StatelessWidget {
           final openRequestsCountText =
               hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
           final countText = hasError ? '!' : (count == null ? '—' : '$count');
+          final humanReviewCountText =
+              hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
           final statusText = hasError
               ? (isArabic ? 'تعذر التحميل' : 'Load failed')
               : (waiting
@@ -3796,7 +3803,11 @@ class _QuickStatCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      isOpenRequestsCounter ? openRequestsCountText : countText,
+                      isOpenRequestsCounter
+                          ? openRequestsCountText
+                          : (isHumanReviewCounter
+                              ? humanReviewCountText
+                              : countText),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: color,
