@@ -267,21 +267,12 @@ class _AdminHubPageState extends State<AdminHubPage> {
     final isArabic = _isArabic(context);
 
     final gatewayStatuses = AdminHubPage._gatewayMonitor.familyStatuses();
-    final topPriorityPeerStreams = <Stream<int>>[
-      _bookingOpenStream,
-      _paymentsReviewStream,
-      _sessionsActionStream,
-      _escalationsOpenStream,
-      _pendingApprovalsStream,
-      _gatewayAttentionStream,
-    ];
 
     final compactCounters = <_QuickStatItem>[
       _QuickStatItem(
         title: isArabic ? 'إشارات طلبات مفتوحة' : 'Open request signals',
         group: AdminVisualGroup.requests,
         stream: _bookingOpenStream,
-        priorityPeers: topPriorityPeerStreams,
         crossSignalStream: _escalationsOpenStream,
         route: Routes.adminOperations,
       ),
@@ -289,21 +280,18 @@ class _AdminHubPageState extends State<AdminHubPage> {
         title: isArabic ? 'السداد تحت المراجعة' : 'Payment review',
         group: AdminVisualGroup.payments,
         stream: _paymentsReviewStream,
-        priorityPeers: topPriorityPeerStreams,
         route: Routes.adminPayments,
       ),
       _QuickStatItem(
         title: isArabic ? 'إشارات جاهزية الجلسات' : 'Session readiness signals',
         group: AdminVisualGroup.sessions,
         stream: _sessionsActionStream,
-        priorityPeers: topPriorityPeerStreams,
         route: Routes.adminSessions,
       ),
       _QuickStatItem(
         title: isArabic ? 'حالات دعم مصعّدة' : 'Escalated Support Cases',
         group: AdminVisualGroup.support,
         stream: _escalationsOpenStream,
-        priorityPeers: topPriorityPeerStreams,
         crossSignalStream: _bookingOpenStream,
         route: Routes.adminSupportChats,
       ),
@@ -311,14 +299,12 @@ class _AdminHubPageState extends State<AdminHubPage> {
         title: isArabic ? 'بوابات اعتماد معلقة' : 'Pending approval gates',
         group: AdminVisualGroup.requests,
         stream: _pendingApprovalsStream,
-        priorityPeers: topPriorityPeerStreams,
         route: Routes.adminClinicianRequests,
       ),
       _QuickStatItem(
         title: isArabic ? 'إشارات بوابات/أجهزة' : 'Gateway/device signals',
         group: AdminVisualGroup.system,
         stream: _gatewayAttentionStream,
-        priorityPeers: topPriorityPeerStreams,
         route: Routes.adminGatewayLayer,
       ),
     ];
@@ -2051,7 +2037,14 @@ class _AdminHomeCountersSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Column(
+      child: _buildCounterWrap(0, const []),
+    );
+  }
+
+  Widget _buildCounterWrap(int index, List<int> counts) {
+    if (index >= cards.length) {
+      final maxCount = counts.isEmpty ? 0 : counts.reduce((a, b) => a > b ? a : b);
+      return Column(
         crossAxisAlignment:
             isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
@@ -2065,12 +2058,23 @@ class _AdminHomeCountersSection extends StatelessWidget {
                 return _QuickStatCard(
                   item: item,
                   isArabic: isArabic,
+                  maxCount: maxCount,
                 );
               }).toList(),
             ),
           ),
         ],
-      ),
+      );
+    }
+
+    return StreamBuilder<int>(
+      stream: cards[index].stream,
+      builder: (context, snapshot) {
+        return _buildCounterWrap(
+          index + 1,
+          [...counts, snapshot.data ?? 0],
+        );
+      },
     );
   }
 }
@@ -3716,7 +3720,6 @@ class _QuickStatItem {
   final String title;
   final AdminVisualGroup? group;
   final Stream<int> stream;
-  final List<Stream<int>>? priorityPeers;
   final Stream<int>? crossSignalStream;
   final String route;
 
@@ -3724,7 +3727,6 @@ class _QuickStatItem {
     required this.title,
     this.group,
     required this.stream,
-    this.priorityPeers,
     this.crossSignalStream,
     required this.route,
   });
@@ -3734,10 +3736,12 @@ class _QuickStatCard extends StatelessWidget {
   const _QuickStatCard({
     required this.item,
     required this.isArabic,
+    required this.maxCount,
   });
 
   final _QuickStatItem item;
   final bool isArabic;
+  final int maxCount;
 
   @override
   Widget build(BuildContext context) {
@@ -3790,20 +3794,9 @@ class _QuickStatCard extends StatelessWidget {
                           : (isGatewaySignalsCounter
                               ? gatewaySignalsCountText
                               : countText))));
-          final priorityFuture = item.priorityPeers == null
-              ? null
-              : Future.wait(item.priorityPeers!.map((stream) => stream.first));
+          final isTopPriority = (count ?? 0) > 0 && (count ?? 0) == maxCount;
 
-          return FutureBuilder<List<int>>(
-            future: priorityFuture,
-            builder: (context, prioritySnapshot) {
-              final priorityCounts = prioritySnapshot.data ?? const <int>[];
-              final maxCount = priorityCounts.isEmpty
-                  ? 0
-                  : priorityCounts.reduce((a, b) => a > b ? a : b);
-              final isTopPriority = (count ?? 0) > 0 && (count ?? 0) == maxCount;
-
-              return Column(
+          return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   item.crossSignalStream == null
@@ -3943,9 +3936,6 @@ class _QuickStatCard extends StatelessWidget {
                       height: 1.2,
                     ),
                   ),
-                ],
-              );
-            },
           );
         },
           ),
