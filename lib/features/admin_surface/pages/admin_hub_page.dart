@@ -114,7 +114,10 @@ class _AdminHubPageState extends State<AdminHubPage> {
 
     _sessionsActionStream = FirebaseFirestore.instance
         .collection('booking_requests')
-        .where('status', isEqualTo: 'session_setup_pending')
+        .where('status', whereIn: [
+          'session_setup_pending',
+          'reschedule_pending',
+        ])
         .snapshots()
         .map((snapshot) => snapshot.docs.length)
         .asBroadcastStream();
