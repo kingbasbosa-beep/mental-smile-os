@@ -136,44 +136,12 @@ class _AdminHubPageState extends State<AdminHubPage> {
         .map((threads) => threads.length)
         .asBroadcastStream();
 
-    _pendingApprovalsStream =
-        Stream<int>.multi((controller) {
-          int clinicianPending = 0;
-          int profilePending = 0;
-          int centersPending = 0;
-
-          void emit() {
-            controller.add(clinicianPending + profilePending + centersPending);
-          }
-
-          final clinicianSub = _clinicianPendingStream.listen(
-            (value) {
-              clinicianPending = value;
-              emit();
-            },
-            onError: controller.addError,
-          );
-          final profileSub = _clinicianProfileRequestsStream.listen(
-            (value) {
-              profilePending = value;
-              emit();
-            },
-            onError: controller.addError,
-          );
-          final centersSub = _centersPendingStream.listen(
-            (value) {
-              centersPending = value;
-              emit();
-            },
-            onError: controller.addError,
-          );
-
-          controller.onCancel = () async {
-            await clinicianSub.cancel();
-            await profileSub.cancel();
-            await centersSub.cancel();
-          };
-        }).asBroadcastStream();
+    _pendingApprovalsStream = FirebaseFirestore.instance
+        .collection('clinicians')
+        .where('status', isEqualTo: 'pending')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length)
+        .asBroadcastStream();
 
     _gatewayAttentionStream =
         Stream<int>.value(AdminHubPage._gatewayMonitor.attentionCount())
