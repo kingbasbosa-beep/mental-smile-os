@@ -3922,22 +3922,23 @@ class _QuickStatCard extends StatelessWidget {
                           ),
                         );
                       },
-                        ),
+                    ),
                   const SizedBox(height: 4),
                   Text(
                     statusText,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: const Color(0xFFE6DAB6),
+                    style: const TextStyle(
+                      color: Color(0xFFE6DAB6),
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       height: 1.2,
                     ),
                   ),
-          );
-        },
+                ],
+              );
+            },
           ),
         ),
       ),
