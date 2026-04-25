@@ -131,9 +131,14 @@ class _AdminHubPageState extends State<AdminHubPage> {
         .map((snapshot) => snapshot.docs.length)
         .asBroadcastStream();
 
-    _gatewayAttentionStream =
-        Stream<int>.value(AdminHubPage._gatewayMonitor.attentionCount())
-            .asBroadcastStream();
+    _gatewayAttentionStream = Stream<int>.fromFuture(
+      Future<int>(() {
+        final families = AdminHubPage._gatewayMonitor.familyStatuses();
+        return families
+            .where((family) => family.level != GatewayHealthLevel.healthy)
+            .length;
+      }),
+    ).asBroadcastStream();
   }
 
   Stream<_SystemAdvisorySummary> _systemAdvisoryStream() {
@@ -3723,6 +3728,7 @@ class _QuickStatCard extends StatelessWidget {
           final isPaymentReviewCounter = item.group == AdminVisualGroup.payments;
           final isSessionReadinessCounter = item.group == AdminVisualGroup.sessions;
           final isHumanReviewCounter = item.group == AdminVisualGroup.support;
+          final isGatewaySignalsCounter = item.group == AdminVisualGroup.system;
           final waiting =
               snapshot.connectionState == ConnectionState.waiting &&
                   !snapshot.hasData;
@@ -3737,6 +3743,8 @@ class _QuickStatCard extends StatelessWidget {
               hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
           final sessionReadinessCountText =
               hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
+          final gatewaySignalsCountText =
+              hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
           final statusText = hasError
               ? (isArabic ? 'تعذر التحميل' : 'Load failed')
               : (waiting
@@ -3750,7 +3758,9 @@ class _QuickStatCard extends StatelessWidget {
                       ? sessionReadinessCountText
                       : (isHumanReviewCounter
                           ? humanReviewCountText
-                          : countText)));
+                          : (isGatewaySignalsCounter
+                              ? gatewaySignalsCountText
+                              : countText))));
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
