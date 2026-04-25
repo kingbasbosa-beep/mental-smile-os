@@ -114,16 +114,9 @@ class _AdminHubPageState extends State<AdminHubPage> {
 
     _sessionsActionStream = FirebaseFirestore.instance
         .collection('booking_requests')
+        .where('status', isEqualTo: 'session_setup_pending')
         .snapshots()
-        .map((snapshot) => snapshot.docs.where((doc) {
-              final data = doc.data();
-              final status = (data['status'] ?? '').toString();
-              return status == 'session_setup_pending' ||
-                  status == 'session_scheduled' ||
-                  status == 'session_in_progress' ||
-                  status == 'reschedule_pending' ||
-                  status == 'session_completed_pending_reviews';
-            }).length)
+        .map((snapshot) => snapshot.docs.length)
         .asBroadcastStream();
 
     _escalationsOpenStream = ChatFirestoreService()
@@ -275,6 +268,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
         title: isArabic ? 'إشارات طلبات مفتوحة' : 'Open request signals',
         group: AdminVisualGroup.requests,
         stream: _bookingOpenStream,
+        crossSignalStream: _escalationsOpenStream,
       ),
       _QuickStatItem(
         title: isArabic ? 'السداد تحت المراجعة' : 'Payment review',
@@ -290,6 +284,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
         title: isArabic ? 'حالات دعم مصعّدة' : 'Escalated Support Cases',
         group: AdminVisualGroup.support,
         stream: _escalationsOpenStream,
+        crossSignalStream: _bookingOpenStream,
       ),
       _QuickStatItem(
         title: isArabic ? 'بوابات اعتماد معلقة' : 'Pending approval gates',
@@ -3696,11 +3691,13 @@ class _QuickStatItem {
   final String title;
   final AdminVisualGroup? group;
   final Stream<int> stream;
+  final Stream<int>? crossSignalStream;
 
   const _QuickStatItem({
     required this.title,
     this.group,
     required this.stream,
+    this.crossSignalStream,
   });
 }
 
@@ -3724,6 +3721,7 @@ class _QuickStatCard extends StatelessWidget {
         builder: (context, snapshot) {
           final isOpenRequestsCounter = item.group == AdminVisualGroup.requests;
           final isPaymentReviewCounter = item.group == AdminVisualGroup.payments;
+          final isSessionReadinessCounter = item.group == AdminVisualGroup.sessions;
           final isHumanReviewCounter = item.group == AdminVisualGroup.support;
           final waiting =
               snapshot.connectionState == ConnectionState.waiting &&
@@ -3737,69 +3735,142 @@ class _QuickStatCard extends StatelessWidget {
               hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
           final paymentReviewCountText =
               hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
+          final sessionReadinessCountText =
+              hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
           final statusText = hasError
               ? (isArabic ? 'تعذر التحميل' : 'Load failed')
               : (waiting
                   ? (isArabic ? 'جارٍ التحديث' : 'Updating')
                   : item.title);
+          final displayCountText = isOpenRequestsCounter
+              ? openRequestsCountText
+              : (isPaymentReviewCounter
+                  ? paymentReviewCountText
+                  : (isSessionReadinessCounter
+                      ? sessionReadinessCountText
+                      : (isHumanReviewCounter
+                          ? humanReviewCountText
+                          : countText)));
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                width: 76,
-                height: 42,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF10161A).withValues(alpha: 0.92),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(
-                    color: const Color(0xFFD8B26A).withValues(
-                      alpha: (count ?? 0) > 0 ? 0.40 : 0.30,
-                    ),
-                    width: 1.1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFD8B26A).withValues(
-                        alpha: (count ?? 0) > 0 ? 0.08 : 0.04,
-                      ),
-                      blurRadius: 5,
-                      spreadRadius: 0.1,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      isOpenRequestsCounter
-                          ? openRequestsCountText
-                          : (isPaymentReviewCounter
-                              ? paymentReviewCountText
-                              : (isHumanReviewCounter
-                                  ? humanReviewCountText
-                                  : countText)),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: color,
-                        fontSize: 21,
-                        fontWeight: FontWeight.w900,
-                        height: 1,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      width: 24,
-                      height: 3,
+              item.crossSignalStream == null
+                  ? Container(
+                      width: 76,
+                      height: 42,
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.62),
+                        color: const Color(0xFF10161A).withValues(alpha: 0.92),
                         borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                          color: const Color(0xFFD8B26A).withValues(
+                            alpha: (count ?? 0) > 0 ? 0.40 : 0.30,
+                          ),
+                          width: 1.1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFD8B26A).withValues(
+                              alpha: (count ?? 0) > 0 ? 0.08 : 0.04,
+                            ),
+                            blurRadius: 5,
+                            spreadRadius: 0.1,
+                          ),
+                        ],
                       ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            displayCountText,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: color,
+                              fontSize: 21,
+                              fontWeight: FontWeight.w900,
+                              height: 1,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            width: 24,
+                            height: 3,
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.62),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : StreamBuilder<int>(
+                      stream: item.crossSignalStream,
+                      builder: (context, crossSnapshot) {
+                        final crossSignalActive =
+                            (count ?? 0) > 0 && (crossSnapshot.data ?? 0) > 0;
+                        return Container(
+                          width: 76,
+                          height: 42,
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF10161A).withValues(alpha: 0.92),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(
+                              color: const Color(0xFFD8B26A).withValues(
+                                alpha: crossSignalActive
+                                    ? 0.46
+                                    : ((count ?? 0) > 0 ? 0.40 : 0.30),
+                              ),
+                              width: 1.1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFD8B26A).withValues(
+                                  alpha: crossSignalActive
+                                      ? 0.10
+                                      : ((count ?? 0) > 0 ? 0.08 : 0.04),
+                                ),
+                                blurRadius: 5,
+                                spreadRadius: 0.1,
+                              ),
+                              if (crossSignalActive)
+                                BoxShadow(
+                                  color: const Color(0xFF3E7C6F).withValues(
+                                    alpha: 0.05,
+                                  ),
+                                  blurRadius: 6,
+                                  spreadRadius: 0.15,
+                                ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                displayCountText,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: color,
+                                  fontSize: 21,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                width: 24,
+                                height: 3,
+                                decoration: BoxDecoration(
+                                  color: color.withValues(alpha: 0.62),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                  ],
-                ),
-              ),
               const SizedBox(height: 4),
               Text(
                 statusText,
