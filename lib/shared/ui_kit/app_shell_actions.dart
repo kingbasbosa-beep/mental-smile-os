@@ -15,8 +15,15 @@ class AppShellActions {
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
     return AppBar(
-      title: Text(title),
-      backgroundColor: Colors.white.withValues(alpha: 0.90),
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Color(0xFFC9A75B),
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+      backgroundColor: const Color(0xFF0F1316).withValues(alpha: 0.96),
+      foregroundColor: const Color(0xFFC9A75B),
       elevation: 0,
       leading: IconButton(
         onPressed: () {
@@ -29,7 +36,7 @@ class AppShellActions {
             );
           }
         },
-        icon: const Icon(Icons.arrow_back),
+        icon: const Icon(Icons.arrow_back, color: Color(0xFFC9A75B)),
         tooltip: isArabic ? 'رجوع' : 'Back',
       ),
       actions: [
@@ -44,7 +51,7 @@ class AppShellActions {
                 (route) => false,
               );
             },
-            icon: const Icon(Icons.logout_rounded, color: AppColors.deepTeal),
+            icon: const Icon(Icons.logout_rounded, color: Color(0xFFC9A75B)),
           ),
       ],
       bottom: showAccountBadge
@@ -86,6 +93,7 @@ class _AccountRoleBanner extends StatelessWidget {
             return Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+              color: const Color(0xFF0F1316).withValues(alpha: 0.96),
               alignment: Alignment.centerRight,
               child: Wrap(
                 spacing: 8,
@@ -98,10 +106,10 @@ class _AccountRoleBanner extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.deepTeal.withValues(alpha: 0.10),
+                      color: const Color(0xFF12181D).withValues(alpha: 0.92),
                       borderRadius: BorderRadius.circular(999),
                       border: Border.all(
-                        color: AppColors.deepTeal.withValues(alpha: 0.22),
+                        color: const Color(0xFFD8B26A).withValues(alpha: 0.18),
                       ),
                     ),
                     child: Text(
@@ -109,7 +117,7 @@ class _AccountRoleBanner extends StatelessWidget {
                           ? 'الحساب الحالي: $role'
                           : 'Current account: $role',
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: AppColors.deepTeal,
+                            color: const Color(0xFFC9A75B),
                             fontWeight: FontWeight.w700,
                           ),
                     ),
@@ -117,7 +125,7 @@ class _AccountRoleBanner extends StatelessWidget {
                   Text(
                     identity,
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          color: Colors.black54,
+                          color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                         ),
                   ),
                 ],

@@ -134,15 +134,29 @@ class AdminDomainStatusPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF0F1316),
       appBar: AppShellActions.buildAppBar(
         context,
         title: 'System Domains',
       ),
-      body: AppPageBackground(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF13191D),
+              Color(0xFF0F1316),
+              Color(0xFF151B1F),
+            ],
+          ),
+        ),
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
             AppSurfaceCard(
+              color: const Color(0xFF0B1014).withValues(alpha: 0.96),
+              borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -181,6 +195,9 @@ class AdminDomainStatusPage extends StatelessWidget {
                             status.statusSource == 'mixed';
 
                     return AppSurfaceCard(
+                      color: const Color(0xFF10161A).withValues(alpha: 0.94),
+                      borderColor:
+                          const Color(0xFFD8B26A).withValues(alpha: 0.18),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

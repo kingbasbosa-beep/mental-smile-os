@@ -14,7 +14,34 @@ import 'package:flutterprojects/features/admin_surface/models/analytics_summary_
 import 'package:flutterprojects/features/admin_surface/services/analytics_summary_repository.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
-import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
+
+enum AdminVisualGroup {
+  requests,
+  sessions,
+  payments,
+  support,
+  analytics,
+  system,
+}
+
+Color _adminVisualGroupColor(AdminVisualGroup? group) {
+  switch (group) {
+    case AdminVisualGroup.requests:
+      return const Color(0xFF5B6FA8);
+    case AdminVisualGroup.sessions:
+      return const Color(0xFF4F8FB8);
+    case AdminVisualGroup.payments:
+      return const Color(0xFF8A7468);
+    case AdminVisualGroup.support:
+      return const Color(0xFFC66A4A);
+    case AdminVisualGroup.analytics:
+      return const Color(0xFF6E5FA3);
+    case AdminVisualGroup.system:
+      return const Color(0xFF3E7C6F);
+    case null:
+      return AppColors.deepTeal;
+  }
+}
 
 // ADMIN_SURFACE: SAFE_UI
 class AdminHubPage extends StatefulWidget {
@@ -39,6 +66,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
   late final Stream<int> _escalationsOpenStream;
   late final Stream<int> _pendingApprovalsStream;
   late final Stream<int> _gatewayAttentionStream;
+  int _selectedDetailSectionIndex = 0;
 
   @override
   void initState() {
@@ -282,32 +310,32 @@ class _AdminHubPageState extends State<AdminHubPage> {
     final compactCounters = <_QuickStatItem>[
       _QuickStatItem(
         title: isArabic ? 'إشارات طلبات مفتوحة' : 'Open request signals',
-        color: const Color(0xFF7C6EF6),
+        group: AdminVisualGroup.requests,
         stream: _bookingOpenStream,
       ),
       _QuickStatItem(
         title: isArabic ? 'السداد تحت المراجعة' : 'Payment review',
-        color: const Color(0xFF9A7A6E),
+        group: AdminVisualGroup.payments,
         stream: _paymentsReviewStream,
       ),
       _QuickStatItem(
         title: isArabic ? 'إشارات جاهزية الجلسات' : 'Session readiness signals',
-        color: AppColors.info,
+        group: AdminVisualGroup.sessions,
         stream: _sessionsActionStream,
       ),
       _QuickStatItem(
         title: isArabic ? 'حالات دعم مصعّدة' : 'Escalated Support Cases',
-        color: const Color(0xFF6C55B3),
+        group: AdminVisualGroup.support,
         stream: _escalationsOpenStream,
       ),
       _QuickStatItem(
         title: isArabic ? 'بوابات اعتماد معلقة' : 'Pending approval gates',
-        color: const Color(0xFFE2A067),
+        group: AdminVisualGroup.requests,
         stream: _pendingApprovalsStream,
       ),
       _QuickStatItem(
         title: isArabic ? 'إشارات بوابات/أجهزة' : 'Gateway/device signals',
-        color: const Color(0xFF4D7C6A),
+        group: AdminVisualGroup.system,
         stream: _gatewayAttentionStream,
       ),
     ];
@@ -319,7 +347,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
             ? 'مراقبة الطلبات والمدفوعات والجلسات دون ملكية تشغيل يومية'
             : 'Monitor requests, payments, and sessions without daily operational ownership',
         icon: Icons.assignment_outlined,
-        color: const Color(0xFF7C6EF6),
+        group: AdminVisualGroup.requests,
         route: Routes.adminOperations,
       ),
       _AdminSectionLaunchCardData(
@@ -330,7 +358,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
             ? 'مراجعة بشرية مطلوبة وحالات دعم مصعّدة للمتابعة فقط'
             : 'Human review needed and escalated support cases for visibility only',
         icon: Icons.support_agent_outlined,
-        color: const Color(0xFFE58667),
+        group: AdminVisualGroup.support,
         route: Routes.adminCommunications,
       ),
       _AdminSectionLaunchCardData(
@@ -339,7 +367,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
             ? 'العملاء والمراكز وإشارات الاعتماد'
             : 'Clients, centers, and approval-gate visibility',
         icon: Icons.apartment_outlined,
-        color: const Color(0xFF37B8B0),
+        group: AdminVisualGroup.requests,
         route: Routes.adminClinicianRequests,
       ),
       _AdminSectionLaunchCardData(
@@ -348,7 +376,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
             ? 'سياسات الذكاء وحالة النطاقات'
             : 'Policies, domains, and governance visibility',
         icon: Icons.policy_outlined,
-        color: const Color(0xFF4F7BFF),
+        group: AdminVisualGroup.system,
         route: Routes.adminDomainStatus,
       ),
       _AdminSectionLaunchCardData(
@@ -357,7 +385,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
             ? 'حوكمة المحتوى والرسائل والمتابعة الداعمة'
             : 'Governance for content, support messaging, and follow-up care',
         icon: Icons.menu_book_outlined,
-        color: const Color(0xFF8D6E63),
+        group: AdminVisualGroup.support,
         route: Routes.adminContentCarePrograms,
       ),
       _AdminSectionLaunchCardData(
@@ -366,7 +394,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
             ? 'التوعية، التوزيع، وخطط الظهور المدروسة'
             : 'Awareness, distribution, and supervised exposure planning',
         icon: Icons.campaign_outlined,
-        color: const Color(0xFFB86E52),
+        group: AdminVisualGroup.analytics,
         route: Routes.adminGrowthLayer,
       ),
       _AdminSectionLaunchCardData(
@@ -375,7 +403,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
             ? 'قنوات وتكاملات وأجهزة وصيانة'
             : 'Channels, tools, devices, and maintenance',
         icon: Icons.hub_outlined,
-        color: const Color(0xFF3E8B7B),
+        group: AdminVisualGroup.system,
         route: Routes.adminGatewayLayer,
       ),
       _AdminSectionLaunchCardData(
@@ -384,7 +412,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
             ? 'مرجع تاريخي وتقارير مؤرشفة'
             : 'Historical lookup and archived reporting',
         icon: Icons.archive_outlined,
-        color: const Color(0xFF4D7C6A),
+        group: AdminVisualGroup.system,
         route: Routes.adminArchive,
       ),
     ];
@@ -393,21 +421,25 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminQuickActionItem(
         label: isArabic ? 'Support Email' : 'Support Email',
         icon: Icons.email_outlined,
+        group: AdminVisualGroup.system,
         route: Routes.adminCommunicationGateway,
       ),
       _AdminQuickActionItem(
         label: isArabic ? 'Messaging Governance' : 'Messaging Governance',
         icon: Icons.mark_chat_read_outlined,
+        group: AdminVisualGroup.support,
         route: Routes.adminSupportMessagingGovernance,
       ),
       _AdminQuickActionItem(
         label: isArabic ? 'Follow-up Governance' : 'Follow-up Governance',
         icon: Icons.volunteer_activism_outlined,
+        group: AdminVisualGroup.sessions,
         route: Routes.adminFollowupCareGovernance,
       ),
       _AdminQuickActionItem(
         label: isArabic ? 'Library Governance' : 'Library Governance',
         icon: Icons.local_library_outlined,
+        group: AdminVisualGroup.support,
         route: Routes.adminLibraryGovernance,
       ),
     ];
@@ -416,21 +448,25 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminQuickActionItem(
         label: isArabic ? 'System Activation Pack' : 'System Activation Pack',
         icon: Icons.inventory_2_outlined,
+        group: AdminVisualGroup.system,
         route: Routes.adminSystemActivationPack,
       ),
       _AdminQuickActionItem(
         label: isArabic ? 'Blueprint Handoff' : 'Blueprint Handoff',
         icon: Icons.map_outlined,
+        group: AdminVisualGroup.system,
         route: Routes.adminBlueprintHandoff,
       ),
       _AdminQuickActionItem(
         label: isArabic ? 'Compliance Checkpoints' : 'Compliance Checkpoints',
         icon: Icons.verified_outlined,
+        group: AdminVisualGroup.system,
         route: Routes.adminComplianceCheckpoints,
       ),
       _AdminQuickActionItem(
         label: isArabic ? 'Exposure Rules' : 'Exposure Rules',
         icon: Icons.visibility_outlined,
+        group: AdminVisualGroup.analytics,
         route: Routes.adminExposureRules,
       ),
     ];
@@ -447,6 +483,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
         secondaryActionLabel:
             isArabic ? 'Messaging Governance' : 'Messaging Governance',
         secondaryRoute: Routes.adminSupportMessagingGovernance,
+        group: AdminVisualGroup.support,
       ),
       _AdminGuidedWorkflowCardData(
         title: isArabic ? 'جاهزية المتابعة' : 'Follow-Up Readiness',
@@ -459,6 +496,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
         secondaryActionLabel:
             isArabic ? 'AI Follow-Up Boundaries' : 'AI Follow-Up Boundaries',
         secondaryRoute: Routes.adminAiFollowupBoundaries,
+        group: AdminVisualGroup.sessions,
       ),
       _AdminGuidedWorkflowCardData(
         title: isArabic ? 'مراجعة إدخال المحتوى' : 'Content Intake Review',
@@ -471,57 +509,313 @@ class _AdminHubPageState extends State<AdminHubPage> {
         secondaryActionLabel:
             isArabic ? 'Content & Care Programs' : 'Content & Care Programs',
         secondaryRoute: Routes.adminContentCarePrograms,
+        group: AdminVisualGroup.support,
+      ),
+    ];
+
+    final detailSections = <_AdminDetailPanelSection>[
+      _AdminDetailPanelSection(
+        title: isArabic ? 'المسارات الموجهة' : 'Guided Workflows',
+        subtitle: isArabic
+            ? 'إظهار المسارات الموجهة فقط عند الحاجة.'
+            : 'Guided review paths kept available without stretching the main hub.',
+        child: _AdminGuidedWorkflowsSection(
+          title: isArabic ? 'مسارات مراجعة موجهة' : 'Guided Review Paths',
+          subtitle: isArabic
+              ? 'تجميعات تنقل خفيفة للمراجعة والوعي فقط، وليست مسار تشغيل جديد.'
+              : 'Compact route groupings for review and awareness only, not a new operating workflow.',
+          workflows: guidedWorkflows,
+        ),
+      ),
+      _AdminDetailPanelSection(
+        title: isArabic ? 'المراجع' : 'References',
+        subtitle: isArabic
+            ? 'الروابط المرجعية والسياسات في قسم منفصل قابل للطي.'
+            : 'Reference pages and policy shortcuts kept below the fold.',
+        child: _AdminQuickActionsStrip(
+          title: isArabic ? 'مراجع أساسية' : 'Key References',
+          subtitle: isArabic
+              ? 'صفحات مرجعية تساعد غرفة التحكم على فهم الحدود والسياسات.'
+              : 'Reference pages that help the control room understand boundaries and policy.',
+          actions: keyReferences,
+        ),
+      ),
+      _AdminDetailPanelSection(
+        title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
+        subtitle: isArabic
+            ? 'حالة البوابات والاتصالات في قسم مضغوط.'
+            : 'Gateway status and connectivity details in a condensed section.',
+        child: _GatewaySummaryStrip(statuses: gatewayStatuses),
+      ),
+      _AdminDetailPanelSection(
+        title: isArabic ? 'متابعة تفصيلية' : 'Detailed Monitoring',
+        subtitle: isArabic
+            ? 'بطاقات التنبيه والصحة وإشارات البوابات في قسم واحد قابل للطي.'
+            : 'Alerts, health, and gateway signals in one collapsible section.',
+        child: Column(
+          children: [
+            const _ControlRoomIntro(),
+            const SizedBox(height: 2),
+            _ControlRoomDashboardLayout(
+              leftCards: const [
+                _OperationalAlertsCard(),
+                _AdminSystemHealthCard(),
+                _CriticalAlertsCard(),
+              ],
+              supervisoryCard: _GatewaySignalsCard(
+                statuses: gatewayStatuses,
+                gatewayMonitor: AdminHubPage._gatewayMonitor,
+              ),
+            ),
+          ],
+        ),
+      ),
+      _AdminDetailPanelSection(
+        title: isArabic ? 'تفاصيل التحليلات' : 'Analytics Details',
+        subtitle: isArabic
+            ? 'ملخص السلوك ومؤشرات المراقبة في قسم مختصر.'
+            : 'Behavior and monitoring analytics kept available without stretching the main page.',
+        child: _UserBehaviorAnalyticsPlaceholder(isArabic: isArabic),
       ),
     ];
 
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
-        backgroundColor: AppColors.warmIvory,
-        appBar: AppShellActions.buildAppBar(
-          context,
-          title: isArabic ? 'غرفة التحكم' : 'Control Room',
+        backgroundColor: const Color(0xFF0F1316),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          elevation: 0,
+          toolbarHeight: 42,
+          automaticallyImplyLeading: false,
+          titleSpacing: 0,
+          title: const SizedBox.shrink(),
+          leading: IconButton(
+            onPressed: () async {
+              final didPop = await Navigator.of(context).maybePop();
+              if (!didPop && context.mounted) {
+                Navigator.of(context).pushNamed(Routes.menu);
+              }
+            },
+            icon: const Icon(
+              Icons.logout,
+              color: Color(0xFFE8D7A5),
+            ),
+          ),
         ),
-        body: AppPageBackground(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final width = constraints.maxWidth;
-              int crossAxisCount = 3;
-              double childAspectRatio = 1.58;
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFF13191D),
+                Color(0xFF0F1316),
+                Color(0xFF151B1F),
+              ],
+            ),
+          ),
+          child: Stack(
+            children: [
+              const Positioned.fill(
+                child: IgnorePointer(
+                  child: _AdminHubAmbientBackground(),
+                ),
+              ),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth;
 
-              if (width < 1150) {
-                crossAxisCount = 2;
-                childAspectRatio = 1.58;
-              }
-              if (width < 700) {
-                crossAxisCount = 1;
-                childAspectRatio = 2.05;
-              }
-
-              return ListView(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                children: [
-                  const Center(
-                    child: AppLogoWordmark(width: 220, height: 128),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _SystemAdvisoryCard(
-                    advisoryStream: _systemAdvisoryStream(),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _AdminHomeCountersSection(
-                    isArabic: isArabic,
-                    cards: compactCounters,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _AdminQuickActionsStrip(
+                  return ListView(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.sm,
+                      2,
+                      AppSpacing.sm,
+                      AppSpacing.sm,
+                    ),
+                    children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 5,
+                        child: _AdminQuickActionsStrip(
                     title: isArabic ? 'اختصارات مرجعية' : 'Reference Shortcuts',
                     subtitle: isArabic
                         ? 'وصول سريع لأسطح الحوكمة والدعم دون تحويل الصفحة إلى سطح تنفيذ.'
                         : 'Fast access to governance and support surfaces without turning the hub into an execution console.',
                     actions: quickActions,
+                    vertical: true,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        flex: 7,
+                        child: _AdminHomeCountersSection(
+                          isArabic: isArabic,
+                          cards: compactCounters,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.lg),
+                  SizedBox(height: width >= 960 ? 1 : 2),
+                  if (width >= 960)
+                    Row(
+                      textDirection: TextDirection.ltr,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 7,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: _AdminSectionLaunchpad(cards: sectionCards),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          flex: 5,
+                          child: _AdminFixedDetailPanel(
+                            isArabic: isArabic,
+                            sections: detailSections,
+                            selectedIndex: _selectedDetailSectionIndex,
+                            onSelected: (index) {
+                              if (_selectedDetailSectionIndex == index) return;
+                              setState(() {
+                                _selectedDetailSectionIndex = index;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (false && width >= 960)
+                    Row(
+                      textDirection: TextDirection.ltr,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 7,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: _AdminSectionLaunchpad(cards: sectionCards),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          flex: 5,
+                          child: Stack(
+                            children: [
+                              _AdminFixedDetailPanel(
+                                isArabic: isArabic,
+                                sections: detailSections,
+                                selectedIndex: _selectedDetailSectionIndex,
+                                onSelected: (index) {
+                                  if (_selectedDetailSectionIndex == index) return;
+                                  setState(() {
+                                    _selectedDetailSectionIndex = index;
+                                  });
+                                },
+                              ),
+                              Offstage(
+                                offstage: true,
+                                child: Column(
+                                  children: [
+                              _HubExpandableSection(
+                                title: isArabic ? 'المسارات الموجهة' : 'Guided Workflows',
+                                subtitle: isArabic
+                                    ? 'إظهار المسارات الموجهة فقط عند الحاجة.'
+                                    : 'Guided review paths kept available without stretching the main hub.',
+                                child: Column(
+                                  children: [
+                                    _AdminGuidedWorkflowsSection(
+                                      title: isArabic ? 'مسارات مراجعة موجهة' : 'Guided Review Paths',
+                                      subtitle: isArabic
+                                          ? 'تجميعات تنقل خفيفة للمراجعة والوعي فقط، وليست مسار تشغيل جديد.'
+                                          : 'Compact route groupings for review and awareness only, not a new operating workflow.',
+                                      workflows: guidedWorkflows,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 0.5),
+                              _HubExpandableSection(
+                                title: isArabic ? 'المراجع' : 'References',
+                                subtitle: isArabic
+                                    ? 'الروابط المرجعية والسياسات في قسم منفصل قابل للطي.'
+                                    : 'Reference pages and policy shortcuts kept below the fold.',
+                                child: _AdminQuickActionsStrip(
+                                  title: isArabic ? 'مراجع أساسية' : 'Key References',
+                                  subtitle: isArabic
+                                      ? 'صفحات مرجعية تساعد غرفة التحكم على فهم الحدود والسياسات.'
+                                      : 'Reference pages that help the control room understand boundaries and policy.',
+                                  actions: keyReferences,
+                                ),
+                              ),
+                              const SizedBox(height: 1),
+                              _HubExpandableSection(
+                                title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
+                                subtitle: isArabic
+                                    ? 'حالة البوابات والاتصالات في قسم مضغوط.'
+                                    : 'Gateway status and connectivity details in a condensed section.',
+                                child: _GatewaySummaryStrip(statuses: gatewayStatuses),
+                              ),
+                              const SizedBox(height: 2),
+                              _HubExpandableSection(
+                                title: isArabic ? 'متابعة تفصيلية' : 'Detailed Monitoring',
+                                subtitle: isArabic
+                                    ? 'بطاقات التنبيه والصحة وإشارات البوابات في قسم واحد قابل للطي.'
+                                    : 'Alerts, health, and gateway signals in one collapsible section.',
+                                child: Column(
+                                  children: [
+                                    const _ControlRoomIntro(),
+                                    const SizedBox(height: 2),
+                                    _ControlRoomDashboardLayout(
+                                      leftCards: const [
+                                        _OperationalAlertsCard(),
+                                        _AdminSystemHealthCard(),
+                                        _CriticalAlertsCard(),
+                                      ],
+                                      supervisoryCard: _GatewaySignalsCard(
+                                        statuses: gatewayStatuses,
+                                        gatewayMonitor: AdminHubPage._gatewayMonitor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              _HubExpandableSection(
+                                title: isArabic ? 'تفاصيل التحليلات' : 'Analytics Details',
+                                subtitle: isArabic
+                                    ? 'ملخص السلوك ومؤشرات المراقبة في قسم مختصر قابل للطي.'
+                                    : 'Behavior and monitoring analytics kept available without stretching the main page.',
+                                child: _UserBehaviorAnalyticsPlaceholder(isArabic: isArabic),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (width < 960)
+                    _AdminSectionLaunchpad(cards: sectionCards),
+                  const SizedBox(height: 2),
+                  _SystemAdvisoryCard(
+                    advisoryStream: _systemAdvisoryStream(),
+                  ),
+                  if (width < 960) const SizedBox(height: 2),
+                  if (width < 960)
+                    _HubExpandableSection(
+                    title: isArabic ? 'المسارات الموجهة' : 'Guided Workflows',
+                    subtitle: isArabic
+                        ? 'إظهار المسارات الموجهة فقط عند الحاجة.'
+                        : 'Guided review paths kept available without stretching the main hub.',
+                    child: Column(
+                      children: [
                   _AdminGuidedWorkflowsSection(
                     title: isArabic ? 'مسارات مراجعة موجهة' : 'Guided Review Paths',
                     subtitle: isArabic
@@ -529,19 +823,45 @@ class _AdminHubPageState extends State<AdminHubPage> {
                         : 'Compact route groupings for review and awareness only, not a new operating workflow.',
                     workflows: guidedWorkflows,
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  _AdminQuickActionsStrip(
+                      ],
+                    ),
+                  ),
+                  if (width < 960) const SizedBox(height: 2),
+                  if (width < 960)
+                    _HubExpandableSection(
+                    title: isArabic ? 'المراجع' : 'References',
+                    subtitle: isArabic
+                        ? 'الروابط المرجعية والسياسات في قسم منفصل قابل للطي.'
+                        : 'Reference pages and policy shortcuts kept below the fold.',
+                    child: _AdminQuickActionsStrip(
                     title: isArabic ? 'مراجع أساسية' : 'Key References',
                     subtitle: isArabic
                         ? 'صفحات مرجعية تساعد غرفة التحكم على فهم الحدود والسياسات.'
                         : 'Reference pages that help the control room understand boundaries and policy.',
                     actions: keyReferences,
                   ),
-                  const SizedBox(height: AppSpacing.lg),
+                  ),
+                  if (width < 960) const SizedBox(height: 2),
+                  if (width < 960)
+                    _HubExpandableSection(
+                    title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
+                    subtitle: isArabic
+                        ? 'حالة البوابات والاتصالات في قسم مضغوط.'
+                        : 'Gateway status and connectivity details in a condensed section.',
+                    child:
                   _GatewaySummaryStrip(statuses: gatewayStatuses),
-                  const SizedBox(height: AppSpacing.lg),
+                  ),
+                  if (width < 960) const SizedBox(height: 2),
+                  if (width < 960)
+                    _HubExpandableSection(
+                    title: isArabic ? 'متابعة تفصيلية' : 'Detailed Monitoring',
+                    subtitle: isArabic
+                        ? 'بطاقات التنبيه والصحة وإشارات البوابات في قسم واحد قابل للطي.'
+                        : 'Alerts, health, and gateway signals in one collapsible section.',
+                    child: Column(
+                      children: [
                   const _ControlRoomIntro(),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: 2),
                   _ControlRoomDashboardLayout(
                     leftCards: const [
                       _OperationalAlertsCard(),
@@ -553,19 +873,386 @@ class _AdminHubPageState extends State<AdminHubPage> {
                       gatewayMonitor: AdminHubPage._gatewayMonitor,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  _UserBehaviorAnalyticsPlaceholder(isArabic: isArabic),
-                  const SizedBox(height: AppSpacing.lg),
-                  _AdminSectionLaunchpad(
-                    cards: sectionCards,
-                    crossAxisCount: crossAxisCount,
-                    childAspectRatio: childAspectRatio,
+                      ],
+                    ),
                   ),
-                ],
-              );
-            },
+                  if (width < 960) const SizedBox(height: AppSpacing.sm),
+                  if (width < 960)
+                    _HubExpandableSection(
+                    title: isArabic ? 'تفاصيل التحليلات' : 'Analytics Details',
+                    subtitle: isArabic
+                        ? 'ملخص السلوك ومؤشرات المراقبة في قسم مختصر قابل للطي.'
+                        : 'Behavior and monitoring analytics kept available without stretching the main page.',
+                    child: _UserBehaviorAnalyticsPlaceholder(isArabic: isArabic),
+                  ),
+                    ],
+                  );
+                },
+              ),
+            ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _HubExpandableSection extends StatelessWidget {
+  const _HubExpandableSection({
+    required this.title,
+    required this.subtitle,
+    required this.child,
+  });
+
+  final String title;
+  final String subtitle;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+    return Theme(
+      data: theme.copyWith(
+        dividerColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+      ),
+      child: Align(
+        alignment: isRtl ? Alignment.centerRight : Alignment.centerLeft,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: ExpansionTile(
+            controlAffinity: isRtl
+                ? ListTileControlAffinity.leading
+                : ListTileControlAffinity.trailing,
+            tilePadding: EdgeInsets.zero,
+            childrenPadding: const EdgeInsets.only(top: 1),
+            visualDensity: const VisualDensity(horizontal: -2, vertical: -3),
+            minTileHeight: 32,
+            title: Tooltip(
+              message: subtitle,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF12181D).withValues(alpha: 0.92),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: const Color(0xFFD8B26A).withValues(alpha: 0.18),
+                    width: 0.8,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 2,
+                      height: 18,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(999),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            const Color(0xFFD8B26A).withValues(alpha: 0.42),
+                            const Color(0xFF3E9B90).withValues(alpha: 0.26),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        title,
+                        textAlign: isRtl ? TextAlign.right : TextAlign.left,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 18,
+                          color: const Color(0xFFF1E5C8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10161A).withValues(alpha: 0.94),
+                  borderRadius: BorderRadius.circular(AppRadii.lg),
+                  border: Border.all(
+                    color: const Color(0xFFD8B26A).withValues(alpha: 0.18),
+                    width: 0.8,
+                  ),
+                ),
+                child: child,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AdminDetailPanelSection {
+  const _AdminDetailPanelSection({
+    required this.title,
+    required this.subtitle,
+    required this.child,
+  });
+
+  final String title;
+  final String subtitle;
+  final Widget child;
+}
+
+class _AdminFixedDetailPanel extends StatelessWidget {
+  const _AdminFixedDetailPanel({
+    required this.isArabic,
+    required this.sections,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  final bool isArabic;
+  final List<_AdminDetailPanelSection> sections;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final safeIndex =
+        selectedIndex >= 0 && selectedIndex < sections.length ? selectedIndex : 0;
+    final selected = sections[safeIndex];
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+
+    return Column(
+      crossAxisAlignment:
+          isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          alignment: isRtl ? WrapAlignment.end : WrapAlignment.start,
+          runSpacing: 4,
+          spacing: 4,
+          children: List.generate(sections.length, (index) {
+            final item = sections[index];
+            final isSelected = index == safeIndex;
+            return Tooltip(
+              message: item.subtitle,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(999),
+                onTap: () => onSelected(index),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? const Color(0xFF171E23).withValues(alpha: 0.94)
+                        : const Color(0xFF10161A).withValues(alpha: 0.76),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                      color: isSelected
+                          ? const Color(0xFFD8B26A).withValues(alpha: 0.28)
+                          : const Color(0xFF3E9B90).withValues(alpha: 0.14),
+                      width: 0.7,
+                    ),
+                  ),
+                  child: Text(
+                    item.title,
+                    textAlign: isRtl ? TextAlign.right : TextAlign.left,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: isSelected
+                              ? const Color(0xFFC9A75B)
+                              : const Color(0xFF314A5C).withValues(alpha: 0.88),
+                        ),
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
+        const SizedBox(height: 6),
+        SizedBox(
+          height: 360,
+          child: AppSurfaceCard(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            color: const Color(0xFF080D10).withValues(alpha: 0.98),
+            borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.24),
+            child: SingleChildScrollView(
+              child: selected.child,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AdminHubAmbientBackground extends StatelessWidget {
+  const _AdminHubAmbientBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Positioned(
+          top: 40,
+          left: 80,
+          child: _AmbientDisc(
+            size: 320,
+            glowColor: const Color(0xFFD8B26A).withValues(alpha: 0.16),
+            ringColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
+          ),
+        ),
+        Positioned(
+          top: 260,
+          left: 220,
+          child: _AmbientDisc(
+            size: 336,
+            glowColor: const Color(0xFFD8B26A).withValues(alpha: 0.09),
+            ringColor: const Color(0xFF3E9B90).withValues(alpha: 0.14),
+          ),
+        ),
+        Positioned(
+          top: 84,
+          right: 48,
+          child: Container(
+            width: 1,
+            height: 280,
+            color: const Color(0xFF3E9B90).withValues(alpha: 0.12),
+          ),
+        ),
+        Positioned(
+          top: 112,
+          left: 52,
+          child: Container(
+            width: 1,
+            height: 240,
+            color: const Color(0xFF3E9B90).withValues(alpha: 0.09),
+          ),
+        ),
+        Positioned(
+          top: 96,
+          right: 20,
+          child: _EdgeTempleHint(
+            height: 320,
+            color: const Color(0xFFD8B26A).withValues(alpha: 0.03),
+          ),
+        ),
+        Positioned(
+          top: 124,
+          left: 20,
+          child: _EdgeTempleHint(
+            height: 280,
+            color: const Color(0xFFD8B26A).withValues(alpha: 0.024),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AmbientDisc extends StatelessWidget {
+  const _AmbientDisc({
+    required this.size,
+    required this.glowColor,
+    required this.ringColor,
+  });
+
+  final double size;
+  final Color glowColor;
+  final Color ringColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  glowColor,
+                  glowColor.withValues(alpha: glowColor.a * 0.35),
+                  Colors.transparent,
+                ],
+                stops: const [0.0, 0.42, 1.0],
+              ),
+            ),
+          ),
+          Container(
+            width: size * 0.74,
+            height: size * 0.74,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: ringColor, width: 1),
+            ),
+          ),
+          Container(
+            width: size * 0.52,
+            height: size * 0.52,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: ringColor.withValues(alpha: ringColor.a * 0.75),
+                width: 0.8,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EdgeTempleHint extends StatelessWidget {
+  const _EdgeTempleHint({
+    required this.height,
+    required this.color,
+  });
+
+  final double height;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 18,
+      height: height,
+      child: Column(
+        children: [
+          Container(
+            width: 18,
+            height: 3,
+            color: color,
+          ),
+          const SizedBox(height: 6),
+          Expanded(
+            child: Container(
+              width: 10,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    color,
+                    color.withValues(alpha: color.a * 0.55),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -576,14 +1263,14 @@ class _AdminSectionLaunchCardData {
     required this.title,
     required this.subtitle,
     required this.icon,
-    required this.color,
+    this.group,
     required this.route,
   });
 
   final String title;
   final String subtitle;
   final IconData icon;
-  final Color color;
+  final AdminVisualGroup? group;
   final String route;
 }
 
@@ -591,11 +1278,13 @@ class _AdminQuickActionItem {
   const _AdminQuickActionItem({
     required this.label,
     required this.icon,
+    this.group,
     required this.route,
   });
 
   final String label;
   final IconData icon;
+  final AdminVisualGroup? group;
   final String route;
 }
 
@@ -607,6 +1296,7 @@ class _AdminGuidedWorkflowCardData {
     required this.primaryRoute,
     required this.secondaryActionLabel,
     required this.secondaryRoute,
+    this.group,
   });
 
   final String title;
@@ -615,6 +1305,7 @@ class _AdminGuidedWorkflowCardData {
   final String primaryRoute;
   final String secondaryActionLabel;
   final String secondaryRoute;
+  final AdminVisualGroup? group;
 }
 
 class _AdminQuickActionsStrip extends StatelessWidget {
@@ -622,53 +1313,107 @@ class _AdminQuickActionsStrip extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.actions,
+    this.vertical = false,
   });
 
   final String title;
   final String subtitle;
   final List<_AdminQuickActionItem> actions;
+  final bool vertical;
 
   @override
   Widget build(BuildContext context) {
-    return AppSurfaceCard(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            subtitle,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.70),
-                ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: actions
-                .map(
-                  (action) => ActionChip(
-                    avatar: Icon(
-                      action.icon,
-                      size: 18,
-                      color: AppColors.info,
-                    ),
-                    label: Text(action.label),
-                    onPressed: () =>
-                        Navigator.of(context).pushNamed(action.route),
+          if (vertical)
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final chipWidth = constraints.maxWidth >= 360
+                    ? (constraints.maxWidth - 4) / 2
+                    : constraints.maxWidth;
+                return Align(
+                  alignment:
+                      isRtl ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Wrap(
+                    alignment: isRtl ? WrapAlignment.end : WrapAlignment.start,
+                    spacing: 4,
+                    runSpacing: 4,
+                    children: actions.map((action) {
+                      final color = _adminVisualGroupColor(action.group);
+                      return SizedBox(
+                        width: chipWidth,
+                        child: ActionChip(
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: const VisualDensity(
+                            horizontal: -2,
+                            vertical: -2,
+                          ),
+                          backgroundColor:
+                              const Color(0xFF182026).withValues(alpha: 0.88),
+                          side: BorderSide(
+                            color: const Color(0xFFD8B26A).withValues(alpha: 0.20),
+                          ),
+                          avatar: Icon(
+                            action.icon,
+                            size: 18,
+                            color: color,
+                          ),
+                          label: Text(
+                            action.label,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xFFF1E5C8),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          onPressed: () =>
+                              Navigator.of(context).pushNamed(action.route),
+                        ),
+                      );
+                    }).toList(),
                   ),
-                )
-                .toList(),
-          ),
+                );
+              },
+            )
+          else
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: actions
+                  .map(
+                    (action) {
+                      final color = _adminVisualGroupColor(action.group);
+                      return ActionChip(
+                        backgroundColor:
+                            const Color(0xFF182026).withValues(alpha: 0.88),
+                        side: BorderSide(
+                          color: const Color(0xFFD8B26A).withValues(alpha: 0.18),
+                        ),
+                        avatar: Icon(
+                          action.icon,
+                          size: 18,
+                          color: color,
+                        ),
+                        label: Text(
+                          action.label,
+                          style: const TextStyle(
+                            color: Color(0xFFF1E5C8),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        onPressed: () =>
+                            Navigator.of(context).pushNamed(action.route),
+                      );
+                    },
+                  )
+                  .toList(),
+            ),
         ],
       ),
     );
@@ -690,6 +1435,8 @@ class _AdminGuidedWorkflowsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppSurfaceCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
+      color: const Color(0xFF0B1014).withValues(alpha: 0.96),
+      borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -697,6 +1444,7 @@ class _AdminGuidedWorkflowsSection extends StatelessWidget {
             title,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w800,
+                  color: const Color(0xFFC9A75B),
                 ),
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -705,7 +1453,7 @@ class _AdminGuidedWorkflowsSection extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.70),
+                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                 ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -753,7 +1501,10 @@ class _AdminGuidedWorkflowCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = _adminVisualGroupColor(item.group);
     return AppSectionPanel(
+      color: const Color(0xFF10161A).withValues(alpha: 0.94),
+      borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.20),
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -762,6 +1513,7 @@ class _AdminGuidedWorkflowCard extends StatelessWidget {
             item.title,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
+                  color: const Color(0xFFC9A75B),
                 ),
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -770,7 +1522,7 @@ class _AdminGuidedWorkflowCard extends StatelessWidget {
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.72),
+                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                   height: 1.3,
                 ),
           ),
@@ -781,11 +1533,23 @@ class _AdminGuidedWorkflowCard extends StatelessWidget {
             children: [
               OutlinedButton(
                 onPressed: () => Navigator.of(context).pushNamed(item.primaryRoute),
+                style: OutlinedButton.styleFrom(
+                                  foregroundColor: const Color(0xFFC9A75B),
+                  side: BorderSide(
+                    color: color.withValues(alpha: 0.42),
+                  ),
+                ),
                 child: Text(item.primaryActionLabel),
               ),
               OutlinedButton(
                 onPressed: () =>
                     Navigator.of(context).pushNamed(item.secondaryRoute),
+                style: OutlinedButton.styleFrom(
+                                  foregroundColor: const Color(0xFFC9A75B),
+                  side: BorderSide(
+                    color: const Color(0xFFD8B26A).withValues(alpha: 0.28),
+                  ),
+                ),
                 child: Text(item.secondaryActionLabel),
               ),
             ],
@@ -799,47 +1563,25 @@ class _AdminGuidedWorkflowCard extends StatelessWidget {
 class _AdminSectionLaunchpad extends StatelessWidget {
   const _AdminSectionLaunchpad({
     required this.cards,
-    required this.crossAxisCount,
-    required this.childAspectRatio,
   });
 
   final List<_AdminSectionLaunchCardData> cards;
-  final int crossAxisCount;
-  final double childAspectRatio;
 
   @override
   Widget build(BuildContext context) {
-    return AppSurfaceCard(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Monitoring Entry Points',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Open the right monitoring surface without turning the hub into a daily operations workbench.',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.70),
-                ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: cards.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: AppSpacing.md,
-              mainAxisSpacing: AppSpacing.md,
-              childAspectRatio: childAspectRatio,
-            ),
-            itemBuilder: (context, index) {
-              return _AdminSectionLaunchCard(item: cards[index]);
-            },
+          Wrap(
+            alignment: WrapAlignment.center,
+            textDirection: Directionality.of(context),
+            spacing: 10,
+            runSpacing: 9,
+            children: cards.map((card) {
+              return _AdminSectionLaunchCard(item: card);
+            }).toList(),
           ),
         ],
       ),
@@ -856,88 +1598,85 @@ class _AdminSectionLaunchCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(AppRadii.xl),
-      onTap: () => Navigator.of(context).pushNamed(item.route),
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 240),
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: item.color,
-          borderRadius: BorderRadius.circular(AppRadii.xl),
-          boxShadow: AppShadows.card,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: 9,
+    final color = _adminVisualGroupColor(item.group);
+    return Tooltip(
+      message: item.subtitle,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.xl),
+        onTap: () => Navigator.of(context).pushNamed(item.route),
+        child: SizedBox(
+          height: 96,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 66,
+                height: 66,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF151C21),
+                  border: Border.all(
+                    color: const Color(0xFFD8B26A).withValues(alpha: 0.34),
+                    width: 1.6,
+                  ),
+                  boxShadow: [
+                    ...AppShadows.card,
+                    BoxShadow(
+                      color: const Color(0xFFD8B26A).withValues(alpha: 0.16),
+                      blurRadius: 18,
+                      spreadRadius: 0.6,
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFF0F1519),
+                      border: Border.all(
+                        color: const Color(0xFFD8B26A).withValues(alpha: 0.42),
+                        width: 1.25,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.20),
-                        borderRadius: BorderRadius.circular(AppRadii.pill),
-                      ),
-                      child: Text(
-                        'Open view',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
+                    ),
+                    child: Center(
+                      child: Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: color.withValues(alpha: 0.14),
+                          border: Border.all(
+                            color: const Color(0xFF3E9B90).withValues(alpha: 0.26),
+                            width: 1,
+                          ),
+                        ),
+                        child: Icon(
+                          item.icon,
+                          color: color,
+                          size: 18,
                         ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.18),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    item.icon,
-                    color: Colors.white,
-                    size: 32,
-                  ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                item.title,
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: const Color(0xFFC9A75B),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  height: 1.15,
                 ),
-              ],
-            ),
-            const Spacer(),
-            Text(
-              item.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.w800,
-                height: 1.08,
               ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              item.subtitle,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                height: 1.2,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -993,6 +1732,8 @@ class _SystemAdvisoryCard extends StatelessWidget {
         final color = _severityColor(summary.highestSeverity);
 
         return AppSurfaceCard(
+          color: const Color(0xFF151B20).withValues(alpha: 0.94),
+          borderColor: color.withValues(alpha: 0.24),
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: 108),
             child: Row(
@@ -1018,6 +1759,7 @@ class _SystemAdvisoryCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w800,
+                            color: const Color(0xFFF1E5C8),
                           ),
                     ),
                     const SizedBox(height: AppSpacing.xs),
@@ -1025,7 +1767,10 @@ class _SystemAdvisoryCard extends StatelessWidget {
                       '${summary.affectedCount} domains require attention (highest: ${summary.highestSeverity})',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color:
+                                const Color(0xFFD6D8DA).withValues(alpha: 0.84),
+                          ),
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
@@ -1033,7 +1778,8 @@ class _SystemAdvisoryCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.obsidian.withValues(alpha: 0.72),
+                            color:
+                                const Color(0xFFD6D8DA).withValues(alpha: 0.72),
                           ),
                     ),
                   ],
@@ -1044,7 +1790,13 @@ class _SystemAdvisoryCard extends StatelessWidget {
                 onPressed: () {
                   Navigator.pushNamed(context, Routes.adminDomainStatus);
                 },
-                child: const Text('View details'),
+                child: const Text(
+                  'View details',
+                  style: TextStyle(
+                    color: Color(0xFFE8D7A5),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
             ],
             ),
@@ -1268,7 +2020,7 @@ class _AdminHubCard extends StatelessWidget {
                   ),
                   child: Icon(
                     item.icon,
-                    color: Colors.white,
+                    color: item.color,
                     size: 38,
                   ),
                 ),
@@ -1296,24 +2048,6 @@ class _AdminHubCard extends StatelessWidget {
                 height: 1.2,
               ),
             ),
-            const SizedBox(height: AppSpacing.md),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: 9,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.20),
-                borderRadius: BorderRadius.circular(AppRadii.pill),
-              ),
-              child: Text(
-                isArabic ? 'فتح العرض' : 'Open view',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -1332,30 +2066,18 @@ class _AdminHomeCountersSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppSurfaceCard(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
       child: Column(
         crossAxisAlignment:
             isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
-          Text(
-            isArabic ? 'عدادات نبض النظام' : 'System Pulse Counters',
-            textAlign: isArabic ? TextAlign.right : TextAlign.left,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            isArabic
-                ? 'إشارات إشرافية سريعة للوعي والبوابات والعوائق فقط.'
-                : 'Fast supervisory signals for awareness, gates, and blockers only.',
-            textAlign: isArabic ? TextAlign.right : TextAlign.left,
-          ),
-          const SizedBox(height: AppSpacing.md),
           Align(
             alignment: Alignment.center,
             child: Wrap(
               alignment: WrapAlignment.center,
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
+              spacing: 4,
+              runSpacing: 4,
               children: cards.map((item) {
                 return _QuickStatCard(
                   item: item,
@@ -1398,12 +2120,17 @@ class _GatewaySummaryStrip extends StatelessWidget {
     ];
 
     return AppSurfaceCard(
+      color: const Color(0xFF10161A).withValues(alpha: 0.94),
+      borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Gateway Layer',
-            style: Theme.of(context).textTheme.titleLarge,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: const Color(0xFFF1E5C8),
+                  fontWeight: FontWeight.w800,
+                ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
@@ -1411,7 +2138,7 @@ class _GatewaySummaryStrip extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.70),
+                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                 ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -1471,9 +2198,11 @@ class _GatewaySummaryPill extends StatelessWidget {
           vertical: AppSpacing.sm,
         ),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.10),
+          color: const Color(0xFF12181D).withValues(alpha: 0.92),
           borderRadius: BorderRadius.circular(AppRadii.pill),
-          border: Border.all(color: color.withValues(alpha: 0.24)),
+          border: Border.all(
+            color: const Color(0xFFD8B26A).withValues(alpha: 0.20),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -1484,8 +2213,8 @@ class _GatewaySummaryPill extends StatelessWidget {
               item.title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: color,
+              style: const TextStyle(
+                color: Color(0xFFC9A75B),
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -1512,6 +2241,7 @@ class _GatewaySignalsCard extends StatelessWidget {
     return _ControlRoomCardShell(
       title: 'Gateway Signals',
       subtitle: 'Gateway-layer supervision by family',
+      group: AdminVisualGroup.system,
       minHeight: 360,
       child: _ControlRoomBodyFrame(
         child: Column(
@@ -1533,7 +2263,7 @@ class _GatewaySignalsCard extends StatelessWidget {
             Text(
               'Gateway health reflects shell readiness and isolation boundaries, without triggering external integrations.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.obsidian.withValues(alpha: 0.72),
+                    color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                   ),
             ),
           ],
@@ -1561,9 +2291,11 @@ class _GatewaySignalChip extends StatelessWidget {
       constraints: const BoxConstraints(minWidth: 180, maxWidth: 240),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.10),
+        color: const Color(0xFF12181D).withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(AppRadii.lg),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
+        border: Border.all(
+          color: const Color(0xFFD8B26A).withValues(alpha: 0.18),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1575,6 +2307,7 @@ class _GatewaySignalChip extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w800,
+                  color: const Color(0xFFC9A75B),
                 ),
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -1585,7 +2318,7 @@ class _GatewaySignalChip extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.72),
+                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                 ),
           ),
         ],
@@ -1623,7 +2356,7 @@ class _AdminSystemHealthCard extends StatelessWidget {
       children: [
         AppStatusBadge(
           label: 'Status: $statusText',
-          color: AppColors.info,
+          color: _adminVisualGroupColor(AdminVisualGroup.system),
         ),
         const SizedBox(height: AppSpacing.md),
         const Text(
@@ -1680,6 +2413,7 @@ class _AdminSystemHealthCard extends StatelessWidget {
     return _ControlRoomCardShell(
       title: 'System Health',
       subtitle: 'Python QA snapshot',
+      group: AdminVisualGroup.system,
       minHeight: 224,
       child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
@@ -1742,6 +2476,7 @@ class _PendingActionsCard extends StatelessWidget {
     return _ControlRoomCardShell(
       title: 'Attention Signals',
       subtitle: 'Requests, gates, and blockers needing control-room awareness',
+      group: AdminVisualGroup.requests,
       child: _ControlRoomBodyFrame(
         child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
           stream: clientUpdatesStream,
@@ -1789,11 +2524,22 @@ class _PendingActionsCard extends StatelessWidget {
                                 spacing: AppSpacing.md,
                                 runSpacing: AppSpacing.md,
                                 children: const [
-                                  _StaticInfoChip(label: 'Client Updates: —'),
-                                  _StaticInfoChip(label: 'Center Follow-up: —'),
-                                  _StaticInfoChip(label: 'Payout Pending: —'),
                                   _StaticInfoChip(
-                                      label: 'Centers Pending Admin: —'),
+                                    label: 'Client Updates: —',
+                                    group: AdminVisualGroup.requests,
+                                  ),
+                                  _StaticInfoChip(
+                                    label: 'Center Follow-up: —',
+                                    group: AdminVisualGroup.requests,
+                                  ),
+                                  _StaticInfoChip(
+                                    label: 'Payout Pending: —',
+                                    group: AdminVisualGroup.payments,
+                                  ),
+                                  _StaticInfoChip(
+                                    label: 'Centers Pending Admin: —',
+                                    group: AdminVisualGroup.requests,
+                                  ),
                                 ],
                               )
                             else if (totalCount == 0)
@@ -1810,17 +2556,21 @@ class _PendingActionsCard extends StatelessWidget {
                                     children: [
                                       _StaticInfoChip(
                                         label: 'Client Updates: $clientCount',
+                                        group: AdminVisualGroup.requests,
                                       ),
                                       _StaticInfoChip(
                                         label:
                                             'Center Follow-up: $followUpCount',
+                                        group: AdminVisualGroup.requests,
                                       ),
                                       _StaticInfoChip(
                                         label: 'Payout Pending: $payoutCount',
+                                        group: AdminVisualGroup.payments,
                                       ),
                                       _StaticInfoChip(
                                         label:
                                             'Centers Pending Admin: $centersCount',
+                                        group: AdminVisualGroup.requests,
                                       ),
                                     ],
                                   ),
@@ -1861,6 +2611,7 @@ class _ActiveConversationsCard extends StatelessWidget {
     return _ControlRoomCardShell(
       title: 'Human Review Needed',
       subtitle: 'Open support-only threads requiring human review',
+      group: AdminVisualGroup.support,
       child: _ControlRoomBodyFrame(
         child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
           stream: FirebaseFirestore.instance
@@ -1889,9 +2640,18 @@ class _ActiveConversationsCard extends StatelessWidget {
                     spacing: AppSpacing.md,
                     runSpacing: AppSpacing.md,
                     children: const [
-                      _StaticInfoChip(label: 'Human Review Needed: —'),
-                      _StaticInfoChip(label: 'Center Chats: —'),
-                      _StaticInfoChip(label: 'Client Chats: —'),
+                      _StaticInfoChip(
+                        label: 'Human Review Needed: —',
+                        group: AdminVisualGroup.support,
+                      ),
+                      _StaticInfoChip(
+                        label: 'Center Chats: —',
+                        group: AdminVisualGroup.support,
+                      ),
+                      _StaticInfoChip(
+                        label: 'Client Chats: —',
+                        group: AdminVisualGroup.support,
+                      ),
                     ],
                   )
                 else if (snapshot.connectionState == ConnectionState.active &&
@@ -1910,14 +2670,17 @@ class _ActiveConversationsCard extends StatelessWidget {
                           _ConversationCountChip(
                             label: 'Human Review Needed',
                             count: '$humanSupportCount',
+                            group: AdminVisualGroup.support,
                           ),
                           _ConversationCountChip(
                             label: 'Center Chats',
                             count: '$centerChatsCount',
+                            group: AdminVisualGroup.support,
                           ),
                           _ConversationCountChip(
                             label: 'Client Chats',
                             count: '$clientChatsCount',
+                            group: AdminVisualGroup.support,
                           ),
                         ],
                       ),
@@ -1972,6 +2735,7 @@ class _OperationalAlertsCard extends StatelessWidget {
     return _ControlRoomCardShell(
       title: 'System Attention Signals',
       subtitle: 'Generated monitoring signals for blockers and exceptions',
+      group: AdminVisualGroup.system,
       minHeight: 224,
       child: _ControlRoomBodyFrame(
         child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
@@ -1985,9 +2749,18 @@ class _OperationalAlertsCard extends StatelessWidget {
                 spacing: AppSpacing.md,
                 runSpacing: AppSpacing.md,
                 children: const [
-                  _StaticInfoChip(label: 'Center Follow-up: —'),
-                  _StaticInfoChip(label: 'Client Update Required: —'),
-                  _StaticInfoChip(label: 'Payout Pending: —'),
+                  _StaticInfoChip(
+                    label: 'Center Follow-up: —',
+                    group: AdminVisualGroup.requests,
+                  ),
+                  _StaticInfoChip(
+                    label: 'Client Update Required: —',
+                    group: AdminVisualGroup.requests,
+                  ),
+                  _StaticInfoChip(
+                    label: 'Payout Pending: —',
+                    group: AdminVisualGroup.payments,
+                  ),
                 ],
               );
             }
@@ -2034,13 +2807,16 @@ class _OperationalAlertsCard extends StatelessWidget {
                   children: [
                     _StaticInfoChip(
                       label: 'Center Follow-up: $centerFollowUpCount',
+                      group: AdminVisualGroup.requests,
                     ),
                     _StaticInfoChip(
                       label:
                           'Client Update Required: $clientUpdateRequiredCount',
+                      group: AdminVisualGroup.requests,
                     ),
                     _StaticInfoChip(
                       label: 'Payout Pending: $payoutPendingCount',
+                      group: AdminVisualGroup.payments,
                     ),
                   ],
                 ),
@@ -2093,6 +2869,7 @@ class _CriticalAlertsCard extends StatelessWidget {
       title: 'Safety / Urgent Attention',
       subtitle:
           'High-attention human review, payout, and stuck-flow indicators',
+      group: AdminVisualGroup.support,
       minHeight: 224,
       child: _ControlRoomBodyFrame(
         child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -2129,11 +2906,18 @@ class _CriticalAlertsCard extends StatelessWidget {
                             spacing: AppSpacing.md,
                             runSpacing: AppSpacing.md,
                             children: const [
-                              _StaticInfoChip(label: 'Stuck Follow-ups: —'),
+                              _StaticInfoChip(
+                                label: 'Stuck Follow-ups: —',
+                                group: AdminVisualGroup.sessions,
+                              ),
                               _StaticInfoChip(
                                 label: 'Human Review Needed: —',
+                                group: AdminVisualGroup.support,
                               ),
-                              _StaticInfoChip(label: 'Pending Payouts: —'),
+                              _StaticInfoChip(
+                                label: 'Pending Payouts: —',
+                                group: AdminVisualGroup.payments,
+                              ),
                             ],
                           )
                         else if (followUpsSnapshot.connectionState ==
@@ -2157,14 +2941,17 @@ class _CriticalAlertsCard extends StatelessWidget {
                                   _StaticInfoChip(
                                     label:
                                         'Stuck Follow-ups: $stuckFollowUpsCount',
+                                    group: AdminVisualGroup.sessions,
                                   ),
                                   _StaticInfoChip(
                                     label:
                                         'Human Review Needed: $unresolvedSupportChatsCount',
+                                    group: AdminVisualGroup.support,
                                   ),
                                   _StaticInfoChip(
                                     label:
                                         'Pending Payouts: $pendingPayoutsCount',
+                                    group: AdminVisualGroup.payments,
                                   ),
                                 ],
                               ),
@@ -2229,6 +3016,7 @@ class _UserBehaviorAnalyticsPlaceholderState
       subtitle: widget.isArabic
           ? 'قراءة هادئة لأنماط دخول المستخدمين واختياراتهم داخل المسارات الأساسية.'
           : 'Passive awareness of user entry patterns and support-path choices across core modules.',
+      group: AdminVisualGroup.analytics,
       minHeight: 232,
       child: _ControlRoomBodyFrame(
         child: FutureBuilder<AnalyticsSummaryBundle>(
@@ -2286,7 +3074,7 @@ class _BackendAnalyticsSummaryView extends StatelessWidget {
       children: [
         AppStatusBadge(
           label: isArabic ? 'أحدث ملخص محفوظ' : 'Latest summary',
-          color: AppColors.info,
+          color: _adminVisualGroupColor(AdminVisualGroup.analytics),
         ),
         const SizedBox(height: AppSpacing.md),
         Wrap(
@@ -2335,7 +3123,7 @@ class _BackendAnalyticsSummaryView extends StatelessWidget {
             isArabic ? 'لا توجد بيانات بعد' : 'No data yet',
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.68),
+                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                   fontWeight: FontWeight.w600,
                 ),
           ),
@@ -2372,7 +3160,7 @@ class _LocalAnalyticsSummaryView extends StatelessWidget {
               label: isArabic
                   ? 'معاينة الجلسة الحالية'
                   : 'Current session preview',
-              color: AppColors.info,
+              color: _adminVisualGroupColor(AdminVisualGroup.analytics),
             ),
             const SizedBox(height: AppSpacing.md),
             Wrap(
@@ -2420,7 +3208,7 @@ class _LocalAnalyticsSummaryView extends StatelessWidget {
                 isArabic ? 'لا توجد بيانات بعد' : 'No data yet',
                 textAlign: isArabic ? TextAlign.right : TextAlign.left,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.obsidian.withValues(alpha: 0.68),
+                      color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                       fontWeight: FontWeight.w600,
                     ),
               ),
@@ -2447,7 +3235,8 @@ class _AnalyticsSummaryCard extends StatelessWidget {
     return SizedBox(
       width: 260,
       child: AppSurfaceCard(
-        color: Colors.white.withValues(alpha: 0.82),
+        color: const Color(0xFF10161A).withValues(alpha: 0.94),
+        borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2458,6 +3247,7 @@ class _AnalyticsSummaryCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w800,
+                    color: const Color(0xFFC9A75B),
                   ),
             ),
             const SizedBox(height: AppSpacing.xs),
@@ -2466,7 +3256,7 @@ class _AnalyticsSummaryCard extends StatelessWidget {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.obsidian.withValues(alpha: 0.70),
+                    color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                     height: 1.25,
                   ),
             ),
@@ -2497,7 +3287,7 @@ class _AnalyticsEntryList extends StatelessWidget {
         emptyLabel,
         textAlign: isArabic ? TextAlign.right : TextAlign.left,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.obsidian.withValues(alpha: 0.68),
+              color: const Color(0xFF314A5C).withValues(alpha: 0.88),
               fontWeight: FontWeight.w600,
             ),
       );
@@ -2542,7 +3332,7 @@ class _ChatContextSummary extends StatelessWidget {
         isArabic ? 'لا توجد بيانات بعد' : 'No activity yet',
         textAlign: isArabic ? TextAlign.right : TextAlign.left,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.obsidian.withValues(alpha: 0.68),
+              color: const Color(0xFF314A5C).withValues(alpha: 0.88),
               fontWeight: FontWeight.w600,
             ),
       );
@@ -2596,7 +3386,7 @@ class _AnalyticsLineItem extends StatelessWidget {
           value,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: AppColors.obsidian,
+                color: const Color(0xFFC9A75B),
               ),
         ),
         const SizedBox(width: AppSpacing.sm),
@@ -2605,7 +3395,7 @@ class _AnalyticsLineItem extends StatelessWidget {
             label,
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.72),
+                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                   fontWeight: FontWeight.w600,
                   height: 1.2,
                 ),
@@ -2630,13 +3420,14 @@ class _ControlRoomIntro extends StatelessWidget {
             'Control Room',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
+                  color: const Color(0xFFC9A75B),
                 ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             'System awareness for health, blockers, gates, support signals, and exceptions.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.70),
+                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                 ),
           ),
         ],
@@ -2708,44 +3499,72 @@ class _ControlRoomCardShell extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.child,
+    this.group,
     this.minHeight = 264,
   });
 
   final String title;
   final String subtitle;
   final Widget child;
+  final AdminVisualGroup? group;
   final double minHeight;
 
   @override
   Widget build(BuildContext context) {
+    final color = _adminVisualGroupColor(group);
     return AppSurfaceCard(
+      color: const Color(0xFF10161A).withValues(alpha: 0.94),
+      borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
       padding: const EdgeInsets.all(AppSpacing.lg),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: minHeight),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: 0,
+            left: 0,
+            child: Container(
+              width: 44,
+              height: 3,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFFD8B26A).withValues(alpha: 0.85),
+                    color.withValues(alpha: 0.70),
+                    const Color(0xFF3E9B90).withValues(alpha: 0.52),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              subtitle,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.obsidian.withValues(alpha: 0.68),
-                  ),
+          ),
+          ConstrainedBox(
+            constraints: BoxConstraints(minHeight: minHeight),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFFC9A75B),
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  subtitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: const Color(0xFF314A5C).withValues(alpha: 0.88),
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                child,
+              ],
             ),
-            const SizedBox(height: AppSpacing.md),
-            child,
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -2767,7 +3586,7 @@ class _ControlRoomEmptyState extends StatelessWidget {
         maxLines: 3,
         overflow: TextOverflow.ellipsis,
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.obsidian.withValues(alpha: 0.68),
+              color: const Color(0xFF314A5C).withValues(alpha: 0.88),
               fontWeight: FontWeight.w500,
               height: 1.25,
             ),
@@ -2815,6 +3634,7 @@ class _ControlRoomActionButton extends StatelessWidget {
             horizontal: AppSpacing.sm,
             vertical: AppSpacing.xs,
           ),
+          foregroundColor: const Color(0xFFE8D7A5),
           minimumSize: Size.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           visualDensity: VisualDensity.compact,
@@ -2838,22 +3658,25 @@ void _showControlRoomSnackBar(BuildContext context, String message) {
 class _StaticInfoChip extends StatelessWidget {
   const _StaticInfoChip({
     required this.label,
+    this.group,
   });
 
   final String label;
+  final AdminVisualGroup? group;
 
   @override
   Widget build(BuildContext context) {
+    final color = _adminVisualGroupColor(group);
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
         vertical: AppSpacing.md,
       ),
       decoration: BoxDecoration(
-        color: AppColors.mist,
+        color: const Color(0xFF12181D).withValues(alpha: 0.90),
         borderRadius: BorderRadius.circular(AppRadii.lg),
         border: Border.all(
-          color: AppColors.info.withValues(alpha: 0.20),
+          color: color.withValues(alpha: 0.28),
         ),
       ),
       child: Text(
@@ -2861,6 +3684,7 @@ class _StaticInfoChip extends StatelessWidget {
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w700,
               height: 1.2,
+              color: const Color(0xFFC9A75B),
             ),
       ),
     );
@@ -2871,23 +3695,26 @@ class _ConversationCountChip extends StatelessWidget {
   const _ConversationCountChip({
     required this.label,
     required this.count,
+    this.group,
   });
 
   final String label;
   final String count;
+  final AdminVisualGroup? group;
 
   @override
   Widget build(BuildContext context) {
+    final color = _adminVisualGroupColor(group);
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
         vertical: AppSpacing.md,
       ),
       decoration: BoxDecoration(
-        color: AppColors.mist,
+        color: const Color(0xFF12181D).withValues(alpha: 0.90),
         borderRadius: BorderRadius.circular(AppRadii.lg),
         border: Border.all(
-          color: AppColors.info.withValues(alpha: 0.20),
+          color: color.withValues(alpha: 0.28),
         ),
       ),
       child: Text(
@@ -2895,6 +3722,7 @@ class _ConversationCountChip extends StatelessWidget {
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w700,
               height: 1.2,
+              color: const Color(0xFFC9A75B),
             ),
       ),
     );
@@ -2903,12 +3731,12 @@ class _ConversationCountChip extends StatelessWidget {
 
 class _QuickStatItem {
   final String title;
-  final Color color;
+  final AdminVisualGroup? group;
   final Stream<int> stream;
 
   const _QuickStatItem({
     required this.title,
-    required this.color,
+    this.group,
     required this.stream,
   });
 }
@@ -2924,73 +3752,88 @@ class _QuickStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = _adminVisualGroupColor(item.group);
     return SizedBox(
-      width: 220,
-      height: 112,
-      child: AppSectionPanel(
-        color: item.color.withValues(alpha: 0.10),
-        borderColor: item.color.withValues(alpha: 0.22),
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: StreamBuilder<int>(
-          stream: item.stream,
-          builder: (context, snapshot) {
-            final waiting =
-                snapshot.connectionState == ConnectionState.waiting &&
-                    !snapshot.hasData;
-            final hasError = snapshot.hasError;
-            final count = snapshot.data;
-            final countText = hasError ? '!' : (count == null ? '—' : '$count');
-            final statusText = hasError
-                ? (isArabic ? 'تعذر التحميل' : 'Load failed')
-                : (waiting
-                    ? (isArabic ? 'جارٍ التحديث' : 'Updating')
-                    : item.title);
+      width: 90,
+      height: 104,
+      child: StreamBuilder<int>(
+        stream: item.stream,
+        builder: (context, snapshot) {
+          final waiting =
+              snapshot.connectionState == ConnectionState.waiting &&
+                  !snapshot.hasData;
+          final hasError = snapshot.hasError;
+          final count = snapshot.data;
+          final countText = hasError ? '!' : (count == null ? '—' : '$count');
+          final statusText = hasError
+              ? (isArabic ? 'تعذر التحميل' : 'Load failed')
+              : (waiting
+                  ? (isArabic ? 'جارٍ التحديث' : 'Updating')
+                  : item.title);
 
-            return Column(
-              crossAxisAlignment:
-                  isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 32,
-                  child: Align(
-                    alignment:
-                        isArabic ? Alignment.centerRight : Alignment.centerLeft,
-                    child: Text(
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 76,
+                height: 42,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10161A).withValues(alpha: 0.92),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: const Color(0xFFD8B26A).withValues(alpha: 0.30),
+                    width: 1.1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFD8B26A).withValues(alpha: 0.04),
+                      blurRadius: 5,
+                      spreadRadius: 0.1,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
                       countText,
-                      textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                      textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: item.color,
-                        fontSize: 28,
+                        color: color,
+                        fontSize: 21,
                         fontWeight: FontWeight.w900,
                         height: 1,
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                SizedBox(
-                  height: 34,
-                  child: Align(
-                    alignment:
-                        isArabic ? Alignment.topRight : Alignment.topLeft,
-                    child: Text(
-                      statusText,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                      style: TextStyle(
-                        color: item.color,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        height: 1.2,
+                    const SizedBox(height: 4),
+                    Container(
+                      width: 24,
+                      height: 3,
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.62),
+                        borderRadius: BorderRadius.circular(999),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            );
-          },
-        ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                statusText,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: const Color(0xFFE6DAB6),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  height: 1.2,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

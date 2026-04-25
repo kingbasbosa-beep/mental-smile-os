@@ -16,12 +16,23 @@ class AdminGatewayLayerPage extends StatelessWidget {
     };
 
     return Scaffold(
-      backgroundColor: AppColors.warmIvory,
+      backgroundColor: const Color(0xFF0F1316),
       appBar: AppShellActions.buildAppBar(
         context,
         title: 'Gateway Layer',
       ),
-      body: AppPageBackground(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF13191D),
+              Color(0xFF0F1316),
+              Color(0xFF151B1F),
+            ],
+          ),
+        ),
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           children: [

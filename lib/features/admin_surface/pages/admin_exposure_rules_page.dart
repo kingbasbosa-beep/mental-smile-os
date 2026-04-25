@@ -17,6 +17,8 @@ class AdminExposureRulesPage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: AppSectionPanel(
+        color: const Color(0xFF10161A).withValues(alpha: 0.94),
+        borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,13 +27,14 @@ class AdminExposureRulesPage extends StatelessWidget {
               title,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w800,
+                    color: const Color(0xFFC9A75B),
                   ),
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
               statusLabel,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: const Color(0xFF2E5AAC),
+                    color: const Color(0xFFC9A75B),
                     fontWeight: FontWeight.w700,
                   ),
             ),
@@ -39,14 +42,14 @@ class AdminExposureRulesPage extends StatelessWidget {
             Text(
               summary,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.obsidian.withValues(alpha: 0.84),
+                    color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                   ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               'Boundary: $boundaryNote',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.obsidian.withValues(alpha: 0.70),
+                    color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                     height: 1.35,
                   ),
             ),
@@ -61,12 +64,23 @@ class AdminExposureRulesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.warmIvory,
+      backgroundColor: const Color(0xFF0F1316),
       appBar: AppShellActions.buildAppBar(
         context,
         title: 'Ad / Awareness Exposure Rules',
       ),
-      body: AppPageBackground(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF13191D),
+              Color(0xFF0F1316),
+              Color(0xFF151B1F),
+            ],
+          ),
+        ),
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           children: [

@@ -178,6 +178,8 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
 
   Widget _buildIntroCard(BuildContext context, bool isArabic) {
     return AppSurfaceCard(
+      color: const Color(0xFF10161A).withValues(alpha: 0.94),
+      borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
         crossAxisAlignment:
@@ -218,12 +220,24 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
+        backgroundColor: const Color(0xFF0F1316),
         appBar: AppShellActions.buildAppBar(
           context,
           title: isArabic ? 'رسائل الإدارة' : 'Admin Messages',
           canLogout: false,
         ),
-        body: AppPageBackground(
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFF13191D),
+                Color(0xFF0F1316),
+                Color(0xFF151B1F),
+              ],
+            ),
+          ),
           child: StreamBuilder<List<ChatThreadModel>>(
             stream: _chatFirestoreService.streamAdminSupportInboxThreads(),
             builder: (context, snapshot) {
@@ -285,6 +299,10 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
                             );
                           },
                           child: AppSurfaceCard(
+                            color: const Color(0xFF10161A)
+                                .withValues(alpha: 0.94),
+                            borderColor: const Color(0xFFD8B26A)
+                                .withValues(alpha: 0.18),
                             padding: const EdgeInsets.all(AppSpacing.md),
                             child: Row(
                               textDirection: isArabic

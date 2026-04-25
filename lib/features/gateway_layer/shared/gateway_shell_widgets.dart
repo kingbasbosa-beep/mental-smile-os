@@ -86,6 +86,8 @@ class GatewayPageIntroCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppSurfaceCard(
+      color: const Color(0xFF0B1014).withValues(alpha: 0.96),
+      borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -93,20 +95,21 @@ class GatewayPageIntroCard extends StatelessWidget {
             title,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
+                  color: const Color(0xFFC9A75B),
                 ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             summary,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.72),
+                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                 ),
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
             boundaryNote,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.70),
+                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                 ),
           ),
           if ((emphasis ?? '').trim().isNotEmpty) ...[
@@ -114,7 +117,7 @@ class GatewayPageIntroCard extends StatelessWidget {
             Text(
               emphasis!.trim(),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.obsidian.withValues(alpha: 0.70),
+                    color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                     fontWeight: FontWeight.w600,
                   ),
             ),
@@ -140,6 +143,8 @@ class GatewaySectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppSurfaceCard(
+      color: const Color(0xFF10161A).withValues(alpha: 0.94),
+      borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -147,6 +152,7 @@ class GatewaySectionCard extends StatelessWidget {
             title,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
+                  color: const Color(0xFFC9A75B),
                 ),
           ),
           if ((description ?? '').trim().isNotEmpty) ...[
@@ -154,7 +160,7 @@ class GatewaySectionCard extends StatelessWidget {
             Text(
               description!.trim(),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.obsidian.withValues(alpha: 0.70),
+                    color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                   ),
             ),
           ],
@@ -181,7 +187,7 @@ class GatewaySupervisionNote extends StatelessWidget {
       child: Text(
         text,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.obsidian.withValues(alpha: 0.70),
+              color: const Color(0xFF314A5C).withValues(alpha: 0.88),
             ),
       ),
     );
@@ -205,6 +211,8 @@ class GatewayFamilyCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppRadii.xl),
       onTap: () => Navigator.of(context).pushNamed(entry.route),
       child: AppSurfaceCard(
+        color: const Color(0xFF10161A).withValues(alpha: 0.94),
+        borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
         child: GatewayStatusBlock(
           title: entry.title,
           level: status.level,
@@ -235,6 +243,8 @@ class GatewayEntryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppSectionPanel(
       padding: const EdgeInsets.all(AppSpacing.md),
+      color: const Color(0xFF10161A).withValues(alpha: 0.94),
+      borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
       child: GatewayStatusBlock(
         title: entry.title,
         level: entry.status.level,
@@ -288,6 +298,7 @@ class GatewayStatusBlock extends StatelessWidget {
                     title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w800,
+                          color: const Color(0xFFC9A75B),
                         ),
                   ),
                   const SizedBox(height: AppSpacing.xs),
@@ -319,7 +330,7 @@ class GatewayStatusBlock extends StatelessWidget {
           Text(
             roleText!.trim(),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.74),
+                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                 ),
           ),
         ],
@@ -327,7 +338,7 @@ class GatewayStatusBlock extends StatelessWidget {
         Text(
           summary,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.obsidian.withValues(alpha: 0.84),
+                color: const Color(0xFF314A5C).withValues(alpha: 0.88),
               ),
         ),
         if ((boundaryNote ?? '').trim().isNotEmpty) ...[
@@ -384,7 +395,7 @@ class _GatewayMetaLine extends StatelessWidget {
     return Text(
       '$label: $value',
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppColors.obsidian.withValues(alpha: 0.70),
+            color: const Color(0xFF314A5C).withValues(alpha: 0.88),
             height: 1.35,
           ),
     );

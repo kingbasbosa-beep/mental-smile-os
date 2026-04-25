@@ -229,12 +229,23 @@ class _AdminCommunicationGatewayPageState
         .toList();
 
     return Scaffold(
-      backgroundColor: AppColors.warmIvory,
+      backgroundColor: const Color(0xFF0F1316),
       appBar: AppShellActions.buildAppBar(
         context,
         title: 'Communication Gateway',
       ),
-      body: AppPageBackground(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF13191D),
+              Color(0xFF0F1316),
+              Color(0xFF151B1F),
+            ],
+          ),
+        ),
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
@@ -276,6 +287,8 @@ class _AdminCommunicationGatewayPageState
             ),
             const SizedBox(height: AppSpacing.md),
             AppSurfaceCard(
+              color: const Color(0xFF10161A).withValues(alpha: 0.94),
+              borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -283,6 +296,7 @@ class _AdminCommunicationGatewayPageState
                     'Support Email intent',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
+                          color: const Color(0xFFC9A75B),
                         ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
@@ -292,6 +306,18 @@ class _AdminCommunicationGatewayPageState
                     children: SupportEmailIntent.values.map((intent) {
                       return ChoiceChip(
                         label: Text(_intentLabel(intent)),
+                        labelStyle: const TextStyle(
+                          color: Color(0xFFC9A75B),
+                          fontWeight: FontWeight.w700,
+                        ),
+                        backgroundColor:
+                            const Color(0xFF12181D).withValues(alpha: 0.88),
+                        selectedColor:
+                            const Color(0xFFD8B26A).withValues(alpha: 0.14),
+                        side: BorderSide(
+                          color:
+                              const Color(0xFFD8B26A).withValues(alpha: 0.18),
+                        ),
                         showCheckmark: true,
                         selected: _selectedIntent == intent,
                         onSelected: (_) {
@@ -312,7 +338,7 @@ class _AdminCommunicationGatewayPageState
                   Text(
                     'Selected: ${_intentLabel(_selectedIntent)}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: const Color(0xFF2E5AAC),
+                          color: const Color(0xFFC9A75B),
                           fontWeight: FontWeight.w700,
                         ),
                   ),
