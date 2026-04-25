@@ -107,14 +107,9 @@ class _AdminHubPageState extends State<AdminHubPage> {
 
     _paymentsReviewStream = FirebaseFirestore.instance
         .collection('booking_requests')
+        .where('payment_confirmed', isEqualTo: false)
         .snapshots()
-        .map((snapshot) => snapshot.docs.where((doc) {
-              final data = doc.data();
-              final status = (data['status'] ?? '').toString();
-              final paymentStatus = (data['paymentStatus'] ?? '').toString();
-              return status == 'payment_review' ||
-                  paymentStatus == 'submitted_by_client';
-            }).length)
+        .map((snapshot) => snapshot.docs.length)
         .asBroadcastStream();
 
     _sessionsActionStream = FirebaseFirestore.instance
@@ -3728,6 +3723,7 @@ class _QuickStatCard extends StatelessWidget {
         stream: item.stream,
         builder: (context, snapshot) {
           final isOpenRequestsCounter = item.group == AdminVisualGroup.requests;
+          final isPaymentReviewCounter = item.group == AdminVisualGroup.payments;
           final isHumanReviewCounter = item.group == AdminVisualGroup.support;
           final waiting =
               snapshot.connectionState == ConnectionState.waiting &&
@@ -3738,6 +3734,8 @@ class _QuickStatCard extends StatelessWidget {
               hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
           final countText = hasError ? '!' : (count == null ? '—' : '$count');
           final humanReviewCountText =
+              hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
+          final paymentReviewCountText =
               hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
           final statusText = hasError
               ? (isArabic ? 'تعذر التحميل' : 'Load failed')
@@ -3777,9 +3775,11 @@ class _QuickStatCard extends StatelessWidget {
                     Text(
                       isOpenRequestsCounter
                           ? openRequestsCountText
-                          : (isHumanReviewCounter
-                              ? humanReviewCountText
-                              : countText),
+                          : (isPaymentReviewCounter
+                              ? paymentReviewCountText
+                              : (isHumanReviewCounter
+                                  ? humanReviewCountText
+                                  : countText)),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: color,
