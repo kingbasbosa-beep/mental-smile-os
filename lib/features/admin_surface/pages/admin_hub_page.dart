@@ -99,13 +99,9 @@ class _AdminHubPageState extends State<AdminHubPage> {
 
     _bookingOpenStream = FirebaseFirestore.instance
         .collection('booking_requests')
+        .where('archived', isEqualTo: false)
         .snapshots()
-        .map((snapshot) => snapshot.docs.where((doc) {
-              final data = doc.data();
-              final archived = (data['archived'] ?? false) == true;
-              final status = (data['status'] ?? 'pending_admin').toString();
-              return !archived && status != 'completed_success';
-            }).length)
+        .map((snapshot) => snapshot.docs.length)
         .asBroadcastStream();
 
     _paymentsReviewStream = FirebaseFirestore.instance
@@ -3759,11 +3755,14 @@ class _QuickStatCard extends StatelessWidget {
       child: StreamBuilder<int>(
         stream: item.stream,
         builder: (context, snapshot) {
+          final isOpenRequestsCounter = item.group == AdminVisualGroup.requests;
           final waiting =
               snapshot.connectionState == ConnectionState.waiting &&
                   !snapshot.hasData;
           final hasError = snapshot.hasError;
           final count = snapshot.data;
+          final openRequestsCountText =
+              hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
           final countText = hasError ? '!' : (count == null ? '—' : '$count');
           final statusText = hasError
               ? (isArabic ? 'تعذر التحميل' : 'Load failed')
@@ -3797,7 +3796,7 @@ class _QuickStatCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      countText,
+                      isOpenRequestsCounter ? openRequestsCountText : countText,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: color,
