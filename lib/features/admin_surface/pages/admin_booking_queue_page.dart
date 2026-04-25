@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -86,10 +86,31 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       'labelEn': 'Pending admin'
     },
     {
+      'key': 'client_update_required',
+      'labelAr': 'بانتظار تعديل العميل',
+      'labelEn': 'Client update required'
+    },
+    {
       'key': 'center_follow_up',
       'labelAr': 'متابعة المراكز',
       'labelEn': 'Center follow-up'
     },
+    {
+      'key': 'payment_review',
+      'labelAr': 'مراجعة السداد',
+      'labelEn': 'Payment review'
+    },
+    {
+      'key': 'reschedule_pending',
+      'labelAr': 'إعادة جدولة',
+      'labelEn': 'Reschedule'
+    },
+    {
+      'key': 'cancellation_pending',
+      'labelAr': 'إلغاء',
+      'labelEn': 'Cancellation'
+    },
+    {'key': 'dispute_pending', 'labelAr': 'نزاع', 'labelEn': 'Dispute'},
     {
       'key': 'center_intake_pending',
       'labelAr': 'بانتظار بيانات التقييم الأولي',
@@ -101,11 +122,6 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       'labelEn': 'Awaiting center recommendation'
     },
     {
-      'key': 'client_update_required',
-      'labelAr': 'بانتظار تعديل العميل',
-      'labelEn': 'Client update required'
-    },
-    {
       'key': 'assigned_clinician',
       'labelAr': 'بانتظار رد الأخصائي',
       'labelEn': 'Awaiting clinician'
@@ -114,11 +130,6 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       'key': 'awaiting_payment',
       'labelAr': 'بانتظار التحويل المالي',
       'labelEn': 'Awaiting payment'
-    },
-    {
-      'key': 'payment_review',
-      'labelAr': 'مراجعة السداد',
-      'labelEn': 'Payment review'
     },
     {
       'key': 'session_setup_pending',
@@ -155,17 +166,6 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       'labelAr': 'مرفوضة من الأخصائي',
       'labelEn': 'Clinician rejected'
     },
-    {
-      'key': 'reschedule_pending',
-      'labelAr': 'إعادة جدولة',
-      'labelEn': 'Reschedule'
-    },
-    {
-      'key': 'cancellation_pending',
-      'labelAr': 'إلغاء',
-      'labelEn': 'Cancellation'
-    },
-    {'key': 'dispute_pending', 'labelAr': 'نزاع', 'labelEn': 'Dispute'},
   ];
 
   bool _isArabic(BuildContext context) {
