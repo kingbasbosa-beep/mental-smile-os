@@ -267,39 +267,59 @@ class _AdminHubPageState extends State<AdminHubPage> {
     final isArabic = _isArabic(context);
 
     final gatewayStatuses = AdminHubPage._gatewayMonitor.familyStatuses();
+    final topPriorityPeerStreams = <Stream<int>>[
+      _bookingOpenStream,
+      _paymentsReviewStream,
+      _sessionsActionStream,
+      _escalationsOpenStream,
+      _pendingApprovalsStream,
+      _gatewayAttentionStream,
+    ];
 
     final compactCounters = <_QuickStatItem>[
       _QuickStatItem(
         title: isArabic ? 'إشارات طلبات مفتوحة' : 'Open request signals',
         group: AdminVisualGroup.requests,
         stream: _bookingOpenStream,
+        priorityPeers: topPriorityPeerStreams,
         crossSignalStream: _escalationsOpenStream,
+        route: Routes.adminOperations,
       ),
       _QuickStatItem(
         title: isArabic ? 'السداد تحت المراجعة' : 'Payment review',
         group: AdminVisualGroup.payments,
         stream: _paymentsReviewStream,
+        priorityPeers: topPriorityPeerStreams,
+        route: Routes.adminPayments,
       ),
       _QuickStatItem(
         title: isArabic ? 'إشارات جاهزية الجلسات' : 'Session readiness signals',
         group: AdminVisualGroup.sessions,
         stream: _sessionsActionStream,
+        priorityPeers: topPriorityPeerStreams,
+        route: Routes.adminSessions,
       ),
       _QuickStatItem(
         title: isArabic ? 'حالات دعم مصعّدة' : 'Escalated Support Cases',
         group: AdminVisualGroup.support,
         stream: _escalationsOpenStream,
+        priorityPeers: topPriorityPeerStreams,
         crossSignalStream: _bookingOpenStream,
+        route: Routes.adminSupportChats,
       ),
       _QuickStatItem(
         title: isArabic ? 'بوابات اعتماد معلقة' : 'Pending approval gates',
         group: AdminVisualGroup.requests,
         stream: _pendingApprovalsStream,
+        priorityPeers: topPriorityPeerStreams,
+        route: Routes.adminClinicianRequests,
       ),
       _QuickStatItem(
         title: isArabic ? 'إشارات بوابات/أجهزة' : 'Gateway/device signals',
         group: AdminVisualGroup.system,
         stream: _gatewayAttentionStream,
+        priorityPeers: topPriorityPeerStreams,
+        route: Routes.adminGatewayLayer,
       ),
     ];
 
@@ -3696,13 +3716,17 @@ class _QuickStatItem {
   final String title;
   final AdminVisualGroup? group;
   final Stream<int> stream;
+  final List<Stream<int>>? priorityPeers;
   final Stream<int>? crossSignalStream;
+  final String route;
 
   const _QuickStatItem({
     required this.title,
     this.group,
     required this.stream,
+    this.priorityPeers,
     this.crossSignalStream,
+    required this.route,
   });
 }
 
@@ -3718,10 +3742,15 @@ class _QuickStatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _adminVisualGroupColor(item.group);
-    return SizedBox(
-      width: 90,
-      height: 104,
-      child: StreamBuilder<int>(
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => Navigator.of(context).pushNamed(item.route),
+        child: SizedBox(
+          width: 90,
+          height: 104,
+          child: StreamBuilder<int>(
         stream: item.stream,
         builder: (context, snapshot) {
           final isOpenRequestsCounter = item.group == AdminVisualGroup.requests;
@@ -3761,12 +3790,24 @@ class _QuickStatCard extends StatelessWidget {
                           : (isGatewaySignalsCounter
                               ? gatewaySignalsCountText
                               : countText))));
+          final priorityFuture = item.priorityPeers == null
+              ? null
+              : Future.wait(item.priorityPeers!.map((stream) => stream.first));
 
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              item.crossSignalStream == null
-                  ? Container(
+          return FutureBuilder<List<int>>(
+            future: priorityFuture,
+            builder: (context, prioritySnapshot) {
+              final priorityCounts = prioritySnapshot.data ?? const <int>[];
+              final maxCount = priorityCounts.isEmpty
+                  ? 0
+                  : priorityCounts.reduce((a, b) => a > b ? a : b);
+              final isTopPriority = (count ?? 0) > 0 && (count ?? 0) == maxCount;
+
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  item.crossSignalStream == null
+                      ? Container(
                       width: 76,
                       height: 42,
                       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -3775,14 +3816,18 @@ class _QuickStatCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(999),
                         border: Border.all(
                           color: const Color(0xFFD8B26A).withValues(
-                            alpha: (count ?? 0) > 0 ? 0.40 : 0.30,
+                            alpha: isTopPriority
+                                ? 0.48
+                                : ((count ?? 0) > 0 ? 0.40 : 0.30),
                           ),
                           width: 1.1,
                         ),
                         boxShadow: [
                           BoxShadow(
                             color: const Color(0xFFD8B26A).withValues(
-                              alpha: (count ?? 0) > 0 ? 0.08 : 0.04,
+                              alpha: isTopPriority
+                                  ? 0.11
+                                  : ((count ?? 0) > 0 ? 0.08 : 0.04),
                             ),
                             blurRadius: 5,
                             spreadRadius: 0.1,
@@ -3813,8 +3858,8 @@ class _QuickStatCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                    )
-                  : StreamBuilder<int>(
+                        )
+                      : StreamBuilder<int>(
                       stream: item.crossSignalStream,
                       builder: (context, crossSnapshot) {
                         final crossSignalActive =
@@ -3828,18 +3873,22 @@ class _QuickStatCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(999),
                             border: Border.all(
                               color: const Color(0xFFD8B26A).withValues(
-                                alpha: crossSignalActive
-                                    ? 0.46
-                                    : ((count ?? 0) > 0 ? 0.40 : 0.30),
+                                alpha: isTopPriority
+                                    ? 0.52
+                                    : (crossSignalActive
+                                        ? 0.46
+                                        : ((count ?? 0) > 0 ? 0.40 : 0.30)),
                               ),
                               width: 1.1,
                             ),
                             boxShadow: [
                               BoxShadow(
                                 color: const Color(0xFFD8B26A).withValues(
-                                  alpha: crossSignalActive
-                                      ? 0.10
-                                      : ((count ?? 0) > 0 ? 0.08 : 0.04),
+                                  alpha: isTopPriority
+                                      ? 0.12
+                                      : (crossSignalActive
+                                          ? 0.10
+                                          : ((count ?? 0) > 0 ? 0.08 : 0.04)),
                                 ),
                                 blurRadius: 5,
                                 spreadRadius: 0.1,
@@ -3880,23 +3929,27 @@ class _QuickStatCard extends StatelessWidget {
                           ),
                         );
                       },
+                        ),
+                  const SizedBox(height: 4),
+                  Text(
+                    statusText,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: const Color(0xFFE6DAB6),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      height: 1.2,
                     ),
-              const SizedBox(height: 4),
-              Text(
-                statusText,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: const Color(0xFFE6DAB6),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  height: 1.2,
-                ),
-              ),
-            ],
+                  ),
+                ],
+              );
+            },
           );
         },
+          ),
+        ),
       ),
     );
   }
