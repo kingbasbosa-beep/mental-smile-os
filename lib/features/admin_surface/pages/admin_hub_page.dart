@@ -3756,12 +3756,16 @@ class _QuickStatCard extends StatelessWidget {
                   color: const Color(0xFF10161A).withValues(alpha: 0.92),
                   borderRadius: BorderRadius.circular(999),
                   border: Border.all(
-                    color: const Color(0xFFD8B26A).withValues(alpha: 0.30),
+                    color: const Color(0xFFD8B26A).withValues(
+                      alpha: (count ?? 0) > 0 ? 0.40 : 0.30,
+                    ),
                     width: 1.1,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFD8B26A).withValues(alpha: 0.04),
+                      color: const Color(0xFFD8B26A).withValues(
+                        alpha: (count ?? 0) > 0 ? 0.08 : 0.04,
+                      ),
                       blurRadius: 5,
                       spreadRadius: 0.1,
                     ),
