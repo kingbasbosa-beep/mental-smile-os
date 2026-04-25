@@ -174,8 +174,9 @@ class _AdminClinicianRequestsPageState
       child: Scaffold(
         appBar: AppShellActions.buildAppBar(
           context,
-          title:
-              isArabic ? 'طلبات تسجيل الأخصائيين' : 'Clinician registrations',
+          title: isArabic
+              ? 'دليل الأخصائيين وبوابات الاعتماد'
+              : 'Directory & Approval Gates',
           canLogout: false,
         ),
         body: AppPageBackground(
@@ -250,14 +251,18 @@ class _AdminClinicianRequestsPageState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Clinician Layer Definition',
+                          isArabic
+                              ? 'دليل الأخصائيين وبوابات الاعتماد'
+                              : 'Directory & Approval Gates',
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.w800,
                               ),
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          'This compact section defines the clinician layer as a separate, currently frozen subsystem.',
+                          isArabic
+                              ? 'التركيز: الأخصائيون بانتظار الاعتماد. الحالات الأخرى للرجوع فقط.'
+                              : 'Focus: clinicians awaiting approval. Other states are reference views.',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 color: AppColors.obsidian.withValues(alpha: 0.72),
                               ),
@@ -467,6 +472,9 @@ class _AdminClinicianRequestsPageState
                             isArabic
                                 ? 'بانتظار الإدارة ($pendingCount)'
                                 : 'Pending ($pendingCount)',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
                           onSelected: (_) => setState(() => _tab = 'pending'),
                         ),
@@ -476,6 +484,10 @@ class _AdminClinicianRequestsPageState
                             isArabic
                                 ? 'مقبولون ($approvedCount)'
                                 : 'Approved ($approvedCount)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.obsidian.withValues(alpha: 0.72),
+                            ),
                           ),
                           onSelected: (_) => setState(() => _tab = 'approved'),
                         ),
@@ -485,6 +497,10 @@ class _AdminClinicianRequestsPageState
                             isArabic
                                 ? 'مرفوضون ($rejectedCount)'
                                 : 'Rejected ($rejectedCount)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.obsidian.withValues(alpha: 0.72),
+                            ),
                           ),
                           onSelected: (_) => setState(() => _tab = 'rejected'),
                         ),
@@ -494,6 +510,10 @@ class _AdminClinicianRequestsPageState
                             isArabic
                                 ? 'محظورون ($blockedCount)'
                                 : 'Blocked ($blockedCount)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.obsidian.withValues(alpha: 0.72),
+                            ),
                           ),
                           onSelected: (_) => setState(() => _tab = 'blocked'),
                         ),
