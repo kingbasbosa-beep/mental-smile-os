@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -107,15 +107,15 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
     switch (value.trim()) {
       case 'residential_psych':
         return isArabic
-            ? 'إقامة نفسية داخلية'
+            ? 'Ø¥Ù‚Ø§Ù…Ø© Ù†ÙØ³ÙŠØ© Ø¯Ø§Ø®Ù„ÙŠØ©'
             : 'Residential psychiatric care';
       case 'detox':
-        return isArabic ? 'سحب سموم ومتابعة' : 'Detox and monitoring';
+        return isArabic ? 'Ø³Ø­Ø¨ Ø³Ù…ÙˆÙ… ÙˆÙ…ØªØ§Ø¨Ø¹Ø©' : 'Detox and monitoring';
       case 'dual_diagnosis':
-        return isArabic ? 'رعاية مزدوجة' : 'Dual diagnosis care';
+        return isArabic ? 'Ø±Ø¹Ø§ÙŠØ© Ù…Ø²Ø¯ÙˆØ¬Ø©' : 'Dual diagnosis care';
       case 'diagnostic_observation':
         return isArabic
-            ? 'ملاحظة تشخيصية داخلية'
+            ? 'Ù…Ù„Ø§Ø­Ø¸Ø© ØªØ´Ø®ÙŠØµÙŠØ© Ø¯Ø§Ø®Ù„ÙŠØ©'
             : 'Diagnostic observation';
       default:
         return value.trim();
@@ -200,7 +200,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'أدخل موعد الجلسة والرابط والكود أولًا'
+                ? 'Ø£Ø¯Ø®Ù„ Ù…ÙˆØ¹Ø¯ Ø§Ù„Ø¬Ù„Ø³Ø© ÙˆØ§Ù„Ø±Ø§Ø¨Ø· ÙˆØ§Ù„ÙƒÙˆØ¯ Ø£ÙˆÙ„Ù‹Ø§'
                 : 'Enter session date, link, and code first',
           ),
         ),
@@ -225,7 +225,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'تمت جدولة الجلسة بنجاح'
+                ? 'ØªÙ…Øª Ø¬Ø¯ÙˆÙ„Ø© Ø§Ù„Ø¬Ù„Ø³Ø© Ø¨Ù†Ø¬Ø§Ø­'
                 : 'Session scheduled successfully',
           ),
         ),
@@ -259,7 +259,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
         SnackBar(
           content: Text(
             isArabic
-                ? 'أدخل بداية الإقامة ونهايتها والمدة والسبب والرابط والكود أولًا'
+                ? 'Ø£Ø¯Ø®Ù„ Ø¨Ø¯Ø§ÙŠØ© Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© ÙˆÙ†Ù‡Ø§ÙŠØªÙ‡Ø§ ÙˆØ§Ù„Ù…Ø¯Ø© ÙˆØ§Ù„Ø³Ø¨Ø¨ ÙˆØ§Ù„Ø±Ø§Ø¨Ø· ÙˆØ§Ù„ÙƒÙˆØ¯ Ø£ÙˆÙ„Ù‹Ø§'
                 : 'Enter start, end, duration, reason, link, and code first',
           ),
         ),
@@ -273,7 +273,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
         SnackBar(
           content: Text(
             isArabic
-                ? 'أدخل عدد أيام إقامة صالح'
+                ? 'Ø£Ø¯Ø®Ù„ Ø¹Ø¯Ø¯ Ø£ÙŠØ§Ù… Ø¥Ù‚Ø§Ù…Ø© ØµØ§Ù„Ø­'
                 : 'Enter a valid number of residency days',
           ),
         ),
@@ -289,8 +289,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
         (data['selectedAccommodationPricingUnit'] ?? '').toString().trim();
     final unitPrice = _asDouble(data['selectedAccommodationPrice']);
     final paymentBreakdownText = isArabic
-        ? 'سعر ${pricingUnit == 'month' ? 'شهري' : 'يومي'} ${unitPrice.toStringAsFixed(unitPrice.truncateToDouble() == unitPrice ? 0 : 2)} × $durationDays يوم + ضريبة ${taxPercent.toStringAsFixed(0)}%'
-        : '${pricingUnit == 'month' ? 'Monthly' : 'Daily'} price ${unitPrice.toStringAsFixed(unitPrice.truncateToDouble() == unitPrice ? 0 : 2)} × $durationDays day(s) + ${taxPercent.toStringAsFixed(0)}% tax';
+        ? 'Ø³Ø¹Ø± ${pricingUnit == 'month' ? 'Ø´Ù‡Ø±ÙŠ' : 'ÙŠÙˆÙ…ÙŠ'} ${unitPrice.toStringAsFixed(unitPrice.truncateToDouble() == unitPrice ? 0 : 2)} Ã— $durationDays ÙŠÙˆÙ… + Ø¶Ø±ÙŠØ¨Ø© ${taxPercent.toStringAsFixed(0)}%'
+        : '${pricingUnit == 'month' ? 'Monthly' : 'Daily'} price ${unitPrice.toStringAsFixed(unitPrice.truncateToDouble() == unitPrice ? 0 : 2)} Ã— $durationDays day(s) + ${taxPercent.toStringAsFixed(0)}% tax';
 
     final shouldOpenPayment = await showDialog<bool>(
       context: context,
@@ -298,24 +298,24 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
         return AlertDialog(
           title: Text(
             isArabic
-                ? 'تأكيد مراجعة التجهيز وفتح الدفع'
+                ? 'ØªØ£ÙƒÙŠØ¯ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„ØªØ¬Ù‡ÙŠØ² ÙˆÙØªØ­ Ø§Ù„Ø¯ÙØ¹'
                 : 'Confirm setup review and open payment',
           ),
           content: Text(
             isArabic
-                ? 'سيتم حفظ بيانات التجهيز وإرسال بيان الدفع للعميل. هذا لا يعني اعتماد الدفع بعد.'
+                ? 'Ø³ÙŠØªÙ… Ø­ÙØ¸ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªØ¬Ù‡ÙŠØ² ÙˆØ¥Ø±Ø³Ø§Ù„ Ø¨ÙŠØ§Ù† Ø§Ù„Ø¯ÙØ¹ Ù„Ù„Ø¹Ù…ÙŠÙ„. Ù‡Ø°Ø§ Ù„Ø§ ÙŠØ¹Ù†ÙŠ Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ø¯ÙØ¹ Ø¨Ø¹Ø¯.'
                 : 'Setup values will be saved and the payment quote will be opened for the client. Payment is not approved yet.',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(isArabic ? 'إلغاء' : 'Cancel'),
+              child: Text(isArabic ? 'Ø¥Ù„ØºØ§Ø¡' : 'Cancel'),
             ),
             FilledButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
               child: Text(
                 isArabic
-                    ? 'تأكيد وفتح الدفع'
+                    ? 'ØªØ£ÙƒÙŠØ¯ ÙˆÙØªØ­ Ø§Ù„Ø¯ÙØ¹'
                     : 'Confirm and open payment',
               ),
             ),
@@ -372,7 +372,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
         SnackBar(
           content: Text(
             isArabic
-                ? 'تمت جدولة الإقامة المبدئية وإرسال بيان الدفع للعميل'
+                ? 'ØªÙ…Øª Ø¬Ø¯ÙˆÙ„Ø© Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ø§Ù„Ù…Ø¨Ø¯Ø¦ÙŠØ© ÙˆØ¥Ø±Ø³Ø§Ù„ Ø¨ÙŠØ§Ù† Ø§Ù„Ø¯ÙØ¹ Ù„Ù„Ø¹Ù…ÙŠÙ„'
                 : 'Preliminary residency scheduled and payment quote sent to client',
           ),
         ),
@@ -386,7 +386,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
         SnackBar(
           content: Text(
             isArabic
-                ? 'فشل حفظ الجدولة أو إرسال بيان الدفع: $e'
+                ? 'ÙØ´Ù„ Ø­ÙØ¸ Ø§Ù„Ø¬Ø¯ÙˆÙ„Ø© Ø£Ùˆ Ø¥Ø±Ø³Ø§Ù„ Ø¨ÙŠØ§Ù† Ø§Ù„Ø¯ÙØ¹: $e'
                 : 'Failed to save schedule or send payment quote: $e',
           ),
         ),
@@ -409,7 +409,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'تم تحويل الجلسة إلى جارية'
+                ? 'ØªÙ… ØªØ­ÙˆÙŠÙ„ Ø§Ù„Ø¬Ù„Ø³Ø© Ø¥Ù„Ù‰ Ø¬Ø§Ø±ÙŠØ©'
                 : 'Session marked in progress',
           ),
         ),
@@ -433,7 +433,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'تم تعليم الجلسة كمكتملة'
+                ? 'ØªÙ… ØªØ¹Ù„ÙŠÙ… Ø§Ù„Ø¬Ù„Ø³Ø© ÙƒÙ…ÙƒØªÙ…Ù„Ø©'
                 : 'Session marked completed',
           ),
         ),
@@ -456,7 +456,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'تم تحويل الطلب إلى انتظار إعادة الجدولة'
+                ? 'ØªÙ… ØªØ­ÙˆÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨ Ø¥Ù„Ù‰ Ø§Ù†ØªØ¸Ø§Ø± Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ø¬Ø¯ÙˆÙ„Ø©'
                 : 'Moved to reschedule pending',
           ),
         ),
@@ -483,22 +483,22 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
     switch (status) {
       case 'session_scheduled':
         return isCenterRequest
-            ? (isArabic ? 'إقامة مجدولة' : 'Residency scheduled')
-            : (isArabic ? 'جلسة مجدولة' : 'Session scheduled');
+            ? (isArabic ? 'Ø¥Ù‚Ø§Ù…Ø© Ù…Ø¬Ø¯ÙˆÙ„Ø©' : 'Residency scheduled')
+            : (isArabic ? 'Ø¬Ù„Ø³Ø© Ù…Ø¬Ø¯ÙˆÙ„Ø©' : 'Session scheduled');
       case 'session_in_progress':
         return isCenterRequest
-            ? (isArabic ? 'الإقامة جارية' : 'Residency in progress')
-            : (isArabic ? 'جلسة جارية' : 'Session in progress');
+            ? (isArabic ? 'Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ø¬Ø§Ø±ÙŠØ©' : 'Residency in progress')
+            : (isArabic ? 'Ø¬Ù„Ø³Ø© Ø¬Ø§Ø±ÙŠØ©' : 'Session in progress');
       case 'session_completed_pending_reviews':
         return isCenterRequest
-            ? (isArabic ? 'بانتظار تقارير الخروج' : 'Pending discharge reviews')
-            : (isArabic ? 'بانتظار التقييمات' : 'Pending reviews');
+            ? (isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚Ø§Ø±ÙŠØ± Ø§Ù„Ø®Ø±ÙˆØ¬' : 'Pending discharge reviews')
+            : (isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª' : 'Pending reviews');
       case 'reschedule_pending':
-        return isArabic ? 'بانتظار إعادة الجدولة' : 'Reschedule pending';
+        return isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ø¬Ø¯ÙˆÙ„Ø©' : 'Reschedule pending';
       default:
         return isCenterRequest
-            ? (isArabic ? 'بانتظار تجهيز الإقامة' : 'Residency setup pending')
-            : (isArabic ? 'بانتظار تجهيز الجلسة' : 'Session setup pending');
+            ? (isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ¬Ù‡ÙŠØ² Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©' : 'Residency setup pending')
+            : (isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ¬Ù‡ÙŠØ² Ø§Ù„Ø¬Ù„Ø³Ø©' : 'Session setup pending');
     }
   }
 
@@ -537,51 +537,51 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
       case 'session_setup_pending':
         return isCenterRequest
             ? (isArabic
-                ? 'بانتظار مراجعة تجهيز الإقامة قبل فتح الدفع'
+                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ù…Ø±Ø§Ø¬Ø¹Ø© ØªØ¬Ù‡ÙŠØ² Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ù‚Ø¨Ù„ ÙØªØ­ Ø§Ù„Ø¯ÙØ¹'
                 : 'Waiting for residency setup review before payment opening')
             : (isArabic
-                ? 'بانتظار تجهيز جلسة أخصائي'
+                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ¬Ù‡ÙŠØ² Ø¬Ù„Ø³Ø© Ø£Ø®ØµØ§Ø¦ÙŠ'
                 : 'Waiting for clinician session setup');
       case 'reschedule_pending':
         return isArabic
-            ? 'بانتظار معالجة إعادة الجدولة'
+            ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ù…Ø¹Ø§Ù„Ø¬Ø© Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ø¬Ø¯ÙˆÙ„Ø©'
             : 'Waiting for reschedule handling';
       case 'session_scheduled':
         if (awaitingResidencyStart) {
           return isArabic
-              ? 'الإقامة مجدولة وتنتظر تأكيدات البداية'
+              ? 'Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ù…Ø¬Ø¯ÙˆÙ„Ø© ÙˆØªÙ†ØªØ¸Ø± ØªØ£ÙƒÙŠØ¯Ø§Øª Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©'
               : 'Residency is scheduled and waiting for start confirmations';
         }
         return isCenterRequest
             ? (isArabic
-                ? 'الإقامة مجدولة للمتابعة'
+                ? 'Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ù…Ø¬Ø¯ÙˆÙ„Ø© Ù„Ù„Ù…ØªØ§Ø¨Ø¹Ø©'
                 : 'Residency is scheduled for monitoring')
             : (isArabic
-                ? 'الجلسة مجدولة للمتابعة'
+                ? 'Ø§Ù„Ø¬Ù„Ø³Ø© Ù…Ø¬Ø¯ÙˆÙ„Ø© Ù„Ù„Ù…ØªØ§Ø¨Ø¹Ø©'
                 : 'Session is scheduled for monitoring');
       case 'session_in_progress':
         return isCenterRequest
             ? (isArabic
-                ? 'الإقامة جارية وتحت المتابعة'
+                ? 'Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ø¬Ø§Ø±ÙŠØ© ÙˆØªØ­Øª Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©'
                 : 'Residency is in progress and under monitoring')
             : (isArabic
-                ? 'الجلسة جارية وتحت المتابعة'
+                ? 'Ø§Ù„Ø¬Ù„Ø³Ø© Ø¬Ø§Ø±ÙŠØ© ÙˆØªØ­Øª Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©'
                 : 'Session is in progress and under monitoring');
       case 'session_completed_pending_reviews':
         return isCenterRequest
             ? (isArabic
-                ? 'بانتظار تقييم الأسرة وتقرير خروج المركز'
+                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø£Ø³Ø±Ø© ÙˆØªÙ‚Ø±ÙŠØ± Ø®Ø±ÙˆØ¬ Ø§Ù„Ù…Ø±ÙƒØ²'
                 : 'Waiting for family review and center discharge report')
             : (isArabic
-                ? 'بانتظار تقييم العميل والأخصائي'
+                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø¹Ù…ÙŠÙ„ ÙˆØ§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ'
                 : 'Waiting for client and clinician reviews');
       case 'payout_pending':
         return isArabic
-            ? 'بانتظار بوابة مالية أو مراجعة مستحقات'
+            ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø¨ÙˆØ§Ø¨Ø© Ù…Ø§Ù„ÙŠØ© Ø£Ùˆ Ù…Ø±Ø§Ø¬Ø¹Ø© Ù…Ø³ØªØ­Ù‚Ø§Øª'
             : 'Waiting for financial gate or payout review';
       default:
         return isArabic
-            ? 'متابعة حالة من غرفة التحكم'
+            ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø­Ø§Ù„Ø© Ù…Ù† ØºØ±ÙØ© Ø§Ù„ØªØ­ÙƒÙ…'
             : 'Control-room state monitoring';
     }
   }
@@ -598,41 +598,41 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
       case 'session_setup_pending':
         return isCenterRequest
             ? (isArabic
-                ? 'مراجعة التجهيز ثم فتح بيان الدفع'
+                ? 'Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„ØªØ¬Ù‡ÙŠØ² Ø«Ù… ÙØªØ­ Ø¨ÙŠØ§Ù† Ø§Ù„Ø¯ÙØ¹'
                 : 'Review setup, then open payment quote')
             : (isArabic
-                ? 'استخدام إجراء الاسترداد عند الحاجة فقط'
+                ? 'Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø¥Ø¬Ø±Ø§Ø¡ Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© ÙÙ‚Ø·'
                 : 'Use recovery action only if needed');
       case 'reschedule_pending':
         return isArabic
-            ? 'إعادة الجدولة كاسترداد مسار'
+            ? 'Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ø¬Ø¯ÙˆÙ„Ø© ÙƒØ§Ø³ØªØ±Ø¯Ø§Ø¯ Ù…Ø³Ø§Ø±'
             : 'Reschedule as flow recovery';
       case 'session_scheduled':
         if (awaitingResidencyStart) {
           return isArabic
-              ? 'انتظار تأكيد المركز والأسرة'
+              ? 'Ø§Ù†ØªØ¸Ø§Ø± ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ù…Ø±ÙƒØ² ÙˆØ§Ù„Ø£Ø³Ø±Ø©'
               : 'Wait for center and family confirmations';
         }
-        return isArabic ? 'متابعة التشغيل' : 'Monitor operation';
+        return isArabic ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„ØªØ´ØºÙŠÙ„' : 'Monitor operation';
       case 'session_in_progress':
         return isArabic
-            ? 'متابعة حتى الاكتمال'
+            ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø­ØªÙ‰ Ø§Ù„Ø§ÙƒØªÙ…Ø§Ù„'
             : 'Monitor until completion';
       case 'session_completed_pending_reviews':
         if (!clientReviewSubmitted || !providerReviewSubmitted) {
           return isArabic
-              ? 'استكمال التقييمات المطلوبة'
+              ? 'Ø§Ø³ØªÙƒÙ…Ø§Ù„ Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©'
               : 'Complete required reviews';
         }
         return isArabic
-            ? 'الانتقال للمراجعة المالية عند اكتمالها'
+            ? 'Ø§Ù„Ø§Ù†ØªÙ‚Ø§Ù„ Ù„Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ù…Ø§Ù„ÙŠØ© Ø¹Ù†Ø¯ Ø§ÙƒØªÙ…Ø§Ù„Ù‡Ø§'
             : 'Move toward financial review when complete';
       case 'payout_pending':
         return isArabic
-            ? 'مراجعة أو تأكيد المستحقات المالية'
+            ? 'Ù…Ø±Ø§Ø¬Ø¹Ø© Ø£Ùˆ ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ù…Ø³ØªØ­Ù‚Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ©'
             : 'Review or confirm financial payout';
       default:
-        return isArabic ? 'متابعة الحالة' : 'Monitor the state';
+        return isArabic ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø­Ø§Ù„Ø©' : 'Monitor the state';
     }
   }
 
@@ -645,39 +645,39 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
       case 'session_setup_pending':
         return isCenterRequest
             ? (isArabic
-                ? 'بوابة إدارية مالية قبل الدفع'
+                ? 'Ø¨ÙˆØ§Ø¨Ø© Ø¥Ø¯Ø§Ø±ÙŠØ© Ù…Ø§Ù„ÙŠØ© Ù‚Ø¨Ù„ Ø§Ù„Ø¯ÙØ¹'
                 : 'Admin financial gate before payment')
             : (isArabic
-                ? 'استرداد إداري لجلسة أخصائي'
+                ? 'Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø¥Ø¯Ø§Ø±ÙŠ Ù„Ø¬Ù„Ø³Ø© Ø£Ø®ØµØ§Ø¦ÙŠ'
                 : 'Admin recovery for clinician session');
       case 'reschedule_pending':
         return isArabic
-            ? 'استرداد إداري فقط'
+            ? 'Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø¥Ø¯Ø§Ø±ÙŠ ÙÙ‚Ø·'
             : 'Admin recovery only';
       case 'session_scheduled':
       case 'session_in_progress':
         return isCenterRequest
             ? (isArabic
-                ? 'المسار التشغيلي: المركز / الأسرة'
+                ? 'Ø§Ù„Ù…Ø³Ø§Ø± Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠ: Ø§Ù„Ù…Ø±ÙƒØ² / Ø§Ù„Ø£Ø³Ø±Ø©'
                 : 'Operational path: center / family')
             : (isArabic
-                ? 'المسار التشغيلي: الأخصائي / العميل'
+                ? 'Ø§Ù„Ù…Ø³Ø§Ø± Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠ: Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ / Ø§Ù„Ø¹Ù…ÙŠÙ„'
                 : 'Operational path: clinician / client');
       case 'session_completed_pending_reviews':
         return isCenterRequest
             ? (isArabic
-                ? 'التقييمات: الأسرة / المركز'
+                ? 'Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª: Ø§Ù„Ø£Ø³Ø±Ø© / Ø§Ù„Ù…Ø±ÙƒØ²'
                 : 'Reviews: family / center')
             : (isArabic
-                ? 'التقييمات: العميل / الأخصائي'
+                ? 'Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª: Ø§Ù„Ø¹Ù…ÙŠÙ„ / Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ'
                 : 'Reviews: client / clinician');
       case 'payout_pending':
         return isArabic
-            ? 'بوابة مالية إدارية'
+            ? 'Ø¨ÙˆØ§Ø¨Ø© Ù…Ø§Ù„ÙŠØ© Ø¥Ø¯Ø§Ø±ÙŠØ©'
             : 'Admin financial gate';
       default:
         return isArabic
-            ? 'متابعة من غرفة التحكم'
+            ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ù…Ù† ØºØ±ÙØ© Ø§Ù„ØªØ­ÙƒÙ…'
             : 'Control-room monitoring';
     }
   }
@@ -703,40 +703,40 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
     if (awaitingResidencyStart) {
       if (!centerArrivalConfirmed && !clientCheckInConfirmed) {
         return isArabic
-            ? 'بانتظار تأكيد المركز والأسرة لبداية الإقامة'
+            ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ù…Ø±ÙƒØ² ÙˆØ§Ù„Ø£Ø³Ø±Ø© Ù„Ø¨Ø¯Ø§ÙŠØ© Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©'
             : 'Waiting for center and family start confirmations';
       }
       if (!centerArrivalConfirmed) {
         return isArabic
-            ? 'بانتظار تأكيد المركز للوصول'
+            ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ù…Ø±ÙƒØ² Ù„Ù„ÙˆØµÙˆÙ„'
             : 'Waiting for center arrival confirmation';
       }
       return isArabic
-          ? 'بانتظار تأكيد الأسرة لبداية الإقامة'
+          ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø£Ø³Ø±Ø© Ù„Ø¨Ø¯Ø§ÙŠØ© Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©'
           : 'Waiting for family check-in confirmation';
     }
     if (status == 'session_completed_pending_reviews') {
       if (!clientReviewSubmitted && !providerReviewSubmitted) {
         return isCenterRequest
             ? (isArabic
-                ? 'بانتظار تقييم الأسرة وتقرير المركز'
+                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø£Ø³Ø±Ø© ÙˆØªÙ‚Ø±ÙŠØ± Ø§Ù„Ù…Ø±ÙƒØ²'
                 : 'Waiting for family review and center report')
             : (isArabic
-                ? 'بانتظار تقييم العميل والأخصائي'
+                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø¹Ù…ÙŠÙ„ ÙˆØ§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ'
                 : 'Waiting for client and clinician reviews');
       }
       if (!clientReviewSubmitted) {
         return isArabic
-            ? 'بانتظار تقييم العميل / الأسرة'
+            ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø¹Ù…ÙŠÙ„ / Ø§Ù„Ø£Ø³Ø±Ø©'
             : 'Waiting for client / family review';
       }
       if (!providerReviewSubmitted) {
         return isCenterRequest
             ? (isArabic
-                ? 'بانتظار تقرير المركز'
+                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚Ø±ÙŠØ± Ø§Ù„Ù…Ø±ÙƒØ²'
                 : 'Waiting for center report')
             : (isArabic
-                ? 'بانتظار تقييم الأخصائي'
+                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ'
                 : 'Waiting for clinician review');
       }
     }
@@ -791,7 +791,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
       child: Scaffold(
         appBar: AppShellActions.buildAppBar(
           context,
-          title: isArabic ? 'الجلسات والإقامات' : 'Sessions & Residencies',
+          title: isArabic ? 'Ø§Ù„Ø¬Ù„Ø³Ø§Øª ÙˆØ§Ù„Ø¥Ù‚Ø§Ù…Ø§Øª' : 'Sessions & Residencies',
         ),
         body: AppPageBackground(
           child:
@@ -801,7 +801,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
               if (snapshot.hasError) {
                 return AppEmptyState(
                   message: isArabic
-                      ? 'تعذر تحميل الجلسات والإقامات'
+                      ? 'ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø¬Ù„Ø³Ø§Øª ÙˆØ§Ù„Ø¥Ù‚Ø§Ù…Ø§Øª'
                       : 'Unable to load sessions and residencies',
                   icon: Icons.error_outline,
                 );
@@ -832,7 +832,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                       children: [
                         Text(
                           isArabic
-                              ? 'متابعة الجاهزية والاستثناءات للجلسات'
+                              ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø¬Ø§Ù‡Ø²ÙŠØ© ÙˆØ§Ù„Ø§Ø³ØªØ«Ù†Ø§Ø¡Ø§Øª Ù„Ù„Ø¬Ù„Ø³Ø§Øª'
                               : 'Sessions Readiness & Exception Control',
                           style:
                               Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -842,8 +842,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                         const SizedBox(height: AppSpacing.xs),
                         Text(
                           isArabic
-                              ? 'هذه الصفحة تتابع الجاهزية والعوائق والبوابات المالية وإشارات المراجعة أو الاكتمال وحالات الاسترداد الاستثنائية؛ وليست سطح الملكية التشغيلية اليومية.'
-                              : 'This page tracks readiness, blockers, financial gates, review/completion signals, and exceptional recovery cases; it is not the normal operational ownership surface.',
+                              ? 'التركيز: جاهزية الجلسات، العوائق، تأكيدات البدء، وحالات الاسترداد.'
+                              : 'Focus: session readiness, blockers, start confirmations, and recovery cases.',
                           textAlign: isArabic ? TextAlign.right : TextAlign.left,
                           style:
                               Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -861,15 +861,23 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                             ChoiceChip(
                               selected: _tab == 'session_setup_pending',
                               label: Text(
-                                isArabic ? 'بانتظار التجهيز' : 'Setup pending',
+                                isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªØ¬Ù‡ÙŠØ²' : 'Setup pending',
                               ),
                               onSelected: (_) => setState(
                                   () => _tab = 'session_setup_pending'),
                             ),
                             ChoiceChip(
+                              selected: _tab == 'reschedule_pending',
+                              label: Text(
+                                isArabic ? 'Ø¥Ø¹Ø§Ø¯Ø© Ø¬Ø¯ÙˆÙ„Ø©' : 'Reschedule',
+                              ),
+                              onSelected: (_) =>
+                                  setState(() => _tab = 'reschedule_pending'),
+                            ),
+                            ChoiceChip(
                               selected: _tab == 'session_scheduled',
                               label: Text(
-                                isArabic ? 'مجدولة' : 'Scheduled',
+                                isArabic ? 'Ù…Ø¬Ø¯ÙˆÙ„Ø©' : 'Scheduled',
                               ),
                               onSelected: (_) =>
                                   setState(() => _tab = 'session_scheduled'),
@@ -879,21 +887,13 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   _tab == 'session_completed_pending_reviews',
                               label: Text(
                                 isArabic
-                                    ? 'بانتظار التقارير/التقييمات'
+                                    ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªÙ‚Ø§Ø±ÙŠØ±/Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª'
                                     : 'Pending reviews',
                               ),
                               onSelected: (_) => setState(
                                 () =>
                                     _tab = 'session_completed_pending_reviews',
                               ),
-                            ),
-                            ChoiceChip(
-                              selected: _tab == 'reschedule_pending',
-                              label: Text(
-                                isArabic ? 'إعادة جدولة' : 'Reschedule',
-                              ),
-                              onSelected: (_) =>
-                                  setState(() => _tab = 'reschedule_pending'),
                             ),
                           ],
                         ),
@@ -904,7 +904,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                   if (docs.isEmpty)
                     AppEmptyState(
                       message: isArabic
-                          ? 'لا توجد طلبات في هذا القسم'
+                          ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª ÙÙŠ Ù‡Ø°Ø§ Ø§Ù„Ù‚Ø³Ù…'
                           : 'No requests in this section',
                     )
                   else
@@ -1075,20 +1075,20 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                         if (isCenterRequest &&
                             centerRecommendedStayDays <= 0)
                           isArabic
-                              ? 'لا توجد مدة موصى بها من المركز.'
+                              ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø¯Ø© Ù…ÙˆØµÙ‰ Ø¨Ù‡Ø§ Ù…Ù† Ø§Ù„Ù…Ø±ÙƒØ².'
                               : 'No center-recommended duration is available.',
                         if (isCenterRequest &&
                             centerRecommendedStayDays > 0 &&
                             enteredDurationDays > 0 &&
                             enteredDurationDays != centerRecommendedStayDays)
                           isArabic
-                              ? 'مدة التجهيز تختلف عن مدة توصية المركز.'
+                              ? 'Ù…Ø¯Ø© Ø§Ù„ØªØ¬Ù‡ÙŠØ² ØªØ®ØªÙ„Ù Ø¹Ù† Ù…Ø¯Ø© ØªÙˆØµÙŠØ© Ø§Ù„Ù…Ø±ÙƒØ².'
                               : 'Setup duration differs from the center recommendation.',
                         if (isCenterRequest &&
                             (selectedAccommodationPrice <= 0 ||
                                 selectedAccommodationPricingUnit.isEmpty))
                           isArabic
-                              ? 'بيانات تسعير الإقامة غير مكتملة.'
+                              ? 'Ø¨ÙŠØ§Ù†Ø§Øª ØªØ³Ø¹ÙŠØ± Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© ØºÙŠØ± Ù…ÙƒØªÙ…Ù„Ø©.'
                               : 'Accommodation pricing data is incomplete.',
                         if (isCenterRequest &&
                             contractRoom != null &&
@@ -1106,11 +1106,11 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                     contractPricingUnit !=
                                         selectedAccommodationPricingUnit)))
                           isArabic
-                              ? 'بيانات الإقامة المختارة تختلف عن مسودة العقد.'
+                              ? 'Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ø§Ù„Ù…Ø®ØªØ§Ø±Ø© ØªØ®ØªÙ„Ù Ø¹Ù† Ù…Ø³ÙˆØ¯Ø© Ø§Ù„Ø¹Ù‚Ø¯.'
                               : 'Selected accommodation differs from the contract draft.',
                         if (isCenterRequest && existingQuoteAlready)
                           isArabic
-                              ? 'يوجد تجهيز سابق محفوظ؛ لن يتم استخدام الملء التلقائي.'
+                              ? 'ÙŠÙˆØ¬Ø¯ ØªØ¬Ù‡ÙŠØ² Ø³Ø§Ø¨Ù‚ Ù…Ø­ÙÙˆØ¸Ø› Ù„Ù† ÙŠØªÙ… Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø§Ù„Ù…Ù„Ø¡ Ø§Ù„ØªÙ„Ù‚Ø§Ø¦ÙŠ.'
                               : 'Existing setup already exists; pre-fill is not applied.',
                       ];
                       final whyHere = _whyHereLabel(
@@ -1194,20 +1194,20 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                         Text(
                                           isCenterRequest
                                               ? (isArabic
-                                                  ? 'المركز: $companionName'
+                                                  ? 'Ø§Ù„Ù…Ø±ÙƒØ²: $companionName'
                                                   : 'Center: $companionName')
                                               : (isArabic
-                                                  ? 'الأخصائي: $companionName'
+                                                  ? 'Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ: $companionName'
                                                   : 'Clinician: $companionName'),
                                         ),
                                       const SizedBox(height: AppSpacing.xs),
                                       Text(
                                         isCenterRequest
                                             ? (isArabic
-                                                ? 'طلب مركز'
+                                                ? 'Ø·Ù„Ø¨ Ù…Ø±ÙƒØ²'
                                                 : 'Center request')
                                             : (isArabic
-                                                ? 'طلب أخصائي'
+                                                ? 'Ø·Ù„Ø¨ Ø£Ø®ØµØ§Ø¦ÙŠ'
                                                 : 'Clinician request'),
                                         style: Theme.of(context)
                                             .textTheme
@@ -1225,7 +1225,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                 AppStatusBadge(
                                   label: awaitingResidencyStart
                                       ? (isArabic
-                                          ? 'بانتظار تأكيد البداية'
+                                          ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©'
                                           : 'Awaiting start confirmations')
                                       : _statusLabel(
                                           status,
@@ -1245,7 +1245,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                     bottom: AppSpacing.xs),
                                 child: Text(
                                   isArabic
-                                      ? 'تاريخ الطلب: $createdAt'
+                                      ? 'ØªØ§Ø±ÙŠØ® Ø§Ù„Ø·Ù„Ø¨: $createdAt'
                                       : 'Request date: $createdAt',
                                 ),
                               ),
@@ -1255,7 +1255,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                     bottom: AppSpacing.xs),
                                 child: Text(
                                   isArabic
-                                      ? 'ملاحظة العميل: $note'
+                                      ? 'Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„Ø¹Ù…ÙŠÙ„: $note'
                                       : 'Client note: $note',
                                 ),
                               ),
@@ -1269,7 +1269,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                 children: [
                                   Text(
                                     isArabic
-                                        ? 'مراقبة / عوائق / الخطوة التالية'
+                                        ? 'Ù…Ø±Ø§Ù‚Ø¨Ø© / Ø¹ÙˆØ§Ø¦Ù‚ / Ø§Ù„Ø®Ø·ÙˆØ© Ø§Ù„ØªØ§Ù„ÙŠØ©'
                                         : 'Monitoring / Blockers / Next Step',
                                     textAlign: isArabic
                                         ? TextAlign.right
@@ -1284,7 +1284,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     isArabic
-                                        ? 'سبب وجود الطلب هنا: $whyHere'
+                                        ? 'Ø³Ø¨Ø¨ ÙˆØ¬ÙˆØ¯ Ø§Ù„Ø·Ù„Ø¨ Ù‡Ù†Ø§: $whyHere'
                                         : 'Why this is here: $whyHere',
                                     textAlign: isArabic
                                         ? TextAlign.right
@@ -1293,7 +1293,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     isArabic
-                                        ? 'الخطوة المنظمة التالية: $nextStructuredStep'
+                                        ? 'Ø§Ù„Ø®Ø·ÙˆØ© Ø§Ù„Ù…Ù†Ø¸Ù…Ø© Ø§Ù„ØªØ§Ù„ÙŠØ©: $nextStructuredStep'
                                         : 'Next structured step: $nextStructuredStep',
                                     textAlign: isArabic
                                         ? TextAlign.right
@@ -1302,7 +1302,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     isArabic
-                                        ? 'إشارة الملكية: $ownershipCue'
+                                        ? 'Ø¥Ø´Ø§Ø±Ø© Ø§Ù„Ù…Ù„ÙƒÙŠØ©: $ownershipCue'
                                         : 'Ownership cue: $ownershipCue',
                                     textAlign: isArabic
                                         ? TextAlign.right
@@ -1312,7 +1312,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                     const SizedBox(height: AppSpacing.xs),
                                     Text(
                                       isArabic
-                                          ? 'سبب التعطيل: $blockingReason'
+                                          ? 'Ø³Ø¨Ø¨ Ø§Ù„ØªØ¹Ø·ÙŠÙ„: $blockingReason'
                                           : 'Blocking reason: $blockingReason',
                                       textAlign: isArabic
                                           ? TextAlign.right
@@ -1333,7 +1333,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                             if (status == 'session_setup_pending' ||
                                 status == 'reschedule_pending') ...[
                               Text(
-                                isArabic ? 'مراجعة التجهيز' : 'Setup review',
+                                isArabic ? 'Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„ØªØ¬Ù‡ÙŠØ²' : 'Setup review',
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleSmall
@@ -1342,7 +1342,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                               const SizedBox(height: AppSpacing.xs),
                               Text(
                                 isArabic
-                                    ? 'مراجعة التجهيز خطوة تحقق قبل فتح الدفع، وليست ملكية تشغيلية عادية للإدارة.'
+                                    ? 'Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„ØªØ¬Ù‡ÙŠØ² Ø®Ø·ÙˆØ© ØªØ­Ù‚Ù‚ Ù‚Ø¨Ù„ ÙØªØ­ Ø§Ù„Ø¯ÙØ¹ØŒ ÙˆÙ„ÙŠØ³Øª Ù…Ù„ÙƒÙŠØ© ØªØ´ØºÙŠÙ„ÙŠØ© Ø¹Ø§Ø¯ÙŠØ© Ù„Ù„Ø¥Ø¯Ø§Ø±Ø©.'
                                     : 'Setup review is a verification step before payment opening, not normal admin operational ownership.',
                                 style: Theme.of(context)
                                     .textTheme
@@ -1360,14 +1360,14 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   context: context,
                                   label: isArabic
                                       ? (isCenterRequest
-                                          ? 'موعد بداية الإقامة'
-                                          : 'موعد الجلسة')
+                                          ? 'Ù…ÙˆØ¹Ø¯ Ø¨Ø¯Ø§ÙŠØ© Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©'
+                                          : 'Ù…ÙˆØ¹Ø¯ Ø§Ù„Ø¬Ù„Ø³Ø©')
                                       : (isCenterRequest
                                           ? 'Residency start'
                                           : 'Session date/time'),
                                   icon: Icons.event_outlined,
                                   hintText: isArabic
-                                      ? 'مثال: 25-03-2026 08:30 PM'
+                                      ? 'Ù…Ø«Ø§Ù„: 25-03-2026 08:30 PM'
                                       : 'Example: 25-03-2026 08:30 PM',
                                 ),
                               ),
@@ -1393,7 +1393,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                     children: [
                                       Text(
                                         isArabic
-                                            ? 'سياق التجهيز المقترح'
+                                            ? 'Ø³ÙŠØ§Ù‚ Ø§Ù„ØªØ¬Ù‡ÙŠØ² Ø§Ù„Ù…Ù‚ØªØ±Ø­'
                                             : 'Suggested setup context',
                                         style: Theme.of(context)
                                             .textTheme
@@ -1405,24 +1405,24 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                       if (centerRecommendedCareLevel.isNotEmpty)
                                         Text(
                                           isArabic
-                                              ? 'توصية المركز: ${_centerCareLevelLabel(centerRecommendedCareLevel, isArabic)}'
+                                              ? 'ØªÙˆØµÙŠØ© Ø§Ù„Ù…Ø±ÙƒØ²: ${_centerCareLevelLabel(centerRecommendedCareLevel, isArabic)}'
                                               : 'Center recommendation: ${_centerCareLevelLabel(centerRecommendedCareLevel, isArabic)}',
                                         ),
                                       if (centerRecommendedStayDays > 0)
                                         Text(
                                           isArabic
-                                              ? 'مدة موصى بها: $centerRecommendedStayDays يوم'
+                                              ? 'Ù…Ø¯Ø© Ù…ÙˆØµÙ‰ Ø¨Ù‡Ø§: $centerRecommendedStayDays ÙŠÙˆÙ…'
                                               : 'Recommended duration: $centerRecommendedStayDays day(s)',
                                         ),
                                       Text(
                                         isArabic
-                                            ? 'يحتاج تقييمًا داخليًا: ${centerNeedsInternalAssessment ? 'نعم' : 'لا'}'
+                                            ? 'ÙŠØ­ØªØ§Ø¬ ØªÙ‚ÙŠÙŠÙ…Ù‹Ø§ Ø¯Ø§Ø®Ù„ÙŠÙ‹Ø§: ${centerNeedsInternalAssessment ? 'Ù†Ø¹Ù…' : 'Ù„Ø§'}'
                                             : 'Needs internal assessment: ${centerNeedsInternalAssessment ? 'Yes' : 'No'}',
                                       ),
                                       if (selectedAccommodationLabel.isNotEmpty)
                                         Text(
                                           isArabic
-                                              ? 'الإقامة المختارة: $selectedAccommodationLabel'
+                                              ? 'Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ø§Ù„Ù…Ø®ØªØ§Ø±Ø©: $selectedAccommodationLabel'
                                               : 'Selected accommodation: $selectedAccommodationLabel',
                                         ),
                                       if (selectedAccommodationPrice > 0 ||
@@ -1430,7 +1430,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                               .isNotEmpty)
                                         Text(
                                           isArabic
-                                              ? 'تسعير الإقامة: ${selectedAccommodationPrice.toStringAsFixed(selectedAccommodationPrice.truncateToDouble() == selectedAccommodationPrice ? 0 : 2)} / $selectedAccommodationPricingUnit'
+                                              ? 'ØªØ³Ø¹ÙŠØ± Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©: ${selectedAccommodationPrice.toStringAsFixed(selectedAccommodationPrice.truncateToDouble() == selectedAccommodationPrice ? 0 : 2)} / $selectedAccommodationPricingUnit'
                                               : 'Accommodation pricing: ${selectedAccommodationPrice.toStringAsFixed(selectedAccommodationPrice.truncateToDouble() == selectedAccommodationPrice ? 0 : 2)} / $selectedAccommodationPricingUnit',
                                         ),
                                       if (contractRoomLabel.isNotEmpty ||
@@ -1438,7 +1438,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                           contractPricingUnit.isNotEmpty)
                                         Text(
                                           isArabic
-                                              ? 'مسودة العقد: ${contractRoomLabel.isEmpty ? '-' : contractRoomLabel} | ${contractRoomPrice.toStringAsFixed(contractRoomPrice.truncateToDouble() == contractRoomPrice ? 0 : 2)} / $contractPricingUnit'
+                                              ? 'Ù…Ø³ÙˆØ¯Ø© Ø§Ù„Ø¹Ù‚Ø¯: ${contractRoomLabel.isEmpty ? '-' : contractRoomLabel} | ${contractRoomPrice.toStringAsFixed(contractRoomPrice.truncateToDouble() == contractRoomPrice ? 0 : 2)} / $contractPricingUnit'
                                               : 'Contract draft: ${contractRoomLabel.isEmpty ? '-' : contractRoomLabel} | ${contractRoomPrice.toStringAsFixed(contractRoomPrice.truncateToDouble() == contractRoomPrice ? 0 : 2)} / $contractPricingUnit',
                                         ),
                                     ],
@@ -1450,11 +1450,11 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   decoration: appInputDecoration(
                                     context: context,
                                     label: isArabic
-                                        ? 'تاريخ نهاية الإقامة المبدئي'
+                                        ? 'ØªØ§Ø±ÙŠØ® Ù†Ù‡Ø§ÙŠØ© Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ø§Ù„Ù…Ø¨Ø¯Ø¦ÙŠ'
                                         : 'Preliminary residency end',
                                     icon: Icons.event_available_outlined,
                                     hintText: isArabic
-                                        ? 'مثال: 30-03-2026 12:00 PM'
+                                        ? 'Ù…Ø«Ø§Ù„: 30-03-2026 12:00 PM'
                                         : 'Example: 30-03-2026 12:00 PM',
                                   ),
                                 ),
@@ -1465,7 +1465,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   decoration: appInputDecoration(
                                     context: context,
                                     label: isArabic
-                                        ? 'عدد أيام الإقامة المبدئي'
+                                        ? 'Ø¹Ø¯Ø¯ Ø£ÙŠØ§Ù… Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ø§Ù„Ù…Ø¨Ø¯Ø¦ÙŠ'
                                         : 'Preliminary stay days',
                                     icon: Icons.hotel_outlined,
                                   ),
@@ -1477,7 +1477,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   decoration: appInputDecoration(
                                     context: context,
                                     label: isArabic
-                                        ? 'سبب تحديد المدة مبدئيًا'
+                                        ? 'Ø³Ø¨Ø¨ ØªØ­Ø¯ÙŠØ¯ Ø§Ù„Ù…Ø¯Ø© Ù…Ø¨Ø¯Ø¦ÙŠÙ‹Ø§'
                                         : 'Reason for preliminary duration',
                                     icon: Icons.fact_check_outlined,
                                   ),
@@ -1485,7 +1485,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                 const SizedBox(height: AppSpacing.sm),
                                 Text(
                                   isArabic
-                                      ? 'هذه المدة مبدئية حتى تقييم الحالة عند الاستقبال داخل المركز.'
+                                      ? 'Ù‡Ø°Ù‡ Ø§Ù„Ù…Ø¯Ø© Ù…Ø¨Ø¯Ø¦ÙŠØ© Ø­ØªÙ‰ ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø­Ø§Ù„Ø© Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…Ø±ÙƒØ².'
                                       : 'This duration is preliminary until the intake assessment at the center.',
                                 ),
                                 if (setupWarnings.isNotEmpty) ...[
@@ -1510,7 +1510,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                       children: [
                                         Text(
                                           isArabic
-                                              ? 'تنبيهات غير مانعة'
+                                              ? 'ØªÙ†Ø¨ÙŠÙ‡Ø§Øª ØºÙŠØ± Ù…Ø§Ù†Ø¹Ø©'
                                               : 'Non-blocking warnings',
                                           style: Theme.of(context)
                                               .textTheme
@@ -1529,7 +1529,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                     enteredDurationDays > 0) ...[
                                   const SizedBox(height: AppSpacing.sm),
                                   Text(
-                                    isArabic ? 'فتح الدفع' : 'Payment opening',
+                                    isArabic ? 'ÙØªØ­ Ø§Ù„Ø¯ÙØ¹' : 'Payment opening',
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleSmall
@@ -1538,13 +1538,13 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     isArabic
-                                        ? 'سيؤدي التأكيد إلى إرسال بيان الدفع للعميل، وليس اعتماد الدفع.'
+                                        ? 'Ø³ÙŠØ¤Ø¯ÙŠ Ø§Ù„ØªØ£ÙƒÙŠØ¯ Ø¥Ù„Ù‰ Ø¥Ø±Ø³Ø§Ù„ Ø¨ÙŠØ§Ù† Ø§Ù„Ø¯ÙØ¹ Ù„Ù„Ø¹Ù…ÙŠÙ„ØŒ ÙˆÙ„ÙŠØ³ Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ø¯ÙØ¹.'
                                         : 'Confirming sends the payment quote to the client; it does not approve payment.',
                                   ),
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     isArabic
-                                        ? 'هذه بوابة مالية تحت إشراف الإدارة، وليست اعتمادًا للدفع أو تنفيذًا للرعاية.'
+                                        ? 'Ù‡Ø°Ù‡ Ø¨ÙˆØ§Ø¨Ø© Ù…Ø§Ù„ÙŠØ© ØªØ­Øª Ø¥Ø´Ø±Ø§Ù Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©ØŒ ÙˆÙ„ÙŠØ³Øª Ø§Ø¹ØªÙ…Ø§Ø¯Ù‹Ø§ Ù„Ù„Ø¯ÙØ¹ Ø£Ùˆ ØªÙ†ÙÙŠØ°Ù‹Ø§ Ù„Ù„Ø±Ø¹Ø§ÙŠØ©.'
                                         : 'This is an admin-supervised financial gate, not payment approval or care execution.',
                                     style: Theme.of(context)
                                         .textTheme
@@ -1558,25 +1558,25 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   const SizedBox(height: AppSpacing.sm),
                                   Text(
                                     isArabic
-                                        ? 'السعر ${selectedAccommodationPricingUnit == 'month' ? 'الشهري' : 'اليومي'}: ${selectedAccommodationPrice.toStringAsFixed(selectedAccommodationPrice.truncateToDouble() == selectedAccommodationPrice ? 0 : 2)}'
+                                        ? 'Ø§Ù„Ø³Ø¹Ø± ${selectedAccommodationPricingUnit == 'month' ? 'Ø§Ù„Ø´Ù‡Ø±ÙŠ' : 'Ø§Ù„ÙŠÙˆÙ…ÙŠ'}: ${selectedAccommodationPrice.toStringAsFixed(selectedAccommodationPrice.truncateToDouble() == selectedAccommodationPrice ? 0 : 2)}'
                                         : '${selectedAccommodationPricingUnit == 'month' ? 'Monthly' : 'Daily'} price: ${selectedAccommodationPrice.toStringAsFixed(selectedAccommodationPrice.truncateToDouble() == selectedAccommodationPrice ? 0 : 2)}',
                                   ),
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     isArabic
-                                        ? 'المبلغ الأساسي: ${computedBaseAmount.toStringAsFixed(2)}'
+                                        ? 'Ø§Ù„Ù…Ø¨Ù„Øº Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ: ${computedBaseAmount.toStringAsFixed(2)}'
                                         : 'Base amount: ${computedBaseAmount.toStringAsFixed(2)}',
                                   ),
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     isArabic
-                                        ? 'الضريبة 10%: ${computedTaxAmount.toStringAsFixed(2)}'
+                                        ? 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© 10%: ${computedTaxAmount.toStringAsFixed(2)}'
                                         : 'Tax 10%: ${computedTaxAmount.toStringAsFixed(2)}',
                                   ),
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     isArabic
-                                        ? 'المبلغ المطلوب من العميل: ${computedTotalAmount.toStringAsFixed(2)}'
+                                        ? 'Ø§Ù„Ù…Ø¨Ù„Øº Ø§Ù„Ù…Ø·Ù„ÙˆØ¨ Ù…Ù† Ø§Ù„Ø¹Ù…ÙŠÙ„: ${computedTotalAmount.toStringAsFixed(2)}'
                                         : 'Gross client-paid amount: ${computedTotalAmount.toStringAsFixed(2)}',
                                   ),
                                 ],
@@ -1588,8 +1588,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   context: context,
                                   label: isArabic
                                       ? (isCenterRequest
-                                          ? 'رابط المتابعة'
-                                          : 'رابط الجلسة')
+                                          ? 'Ø±Ø§Ø¨Ø· Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©'
+                                          : 'Ø±Ø§Ø¨Ø· Ø§Ù„Ø¬Ù„Ø³Ø©')
                                       : (isCenterRequest
                                           ? 'Follow-up link'
                                           : 'Session link'),
@@ -1603,8 +1603,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   context: context,
                                   label: isArabic
                                       ? (isCenterRequest
-                                          ? 'كود الإقامة'
-                                          : 'كود الجلسة')
+                                          ? 'ÙƒÙˆØ¯ Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©'
+                                          : 'ÙƒÙˆØ¯ Ø§Ù„Ø¬Ù„Ø³Ø©')
                                       : (isCenterRequest
                                           ? 'Residency code'
                                           : 'Session code'),
@@ -1618,7 +1618,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                 decoration: appInputDecoration(
                                   context: context,
                                   label: isArabic
-                                      ? 'ملاحظات الإدارة'
+                                      ? 'Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©'
                                       : 'Admin notes',
                                   icon: Icons.notes_outlined,
                                 ),
@@ -1636,7 +1636,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                       bottom: AppSpacing.xs),
                                   child: Text(
                                     isArabic
-                                        ? '${isCenterRequest ? 'موعد بداية الإقامة' : 'موعد الجلسة'}: ${(data['sessionDateText'] ?? '').toString()}'
+                                        ? '${isCenterRequest ? 'Ù…ÙˆØ¹Ø¯ Ø¨Ø¯Ø§ÙŠØ© Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©' : 'Ù…ÙˆØ¹Ø¯ Ø§Ù„Ø¬Ù„Ø³Ø©'}: ${(data['sessionDateText'] ?? '').toString()}'
                                         : '${isCenterRequest ? 'Residency start' : 'Session date'}: ${(data['sessionDateText'] ?? '').toString()}',
                                   ),
                                 ),
@@ -1646,7 +1646,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                       bottom: AppSpacing.xs),
                                   child: Text(
                                     isArabic
-                                        ? 'نهاية الإقامة المبدئية: $stayEndDateText'
+                                        ? 'Ù†Ù‡Ø§ÙŠØ© Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ø§Ù„Ù…Ø¨Ø¯Ø¦ÙŠØ©: $stayEndDateText'
                                         : 'Preliminary residency end: $stayEndDateText',
                                   ),
                                 ),
@@ -1657,7 +1657,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                       bottom: AppSpacing.xs),
                                   child: Text(
                                     isArabic
-                                        ? 'مدة الإقامة المبدئية: $stayDurationDays يوم'
+                                        ? 'Ù…Ø¯Ø© Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ø§Ù„Ù…Ø¨Ø¯Ø¦ÙŠØ©: $stayDurationDays ÙŠÙˆÙ…'
                                         : 'Preliminary stay duration: $stayDurationDays day(s)',
                                   ),
                                 ),
@@ -1668,7 +1668,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                       bottom: AppSpacing.xs),
                                   child: Text(
                                     isArabic
-                                        ? 'سبب تحديد المدة مبدئيًا: $stayDurationReason'
+                                        ? 'Ø³Ø¨Ø¨ ØªØ­Ø¯ÙŠØ¯ Ø§Ù„Ù…Ø¯Ø© Ù…Ø¨Ø¯Ø¦ÙŠÙ‹Ø§: $stayDurationReason'
                                         : 'Reason for preliminary duration: $stayDurationReason',
                                   ),
                                 ),
@@ -1678,7 +1678,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                       bottom: AppSpacing.xs),
                                   child: Text(
                                     isArabic
-                                        ? 'ملاحظة: المدة مبدئية وتؤكد أو تعدل بعد تقييم الاستقبال داخل المركز.'
+                                        ? 'Ù…Ù„Ø§Ø­Ø¸Ø©: Ø§Ù„Ù…Ø¯Ø© Ù…Ø¨Ø¯Ø¦ÙŠØ© ÙˆØªØ¤ÙƒØ¯ Ø£Ùˆ ØªØ¹Ø¯Ù„ Ø¨Ø¹Ø¯ ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…Ø±ÙƒØ².'
                                         : 'Note: This duration is preliminary and may be confirmed or adjusted after intake assessment.',
                                   ),
                                 ),
@@ -1691,7 +1691,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                       bottom: AppSpacing.xs),
                                   child: Text(
                                     isArabic
-                                        ? 'الرابط: ${(data['sessionLink'] ?? '').toString()}'
+                                        ? 'Ø§Ù„Ø±Ø§Ø¨Ø·: ${(data['sessionLink'] ?? '').toString()}'
                                         : 'Link: ${(data['sessionLink'] ?? '').toString()}',
                                   ),
                                 ),
@@ -1704,7 +1704,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                       bottom: AppSpacing.xs),
                                   child: Text(
                                     isArabic
-                                        ? 'الكود: ${(data['sessionCode'] ?? '').toString()}'
+                                        ? 'Ø§Ù„ÙƒÙˆØ¯: ${(data['sessionCode'] ?? '').toString()}'
                                         : 'Code: ${(data['sessionCode'] ?? '').toString()}',
                                   ),
                                 ),
@@ -1713,13 +1713,13 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                             if (isCenterRequest) ...[
                               Text(
                                 isArabic
-                                    ? 'تأكيد المركز لوصول الحالة: ${centerArrivalConfirmed ? 'تم' : 'بانتظار التأكيد'}'
+                                    ? 'ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ù…Ø±ÙƒØ² Ù„ÙˆØµÙˆÙ„ Ø§Ù„Ø­Ø§Ù„Ø©: ${centerArrivalConfirmed ? 'ØªÙ…' : 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªØ£ÙƒÙŠØ¯'}'
                                     : 'Center arrival confirmation: ${centerArrivalConfirmed ? 'confirmed' : 'pending'}',
                               ),
                               const SizedBox(height: AppSpacing.xs),
                               Text(
                                 isArabic
-                                    ? 'تأكيد الأسرة لبداية الإقامة: ${clientCheckInConfirmed ? 'تم' : 'بانتظار التأكيد'}'
+                                    ? 'ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø£Ø³Ø±Ø© Ù„Ø¨Ø¯Ø§ÙŠØ© Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©: ${clientCheckInConfirmed ? 'ØªÙ…' : 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªØ£ÙƒÙŠØ¯'}'
                                     : 'Family check-in confirmation: ${clientCheckInConfirmed ? 'confirmed' : 'pending'}',
                               ),
                               if (status == 'session_in_progress')
@@ -1730,7 +1730,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   ),
                                   child: Text(
                                     isArabic
-                                        ? 'بدء الإقامة مؤكد${residencyStartedBy.isEmpty ? '' : ' بواسطة ${residencyStartedBy == 'center' ? 'المركز' : 'الأسرة'}'}'
+                                        ? 'Ø¨Ø¯Ø¡ Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ù…Ø¤ÙƒØ¯${residencyStartedBy.isEmpty ? '' : ' Ø¨ÙˆØ§Ø³Ø·Ø© ${residencyStartedBy == 'center' ? 'Ø§Ù„Ù…Ø±ÙƒØ²' : 'Ø§Ù„Ø£Ø³Ø±Ø©'}'}'
                                         : 'Residency start confirmed${residencyStartedBy.isEmpty ? '' : ' by ${residencyStartedBy == 'center' ? 'center' : 'client'}'}',
                                   ),
                                 )
@@ -1741,13 +1741,13 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   status == 'payout_pending') ...[
                                 Text(
                                   isArabic
-                                      ? 'تقييم الأسرة: ${clientReviewSubmitted ? 'تم' : 'بانتظار الإرسال'}'
+                                      ? 'ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø£Ø³Ø±Ø©: ${clientReviewSubmitted ? 'ØªÙ…' : 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø¥Ø±Ø³Ø§Ù„'}'
                                       : 'Family review: ${clientReviewSubmitted ? 'submitted' : 'pending'}',
                                 ),
                                 const SizedBox(height: AppSpacing.xs),
                                 Text(
                                   isArabic
-                                      ? 'تقرير خروج المركز: ${centerReviewSubmitted ? 'تم' : 'بانتظار الإرسال'}'
+                                      ? 'ØªÙ‚Ø±ÙŠØ± Ø®Ø±ÙˆØ¬ Ø§Ù„Ù…Ø±ÙƒØ²: ${centerReviewSubmitted ? 'ØªÙ…' : 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø¥Ø±Ø³Ø§Ù„'}'
                                       : 'Center discharge report: ${centerReviewSubmitted ? 'submitted' : 'pending'}',
                                 ),
                                 const SizedBox(height: AppSpacing.sm),
@@ -1757,13 +1757,13 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                 status == 'payout_pending') ...[
                               Text(
                                 isArabic
-                                    ? 'تقييم العميل: ${clientReviewSubmitted ? 'تم' : 'بانتظار الإرسال'}'
+                                    ? 'ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø¹Ù…ÙŠÙ„: ${clientReviewSubmitted ? 'ØªÙ…' : 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø¥Ø±Ø³Ø§Ù„'}'
                                     : 'Client review: ${clientReviewSubmitted ? 'submitted' : 'pending'}',
                               ),
                               const SizedBox(height: AppSpacing.xs),
                               Text(
                                 isArabic
-                                    ? 'تقييم الأخصائي: ${clinicianReviewSubmitted ? 'تم' : 'بانتظار الإرسال'}'
+                                    ? 'ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ: ${clinicianReviewSubmitted ? 'ØªÙ…' : 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø¥Ø±Ø³Ø§Ù„'}'
                                     : 'Clinician review: ${clinicianReviewSubmitted ? 'submitted' : 'pending'}',
                               ),
                               const SizedBox(height: AppSpacing.sm),
@@ -1784,7 +1784,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                     icon: const Icon(Icons.payments_outlined),
                                     label: Text(
                                       isArabic
-                                          ? 'تأكيد مراجعة التجهيز وفتح الدفع'
+                                          ? 'ØªØ£ÙƒÙŠØ¯ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„ØªØ¬Ù‡ÙŠØ² ÙˆÙØªØ­ Ø§Ù„Ø¯ÙØ¹'
                                           : 'Confirm setup review and open payment',
                                     ),
                                   ),
@@ -1812,7 +1812,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   ),
                                   title: Text(
                                     isArabic
-                                        ? 'إجراءات استثنائية / استرداد المسار'
+                                        ? 'Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª Ø§Ø³ØªØ«Ù†Ø§Ø¦ÙŠØ© / Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø§Ù„Ù…Ø³Ø§Ø±'
                                         : 'Fallback / Recovery Actions',
                                     textAlign:
                                         isArabic ? TextAlign.right : TextAlign.left,
@@ -1825,7 +1825,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   ),
                                   subtitle: Text(
                                     isArabic
-                                        ? 'تُستخدم هذه الإجراءات فقط عند الحاجة إلى تصحيح إداري أو استرداد المسار، وليست المسار التشغيلي المعتاد.'
+                                        ? 'ØªÙØ³ØªØ®Ø¯Ù… Ù‡Ø°Ù‡ Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª ÙÙ‚Ø· Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© Ø¥Ù„Ù‰ ØªØµØ­ÙŠØ­ Ø¥Ø¯Ø§Ø±ÙŠ Ø£Ùˆ Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø§Ù„Ù…Ø³Ø§Ø±ØŒ ÙˆÙ„ÙŠØ³Øª Ø§Ù„Ù…Ø³Ø§Ø± Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠ Ø§Ù„Ù…Ø¹ØªØ§Ø¯.'
                                         : 'These actions are for admin correction or flow recovery only, not the normal operational path.',
                                     textAlign:
                                         isArabic ? TextAlign.right : TextAlign.left,
@@ -1847,7 +1847,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                             ),
                                             label: Text(
                                               isArabic
-                                                  ? 'إنشاء/جدولة الجلسة'
+                                                  ? 'Ø¥Ù†Ø´Ø§Ø¡/Ø¬Ø¯ÙˆÙ„Ø© Ø§Ù„Ø¬Ù„Ø³Ø©'
                                                   : 'Schedule session',
                                             ),
                                           ),
@@ -1863,8 +1863,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                             label: Text(
                                               isArabic
                                                   ? (isCenterRequest
-                                                      ? 'تعليم كإقامة جارية'
-                                                      : 'تعليم كجلسة جارية')
+                                                      ? 'ØªØ¹Ù„ÙŠÙ… ÙƒØ¥Ù‚Ø§Ù…Ø© Ø¬Ø§Ø±ÙŠØ©'
+                                                      : 'ØªØ¹Ù„ÙŠÙ… ÙƒØ¬Ù„Ø³Ø© Ø¬Ø§Ø±ÙŠØ©')
                                                   : (isCenterRequest
                                                       ? 'Mark residency in progress'
                                                       : 'Mark in progress'),
@@ -1877,7 +1877,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                             ),
                                             child: Text(
                                               isArabic
-                                                  ? 'سيظهر بدء الإقامة بعد تأكيد الوصول من المركز وتأكيد البداية من الأسرة.'
+                                                  ? 'Ø³ÙŠØ¸Ù‡Ø± Ø¨Ø¯Ø¡ Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ø¨Ø¹Ø¯ ØªØ£ÙƒÙŠØ¯ Ø§Ù„ÙˆØµÙˆÙ„ Ù…Ù† Ø§Ù„Ù…Ø±ÙƒØ² ÙˆØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø¨Ø¯Ø§ÙŠØ© Ù…Ù† Ø§Ù„Ø£Ø³Ø±Ø©.'
                                                   : 'Residency start will appear after center arrival and family check-in confirmations.',
                                             ),
                                           ),
@@ -1893,8 +1893,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                             label: Text(
                                               isArabic
                                                   ? (isCenterRequest
-                                                      ? 'تعليم كإقامة مكتملة'
-                                                      : 'تعليم كمكتملة')
+                                                      ? 'ØªØ¹Ù„ÙŠÙ… ÙƒØ¥Ù‚Ø§Ù…Ø© Ù…ÙƒØªÙ…Ù„Ø©'
+                                                      : 'ØªØ¹Ù„ÙŠÙ… ÙƒÙ…ÙƒØªÙ…Ù„Ø©')
                                                   : (isCenterRequest
                                                       ? 'Mark residency completed'
                                                       : 'Mark completed'),
@@ -1910,7 +1910,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                                 const Icon(Icons.update_outlined),
                                             label: Text(
                                               isArabic
-                                                  ? 'إعادة جدولة'
+                                                  ? 'Ø¥Ø¹Ø§Ø¯Ø© Ø¬Ø¯ÙˆÙ„Ø©'
                                                   : 'Reschedule',
                                             ),
                                           ),
