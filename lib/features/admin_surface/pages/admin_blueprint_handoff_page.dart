@@ -1,10 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class AdminBlueprintHandoffPage extends StatelessWidget {
   const AdminBlueprintHandoffPage({super.key});
+
+  String _buildFullContent() {
+    return '''
+Blueprint Handoff
+
+Purpose
+Single handoff reference explaining what is already built, what remains conceptual, what is monitored, what is frozen, and what must exist before future activation.
+
+Built Foundations
+- Admin structure
+- Gateway layer
+- Communication Gateway v1
+- Engineering Gateway v1
+- Device / Storage Gateway v1
+- Growth & Awareness layer
+- Exposure rules
+- Compliance-to-code checkpoints
+
+Conceptual / Not Activated
+- Real channel integrations
+- Real advertising / awareness placements
+- Automation surfaces
+- Advanced gateway telemetry
+
+Monitoring-only / Supervisory Boundaries
+- Communication boundaries
+- Engineering supervision
+- Device and storage supervision
+
+Frozen / Protected Areas
+- clinician-request path
+- protected architecture areas
+- unsafe direct integrations blocked
+
+Future Activation Conditions
+- Before real integrations
+- Before exposure / advertising
+- Before automation
+
+Project Direction
+- Platform-first
+- Independent modules
+- Shared core / contracts / auth / analytics
+- AI manager per module
+- Possible future split into standalone apps
+
+Current status: Reference entry active
+Manual notes: ...
+''';
+  }
+
+  Future<void> _copyFullContent(BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: _buildFullContent()));
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Copied')),
+      );
+    }
+  }
 
   Widget _buildHandoffCard(
     BuildContext context, {
@@ -92,6 +152,15 @@ class AdminBlueprintHandoffPage extends StatelessWidget {
                   'هذه الصفحة توثيقية ومعمارية فقط. لا تقوم بتفعيل أنظمة، أو تكاملات، أو تتبع، أو أي سلوك تشغيلي.',
               emphasis:
                   'تُستخدم هذه الصفحة كمرجع تسليم للحالة الحالية للمشروع من حيث المعمارية، والسلامة، وحدود البوابات، وجاهزية التفعيل المستقبلي.',
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Align(
+              alignment: Alignment.centerRight,
+              child: OutlinedButton.icon(
+                onPressed: () => _copyFullContent(context),
+                icon: const Icon(Icons.copy_all_outlined, size: 18),
+                label: const Text('Copy Full Content'),
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(

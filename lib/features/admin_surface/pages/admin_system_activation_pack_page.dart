@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
@@ -6,6 +7,39 @@ import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class AdminSystemActivationPackPage extends StatelessWidget {
   const AdminSystemActivationPackPage({super.key});
+
+  String _buildFullContent() {
+    return '''
+System Activation Pack
+
+Purpose
+Executive activation reference for safe activation, compliance, boundaries, and readiness.
+
+Unified Executive Reference
+- Blueprint Handoff
+- Compliance-to-Code Checkpoints
+- Exposure Rules
+- Activation Readiness Matrix
+
+Supervisory Notes
+- Safety comes before any technical, operational, or commercial activation.
+- Compliance comes before any integration, automation, or deeper activation.
+- No deep activation without clear safeguards, real monitoring, and explicit ownership.
+- No monetization without explicit approval for exposure rules and ethical constraints.
+
+Current status: Reference entry active
+Manual notes: ...
+''';
+  }
+
+  Future<void> _copyFullContent(BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: _buildFullContent()));
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Copied')),
+      );
+    }
+  }
 
   Widget _buildPackCard(
     BuildContext context, {
@@ -117,6 +151,15 @@ class AdminSystemActivationPackPage extends StatelessWidget {
                   'الهدف منها هو جمع الصفحات المرجعية الأساسية في نقطة واحدة واضحة قبل أي تفعيل أعمق أو أي توسع مستقبلي.',
               emphasis:
                   'النظام حاليًا في مرحلة Supervised Activation Phase، وأي activation أعمق يبقى مشروطًا بالضوابط، والجاهزية، والسلامة، والامتثال.',
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Align(
+              alignment: Alignment.centerRight,
+              child: OutlinedButton.icon(
+                onPressed: () => _copyFullContent(context),
+                icon: const Icon(Icons.copy_all_outlined, size: 18),
+                label: const Text('Copy Full Content'),
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(

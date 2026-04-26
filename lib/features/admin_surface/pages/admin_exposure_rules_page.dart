@@ -1,10 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class AdminExposureRulesPage extends StatelessWidget {
   const AdminExposureRulesPage({super.key});
+
+  String _buildFullContent() {
+    return '''
+Ad / Awareness Exposure Rules
+
+Purpose
+Supervise when awareness content or monetized promotional content may appear, and when it must remain blocked, within a mental support product.
+
+Exposure Eligibility
+- Stable states only
+- Family-safe contexts
+- Approved surfaces only
+
+Blocked States
+- Crisis states
+- Self-harm / suicide risk states
+- Vulnerable emotional states
+- Escalation-active sessions
+- Active support intervention contexts
+
+Allowed Surfaces
+- Dashboard placements
+- Library surfaces
+- Limited awareness banners
+- Controlled temporary spotlight areas
+
+Restricted / Disallowed Surfaces
+- Crisis chat
+- Active escalation threads
+- Emergency / safety contexts
+- Intrusive interruption points
+
+Priority Logic
+- Awareness first, but never over safety
+- Safety first
+- Support first
+- Monetization never overrides safety/support
+
+Ethical Guard Rules
+- No targeting based on vulnerability
+- No deceptive urgency
+- No manipulative exposure
+- Family-safe only
+- Time-limited, non-intrusive exposure
+
+Current status: Reference entry active
+Manual notes: ...
+''';
+  }
+
+  Future<void> _copyFullContent(BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: _buildFullContent()));
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Copied')),
+      );
+    }
+  }
 
   Widget _buildRuleCard(
     BuildContext context, {
@@ -92,6 +151,15 @@ class AdminExposureRulesPage extends StatelessWidget {
                   'This page defines policy and exposure boundaries only. It does not activate ad delivery, tracking, or runtime enforcement.',
               emphasis:
                   'Safety, support, and ethical safeguards always take priority over awareness or monetization concepts.',
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Align(
+              alignment: Alignment.centerRight,
+              child: OutlinedButton.icon(
+                onPressed: () => _copyFullContent(context),
+                icon: const Icon(Icons.copy_all_outlined, size: 18),
+                label: const Text('Copy Full Content'),
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(

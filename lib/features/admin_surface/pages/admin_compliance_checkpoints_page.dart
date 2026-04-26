@@ -1,10 +1,65 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class AdminComplianceCheckpointsPage extends StatelessWidget {
   const AdminComplianceCheckpointsPage({super.key});
+
+  String _buildFullContent() {
+    return '''
+Compliance-to-Code Checkpoints
+
+Purpose
+Supervise how architecture, safety, gateway boundaries, growth limits, and non-medical positioning should translate into future implementation checkpoints.
+
+Product Positioning Checkpoints
+- Non-medical support only
+- Non-diagnostic AI
+- Not a substitute for clinician care
+
+Safety Checkpoints
+- Escalation required states
+- Blocked exposure states
+- Crisis-safe handling
+- Support-first logic
+
+Gateway Checkpoints
+- Communication boundaries only
+- Engineering supervision only
+- Device / storage supervision only
+- No active integrations unless explicitly approved later
+
+Growth / Exposure Checkpoints
+- Awareness before monetization
+- No ads in blocked states
+- No targeting by vulnerability
+- Family-safe placements only
+
+Admin Surface Checkpoints
+- Home = launchpad, not workbench
+- Control Room = awareness only
+- Operations / Communications separate from Gateway / Growth
+
+Future Activation Checkpoints
+- Before real integrations
+- Before monetized placements
+- Before channel automation
+
+Current status: Reference entry active
+Manual notes: ...
+''';
+  }
+
+  Future<void> _copyFullContent(BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: _buildFullContent()));
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Copied')),
+      );
+    }
+  }
 
   Widget _buildCheckpointCard(
     BuildContext context, {
@@ -91,6 +146,15 @@ class AdminComplianceCheckpointsPage extends StatelessWidget {
                   'This page is a blueprint surface only. It does not activate policy enforcement, integrations, tracking, or business logic.',
               emphasis:
                   'Architecture, safety, support, and compliance must remain aligned before any real activation or automation happens.',
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Align(
+              alignment: Alignment.centerRight,
+              child: OutlinedButton.icon(
+                onPressed: () => _copyFullContent(context),
+                icon: const Icon(Icons.copy_all_outlined, size: 18),
+                label: const Text('Copy Full Content'),
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
