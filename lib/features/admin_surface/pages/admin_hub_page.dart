@@ -1,7 +1,8 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/system/domain_registry.dart';
 import 'package:flutterprojects/core/system/domain_status.dart';
@@ -208,6 +209,185 @@ class _AdminHubPageState extends State<AdminHubPage> {
     });
   }
 
+  String _buildMonitoringSnapshotText({
+    required DocumentSnapshot<Map<String, dynamic>>? operationalAlertsDoc,
+    required DocumentSnapshot<Map<String, dynamic>>? systemHealthDoc,
+    required int stuckFollowUpsCount,
+    required int humanReviewCount,
+    required int pendingPayoutsCount,
+    required List<GatewayStatus> gatewayStatuses,
+  }) {
+    final operationalData = operationalAlertsDoc?.data();
+    final systemHealthData = systemHealthDoc?.data();
+    final hasOperationalSnapshot =
+        operationalAlertsDoc != null && operationalAlertsDoc.exists &&
+        operationalData != null;
+    final hasSystemHealthSnapshot =
+        systemHealthDoc != null && systemHealthDoc.exists && systemHealthData != null;
+    final hasAnyFallback = !hasOperationalSnapshot || !hasSystemHealthSnapshot;
+
+    final centerFollowUp = hasOperationalSnapshot
+        ? (operationalData?['centerFollowUpCount'] ?? 0).toString()
+        : stuckFollowUpsCount.toString();
+    final clientUpdateRequired = hasOperationalSnapshot
+        ? (operationalData?['clientUpdateRequiredCount'] ?? 0).toString()
+        : '0';
+    final operationalPayoutPending = hasOperationalSnapshot
+        ? (operationalData?['payoutPendingCount'] ?? 0).toString()
+        : pendingPayoutsCount.toString();
+
+    final fallbackIssuesCount =
+        stuckFollowUpsCount + humanReviewCount + pendingPayoutsCount;
+    final systemStatus = hasSystemHealthSnapshot
+        ? (systemHealthData?['status'] ?? 'unknown').toString()
+        : (fallbackIssuesCount > 0 ? 'Degraded' : 'OK');
+    final issuesCount = hasSystemHealthSnapshot
+        ? (systemHealthData?['issuesCount'] ?? 0).toString()
+        : fallbackIssuesCount.toString();
+    final rawLastScan = hasSystemHealthSnapshot
+        ? (systemHealthData?['timestamp'])
+        : DateTime.now().toIso8601String();
+    final lastScan = rawLastScan is Timestamp
+        ? rawLastScan.toDate().toIso8601String()
+        : rawLastScan?.toString().trim() ?? DateTime.now().toIso8601String();
+    final gatewayLines = gatewayStatuses.map((status) {
+      final level = status.level.name;
+      final label = status.label ?? status.key ?? 'Gateway';
+      return '- $label: $level';
+    }).join('\n');
+
+    return '''
+Detailed Monitoring Snapshot
+
+${hasAnyFallback ? 'Source: Fallback (no system snapshot found)\n' : ''}
+
+Operational Alerts
+- Center Follow-up: $centerFollowUp
+- Client Update Required: $clientUpdateRequired
+- Payout Pending: $operationalPayoutPending
+
+Critical Alerts
+- Stuck Follow-ups: $stuckFollowUpsCount
+- Human Review Needed: $humanReviewCount
+- Pending Payouts: $pendingPayoutsCount
+
+System Health
+- Status: $systemStatus
+- Issues Count: $issuesCount
+- Last Scan: ${lastScan.isEmpty ? 'N/A' : lastScan}
+
+Gateway Signals
+$gatewayLines
+''';
+  }
+
+  Future<void> _showMonitoringSnapshotDialog(
+    BuildContext context, {
+    required Stream<DocumentSnapshot<Map<String, dynamic>>> operationalAlertsStream,
+    required Stream<DocumentSnapshot<Map<String, dynamic>>> systemHealthStream,
+    required Stream<QuerySnapshot<Map<String, dynamic>>> stuckFollowUpsStream,
+    required Stream<QuerySnapshot<Map<String, dynamic>>> unresolvedSupportChatsStream,
+    required Stream<QuerySnapshot<Map<String, dynamic>>> pendingPayoutsStream,
+    required List<GatewayStatus> gatewayStatuses,
+  }) async {
+    try {
+      Future<int> safeInt(Future<int> future) async {
+        try {
+          return await future.timeout(const Duration(milliseconds: 800));
+        } catch (_) {
+          return 0;
+        }
+      }
+
+      Future<dynamic> safeValue(Future future) async {
+        try {
+          return await future.timeout(const Duration(milliseconds: 800));
+        } catch (_) {
+          return null;
+        }
+      }
+
+      final operationalAlertsDoc =
+          await safeValue(operationalAlertsStream.first);
+      final systemHealthDoc = await safeValue(systemHealthStream.first);
+      final stuckFollowUpsCount = await safeInt(
+        stuckFollowUpsStream.first.then((snapshot) => snapshot.docs.length),
+      );
+      final humanReviewCount = await safeInt(
+        unresolvedSupportChatsStream.first.then((snapshot) => snapshot.docs.length),
+      );
+      final pendingPayoutsCount = await safeInt(
+        pendingPayoutsStream.first.then((snapshot) => snapshot.docs.length),
+      );
+
+      final text = _buildMonitoringSnapshotText(
+        operationalAlertsDoc: operationalAlertsDoc,
+        systemHealthDoc: systemHealthDoc,
+        stuckFollowUpsCount: stuckFollowUpsCount,
+        humanReviewCount: humanReviewCount,
+        pendingPayoutsCount: pendingPayoutsCount,
+        gatewayStatuses: gatewayStatuses,
+      );
+
+      if (!context.mounted) return;
+
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF10161A),
+            title: const Text('Monitoring TXT Snapshot'),
+            content: SingleChildScrollView(
+              child: SelectableText(text),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  await Clipboard.setData(ClipboardData(text: text));
+                  if (dialogContext.mounted) {
+                    Navigator.of(dialogContext).pop();
+                  }
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Copied')),
+                    );
+                  }
+                },
+                child: const Text('Copy'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (error, stack) {
+      debugPrint('Monitoring export error: $error');
+      debugPrint('$stack');
+      if (!context.mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF10161A),
+            title: const Text('Monitoring export error'),
+            content: SingleChildScrollView(
+              child: Text(error.toString()),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   Stream<int> _openEscalationsStream() {
     return FirebaseFirestore.instance
         .collection('chat_escalations')
@@ -270,6 +450,26 @@ class _AdminHubPageState extends State<AdminHubPage> {
     final isArabic = _isArabic(context);
 
     final gatewayStatuses = AdminHubPage._gatewayMonitor.familyStatuses();
+    final operationalAlertsStream = FirebaseFirestore.instance
+        .collection('system_alerts')
+        .doc('latest')
+        .snapshots();
+    final systemHealthStream = FirebaseFirestore.instance
+        .collection('system_health')
+        .doc('latest')
+        .snapshots();
+    final monitoringBookingRequests =
+        FirebaseFirestore.instance.collection('booking_requests');
+    final monitoringChatThreads =
+        FirebaseFirestore.instance.collection('chat_threads');
+    final stuckFollowUpsStream = monitoringBookingRequests
+        .where('status', isEqualTo: 'center_follow_up')
+        .snapshots();
+    final unresolvedSupportChatsStream =
+        monitoringChatThreads.where('needsHumanSupport', isEqualTo: true).snapshots();
+    final pendingPayoutsStream = monitoringBookingRequests
+        .where('status', isEqualTo: 'payout_pending')
+        .snapshots();
 
     final compactCounters = <_QuickStatItem>[
       _QuickStatItem(
@@ -316,16 +516,14 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminSectionLaunchCardData(
         title: isArabic ? 'مراقبة الطلبات والبوابات' : 'Requests & Gates',
         subtitle: isArabic
-            ? 'مراقبة الطلبات والمدفوعات والجلسات دون ملكية تشغيل يومية'
-            : 'Monitor requests, payments, and sessions without daily operational ownership',
+            ? 'مراقبة الطلبات والمدفوعات والجلسات دون ملكية تشغيل يومية' : 'Monitor requests, payments, and sessions without daily operational ownership',
         icon: Icons.assignment_outlined,
         group: AdminVisualGroup.requests,
         route: Routes.adminOperations,
       ),
       _AdminSectionLaunchCardData(
         title: isArabic
-            ? 'المراجعة البشرية والتصعيد'
-            : 'Human Review & Escalated Support',
+            ? 'المراجعة البشرية والتصعيد' : 'Human Review & Escalated Support',
         subtitle: isArabic
             ? 'مراجعة بشرية مطلوبة وحالات دعم مصعّدة للمتابعة فقط'
             : 'Human review needed and escalated support cases for visibility only',
@@ -336,8 +534,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminSectionLaunchCardData(
         title: isArabic ? 'الدليل وبوابات الاعتماد' : 'Directory & Approval Gates',
         subtitle: isArabic
-            ? 'العملاء والمراكز وإشارات الاعتماد'
-            : 'Clients, centers, and approval-gate visibility',
+            ? 'العملاء والمراكز وإشارات الاعتماد' : 'Clients, centers, and approval-gate visibility',
         icon: Icons.apartment_outlined,
         group: AdminVisualGroup.requests,
         route: Routes.adminClinicianRequests,
@@ -345,8 +542,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminSectionLaunchCardData(
         title: isArabic ? 'الحوكمة' : 'Governance',
         subtitle: isArabic
-            ? 'سياسات الذكاء وحالة النطاقات'
-            : 'Policies, domains, and governance visibility',
+            ? 'سياسات الذكاء وحالة النطاقات' : 'Policies, domains, and governance visibility',
         icon: Icons.policy_outlined,
         group: AdminVisualGroup.system,
         route: Routes.adminDomainStatus,
@@ -354,8 +550,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminSectionLaunchCardData(
         title: isArabic ? 'برامج المحتوى والرعاية' : 'Content & Care Programs',
         subtitle: isArabic
-            ? 'حوكمة المحتوى والرسائل والمتابعة الداعمة'
-            : 'Governance for content, support messaging, and follow-up care',
+            ? 'حوكمة المحتوى والرسائل والمتابعة الداعمة' : 'Governance for content, support messaging, and follow-up care',
         icon: Icons.menu_book_outlined,
         group: AdminVisualGroup.support,
         route: Routes.adminContentCarePrograms,
@@ -363,8 +558,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminSectionLaunchCardData(
         title: isArabic ? 'النمو والانتشار' : 'Growth & Awareness',
         subtitle: isArabic
-            ? 'التوعية، التوزيع، وخطط الظهور المدروسة'
-            : 'Awareness, distribution, and supervised exposure planning',
+            ? 'التوعية، التوزيع، وخطط الظهور المدروسة' : 'Awareness, distribution, and supervised exposure planning',
         icon: Icons.campaign_outlined,
         group: AdminVisualGroup.analytics,
         route: Routes.adminGrowthLayer,
@@ -372,8 +566,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminSectionLaunchCardData(
         title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
         subtitle: isArabic
-            ? 'قنوات وتكاملات وأجهزة وصيانة'
-            : 'Channels, tools, devices, and maintenance',
+            ? 'قنوات وتكاملات وأجهزة وصيانة' : 'Channels, tools, devices, and maintenance',
         icon: Icons.hub_outlined,
         group: AdminVisualGroup.system,
         route: Routes.adminGatewayLayer,
@@ -381,8 +574,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminSectionLaunchCardData(
         title: isArabic ? 'الأرشيف' : 'Archive',
         subtitle: isArabic
-            ? 'مرجع تاريخي وتقارير مؤرشفة'
-            : 'Historical lookup and archived reporting',
+            ? 'مرجع تاريخي وتقارير مؤرشفة' : 'Historical lookup and archived reporting',
         icon: Icons.archive_outlined,
         group: AdminVisualGroup.system,
         route: Routes.adminArchive,
@@ -447,8 +639,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminGuidedWorkflowCardData(
         title: isArabic ? 'معالجة الدعم' : 'Support Handling',
         subtitle: isArabic
-            ? 'ابدأ من حدود القناة ثم راجع حوكمة الرسائل الداعمة.'
-            : 'Start with channel boundaries, then review support messaging governance.',
+            ? 'ابدأ من حدود القناة ثم راجع حوكمة الرسائل الداعمة.' : 'Start with channel boundaries, then review support messaging governance.',
         primaryActionLabel:
             isArabic ? 'Communication Gateway' : 'Communication Gateway',
         primaryRoute: Routes.adminCommunicationGateway,
@@ -460,8 +651,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminGuidedWorkflowCardData(
         title: isArabic ? 'جاهزية المتابعة' : 'Follow-Up Readiness',
         subtitle: isArabic
-            ? 'راجع حوكمة المتابعة ثم حدود الذكاء قبل أي توسع لاحق.'
-            : 'Review follow-up governance, then AI boundaries before any later expansion.',
+            ? 'راجع حوكمة المتابعة ثم حدود الذكاء قبل أي توسع لاحق.' : 'Review follow-up governance, then AI boundaries before any later expansion.',
         primaryActionLabel:
             isArabic ? 'Follow-Up Care Governance' : 'Follow-Up Care Governance',
         primaryRoute: Routes.adminFollowupCareGovernance,
@@ -473,13 +663,12 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminGuidedWorkflowCardData(
         title: isArabic ? 'مراجعة إدخال المحتوى' : 'Content Intake Review',
         subtitle: isArabic
-            ? 'راجع حوكمة المكتبة ثم ارجع إلى سطح برامج المحتوى والرعاية.'
-            : 'Review library governance, then return to the content and care surface.',
+            ? 'راجع حوكمة المكتبة ثم ارجع إلى سطح برامج المحتوى والرعاية.' : 'Review library governance, then return to the content and care surface.',
         primaryActionLabel:
             isArabic ? 'Library Governance' : 'Library Governance',
         primaryRoute: Routes.adminLibraryGovernance,
         secondaryActionLabel:
-            isArabic ? 'Content & Care Programs' : 'Content & Care Programs',
+            isArabic ? 'برامج المحتوى والرعاية' : 'Content & Care Programs',
         secondaryRoute: Routes.adminContentCarePrograms,
         group: AdminVisualGroup.support,
       ),
@@ -489,50 +678,73 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminDetailPanelSection(
         title: isArabic ? 'المسارات الموجهة' : 'Guided Workflows',
         subtitle: isArabic
-            ? 'إظهار المسارات الموجهة فقط عند الحاجة.'
-            : 'Guided review paths kept available without stretching the main hub.',
+            ? 'إظهار المسارات الموجهة فقط عند الحاجة.' : 'Guided review paths kept available without stretching the main hub.',
         child: _AdminGuidedWorkflowsSection(
           title: isArabic ? 'مسارات مراجعة موجهة' : 'Guided Review Paths',
           subtitle: isArabic
-              ? 'تجميعات تنقل خفيفة للمراجعة والوعي فقط، وليست مسار تشغيل جديد.'
-              : 'Compact route groupings for review and awareness only, not a new operating workflow.',
+              ? 'تجميعات تنقل خفيفة للمراجعة والوعي فقط، وليست مسار تشغيل جديد.' : 'Compact route groupings for review and awareness only, not a new operating workflow.',
           workflows: guidedWorkflows,
         ),
       ),
       _AdminDetailPanelSection(
         title: isArabic ? 'المراجع' : 'References',
         subtitle: isArabic
-            ? 'الروابط المرجعية والسياسات في قسم منفصل قابل للطي.'
-            : 'Reference pages and policy shortcuts kept below the fold.',
-        child: _AdminQuickActionsStrip(
+            ? 'الروابط المرجعية والسياسات في قسم منفصل قابل للطي.' : 'Reference pages and policy shortcuts kept below the fold.',
+        child: _AdminReferencesSection(
+          isArabic: isArabic,
           title: isArabic ? 'مراجع أساسية' : 'Key References',
           subtitle: isArabic
-              ? 'صفحات مرجعية تساعد غرفة التحكم على فهم الحدود والسياسات.'
-              : 'Reference pages that help the control room understand boundaries and policy.',
+              ? 'صفحات مرجعية تساعد غرفة التحكم على فهم الحدود والسياسات.' : 'Reference pages that help the control room understand boundaries and policy.',
           actions: keyReferences,
         ),
       ),
       _AdminDetailPanelSection(
         title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
         subtitle: isArabic
-            ? 'حالة البوابات والاتصالات في قسم مضغوط.'
-            : 'Gateway status and connectivity details in a condensed section.',
+            ? 'حالة البوابات والاتصالات في قسم مضغوط.' : 'Gateway status and connectivity details in a condensed section.',
         child: _GatewaySummaryStrip(statuses: gatewayStatuses),
       ),
       _AdminDetailPanelSection(
         title: isArabic ? 'متابعة تفصيلية' : 'Detailed Monitoring',
         subtitle: isArabic
-            ? 'بطاقات التنبيه والصحة وإشارات البوابات في قسم واحد قابل للطي.'
-            : 'Alerts, health, and gateway signals in one collapsible section.',
+            ? 'بطاقات التنبيه والصحة وإشارات البوابات في قسم واحد قابل للطي.' : 'Alerts, health, and gateway signals in one collapsible section.',
         child: Column(
           children: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Monitoring export started'),
+                    ),
+                  );
+                  _showMonitoringSnapshotDialog(
+                    context,
+                    operationalAlertsStream: operationalAlertsStream,
+                    systemHealthStream: systemHealthStream,
+                    stuckFollowUpsStream: stuckFollowUpsStream,
+                    unresolvedSupportChatsStream: unresolvedSupportChatsStream,
+                    pendingPayoutsStream: pendingPayoutsStream,
+                    gatewayStatuses: gatewayStatuses,
+                  );
+                },
+                icon: const Icon(Icons.copy_all_outlined, size: 18),
+                label: const Text('Export Monitoring TXT'),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
             const _ControlRoomIntro(),
             const SizedBox(height: 2),
             _ControlRoomDashboardLayout(
-              leftCards: const [
-                _OperationalAlertsCard(),
-                _AdminSystemHealthCard(),
-                _CriticalAlertsCard(),
+              leftCards: [
+                _OperationalAlertsCard(alertsStream: operationalAlertsStream),
+                _AdminSystemHealthCard(healthStream: systemHealthStream),
+                _CriticalAlertsCard(
+                  stuckFollowUpsStream: stuckFollowUpsStream,
+                  unresolvedSupportChatsStream: unresolvedSupportChatsStream,
+                  pendingPayoutsStream: pendingPayoutsStream,
+                ),
               ],
               supervisoryCard: _GatewaySignalsCard(
                 statuses: gatewayStatuses,
@@ -545,8 +757,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminDetailPanelSection(
         title: isArabic ? 'تفاصيل التحليلات' : 'Analytics Details',
         subtitle: isArabic
-            ? 'ملخص السلوك ومؤشرات المراقبة في قسم مختصر.'
-            : 'Behavior and monitoring analytics kept available without stretching the main page.',
+            ? 'ملخص السلوك ومؤشرات المراقبة في قسم مختصر.' : 'Behavior and monitoring analytics kept available without stretching the main page.',
         child: _UserBehaviorAnalyticsPlaceholder(isArabic: isArabic),
       ),
     ];
@@ -616,8 +827,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
                         child: _AdminQuickActionsStrip(
                     title: isArabic ? 'اختصارات مرجعية' : 'Reference Shortcuts',
                     subtitle: isArabic
-                        ? 'وصول سريع لأسطح الحوكمة والدعم دون تحويل الصفحة إلى سطح تنفيذ.'
-                        : 'Fast access to governance and support surfaces without turning the hub into an execution console.',
+                        ? 'وصول سريع لأسطح الحوكمة والدعم دون تحويل الصفحة إلى سطح تنفيذ.' : 'Fast access to governance and support surfaces without turning the hub into an execution console.',
                     actions: quickActions,
                     vertical: true,
                         ),
@@ -697,15 +907,13 @@ class _AdminHubPageState extends State<AdminHubPage> {
                               _HubExpandableSection(
                                 title: isArabic ? 'المسارات الموجهة' : 'Guided Workflows',
                                 subtitle: isArabic
-                                    ? 'إظهار المسارات الموجهة فقط عند الحاجة.'
-                                    : 'Guided review paths kept available without stretching the main hub.',
+                                    ? 'إظهار المسارات الموجهة فقط عند الحاجة.' : 'Guided review paths kept available without stretching the main hub.',
                                 child: Column(
                                   children: [
                                     _AdminGuidedWorkflowsSection(
                                       title: isArabic ? 'مسارات مراجعة موجهة' : 'Guided Review Paths',
                                       subtitle: isArabic
-                                          ? 'تجميعات تنقل خفيفة للمراجعة والوعي فقط، وليست مسار تشغيل جديد.'
-                                          : 'Compact route groupings for review and awareness only, not a new operating workflow.',
+                                          ? 'تجميعات تنقل خفيفة للمراجعة والوعي فقط، وليست مسار تشغيل جديد.' : 'Compact route groupings for review and awareness only, not a new operating workflow.',
                                       workflows: guidedWorkflows,
                                     ),
                                   ],
@@ -718,13 +926,12 @@ class _AdminHubPageState extends State<AdminHubPage> {
                               _HubExpandableSection(
                                 title: isArabic ? 'المراجع' : 'References',
                                 subtitle: isArabic
-                                    ? 'الروابط المرجعية والسياسات في قسم منفصل قابل للطي.'
-                                    : 'Reference pages and policy shortcuts kept below the fold.',
-                                child: _AdminQuickActionsStrip(
+                                    ? 'الروابط المرجعية والسياسات في قسم منفصل قابل للطي.' : 'Reference pages and policy shortcuts kept below the fold.',
+                                child: _AdminReferencesSection(
+                                  isArabic: isArabic,
                                   title: isArabic ? 'مراجع أساسية' : 'Key References',
                                   subtitle: isArabic
-                                      ? 'صفحات مرجعية تساعد غرفة التحكم على فهم الحدود والسياسات.'
-                                      : 'Reference pages that help the control room understand boundaries and policy.',
+                                      ? 'صفحات مرجعية تساعد غرفة التحكم على فهم الحدود والسياسات.' : 'Reference pages that help the control room understand boundaries and policy.',
                                   actions: keyReferences,
                                 ),
                               ),
@@ -732,25 +939,68 @@ class _AdminHubPageState extends State<AdminHubPage> {
                               _HubExpandableSection(
                                 title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
                                 subtitle: isArabic
-                                    ? 'حالة البوابات والاتصالات في قسم مضغوط.'
-                                    : 'Gateway status and connectivity details in a condensed section.',
+                                    ? 'حالة البوابات والاتصالات في قسم مضغوط.' : 'Gateway status and connectivity details in a condensed section.',
                                 child: _GatewaySummaryStrip(statuses: gatewayStatuses),
                               ),
                               const SizedBox(height: 2),
                               _HubExpandableSection(
                                 title: isArabic ? 'متابعة تفصيلية' : 'Detailed Monitoring',
                                 subtitle: isArabic
-                                    ? 'بطاقات التنبيه والصحة وإشارات البوابات في قسم واحد قابل للطي.'
-                                    : 'Alerts, health, and gateway signals in one collapsible section.',
+                                    ? 'بطاقات التنبيه والصحة وإشارات البوابات في قسم واحد قابل للطي.' : 'Alerts, health, and gateway signals in one collapsible section.',
                                 child: Column(
                                   children: [
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: OutlinedButton.icon(
+                                        onPressed: () {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content: Text('Monitoring export started'),
+                                            ),
+                                          );
+                                          _showMonitoringSnapshotDialog(
+                                            context,
+                                            operationalAlertsStream:
+                                                operationalAlertsStream,
+                                            systemHealthStream:
+                                                systemHealthStream,
+                                            stuckFollowUpsStream:
+                                                stuckFollowUpsStream,
+                                            unresolvedSupportChatsStream:
+                                                unresolvedSupportChatsStream,
+                                            pendingPayoutsStream:
+                                                pendingPayoutsStream,
+                                            gatewayStatuses: gatewayStatuses,
+                                          );
+                                        },
+                                        icon: const Icon(
+                                          Icons.copy_all_outlined,
+                                          size: 18,
+                                        ),
+                                        label: const Text(
+                                          'Export Monitoring TXT',
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.sm),
                                     const _ControlRoomIntro(),
                                     const SizedBox(height: 2),
                                     _ControlRoomDashboardLayout(
-                                      leftCards: const [
-                                        _OperationalAlertsCard(),
-                                        _AdminSystemHealthCard(),
-                                        _CriticalAlertsCard(),
+                                      leftCards: [
+                                        _OperationalAlertsCard(
+                                          alertsStream: operationalAlertsStream,
+                                        ),
+                                        _AdminSystemHealthCard(
+                                          healthStream: systemHealthStream,
+                                        ),
+                                        _CriticalAlertsCard(
+                                          stuckFollowUpsStream:
+                                              stuckFollowUpsStream,
+                                          unresolvedSupportChatsStream:
+                                              unresolvedSupportChatsStream,
+                                          pendingPayoutsStream:
+                                              pendingPayoutsStream,
+                                        ),
                                       ],
                                       supervisoryCard: _GatewaySignalsCard(
                                         statuses: gatewayStatuses,
@@ -764,8 +1014,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
                               _HubExpandableSection(
                                 title: isArabic ? 'تفاصيل التحليلات' : 'Analytics Details',
                                 subtitle: isArabic
-                                    ? 'ملخص السلوك ومؤشرات المراقبة في قسم مختصر قابل للطي.'
-                                    : 'Behavior and monitoring analytics kept available without stretching the main page.',
+                                    ? 'ملخص السلوك ومؤشرات المراقبة في قسم مختصر.' : 'Behavior and monitoring analytics kept available without stretching the main page.',
                                 child: _UserBehaviorAnalyticsPlaceholder(isArabic: isArabic),
                               ),
                             ],
@@ -784,15 +1033,13 @@ class _AdminHubPageState extends State<AdminHubPage> {
                     _HubExpandableSection(
                     title: isArabic ? 'المسارات الموجهة' : 'Guided Workflows',
                     subtitle: isArabic
-                        ? 'إظهار المسارات الموجهة فقط عند الحاجة.'
-                        : 'Guided review paths kept available without stretching the main hub.',
+                        ? 'إظهار المسارات الموجهة فقط عند الحاجة.' : 'Guided review paths kept available without stretching the main hub.',
                     child: Column(
                       children: [
                   _AdminGuidedWorkflowsSection(
                     title: isArabic ? 'مسارات مراجعة موجهة' : 'Guided Review Paths',
                     subtitle: isArabic
-                        ? 'تجميعات تنقل خفيفة للمراجعة والوعي فقط، وليست مسار تشغيل جديد.'
-                        : 'Compact route groupings for review and awareness only, not a new operating workflow.',
+                        ? 'تجميعات تنقل خفيفة للمراجعة والوعي فقط، وليست مسار تشغيل جديد.' : 'Compact route groupings for review and awareness only, not a new operating workflow.',
                     workflows: guidedWorkflows,
                   ),
                       ],
@@ -803,13 +1050,12 @@ class _AdminHubPageState extends State<AdminHubPage> {
                     _HubExpandableSection(
                     title: isArabic ? 'المراجع' : 'References',
                     subtitle: isArabic
-                        ? 'الروابط المرجعية والسياسات في قسم منفصل قابل للطي.'
-                        : 'Reference pages and policy shortcuts kept below the fold.',
-                    child: _AdminQuickActionsStrip(
+                        ? 'الروابط المرجعية والسياسات في قسم منفصل قابل للطي.' : 'Reference pages and policy shortcuts kept below the fold.',
+                    child: _AdminReferencesSection(
+                      isArabic: isArabic,
                     title: isArabic ? 'مراجع أساسية' : 'Key References',
                     subtitle: isArabic
-                        ? 'صفحات مرجعية تساعد غرفة التحكم على فهم الحدود والسياسات.'
-                        : 'Reference pages that help the control room understand boundaries and policy.',
+                        ? 'صفحات مرجعية تساعد غرفة التحكم على فهم الحدود والسياسات.' : 'Reference pages that help the control room understand boundaries and policy.',
                     actions: keyReferences,
                   ),
                   ),
@@ -818,8 +1064,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
                     _HubExpandableSection(
                     title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
                     subtitle: isArabic
-                        ? 'حالة البوابات والاتصالات في قسم مضغوط.'
-                        : 'Gateway status and connectivity details in a condensed section.',
+                        ? 'حالة البوابات والاتصالات في قسم مضغوط.' : 'Gateway status and connectivity details in a condensed section.',
                     child:
                   _GatewaySummaryStrip(statuses: gatewayStatuses),
                   ),
@@ -828,17 +1073,50 @@ class _AdminHubPageState extends State<AdminHubPage> {
                     _HubExpandableSection(
                     title: isArabic ? 'متابعة تفصيلية' : 'Detailed Monitoring',
                     subtitle: isArabic
-                        ? 'بطاقات التنبيه والصحة وإشارات البوابات في قسم واحد قابل للطي.'
-                        : 'Alerts, health, and gateway signals in one collapsible section.',
+                        ? 'بطاقات التنبيه والصحة وإشارات البوابات في قسم واحد قابل للطي.' : 'Alerts, health, and gateway signals in one collapsible section.',
                     child: Column(
                       children: [
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Monitoring export started'),
+                          ),
+                        );
+                        _showMonitoringSnapshotDialog(
+                          context,
+                          operationalAlertsStream: operationalAlertsStream,
+                          systemHealthStream: systemHealthStream,
+                          stuckFollowUpsStream: stuckFollowUpsStream,
+                          unresolvedSupportChatsStream:
+                              unresolvedSupportChatsStream,
+                          pendingPayoutsStream: pendingPayoutsStream,
+                          gatewayStatuses: gatewayStatuses,
+                        );
+                      },
+                      icon: const Icon(Icons.copy_all_outlined, size: 18),
+                      label: const Text('Export Monitoring TXT'),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
                   const _ControlRoomIntro(),
                   const SizedBox(height: 2),
                   _ControlRoomDashboardLayout(
-                    leftCards: const [
-                      _OperationalAlertsCard(),
-                      _AdminSystemHealthCard(),
-                      _CriticalAlertsCard(),
+                    leftCards: [
+                      _OperationalAlertsCard(
+                        alertsStream: operationalAlertsStream,
+                      ),
+                      _AdminSystemHealthCard(
+                        healthStream: systemHealthStream,
+                      ),
+                      _CriticalAlertsCard(
+                        stuckFollowUpsStream: stuckFollowUpsStream,
+                        unresolvedSupportChatsStream:
+                            unresolvedSupportChatsStream,
+                        pendingPayoutsStream: pendingPayoutsStream,
+                      ),
                     ],
                     supervisoryCard: _GatewaySignalsCard(
                       statuses: gatewayStatuses,
@@ -853,8 +1131,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
                     _HubExpandableSection(
                     title: isArabic ? 'تفاصيل التحليلات' : 'Analytics Details',
                     subtitle: isArabic
-                        ? 'ملخص السلوك ومؤشرات المراقبة في قسم مختصر قابل للطي.'
-                        : 'Behavior and monitoring analytics kept available without stretching the main page.',
+                        ? 'ملخص السلوك ومؤشرات المراقبة في قسم مختصر.' : 'Behavior and monitoring analytics kept available without stretching the main page.',
                     child: _UserBehaviorAnalyticsPlaceholder(isArabic: isArabic),
                   ),
                     ],
@@ -1392,13 +1669,174 @@ class _AdminQuickActionsStrip extends StatelessWidget {
   }
 }
 
+class _AdminReferencesSection extends StatelessWidget {
+  const _AdminReferencesSection({
+    required this.isArabic,
+    required this.title,
+    required this.subtitle,
+    required this.actions,
+  });
+
+  final bool isArabic;
+  final String title;
+  final String subtitle;
+  final List<_AdminQuickActionItem> actions;
+
+  String _referencePurpose(_AdminQuickActionItem item) {
+    switch (item.route) {
+      case Routes.adminSystemActivationPack:
+        return 'Activation reference for control-room setup readiness.';
+      case Routes.adminBlueprintHandoff:
+        return 'Boundary handoff reference between planning and implementation.';
+      case Routes.adminComplianceCheckpoints:
+        return 'Compliance and approval checkpoints reference for governance review.';
+      case Routes.adminExposureRules:
+        return 'Exposure and visibility guardrails reference for rollout decisions.';
+      default:
+        return 'Reference entry for control-room review.';
+    }
+  }
+
+  Future<void> _showReferenceSnapshotDialog(
+    BuildContext context,
+    _AdminQuickActionItem item,
+  ) async {
+    final text = [
+      item.label,
+      '',
+      'Purpose: ${_referencePurpose(item)}',
+      'Route: ${item.route}',
+      'Current status: Reference entry active',
+      'Manual notes: ...',
+    ].join('\n');
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF10161A),
+          title: Text(
+            isArabic ? 'تصدير مرجع نصي' : 'Export TXT Reference',
+            style: const TextStyle(
+              color: Color(0xFFF1E5C8),
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          content: SizedBox(
+            width: 420,
+            child: SingleChildScrollView(
+              child: SelectableText(
+                text,
+                style: const TextStyle(
+                  color: Color(0xFFE5D6B2),
+                  height: 1.45,
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(isArabic ? 'إغلاق' : 'Close'),
+            ),
+            FilledButton.tonal(
+              onPressed: () async {
+                await Clipboard.setData(ClipboardData(text: text));
+                if (!dialogContext.mounted) return;
+                Navigator.of(dialogContext).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      isArabic ? 'تم نسخ النص' : 'Reference snapshot copied',
+                    ),
+                  ),
+                );
+              },
+              child: Text(isArabic ? 'نسخ النص' : 'Copy text'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1),
+      child: Column(
+        crossAxisAlignment:
+            isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            alignment: isRtl ? WrapAlignment.end : WrapAlignment.start,
+            children: actions.map((action) {
+              final color = _adminVisualGroupColor(action.group);
+              return Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  ActionChip(
+                    backgroundColor:
+                        const Color(0xFF182026).withValues(alpha: 0.88),
+                    side: BorderSide(
+                      color: const Color(0xFFD8B26A).withValues(alpha: 0.18),
+                    ),
+                    avatar: Icon(
+                      action.icon,
+                      size: 18,
+                      color: color,
+                    ),
+                    label: Text(
+                      action.label,
+                      style: const TextStyle(
+                        color: Color(0xFFF1E5C8),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    onPressed: () =>
+                        Navigator.of(context).pushNamed(action.route),
+                  ),
+                  ActionChip(
+                    backgroundColor:
+                        const Color(0xFF182026).withValues(alpha: 0.90),
+                    side: BorderSide(
+                      color: const Color(0xFF3E9B90).withValues(alpha: 0.34),
+                    ),
+                    avatar: const Icon(
+                      Icons.text_snippet_outlined,
+                      size: 16,
+                      color: Color(0xFF3E9B90),
+                    ),
+                    label: Text(
+                      isArabic ? 'تصدير TXT' : 'Export TXT',
+                      style: const TextStyle(
+                        color: Color(0xFFF1E5C8),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    onPressed: () => _showReferenceSnapshotDialog(context, action),
+                  ),
+                ],
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _AdminGuidedWorkflowsSection extends StatelessWidget {
   const _AdminGuidedWorkflowsSection({
     required this.title,
     required this.subtitle,
     required this.workflows,
   });
-
   final String title;
   final String subtitle;
   final List<_AdminGuidedWorkflowCardData> workflows;
@@ -1471,6 +1909,75 @@ class _AdminGuidedWorkflowCard extends StatelessWidget {
 
   final _AdminGuidedWorkflowCardData item;
 
+  String _buildWorkflowExportText() {
+    final expectedOutcome = switch (item.title) {
+      'Support Handling' || 'معالجة الدعم' =>
+        'Clear support boundary review with channel governance and escalation-safe handling awareness.',
+      'Follow-Up Readiness' || 'جاهزية المتابعة' =>
+        'Follow-up governance is reviewed before any AI-assisted expansion or readiness decision.',
+      'Content Intake Review' || 'مراجعة إدخال المحتوى' =>
+        'Content intake and library governance are reviewed before returning to the program surface.',
+      _ => 'Workflow reference captured for guided review.',
+    };
+
+    return '''
+Workflow: ${item.title}
+
+Entry Points
+- ${item.primaryActionLabel}: ${item.primaryRoute}
+- ${item.secondaryActionLabel}: ${item.secondaryRoute}
+
+Logical Steps
+1. Open ${item.primaryActionLabel}
+2. Review its boundary and current guidance
+3. Open ${item.secondaryActionLabel}
+4. Cross-check governance alignment
+5. Return to Control Room with review awareness only
+
+Expected Outcome
+$expectedOutcome
+
+Observations
+Manual notes: ...
+''';
+  }
+
+  Future<void> _showWorkflowExportDialog(BuildContext context) async {
+    final text = _buildWorkflowExportText();
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF10161A),
+          title: const Text('Workflow TXT Snapshot'),
+          content: SingleChildScrollView(
+            child: SelectableText(text),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await Clipboard.setData(ClipboardData(text: text));
+                if (dialogContext.mounted) {
+                  Navigator.of(dialogContext).pop();
+                }
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Copied')),
+                  );
+                }
+              },
+              child: const Text('Copy'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final color = _adminVisualGroupColor(item.group);
@@ -1523,6 +2030,16 @@ class _AdminGuidedWorkflowCard extends StatelessWidget {
                   ),
                 ),
                 child: Text(item.secondaryActionLabel),
+              ),
+              OutlinedButton(
+                onPressed: () => _showWorkflowExportDialog(context),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFFC9A75B),
+                  side: BorderSide(
+                    color: const Color(0xFFD8B26A).withValues(alpha: 0.22),
+                  ),
+                ),
+                child: const Text('Export Workflow TXT'),
               ),
             ],
           ),
@@ -1926,7 +2443,7 @@ class _AdminHubCard extends StatelessWidget {
                           : (waiting
                               ? '...'
                               : (count == null
-                                  ? '—'
+                                  ? 'â€”'
                                   : (isArabic
                                       ? '$count عنصر'
                                       : '$count items')));
@@ -2318,7 +2835,11 @@ class _GatewaySignalChip extends StatelessWidget {
 }
 
 class _AdminSystemHealthCard extends StatelessWidget {
-  const _AdminSystemHealthCard();
+  const _AdminSystemHealthCard({
+    required this.healthStream,
+  });
+
+  final Stream<DocumentSnapshot<Map<String, dynamic>>> healthStream;
 
   String _dateText(dynamic value) {
     if (value is Timestamp) {
@@ -2350,7 +2871,7 @@ class _AdminSystemHealthCard extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
         const Text(
-          'Issues: —',
+          'Issues: â€”',
           style: TextStyle(
             fontWeight: FontWeight.w800,
           ),
@@ -2406,10 +2927,7 @@ class _AdminSystemHealthCard extends StatelessWidget {
       group: AdminVisualGroup.system,
       minHeight: 224,
       child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance
-            .collection('system_health')
-            .doc('latest')
-            .snapshots(),
+        stream: healthStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return _buildSystemHealthFallback("جارٍ التحديث...");
@@ -2515,19 +3033,19 @@ class _PendingActionsCard extends StatelessWidget {
                                 runSpacing: AppSpacing.md,
                                 children: const [
                                   _StaticInfoChip(
-                                    label: 'Client Updates: —',
+                                    label: 'Client Updates: â€”',
                                     group: AdminVisualGroup.requests,
                                   ),
                                   _StaticInfoChip(
-                                    label: 'Center Follow-up: —',
+                                    label: 'Center Follow-up: â€”',
                                     group: AdminVisualGroup.requests,
                                   ),
                                   _StaticInfoChip(
-                                    label: 'Payout Pending: —',
+                                    label: 'Payout Pending: â€”',
                                     group: AdminVisualGroup.payments,
                                   ),
                                   _StaticInfoChip(
-                                    label: 'Centers Pending Admin: —',
+                                    label: 'Centers Pending Admin: â€”',
                                     group: AdminVisualGroup.requests,
                                   ),
                                 ],
@@ -2631,15 +3149,15 @@ class _ActiveConversationsCard extends StatelessWidget {
                     runSpacing: AppSpacing.md,
                     children: const [
                       _StaticInfoChip(
-                        label: 'Human Review Needed: —',
+                        label: 'Human Review Needed: â€”',
                         group: AdminVisualGroup.support,
                       ),
                       _StaticInfoChip(
-                        label: 'Center Chats: —',
+                        label: 'Center Chats: â€”',
                         group: AdminVisualGroup.support,
                       ),
                       _StaticInfoChip(
-                        label: 'Client Chats: —',
+                        label: 'Client Chats: â€”',
                         group: AdminVisualGroup.support,
                       ),
                     ],
@@ -2698,7 +3216,11 @@ class _ActiveConversationsCard extends StatelessWidget {
 }
 
 class _OperationalAlertsCard extends StatelessWidget {
-  const _OperationalAlertsCard();
+  const _OperationalAlertsCard({
+    required this.alertsStream,
+  });
+
+  final Stream<DocumentSnapshot<Map<String, dynamic>>> alertsStream;
 
   String _dateText(dynamic value) {
     if (value is Timestamp) {
@@ -2729,10 +3251,7 @@ class _OperationalAlertsCard extends StatelessWidget {
       minHeight: 224,
       child: _ControlRoomBodyFrame(
         child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          stream: FirebaseFirestore.instance
-              .collection('system_alerts')
-              .doc('latest')
-              .snapshots(),
+          stream: alertsStream,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Wrap(
@@ -2740,15 +3259,15 @@ class _OperationalAlertsCard extends StatelessWidget {
                 runSpacing: AppSpacing.md,
                 children: const [
                   _StaticInfoChip(
-                    label: 'Center Follow-up: —',
+                    label: 'Center Follow-up: â€”',
                     group: AdminVisualGroup.requests,
                   ),
                   _StaticInfoChip(
-                    label: 'Client Update Required: —',
+                    label: 'Client Update Required: â€”',
                     group: AdminVisualGroup.requests,
                   ),
                   _StaticInfoChip(
-                    label: 'Payout Pending: —',
+                    label: 'Payout Pending: â€”',
                     group: AdminVisualGroup.payments,
                   ),
                 ],
@@ -2838,23 +3357,18 @@ class _OperationalAlertsCard extends StatelessWidget {
 }
 
 class _CriticalAlertsCard extends StatelessWidget {
-  const _CriticalAlertsCard();
+  const _CriticalAlertsCard({
+    required this.stuckFollowUpsStream,
+    required this.unresolvedSupportChatsStream,
+    required this.pendingPayoutsStream,
+  });
+
+  final Stream<QuerySnapshot<Map<String, dynamic>>> stuckFollowUpsStream;
+  final Stream<QuerySnapshot<Map<String, dynamic>>> unresolvedSupportChatsStream;
+  final Stream<QuerySnapshot<Map<String, dynamic>>> pendingPayoutsStream;
 
   @override
   Widget build(BuildContext context) {
-    final bookingRequests =
-        FirebaseFirestore.instance.collection('booking_requests');
-    final chatThreads = FirebaseFirestore.instance.collection('chat_threads');
-
-    final stuckFollowUpsStream = bookingRequests
-        .where('status', isEqualTo: 'center_follow_up')
-        .snapshots();
-    final unresolvedSupportChatsStream =
-        chatThreads.where('needsHumanSupport', isEqualTo: true).snapshots();
-    final pendingPayoutsStream = bookingRequests
-        .where('status', isEqualTo: 'payout_pending')
-        .snapshots();
-
     return _ControlRoomCardShell(
       title: 'Safety / Urgent Attention',
       subtitle:
@@ -2897,15 +3411,15 @@ class _CriticalAlertsCard extends StatelessWidget {
                             runSpacing: AppSpacing.md,
                             children: const [
                               _StaticInfoChip(
-                                label: 'Stuck Follow-ups: —',
+                                label: 'Stuck Follow-ups: â€”',
                                 group: AdminVisualGroup.sessions,
                               ),
                               _StaticInfoChip(
-                                label: 'Human Review Needed: —',
+                                label: 'Human Review Needed: â€”',
                                 group: AdminVisualGroup.support,
                               ),
                               _StaticInfoChip(
-                                label: 'Pending Payouts: —',
+                                label: 'Pending Payouts: â€”',
                                 group: AdminVisualGroup.payments,
                               ),
                             ],
@@ -2991,6 +3505,114 @@ class _UserBehaviorAnalyticsPlaceholderState
 
   late final Future<AnalyticsSummaryBundle> _backendSummaryFuture;
 
+  String _buildAnalyticsSnapshotText({
+    required String source,
+    required List<MapEntry<String, int>> topModules,
+    required List<MapEntry<String, int>> topPaths,
+    required Map<String, int> chatSplit,
+  }) {
+    String formatEntries(List<MapEntry<String, int>> entries) {
+      if (entries.isEmpty) return 'No activity yet';
+      return entries.map((entry) => '- ${entry.key}: ${entry.value}').join('\n');
+    }
+
+    String formatChatMix(Map<String, int> counts) {
+      if (counts.values.fold<int>(0, (sum, value) => sum + value) <= 0) {
+        return 'No activity yet';
+      }
+      const contexts = ['general', 'family_support', 'recovery_support'];
+      return contexts
+          .map((context) => '- $context: ${counts[context] ?? 0}')
+          .join('\n');
+    }
+
+    return '''
+Analytics Snapshot
+
+Source
+$source
+
+Top Entry Modules
+${formatEntries(topModules)}
+
+Top Selected Paths
+${formatEntries(topPaths)}
+
+Chat Context Mix
+${formatChatMix(chatSplit)}
+''';
+  }
+
+  Future<void> _showAnalyticsSnapshotDialog(BuildContext context) async {
+    AnalyticsSummaryBundle? bundle;
+    try {
+      bundle = await _backendSummaryFuture;
+    } catch (_) {
+      bundle = null;
+    }
+
+    final hasBackend = bundle?.hasAnyData == true;
+    final topModules = hasBackend
+        ? (bundle!.topEntryModules?.items ?? const <TopEntryModuleItem>[])
+            .map((item) => MapEntry(item.key, item.count))
+            .toList()
+        : AppAnalytics.getTopModules().take(5).toList();
+    final topPaths = hasBackend
+        ? (bundle!.topSelectedPaths?.items ?? const <TopSelectedPathItem>[])
+            .map((item) => MapEntry(item.key, item.count))
+            .toList()
+        : AppAnalytics.getTopPaths().take(5).toList();
+    final chatSplit = hasBackend
+        ? {
+            for (final item
+                in bundle!.chatOpensByContext?.items ??
+                    const <ChatContextCountItem>[])
+              item.context: item.count,
+          }
+        : AppAnalytics.getChatContextSplit();
+    final text = _buildAnalyticsSnapshotText(
+      source: hasBackend ? 'Backend' : 'Local fallback',
+      topModules: topModules,
+      topPaths: topPaths,
+      chatSplit: chatSplit,
+    );
+
+    if (!context.mounted) return;
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF10161A),
+          title: const Text('Analytics TXT Snapshot'),
+          content: SingleChildScrollView(
+            child: SelectableText(text),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await Clipboard.setData(ClipboardData(text: text));
+                if (dialogContext.mounted) {
+                  Navigator.of(dialogContext).pop();
+                }
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Copied')),
+                  );
+                }
+              },
+              child: const Text('Copy'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -3001,28 +3623,40 @@ class _UserBehaviorAnalyticsPlaceholderState
   Widget build(BuildContext context) {
     return _ControlRoomCardShell(
       title: widget.isArabic
-          ? 'تحليلات سلوك المستخدمين'
-          : 'User Behavior Analytics',
+          ? 'تحليلات سلوك المستخدمين' : 'User Behavior Analytics',
       subtitle: widget.isArabic
-          ? 'قراءة هادئة لأنماط دخول المستخدمين واختياراتهم داخل المسارات الأساسية.'
-          : 'Passive awareness of user entry patterns and support-path choices across core modules.',
+          ? 'قراءة هادئة لأنماط دخول المستخدمين واختياراتهم داخل المسارات الأساسية.' : 'Passive awareness of user entry patterns and support-path choices across core modules.',
       group: AdminVisualGroup.analytics,
       minHeight: 232,
       child: _ControlRoomBodyFrame(
-        child: FutureBuilder<AnalyticsSummaryBundle>(
-          future: _backendSummaryFuture,
-          builder: (context, snapshot) {
-            if (snapshot.data?.hasAnyData == true) {
-              return _BackendAnalyticsSummaryView(
-                isArabic: widget.isArabic,
-                bundle: snapshot.data!,
-              );
-            }
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: OutlinedButton.icon(
+                onPressed: () => _showAnalyticsSnapshotDialog(context),
+                icon: const Icon(Icons.copy_all_outlined, size: 18),
+                label: const Text('Export Analytics TXT'),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            FutureBuilder<AnalyticsSummaryBundle>(
+              future: _backendSummaryFuture,
+              builder: (context, snapshot) {
+                if (snapshot.data?.hasAnyData == true) {
+                  return _BackendAnalyticsSummaryView(
+                    isArabic: widget.isArabic,
+                    bundle: snapshot.data!,
+                  );
+                }
 
-            return _LocalAnalyticsSummaryView(
-              isArabic: widget.isArabic,
-            );
-          },
+                return _LocalAnalyticsSummaryView(
+                  isArabic: widget.isArabic,
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -3074,8 +3708,7 @@ class _BackendAnalyticsSummaryView extends StatelessWidget {
             _AnalyticsSummaryCard(
               title: isArabic ? 'مصادر الدخول' : 'Top Entry Modules',
               helper: isArabic
-                  ? 'أكثر الأقسام دخولًا من الملخص المحفوظ.'
-                  : 'Most entered modules from the latest stored summary.',
+                  ? 'أكثر الأقسام دخولًا من الملخص المحفوظ.' : 'Most entered modules from the latest stored summary.',
               child: _AnalyticsEntryList(
                 isArabic: isArabic,
                 entries: topModules,
@@ -3085,8 +3718,7 @@ class _BackendAnalyticsSummaryView extends StatelessWidget {
             _AnalyticsSummaryCard(
               title: isArabic ? 'أكثر المسارات اختيارًا' : 'Top Selected Paths',
               helper: isArabic
-                  ? 'أكثر المسارات ظهورًا من الملخص المحفوظ.'
-                  : 'Most selected paths from the latest stored summary.',
+                  ? 'أكثر المسارات ظهورًا من الملخص المحفوظ.' : 'Most selected paths from the latest stored summary.',
               child: _AnalyticsEntryList(
                 isArabic: isArabic,
                 entries: topPaths,
@@ -3097,8 +3729,7 @@ class _BackendAnalyticsSummaryView extends StatelessWidget {
               title:
                   isArabic ? 'توزيع فتح الشات حسب السياق' : 'Chat Context Mix',
               helper: isArabic
-                  ? 'سياقات فتح الشات من الملخص المحفوظ.'
-                  : 'Chat open contexts from the latest stored summary.',
+                  ? 'سياقات فتح الشات من الملخص المحفوظ.' : 'Chat open contexts from the latest stored summary.',
               child: _ChatContextSummary(
                 isArabic: isArabic,
                 counts: chatSplit,
@@ -3148,8 +3779,7 @@ class _LocalAnalyticsSummaryView extends StatelessWidget {
           children: [
             AppStatusBadge(
               label: isArabic
-                  ? 'معاينة الجلسة الحالية'
-                  : 'Current session preview',
+                  ? 'معاينة الجلسة الحالية' : 'Current session preview',
               color: _adminVisualGroupColor(AdminVisualGroup.analytics),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -3160,8 +3790,7 @@ class _LocalAnalyticsSummaryView extends StatelessWidget {
                 _AnalyticsSummaryCard(
                   title: isArabic ? 'مصادر الدخول' : 'Top Entry Modules',
                   helper: isArabic
-                      ? 'أكثر الأقسام دخولًا في هذه الجلسة.'
-                      : 'Most entered modules in this session.',
+                      ? 'أكثر الأقسام دخولًا في هذه الجلسة.' : 'Most entered modules in this session.',
                   child: _AnalyticsEntryList(
                     isArabic: isArabic,
                     entries: topModules,
@@ -3171,8 +3800,7 @@ class _LocalAnalyticsSummaryView extends StatelessWidget {
                 _AnalyticsSummaryCard(
                   title: isArabic ? 'أكثر المسارات اختيارًا' : 'Top Selected Paths',
                   helper: isArabic
-                      ? 'أكثر المسارات التي تم اختيارها داخل هذه الجلسة.'
-                      : 'Most selected paths in this session.',
+                      ? 'أكثر المسارات التي تم اختيارها داخل هذه الجلسة.' : 'Most selected paths in this session.',
                   child: _AnalyticsEntryList(
                     isArabic: isArabic,
                     entries: topPaths,
@@ -3183,8 +3811,7 @@ class _LocalAnalyticsSummaryView extends StatelessWidget {
                   title:
                       isArabic ? 'توزيع فتح الشات حسب السياق' : 'Chat Context Mix',
                   helper: isArabic
-                      ? 'الشات العام، والأسرة، والتعافي داخل هذه الجلسة.'
-                      : 'General, family, and recovery chat openings in this session.',
+                      ? 'الشات العام، والأسرة، والتعافي داخل هذه الجلسة.' : 'General, family, and recovery chat openings in this session.',
                   child: _ChatContextSummary(
                     isArabic: isArabic,
                     counts: chatSplit,
@@ -3319,7 +3946,7 @@ class _ChatContextSummary extends StatelessWidget {
 
     if (total == 0) {
       return Text(
-        isArabic ? 'لا توجد بيانات بعد' : 'No activity yet',
+        isArabic ? 'لا يوجد نشاط بعد' : 'No activity yet',
         textAlign: isArabic ? TextAlign.right : TextAlign.left,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: const Color(0xFF314A5C).withValues(alpha: 0.88),
@@ -3771,16 +4398,16 @@ class _QuickStatCard extends StatelessWidget {
           final hasError = snapshot.hasError;
           final count = snapshot.data;
           final openRequestsCountText =
-              hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
-          final countText = hasError ? '!' : (count == null ? '—' : '$count');
+              hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
+          final countText = hasError ? '!' : (count == null ? 'â€”' : '$count');
           final humanReviewCountText =
-              hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
+              hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
           final paymentReviewCountText =
-              hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
+              hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
           final sessionReadinessCountText =
-              hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
+              hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
           final gatewaySignalsCountText =
-              hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
+              hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
           final statusText = hasError
               ? (isArabic ? 'تعذر التحميل' : 'Load failed')
               : (waiting
