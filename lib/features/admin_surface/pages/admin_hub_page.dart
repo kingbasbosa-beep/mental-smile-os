@@ -59,6 +59,11 @@ class AdminHubPage extends StatefulWidget {
 }
 
 class _AdminHubPageState extends State<AdminHubPage> {
+  static const int pendingContentCount = 6;
+  static const int openIssuesCount = 3;
+  static const int aiDevOpsCount = 4;
+  static const int domainAvailabilityCount = 2;
+  static const int whatsAppSignalsCount = 2;
   late final Stream<int> _clinicianPendingStream;
   late final Stream<int> _clinicianProfileRequestsStream;
   late final Stream<int> _centersPendingStream;
@@ -510,9 +515,39 @@ $gatewayLines
         stream: _gatewayAttentionStream,
         route: Routes.adminGatewayLayer,
       ),
+      _QuickStatItem(
+        title: isArabic ? 'مشاكل مفتوحة' : 'Open Issues',
+        group: AdminVisualGroup.system,
+        staticCount: openIssuesCount,
+        route: Routes.adminMaintenanceSystem,
+      ),
+      _QuickStatItem(
+        title: isArabic ? 'حالة الأقسام' : 'Domains',
+        group: AdminVisualGroup.system,
+        staticCount: domainAvailabilityCount,
+        route: Routes.adminDomainAvailability,
+      ),
+      _QuickStatItem(
+        title: isArabic ? 'إشارات واتساب' : 'WhatsApp Signals',
+        group: AdminVisualGroup.support,
+        staticCount: whatsAppSignalsCount,
+        route: Routes.adminCommunicationGateway,
+      ),
+      _QuickStatItem(
+        title: isArabic ? 'تشغيل الذكاء والكود' : 'AI DevOps',
+        group: AdminVisualGroup.analytics,
+        staticCount: aiDevOpsCount,
+        route: Routes.adminAiDevOpsCenter,
+      ),
+      _QuickStatItem(
+        title: isArabic ? 'محتوى قيد التنفيذ' : 'Pending Content',
+        group: AdminVisualGroup.analytics,
+        staticCount: pendingContentCount,
+        route: Routes.contentWorkspace,
+      ),
     ];
 
-    final sectionCards = <_AdminSectionLaunchCardData>[
+    final mainSectionCards = <_AdminSectionLaunchCardData>[
       _AdminSectionLaunchCardData(
         title: isArabic ? 'مراقبة الطلبات والبوابات' : 'Requests & Gates',
         subtitle: isArabic
@@ -578,6 +613,36 @@ $gatewayLines
         icon: Icons.archive_outlined,
         group: AdminVisualGroup.system,
         route: Routes.adminArchive,
+      ),
+    ];
+
+    final departmentSectionCards = <_AdminSectionLaunchCardData>[
+      _AdminSectionLaunchCardData(
+        title: isArabic ? 'المتابعة وخدمة العملاء' : 'Customer Follow-up',
+        subtitle: isArabic
+            ? 'واتساب وطلبات الويب والبريد والمتابعة التشغيلية'
+            : 'WhatsApp, web requests, email, and operational follow-up',
+        icon: Icons.support_agent_outlined,
+        group: AdminVisualGroup.support,
+        route: Routes.customerFollowUpWorkspace,
+      ),
+      _AdminSectionLaunchCardData(
+        title: isArabic ? 'الدعم التقني والصيانة' : 'Technical Support',
+        subtitle: isArabic
+            ? 'الأعطال والصيانة والتشخيص وصحة النظام'
+            : 'Diagnostics, maintenance, issue handling, and system health',
+        icon: Icons.build_circle_outlined,
+        group: AdminVisualGroup.system,
+        route: Routes.technicalSupportWorkspace,
+      ),
+      _AdminSectionLaunchCardData(
+        title: isArabic ? 'الدعاية والمحتوى' : 'Marketing',
+        subtitle: isArabic
+            ? 'المحتوى والحملات وتجهيز النشر والمواد التعليمية'
+            : 'Content, campaigns, publish prep, and educational materials',
+        icon: Icons.campaign_outlined,
+        group: AdminVisualGroup.analytics,
+        route: Routes.marketingWorkspace,
       ),
     ];
 
@@ -850,9 +915,18 @@ $gatewayLines
                       children: [
                         Expanded(
                           flex: 7,
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: _AdminSectionLaunchpad(cards: sectionCards),
+                          child: Column(
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: _AdminSectionLaunchpad(cards: mainSectionCards),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              _AdminDepartmentSection(
+                                isArabic: isArabic,
+                                cards: departmentSectionCards,
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(width: AppSpacing.sm),
@@ -879,9 +953,18 @@ $gatewayLines
                       children: [
                         Expanded(
                           flex: 7,
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: _AdminSectionLaunchpad(cards: sectionCards),
+                          child: Column(
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: _AdminSectionLaunchpad(cards: mainSectionCards),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              _AdminDepartmentSection(
+                                isArabic: isArabic,
+                                cards: departmentSectionCards,
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(width: AppSpacing.sm),
@@ -1023,7 +1106,13 @@ $gatewayLines
                       ],
                     ),
                   if (width < 960)
-                    _AdminSectionLaunchpad(cards: sectionCards),
+                    _AdminSectionLaunchpad(cards: mainSectionCards),
+                  if (width < 960) const SizedBox(height: AppSpacing.md),
+                  if (width < 960)
+                    _AdminDepartmentSection(
+                      isArabic: isArabic,
+                      cards: departmentSectionCards,
+                    ),
                   const SizedBox(height: 2),
                   _SystemAdvisoryCard(
                     advisoryStream: _systemAdvisoryStream(),
@@ -2172,6 +2261,55 @@ class _AdminSectionLaunchCard extends StatelessWidget {
   }
 }
 
+class _AdminDepartmentSection extends StatelessWidget {
+  const _AdminDepartmentSection({
+    required this.isArabic,
+    required this.cards,
+  });
+
+  final bool isArabic;
+  final List<_AdminSectionLaunchCardData> cards;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return AppSurfaceCard(
+      color: const Color(0xFF10161A).withValues(alpha: 0.94),
+      borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.md,
+        AppSpacing.md,
+        AppSpacing.sm,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic ? 'الأقسام التشغيلية' : 'Operational Departments',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: const Color(0xFFF1E5C8),
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            isArabic
+                ? 'مساحات تشغيل مستقلة للمتابعة والدعم التقني والتسويق.'
+                : 'Independent operating surfaces for follow-up, technical support, and marketing.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: const Color(0xFFD6D8DA).withValues(alpha: 0.78),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          _AdminSectionLaunchpad(cards: cards),
+        ],
+      ),
+    );
+  }
+}
+
 class _SystemAdvisorySummary {
   const _SystemAdvisorySummary({
     required this.affectedCount,
@@ -2563,7 +2701,8 @@ class _AdminHomeCountersSection extends StatelessWidget {
 
   Widget _buildCounterWrap(int index, List<int> counts) {
     if (index >= cards.length) {
-      final maxCount = counts.isEmpty ? 0 : counts.reduce((a, b) => a > b ? a : b);
+      final maxCount =
+          counts.isEmpty ? 0 : counts.reduce((a, b) => a > b ? a : b);
       return Column(
         crossAxisAlignment:
             isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
@@ -2587,8 +2726,16 @@ class _AdminHomeCountersSection extends StatelessWidget {
       );
     }
 
+    final card = cards[index];
+    if (card.staticCount != null) {
+      return _buildCounterWrap(
+        index + 1,
+        [...counts, card.staticCount!],
+      );
+    }
+
     return StreamBuilder<int>(
-      stream: cards[index].stream,
+      stream: card.stream!,
       builder: (context, snapshot) {
         return _buildCounterWrap(
           index + 1,
@@ -4349,14 +4496,16 @@ class _ConversationCountChip extends StatelessWidget {
 class _QuickStatItem {
   final String title;
   final AdminVisualGroup? group;
-  final Stream<int> stream;
+  final Stream<int>? stream;
+  final int? staticCount;
   final Stream<int>? crossSignalStream;
   final String route;
 
   const _QuickStatItem({
     required this.title,
     this.group,
-    required this.stream,
+    this.stream,
+    this.staticCount,
     this.crossSignalStream,
     required this.route,
   });
@@ -4376,72 +4525,122 @@ class _QuickStatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _adminVisualGroupColor(item.group);
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () => Navigator.of(context).pushNamed(item.route),
-        child: SizedBox(
-          width: 90,
-          height: 104,
-          child: StreamBuilder<int>(
-        stream: item.stream,
-        builder: (context, snapshot) {
-          final isOpenRequestsCounter = item.group == AdminVisualGroup.requests;
-          final isPaymentReviewCounter = item.group == AdminVisualGroup.payments;
-          final isSessionReadinessCounter = item.group == AdminVisualGroup.sessions;
-          final isHumanReviewCounter = item.group == AdminVisualGroup.support;
-          final isGatewaySignalsCounter = item.group == AdminVisualGroup.system;
-          final waiting =
-              snapshot.connectionState == ConnectionState.waiting &&
-                  !snapshot.hasData;
-          final hasError = snapshot.hasError;
-          final count = snapshot.data;
-          final openRequestsCountText =
-              hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
-          final countText = hasError ? '!' : (count == null ? 'â€”' : '$count');
-          final humanReviewCountText =
-              hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
-          final paymentReviewCountText =
-              hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
-          final sessionReadinessCountText =
-              hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
-          final gatewaySignalsCountText =
-              hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
-          final statusText = hasError
-              ? (isArabic ? 'تعذر التحميل' : 'Load failed')
-              : (waiting
-                  ? (isArabic ? 'جارٍ التحديث' : 'Updating')
-                  : item.title);
-          final displayCountText = isOpenRequestsCounter
-              ? openRequestsCountText
-              : (isPaymentReviewCounter
-                  ? paymentReviewCountText
-                  : (isSessionReadinessCounter
-                      ? sessionReadinessCountText
-                      : (isHumanReviewCounter
-                          ? humanReviewCountText
-                          : (isGatewaySignalsCounter
-                              ? gatewaySignalsCountText
-                              : countText))));
-          final isTopPriority = (count ?? 0) > 0 && (count ?? 0) == maxCount;
+    Widget buildCounterContent({
+      required bool waiting,
+      required bool hasError,
+      required int? count,
+    }) {
+      final isOpenRequestsCounter = item.group == AdminVisualGroup.requests;
+      final isPaymentReviewCounter = item.group == AdminVisualGroup.payments;
+      final isSessionReadinessCounter =
+          item.group == AdminVisualGroup.sessions;
+      final isHumanReviewCounter = item.group == AdminVisualGroup.support;
+      final isGatewaySignalsCounter = item.group == AdminVisualGroup.system;
+      final openRequestsCountText =
+          hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
+      final countText = hasError ? '!' : (count == null ? 'â€”' : '$count');
+      final humanReviewCountText =
+          hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
+      final paymentReviewCountText =
+          hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
+      final sessionReadinessCountText =
+          hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
+      final gatewaySignalsCountText =
+          hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
+      final statusText = hasError
+          ? (isArabic ? 'تعذر التحميل' : 'Load failed')
+          : (waiting
+              ? (isArabic ? 'جارٍ التحديث' : 'Updating')
+              : item.title);
+      final displayCountText = isOpenRequestsCounter
+          ? openRequestsCountText
+          : (isPaymentReviewCounter
+              ? paymentReviewCountText
+              : (isSessionReadinessCounter
+                  ? sessionReadinessCountText
+                  : (isHumanReviewCounter
+                      ? humanReviewCountText
+                      : (isGatewaySignalsCounter
+                          ? gatewaySignalsCountText
+                          : countText))));
+      final isTopPriority = (count ?? 0) > 0 && (count ?? 0) == maxCount;
 
-          return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  item.crossSignalStream == null
-                      ? Container(
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          item.crossSignalStream == null
+              ? Container(
+                  width: 76,
+                  height: 42,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10161A).withValues(alpha: 0.92),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                      color: const Color(0xFFD8B26A).withValues(
+                        alpha: isTopPriority
+                            ? 0.48
+                            : ((count ?? 0) > 0 ? 0.40 : 0.30),
+                      ),
+                      width: 1.1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFD8B26A).withValues(
+                          alpha: isTopPriority
+                              ? 0.11
+                              : ((count ?? 0) > 0 ? 0.08 : 0.04),
+                        ),
+                        blurRadius: 5,
+                        spreadRadius: 0.1,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        displayCountText,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: color,
+                          fontSize: 21,
+                          fontWeight: FontWeight.w900,
+                          height: 1,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        width: 24,
+                        height: 3,
+                        decoration: BoxDecoration(
+                          color: color.withValues(alpha: 0.62),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : StreamBuilder<int>(
+                  stream: item.crossSignalStream,
+                  builder: (context, crossSnapshot) {
+                    final crossSignalActive =
+                        (count ?? 0) > 0 && (crossSnapshot.data ?? 0) > 0;
+                    return Container(
                       width: 76,
                       height: 42,
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF10161A).withValues(alpha: 0.92),
+                        color:
+                            const Color(0xFF10161A).withValues(alpha: 0.92),
                         borderRadius: BorderRadius.circular(999),
                         border: Border.all(
                           color: const Color(0xFFD8B26A).withValues(
                             alpha: isTopPriority
-                                ? 0.48
-                                : ((count ?? 0) > 0 ? 0.40 : 0.30),
+                                ? 0.52
+                                : (crossSignalActive
+                                    ? 0.46
+                                    : ((count ?? 0) > 0 ? 0.40 : 0.30)),
                           ),
                           width: 1.1,
                         ),
@@ -4449,12 +4648,22 @@ class _QuickStatCard extends StatelessWidget {
                           BoxShadow(
                             color: const Color(0xFFD8B26A).withValues(
                               alpha: isTopPriority
-                                  ? 0.11
-                                  : ((count ?? 0) > 0 ? 0.08 : 0.04),
+                                  ? 0.12
+                                  : (crossSignalActive
+                                      ? 0.10
+                                      : ((count ?? 0) > 0 ? 0.08 : 0.04)),
                             ),
                             blurRadius: 5,
                             spreadRadius: 0.1,
                           ),
+                          if (crossSignalActive)
+                            BoxShadow(
+                              color: const Color(0xFF3E7C6F).withValues(
+                                alpha: 0.05,
+                              ),
+                              blurRadius: 6,
+                              spreadRadius: 0.15,
+                            ),
                         ],
                       ),
                       child: Column(
@@ -4481,95 +4690,53 @@ class _QuickStatCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                        )
-                      : StreamBuilder<int>(
-                      stream: item.crossSignalStream,
-                      builder: (context, crossSnapshot) {
-                        final crossSignalActive =
-                            (count ?? 0) > 0 && (crossSnapshot.data ?? 0) > 0;
-                        return Container(
-                          width: 76,
-                          height: 42,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF10161A).withValues(alpha: 0.92),
-                            borderRadius: BorderRadius.circular(999),
-                            border: Border.all(
-                              color: const Color(0xFFD8B26A).withValues(
-                                alpha: isTopPriority
-                                    ? 0.52
-                                    : (crossSignalActive
-                                        ? 0.46
-                                        : ((count ?? 0) > 0 ? 0.40 : 0.30)),
-                              ),
-                              width: 1.1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFD8B26A).withValues(
-                                  alpha: isTopPriority
-                                      ? 0.12
-                                      : (crossSignalActive
-                                          ? 0.10
-                                          : ((count ?? 0) > 0 ? 0.08 : 0.04)),
-                                ),
-                                blurRadius: 5,
-                                spreadRadius: 0.1,
-                              ),
-                              if (crossSignalActive)
-                                BoxShadow(
-                                  color: const Color(0xFF3E7C6F).withValues(
-                                    alpha: 0.05,
-                                  ),
-                                  blurRadius: 6,
-                                  spreadRadius: 0.15,
-                                ),
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                displayCountText,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: color,
-                                  fontSize: 21,
-                                  fontWeight: FontWeight.w900,
-                                  height: 1,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Container(
-                                width: 24,
-                                height: 3,
-                                decoration: BoxDecoration(
-                                  color: color.withValues(alpha: 0.62),
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  const SizedBox(height: 4),
-                  Text(
-                    statusText,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Color(0xFFE6DAB6),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      height: 1.2,
-                    ),
-                  ),
-                ],
-              );
-            },
+                    );
+                  },
+                ),
+          const SizedBox(height: 4),
+          Text(
+            statusText,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Color(0xFFE6DAB6),
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              height: 1.2,
+            ),
           ),
+        ],
+      );
+    }
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => Navigator.of(context).pushNamed(item.route),
+        child: SizedBox(
+          width: 90,
+          height: 104,
+          child: item.staticCount != null
+              ? buildCounterContent(
+                  waiting: false,
+                  hasError: false,
+                  count: item.staticCount,
+                )
+              : StreamBuilder<int>(
+                  stream: item.stream!,
+                  builder: (context, snapshot) {
+                    final waiting =
+                        snapshot.connectionState == ConnectionState.waiting &&
+                            !snapshot.hasData;
+                    return buildCounterContent(
+                      waiting: waiting,
+                      hasError: snapshot.hasError,
+                      count: snapshot.data,
+                    );
+                  },
+                ),
         ),
       ),
     );

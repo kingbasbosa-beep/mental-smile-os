@@ -3,6 +3,7 @@ import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/system/domain_registry.dart';
 import 'package:flutterprojects/core/system/domain_status.dart';
 import 'package:flutterprojects/core/system/domain_status_service.dart';
+import 'package:flutterprojects/features/admin_surface/shared/admin_whatsapp_support_helper.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_firestore_service.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_health_service.dart';
@@ -384,6 +385,25 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
                                         runSpacing: AppSpacing.xs,
                                         alignment: WrapAlignment.end,
                                         children: [
+                                          OutlinedButton.icon(
+                                            icon: const Icon(
+                                              Icons.warning_amber_rounded,
+                                              size: 18,
+                                            ),
+                                            label: const Text(
+                                              'Escalate to WhatsApp',
+                                            ),
+                                            onPressed: () {
+                                              openAdminWhatsAppSupport(
+                                                context,
+                                                type: 'Human Review Required',
+                                                source: 'Support Chat',
+                                                referenceId: threadId,
+                                                notes:
+                                                    'Thread requires manual admin intervention.',
+                                              );
+                                            },
+                                          ),
                                           AppStatusBadge(
                                             label: _sourceLabel(data, isArabic),
                                             color: const Color(0xFF8A5A1F),

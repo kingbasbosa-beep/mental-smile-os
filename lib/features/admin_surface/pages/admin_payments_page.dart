@@ -410,19 +410,19 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
         (data['accountingReviewStatus'] ?? '').toString();
 
     if (_isInPaymentReview(data)) {
-      return isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø³Ø¯Ø§Ø¯' : 'Payment review';
+      return isArabic ? 'بانتظار مراجعة السداد' : 'Payment review';
     }
 
     if (status == 'payout_pending') {
       if (requestKind == 'center' && accountingReviewStatus != 'confirmed') {
         return isArabic
-            ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ù…Ø±Ø§Ø¬Ø¹Ø© Ù…Ø­Ø§Ø³Ø¨ÙŠØ© Ù„Ù„Ù…Ø±ÙƒØ²'
+            ? 'بانتظار مراجعة محاسبية للمركز'
             : 'Center accounting review pending';
       }
       return isArabic
           ? (requestKind == 'center'
-              ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ­ÙˆÙŠÙ„ Ù…Ø³ØªØ­Ù‚ Ø§Ù„Ù…Ø±ÙƒØ²'
-              : 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ­ÙˆÙŠÙ„ Ù…Ø³ØªØ­Ù‚ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ')
+              ? 'بانتظار تحويل مستحق المركز'
+              : 'بانتظار تحويل مستحق الأخصائي')
           : (requestKind == 'center'
               ? 'Center payout pending'
               : 'Payout pending');
@@ -431,24 +431,24 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
     if (payoutStatus == 'paid_to_clinician' ||
         payoutStatus == 'paid_to_center' ||
         status == 'completed_success') {
-      return isArabic ? 'Ù…ÙƒØªÙ…Ù„ ÙˆÙ…ØºÙ„Ù‚' : 'Completed and closed';
+      return isArabic ? 'مكتمل ومغلق' : 'Completed and closed';
     }
 
     if (paymentStatus == 'approved' && status == 'session_setup_pending') {
       return isArabic
-          ? 'Ù…Ø¹ØªÙ…Ø¯ ÙˆØ¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ¬Ù‡ÙŠØ² Ø§Ù„Ø¬Ù„Ø³Ø©'
+          ? 'معتمد وبانتظار تجهيز الجلسة'
           : 'Approved / session setup pending';
     }
 
     switch (status) {
       case 'session_scheduled':
-        return isArabic ? 'Ø¬Ù„Ø³Ø© Ù…Ø¬Ø¯ÙˆÙ„Ø©' : 'Session scheduled';
+        return isArabic ? 'جلسة مجدولة' : 'Session scheduled';
       case 'session_in_progress':
-        return isArabic ? 'Ø¬Ù„Ø³Ø© Ø¬Ø§Ø±ÙŠØ©' : 'Session in progress';
+        return isArabic ? 'جلسة جارية' : 'Session in progress';
       case 'session_completed_pending_reviews':
-        return isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª' : 'Pending reviews';
+        return isArabic ? 'بانتظار التقييمات' : 'Pending reviews';
       default:
-        return isArabic ? 'Ø­Ø§Ù„Ø© Ù…Ø§Ù„ÙŠØ©' : 'Payment state';
+        return isArabic ? 'حالة مالية' : 'Payment state';
     }
   }
 
@@ -490,26 +490,26 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
 
     if (_isInPaymentReview(data)) {
       return isArabic
-          ? 'Ø¥Ø«Ø¨Ø§Øª Ø³Ø¯Ø§Ø¯ Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ù‚Ø±Ø§Ø± Ù…Ø§Ù„ÙŠ'
+          ? 'إثبات سداد بانتظار قرار مالي'
           : 'Payment proof is waiting for a financial decision';
     }
     if (status == 'payout_pending') {
       if (requestKind == 'center' && accountingReviewStatus != 'confirmed') {
         return isArabic
-            ? 'Ù…Ø³ØªØ­Ù‚ Ù…Ø±ÙƒØ² Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ù…Ø±Ø§Ø¬Ø¹Ø© Ù…Ø­Ø§Ø³Ø¨ÙŠØ©'
+            ? 'مستحق مركز بانتظار مراجعة محاسبية'
             : 'Center payout is waiting for accounting review';
       }
       return isArabic
-          ? 'Ù…Ø³ØªØ­Ù‚ Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ£ÙƒÙŠØ¯ Ø§Ù„ØªØ­ÙˆÙŠÙ„'
+          ? 'مستحق بانتظار تأكيد التحويل'
           : 'Payout is waiting for transfer confirmation';
     }
     if (status == 'completed_success') {
       return isArabic
-          ? 'Ø¹Ù…Ù„ÙŠØ© Ù…ÙƒØªÙ…Ù„Ø© Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø¨ÙˆØ§Ø¨Ø© Ø§Ù„Ø£Ø±Ø´ÙØ©'
+          ? 'عملية مكتملة بانتظار بوابة الأرشفة'
           : 'Completed flow is waiting for archive gate';
     }
     return isArabic
-        ? 'Ø­Ø§Ù„Ø© Ù…Ø§Ù„ÙŠØ© Ù…Ø±Ø¦ÙŠØ© Ù„ØºØ±ÙØ© Ø§Ù„ØªØ­ÙƒÙ…'
+        ? 'حالة مالية مرئية لغرفة التحكم'
         : 'Financial state visible to the control room';
   }
 
@@ -521,23 +521,23 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
 
     if (_isInPaymentReview(data)) {
       return isArabic
-          ? 'Ø§Ø¹ØªÙ…Ø§Ø¯ Ø£Ùˆ Ø±ÙØ¶ Ø¥Ø«Ø¨Ø§Øª Ø§Ù„Ø³Ø¯Ø§Ø¯'
+          ? 'اعتماد أو رفض إثبات السداد'
           : 'Approve or reject payment proof';
     }
     if (status == 'payout_pending') {
       if (requestKind == 'center' && accountingReviewStatus != 'confirmed') {
         return isArabic
-            ? 'Ù…Ø±Ø§Ø¬Ø¹Ø© Ù…Ø­Ø§Ø³Ø¨ÙŠØ© Ù‚Ø¨Ù„ Ø§Ù„ØªØ­ÙˆÙŠÙ„'
+            ? 'مراجعة محاسبية قبل التحويل'
             : 'Accounting review before payout';
       }
       return isArabic
-          ? 'ØªØ£ÙƒÙŠØ¯ ØªØ­ÙˆÙŠÙ„ Ø§Ù„Ù…Ø³ØªØ­Ù‚'
+          ? 'تأكيد تحويل المستحق'
           : 'Confirm payout transfer';
     }
     if (status == 'completed_success') {
-      return isArabic ? 'Ø¨ÙˆØ§Ø¨Ø© Ø£Ø±Ø´ÙØ©' : 'Archive gate';
+      return isArabic ? 'بوابة أرشفة' : 'Archive gate';
     }
-    return isArabic ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ù…Ø§Ù„ÙŠØ© ÙÙ‚Ø·' : 'Financial monitoring only';
+    return isArabic ? 'متابعة مالية فقط' : 'Financial monitoring only';
   }
 
   String _nextStepLabel(Map<String, dynamic> data, bool isArabic) {
@@ -548,21 +548,21 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
 
     if (_isInPaymentReview(data)) {
       return isArabic
-          ? 'Ù‚Ø±Ø§Ø± Ù…Ø§Ù„ÙŠ Ø«Ù… Ø¹ÙˆØ¯Ø© Ø§Ù„Ø·Ù„Ø¨ Ù„Ù„Ù…Ø³Ø§Ø± Ø§Ù„Ù…Ù†Ø¸Ù…'
+          ? 'قرار مالي ثم عودة الطلب للمسار المنظم'
           : 'Financial decision, then return to the structured flow';
     }
     if (status == 'payout_pending') {
       if (requestKind == 'center' && accountingReviewStatus != 'confirmed') {
         return isArabic
-            ? 'Ø¥ÙƒÙ…Ø§Ù„ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ù…Ø­Ø§Ø³Ø¨ÙŠØ©'
+            ? 'إكمال المراجعة المحاسبية'
             : 'Complete accounting review';
       }
-      return isArabic ? 'ØªØ£ÙƒÙŠØ¯ Ø§Ù„ØªØ­ÙˆÙŠÙ„' : 'Confirm payout';
+      return isArabic ? 'تأكيد التحويل' : 'Confirm payout';
     }
     if (status == 'completed_success') {
-      return isArabic ? 'Ø§Ù„Ø£Ø±Ø´ÙØ© Ø§Ù„Ù…Ù†Ø§Ø³Ø¨Ø©' : 'Archive in the proper section';
+      return isArabic ? 'الأرشفة المناسبة' : 'Archive in the proper section';
     }
-    return isArabic ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø§Ù„ÙŠØ©' : 'Monitor financial state';
+    return isArabic ? 'متابعة الحالة المالية' : 'Monitor financial state';
   }
 
   String _ownershipCueLabel(Map<String, dynamic> data, bool isArabic) {
@@ -570,16 +570,16 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
 
     if (_isInPaymentReview(data) || status == 'payout_pending') {
       return isArabic
-          ? 'Ø¨ÙˆØ§Ø¨Ø© Ù…Ø§Ù„ÙŠØ© Ø¥Ø¯Ø§Ø±ÙŠØ©'
+          ? 'بوابة مالية إدارية'
           : 'Admin financial gate';
     }
     if (status == 'completed_success') {
       return isArabic
-          ? 'Ø¥ØºÙ„Ø§Ù‚ ÙˆØ£Ø±Ø´ÙØ© ØªØ­Øª ØªØ­ÙƒÙ… Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©'
+          ? 'إغلاق وأرشفة تحت تحكم الإدارة'
           : 'Admin closeout and archive';
     }
     return isArabic
-        ? 'Ø±Ø¤ÙŠØ© Ù…Ø§Ù„ÙŠØ© Ù…Ù† ØºØ±ÙØ© Ø§Ù„ØªØ­ÙƒÙ…'
+        ? 'رؤية مالية من غرفة التحكم'
         : 'Control-room financial visibility';
   }
 
@@ -594,7 +594,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
     if (_isInPaymentReview(data)) {
       return receiptFile.isEmpty
           ? (isArabic
-              ? 'Ù„Ø§ ÙŠØ¸Ù‡Ø± Ø§Ø³Ù… Ù…Ù„Ù Ø¥Ø«Ø¨Ø§Øª Ø§Ù„Ø³Ø¯Ø§Ø¯'
+              ? 'لا يظهر اسم ملف إثبات السداد'
               : 'Payment proof file name is not visible')
           : null;
     }
@@ -602,7 +602,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
         requestKind == 'center' &&
         accountingReviewStatus != 'confirmed') {
       return isArabic
-          ? 'Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ù…Ø­Ø§Ø³Ø¨ÙŠØ© Ù„Ù… ØªØ¹ØªÙ…Ø¯ Ø¨Ø¹Ø¯'
+          ? 'المراجعة المحاسبية لم تعتمد بعد'
           : 'Accounting review is not confirmed yet';
     }
     return null;
@@ -645,7 +645,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
         appBar: AppShellActions.buildAppBar(
           context,
           title: isArabic
-              ? 'Ø¨ÙˆØ§Ø¨Ø§Øª Ø§Ù„Ø³Ø¯Ø§Ø¯ ÙˆØ§Ù„Ù…Ø­Ø§Ø³Ø¨Ø©'
+              ? 'بوابات السداد والمحاسبة'
               : 'Payment & Accounting Gates',
         ),
         body: AppPageBackground(
@@ -657,7 +657,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
               if (snapshot.hasError) {
                 return AppEmptyState(
                   message: isArabic
-                      ? 'ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ø¯ÙÙˆØ¹Ø§Øª'
+                      ? 'تعذر تحميل المدفوعات'
                       : 'Unable to load payments',
                   icon: Icons.error_outline,
                 );
@@ -702,7 +702,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                       children: [
                         Text(
                           isArabic
-                              ? 'Ø¨ÙˆØ§Ø¨Ø© Ù…Ø§Ù„ÙŠØ© Ù…Ù† ØºØ±ÙØ© Ø§Ù„ØªØ­ÙƒÙ…'
+                              ? 'بوابة مالية من غرفة التحكم'
                               : 'Control-Room Financial Gate',
                           textAlign:
                               isArabic ? TextAlign.right : TextAlign.left,
@@ -735,7 +735,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                               selected: _tab == 'payment_review',
                               label: Text(
                                 isArabic
-                                    ? 'Ø¨ÙˆØ§Ø¨Ø© Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø³Ø¯Ø§Ø¯'
+                                    ? 'بوابة مراجعة السداد'
                                     : 'Payment review gate',
                               ),
                               onSelected: (_) =>
@@ -745,7 +745,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                               selected: _tab == 'approved',
                               label: Text(
                                 isArabic
-                                    ? 'Ø§Ù„Ù…Ø¹ØªÙ…Ø¯Ø© / Ø§Ù„Ù…Ø³ØªØ­Ù‚Ø§Øª / Ø§Ù„Ø¥ØºÙ„Ø§Ù‚'
+                                    ? 'المعتمدة / المستحقات / الإغلاق'
                                     : 'Approved / payout / closeout',
                               ),
                               onSelected: (_) =>
@@ -760,7 +760,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                   if (docs.isEmpty)
                     AppEmptyState(
                       message: isArabic
-                          ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª ÙÙŠ Ù‡Ø°Ø§ Ø§Ù„Ù‚Ø³Ù…'
+                          ? 'لا توجد طلبات في هذا القسم'
                           : 'No requests in this section',
                     )
                   else
@@ -847,7 +847,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                       if (clinicianName.trim().isNotEmpty)
                                         Text(
                                           isArabic
-                                              ? 'Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ: $clinicianName'
+                                              ? 'الأخصائي: $clinicianName'
                                               : 'Clinician: $clinicianName',
                                         ),
                                     ],
@@ -873,7 +873,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                             if (archived)
                               Text(
                                 isArabic
-                                    ? 'Ù…Ø¤Ø±Ø´Ù: Ù†Ø¹Ù… ($archiveSection)'
+                                    ? 'مؤرشف: نعم ($archiveSection)'
                                     : 'Archived: yes ($archiveSection)',
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w800),
@@ -881,7 +881,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                             if (finalReviewPercentage > 0)
                               Text(
                                 isArabic
-                                    ? 'Ø§Ù„Ù…ØªÙˆØ³Ø· Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ: ${finalReviewPercentage.toStringAsFixed(1)}%'
+                                    ? 'المتوسط النهائي: ${finalReviewPercentage.toStringAsFixed(1)}%'
                                     : 'Final average: ${finalReviewPercentage.toStringAsFixed(1)}%',
                               ),
                             if (createdAt.isNotEmpty)
@@ -889,7 +889,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
                                   isArabic
-                                      ? 'ØªØ§Ø±ÙŠØ® Ø§Ù„Ø·Ù„Ø¨: $createdAt'
+                                      ? 'تاريخ الطلب: $createdAt'
                                       : 'Request date: $createdAt',
                                 ),
                               ),
@@ -898,7 +898,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
                                   isArabic
-                                      ? 'ØªØ§Ø±ÙŠØ® Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø¥Ø«Ø¨Ø§Øª: $submittedAt'
+                                      ? 'تاريخ إرسال الإثبات: $submittedAt'
                                       : 'Proof submitted at: $submittedAt',
                                 ),
                               ),
@@ -907,7 +907,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
                                   isArabic
-                                      ? 'ØªØ§Ø±ÙŠØ® Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ø³Ø¯Ø§Ø¯: $approvedAt'
+                                      ? 'تاريخ اعتماد السداد: $approvedAt'
                                       : 'Payment approved at: $approvedAt',
                                 ),
                               ),
@@ -916,7 +916,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
                                   isArabic
-                                      ? 'ØªØ§Ø±ÙŠØ® ØªØ­ÙˆÙŠÙ„ Ø§Ù„Ù…Ø³ØªØ­Ù‚: $payoutTransferredAt'
+                                      ? 'تاريخ تحويل المستحق: $payoutTransferredAt'
                                       : 'Payout transferred at: $payoutTransferredAt',
                                 ),
                               ),
@@ -925,7 +925,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
                                   isArabic
-                                      ? 'ØªØ§Ø±ÙŠØ® Ø§Ù„Ø£Ø±Ø´ÙØ©: $archivedAt'
+                                      ? 'تاريخ الأرشفة: $archivedAt'
                                       : 'Archived at: $archivedAt',
                                 ),
                               ),
@@ -934,7 +934,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
                                   isArabic
-                                      ? 'Ø§Ø³Ù… Ø§Ù„Ù…Ù„Ù: $receiptFile'
+                                      ? 'اسم الملف: $receiptFile'
                                       : 'File name: $receiptFile',
                                 ),
                               ),
@@ -943,7 +943,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
                                   isArabic
-                                      ? 'Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„Ø¹Ù…ÙŠÙ„: $clientNote'
+                                      ? 'ملاحظة العميل: $clientNote'
                                       : 'Client note: $clientNote',
                                 ),
                               ),
@@ -958,7 +958,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                 children: [
                                   Text(
                                     isArabic
-                                        ? 'Ø¨ÙˆØ§Ø¨Ø© Ù…Ø§Ù„ÙŠØ© / Ø§Ù„Ø®Ø·ÙˆØ© Ø§Ù„ØªØ§Ù„ÙŠØ©'
+                                        ? 'بوابة مالية / الخطوة التالية'
                                         : 'Financial Gate / Next Step',
                                     textAlign: isArabic
                                         ? TextAlign.right
@@ -973,7 +973,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     isArabic
-                                        ? 'Ø³Ø¨Ø¨ ÙˆØ¬ÙˆØ¯ Ø§Ù„Ø³Ø¬Ù„ Ù‡Ù†Ø§: $whyHere'
+                                        ? 'سبب وجود السجل هنا: $whyHere'
                                         : 'Why this is here: $whyHere',
                                     textAlign: isArabic
                                         ? TextAlign.right
@@ -982,7 +982,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     isArabic
-                                        ? 'Ø§Ù„Ø¨ÙˆØ§Ø¨Ø© Ø§Ù„Ù…Ø§Ù„ÙŠØ© Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©: $requiredGate'
+                                        ? 'البوابة المالية المطلوبة: $requiredGate'
                                         : 'Required financial/admin gate: $requiredGate',
                                     textAlign: isArabic
                                         ? TextAlign.right
@@ -991,7 +991,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     isArabic
-                                        ? 'Ø§Ù„Ø®Ø·ÙˆØ© Ø§Ù„Ù…Ù†Ø¸Ù…Ø© Ø§Ù„ØªØ§Ù„ÙŠØ©: $nextStructuredStep'
+                                        ? 'الخطوة المنظمة التالية: $nextStructuredStep'
                                         : 'Next structured step: $nextStructuredStep',
                                     textAlign: isArabic
                                         ? TextAlign.right
@@ -1000,7 +1000,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     isArabic
-                                        ? 'Ø¥Ø´Ø§Ø±Ø© Ø§Ù„Ù…Ù„ÙƒÙŠØ©: $ownershipCue'
+                                        ? 'إشارة الملكية: $ownershipCue'
                                         : 'Ownership cue: $ownershipCue',
                                     textAlign: isArabic
                                         ? TextAlign.right
@@ -1010,7 +1010,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                     const SizedBox(height: AppSpacing.xs),
                                     Text(
                                       isArabic
-                                          ? 'Ø³Ø¨Ø¨ Ø§Ù„ØªØ¹Ø·ÙŠÙ„: $blockingReason'
+                                          ? 'سبب التعطيل: $blockingReason'
                                           : 'Blocking reason: $blockingReason',
                                       textAlign: isArabic
                                           ? TextAlign.right
@@ -1044,7 +1044,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                   },
                                   icon: const Icon(Icons.assessment_outlined),
                                   label: Text(
-                                    isArabic ? 'Ø¹Ø±Ø¶ Ø§Ù„ØªÙ‚Ø±ÙŠØ±' : 'View report',
+                                    isArabic ? 'عرض التقرير' : 'View report',
                                   ),
                                 ),
                               ],
@@ -1053,7 +1053,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                               const SizedBox(height: AppSpacing.sm),
                               Text(
                                 isArabic
-                                    ? 'Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª Ø§Ù„Ø¨ÙˆØ§Ø¨Ø© Ø§Ù„Ù…Ø§Ù„ÙŠØ©'
+                                    ? 'إجراءات البوابة المالية'
                                     : 'Financial Gate Actions',
                                 textAlign:
                                     isArabic ? TextAlign.right : TextAlign.left,
@@ -1078,7 +1078,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                       ),
                                       label: Text(
                                         isArabic
-                                            ? 'Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ø³Ø¯Ø§Ø¯'
+                                            ? 'اعتماد السداد'
                                             : 'Approve payment',
                                       ),
                                     ),
@@ -1090,7 +1090,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                       icon: const Icon(Icons.cancel_outlined),
                                       label: Text(
                                         isArabic
-                                            ? 'Ø±ÙØ¶ Ø§Ù„Ø³Ø¯Ø§Ø¯'
+                                            ? 'رفض السداد'
                                             : 'Reject payment',
                                       ),
                                       style: appDestructiveButtonStyle(),
@@ -1105,7 +1105,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                       icon: const Icon(Icons.payments_outlined),
                                       label: Text(
                                         isArabic
-                                            ? 'ØªÙ… ØªØ­ÙˆÙŠÙ„ Ù…Ø³ØªØ­Ù‚ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ'
+                                            ? 'تم تحويل مستحق الأخصائي'
                                             : 'Confirm clinician payout',
                                       ),
                                     ),
@@ -1123,7 +1123,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                       icon: const Icon(Icons.calculate_outlined),
                                       label: Text(
                                         isArabic
-                                            ? 'Ù…Ø±Ø§Ø¬Ø¹Ø© Ù…Ø­Ø§Ø³Ø¨ÙŠØ©'
+                                            ? 'مراجعة محاسبية'
                                             : 'Accounting review',
                                       ),
                                     ),
@@ -1141,7 +1141,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                       ),
                                       label: Text(
                                         isArabic
-                                            ? 'ØªÙ… ØªØ­ÙˆÙŠÙ„ Ù…Ø³ØªØ­Ù‚ Ø§Ù„Ù…Ø±ÙƒØ²'
+                                            ? 'تم تحويل مستحق المركز'
                                             : 'Confirm center payout',
                                       ),
                                     ),
@@ -1152,7 +1152,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                               const SizedBox(height: AppSpacing.sm),
                               Text(
                                 isArabic
-                                    ? 'Ø¨ÙˆØ§Ø¨Ø© Ø§Ù„Ø¥ØºÙ„Ø§Ù‚ ÙˆØ§Ù„Ø£Ø±Ø´ÙØ©'
+                                    ? 'بوابة الإغلاق والأرشفة'
                                     : 'Closeout / Archive Gate',
                                 textAlign:
                                     isArabic ? TextAlign.right : TextAlign.left,
@@ -1177,7 +1177,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                       icon: const Icon(Icons.video_call_outlined),
                                       label: Text(
                                         isArabic
-                                            ? 'Ø£Ø±Ø´ÙØ© Ø¬Ù„Ø³ÙŠØ©'
+                                            ? 'أرشفة جلسية'
                                             : 'Session archive',
                                       ),
                                     ),
@@ -1193,7 +1193,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                       ),
                                       label: Text(
                                         isArabic
-                                            ? 'Ø£Ø±Ø´ÙØ© Ù…Ø§Ù„ÙŠØ©'
+                                            ? 'أرشفة مالية'
                                             : 'Financial archive',
                                       ),
                                     ),

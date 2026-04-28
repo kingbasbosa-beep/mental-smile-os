@@ -1,10 +1,110 @@
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class AdminGrowthLayerPage extends StatelessWidget {
   const AdminGrowthLayerPage({super.key});
+
+  Widget _buildLauncherCard(
+    BuildContext context, {
+    required String title,
+    required String summary,
+    required String route,
+    String? statusLabel,
+    String? counterLabel,
+    int? counterValue,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(AppRadii.xl),
+      onTap: () => Navigator.of(context).pushNamed(route),
+      child: AppSectionPanel(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        color: const Color(0xFF10161A).withValues(alpha: 0.94),
+        borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFFC9A75B),
+                  ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              'Operational launcher',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: const Color(0xFFC9A75B),
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            if ((statusLabel ?? '').trim().isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                statusLabel!.trim(),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.obsidian.withValues(alpha: 0.84),
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+            ],
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              summary,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.obsidian.withValues(alpha: 0.84),
+                  ),
+            ),
+            if (counterLabel != null && counterValue != null) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xs,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFC9A75B).withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(AppRadii.pill),
+                  border: Border.all(
+                    color: const Color(0xFFC9A75B).withValues(alpha: 0.22),
+                  ),
+                ),
+                child: Text(
+                  '$counterLabel: $counterValue',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: const Color(0xFFC9A75B),
+                        fontWeight: FontWeight.w800,
+                      ),
+                ),
+              ),
+            ],
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  'Open workspace',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: const Color(0xFFC9A75B),
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                const Icon(
+                  Icons.open_in_new,
+                  size: 18,
+                  color: Color(0xFFC9A75B),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildConceptCard(
     BuildContext context, {
@@ -77,6 +177,52 @@ class AdminGrowthLayerPage extends StatelessWidget {
                   'This layer exists to define safe planning boundaries for creation, distribution, monetization, and ethics.',
               emphasis:
                   'No ad delivery, tracking, backend logic, or monetization automation is active here.',
+            ),
+            const SizedBox(height: AppSpacing.md),
+            GatewaySectionCard(
+              title: 'Workspace Command Center',
+              description:
+                  'Manual command surface for creative workspaces, content board visibility, and publish-prep context actions.',
+              children: [
+                _buildLauncherCard(
+                  context,
+                  title: 'Employee System',
+                  summary:
+                      'Future-ready staff layer chassis for directory, workspaces, task queues, and review surfaces without full admin access.',
+                  route: Routes.adminEmployeeSystem,
+                  statusLabel:
+                      'Controlled staff layer • no employee auth active yet',
+                ),
+                const SizedBox(height: AppSpacing.md),
+                _buildLauncherCard(
+                  context,
+                  title: 'Maintenance & Diagnostics',
+                  summary:
+                      'Future-ready monitoring and diagnostics surface for issue visibility, investigation tools, and escalation guidance.',
+                  route: Routes.adminMaintenanceSystem,
+                  statusLabel:
+                      'Monitoring chassis • no active fixing system yet',
+                ),
+                const SizedBox(height: AppSpacing.md),
+                _buildLauncherCard(
+                  context,
+                  title: 'Workspace Command Center',
+                  summary:
+                      'Open workspace tools, track content progress, and use manual context actions without API integration or publishing automation.',
+                  route: Routes.adminWorkspaceCommandCenter,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                _buildLauncherCard(
+                  context,
+                  title: 'Content Workspace',
+                  summary:
+                      'Standalone content operations surface for tools, board tracking, content cards, and production links.',
+                  route: Routes.contentWorkspace,
+                  statusLabel: 'Future employee-ready surface • no admin controls',
+                  counterLabel: 'Pending Content',
+                  counterValue: 6,
+                ),
+              ],
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(

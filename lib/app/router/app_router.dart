@@ -43,13 +43,23 @@ import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.
 import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_workspace_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_content_care_programs_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_ai_followup_boundaries_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_ai_devops_center_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_ai_policy_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_compliance_checkpoints_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_domain_status_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_domain_availability_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_employee_system_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_functional_workspaces_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_maintenance_system_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/customer_follow_up_workspace_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_library_governance_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/marketing_workspace_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_exposure_rules_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_gateway_layer_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_growth_layer_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/technical_support_workspace_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_workspace_command_center_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/content_workspace_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_support_messaging_governance_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_communication_gateway_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_engineering_gateway_page.dart';
@@ -105,12 +115,20 @@ class AppRouter {
     Routes.adminSupportChats,
     Routes.adminAiPolicies,
     Routes.adminDomainStatus,
+    Routes.adminDomainAvailability,
+    Routes.adminFunctionalWorkspaces,
+    Routes.customerFollowUpWorkspace,
+    Routes.technicalSupportWorkspace,
+    Routes.marketingWorkspace,
     Routes.adminContentCarePrograms,
     Routes.adminLibraryGovernance,
     Routes.adminSupportMessagingGovernance,
     Routes.adminFollowupCareGovernance,
     Routes.adminAiFollowupBoundaries,
     Routes.adminGrowthLayer,
+    Routes.adminAiDevOpsCenter,
+    Routes.adminWorkspaceCommandCenter,
+    Routes.contentWorkspace,
     Routes.adminBlueprintHandoff,
     Routes.adminComplianceCheckpoints,
     Routes.adminExposureRules,
@@ -300,6 +318,36 @@ class AppRouter {
           settings: settings,
         );
 
+      case Routes.adminDomainAvailability:
+        return _adminProtectedRoute(
+          child: const AdminDomainAvailabilityPage(),
+          settings: settings,
+        );
+
+      case Routes.adminFunctionalWorkspaces:
+        return _adminProtectedRoute(
+          child: const AdminFunctionalWorkspacesPage(),
+          settings: settings,
+        );
+
+      case Routes.customerFollowUpWorkspace:
+        return _adminProtectedRoute(
+          child: const CustomerFollowUpWorkspacePage(),
+          settings: settings,
+        );
+
+      case Routes.technicalSupportWorkspace:
+        return _adminProtectedRoute(
+          child: const TechnicalSupportWorkspacePage(),
+          settings: settings,
+        );
+
+      case Routes.marketingWorkspace:
+        return _adminProtectedRoute(
+          child: const MarketingWorkspacePage(),
+          settings: settings,
+        );
+
       case Routes.adminContentCarePrograms:
         return _adminProtectedRoute(
           child: const AdminContentCareProgramsPage(),
@@ -333,6 +381,36 @@ class AppRouter {
       case Routes.adminGrowthLayer:
         return _adminProtectedRoute(
           child: const AdminGrowthLayerPage(),
+          settings: settings,
+        );
+
+      case Routes.adminEmployeeSystem:
+        return _adminProtectedRoute(
+          child: const AdminEmployeeSystemPage(),
+          settings: settings,
+        );
+
+      case Routes.adminMaintenanceSystem:
+        return _adminProtectedRoute(
+          child: const AdminMaintenanceSystemPage(),
+          settings: settings,
+        );
+
+      case Routes.adminAiDevOpsCenter:
+        return _adminProtectedRoute(
+          child: const AdminAiDevOpsCenterPage(),
+          settings: settings,
+        );
+
+      case Routes.adminWorkspaceCommandCenter:
+        return _adminProtectedRoute(
+          child: const AdminWorkspaceCommandCenterPage(),
+          settings: settings,
+        );
+
+      case Routes.contentWorkspace:
+        return _adminProtectedRoute(
+          child: const ContentWorkspacePage(),
           settings: settings,
         );
 

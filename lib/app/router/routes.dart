@@ -66,6 +66,17 @@ class Routes {
   static const adminAiFollowupBoundaries =
       '/admin/ai-followup-boundaries';
   static const adminGrowthLayer = '/admin/growth-layer';
+  static const adminEmployeeSystem = '/admin/employee-system';
+  static const adminMaintenanceSystem = '/admin/maintenance';
+  static const adminAiDevOpsCenter = '/admin/ai-devops';
+  static const adminDomainAvailability = '/admin/domain-availability';
+  static const adminFunctionalWorkspaces = '/admin/functional-workspaces';
+  static const customerFollowUpWorkspace = '/workspace/customer-follow-up';
+  static const technicalSupportWorkspace = '/workspace/technical-support';
+  static const marketingWorkspace = '/workspace/marketing';
+  static const adminWorkspaceCommandCenter =
+      '/admin/workspace-command-center';
+  static const contentWorkspace = '/workspace/content';
   static const adminBlueprintHandoff = '/admin/blueprint-handoff';
   static const adminComplianceCheckpoints = '/admin/compliance-checkpoints';
   static const adminExposureRules = '/admin/exposure-rules';

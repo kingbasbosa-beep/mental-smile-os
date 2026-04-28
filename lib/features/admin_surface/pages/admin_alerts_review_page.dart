@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/features/admin_surface/shared/admin_whatsapp_support_helper.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
@@ -58,19 +59,44 @@ class AdminAlertsReviewPage extends StatelessWidget {
                     .doc('latest')
                     .snapshots(),
                 builder: (context, snapshot) {
+                  final headerChildren = <Widget>[
+                    const Text(
+                      'Alerts Review',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Python-generated operational alerts',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppColors.obsidian.withValues(alpha: 0.68),
+                          ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: OutlinedButton.icon(
+                        onPressed: () => openAdminWhatsAppSupport(
+                          context,
+                          type: 'System Alert Review',
+                          source: 'Alerts Review',
+                          notes: 'Admin is reviewing operational alerts.',
+                        ),
+                        icon: const Icon(Icons.chat_outlined, size: 18),
+                        label: const Text('Send WhatsApp Alert'),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                  ];
+
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Column(
+                    return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Alerts Review',
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.w800),
-                        ),
-                        SizedBox(height: AppSpacing.xs),
-                        Text('Python-generated operational alerts'),
-                        SizedBox(height: AppSpacing.md),
-                        Text('Loading alerts snapshot...'),
+                        ...headerChildren,
+                        const Text('Loading alerts snapshot...'),
                       ],
                     );
                   }
@@ -78,36 +104,22 @@ class AdminAlertsReviewPage extends StatelessWidget {
                   if (!snapshot.hasData ||
                       snapshot.data == null ||
                       !snapshot.data!.exists) {
-                    return const Column(
+                    return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Alerts Review',
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.w800),
-                        ),
-                        SizedBox(height: AppSpacing.xs),
-                        Text('Python-generated operational alerts'),
-                        SizedBox(height: AppSpacing.md),
-                        Text('No alerts snapshot available'),
+                        ...headerChildren,
+                        const Text('No alerts snapshot available'),
                       ],
                     );
                   }
 
                   final data = snapshot.data!.data();
                   if (data == null) {
-                    return const Column(
+                    return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Alerts Review',
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.w800),
-                        ),
-                        SizedBox(height: AppSpacing.xs),
-                        Text('Python-generated operational alerts'),
-                        SizedBox(height: AppSpacing.md),
-                        Text('No alerts snapshot available'),
+                        ...headerChildren,
+                        const Text('No alerts snapshot available'),
                       ],
                     );
                   }
@@ -127,19 +139,7 @@ class AdminAlertsReviewPage extends StatelessWidget {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Alerts Review',
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.w800),
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        'Python-generated operational alerts',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.obsidian.withValues(alpha: 0.68),
-                            ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
+                      ...headerChildren,
                       AppStatusBadge(
                         label: 'Status: $status',
                         color: _statusColor(status),

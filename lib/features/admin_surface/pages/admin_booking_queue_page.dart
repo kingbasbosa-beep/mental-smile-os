@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/features/admin_surface/shared/admin_whatsapp_support_helper.dart';
 import 'package:flutterprojects/core/system/domain_registry.dart';
 import 'package:flutterprojects/core/system/domain_status.dart';
 import 'package:flutterprojects/core/system/domain_status_service.dart';
@@ -2700,6 +2701,22 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                   alignment:
                       isArabic ? WrapAlignment.end : WrapAlignment.start,
                   children: [
+                    OutlinedButton.icon(
+                      onPressed: () => openAdminWhatsAppSupport(
+                        context,
+                        type: 'Request Follow-up Required',
+                        source: 'Booking Queue',
+                        referenceId: requestId,
+                        notes:
+                            'Booking request needs manual follow-up. Status: $status',
+                      ),
+                      icon: const Icon(Icons.send_rounded),
+                      label: Text(
+                        isArabic
+                            ? 'متابعة عبر واتساب'
+                            : 'Follow-up via WhatsApp',
+                      ),
+                    ),
                     if (status == 'pending_admin')
                       OutlinedButton.icon(
                         onPressed: busy

@@ -107,15 +107,15 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
     switch (value.trim()) {
       case 'residential_psych':
         return isArabic
-            ? 'Ø¥Ù‚Ø§Ù…Ø© Ù†ÙØ³ÙŠØ© Ø¯Ø§Ø®Ù„ÙŠØ©'
+            ? 'إقامة نفسية داخلية'
             : 'Residential psychiatric care';
       case 'detox':
-        return isArabic ? 'Ø³Ø­Ø¨ Ø³Ù…ÙˆÙ… ÙˆÙ…ØªØ§Ø¨Ø¹Ø©' : 'Detox and monitoring';
+        return isArabic ? 'سحب سموم ومتابعة' : 'Detox and monitoring';
       case 'dual_diagnosis':
-        return isArabic ? 'Ø±Ø¹Ø§ÙŠØ© Ù…Ø²Ø¯ÙˆØ¬Ø©' : 'Dual diagnosis care';
+        return isArabic ? 'رعاية مزدوجة' : 'Dual diagnosis care';
       case 'diagnostic_observation':
         return isArabic
-            ? 'Ù…Ù„Ø§Ø­Ø¸Ø© ØªØ´Ø®ÙŠØµÙŠØ© Ø¯Ø§Ø®Ù„ÙŠØ©'
+            ? 'ملاحظة تشخيصية داخلية'
             : 'Diagnostic observation';
       default:
         return value.trim();
@@ -483,22 +483,22 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
     switch (status) {
       case 'session_scheduled':
         return isCenterRequest
-            ? (isArabic ? 'Ø¥Ù‚Ø§Ù…Ø© Ù…Ø¬Ø¯ÙˆÙ„Ø©' : 'Residency scheduled')
-            : (isArabic ? 'Ø¬Ù„Ø³Ø© Ù…Ø¬Ø¯ÙˆÙ„Ø©' : 'Session scheduled');
+            ? (isArabic ? 'إقامة مجدولة' : 'Residency scheduled')
+            : (isArabic ? 'جلسة مجدولة' : 'Session scheduled');
       case 'session_in_progress':
         return isCenterRequest
-            ? (isArabic ? 'Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ø¬Ø§Ø±ÙŠØ©' : 'Residency in progress')
-            : (isArabic ? 'Ø¬Ù„Ø³Ø© Ø¬Ø§Ø±ÙŠØ©' : 'Session in progress');
+            ? (isArabic ? 'الإقامة جارية' : 'Residency in progress')
+            : (isArabic ? 'جلسة جارية' : 'Session in progress');
       case 'session_completed_pending_reviews':
         return isCenterRequest
-            ? (isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚Ø§Ø±ÙŠØ± Ø§Ù„Ø®Ø±ÙˆØ¬' : 'Pending discharge reviews')
-            : (isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª' : 'Pending reviews');
+            ? (isArabic ? 'بانتظار تقارير الخروج' : 'Pending discharge reviews')
+            : (isArabic ? 'بانتظار التقييمات' : 'Pending reviews');
       case 'reschedule_pending':
-        return isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ø¬Ø¯ÙˆÙ„Ø©' : 'Reschedule pending';
+        return isArabic ? 'بانتظار إعادة الجدولة' : 'Reschedule pending';
       default:
         return isCenterRequest
-            ? (isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ¬Ù‡ÙŠØ² Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©' : 'Residency setup pending')
-            : (isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ¬Ù‡ÙŠØ² Ø§Ù„Ø¬Ù„Ø³Ø©' : 'Session setup pending');
+            ? (isArabic ? 'بانتظار تجهيز الإقامة' : 'Residency setup pending')
+            : (isArabic ? 'بانتظار تجهيز الجلسة' : 'Session setup pending');
     }
   }
 
@@ -537,51 +537,51 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
       case 'session_setup_pending':
         return isCenterRequest
             ? (isArabic
-                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ù…Ø±Ø§Ø¬Ø¹Ø© ØªØ¬Ù‡ÙŠØ² Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ù‚Ø¨Ù„ ÙØªØ­ Ø§Ù„Ø¯ÙØ¹'
+                ? 'بانتظار مراجعة تجهيز الإقامة قبل فتح الدفع'
                 : 'Waiting for residency setup review before payment opening')
             : (isArabic
-                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ¬Ù‡ÙŠØ² Ø¬Ù„Ø³Ø© Ø£Ø®ØµØ§Ø¦ÙŠ'
+                ? 'بانتظار تجهيز جلسة أخصائي'
                 : 'Waiting for clinician session setup');
       case 'reschedule_pending':
         return isArabic
-            ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ù…Ø¹Ø§Ù„Ø¬Ø© Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ø¬Ø¯ÙˆÙ„Ø©'
+            ? 'بانتظار معالجة إعادة الجدولة'
             : 'Waiting for reschedule handling';
       case 'session_scheduled':
         if (awaitingResidencyStart) {
           return isArabic
-              ? 'Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ù…Ø¬Ø¯ÙˆÙ„Ø© ÙˆØªÙ†ØªØ¸Ø± ØªØ£ÙƒÙŠØ¯Ø§Øª Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©'
+              ? 'الإقامة مجدولة وتنتظر تأكيدات البداية'
               : 'Residency is scheduled and waiting for start confirmations';
         }
         return isCenterRequest
             ? (isArabic
-                ? 'Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ù…Ø¬Ø¯ÙˆÙ„Ø© Ù„Ù„Ù…ØªØ§Ø¨Ø¹Ø©'
+                ? 'الإقامة مجدولة للمتابعة'
                 : 'Residency is scheduled for monitoring')
             : (isArabic
-                ? 'Ø§Ù„Ø¬Ù„Ø³Ø© Ù…Ø¬Ø¯ÙˆÙ„Ø© Ù„Ù„Ù…ØªØ§Ø¨Ø¹Ø©'
+                ? 'الجلسة مجدولة للمتابعة'
                 : 'Session is scheduled for monitoring');
       case 'session_in_progress':
         return isCenterRequest
             ? (isArabic
-                ? 'Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ø¬Ø§Ø±ÙŠØ© ÙˆØªØ­Øª Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©'
+                ? 'الإقامة جارية وتحت المتابعة'
                 : 'Residency is in progress and under monitoring')
             : (isArabic
-                ? 'Ø§Ù„Ø¬Ù„Ø³Ø© Ø¬Ø§Ø±ÙŠØ© ÙˆØªØ­Øª Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©'
+                ? 'الجلسة جارية وتحت المتابعة'
                 : 'Session is in progress and under monitoring');
       case 'session_completed_pending_reviews':
         return isCenterRequest
             ? (isArabic
-                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø£Ø³Ø±Ø© ÙˆØªÙ‚Ø±ÙŠØ± Ø®Ø±ÙˆØ¬ Ø§Ù„Ù…Ø±ÙƒØ²'
+                ? 'بانتظار تقييم الأسرة وتقرير خروج المركز'
                 : 'Waiting for family review and center discharge report')
             : (isArabic
-                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø¹Ù…ÙŠÙ„ ÙˆØ§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ'
+                ? 'بانتظار تقييم العميل والأخصائي'
                 : 'Waiting for client and clinician reviews');
       case 'payout_pending':
         return isArabic
-            ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø¨ÙˆØ§Ø¨Ø© Ù…Ø§Ù„ÙŠØ© Ø£Ùˆ Ù…Ø±Ø§Ø¬Ø¹Ø© Ù…Ø³ØªØ­Ù‚Ø§Øª'
+            ? 'بانتظار بوابة مالية أو مراجعة مستحقات'
             : 'Waiting for financial gate or payout review';
       default:
         return isArabic
-            ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø­Ø§Ù„Ø© Ù…Ù† ØºØ±ÙØ© Ø§Ù„ØªØ­ÙƒÙ…'
+            ? 'متابعة حالة من غرفة التحكم'
             : 'Control-room state monitoring';
     }
   }
@@ -598,41 +598,39 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
       case 'session_setup_pending':
         return isCenterRequest
             ? (isArabic
-                ? 'Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„ØªØ¬Ù‡ÙŠØ² Ø«Ù… ÙØªØ­ Ø¨ÙŠØ§Ù† Ø§Ù„Ø¯ÙØ¹'
+                ? 'مراجعة التجهيز ثم فتح بيان الدفع'
                 : 'Review setup, then open payment quote')
             : (isArabic
-                ? 'Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø¥Ø¬Ø±Ø§Ø¡ Ø§Ù„Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø© ÙÙ‚Ø·'
+                ? 'استخدام إجراء الاسترداد عند الحاجة فقط'
                 : 'Use recovery action only if needed');
       case 'reschedule_pending':
         return isArabic
-            ? 'Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ø¬Ø¯ÙˆÙ„Ø© ÙƒØ§Ø³ØªØ±Ø¯Ø§Ø¯ Ù…Ø³Ø§Ø±'
+            ? 'إعادة الجدولة كاسترداد مسار'
             : 'Reschedule as flow recovery';
       case 'session_scheduled':
         if (awaitingResidencyStart) {
           return isArabic
-              ? 'Ø§Ù†ØªØ¸Ø§Ø± ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ù…Ø±ÙƒØ² ÙˆØ§Ù„Ø£Ø³Ø±Ø©'
+              ? 'انتظار تأكيد المركز والأسرة'
               : 'Wait for center and family confirmations';
         }
-        return isArabic ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„ØªØ´ØºÙŠÙ„' : 'Monitor operation';
+        return isArabic ? 'متابعة التشغيل' : 'Monitor operation';
       case 'session_in_progress':
-        return isArabic
-            ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø­ØªÙ‰ Ø§Ù„Ø§ÙƒØªÙ…Ø§Ù„'
-            : 'Monitor until completion';
+        return isArabic ? 'متابعة حتى الاكتمال' : 'Monitor until completion';
       case 'session_completed_pending_reviews':
         if (!clientReviewSubmitted || !providerReviewSubmitted) {
           return isArabic
-              ? 'Ø§Ø³ØªÙƒÙ…Ø§Ù„ Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©'
+              ? 'استكمال التقييمات المطلوبة'
               : 'Complete required reviews';
         }
         return isArabic
-            ? 'Ø§Ù„Ø§Ù†ØªÙ‚Ø§Ù„ Ù„Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ù…Ø§Ù„ÙŠØ© Ø¹Ù†Ø¯ Ø§ÙƒØªÙ…Ø§Ù„Ù‡Ø§'
+            ? 'الانتقال للمراجعة المالية عند اكتمالها'
             : 'Move toward financial review when complete';
       case 'payout_pending':
         return isArabic
-            ? 'Ù…Ø±Ø§Ø¬Ø¹Ø© Ø£Ùˆ ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ù…Ø³ØªØ­Ù‚Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ©'
+            ? 'مراجعة أو تأكيد المستحقات المالية'
             : 'Review or confirm financial payout';
       default:
-        return isArabic ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø­Ø§Ù„Ø©' : 'Monitor the state';
+        return isArabic ? 'متابعة الحالة' : 'Monitor the state';
     }
   }
 
@@ -645,40 +643,34 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
       case 'session_setup_pending':
         return isCenterRequest
             ? (isArabic
-                ? 'Ø¨ÙˆØ§Ø¨Ø© Ø¥Ø¯Ø§Ø±ÙŠØ© Ù…Ø§Ù„ÙŠØ© Ù‚Ø¨Ù„ Ø§Ù„Ø¯ÙØ¹'
+                ? 'بوابة إدارية مالية قبل الدفع'
                 : 'Admin financial gate before payment')
             : (isArabic
-                ? 'Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø¥Ø¯Ø§Ø±ÙŠ Ù„Ø¬Ù„Ø³Ø© Ø£Ø®ØµØ§Ø¦ÙŠ'
+                ? 'استرداد إداري لجلسة أخصائي'
                 : 'Admin recovery for clinician session');
       case 'reschedule_pending':
-        return isArabic
-            ? 'Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø¥Ø¯Ø§Ø±ÙŠ ÙÙ‚Ø·'
-            : 'Admin recovery only';
+        return isArabic ? 'استرداد إداري فقط' : 'Admin recovery only';
       case 'session_scheduled':
       case 'session_in_progress':
         return isCenterRequest
             ? (isArabic
-                ? 'Ø§Ù„Ù…Ø³Ø§Ø± Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠ: Ø§Ù„Ù…Ø±ÙƒØ² / Ø§Ù„Ø£Ø³Ø±Ø©'
+                ? 'المسار التشغيلي: المركز / الأسرة'
                 : 'Operational path: center / family')
             : (isArabic
-                ? 'Ø§Ù„Ù…Ø³Ø§Ø± Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠ: Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ / Ø§Ù„Ø¹Ù…ÙŠÙ„'
+                ? 'المسار التشغيلي: الأخصائي / العميل'
                 : 'Operational path: clinician / client');
       case 'session_completed_pending_reviews':
         return isCenterRequest
             ? (isArabic
-                ? 'Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª: Ø§Ù„Ø£Ø³Ø±Ø© / Ø§Ù„Ù…Ø±ÙƒØ²'
+                ? 'التقييمات: الأسرة / المركز'
                 : 'Reviews: family / center')
             : (isArabic
-                ? 'Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª: Ø§Ù„Ø¹Ù…ÙŠÙ„ / Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ'
+                ? 'التقييمات: العميل / الأخصائي'
                 : 'Reviews: client / clinician');
       case 'payout_pending':
-        return isArabic
-            ? 'Ø¨ÙˆØ§Ø¨Ø© Ù…Ø§Ù„ÙŠØ© Ø¥Ø¯Ø§Ø±ÙŠØ©'
-            : 'Admin financial gate';
+        return isArabic ? 'بوابة مالية إدارية' : 'Admin financial gate';
       default:
-        return isArabic
-            ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ù…Ù† ØºØ±ÙØ© Ø§Ù„ØªØ­ÙƒÙ…'
-            : 'Control-room monitoring';
+        return isArabic ? 'متابعة من غرفة التحكم' : 'Control-room monitoring';
     }
   }
 
@@ -703,40 +695,40 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
     if (awaitingResidencyStart) {
       if (!centerArrivalConfirmed && !clientCheckInConfirmed) {
         return isArabic
-            ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ù…Ø±ÙƒØ² ÙˆØ§Ù„Ø£Ø³Ø±Ø© Ù„Ø¨Ø¯Ø§ÙŠØ© Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©'
+            ? 'بانتظار تأكيد المركز والأسرة لبداية الإقامة'
             : 'Waiting for center and family start confirmations';
       }
       if (!centerArrivalConfirmed) {
         return isArabic
-            ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ù…Ø±ÙƒØ² Ù„Ù„ÙˆØµÙˆÙ„'
+            ? 'بانتظار تأكيد المركز للوصول'
             : 'Waiting for center arrival confirmation';
       }
       return isArabic
-          ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø£Ø³Ø±Ø© Ù„Ø¨Ø¯Ø§ÙŠØ© Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©'
+          ? 'بانتظار تأكيد الأسرة لبداية الإقامة'
           : 'Waiting for family check-in confirmation';
     }
     if (status == 'session_completed_pending_reviews') {
       if (!clientReviewSubmitted && !providerReviewSubmitted) {
         return isCenterRequest
             ? (isArabic
-                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø£Ø³Ø±Ø© ÙˆØªÙ‚Ø±ÙŠØ± Ø§Ù„Ù…Ø±ÙƒØ²'
+                ? 'بانتظار تقييم الأسرة وتقرير المركز'
                 : 'Waiting for family review and center report')
             : (isArabic
-                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø¹Ù…ÙŠÙ„ ÙˆØ§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ'
+                ? 'بانتظار تقييم العميل والأخصائي'
                 : 'Waiting for client and clinician reviews');
       }
       if (!clientReviewSubmitted) {
         return isArabic
-            ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø¹Ù…ÙŠÙ„ / Ø§Ù„Ø£Ø³Ø±Ø©'
+            ? 'بانتظار تقييم العميل / الأسرة'
             : 'Waiting for client / family review';
       }
       if (!providerReviewSubmitted) {
         return isCenterRequest
             ? (isArabic
-                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚Ø±ÙŠØ± Ø§Ù„Ù…Ø±ÙƒØ²'
+                ? 'بانتظار تقرير المركز'
                 : 'Waiting for center report')
             : (isArabic
-                ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ'
+                ? 'بانتظار تقييم الأخصائي'
                 : 'Waiting for clinician review');
       }
     }
@@ -791,7 +783,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
       child: Scaffold(
         appBar: AppShellActions.buildAppBar(
           context,
-          title: isArabic ? 'Ø§Ù„Ø¬Ù„Ø³Ø§Øª ÙˆØ§Ù„Ø¥Ù‚Ø§Ù…Ø§Øª' : 'Sessions & Residencies',
+          title: isArabic ? 'الجلسات والإقامات' : 'Sessions & Residencies',
         ),
         body: AppPageBackground(
           child:
@@ -801,7 +793,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
               if (snapshot.hasError) {
                 return AppEmptyState(
                   message: isArabic
-                      ? 'ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø¬Ù„Ø³Ø§Øª ÙˆØ§Ù„Ø¥Ù‚Ø§Ù…Ø§Øª'
+                      ? 'تعذر تحميل الجلسات والإقامات'
                       : 'Unable to load sessions and residencies',
                   icon: Icons.error_outline,
                 );
@@ -832,7 +824,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                       children: [
                         Text(
                           isArabic
-                              ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø¬Ø§Ù‡Ø²ÙŠØ© ÙˆØ§Ù„Ø§Ø³ØªØ«Ù†Ø§Ø¡Ø§Øª Ù„Ù„Ø¬Ù„Ø³Ø§Øª'
+                              ? 'متابعة الجاهزية والاستثناءات للجلسات'
                               : 'Sessions Readiness & Exception Control',
                           style:
                               Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -861,7 +853,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                             ChoiceChip(
                               selected: _tab == 'session_setup_pending',
                               label: Text(
-                                isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªØ¬Ù‡ÙŠØ²' : 'Setup pending',
+                                isArabic ? 'بانتظار التجهيز' : 'Setup pending',
                               ),
                               onSelected: (_) => setState(
                                   () => _tab = 'session_setup_pending'),
@@ -869,7 +861,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                             ChoiceChip(
                               selected: _tab == 'reschedule_pending',
                               label: Text(
-                                isArabic ? 'Ø¥Ø¹Ø§Ø¯Ø© Ø¬Ø¯ÙˆÙ„Ø©' : 'Reschedule',
+                                isArabic ? 'إعادة جدولة' : 'Reschedule',
                               ),
                               onSelected: (_) =>
                                   setState(() => _tab = 'reschedule_pending'),
@@ -877,7 +869,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                             ChoiceChip(
                               selected: _tab == 'session_scheduled',
                               label: Text(
-                                isArabic ? 'Ù…Ø¬Ø¯ÙˆÙ„Ø©' : 'Scheduled',
+                                isArabic ? 'مجدولة' : 'Scheduled',
                               ),
                               onSelected: (_) =>
                                   setState(() => _tab = 'session_scheduled'),
@@ -887,7 +879,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   _tab == 'session_completed_pending_reviews',
                               label: Text(
                                 isArabic
-                                    ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªÙ‚Ø§Ø±ÙŠØ±/Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª'
+                                    ? 'بانتظار التقارير/التقييمات'
                                     : 'Pending reviews',
                               ),
                               onSelected: (_) => setState(
@@ -904,7 +896,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                   if (docs.isEmpty)
                     AppEmptyState(
                       message: isArabic
-                          ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª ÙÙŠ Ù‡Ø°Ø§ Ø§Ù„Ù‚Ø³Ù…'
+                          ? 'لا توجد طلبات في هذا القسم'
                           : 'No requests in this section',
                     )
                   else
