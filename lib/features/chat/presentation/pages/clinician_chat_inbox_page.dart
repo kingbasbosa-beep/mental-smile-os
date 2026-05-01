@@ -301,15 +301,6 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
                 },
                 child: const Text('فتح الشات'),
               ),
-              OutlinedButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    Routes.chatEscalationReport,
-                    arguments: {'escalationId': escalation.id},
-                  );
-                },
-                child: const Text('عرض التقرير'),
-              ),
               if (canMarkHandled)
                 FilledButton.tonal(
                   onPressed:
