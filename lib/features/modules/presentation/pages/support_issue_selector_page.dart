@@ -25,6 +25,8 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
 
   bool get _isRecoverySupport => widget.supportType == 'recovery_support';
   bool get _isClientSupport => widget.supportType == 'client_support';
+  bool get _isCenterSupport => widget.supportType == 'center_support';
+  bool get _isClinicianSupport => widget.supportType == 'clinician_support';
 
   List<_SupportIssueOption> _options(bool isArabic) {
     if (_isClientSupport) {
@@ -64,6 +66,64 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
       ];
     }
 
+    if (_isCenterSupport) {
+      return [
+        _SupportIssueOption(
+          key: 'booking_issue',
+          label: isArabic ? 'مشكلة في الحجز' : 'Booking issue',
+        ),
+        _SupportIssueOption(
+          key: 'client_no_show',
+          label: isArabic ? 'العميل لم يحضر' : 'Client no-show',
+        ),
+        _SupportIssueOption(
+          key: 'scheduling_problem',
+          label: isArabic ? 'مشكلة في الجدولة' : 'Scheduling problem',
+        ),
+        _SupportIssueOption(
+          key: 'system_issue',
+          label: isArabic ? 'مشكلة في النظام' : 'System issue',
+        ),
+        _SupportIssueOption(
+          key: 'payout_question',
+          label: isArabic ? 'استفسار بخصوص المستحقات' : 'Payout question',
+        ),
+        _SupportIssueOption(
+          key: 'general_admin_request',
+          label: isArabic ? 'طلب إداري عام' : 'General admin request',
+        ),
+      ];
+    }
+
+    if (_isClinicianSupport) {
+      return [
+        _SupportIssueOption(
+          key: 'case_issue',
+          label: isArabic ? 'مشكلة في الحالة' : 'Case issue',
+        ),
+        _SupportIssueOption(
+          key: 'session_problem',
+          label: isArabic ? 'مشكلة في الجلسة' : 'Session problem',
+        ),
+        _SupportIssueOption(
+          key: 'assignment_problem',
+          label: isArabic ? 'مشكلة في الإسناد' : 'Assignment problem',
+        ),
+        _SupportIssueOption(
+          key: 'payment_question',
+          label: isArabic ? 'استفسار بخصوص الدفع' : 'Payment question',
+        ),
+        _SupportIssueOption(
+          key: 'system_issue',
+          label: isArabic ? 'مشكلة في النظام' : 'System issue',
+        ),
+        _SupportIssueOption(
+          key: 'need_admin_support',
+          label: isArabic ? 'أحتاج دعم إداري' : 'Need admin support',
+        ),
+      ];
+    }
+
     if (_isRecoverySupport) {
       return [
         _SupportIssueOption(
@@ -89,8 +149,7 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
         ),
         _SupportIssueOption(
           key: 'general_help',
-          label:
-              isArabic ? 'طلب مساعدة عامة' : 'General help request',
+          label: isArabic ? 'طلب مساعدة عامة' : 'General help request',
         ),
       ];
     }
@@ -125,6 +184,15 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
     ];
   }
 
+  String _userRole() {
+    if (_isCenterSupport) return 'center';
+    if (_isClinicianSupport) return 'clinician';
+    if (_isClientSupport) return 'client';
+
+    final user = FirebaseAuth.instance.currentUser;
+    return user == null || user.isAnonymous ? 'guest' : 'client';
+  }
+
   Future<void> _submitIssue(_SupportIssueOption option) async {
     if (_submittingIssueKey != null) return;
 
@@ -134,10 +202,6 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
 
     try {
       final user = FirebaseAuth.instance.currentUser;
-      final isGuest = user == null || user.isAnonymous;
-      final userRole = _isClientSupport ? 'client' : (isGuest ? 'guest' : 'client');
-      final priority = option.key == 'risk_report' ? 'high' : 'normal';
-
       final ref =
           FirebaseFirestore.instance.collection('support_requests').doc();
 
@@ -145,12 +209,12 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
         'id': ref.id,
         'createdAt': FieldValue.serverTimestamp(),
         'createdByUid': user?.uid,
-        'userRole': userRole,
+        'userRole': _userRole(),
         'supportType': widget.supportType,
         'issueType': option.key,
         'status': 'new',
         'source': 'structured_support',
-        'priority': priority,
+        'priority': 'normal',
       });
 
       if (!mounted) return;
@@ -176,10 +240,11 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
         ),
       );
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _submittingIssueKey = null;
-      });
+      if (mounted) {
+        setState(() {
+          _submittingIssueKey = null;
+        });
+      }
     }
   }
 
