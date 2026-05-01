@@ -272,21 +272,14 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     if (_uid.isEmpty) return Stream.value(0);
 
     return FirebaseFirestore.instance
-        .collection('chat_threads')
-        .where('ownerUid', isEqualTo: _uid)
+        .collection('support_requests')
+        .where('createdByUid', isEqualTo: _uid)
+        .where('supportType', isEqualTo: 'clinician_support')
         .snapshots()
         .map((snapshot) => snapshot.docs.where((doc) {
               final data = doc.data();
-              final threadType = (data['threadType'] ?? '').toString().trim();
-              if (threadType.isNotEmpty) {
-                return threadType == 'admin_support';
-              }
-
-              final handoffState =
-                  (data['handoffState'] ?? '').toString().trim();
-              return (data['needsHumanSupport'] ?? false) == true ||
-                  handoffState == 'admin_review' ||
-                  handoffState == 'admin_replying';
+              final status = (data['status'] ?? '').toString().trim();
+              return status != 'closed';
             }).length)
         .handleError((_) => 0);
   }

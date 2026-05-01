@@ -72,21 +72,14 @@ class ClientDashboardPage extends StatelessWidget {
     final uid = user.uid;
 
     return FirebaseFirestore.instance
-        .collection('chat_threads')
-        .where('ownerUid', isEqualTo: uid)
+        .collection('support_requests')
+        .where('createdByUid', isEqualTo: uid)
+        .where('supportType', isEqualTo: 'client_support')
         .snapshots()
         .map((snapshot) => snapshot.docs.where((doc) {
               final data = doc.data();
-              final threadType = (data['threadType'] ?? '').toString().trim();
-              if (threadType.isNotEmpty) {
-                return threadType == 'admin_support';
-              }
-
-              final handoffState =
-                  (data['handoffState'] ?? '').toString().trim();
-              return (data['needsHumanSupport'] ?? false) == true ||
-                  handoffState == 'admin_review' ||
-                  handoffState == 'admin_replying';
+              final status = (data['status'] ?? '').toString().trim();
+              return status != 'closed';
             }).length)
         .handleError((_) => 0);
   }
