@@ -9,12 +9,258 @@ class CustomerFollowUpWorkspacePage extends StatelessWidget {
 
   static const _supportRequestsCollection = 'support_requests';
 
-  Widget _chip(
-    BuildContext context, {
-    required String label,
-    required IconData icon,
-    required String route,
-  }) {
+  @override
+  Widget build(BuildContext context) {
+    final requestsStream = FirebaseFirestore.instance
+        .collection(_supportRequestsCollection)
+        .orderBy('createdAt', descending: true)
+        .snapshots();
+
+    return DefaultTabController(
+      length: 6,
+      child: Scaffold(
+        backgroundColor: AppColors.obsidian,
+        appBar: AppShellActions.buildAppBar(
+          context,
+          title: 'Customer Follow-up Workspace',
+          bottom: const TabBar(
+            isScrollable: true,
+            tabs: [
+              Tab(text: 'دعم التعافي'),
+              Tab(text: 'دعم الأسرة'),
+              Tab(text: 'العملاء'),
+              Tab(text: 'المراكز'),
+              Tab(text: 'الأخصائيين'),
+              Tab(text: 'بلاغات خطر'),
+            ],
+          ),
+        ),
+        body: AppPageBackground(
+          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+            stream: requestsStream,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              if (snapshot.hasError) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Text(
+                      'Unable to load support requests.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: const Color(0xFFEAEAEA),
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              }
+
+              final docs = snapshot.data?.docs ?? const [];
+              final requests = docs.map((doc) => doc.data()).toList();
+
+              return TabBarView(
+                children: [
+                  _SupportRequestsTab(
+                    requests: _filterBySupportType(requests, 'recovery_support'),
+                  ),
+                  _SupportRequestsTab(
+                    requests: _filterBySupportType(requests, 'family_support'),
+                  ),
+                  _SupportRequestsTab(
+                    requests: _filterBySupportType(requests, 'client_support'),
+                  ),
+                  _SupportRequestsTab(
+                    requests: _filterBySupportType(requests, 'center_support'),
+                  ),
+                  _SupportRequestsTab(
+                    requests:
+                        _filterBySupportType(requests, 'clinician_support'),
+                  ),
+                  _SupportRequestsTab(
+                    requests: _filterRiskRequests(requests),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Map<String, dynamic>> _filterBySupportType(
+    List<Map<String, dynamic>> requests,
+    String supportType,
+  ) {
+    return requests.where((request) {
+      return (request['supportType'] as String? ?? '').trim() == supportType;
+    }).toList();
+  }
+
+  List<Map<String, dynamic>> _filterRiskRequests(
+    List<Map<String, dynamic>> requests,
+  ) {
+    return requests.where((request) {
+      final priority = (request['priority'] as String? ?? '').trim();
+      final issueType = (request['issueType'] as String? ?? '').trim();
+      return priority == 'high' || issueType == 'risk_report';
+    }).toList();
+  }
+}
+
+class _SupportRequestsTab extends StatelessWidget {
+  const _SupportRequestsTab({
+    required this.requests,
+  });
+
+  final List<Map<String, dynamic>> requests;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      children: [
+        AppSectionPanel(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          color: const Color(0xFF020617),
+          borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Customer Follow-up Workspace',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'Structured support viewer only',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: const Color(0xFFEAEAEA),
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xs,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3E9B90).withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(AppRadii.pill),
+                  border: Border.all(
+                    color: const Color(0xFF3E9B90).withValues(alpha: 0.24),
+                  ),
+                ),
+                child: Text(
+                  'Manual • No chat • No processing yet',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: const Color(0xFF73C1B8),
+                        fontWeight: FontWeight.w800,
+                      ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        AppSectionPanel(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          color: const Color(0xFF0F172A),
+          borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
+          child: Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              _WorkspaceChip(
+                label: 'Communication Gateway',
+                icon: Icons.hub_outlined,
+                route: Routes.adminCommunicationGateway,
+              ),
+              _WorkspaceChip(
+                label: 'Support Email',
+                icon: Icons.email_outlined,
+                route: Routes.adminCommunicationGateway,
+              ),
+              _WorkspaceChip(
+                label: 'Booking Requests',
+                icon: Icons.assignment_outlined,
+                route: Routes.adminOperations,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        AppSectionPanel(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          color: const Color(0xFF0F172A),
+          borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Structured Support Requests',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              if (requests.isEmpty)
+                Text(
+                  'No structured support requests yet.',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: const Color(0xFFEAEAEA),
+                      ),
+                )
+              else
+                Column(
+                  children: requests
+                      .map(
+                        (request) => Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                          child: _SupportRequestCard(data: request),
+                        ),
+                      )
+                      .toList(),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Text(
+          'Future smart assistant is not active here. This workspace remains manual and staff-ready only.',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: const Color(0xFFEAEAEA),
+                height: 1.35,
+              ),
+        ),
+      ],
+    );
+  }
+}
+
+class _WorkspaceChip extends StatelessWidget {
+  const _WorkspaceChip({
+    required this.label,
+    required this.icon,
+    required this.route,
+  });
+
+  final String label;
+  final IconData icon;
+  final String route;
+
+  @override
+  Widget build(BuildContext context) {
     return ActionChip(
       avatar: Icon(icon, size: 16, color: const Color(0xFFC9A75B)),
       label: Text(label),
@@ -27,185 +273,6 @@ class CustomerFollowUpWorkspacePage extends StatelessWidget {
         color: const Color(0xFFD8B26A).withValues(alpha: 0.18),
       ),
       onPressed: () => Navigator.of(context).pushNamed(route),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final requestsStream = FirebaseFirestore.instance
-        .collection(_supportRequestsCollection)
-        .orderBy('createdAt', descending: true)
-        .snapshots();
-
-    return Scaffold(
-      backgroundColor: AppColors.obsidian,
-      appBar: AppShellActions.buildAppBar(
-        context,
-        title: 'Customer Follow-up Workspace',
-      ),
-      body: AppPageBackground(
-        child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          children: [
-            AppSectionPanel(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              color: const Color(0xFF020617),
-              borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Customer Follow-up Workspace',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'قسم المتابعة وخدمة العملاء',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: const Color(0xFFEAEAEA),
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: AppSpacing.xs,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF3E9B90).withValues(alpha: 0.10),
-                      borderRadius: BorderRadius.circular(AppRadii.pill),
-                      border: Border.all(
-                        color: const Color(0xFF3E9B90).withValues(alpha: 0.24),
-                      ),
-                    ),
-                    child: Text(
-                      'Manual • Future-ready • No automation',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: const Color(0xFF73C1B8),
-                            fontWeight: FontWeight.w800,
-                          ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    'Handles customer follow-up, external communication, and request tracking.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: const Color(0xFFEAEAEA),
-                          height: 1.35,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            AppSectionPanel(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              color: const Color(0xFF0F172A),
-              borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
-              child: Wrap(
-                spacing: AppSpacing.sm,
-                runSpacing: AppSpacing.sm,
-                children: [
-                  _chip(
-                    context,
-                    label: 'Communication Gateway',
-                    icon: Icons.hub_outlined,
-                    route: Routes.adminCommunicationGateway,
-                  ),
-                  _chip(
-                    context,
-                    label: 'Support Email',
-                    icon: Icons.email_outlined,
-                    route: Routes.adminCommunicationGateway,
-                  ),
-                  _chip(
-                    context,
-                    label: 'Booking Requests',
-                    icon: Icons.assignment_outlined,
-                    route: Routes.adminOperations,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            AppSectionPanel(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              color: const Color(0xFF0F172A),
-              borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Structured Support Requests',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                    stream: requestsStream,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
-                          child: Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      }
-
-                      if (snapshot.hasError) {
-                        return Text(
-                          'Unable to load support requests.',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: const Color(0xFFEAEAEA),
-                              ),
-                        );
-                      }
-
-                      final docs = snapshot.data?.docs ?? const [];
-                      if (docs.isEmpty) {
-                        return Text(
-                          'No structured support requests yet.',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: const Color(0xFFEAEAEA),
-                              ),
-                        );
-                      }
-
-                      return Column(
-                        children: docs
-                            .map(
-                              (doc) => Padding(
-                                padding: const EdgeInsets.only(
-                                  bottom: AppSpacing.sm,
-                                ),
-                                child: _SupportRequestCard(data: doc.data()),
-                              ),
-                            )
-                            .toList(),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              'Future smart assistant is not active here. This workspace remains manual and staff-ready only.',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFFEAEAEA),
-                    height: 1.35,
-                  ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -243,10 +310,22 @@ class _SupportRequestCard extends StatelessWidget {
             spacing: AppSpacing.sm,
             runSpacing: AppSpacing.sm,
             children: [
-              _metaChip(context, 'supportType: ${supportType.isEmpty ? '-' : supportType}'),
-              _metaChip(context, 'issueType: ${issueType.isEmpty ? '-' : issueType}'),
-              _metaChip(context, 'priority: ${priority.isEmpty ? '-' : priority}'),
-              _metaChip(context, 'status: ${status.isEmpty ? '-' : status}'),
+              _metaChip(
+                context,
+                'supportType: ${supportType.isEmpty ? '-' : supportType}',
+              ),
+              _metaChip(
+                context,
+                'issueType: ${issueType.isEmpty ? '-' : issueType}',
+              ),
+              _metaChip(
+                context,
+                'priority: ${priority.isEmpty ? '-' : priority}',
+              ),
+              _metaChip(
+                context,
+                'status: ${status.isEmpty ? '-' : status}',
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
