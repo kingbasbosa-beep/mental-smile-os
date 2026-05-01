@@ -2406,7 +2406,7 @@ service cloud.firestore {
         && (request.resource.data.createdByUid is string)
         && request.resource.data.createdByUid == request.auth.uid
         && request.resource.data.userRole in ['guest', 'client']
-        && request.resource.data.supportType in ['recovery_support', 'family_support']
+        && request.resource.data.supportType in ['recovery_support', 'family_support', 'client_support']
         && request.resource.data.issueType in [
           'need_specialist',
           'need_center',
@@ -2415,7 +2415,14 @@ service cloud.firestore {
           'family_guidance',
           'special_case_support',
           'risk_report',
-          'general_help'
+          'general_help',
+          'booking_issue',
+          'payment_follow_up',
+          'session_timing_issue',
+          'account_profile_issue',
+          'complaint_bad_experience',
+          'need_human_follow_up',
+          'general_admin_question'
         ]
         && request.resource.data.status == 'new'
         && request.resource.data.source == 'structured_support'

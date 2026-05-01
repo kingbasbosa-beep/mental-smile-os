@@ -20,6 +20,7 @@ import 'package:flutterprojects/features/splash/presentation/pages/splash_page.d
 import 'package:flutterprojects/features/language/presentation/pages/language_page.dart';
 import 'package:flutterprojects/features/modules/presentation/pages/module_placeholder_page.dart';
 import 'package:flutterprojects/features/modules/presentation/pages/support_entry_page.dart';
+import 'package:flutterprojects/features/modules/presentation/pages/support_issue_selector_page.dart';
 import 'package:flutterprojects/features/home/presentation/pages/home_page.dart';
 import 'package:flutterprojects/features/home/presentation/pages/menu_page.dart';
 import 'package:flutterprojects/features/specialists/presentation/specialists_categories_page.dart';
@@ -28,6 +29,12 @@ import 'package:flutterprojects/features/specialists/presentation/specialist_det
 import 'package:flutterprojects/features/auth/presentation/pages/login_page.dart';
 import 'package:flutterprojects/features/auth/presentation/pages/client_register_page.dart';
 import 'package:flutterprojects/features/auth/presentation/pages/clinician_register_page.dart';
+import 'package:flutterprojects/features/external_follow_up/presentation/pages/follow_up_registration_page.dart';
+import 'package:flutterprojects/features/external_follow_up/presentation/pages/external_follow_up_workspace_page.dart';
+import 'package:flutterprojects/features/external_follow_up/presentation/pages/follow_up_templates_page.dart';
+import 'package:flutterprojects/features/external_follow_up/presentation/pages/follow_up_campaigns_page.dart';
+import 'package:flutterprojects/features/external_follow_up/presentation/pages/follow_up_campaign_details_page.dart';
+import 'package:flutterprojects/features/external_follow_up/data/models/follow_up_campaign.dart';
 import 'package:flutterprojects/features/chat/presentation/pages/chat_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/chat_escalations_page.dart';
 import 'package:flutterprojects/features/chat/presentation/pages/chat_escalation_report_page.dart';
@@ -117,6 +124,10 @@ class AppRouter {
     Routes.adminDomainStatus,
     Routes.adminDomainAvailability,
     Routes.adminFunctionalWorkspaces,
+    Routes.externalFollowUpWorkspace,
+    Routes.followUpTemplates,
+    Routes.followUpCampaigns,
+    Routes.followUpCampaignDetails,
     Routes.customerFollowUpWorkspace,
     Routes.technicalSupportWorkspace,
     Routes.marketingWorkspace,
@@ -327,6 +338,41 @@ class AppRouter {
       case Routes.adminFunctionalWorkspaces:
         return _adminProtectedRoute(
           child: const AdminFunctionalWorkspacesPage(),
+          settings: settings,
+        );
+
+      case Routes.externalFollowUpWorkspace:
+        return _adminProtectedRoute(
+          child: const ExternalFollowUpWorkspacePage(),
+          settings: settings,
+        );
+
+      case Routes.followUpTemplates:
+        return _adminProtectedRoute(
+          child: const FollowUpTemplatesPage(),
+          settings: settings,
+        );
+
+      case Routes.followUpCampaigns:
+        return _adminProtectedRoute(
+          child: const FollowUpCampaignsPage(),
+          settings: settings,
+        );
+
+      case Routes.followUpCampaignDetails:
+        final args = settings.arguments;
+        if (args is! FollowUpCampaign) {
+          return MaterialPageRoute(
+            builder: (ctx) => Scaffold(
+              body: Center(
+                child: Text(AppLocalizations.of(ctx)!.routeNotFound),
+              ),
+            ),
+            settings: settings,
+          );
+        }
+        return _adminProtectedRoute(
+          child: FollowUpCampaignDetailsPage(campaign: args),
           settings: settings,
         );
 
@@ -626,6 +672,12 @@ class AppRouter {
           settings: settings,
         );
 
+      case Routes.followUpRegistration:
+        return MaterialPageRoute(
+          builder: (_) => const FollowUpRegistrationPage(),
+          settings: settings,
+        );
+
       case Routes.clinicianRegister:
         return MaterialPageRoute(
           builder: (_) => const ClinicianRegisterPage(),
@@ -879,6 +931,27 @@ class AppRouter {
       case Routes.specialNeeds:
         return MaterialPageRoute(
           builder: (_) => const SupportEntryPage.specialNeeds(),
+          settings: settings,
+        );
+
+      case Routes.supportIssueSelector:
+        final args = settings.arguments;
+        final supportType =
+            args is Map ? args['supportType']?.toString() : null;
+        if (supportType != 'recovery_support' &&
+            supportType != 'family_support' &&
+            supportType != 'client_support') {
+          return MaterialPageRoute(
+            builder: (ctx) => Scaffold(
+              body: Center(
+                child: Text(AppLocalizations.of(ctx)!.routeNotFound),
+              ),
+            ),
+            settings: settings,
+          );
+        }
+        return MaterialPageRoute(
+          builder: (_) => SupportIssueSelectorPage(supportType: supportType!),
           settings: settings,
         );
 

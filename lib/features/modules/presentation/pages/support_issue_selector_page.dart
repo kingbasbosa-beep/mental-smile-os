@@ -24,20 +24,56 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
   bool get _isRecoverySupport => widget.supportType == 'recovery_support';
+  bool get _isClientSupport => widget.supportType == 'client_support';
 
   List<_SupportIssueOption> _options(bool isArabic) {
+    if (_isClientSupport) {
+      return [
+        _SupportIssueOption(
+          key: 'booking_issue',
+          label: isArabic ? 'مشكلة في الحجز' : 'Booking issue',
+        ),
+        _SupportIssueOption(
+          key: 'payment_follow_up',
+          label: isArabic ? 'متابعة دفعة أو تحويل' : 'Payment follow-up',
+        ),
+        _SupportIssueOption(
+          key: 'session_timing_issue',
+          label: isArabic ? 'مشكلة في موعد الجلسة' : 'Session timing issue',
+        ),
+        _SupportIssueOption(
+          key: 'account_profile_issue',
+          label: isArabic
+              ? 'مشكلة في الحساب أو الملف الشخصي'
+              : 'Account/profile issue',
+        ),
+        _SupportIssueOption(
+          key: 'complaint_bad_experience',
+          label: isArabic
+              ? 'شكوى أو تجربة غير جيدة'
+              : 'Complaint / bad experience',
+        ),
+        _SupportIssueOption(
+          key: 'need_human_follow_up',
+          label: isArabic ? 'أحتاج متابعة بشرية' : 'Need human follow-up',
+        ),
+        _SupportIssueOption(
+          key: 'general_admin_question',
+          label: isArabic ? 'استفسار إداري عام' : 'General admin question',
+        ),
+      ];
+    }
+
     if (_isRecoverySupport) {
       return [
         _SupportIssueOption(
           key: 'need_specialist',
-          label: isArabic
-              ? 'محتاج أخصائي مناسب'
-              : 'Need a suitable specialist',
+          label:
+              isArabic ? 'محتاج أخصائي مناسب' : 'Need a suitable specialist',
         ),
         _SupportIssueOption(
           key: 'need_center',
-          label:
-              isArabic ? 'محتاج مركز مناسب' : 'Need a suitable center',
+          label: isArabic ? 'محتاج مركز مناسب' : 'Need a suitable center',
         ),
         _SupportIssueOption(
           key: 'recovery_support',
@@ -53,9 +89,8 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
         ),
         _SupportIssueOption(
           key: 'general_help',
-          label: isArabic
-              ? 'طلب مساعدة عامة'
-              : 'General help request',
+          label:
+              isArabic ? 'طلب مساعدة عامة' : 'General help request',
         ),
       ];
     }
@@ -63,8 +98,7 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
     return [
       _SupportIssueOption(
         key: 'need_specialist',
-        label:
-            isArabic ? 'محتاج أخصائي مناسب' : 'Need a suitable specialist',
+        label: isArabic ? 'محتاج أخصائي مناسب' : 'Need a suitable specialist',
       ),
       _SupportIssueOption(
         key: 'need_center',
@@ -86,8 +120,7 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
       ),
       _SupportIssueOption(
         key: 'general_help',
-        label:
-            isArabic ? 'طلب مساعدة عامة' : 'General help request',
+        label: isArabic ? 'طلب مساعدة عامة' : 'General help request',
       ),
     ];
   }
@@ -102,7 +135,7 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       final isGuest = user == null || user.isAnonymous;
-      final userRole = isGuest ? 'guest' : 'client';
+      final userRole = _isClientSupport ? 'client' : (isGuest ? 'guest' : 'client');
       final priority = option.key == 'risk_report' ? 'high' : 'normal';
 
       final ref =

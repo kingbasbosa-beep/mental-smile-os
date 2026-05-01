@@ -389,10 +389,12 @@ class ClientDashboardPage extends StatelessWidget {
                             ? 'عدد محادثات الإدارة المفتوحة: $count'
                             : 'Open admin conversations count: $count',
                         icon: Icons.chat_bubble_outline_rounded,
-                        actionLabel: isArabic ? 'فتح الرسائل' : 'Open chat',
+                        actionLabel: isArabic
+                            ? 'إرسال طلب دعم'
+                            : 'Send support request',
                         onTap: () => Navigator.of(context).pushNamed(
-                          Routes.chat,
-                          arguments: const {'mode': 'admin_support'},
+                          Routes.supportIssueSelector,
+                          arguments: const {'supportType': 'client_support'},
                         ),
                       );
                     },
