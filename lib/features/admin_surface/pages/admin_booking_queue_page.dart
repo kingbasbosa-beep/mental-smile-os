@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/system/domain_registry.dart';
 import 'package:flutterprojects/core/system/domain_status.dart';
 import 'package:flutterprojects/core/system/domain_status_service.dart';
@@ -870,71 +871,17 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
   }
 
   Future<void> _approvePayment(String requestId) async {
-    final isArabic = _isArabic(context);
-    await _setBusy(requestId, true);
-    try {
-      final result = await _bookingDecisionAdapter.approvePayment(
-        requestId: requestId,
-      );
-
-      await _appendSystemMessage(
-        requestId: requestId,
-        text: isArabic
-            ? (result.isCenterRequest
-                ? 'تم تأكيد إشارة السداد وتحديث الخطوة التالية إلى إقامة مبدئية مجدولة.'
-                : 'تم تأكيد إشارة السداد وتحديث الخطوة التالية إلى تجهيز الجلسة.')
-            : (result.isCenterRequest
-                ? 'Payment signal confirmed; next step updated to preliminary residency scheduled.'
-                : 'Payment signal confirmed; next step updated to session setup.'),
-      );
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isArabic
-                ? (result.isCenterRequest
-                    ? 'تم تأكيد إشارة السداد وتحديث الخطوة التالية إلى إقامة مبدئية مجدولة'
-                    : 'تم تأكيد إشارة السداد وتحديث الخطوة التالية إلى تجهيز الجلسة')
-                : (result.isCenterRequest
-                    ? 'Payment signal confirmed; next step updated to preliminary residency scheduled'
-                    : 'Payment signal confirmed; next step updated to session setup'),
-          ),
-        ),
-      );
-    } finally {
-      await _setBusy(requestId, false);
-    }
+    Navigator.of(context).pushNamed(
+      Routes.adminPayments,
+      arguments: {'requestId': requestId},
+    );
   }
 
   Future<void> _rejectPayment(String requestId) async {
-    final isArabic = _isArabic(context);
-    await _setBusy(requestId, true);
-    try {
-      await _bookingDecisionAdapter.rejectPayment(
-        requestId: requestId,
-      );
-
-      await _appendSystemMessage(
-        requestId: requestId,
-        text: isArabic
-            ? 'تم رفض إثبات السداد وإرجاع الطلب إلى انتظار الدفع.'
-            : 'Payment issue flagged and request returned to awaiting payment.',
-      );
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isArabic
-                ? 'تم رفض إثبات السداد وإرجاع الطلب لانتظار الدفع'
-                : 'Payment issue flagged and returned to awaiting payment',
-          ),
-        ),
-      );
-    } finally {
-      await _setBusy(requestId, false);
-    }
+    Navigator.of(context).pushNamed(
+      Routes.adminPayments,
+      arguments: {'requestId': requestId},
+    );
   }
 
   Future<void> _confirmClinicianPayout(String requestId) async {

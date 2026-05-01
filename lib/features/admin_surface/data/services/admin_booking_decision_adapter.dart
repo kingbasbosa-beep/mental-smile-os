@@ -454,6 +454,7 @@ class AdminBookingDecisionAdapter {
     });
   }
 
+  @Deprecated('Payment authority moved to AdminPaymentDecisionAdapter. Use that adapter for payment decisions.')
   Future<AdminApprovePaymentResult> approvePayment({
     required String requestId,
   }) async {
@@ -474,6 +475,7 @@ class AdminBookingDecisionAdapter {
     return AdminApprovePaymentResult(isCenterRequest: isCenterRequest);
   }
 
+  @Deprecated('Payment authority moved to AdminPaymentDecisionAdapter. Use that adapter for payment decisions.')
   Future<void> rejectPayment({
     required String requestId,
   }) async {
