@@ -2,6 +2,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/features/admin_surface/data/services/admin_payment_decision_adapter.dart';
 import 'package:flutterprojects/features/booking/data/services/booking_health_service.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
@@ -16,6 +17,8 @@ class AdminPaymentsPage extends StatefulWidget {
 class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
   static const BookingHealthService _bookingHealthService =
       BookingHealthService();
+  final AdminPaymentDecisionAdapter _paymentDecisionAdapter =
+      AdminPaymentDecisionAdapter();
   String _tab = 'payment_review';
   final Set<String> _busyIds = {};
 
@@ -37,21 +40,6 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
     }
   }
 
-  Map<String, dynamic> _withCanonicalWorkflowStage(
-    Map<String, dynamic> updates,
-  ) {
-    final status = updates['status'];
-    if (status is String &&
-        status.trim().isNotEmpty &&
-        !updates.containsKey('workflowStage')) {
-      return {
-        ...updates,
-        'workflowStage': status,
-      };
-    }
-    return updates;
-  }
-
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
@@ -66,53 +54,20 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
     });
   }
 
-  Future<void> _updateRequestEverywhere(
-    String requestId,
-    Map<String, dynamic> updates,
-  ) async {
-    final payload = {
-      ..._withCanonicalWorkflowStage(updates),
-      'updatedAt': FieldValue.serverTimestamp(),
-    };
-
-    final ref = FirebaseFirestore.instance
-        .collection('booking_requests')
-        .doc(requestId);
-    final snap = await ref.get();
-    if (snap.exists) {
-      await ref.update(payload);
-    }
-  }
-
   Future<void> _approvePayment(String requestId) async {
     await _setBusy(requestId, true);
     try {
-      final snap = await FirebaseFirestore.instance
-          .collection('booking_requests')
-          .doc(requestId)
-          .get();
-      final data = snap.data() ?? const <String, dynamic>{};
-      final isCenterRequest =
-          (data['requestKind'] ?? '').toString().trim() == 'center' ||
-              (data['centerId'] ?? '').toString().trim().isNotEmpty;
-      await _updateRequestEverywhere(requestId, {
-        'status':
-            isCenterRequest ? 'session_scheduled' : 'session_setup_pending',
-        'paymentStatus': 'approved',
-        'payment_confirmed': true,
-        'paymentApprovedAt': FieldValue.serverTimestamp(),
-        'sessionStatus': isCenterRequest ? 'scheduled' : 'not_created',
-      });
+      final result = await _paymentDecisionAdapter.approvePayment(requestId);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? (isCenterRequest
+                ? (result.isCenterRequest
                     ? 'ØªÙ… Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ø³Ø¯Ø§Ø¯ ÙˆØªØ­ÙˆÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨ Ø¥Ù„Ù‰ Ø¥Ù‚Ø§Ù…Ø© Ù…Ø¨Ø¯Ø¦ÙŠØ© Ù…Ø¬Ø¯ÙˆÙ„Ø©'
                     : 'ØªÙ… Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ø³Ø¯Ø§Ø¯ ÙˆØªØ­ÙˆÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨ Ø¥Ù„Ù‰ Ù‚Ø³Ù… Ø§Ù„Ø¬Ù„Ø³Ø§Øª')
-                : (isCenterRequest
+                : (result.isCenterRequest
                     ? 'Payment approved and request moved to preliminary residency scheduled'
                     : 'Payment approved and moved to sessions setup'),
           ),
@@ -126,12 +81,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
   Future<void> _rejectPayment(String requestId) async {
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'status': 'awaiting_payment',
-        'paymentStatus': 'rejected',
-        'payment_confirmed': false,
-        'paymentRejectedAt': FieldValue.serverTimestamp(),
-      });
+      await _paymentDecisionAdapter.rejectPayment(requestId);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -151,13 +101,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
   Future<void> _confirmClinicianPayout(String requestId) async {
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'status': 'completed_success',
-        'sessionStatus': 'completed',
-        'reviewStatus': 'completed',
-        'payoutStatus': 'paid_to_clinician',
-        'payoutTransferredAt': FieldValue.serverTimestamp(),
-      });
+      await _paymentDecisionAdapter.confirmClinicianPayout(requestId);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -277,19 +221,14 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
           : double.tryParse('$baseSeed') ?? 0;
       final commissionPercent =
           double.tryParse(commissionController.text.trim()) ?? 10;
-      final commissionAmount = baseAmount * (commissionPercent / 100);
-      final netAmount = baseAmount - commissionAmount;
-      await _updateRequestEverywhere(requestId, {
-        'status': 'payout_pending',
-        'accountingReviewStatus': 'confirmed',
-        'grossClientPaidAmount': gross,
-        'appCommissionPercent': commissionPercent,
-        'appCommissionAmount': commissionAmount,
-        'netAmountDueToCenter': netAmount,
-        'accountingReviewNotes': noteController.text.trim(),
-        'accountingConfirmedBy': FirebaseAuth.instance.currentUser?.uid ?? '',
-        'accountingConfirmedAt': FieldValue.serverTimestamp(),
-      });
+      await _paymentDecisionAdapter.confirmCenterAccountingReview(
+        requestId: requestId,
+        gross: gross,
+        baseAmount: baseAmount,
+        commissionPercent: commissionPercent,
+        note: noteController.text.trim(),
+        adminUid: FirebaseAuth.instance.currentUser?.uid ?? '',
+      );
     } finally {
       grossController.dispose();
       commissionController.dispose();
@@ -301,13 +240,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
   Future<void> _confirmCenterPayout(String requestId) async {
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'status': 'completed_success',
-        'sessionStatus': 'completed',
-        'reviewStatus': 'completed',
-        'payoutStatus': 'paid_to_center',
-        'payoutTransferredAt': FieldValue.serverTimestamp(),
-      });
+      await _paymentDecisionAdapter.confirmCenterPayout(requestId);
     } finally {
       await _setBusy(requestId, false);
     }
@@ -316,12 +249,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
   Future<void> _sendToSessionArchive(String requestId) async {
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'archived': true,
-        'archivedAt': FieldValue.serverTimestamp(),
-        'archiveSection': 'sessions',
-        'archiveReady': true,
-      });
+      await _paymentDecisionAdapter.sendToSessionArchive(requestId);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -341,12 +269,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
   Future<void> _sendToFinancialArchive(String requestId) async {
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'archived': true,
-        'archivedAt': FieldValue.serverTimestamp(),
-        'archiveSection': 'payments',
-        'archiveReady': true,
-      });
+      await _paymentDecisionAdapter.sendToFinancialArchive(requestId);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
