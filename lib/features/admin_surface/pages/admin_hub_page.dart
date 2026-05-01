@@ -645,6 +645,15 @@ $gatewayLines
         route: Routes.marketingWorkspace,
       ),
       _AdminSectionLaunchCardData(
+        title: isArabic ? 'قسم المحاسبة' : 'Accounting',
+        subtitle: isArabic
+            ? 'مراجعة السداد، سجل المدفوعات، والسجل المحاسبي'
+            : 'Payment review, payments ledger, and accounting archive',
+        icon: Icons.account_balance_wallet_outlined,
+        group: AdminVisualGroup.payments,
+        route: Routes.adminAccountingWorkspace,
+      ),
+      _AdminSectionLaunchCardData(
         title: isArabic ? 'المتابعة الخارجية' : 'External Follow-up',
         subtitle: isArabic
             ? 'إدارة تسجيلات المتابعة والدعم والتهنئة والتوعية'

@@ -89,6 +89,7 @@ import 'package:flutterprojects/features/admin_surface/pages/admin_session_repor
 import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_profile_requests_page.dart';
 import 'package:flutterprojects/features/reviews/presentation/pages/session_review_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_payments_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/accounting_workspace_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_sessions_page.dart';
 import 'package:flutterprojects/features/client/presentation/pages/client_payment_proof_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_requests_page.dart';
@@ -159,6 +160,7 @@ class AppRouter {
     Routes.adminArchiveCenters,
     Routes.adminArchiveSupport,
     Routes.adminArchiveAccounting,
+    Routes.adminAccountingWorkspace,
     Routes.adminSessionReport,
     Routes.adminCenters,
     Routes.chatEscalations,
@@ -517,6 +519,13 @@ class AppRouter {
       case _adminAlertsReviewRoute:
         return _adminProtectedRoute(
           child: const AdminAlertsReviewPage(),
+          settings: settings,
+        );
+
+
+      case Routes.adminAccountingWorkspace:
+        return _adminProtectedRoute(
+          child: const AccountingWorkspacePage(),
           settings: settings,
         );
 
