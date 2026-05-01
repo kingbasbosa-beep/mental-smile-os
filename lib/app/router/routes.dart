@@ -102,6 +102,7 @@ class Routes {
   static const adminArchiveCenters = '/admin/archive/centers';
   static const adminArchiveSupport = '/admin/archive/support';
   static const adminArchiveAccounting = '/admin/archive/accounting';
+  static const adminAccountingWorkspace = '/admin/accounting';
   static const adminPayments = '/admin/payments';
   static const adminSessions = '/admin/sessions';
   static const adminSessionReport = '/admin/session-report';
