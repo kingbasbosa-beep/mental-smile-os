@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/gateways/role_access_gateway.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
@@ -31,8 +30,15 @@ class _ChatPageState extends State<ChatPage> {
   final ScrollController _scrollController = ScrollController();
 
   ChatThreadModel? _thread;
+  ({
+    String english,
+    String arabic,
+    String ownerEnglish,
+    String ownerArabic,
+  })? _selectedStructuredRequest;
   bool _loading = true;
   bool _sending = false;
+  bool? _viewerIsAdmin;
   String? _error;
 
   bool _isArabic() =>
@@ -80,6 +86,306 @@ class _ChatPageState extends State<ChatPage> {
     final thread = _thread;
     if (thread == null) return false;
     return thread.threadType == 'booking_followup' || thread.bookingLinked;
+  }
+
+  List<({String english, String arabic})> get _structuredRequestOptions => [
+        (
+          english: 'Booking / Session Issue',
+          arabic: 'مشكلة حجز أو جلسة',
+        ),
+        (
+          english: 'Clinician Issue',
+          arabic: 'مشكلة مع الأخصائي',
+        ),
+        (
+          english: 'Center Issue',
+          arabic: 'مشكلة مع المركز',
+        ),
+        (
+          english: 'Follow-up Request',
+          arabic: 'طلب متابعة',
+        ),
+        (
+          english: 'Account / Payment Question',
+          arabic: 'سؤال حساب أو دفع',
+        ),
+        (
+          english: 'Other Admin Support',
+          arabic: 'دعم إداري آخر',
+        ),
+      ];
+
+  String _structuredRequestTemplate(
+    bool isArabic,
+    String englishType,
+    String arabicType,
+  ) {
+    if (isArabic) {
+      return '[طلب إداري منظم]\n'
+          'النوع: $arabicType\n'
+          'المصدر: شات الإدارة\n'
+          'التفاصيل: ';
+    }
+
+    return '[Structured Admin Request]\n'
+        'Type: $englishType\n'
+        'Source: Admin Support Chat\n'
+        'Details: ';
+  }
+
+  (String ownerEnglish, String ownerArabic) _structuredRequestOwner(
+    String englishType,
+  ) {
+    switch (englishType) {
+      case 'Booking / Session Issue':
+        return ('Customer Follow-up', 'المتابعة وخدمة العملاء');
+      case 'Clinician Issue':
+        return (
+          'Customer Follow-up / Admin Review',
+          'المتابعة وخدمة العملاء / مراجعة الإدارة',
+        );
+      case 'Center Issue':
+        return (
+          'Customer Follow-up / Admin Review',
+          'المتابعة وخدمة العملاء / مراجعة الإدارة',
+        );
+      case 'Follow-up Request':
+        return ('Customer Follow-up', 'المتابعة وخدمة العملاء');
+      case 'Account / Payment Question':
+        return (
+          'Customer Follow-up / Finance Review',
+          'المتابعة وخدمة العملاء / مراجعة مالية',
+        );
+      case 'Other Admin Support':
+      default:
+        return ('Customer Follow-up', 'المتابعة وخدمة العملاء');
+    }
+  }
+
+  void _insertStructuredRequestTemplate(
+    bool isArabic, {
+    required String englishType,
+    required String arabicType,
+  }) {
+    final template =
+        _structuredRequestTemplate(isArabic, englishType, arabicType);
+
+    _textController
+      ..text = template
+      ..selection = TextSelection.collapsed(offset: template.length);
+
+    if (widget.adminSupportMode && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'تم تجهيز الطلب المنظم.'
+                : 'Structured request prepared.',
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget _buildStructuredRequestMenu(bool isArabic, TextDirection textDirection) {
+    if (!widget.adminSupportMode ||
+        _viewerIsAdmin == true ||
+        _viewerIsAdmin == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        0,
+        AppSpacing.md,
+        AppSpacing.sm,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.72),
+          borderRadius: BorderRadius.circular(AppRadii.md),
+          border: Border.all(
+            color: AppColors.mutedGold.withValues(alpha: 0.22),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment:
+              isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                AppSpacing.sm,
+                AppSpacing.md,
+                AppSpacing.xs,
+              ),
+              child: Column(
+                crossAxisAlignment:
+                    isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isArabic ? 'طلب منظم' : 'Structured Request',
+                    textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: AppColors.obsidian,
+                          fontWeight: FontWeight.w800,
+                        ),
+                  ),
+                  const SizedBox(height: AppSpacing.xxs),
+                  Text(
+                    isArabic
+                        ? 'استخدم الطلبات المنظمة لمشاكل الحجز أو الأخصائي أو المركز أو المتابعة أو الحساب. حالات الخطر يتم التعامل معها عبر الشات العام.'
+                        : 'Use structured requests for booking, clinician, center, follow-up, or account issues. Safety concerns should use the general support chat.',
+                    textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.obsidian.withValues(alpha: 0.76),
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                0,
+                AppSpacing.md,
+                AppSpacing.sm,
+              ),
+              child: SizedBox(
+                height: 44,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    textDirection: textDirection,
+                    children: [
+                      for (final option in _structuredRequestOptions) ...[
+                        ActionChip(
+                          avatar: const Icon(
+                            Icons.add_comment_outlined,
+                            size: 16,
+                            color: AppColors.deepTeal,
+                          ),
+                          label: Text(
+                            isArabic ? option.arabic : option.english,
+                            textAlign:
+                                isArabic ? TextAlign.right : TextAlign.left,
+                          ),
+                          onPressed: () {
+                            final owner =
+                                _structuredRequestOwner(option.english);
+                            setState(() {
+                              _selectedStructuredRequest = (
+                                english: option.english,
+                                arabic: option.arabic,
+                                ownerEnglish: owner.$1,
+                                ownerArabic: owner.$2,
+                              );
+                            });
+                            _insertStructuredRequestTemplate(
+                              isArabic,
+                              englishType: option.english,
+                              arabicType: option.arabic,
+                            );
+                          },
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            if (_selectedStructuredRequest != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  0,
+                  AppSpacing.md,
+                  AppSpacing.md,
+                ),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF7E8),
+                    borderRadius: BorderRadius.circular(AppRadii.md),
+                    border: Border.all(
+                      color: const Color(0xFFD8B26A).withValues(alpha: 0.28),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: isArabic
+                        ? CrossAxisAlignment.end
+                        : CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isArabic ? 'معاينة الطلب' : 'Request Preview',
+                        textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              color: AppColors.obsidian,
+                              fontWeight: FontWeight.w800,
+                            ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        _structuredRequestTemplate(
+                          isArabic,
+                          _selectedStructuredRequest!.english,
+                          _selectedStructuredRequest!.arabic,
+                        ),
+                        textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppColors.obsidian,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      AppStatusBadge(
+                        label: isArabic
+                            ? 'الجهة المسؤولة: ${_selectedStructuredRequest!.ownerArabic}'
+                            : 'Ownership: ${_selectedStructuredRequest!.ownerEnglish}',
+                        color: AppColors.deepTeal,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Align(
+                        alignment: isArabic
+                            ? Alignment.centerLeft
+                            : Alignment.centerRight,
+                        child: FilledButton.icon(
+                          onPressed: _sending
+                              ? null
+                              : () async {
+                                  await _send();
+                                  if (!mounted) return;
+                                  setState(() {
+                                    _selectedStructuredRequest = null;
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        isArabic
+                                            ? 'تم تسجيل طلبك وهو تحت المراجعة.'
+                                            : 'Your request has been submitted and is under review.',
+                                      ),
+                                    ),
+                                  );
+                                },
+                          icon: const Icon(Icons.send_rounded),
+                          label: Text(
+                            isArabic ? 'إرسال الطلب' : 'Submit Request',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildBoundaryBanner(bool isArabic, TextDirection textDirection) {
@@ -158,7 +464,16 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
+    _resolveViewerRole();
     _initThread();
+  }
+
+  Future<void> _resolveViewerRole() async {
+    final isAdmin = await _isAdminUser();
+    if (!mounted) return;
+    setState(() {
+      _viewerIsAdmin = isAdmin;
+    });
   }
 
   Future<void> _initThread() async {
@@ -447,6 +762,7 @@ class _ChatPageState extends State<ChatPage> {
     final isArabic = _isArabic();
     final textDirection = isArabic ? TextDirection.rtl : TextDirection.ltr;
     final entryContextHelper = _entryContextHelper(isArabic);
+    final isViewerAdmin = _viewerIsAdmin == true;
 
     return Directionality(
       textDirection: textDirection,
@@ -621,16 +937,33 @@ class _ChatPageState extends State<ChatPage> {
 
                                     final messages = snapshot.data ?? [];
                                     if (messages.isEmpty) {
-                                      return _buildEmptyState(isArabic);
+                                      return ListView(
+                                        controller: _scrollController,
+                                        padding:
+                                            const EdgeInsets.all(AppSpacing.md),
+                                        children: [
+                                          _buildStructuredRequestMenu(
+                                            isArabic,
+                                            textDirection,
+                                          ),
+                                          _buildEmptyState(isArabic),
+                                        ],
+                                      );
                                     }
 
                                     return ListView.builder(
                                       controller: _scrollController,
                                       padding:
                                           const EdgeInsets.all(AppSpacing.md),
-                                      itemCount: messages.length,
+                                      itemCount: messages.length + 1,
                                       itemBuilder: (context, index) {
-                                        final msg = messages[index];
+                                        if (index == 0) {
+                                          return _buildStructuredRequestMenu(
+                                            isArabic,
+                                            textDirection,
+                                          );
+                                        }
+                                        final msg = messages[index - 1];
                                         if (!msg.visibleToUser) {
                                           return const SizedBox.shrink();
                                         }
@@ -640,72 +973,73 @@ class _ChatPageState extends State<ChatPage> {
                                   },
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  AppSpacing.sm,
-                                  0,
-                                  AppSpacing.sm,
-                                  AppSpacing.sm,
-                                ),
-                                child: AppSectionPanel(
+                              if (!widget.adminSupportMode || isViewerAdmin)
+                                Padding(
                                   padding: const EdgeInsets.fromLTRB(
                                     AppSpacing.sm,
-                                    AppSpacing.sm,
+                                    0,
                                     AppSpacing.sm,
                                     AppSpacing.sm,
                                   ),
-                                  child: Column(
-                                    crossAxisAlignment: isArabic
-                                        ? CrossAxisAlignment.end
-                                        : CrossAxisAlignment.start,
-                                    children: [
-                                      _buildRedirectHint(isArabic),
-                                      Row(
-                                        textDirection: textDirection,
-                                        children: [
-                                          Expanded(
-                                            child: TextField(
-                                              controller: _textController,
-                                              minLines: 1,
-                                              maxLines: 4,
-                                              textDirection: textDirection,
-                                              decoration: InputDecoration(
-                                                hintText: isArabic
-                                                    ? 'اكتب رسالتك هنا...'
-                                                    : 'Type your message here...',
+                                  child: AppSectionPanel(
+                                    padding: const EdgeInsets.fromLTRB(
+                                      AppSpacing.sm,
+                                      AppSpacing.sm,
+                                      AppSpacing.sm,
+                                      AppSpacing.sm,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: isArabic
+                                          ? CrossAxisAlignment.end
+                                          : CrossAxisAlignment.start,
+                                      children: [
+                                        _buildRedirectHint(isArabic),
+                                        Row(
+                                          textDirection: textDirection,
+                                          children: [
+                                            Expanded(
+                                              child: TextField(
+                                                controller: _textController,
+                                                minLines: 1,
+                                                maxLines: 4,
+                                                textDirection: textDirection,
+                                                decoration: InputDecoration(
+                                                  hintText: isArabic
+                                                      ? 'اكتب رسالتك هنا...'
+                                                      : 'Type your message here...',
+                                                ),
+                                                onSubmitted: (_) => _send(),
                                               ),
-                                              onSubmitted: (_) => _send(),
                                             ),
-                                          ),
-                                          const SizedBox(width: AppSpacing.sm),
-                                          SizedBox(
-                                            height: 50,
-                                            child: FilledButton(
-                                              onPressed:
-                                                  _sending ? null : _send,
-                                              child: _sending
-                                                  ? const SizedBox(
-                                                      width: 18,
-                                                      height: 18,
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                        strokeWidth: 2,
-                                                        color: Colors.white,
+                                            const SizedBox(width: AppSpacing.sm),
+                                            SizedBox(
+                                              height: 50,
+                                              child: FilledButton(
+                                                onPressed:
+                                                    _sending ? null : _send,
+                                                child: _sending
+                                                    ? const SizedBox(
+                                                        width: 18,
+                                                        height: 18,
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          strokeWidth: 2,
+                                                          color: Colors.white,
+                                                        ),
+                                                      )
+                                                    : Text(
+                                                        isArabic
+                                                            ? 'إرسال'
+                                                            : 'Send',
                                                       ),
-                                                    )
-                                                  : Text(
-                                                      isArabic
-                                                          ? 'إرسال'
-                                                          : 'Send',
-                                                    ),
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
                             ],
                           ),
           ),
