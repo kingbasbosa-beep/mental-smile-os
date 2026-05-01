@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/core/system/domain_registry.dart';
 import 'package:flutterprojects/core/system/domain_status.dart';
 import 'package:flutterprojects/core/system/domain_status_service.dart';
+import 'package:flutterprojects/features/admin_surface/data/services/admin_booking_decision_adapter.dart';
 import 'package:flutterprojects/features/booking/data/services/booking_legacy_chat_adapter.dart';
 import 'package:flutterprojects/features/booking/data/services/booking_health_service.dart';
 import 'package:flutterprojects/features/admin_surface/widgets/domain_advisory_banner.dart';
@@ -24,6 +25,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       BookingHealthService();
   static const DomainStatusService _domainStatusService = DomainStatusService();
   static const bool _adminClinicianForwardBridgeEnabled = false;
+  late final AdminBookingDecisionAdapter _bookingDecisionAdapter;
   final BookingLegacyChatAdapter _bookingChatAdapter =
       BookingLegacyChatAdapter();
 
@@ -50,6 +52,10 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
   @override
   void initState() {
     super.initState();
+    _bookingDecisionAdapter = AdminBookingDecisionAdapter(
+      refreshAuthContextForFirestore: _refreshAuthContextForFirestore,
+      logFirestore: _logFirestore,
+    );
     _bookingDocsStreamRef = _bookingDocsStream();
     _cliniciansStreamRef = _cliniciansStream();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -65,21 +71,6 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     } catch (_) {
       // Health reporting must stay quiet and never block booking queue usage.
     }
-  }
-
-  Map<String, dynamic> _withCanonicalWorkflowStage(
-    Map<String, dynamic> updates,
-  ) {
-    final status = updates['status'];
-    if (status is String &&
-        status.trim().isNotEmpty &&
-        !updates.containsKey('workflowStage')) {
-      return {
-        ...updates,
-        'workflowStage': status,
-      };
-    }
-    return updates;
   }
 
   static const List<Map<String, String>> _tabs = [
@@ -310,18 +301,6 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     );
   }
 
-  String _debugValue(dynamic value) {
-    if (value is FieldValue) return 'FieldValue';
-    if (value is Timestamp) return value.toDate().toIso8601String();
-    return value?.toString() ?? 'null';
-  }
-
-  Map<String, String> _debugMap(Map<String, dynamic> value) {
-    return {
-      for (final entry in value.entries) entry.key: _debugValue(entry.value),
-    };
-  }
-
   DateTime _docMoment(
     QueryDocumentSnapshot<Map<String, dynamic>> doc,
     String key,
@@ -364,191 +343,6 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final incomingCreated = _docMoment(incoming, 'createdAt');
     if (incomingCreated.isAfter(currentCreated)) return incoming;
     return current;
-  }
-
-  Future<void> _updateRequestEverywhere(
-    String requestId,
-    Map<String, dynamic> updates,
-  ) async {
-    final nowUpdates = {
-      ..._withCanonicalWorkflowStage(updates),
-      'updatedAt': FieldValue.serverTimestamp(),
-    };
-
-    final db = FirebaseFirestore.instance;
-    final refs = [
-      db.collection('booking_requests').doc(requestId),
-    ];
-
-    debugPrint(
-      'CENTER_FLOW_ASSIGN_TRACE '
-      'requestId=$requestId '
-      'targets=${refs.map((ref) => ref.path).join(",")} '
-      'legacyMirrorAttempted=false '
-      'finalUpdate=${_debugMap(nowUpdates)}',
-    );
-
-    for (final ref in refs) {
-      try {
-        _logFirestore(
-          page: 'admin_booking_queue',
-          role: 'admin',
-          operation: 'read',
-          collection: ref.parent.id,
-          documentId: requestId,
-          writeStatus: (updates['status'] ?? '').toString(),
-        );
-        final snap = await ref.get();
-        if (snap.exists) {
-          final data = snap.data() ?? <String, dynamic>{};
-          debugPrint(
-            'CENTER_FLOW_ASSIGN_RESOURCE_TRACE '
-            'requestId=$requestId '
-            'path=${ref.path} '
-            'resourceSnapshot=${_debugMap({
-                  'requestKind': data['requestKind'],
-                  'status': data['status'],
-                  'workflowStage': data['workflowStage'],
-                  'clientId': data['clientId'],
-                  'clientName': data['clientName'],
-                  'createdAt': data['createdAt'],
-                  'note': data['note'],
-                  'clinicianId': data['clinicianId'],
-                  'clinicianName': data['clinicianName'],
-                  'clinicianUid': data['clinicianUid'],
-                  'assignedClinicianId': data['assignedClinicianId'],
-                  'assignedClinicianName': data['assignedClinicianName'],
-                  'adminForwarded': data['adminForwarded'],
-                  'adminAssignedBy': data['adminAssignedBy'],
-                  'adminAssignedAt': data['adminAssignedAt'],
-                })}',
-          );
-          _logFirestore(
-            page: 'admin_booking_queue',
-            role: 'admin',
-            operation: 'update',
-            collection: ref.parent.id,
-            documentId: requestId,
-            requestKind: (data['requestKind'] ?? '').toString(),
-            status: (data['status'] ?? '').toString(),
-            writeStatus: (updates['status'] ?? '').toString(),
-          );
-          await ref.update(nowUpdates);
-        }
-      } catch (e) {
-        _logFirestore(
-          page: 'admin_booking_queue',
-          role: 'admin',
-          operation: 'update_error',
-          collection: ref.parent.id,
-          documentId: requestId,
-          writeStatus: (updates['status'] ?? '').toString(),
-          error: e,
-        );
-        rethrow;
-      }
-    }
-  }
-
-  Future<DocumentSnapshot<Map<String, dynamic>>> _readPrimaryBookingRequest(
-    String requestId,
-  ) async {
-    final ref = FirebaseFirestore.instance
-        .collection('booking_requests')
-        .doc(requestId);
-    _logFirestore(
-      page: 'admin_booking_queue',
-      role: 'admin',
-      operation: 'read',
-      collection: 'booking_requests',
-      documentId: requestId,
-    );
-    return ref.get();
-  }
-
-  Future<void> _updatePrimaryCenterRequest(
-    String requestId,
-    Map<String, dynamic> updates,
-  ) async {
-    final ref = FirebaseFirestore.instance
-        .collection('booking_requests')
-        .doc(requestId);
-    final nowUpdates = {
-      ..._withCanonicalWorkflowStage(updates),
-      'updatedAt': FieldValue.serverTimestamp(),
-    };
-
-    try {
-      await _refreshAuthContextForFirestore(
-        stage: '_updatePrimaryCenterRequest',
-        requestId: requestId,
-      );
-      final snap = await _readPrimaryBookingRequest(requestId);
-      if (!snap.exists) {
-        throw Exception('Center request not found');
-      }
-      final data = snap.data() ?? <String, dynamic>{};
-      print(
-        'CENTER_FOLLOWUP_TRACE '
-        'requestId=$requestId '
-        'currentAuthUid=${FirebaseAuth.instance.currentUser?.uid ?? ''} '
-        'resourceRequestKind=${(data['requestKind'] ?? '').toString()} '
-        'resourceStatus=${(data['status'] ?? '').toString()} '
-        'resourceClientUpdatedAfterCenterFeedback=${data['clientUpdatedAfterCenterFeedback']} '
-        'writeStatus=${(nowUpdates['status'] ?? '').toString()} '
-        'writeWorkflowStage=${(nowUpdates['workflowStage'] ?? '').toString()} '
-        'writeAdminDecisionType=${(nowUpdates['adminDecisionType'] ?? '').toString()} '
-        'writeCenterAdminHandledBy=${(nowUpdates['centerAdminHandledBy'] ?? '').toString()}',
-      );
-      _logFirestore(
-        page: 'admin_booking_queue',
-        role: 'admin',
-        operation: 'update',
-        collection: 'booking_requests',
-        documentId: requestId,
-        requestKind: (data['requestKind'] ?? '').toString(),
-        status: (data['status'] ?? '').toString(),
-        writeStatus: (updates['status'] ?? '').toString(),
-      );
-      print(
-        'CENTER_AUTH_TRACE '
-        'stage=_updatePrimaryCenterRequest '
-        'requestId=$requestId '
-        'phase=before_firestore_update '
-        'currentUserExists=${FirebaseAuth.instance.currentUser != null} '
-        'currentUserUid=${FirebaseAuth.instance.currentUser?.uid ?? ''} '
-        'afterRefresh=true',
-      );
-      await ref.update(nowUpdates);
-      _logFirestore(
-        page: 'admin_booking_queue',
-        role: 'admin',
-        operation: 'transition_success',
-        collection: 'booking_requests',
-        documentId: requestId,
-        requestKind: 'center',
-        status: (data['status'] ?? '').toString(),
-        writeStatus: (updates['status'] ?? '').toString(),
-      );
-    } catch (e) {
-      print(
-        'CENTER_FOLLOWUP_TRACE_ERROR '
-        'requestId=$requestId '
-        'currentAuthUid=${FirebaseAuth.instance.currentUser?.uid ?? ''} '
-        'error=$e',
-      );
-      _logFirestore(
-        page: 'admin_booking_queue',
-        role: 'admin',
-        operation: 'update_error',
-        collection: 'booking_requests',
-        documentId: requestId,
-        requestKind: 'center',
-        writeStatus: (updates['status'] ?? '').toString(),
-        error: e,
-      );
-      rethrow;
-    }
   }
 
   Future<void> _appendSystemMessage({
@@ -743,28 +537,11 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      final payload = {
-        'status': 'rejected_admin',
-        'workflowStage': 'rejected_admin',
-        'adminApproved': false,
-        'adminRejected': true,
-        'adminForwarded': false,
-        'adminDecisionType': 'rejected',
-        'adminDecisionBy': FirebaseAuth.instance.currentUser?.uid ?? '',
-        'adminDecisionAt': FieldValue.serverTimestamp(),
-        'adminAssignedBy': FirebaseAuth.instance.currentUser?.uid ?? '',
-        'adminAssignedAt': FieldValue.serverTimestamp(),
-        'paymentStatus': 'blocked',
-        'payment_confirmed': false,
-        'sessionStatus': 'cancelled',
-        'reviewStatus': 'blocked',
-        'payoutStatus': 'blocked',
-      };
-      if (isCenterRequest) {
-        await _updatePrimaryCenterRequest(requestId, payload);
-      } else {
-        await _updateRequestEverywhere(requestId, payload);
-      }
+      await _bookingDecisionAdapter.rejectRequest(
+        requestId: requestId,
+        isCenterRequest: isCenterRequest,
+        adminUid: FirebaseAuth.instance.currentUser?.uid ?? '',
+      );
 
       await _appendSystemMessage(
         requestId: requestId,
@@ -790,30 +567,10 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'status': 'pending_admin',
-        'workflowStage': 'pending_admin',
-        'adminApproved': false,
-        'adminRejected': false,
-        'adminForwarded': false,
-        'adminAssignedBy': '',
-        'adminAssignedAt': null,
-        'adminDecisionType': 'returned_to_pending',
-        'adminDecisionBy': FirebaseAuth.instance.currentUser?.uid ?? '',
-        'adminDecisionAt': FieldValue.serverTimestamp(),
-        // Canonical ownership field.
-        'assignedClinicianId': '',
-        'assignedClinicianName': '',
-        'clinicianId': '',
-        'clinicianName': '',
-        // Legacy compatibility field.
-        'clinicianUid': '',
-        'paymentStatus': 'not_started',
-        'payment_confirmed': false,
-        'sessionStatus': 'not_created',
-        'reviewStatus': 'not_started',
-        'payoutStatus': 'blocked',
-      });
+      await _bookingDecisionAdapter.returnToPending(
+        requestId: requestId,
+        adminUid: FirebaseAuth.instance.currentUser?.uid ?? '',
+      );
 
       await _appendSystemMessage(
         requestId: requestId,
@@ -841,44 +598,10 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      await _refreshAuthContextForFirestore(
-        stage: '_moveCenterToFollowUp',
+      await _bookingDecisionAdapter.moveCenterToFollowUp(
         requestId: requestId,
+        adminUid: FirebaseAuth.instance.currentUser?.uid ?? '',
       );
-      print(
-        'CENTER_FOLLOWUP_TRACE '
-        'requestId=$requestId '
-        'currentAuthUid=${FirebaseAuth.instance.currentUser?.uid ?? ''} '
-        'payloadCenterAdminHandledBy=${FirebaseAuth.instance.currentUser?.uid ?? ''} '
-        'writeStatus=center_follow_up '
-        'writeWorkflowStage=center_follow_up '
-        'writeAdminDecisionType=center_follow_up '
-        'afterRefresh=true',
-      );
-      _logFirestore(
-        page: 'admin_booking_queue',
-        role: 'admin',
-        operation: 'action_start',
-        collection: 'booking_requests',
-        documentId: requestId,
-        requestKind: 'center',
-        status: 'pending_admin',
-        writeStatus: 'center_follow_up',
-      );
-      await _updatePrimaryCenterRequest(requestId, {
-        'status': 'center_follow_up',
-        'workflowStage': 'center_follow_up',
-        'adminApproved': false,
-        'adminRejected': false,
-        'adminForwarded': false,
-        'adminDecisionType': 'center_follow_up',
-        'adminDecisionBy': FirebaseAuth.instance.currentUser?.uid ?? '',
-        'adminDecisionAt': FieldValue.serverTimestamp(),
-        'adminAssignedBy': FirebaseAuth.instance.currentUser?.uid ?? '',
-        'adminAssignedAt': FieldValue.serverTimestamp(),
-        'centerAdminHandledBy': FirebaseAuth.instance.currentUser?.uid ?? '',
-        'centerAdminHandledAt': FieldValue.serverTimestamp(),
-      });
 
       try {
         await _appendSystemMessage(
@@ -920,13 +643,10 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      await _updatePrimaryCenterRequest(requestId, {
-        'status': 'center_intake_pending',
-        'workflowStage': 'center_intake_pending',
-        'adminDecisionType': 'center_intake_opened',
-        'adminDecisionBy': FirebaseAuth.instance.currentUser?.uid ?? '',
-        'adminDecisionAt': FieldValue.serverTimestamp(),
-      });
+      await _bookingDecisionAdapter.openCenterIntakeStep(
+        requestId: requestId,
+        adminUid: FirebaseAuth.instance.currentUser?.uid ?? '',
+      );
 
       if (!mounted) return;
       setState(() => _tab = 'center_intake_pending');
@@ -948,29 +668,10 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      await _updatePrimaryCenterRequest(requestId, {
-        'status': 'session_setup_pending',
-        'workflowStage': 'session_setup_pending',
-        'adminApproved': true,
-        'adminRejected': false,
-        'adminForwarded': false,
-        'adminDecisionType': 'approved',
-        'adminDecisionBy': FirebaseAuth.instance.currentUser?.uid ?? '',
-        'adminDecisionAt': FieldValue.serverTimestamp(),
-        'adminAssignedBy': FirebaseAuth.instance.currentUser?.uid ?? '',
-        'adminAssignedAt': FieldValue.serverTimestamp(),
-        'paymentStatus': 'pending_client_transfer',
-        'sessionStatus': 'not_created',
-        'reviewStatus': 'not_started',
-        'payoutStatus': 'blocked',
-        // Canonical ownership field.
-        'assignedClinicianId': '',
-        'assignedClinicianName': '',
-        'clinicianId': '',
-        'clinicianName': '',
-        // Legacy compatibility field.
-        'clinicianUid': '',
-      });
+      await _bookingDecisionAdapter.approveCenterRequest(
+        requestId: requestId,
+        adminUid: FirebaseAuth.instance.currentUser?.uid ?? '',
+      );
 
       await _appendSystemMessage(
         requestId: requestId,
@@ -1002,26 +703,11 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      final revision = data['clientRevisionNumber'];
-      final revisionNumber =
-          revision is num ? revision.toInt() : int.tryParse('$revision') ?? 0;
-      await _updatePrimaryCenterRequest(requestId, {
-        'status': 'client_update_required',
-        'workflowStage': 'client_update_required',
-        'lastCenterAvailabilityStatus':
-            (data['centerAvailabilityStatus'] ?? '').toString(),
-        'lastCenterAvailabilityNote':
-            (data['centerAvailabilityNote'] ?? '').toString(),
-        'lastCenterSuggestedAlternativeKey':
-            (data['centerSuggestedAlternativeKey'] ?? '').toString(),
-        'lastCenterSuggestedAlternativeLabelAr':
-            (data['centerSuggestedAlternativeLabelAr'] ?? '').toString(),
-        'lastCenterFeedbackRevisionNumber': revisionNumber,
-        'adminCanApproveWithoutCenterRecheck': false,
-        'adminDecisionType': 'returned_to_client',
-        'adminDecisionBy': FirebaseAuth.instance.currentUser?.uid ?? '',
-        'adminDecisionAt': FieldValue.serverTimestamp(),
-      });
+      await _bookingDecisionAdapter.returnCenterRequestToClient(
+        requestId: requestId,
+        data: data,
+        adminUid: FirebaseAuth.instance.currentUser?.uid ?? '',
+      );
 
       if (!mounted) return;
       setState(() => _tab = 'client_update_required');
@@ -1135,20 +821,13 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       final gross = double.tryParse(grossController.text.trim()) ?? 0;
       final commissionPercent =
           double.tryParse(commissionPercentController.text.trim()) ?? 10;
-      final commissionAmount = gross * (commissionPercent / 100);
-      final netAmount = gross - commissionAmount;
-
-      await _updateRequestEverywhere(requestId, {
-        'status': 'payout_pending',
-        'accountingReviewStatus': 'confirmed',
-        'grossClientPaidAmount': gross,
-        'appCommissionPercent': commissionPercent,
-        'appCommissionAmount': commissionAmount,
-        'netAmountDueToCenter': netAmount,
-        'accountingReviewNotes': noteController.text.trim(),
-        'accountingConfirmedBy': FirebaseAuth.instance.currentUser?.uid ?? '',
-        'accountingConfirmedAt': FieldValue.serverTimestamp(),
-      });
+      await _bookingDecisionAdapter.confirmCenterAccountingReview(
+        requestId: requestId,
+        gross: gross,
+        commissionPercent: commissionPercent,
+        note: noteController.text.trim(),
+        adminUid: FirebaseAuth.instance.currentUser?.uid ?? '',
+      );
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1172,14 +851,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'status': 'completed_success',
-        'workflowStage': 'completed_success',
-        'sessionStatus': 'completed',
-        'reviewStatus': 'completed',
-        'payoutStatus': 'paid_to_center',
-        'payoutTransferredAt': FieldValue.serverTimestamp(),
-      });
+      await _bookingDecisionAdapter.confirmCenterPayout(
+        requestId: requestId,
+      );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1199,32 +873,17 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      final snap = await FirebaseFirestore.instance
-          .collection('booking_requests')
-          .doc(requestId)
-          .get();
-      final data = snap.data() ?? const <String, dynamic>{};
-      final isCenterRequest =
-          (data['requestKind'] ?? '').toString().trim() == 'center' ||
-              (data['centerId'] ?? '').toString().trim().isNotEmpty;
-      await _updateRequestEverywhere(requestId, {
-        'status':
-            isCenterRequest ? 'session_scheduled' : 'session_setup_pending',
-        'workflowStage':
-            isCenterRequest ? 'session_scheduled' : 'session_setup_pending',
-        'paymentStatus': 'approved',
-        'payment_confirmed': true,
-        'paymentApprovedAt': FieldValue.serverTimestamp(),
-        'sessionStatus': isCenterRequest ? 'scheduled' : 'not_created',
-      });
+      final result = await _bookingDecisionAdapter.approvePayment(
+        requestId: requestId,
+      );
 
       await _appendSystemMessage(
         requestId: requestId,
         text: isArabic
-            ? (isCenterRequest
+            ? (result.isCenterRequest
                 ? 'تم اعتماد السداد وتحويل الطلب إلى إقامة مبدئية مجدولة.'
                 : 'تم اعتماد السداد وتحويل الطلب إلى مرحلة تجهيز الجلسة.')
-            : (isCenterRequest
+            : (result.isCenterRequest
                 ? 'Payment approved and request moved to preliminary residency scheduled.'
                 : 'Payment approved and request moved to session setup.'),
       );
@@ -1234,10 +893,10 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         SnackBar(
           content: Text(
             isArabic
-                ? (isCenterRequest
+                ? (result.isCenterRequest
                     ? 'تم اعتماد السداد وتحويل الطلب إلى إقامة مبدئية مجدولة'
                     : 'تم اعتماد السداد وتحويل الطلب إلى تجهيز الجلسة')
-                : (isCenterRequest
+                : (result.isCenterRequest
                     ? 'Payment approved and moved to preliminary residency scheduled'
                     : 'Payment approved and moved to session setup'),
           ),
@@ -1252,13 +911,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'status': 'awaiting_payment',
-        'workflowStage': 'awaiting_payment',
-        'paymentStatus': 'rejected',
-        'payment_confirmed': false,
-        'paymentRejectedAt': FieldValue.serverTimestamp(),
-      });
+      await _bookingDecisionAdapter.rejectPayment(
+        requestId: requestId,
+      );
 
       await _appendSystemMessage(
         requestId: requestId,
@@ -1286,14 +941,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'status': 'completed_success',
-        'workflowStage': 'completed_success',
-        'sessionStatus': 'completed',
-        'reviewStatus': 'completed',
-        'payoutStatus': 'paid_to_clinician',
-        'payoutTransferredAt': FieldValue.serverTimestamp(),
-      });
+      await _bookingDecisionAdapter.confirmClinicianPayout(
+        requestId: requestId,
+      );
 
       await _appendSystemMessage(
         requestId: requestId,
@@ -1321,12 +971,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'archived': true,
-        'archivedAt': FieldValue.serverTimestamp(),
-        'archiveSection': 'sessions',
-        'archiveReady': true,
-      });
+      await _bookingDecisionAdapter.sendToSessionArchive(
+        requestId: requestId,
+      );
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1347,12 +994,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'archived': true,
-        'archivedAt': FieldValue.serverTimestamp(),
-        'archiveSection': 'payments',
-        'archiveReady': true,
-      });
+      await _bookingDecisionAdapter.sendToFinancialArchive(
+        requestId: requestId,
+      );
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1393,43 +1037,12 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         throw Exception('Admin authentication context is unavailable');
       }
 
-      final snap = await _readPrimaryBookingRequest(requestId);
-      if (!snap.exists) {
-        throw Exception('Booking request not found');
-      }
-      final resourceSnapshot = snap.data() ?? const <String, dynamic>{};
-      final currentStatus =
-          (resourceSnapshot['status'] ?? '').toString().trim();
-      final currentWorkflowStage =
-          (resourceSnapshot['workflowStage'] ?? '').toString().trim();
-      final clinicianId = resourceSnapshot['clinicianId'];
-      final clinicianName = resourceSnapshot['clinicianName'];
-      final clinicianUid = resourceSnapshot['clinicianUid'];
-
-      debugPrint(
-        'CENTER_FLOW_ASSIGN_START '
-        'requestId=$requestId '
-        'adminUid=$adminUid '
-        'clinicianId=$clinicianId '
-        'clinicianName=$clinicianName '
-        'clinicianUid=$clinicianUid',
+      final result = await _bookingDecisionAdapter.assignClinician(
+        requestId: requestId,
+        adminUid: adminUid,
       );
 
-      final alreadyAssigned = currentStatus == 'assigned_clinician' ||
-          currentWorkflowStage == 'assigned_clinician';
-
-      if (alreadyAssigned) {
-        _logFirestore(
-          page: 'admin_booking_queue',
-          role: 'admin',
-          operation: 'assign_skip_already_assigned',
-          collection: 'booking_requests',
-          documentId: requestId,
-          requestKind: (resourceSnapshot['requestKind'] ?? '').toString(),
-          status: currentStatus,
-          writeStatus: 'assigned_clinician',
-          error: 'request_already_in_assigned_clinician_state',
-        );
+      if (result.alreadyAssigned) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1443,52 +1056,11 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         return;
       }
 
-      if (clinicianId is! String ||
-          clinicianName is! String ||
-          clinicianUid is! String ||
-          clinicianId.isEmpty ||
-          clinicianName.isEmpty ||
-          clinicianUid.isEmpty) {
-        _logFirestore(
-          page: 'admin_booking_queue',
-          role: 'admin',
-          operation: 'assign_skip_missing_requested_clinician',
-          collection: 'booking_requests',
-          documentId: requestId,
-          requestKind: (resourceSnapshot['requestKind'] ?? '').toString(),
-          status: currentStatus,
-          writeStatus: 'assigned_clinician',
-          error: 'requested_clinician_target_missing',
-        );
-        throw Exception('Requested clinician target is missing');
-      }
-
-      await _updateRequestEverywhere(requestId, {
-        'status': 'assigned_clinician',
-        'workflowStage': 'assigned_clinician',
-        'adminApproved': true,
-        'adminRejected': false,
-        'adminForwarded': true,
-        // Actual approved assignment after admin forward.
-        'assignedClinicianId': clinicianId,
-        'assignedClinicianName': clinicianName,
-        'adminAssignedBy': adminUid,
-        'adminAssignedAt': FieldValue.serverTimestamp(),
-        'adminDecisionType': 'assigned',
-        'adminDecisionBy': adminUid,
-        'adminDecisionAt': FieldValue.serverTimestamp(),
-        'paymentStatus': 'not_started',
-        'payment_confirmed': false,
-        'sessionStatus': 'not_created',
-        'reviewStatus': 'not_started',
-        'payoutStatus': 'blocked',
-      });
-
       await _appendSystemMessage(
         requestId: requestId,
         text: isArabic
-            ? 'تم تحويل الطلب إلى الأخصائي: $clinicianName'
-            : 'The request was assigned to clinician: $clinicianName',
+            ? 'تم تحويل الطلب إلى الأخصائي: ${result.clinicianName}'
+            : 'The request was assigned to clinician: ${result.clinicianName}',
       );
 
       if (!mounted) return;
