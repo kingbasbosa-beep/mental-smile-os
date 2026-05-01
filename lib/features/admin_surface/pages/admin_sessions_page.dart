@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/features/admin_surface/data/services/admin_session_decision_adapter.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
@@ -14,6 +15,8 @@ class AdminSessionsPage extends StatefulWidget {
 }
 
 class _AdminSessionsPageState extends State<AdminSessionsPage> {
+  final AdminSessionDecisionAdapter _sessionDecisionAdapter =
+      AdminSessionDecisionAdapter();
   String _tab = 'session_setup_pending';
   final Set<String> _busyIds = {};
   late final Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>>
@@ -31,21 +34,6 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
   void initState() {
     super.initState();
     _bookingDocsStreamRef = _bookingDocsStream();
-  }
-
-  Map<String, dynamic> _withCanonicalWorkflowStage(
-    Map<String, dynamic> updates,
-  ) {
-    final status = updates['status'];
-    if (status is String &&
-        status.trim().isNotEmpty &&
-        !updates.containsKey('workflowStage')) {
-      return {
-        ...updates,
-        'workflowStage': status,
-      };
-    }
-    return updates;
   }
 
   bool _isArabic(BuildContext context) =>
@@ -122,24 +110,6 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
     }
   }
 
-  Future<void> _updateRequestEverywhere(
-    String requestId,
-    Map<String, dynamic> updates,
-  ) async {
-    final payload = {
-      ..._withCanonicalWorkflowStage(updates),
-      'updatedAt': FieldValue.serverTimestamp(),
-    };
-
-    final ref = FirebaseFirestore.instance
-        .collection('booking_requests')
-        .doc(requestId);
-    final snap = await ref.get();
-    if (snap.exists) {
-      await ref.update(payload);
-    }
-  }
-
   Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>>
       _bookingDocsStream() {
     final primary = FirebaseFirestore.instance
@@ -210,15 +180,13 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
 
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'status': 'session_scheduled',
-        'sessionStatus': 'scheduled',
-        'sessionDateText': dateText,
-        'sessionLink': linkText,
-        'sessionCode': codeText,
-        'sessionAdminNotes': notesText,
-        'sessionCreatedAt': FieldValue.serverTimestamp(),
-      });
+      await _sessionDecisionAdapter.scheduleSession(
+        requestId: requestId,
+        dateText: dateText,
+        linkText: linkText,
+        codeText: codeText,
+        notesText: notesText,
+      );
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -340,32 +308,24 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
         'taxAmount=$taxAmount '
         'totalAmount=$totalAmount',
       );
-      await _updateRequestEverywhere(requestId, {
-        'status': 'awaiting_payment',
-        'workflowStage': 'awaiting_payment',
-        'paymentStatus': 'pending_client_transfer',
-        'payment_confirmed': false,
-        'sessionStatus': 'not_created',
-        'stayStartDateText': startText,
-        'stayEndDateText': endText,
-        'stayDurationDays': durationDays,
-        'stayDurationReason': durationReasonText,
-        'stayDurationIsPreliminary': true,
-        'sessionDateText': startText,
-        'sessionLink': linkText,
-        'sessionCode': codeText,
-        'sessionAdminNotes': notesText,
-        'stayUnitPrice': unitPrice,
-        'stayPricingUnit': pricingUnit,
-        'stayBaseAmount': baseAmount,
-        'stayTaxPercent': taxPercent,
-        'stayTaxAmount': taxAmount,
-        'stayTotalAmount': totalAmount,
-        'grossClientPaidAmount': totalAmount,
-        'paymentBreakdownText': paymentBreakdownText,
-        'paymentQuotePreparedAt': FieldValue.serverTimestamp(),
-        'paymentQuotePreparedBy': FirebaseAuth.instance.currentUser?.uid ?? '',
-      });
+      await _sessionDecisionAdapter.scheduleCenterResidency(
+        requestId: requestId,
+        startText: startText,
+        endText: endText,
+        durationDays: durationDays,
+        durationReasonText: durationReasonText,
+        linkText: linkText,
+        codeText: codeText,
+        notesText: notesText,
+        unitPrice: unitPrice,
+        pricingUnit: pricingUnit,
+        baseAmount: baseAmount,
+        taxPercent: taxPercent,
+        taxAmount: taxAmount,
+        totalAmount: totalAmount,
+        paymentBreakdownText: paymentBreakdownText,
+        adminUid: FirebaseAuth.instance.currentUser?.uid ?? '',
+      );
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -399,10 +359,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
   Future<void> _markInProgress(String requestId) async {
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'status': 'session_in_progress',
-        'sessionStatus': 'in_progress',
-      });
+      await _sessionDecisionAdapter.markInProgress(requestId);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -422,11 +379,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
   Future<void> _markCompleted(String requestId) async {
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'status': 'session_completed_pending_reviews',
-        'sessionStatus': 'completed',
-        'reviewStatus': 'pending_reviews',
-      });
+      await _sessionDecisionAdapter.markCompleted(requestId);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -446,10 +399,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
   Future<void> _moveToReschedule(String requestId) async {
     await _setBusy(requestId, true);
     try {
-      await _updateRequestEverywhere(requestId, {
-        'status': 'reschedule_pending',
-        'sessionStatus': 'reschedule_pending',
-      });
+      await _sessionDecisionAdapter.moveToReschedule(requestId);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
