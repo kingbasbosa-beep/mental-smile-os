@@ -1,6 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatThreadModel {
+  // Canonical chat classification contract:
+  // - threadType is the primary classifier for active chat flows.
+  // - sourceType, handoffState, and lifecycleState remain legacy fallback
+  //   signals only for older threads and rollback-safe compatibility paths.
+  // - New chat flows should not use sourceType as the primary classifier.
   final String id;
   final String ownerUid;
   final String ownerType;

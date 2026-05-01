@@ -92,6 +92,46 @@ class ChatFirestoreService {
     return ChatThreadModel.fromFirestore(query.docs.first);
   }
 
+  /// AI-support-safe lookup.
+  ///
+  /// This helper preserves [getActiveThreadForUser] as a generic latest-thread
+  /// lookup, while giving AI entry flows an explicit way to avoid opening
+  /// non-AI conversations such as:
+  /// - admin_support
+  /// - booking_followup
+  /// - clinician_case
+  ///
+  /// Canonical rule:
+  /// - Prefer explicit `threadType == 'ai_support'`
+  /// Legacy fallback:
+  /// - Only when `threadType` is missing, accept `sourceType == 'client'`
+  ///   or `sourceType == 'guest'`
+  Future<ChatThreadModel?> getActiveAiSupportThreadForUser(
+    String ownerUid,
+  ) async {
+    final query = await _threads
+        .where('ownerUid', isEqualTo: ownerUid)
+        .where('archived', isEqualTo: false)
+        .orderBy('updatedAt', descending: true)
+        .get();
+
+    for (final doc in query.docs) {
+      final thread = ChatThreadModel.fromFirestore(doc);
+      final threadType = thread.threadType?.trim() ?? '';
+
+      if (threadType == 'ai_support') {
+        return thread;
+      }
+
+      if (threadType.isEmpty &&
+          (thread.sourceType == 'client' || thread.sourceType == 'guest')) {
+        return thread;
+      }
+    }
+
+    return null;
+  }
+
   Future<List<ChatThreadModel>> getThreadsForOwner(String ownerUid) async {
     final query = await _threads
         .where('ownerUid', isEqualTo: ownerUid)
