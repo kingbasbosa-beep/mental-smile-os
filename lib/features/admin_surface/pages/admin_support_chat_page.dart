@@ -3,7 +3,6 @@ import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/system/domain_registry.dart';
 import 'package:flutterprojects/core/system/domain_status.dart';
 import 'package:flutterprojects/core/system/domain_status_service.dart';
-import 'package:flutterprojects/features/admin_surface/shared/admin_whatsapp_support_helper.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_firestore_service.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_health_service.dart';
@@ -48,8 +47,21 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
     return Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
   }
 
+  String _threadType(Map<String, dynamic> data) {
+    return (data['threadType'] ?? '').toString().trim();
+  }
+
+  String _sourceType(Map<String, dynamic> data) {
+    return (data['sourceType'] ?? '').toString().trim();
+  }
+
   bool _isEscalatedCase(Map<String, dynamic> data) {
-    final sourceType = (data['sourceType'] ?? '').toString();
+    final threadType = _threadType(data);
+    if (threadType.isNotEmpty) {
+      return threadType == 'ai_support';
+    }
+
+    final sourceType = _sourceType(data);
     return sourceType == 'client' || sourceType == 'guest';
   }
 
@@ -67,7 +79,8 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
   }
 
   String _avatarAsset(Map<String, dynamic> data) {
-    final sourceType = (data['sourceType'] ?? '').toString();
+    final threadType = _threadType(data);
+    final sourceType = _sourceType(data);
     final ownerType = (data['ownerType'] ?? '').toString();
 
     if (ownerType.contains('clinician')) {
@@ -76,23 +89,34 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
     if (ownerType.contains('center')) {
       return 'assets/c5/avatars/avatar_admin_support.png';
     }
-    if (sourceType == 'admin_support') {
+    if (threadType == 'admin_support' ||
+        (threadType.isEmpty && sourceType == 'admin_support')) {
       return 'assets/c5/avatars/avatar_admin_support.png';
     }
     return 'assets/c5/avatars/avatar_client.png';
   }
 
   String _sourceLabel(Map<String, dynamic> data, bool isArabic) {
-    final sourceType = (data['sourceType'] ?? '').toString();
+    final threadType = _threadType(data);
+    final sourceType = _sourceType(data);
     final ownerType = (data['ownerType'] ?? '').toString();
 
-    if (sourceType == 'admin_support') {
+    if (threadType == 'admin_support') {
       return isArabic ? 'دعم مباشر من الإدارة' : 'Direct Admin Support';
     }
-    if (sourceType == 'client' || sourceType == 'guest') {
+    if (threadType == 'ai_support') {
       return isArabic
           ? 'تصعيد تم اكتشافه بواسطة النظام'
-          : 'AI-Detected Escalation';
+          : 'Support Request Under Review';
+    }
+    if (threadType.isEmpty && sourceType == 'admin_support') {
+      return isArabic ? 'دعم مباشر من الإدارة' : 'Direct Admin Support';
+    }
+    if (threadType.isEmpty &&
+        (sourceType == 'client' || sourceType == 'guest')) {
+      return isArabic
+          ? 'تصعيد تم اكتشافه بواسطة النظام'
+          : 'Support Request Under Review';
     }
     if (ownerType.contains('clinician')) {
       return isArabic ? 'أخصائي' : 'Clinician';
@@ -104,12 +128,14 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
   }
 
   String _chatTypeLabel(Map<String, dynamic> data, bool isArabic) {
-    final sourceType = (data['sourceType'] ?? '').toString();
+    final threadType = _threadType(data);
+    final sourceType = _sourceType(data);
 
     if (_isEscalatedCase(data)) {
       return isArabic ? 'حالة دعم مصعّدة' : 'Escalated Support Case';
     }
-    if (sourceType == 'admin_support') {
+    if (threadType == 'admin_support' ||
+        (threadType.isEmpty && sourceType == 'admin_support')) {
       return isArabic ? 'مراجعة بشرية مطلوبة' : 'Human Review Needed';
     }
     return isArabic ? 'محادثة AI' : 'AI Conversation';
@@ -195,14 +221,14 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
           Text(
             isArabic
                 ? 'يعرض هذا السطح محادثات تحتاج مراجعة بشرية، مع تمييز الدعم المباشر من الإدارة عن التصعيد المكتشف بواسطة النظام.'
-                : 'This surface shows conversations needing human review, separating direct admin support from AI-detected escalation.',
+                : 'This surface shows structured admin support requests and admin replies inside the app.',
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             isArabic
                 ? 'يرجى الرد للإرشاد فقط، وتحويل أي طلب تغييري إلى الإجراءات داخل النظام.'
-                : 'Respond for guidance only. Redirect operational requests to system actions.',
+                : 'Use this inbox for structured admin support requests and replies, not as an escalation path.',
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.obsidian.withValues(alpha: 0.72),
@@ -261,7 +287,7 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
                 return AppEmptyState(
                   message: isArabic
                       ? 'لا توجد محادثات تتطلب مراجعة بشرية'
-                      : 'No chats needing human review',
+                      : 'No structured admin support requests',
                   icon: Icons.support_agent_outlined,
                 );
               }
@@ -276,6 +302,7 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
                     Builder(
                       builder: (context) {
                         final data = <String, dynamic>{
+                          'threadType': thread.threadType,
                           'sourceType': thread.sourceType,
                           'ownerType': thread.ownerType,
                         };
@@ -365,7 +392,7 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
                                         Text(
                                           isArabic
                                               ? 'تم تمييز هذه الحالة من قبل الذكاء الاصطناعي بسبب إشارات خطر مكتشفة.'
-                                              : 'This case was flagged by the AI due to detected risk signals.',
+                                              : 'This request is recorded in the admin support flow and is awaiting review or follow-up.',
                                           textAlign: isArabic
                                               ? TextAlign.right
                                               : TextAlign.left,
@@ -385,25 +412,6 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
                                         runSpacing: AppSpacing.xs,
                                         alignment: WrapAlignment.end,
                                         children: [
-                                          OutlinedButton.icon(
-                                            icon: const Icon(
-                                              Icons.warning_amber_rounded,
-                                              size: 18,
-                                            ),
-                                            label: const Text(
-                                              'Escalate to WhatsApp',
-                                            ),
-                                            onPressed: () {
-                                              openAdminWhatsAppSupport(
-                                                context,
-                                                type: 'Human Review Required',
-                                                source: 'Support Chat',
-                                                referenceId: threadId,
-                                                notes:
-                                                    'Thread requires manual admin intervention.',
-                                              );
-                                            },
-                                          ),
                                           AppStatusBadge(
                                             label: _sourceLabel(data, isArabic),
                                             color: const Color(0xFF8A5A1F),
@@ -452,3 +460,5 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
     );
   }
 }
+
+
