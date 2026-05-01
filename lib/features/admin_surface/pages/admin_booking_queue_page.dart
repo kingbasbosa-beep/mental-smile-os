@@ -870,14 +870,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     }
   }
 
-  Future<void> _approvePayment(String requestId) async {
-    Navigator.of(context).pushNamed(
-      Routes.adminPayments,
-      arguments: {'requestId': requestId},
-    );
-  }
-
-  Future<void> _rejectPayment(String requestId) async {
+  Future<void> _openPaymentsQueue(String requestId) async {
     Navigator.of(context).pushNamed(
       Routes.adminPayments,
       arguments: {'requestId': requestId},
@@ -2189,21 +2182,10 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                     if (canReviewPayment)
                       FilledButton.icon(
                         onPressed:
-                            busy ? null : () => _approvePayment(requestId),
-                        icon: const Icon(Icons.verified_outlined),
+                            busy ? null : () => _openPaymentsQueue(requestId),
+                        icon: const Icon(Icons.open_in_new_outlined),
                         label: Text(
-                          isArabic
-                              ? 'تأكيد إشارة السداد'
-                              : 'Confirm payment signal',
-                        ),
-                      ),
-                    if (canReviewPayment)
-                      OutlinedButton.icon(
-                        onPressed:
-                            busy ? null : () => _rejectPayment(requestId),
-                        icon: const Icon(Icons.cancel_outlined),
-                        label: Text(
-                          isArabic ? 'وسم مشكلة السداد' : 'Flag payment issue',
+                          isArabic ? 'فتح بوابة السداد' : 'Open payments queue',
                         ),
                       ),
                     if (!isCenterRequest && status == 'payout_pending')
