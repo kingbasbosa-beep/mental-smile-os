@@ -647,8 +647,8 @@ $gatewayLines
       _AdminSectionLaunchCardData(
         title: isArabic ? 'قسم المحاسبة' : 'Accounting',
         subtitle: isArabic
-            ? 'مراجعة السداد، سجل المدفوعات، والسجل المحاسبي'
-            : 'Payment review, payments ledger, and accounting archive',
+            ? 'مراجعة السداد والتحويلات، سجل المدفوعات، والسجل المحاسبي'
+            : 'Payment Review & Payouts, Payments Ledger, and Accounting Ledger',
         icon: Icons.account_balance_wallet_outlined,
         group: AdminVisualGroup.payments,
         route: Routes.adminAccountingWorkspace,

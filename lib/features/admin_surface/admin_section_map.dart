@@ -40,7 +40,7 @@ const List<AdminSectionEntry> adminSectionEntries = [
   ),
   AdminSectionEntry(
     route: Routes.adminPayments,
-    title: 'Payment Monitoring & Financial Gate',
+    title: 'Payment Review & Payouts',
     section: AdminTopLevelSection.operations,
     purpose:
         'Monitoring, financial gate review, and exception-only payout confirmation. Normal flow ownership should remain outside Control Room.',
@@ -129,7 +129,7 @@ const List<AdminSectionEntry> adminSectionEntries = [
   ),
   AdminSectionEntry(
     route: Routes.adminArchivePayments,
-    title: 'Payments Archive',
+    title: 'Payments Ledger',
     section: AdminTopLevelSection.archive,
     purpose: 'Archived payment and transfer records.',
   ),
@@ -159,7 +159,7 @@ const List<AdminSectionEntry> adminSectionEntries = [
   ),
   AdminSectionEntry(
     route: Routes.adminArchiveAccounting,
-    title: 'Accounting Archive',
+    title: 'Accounting Ledger',
     section: AdminTopLevelSection.archive,
     purpose: 'Archived accounting and finance-oriented records.',
   ),

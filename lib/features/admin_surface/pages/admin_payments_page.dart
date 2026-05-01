@@ -568,8 +568,8 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
         appBar: AppShellActions.buildAppBar(
           context,
           title: isArabic
-              ? 'مراقبة المدفوعات والبوابة المالية'
-              : 'Payment Monitoring & Financial Gate',
+              ? 'مراجعة السداد والتحويلات'
+              : 'Payment Review & Payouts',
         ),
         body: AppPageBackground(
           child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -625,8 +625,8 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                       children: [
                         Text(
                           isArabic
-                              ? 'مراقبة المدفوعات والبوابة المالية'
-                              : 'Payment Monitoring & Financial Gate',
+                              ? 'مراجعة السداد والتحويلات'
+                              : 'Payment Review & Payouts',
                           textAlign:
                               isArabic ? TextAlign.right : TextAlign.left,
                           style:

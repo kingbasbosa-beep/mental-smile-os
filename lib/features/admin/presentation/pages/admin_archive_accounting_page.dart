@@ -97,7 +97,7 @@ class _AdminArchiveAccountingPageState
       child: Scaffold(
         appBar: AppShellActions.buildAppBar(
           context,
-          title: isArabic ? 'أرشيف المحاسبة' : 'Accounting Archive',
+          title: isArabic ? 'السجل المحاسبي' : 'Accounting Ledger',
           canLogout: false,
         ),
         body: AppPageBackground(
@@ -116,7 +116,7 @@ class _AdminArchiveAccountingPageState
                   if (snapA.hasError && snapB.hasError) {
                     return AppEmptyState(
                       message: isArabic
-                          ? 'تعذر تحميل أرشيف المحاسبة'
+                          ? 'تعذر تحميل السجل المحاسبي'
                           : 'Unable to load accounting archive',
                       icon: Icons.error_outline,
                     );
@@ -170,8 +170,8 @@ class _AdminArchiveAccountingPageState
                           children: [
                             Text(
                               isArabic
-                                  ? 'أرشيف المحاسبة'
-                                  : 'Accounting Archive',
+                                  ? 'السجل المحاسبي'
+                                  : 'Accounting Ledger',
                               style: Theme.of(context)
                                   .textTheme
                                   .titleLarge
