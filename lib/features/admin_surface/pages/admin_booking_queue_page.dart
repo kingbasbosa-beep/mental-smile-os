@@ -555,11 +555,10 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     required String requestId,
     required String text,
   }) async {
-    final db = FirebaseFirestore.instance;
     Map<String, dynamic>? requestData;
 
     final requestRefs = [
-      db.collection('booking_requests').doc(requestId),
+      FirebaseFirestore.instance.collection('booking_requests').doc(requestId),
     ];
 
     for (final ref in requestRefs) {
