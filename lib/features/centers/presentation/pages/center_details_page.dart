@@ -635,15 +635,7 @@ class CenterDetailsPage extends StatelessWidget {
                 icon: Icons.chat_outlined,
                 label: 'واتساب',
                 value: whatsapp,
-                onTap: whatsapp.isEmpty
-                    ? null
-                    : () {
-                        final digits = _digitsOnly(whatsapp);
-                        final url = digits.isEmpty
-                            ? Uri.parse('https://wa.me/')
-                            : Uri.parse('https://wa.me/$digits');
-                        _tryLaunch(context, url);
-                      },
+                onTap: null,
               ),
             ],
           ),
