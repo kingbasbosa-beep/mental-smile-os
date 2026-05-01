@@ -137,7 +137,7 @@ class AdminHandoffPackPage extends StatelessWidget {
                   context,
                   title: 'حوارات حدود القنوات',
                   summary:
-                      'Website Chat وWhatsApp وTelegram وFacebook/Messenger وZoom/Meet تعرض boundary dialogs فقط.',
+                      'Website Chat وExternal Follow-up وTelegram وFacebook/Messenger وZoom/Meet تعرض boundary dialogs فقط.',
                   supervisionNote:
                       'مفعّلة كشرح حدود وإشراف، لا كقنوات اتصال حقيقية.',
                   statusLabel: 'مفعّل فعليًا',
@@ -154,7 +154,7 @@ class AdminHandoffPackPage extends StatelessWidget {
                   context,
                   title: 'تكاملات القنوات الحقيقية',
                   summary:
-                      'لا توجد حتى الآن تكاملات فعلية مع WhatsApp أو Telegram أو Facebook/Messenger أو Website live sync.',
+                      'لا توجد حتى الآن تكاملات فعلية مع External Follow-up أو Telegram أو Facebook/Messenger أو Website live sync.',
                   supervisionNote:
                       'ما يزال هذا المسار planned فقط.',
                   statusLabel: 'مفاهيمي / مخطط',

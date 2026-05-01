@@ -1,16 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/gateway_layer/core/communication_gateway_actions.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_entry.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_registry.dart';
-import 'package:flutterprojects/features/gateway_layer/shared/gateway_health_level.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
-import 'package:flutterprojects/features/gateway_layer/shared/gateway_status.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class AdminCommunicationGatewayPage extends StatefulWidget {
   const AdminCommunicationGatewayPage({super.key});
@@ -22,37 +17,7 @@ class AdminCommunicationGatewayPage extends StatefulWidget {
 
 class _AdminCommunicationGatewayPageState
     extends State<AdminCommunicationGatewayPage> {
-  static const String _whatsAppSupportNumber = '201014116531';
-  static const List<String> _signalTypes = [
-    'Support',
-    'Urgent',
-    'Follow-up',
-  ];
-  static const List<String> _signalActions = [
-    'Follow-up',
-    'Assign to Content',
-    'Assign to Support',
-    'Needs QA Review',
-    'Escalated',
-  ];
-  static const List<String> _signalPriorities = [
-    'Low',
-    'Medium',
-    'High',
-  ];
   SupportEmailIntent _selectedIntent = SupportEmailIntent.generalSupport;
-  final TextEditingController _messageController = TextEditingController();
-  final TextEditingController _userNameController = TextEditingController();
-  String _selectedSignalType = _signalTypes.first;
-  String _selectedSignalPriority = _signalPriorities[1];
-  final List<_ManualSupportSignal> _manualSignals = [];
-
-  @override
-  void dispose() {
-    _messageController.dispose();
-    _userNameController.dispose();
-    super.dispose();
-  }
 
   String _intentLabel(SupportEmailIntent intent) {
     return switch (intent) {
@@ -85,17 +50,13 @@ class _AdminCommunicationGatewayPageState
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                boundaryType,
-              ),
+              Text(boundaryType),
               const SizedBox(height: AppSpacing.sm),
               const Text(
                 'Current status: Planned / supervised / not integrated yet.',
               ),
               const SizedBox(height: AppSpacing.sm),
-              Text(
-                separationNote,
-              ),
+              Text(separationNote),
             ],
           ),
           actions: [
@@ -120,91 +81,14 @@ class _AdminCommunicationGatewayPageState
     );
   }
 
-  Future<void> _showWhatsAppBoundary(BuildContext context) {
+  Future<void> _showExternalFollowUpBoundary(BuildContext context) {
     return _showBoundaryDialog(
       context,
-      title: 'WhatsApp Boundary',
+      title: 'External Follow-up Boundary',
       boundaryType:
-          'This boundary is reserved for messaging-channel intake and routing awareness.',
+          'External follow-up is not active here as an operational action in this phase.',
       separationNote:
-          'It remains separate from direct human support handling and does not replace the Communications workspace or escalations.',
-    );
-  }
-
-  String _buildWhatsAppMessage() {
-    return 'Mental Smile Support Request\n'
-        'Source: Communication Gateway\n'
-        'Timestamp: ${DateTime.now().toIso8601String()}\n'
-        'Notes: ...';
-  }
-
-  Future<void> _showWhatsAppFallbackDialog(
-    BuildContext context, {
-    required String number,
-    required String message,
-  }) async {
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        Future<void> copyText(String value, String label) async {
-          await Clipboard.setData(ClipboardData(text: value));
-          if (!dialogContext.mounted) return;
-          ScaffoldMessenger.of(dialogContext).showSnackBar(
-            SnackBar(
-              content: Text('$label copied.'),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        }
-
-        return AlertDialog(
-          title: const Text('WhatsApp fallback'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Unable to open WhatsApp. You can still copy the number and prepared message below.',
-                ),
-                const SizedBox(height: AppSpacing.md),
-                SelectableText('Number: $number'),
-                const SizedBox(height: AppSpacing.sm),
-                SelectableText(message),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => copyText(number, 'Number'),
-              child: const Text('Copy number'),
-            ),
-            TextButton(
-              onPressed: () => copyText(message, 'Message'),
-              child: const Text('Copy message'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _openWhatsAppSupport(BuildContext context) async {
-    final message = _buildWhatsAppMessage();
-    final uri = Uri.parse(
-      'https://wa.me/$_whatsAppSupportNumber?text=${Uri.encodeComponent(message)}',
-    );
-    final ok = await launchUrl(uri, mode: LaunchMode.platformDefault);
-    if (!context.mounted) return;
-    if (ok) return;
-    await _showWhatsAppFallbackDialog(
-      context,
-      number: _whatsAppSupportNumber,
-      message: message,
+          'Future outbound follow-up will live only inside the dedicated External Follow-up workspace.',
     );
   }
 
@@ -213,9 +97,9 @@ class _AdminCommunicationGatewayPageState
       context,
       title: 'Telegram Boundary',
       boundaryType:
-          'This boundary is reserved for Telegram messaging-channel intake and routing awareness.',
+          'This boundary is reserved for Telegram messaging-channel awareness.',
       separationNote:
-          'It remains separate from direct human support handling and does not replace the Communications workspace or escalations.',
+          'It remains separate from direct human support handling and does not replace the Communications workspace.',
     );
   }
 
@@ -224,9 +108,9 @@ class _AdminCommunicationGatewayPageState
       context,
       title: 'Facebook / Messenger Boundary',
       boundaryType:
-          'This boundary is reserved for Facebook or Messenger intake and routing awareness.',
+          'This boundary is reserved for Facebook or Messenger channel awareness.',
       separationNote:
-          'It remains separate from direct human support handling and does not replace the Communications workspace or escalations.',
+          'It remains separate from direct human support handling and does not replace the Communications workspace.',
     );
   }
 
@@ -235,122 +119,13 @@ class _AdminCommunicationGatewayPageState
       context,
       title: 'Zoom / Google Meet Coordination Boundary',
       boundaryType:
-          'This boundary is reserved for meeting-link coordination and external channel routing awareness.',
+          'This boundary is reserved for meeting-link coordination and external channel awareness.',
       separationNote:
           'It remains separate from direct human support handling, Communications workspace case handling, and Operations-owned session scheduling.',
     );
   }
 
-  void _createSupportSignal() {
-    final message = _messageController.text.trim();
-    final userName = _userNameController.text.trim();
-    if (message.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Add a message before creating a support signal.'),
-        ),
-      );
-      return;
-    }
-
-    setState(() {
-      _manualSignals.insert(
-        0,
-        _ManualSupportSignal(
-          source: 'WhatsApp',
-          type: _selectedSignalType,
-          message: message,
-          userName: userName,
-          priority: _selectedSignalPriority,
-          status: 'Pending',
-          actionLabel: 'Not assigned',
-        ),
-      );
-      _messageController.clear();
-      _userNameController.clear();
-      _selectedSignalType = _signalTypes.first;
-      _selectedSignalPriority = _signalPriorities[1];
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Support signal created')),
-    );
-  }
-
-  void _advanceSignalStatus(int index) {
-    const statusFlow = ['Pending', 'In Progress', 'Closed'];
-    final current = _manualSignals[index];
-    final nextIndex = (statusFlow.indexOf(current.status) + 1) % statusFlow.length;
-    setState(() {
-      _manualSignals[index] = current.copyWith(status: statusFlow[nextIndex]);
-    });
-  }
-
-  Future<void> _setSignalAction(int index) async {
-    final selectedAction = await showDialog<String>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Set Action'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _signalActions
-                .map(
-                  (action) => ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(action),
-                    onTap: () => Navigator.of(dialogContext).pop(action),
-                  ),
-                )
-                .toList(),
-          ),
-        );
-      },
-    );
-
-    if (selectedAction == null) return;
-    setState(() {
-      _manualSignals[index] = _manualSignals[index].copyWith(
-        actionLabel: selectedAction,
-      );
-    });
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Action updated')),
-    );
-  }
-
-  String? _routeForSignalAction(String actionLabel) {
-    switch (actionLabel) {
-      case 'Assign to Content':
-        return Routes.contentWorkspace;
-      case 'Assign to Support':
-        return Routes.adminCommunicationGateway;
-      case 'Needs QA Review':
-        return Routes.adminEmployeeSystem;
-      case 'Escalated':
-        return Routes.adminMaintenanceSystem;
-      case 'Follow-up':
-      case 'Not assigned':
-      default:
-        return null;
-    }
-  }
-
-  Color _priorityColor(String priority) {
-    switch (priority) {
-      case 'High':
-        return const Color(0xFFC66A4A);
-      case 'Medium':
-        return const Color(0xFFD8B26A);
-      case 'Low':
-      default:
-        return const Color(0xFF3E9B90);
-    }
-  }
-
-  Widget _buildWhatsAppSignalIntakeCard(BuildContext context) {
+  Widget _buildExternalFollowUpNoticeCard(BuildContext context) {
     return AppSurfaceCard(
       color: const Color(0xFF10161A).withValues(alpha: 0.94),
       borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
@@ -358,7 +133,7 @@ class _AdminCommunicationGatewayPageState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'WhatsApp Manual Signal Intake',
+            'External Follow-up Boundary',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFFC9A75B),
@@ -366,188 +141,44 @@ class _AdminCommunicationGatewayPageState
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'Create local support signals from WhatsApp messages without backend integration or automation.',
+            'External follow-up is not active on this page as an operational tool. Dedicated outbound follow-up actions will be rebuilt later inside their own workspace.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: const Color(0xFFEAEAEA),
                   height: 1.35,
                 ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          TextFormField(
-            initialValue: 'WhatsApp',
-            readOnly: true,
-            decoration: const InputDecoration(
-              labelText: 'Source',
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Row(
-            children: [
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  value: _selectedSignalType,
-                  decoration: const InputDecoration(
-                    labelText: 'Type',
-                  ),
-                  items: _signalTypes
-                      .map(
-                        (type) => DropdownMenuItem<String>(
-                          value: type,
-                          child: Text(type),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (value) {
-                    if (value == null) return;
-                    setState(() {
-                      _selectedSignalType = value;
-                    });
-                  },
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  value: _selectedSignalPriority,
-                  decoration: const InputDecoration(
-                    labelText: 'Priority',
-                  ),
-                  items: _signalPriorities
-                      .map(
-                        (priority) => DropdownMenuItem<String>(
-                          value: priority,
-                          child: Text(priority),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (value) {
-                    if (value == null) return;
-                    setState(() {
-                      _selectedSignalPriority = value;
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          TextFormField(
-            controller: _userNameController,
-            decoration: const InputDecoration(
-              labelText: 'User name (optional)',
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          TextFormField(
-            controller: _messageController,
-            maxLines: 4,
-            decoration: const InputDecoration(
-              labelText: 'Message',
-              alignLabelWithHint: true,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          FilledButton.icon(
-            onPressed: _createSupportSignal,
-            icon: const Icon(Icons.add_comment_outlined),
-            label: const Text('Create Support Signal'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSignalCard(BuildContext context, _ManualSupportSignal signal, int index) {
-    final priorityColor = _priorityColor(signal.priority);
+  Widget _buildExternalFollowUpPausedCard(BuildContext context) {
     return AppSurfaceCard(
       color: const Color(0xFF10161A).withValues(alpha: 0.94),
-      borderColor: priorityColor.withValues(alpha: 0.24),
+      borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            signal.message,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+            'External Follow-up Pending Rebuild',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFFF1E5C8),
-                ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: [
-              _SignalInfoChip(label: 'Source', value: signal.source),
-              _SignalInfoChip(label: 'Type', value: signal.type),
-              _SignalInfoChip(label: 'Priority', value: signal.priority, color: priorityColor),
-              _SignalInfoChip(label: 'Status', value: signal.status),
-              _SignalInfoChip(
-                label: 'Action',
-                value: signal.actionLabel,
-                color: const Color(0xFF3E9B90),
-              ),
-            ],
-          ),
-          if (signal.userName.trim().isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'User: ${signal.userName}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: const Color(0xFFEAEAEA),
-                  ),
-            ),
-          ],
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            'Action / Next Step',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: const Color(0xFFC9A75B),
-                  fontWeight: FontWeight.w700,
                 ),
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: AppSpacing.sm),
           Text(
-            signal.actionLabel,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            'Outbound follow-up actions are intentionally paused here until the dedicated External Follow-up workspace is built.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: const Color(0xFFEAEAEA),
+                  height: 1.35,
                 ),
           ),
           const SizedBox(height: AppSpacing.md),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: [
-              OutlinedButton.icon(
-                onPressed: () => _advanceSignalStatus(index),
-                icon: const Icon(Icons.sync_alt_outlined, size: 18),
-                label: const Text('Advance Status'),
-              ),
-              OutlinedButton.icon(
-                onPressed: () => _setSignalAction(index),
-                icon: const Icon(Icons.playlist_add_check_circle_outlined, size: 18),
-                label: const Text('Set Action'),
-              ),
-              OutlinedButton.icon(
-                onPressed: () {
-                  final route = _routeForSignalAction(signal.actionLabel);
-                  if (route == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          signal.actionLabel == 'Not assigned'
-                              ? 'No action selected'
-                              : 'No related workspace for this action',
-                        ),
-                      ),
-                    );
-                    return;
-                  }
-                  Navigator.of(context).pushNamed(route);
-                },
-                icon: const Icon(Icons.open_in_new_outlined, size: 18),
-                label: const Text('Open Related Workspace'),
-              ),
-            ],
+          const _GatewayStatusChip(
+            label: 'Status',
+            value: 'Paused on this surface',
+            color: Color(0xFFC66A4A),
           ),
         ],
       ),
@@ -602,10 +233,10 @@ class _AdminCommunicationGatewayPageState
       );
     }
 
-    if (entry.id == 'whatsapp') {
+    if (entry.id == 'external_follow_up') {
       return InkWell(
         borderRadius: BorderRadius.circular(AppRadii.xl),
-        onTap: () => _openWhatsAppSupport(context),
+        onTap: () => _showExternalFollowUpBoundary(context),
         child: GatewayEntryCard(entry: entry),
       );
     }
@@ -639,32 +270,23 @@ class _AdminCommunicationGatewayPageState
 
   @override
   Widget build(BuildContext context) {
-    const activeWhatsAppEntry = GatewayEntry(
-      id: 'whatsapp',
-      title: 'WhatsApp Support',
-      boundary: 'WhatsApp external support launch tool.',
-      status: GatewayStatus(
-        level: GatewayHealthLevel.healthy,
-        summary: 'Active external WhatsApp launch tool.',
-        boundaryNote:
-            'Opens WhatsApp Web as an external support tool without backend integration.',
-        monitoredNote: 'No backend or API integration yet.',
-        attentionLabel: 'Active',
-      ),
-    );
     final intakeEntries = communicationGatewayEntries
-        .where((entry) => entry.id == 'website_chat' || entry.id == 'support_email')
+        .where(
+          (entry) => entry.id == 'website_chat' || entry.id == 'support_email',
+        )
         .toList();
     final messagingEntries = communicationGatewayEntries
-        .where((entry) =>
-            entry.id == 'whatsapp' ||
-            entry.id == 'telegram' ||
-            entry.id == 'facebook_messenger')
-        .map((entry) => entry.id == 'whatsapp' ? activeWhatsAppEntry : entry)
+        .where(
+          (entry) =>
+              entry.id == 'external_follow_up' ||
+              entry.id == 'telegram' ||
+              entry.id == 'facebook_messenger',
+        )
         .toList();
     final coordinationEntries = communicationGatewayEntries
-        .where((entry) =>
-            entry.id == 'zoom_meet' || entry.id == 'external_intake')
+        .where(
+          (entry) => entry.id == 'zoom_meet' || entry.id == 'external_intake',
+        )
         .toList();
 
     return Scaffold(
@@ -691,12 +313,14 @@ class _AdminCommunicationGatewayPageState
             const GatewayPageIntroCard(
               title: 'Communication Gateway',
               summary:
-                  'Supervise channel intake boundaries and routing readiness without turning this page into a live communications workspace.',
+                  'Supervise communication boundaries without turning this page into a live support or follow-up workspace.',
               boundaryNote:
-                  'Human case handling remains in Communications. This page stays focused on supervised connector boundaries only.',
+                  'Human case handling remains in Communications. External follow-up actions are paused here.',
               emphasis:
                   'No external channel integrations are active yet. This gateway remains a monitored shell.',
             ),
+            const SizedBox(height: AppSpacing.md),
+            _buildExternalFollowUpNoticeCard(context),
             const SizedBox(height: AppSpacing.md),
             const GatewaySectionCard(
               title: 'Gateway Boundary Definition',
@@ -705,12 +329,12 @@ class _AdminCommunicationGatewayPageState
               children: [
                 GatewaySupervisionNote(
                   text:
-                      'Does: manual support initiation, email-based communication, and intent-based contact preparation.',
+                      'Does: email-based communication and supervised connector visibility.',
                 ),
                 SizedBox(height: AppSpacing.sm),
                 GatewaySupervisionNote(
                   text:
-                      'Does not do: messaging system behavior, live chat handling, automation, or follow-up execution.',
+                      'Does not do: inbound support intake, live chat handling, safety escalation routing, automation, or external follow-up execution.',
                 ),
                 SizedBox(height: AppSpacing.sm),
                 GatewaySupervisionNote(
@@ -797,38 +421,11 @@ class _AdminCommunicationGatewayPageState
               context,
               title: 'Messaging Channels',
               description:
-                  'Messaging-boundary placeholders that remain supervised and separate from direct support handling.',
+                  'Messaging-boundary placeholders that remain supervised and separate from direct support intake.',
               entries: messagingEntries,
             ),
             const SizedBox(height: AppSpacing.md),
-            _buildWhatsAppSignalIntakeCard(context),
-            const SizedBox(height: AppSpacing.md),
-            GatewaySectionCard(
-              title: 'Control Room Signals',
-              description:
-                  'Local advisory signals created manually from WhatsApp intake messages.',
-              children: _manualSignals.isEmpty
-                  ? [
-                      const GatewaySupervisionNote(
-                        text:
-                            'No support signals created yet. Use the intake form above to stage WhatsApp messages locally.',
-                      ),
-                    ]
-                  : _manualSignals
-                      .asMap()
-                      .entries
-                      .map(
-                        (entry) => Padding(
-                          padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                          child: _buildSignalCard(
-                            context,
-                            entry.value,
-                            entry.key,
-                          ),
-                        ),
-                      )
-                      .toList(),
-            ),
+            _buildExternalFollowUpPausedCard(context),
             const SizedBox(height: AppSpacing.md),
             _buildGatewayGroup(
               context,
@@ -844,76 +441,35 @@ class _AdminCommunicationGatewayPageState
   }
 }
 
-class _ManualSupportSignal {
-  final String source;
-  final String type;
-  final String message;
-  final String userName;
-  final String priority;
-  final String status;
-  final String actionLabel;
-
-  const _ManualSupportSignal({
-    required this.source,
-    required this.type,
-    required this.message,
-    required this.userName,
-    required this.priority,
-    required this.status,
-    required this.actionLabel,
-  });
-
-  _ManualSupportSignal copyWith({
-    String? source,
-    String? type,
-    String? message,
-    String? userName,
-    String? priority,
-    String? status,
-    String? actionLabel,
-  }) {
-    return _ManualSupportSignal(
-      source: source ?? this.source,
-      type: type ?? this.type,
-      message: message ?? this.message,
-      userName: userName ?? this.userName,
-      priority: priority ?? this.priority,
-      status: status ?? this.status,
-      actionLabel: actionLabel ?? this.actionLabel,
-    );
-  }
-}
-
-class _SignalInfoChip extends StatelessWidget {
-  const _SignalInfoChip({
+class _GatewayStatusChip extends StatelessWidget {
+  const _GatewayStatusChip({
     required this.label,
     required this.value,
-    this.color,
+    required this.color,
   });
 
   final String label;
   final String value;
-  final Color? color;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
-    final chipColor = color ?? const Color(0xFFD8B26A);
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.sm,
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: chipColor.withValues(alpha: 0.10),
+        color: color.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(AppRadii.pill),
         border: Border.all(
-          color: chipColor.withValues(alpha: 0.24),
+          color: color.withValues(alpha: 0.24),
         ),
       ),
       child: Text(
         '$label: $value',
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: chipColor,
+              color: color,
               fontWeight: FontWeight.w700,
             ),
       ),

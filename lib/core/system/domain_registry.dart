@@ -96,7 +96,7 @@ const List<DomainDefinition> domainRegistry = <DomainDefinition>[
     id: 'communication',
     displayName: 'Communication',
     description:
-        'External messaging gateways such as WhatsApp, Facebook, Telegram, and web chat bridges.',
+        'External messaging gateways such as Facebook, Telegram, and web chat bridges.',
   ),
   DomainDefinition(
     key: DomainKey.marketing,

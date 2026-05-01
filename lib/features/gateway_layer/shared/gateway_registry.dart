@@ -83,14 +83,14 @@ const communicationGatewayEntries = <GatewayEntry>[
     ),
   ),
   GatewayEntry(
-    id: 'whatsapp',
-    title: 'WhatsApp',
-    boundary: 'WhatsApp connector boundary and intake supervision.',
+    id: 'external_follow_up',
+    title: 'External Follow-up',
+    boundary: 'External outbound follow-up boundary.',
     status: GatewayStatus(
       level: GatewayHealthLevel.planned,
-      summary: 'Reserved for WhatsApp intake supervision.',
+      summary: 'Reserved for outbound follow-up tooling.',
       boundaryNote:
-          'Keeps messaging-channel intake outside direct case handling.',
+          'Keeps external follow-up tooling outside direct case handling.',
       monitoredNote: 'Not integrated yet.',
       attentionLabel: 'Planned boundary',
     ),

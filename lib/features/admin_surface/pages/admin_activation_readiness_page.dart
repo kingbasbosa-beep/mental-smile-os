@@ -293,7 +293,7 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   title: 'حوارات حدود القنوات',
                   readinessLabel: 'مفعّل يدويًا بشكل آمن',
                   summary:
-                      'توجد حوارات boundary لـ Website Chat وWhatsApp وTelegram وFacebook/Messenger وZoom/Meet.',
+                      'توجد حوارات boundary لـ Website Chat وExternal Follow-up وTelegram وFacebook/Messenger وZoom/Meet.',
                   currentState: 'Activated in safe manual form',
                   availableNow:
                       'توضيح status والحدود والفصل عن Communications وsupport handling.',
@@ -366,7 +366,7 @@ class AdminActivationReadinessPage extends StatelessWidget {
               children: [
                 _buildReadinessCard(
                   context,
-                  title: 'real WhatsApp integration',
+                  title: 'real external follow-up integration',
                   readinessLabel: 'مفاهيمي / مخطط فقط',
                   summary:
                       'لا يوجد تكامل واتساب حقيقي حتى الآن.',

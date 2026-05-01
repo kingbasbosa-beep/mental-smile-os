@@ -42,7 +42,7 @@ class _AdminWorkspaceCommandCenterPageState
     ),
     _WorkspaceTool(
       title: 'WhatsApp Business',
-      description: 'Manual review handoff and outbound coordination with no automation.',
+      description: 'Marketing tool for audience messaging and business communication with no automation.',
       url: _whatsAppBusinessUrl,
     ),
     _WorkspaceTool(
