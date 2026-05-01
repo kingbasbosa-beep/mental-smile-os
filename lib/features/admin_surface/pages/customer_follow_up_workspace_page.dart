@@ -286,10 +286,18 @@ class _SupportRequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final supportType = (data['supportType'] as String? ?? '').trim();
-    final issueType = (data['issueType'] as String? ?? '').trim();
-    final priority = (data['priority'] as String? ?? '').trim();
-    final status = (data['status'] as String? ?? '').trim();
+    final supportType = _supportTypeLabel(
+      (data['supportType'] as String? ?? '').trim(),
+    );
+    final issueType = _issueTypeLabel(
+      (data['issueType'] as String? ?? '').trim(),
+    );
+    final priority = _priorityLabel(
+      (data['priority'] as String? ?? '').trim(),
+    );
+    final status = _statusLabel(
+      (data['status'] as String? ?? '').trim(),
+    );
     final createdByUid = (data['createdByUid'] as String? ?? '').trim();
     final createdAt = _formatCreatedAt(data['createdAt']);
 
@@ -312,32 +320,32 @@ class _SupportRequestCard extends StatelessWidget {
             children: [
               _metaChip(
                 context,
-                'supportType: ${supportType.isEmpty ? '-' : supportType}',
+                'القسم: ${supportType.isEmpty ? '-' : supportType}',
               ),
               _metaChip(
                 context,
-                'issueType: ${issueType.isEmpty ? '-' : issueType}',
+                'نوع الطلب: ${issueType.isEmpty ? '-' : issueType}',
               ),
               _metaChip(
                 context,
-                'priority: ${priority.isEmpty ? '-' : priority}',
+                'الأولوية: ${priority.isEmpty ? '-' : priority}',
               ),
               _metaChip(
                 context,
-                'status: ${status.isEmpty ? '-' : status}',
+                'الحالة: ${status.isEmpty ? '-' : status}',
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'createdByUid: ${createdByUid.isEmpty ? '-' : createdByUid}',
+            'المستخدم: ${createdByUid.isEmpty ? '-' : createdByUid}',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: const Color(0xFFEAEAEA),
                 ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'createdAt: $createdAt',
+            'وقت الإنشاء: $createdAt',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: const Color(0xFFEAEAEA).withValues(alpha: 0.78),
                 ),
@@ -381,5 +389,53 @@ class _SupportRequestCard extends StatelessWidget {
     }
 
     return '-';
+  }
+
+  String _supportTypeLabel(String value) {
+    switch (value) {
+      case 'recovery_support':
+        return 'دعم التعافي';
+      case 'family_support':
+        return 'دعم الأسرة';
+      case 'client_support':
+        return 'العملاء';
+      case 'center_support':
+        return 'المراكز';
+      case 'clinician_support':
+        return 'الأخصائيين';
+      default:
+        return value;
+    }
+  }
+
+  String _issueTypeLabel(String value) {
+    switch (value) {
+      case 'risk_report':
+        return 'بلاغ خطر';
+      case 'general_help':
+        return 'طلب مساعدة عامة';
+      default:
+        return value;
+    }
+  }
+
+  String _priorityLabel(String value) {
+    switch (value) {
+      case 'normal':
+        return 'عادية';
+      case 'high':
+        return 'عالية';
+      default:
+        return value;
+    }
+  }
+
+  String _statusLabel(String value) {
+    switch (value) {
+      case 'new':
+        return 'جديد';
+      default:
+        return value;
+    }
   }
 }
