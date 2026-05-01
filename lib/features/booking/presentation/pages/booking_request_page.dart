@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/features/booking/data/services/booking_legacy_chat_adapter.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 const String kDevClinicianUid =
@@ -26,6 +27,8 @@ class BookingRequestPage extends StatefulWidget {
 }
 
 class _BookingRequestPageState extends State<BookingRequestPage> {
+  final BookingLegacyChatAdapter _bookingChatAdapter =
+      BookingLegacyChatAdapter();
   final TextEditingController _noteCtrl = TextEditingController();
   bool _submitting = false;
   String? _result;
@@ -62,185 +65,6 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
     }
 
     return <String, dynamic>{};
-  }
-
-  Future<int> _nextSequence(
-      DocumentReference<Map<String, dynamic>> threadRef) async {
-    final latest = await threadRef
-        .collection('messages')
-        .orderBy('sequenceNumber', descending: true)
-        .limit(1)
-        .get();
-
-    if (latest.docs.isEmpty) return 1;
-    final data = latest.docs.first.data();
-    final current = data['sequenceNumber'];
-    if (current is int) return current + 1;
-    return 2;
-  }
-
-  bool _isMissingThreadType(Map<String, dynamic> data) {
-    final threadType = (data['threadType'] ?? '').toString().trim();
-    return threadType.isEmpty;
-  }
-
-  bool _isTypedBookingFollowupThread(Map<String, dynamic> data) {
-    return (data['threadType'] ?? '').toString().trim() == 'booking_followup';
-  }
-
-  QueryDocumentSnapshot<Map<String, dynamic>>? _pickReusableBookingThread(
-    List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
-  ) {
-    QueryDocumentSnapshot<Map<String, dynamic>>? typed;
-    QueryDocumentSnapshot<Map<String, dynamic>>? legacyMissingType;
-    DateTime typedUpdatedAt = DateTime.fromMillisecondsSinceEpoch(0);
-    DateTime legacyUpdatedAt = DateTime.fromMillisecondsSinceEpoch(0);
-
-    for (final doc in docs) {
-      final data = doc.data();
-      final rawUpdatedAt = data['updatedAt'];
-      final updatedAt = rawUpdatedAt is Timestamp
-          ? rawUpdatedAt.toDate()
-          : DateTime.fromMillisecondsSinceEpoch(0);
-
-      if (_isTypedBookingFollowupThread(data)) {
-        if (typed == null || updatedAt.isAfter(typedUpdatedAt)) {
-          typed = doc;
-          typedUpdatedAt = updatedAt;
-        }
-        continue;
-      }
-
-      if (_isMissingThreadType(data)) {
-        if (legacyMissingType == null || updatedAt.isAfter(legacyUpdatedAt)) {
-          legacyMissingType = doc;
-          legacyUpdatedAt = updatedAt;
-        }
-      }
-    }
-
-    return typed ?? legacyMissingType;
-  }
-
-  Future<String> _createOrUpdateAdminThread({
-    required String clientId,
-    required String clientName,
-    required String clientEmail,
-    required String requestId,
-    required String clinicianId,
-    required String clinicianName,
-    required String note,
-  }) async {
-    final firestore = FirebaseFirestore.instance;
-
-    final existing = await firestore
-        .collection('chat_threads')
-        .where('ownerUid', isEqualTo: clientId)
-        .where('archived', isEqualTo: false)
-        .get();
-
-    final now = FieldValue.serverTimestamp();
-    final preview = note.isNotEmpty
-        ? note
-        : (_isArabic
-            ? 'تم إنشاء طلب حجز جديد'
-            : 'A new booking request was created');
-
-    DocumentReference<Map<String, dynamic>> threadRef;
-
-    final reusableThread = _pickReusableBookingThread(existing.docs);
-
-    if (reusableThread != null) {
-      threadRef = reusableThread.reference;
-      await threadRef.update({
-        'threadType': 'booking_followup',
-        'updatedAt': now,
-        'lastMessageAt': now,
-        'lastMessagePreview': preview,
-        'assignedAdminUid': '',
-        'handoffState': 'admin_review',
-        'lifecycleState': 'assigned_admin',
-        'bookingLinked': true,
-        'bookingRequestId': requestId,
-      });
-    } else {
-      threadRef = firestore.collection('chat_threads').doc();
-      await threadRef.set({
-        'ownerUid': clientId,
-        'ownerType': 'registered_client',
-        'displayName': clientEmail.isNotEmpty ? clientEmail : clientName,
-        'status': 'active',
-        'threadType': 'booking_followup',
-        'sourceType': 'booking_flow',
-        'createdAt': now,
-        'updatedAt': now,
-        'lastMessageAt': now,
-        'lastMessagePreview': preview,
-        'messageCount': 0,
-        'isTemporary': false,
-        'convertedToOfficialClient': true,
-        'officialClientUid': clientId,
-        'bookingLinked': true,
-        'bookingRequestId': requestId,
-        'assignedClinicianUid': clinicianId,
-        'assignedAdminUid': '',
-        'needsHumanSupport': true,
-        'escalationLevel': 'recommended',
-        'archived': false,
-        'closedAt': null,
-        'language': _isArabic ? 'ar' : 'en',
-        'lifecycleState': 'assigned_admin',
-        'identityState': 'registered_client',
-        'safetyState': 'monitor',
-        'handoffState': 'admin_review',
-        'riskScore': 0,
-        'riskLevel': 'low',
-        'strategyMode': 'containment',
-        'lastEmotionalStates': const [],
-        'lastDetectedRole': null,
-      });
-    }
-
-    final seq = await _nextSequence(threadRef);
-
-    await threadRef.collection('messages').add({
-      'threadId': threadRef.id,
-      'senderType': 'user',
-      'senderUid': clientId,
-      'text': note.isNotEmpty
-          ? note
-          : (_isArabic
-              ? 'تم إرسال طلب حجز إلى الإدارة'
-              : 'A booking request was sent to admin'),
-      'createdAt': FieldValue.serverTimestamp(),
-      'sequenceNumber': seq,
-      'visibleToUser': true,
-      'messageKind': 'booking_request',
-      'roleDetected': null,
-      'statesDetected': const [],
-      'riskScore': 0,
-      'riskLevel': 'low',
-      'strategyMode': 'containment',
-      'safetyTriggered': false,
-      'containsEscalationSignal': false,
-      'aiModelVersion': null,
-      'systemVersion': 'booking_v1',
-      'metadata': {
-        'requestId': requestId,
-        'clinicianId': clinicianId,
-        'clinicianName': clinicianName,
-      },
-    });
-
-    await threadRef.update({
-      'messageCount': FieldValue.increment(1),
-      'updatedAt': FieldValue.serverTimestamp(),
-      'lastMessageAt': FieldValue.serverTimestamp(),
-      'lastMessagePreview':
-          preview.length > 120 ? preview.substring(0, 120) : preview,
-    });
-
-    return threadRef.id;
   }
 
   Future<void> _submit() async {
@@ -302,7 +126,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
 
       await requestRef.set(requestData);
 
-      final threadId = await _createOrUpdateAdminThread(
+      final threadId = await _bookingChatAdapter.createOrUpdateAdminThreadForBooking(
         clientId: uid,
         clientName: clientName,
         clientEmail: clientEmail,
@@ -310,6 +134,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
         clinicianId: widget.args.clinicianId,
         clinicianName: widget.args.clinicianName,
         note: note,
+        isArabic: _isArabic,
       );
 
       await requestRef.update({

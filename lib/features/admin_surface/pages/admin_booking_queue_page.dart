@@ -3,10 +3,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/features/admin_surface/shared/admin_whatsapp_support_helper.dart';
 import 'package:flutterprojects/core/system/domain_registry.dart';
 import 'package:flutterprojects/core/system/domain_status.dart';
 import 'package:flutterprojects/core/system/domain_status_service.dart';
+import 'package:flutterprojects/features/booking/data/services/booking_legacy_chat_adapter.dart';
 import 'package:flutterprojects/features/booking/data/services/booking_health_service.dart';
 import 'package:flutterprojects/features/admin_surface/widgets/domain_advisory_banner.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
@@ -24,6 +24,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       BookingHealthService();
   static const DomainStatusService _domainStatusService = DomainStatusService();
   static const bool _adminClinicianForwardBridgeEnabled = false;
+  final BookingLegacyChatAdapter _bookingChatAdapter =
+      BookingLegacyChatAdapter();
 
   String _centerTypeLabel(String type, bool isArabic) {
     switch (type.trim()) {
@@ -591,9 +593,6 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final threadId = (requestData['threadId'] ?? '').toString();
     if (threadId.trim().isEmpty) return;
 
-    DocumentReference<Map<String, dynamic>>? threadRef;
-
-    final chatThreadsRef = db.collection('chat_threads').doc(threadId);
     _logFirestore(
       page: 'admin_booking_queue',
       role: 'admin',
@@ -601,12 +600,19 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       collection: 'chat_threads',
       documentId: threadId,
     );
-    final chatThreadsSnap = await chatThreadsRef.get();
-    if (chatThreadsSnap.exists) {
-      threadRef = chatThreadsRef;
-    }
-
-    if (threadRef == null) {
+    _logFirestore(
+      page: 'admin_booking_queue',
+      role: 'admin',
+      operation: 'create',
+      collection: 'chat_threads/messages',
+      documentId: threadId,
+    );
+    final appended = await _bookingChatAdapter.appendAdminQueueMessage(
+      threadId: threadId,
+      requestId: requestId,
+      text: text,
+    );
+    if (!appended) {
       _logFirestore(
         page: 'admin_booking_queue',
         role: 'admin',
@@ -621,72 +627,10 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     _logFirestore(
       page: 'admin_booking_queue',
       role: 'admin',
-      operation: 'read',
-      collection: '${threadRef.parent.id}/messages',
-      documentId: threadId,
-    );
-    final latestMessage = await threadRef
-        .collection('messages')
-        .orderBy('sequenceNumber', descending: true)
-        .limit(1)
-        .get();
-
-    int nextSequence = 1;
-    if (latestMessage.docs.isNotEmpty) {
-      final current = latestMessage.docs.first.data()['sequenceNumber'];
-      if (current is int) {
-        nextSequence = current + 1;
-      } else {
-        nextSequence = (int.tryParse('$current') ?? 0) + 1;
-      }
-    }
-
-    _logFirestore(
-      page: 'admin_booking_queue',
-      role: 'admin',
-      operation: 'create',
-      collection: '${threadRef.parent.id}/messages',
-      documentId: threadId,
-    );
-    await threadRef.collection('messages').add({
-      'threadId': threadId,
-      'senderType': 'admin',
-      'senderUid': FirebaseAuth.instance.currentUser?.uid ?? '',
-      'text': text,
-      'createdAt': FieldValue.serverTimestamp(),
-      'sequenceNumber': nextSequence,
-      'visibleToUser': true,
-      'messageKind': 'admin_update',
-      'roleDetected': null,
-      'statesDetected': const [],
-      'riskScore': 0,
-      'riskLevel': 'low',
-      'strategyMode': 'containment',
-      'safetyTriggered': false,
-      'containsEscalationSignal': false,
-      'aiModelVersion': null,
-      'systemVersion': 'admin_queue_v1',
-      'metadata': {
-        'requestId': requestId,
-        'source': 'admin_booking_queue',
-      },
-    });
-
-    _logFirestore(
-      page: 'admin_booking_queue',
-      role: 'admin',
       operation: 'update',
-      collection: threadRef.parent.id,
+      collection: 'chat_threads',
       documentId: threadId,
     );
-    await threadRef.update({
-      'lastMessagePreview': text.length > 120 ? text.substring(0, 120) : text,
-      'lastMessageAt': FieldValue.serverTimestamp(),
-      'messageCount': FieldValue.increment(1),
-      'lastSenderType': 'admin',
-      'handoffState': 'admin_replying',
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
   }
 
   Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>>
@@ -2701,22 +2645,6 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                   alignment:
                       isArabic ? WrapAlignment.end : WrapAlignment.start,
                   children: [
-                    OutlinedButton.icon(
-                      onPressed: () => openAdminWhatsAppSupport(
-                        context,
-                        type: 'Request Follow-up Required',
-                        source: 'Booking Queue',
-                        referenceId: requestId,
-                        notes:
-                            'Booking request needs manual follow-up. Status: $status',
-                      ),
-                      icon: const Icon(Icons.send_rounded),
-                      label: Text(
-                        isArabic
-                            ? 'متابعة عبر واتساب'
-                            : 'Follow-up via WhatsApp',
-                      ),
-                    ),
                     if (status == 'pending_admin')
                       OutlinedButton.icon(
                         onPressed: busy
