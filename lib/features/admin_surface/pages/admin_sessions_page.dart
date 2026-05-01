@@ -593,8 +593,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
       case 'session_setup_pending':
         return isCenterRequest
             ? (isArabic
-                ? 'بوابة إدارية مالية قبل الدفع'
-                : 'Admin financial gate before payment')
+                ? 'بوابة مالية استثنائية قبل الدفع'
+                : 'Control-room financial exception gate before payment')
             : (isArabic
                 ? 'استرداد إداري لجلسة أخصائي'
                 : 'Admin recovery for clinician session');
@@ -618,7 +618,9 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                 ? 'التقييمات: العميل / الأخصائي'
                 : 'Reviews: client / clinician');
       case 'payout_pending':
-        return isArabic ? 'بوابة مالية إدارية' : 'Admin financial gate';
+        return isArabic
+            ? 'بوابة مالية استثنائية'
+            : 'Financial exception gate';
       default:
         return isArabic ? 'متابعة من غرفة التحكم' : 'Control-room monitoring';
     }
@@ -1493,7 +1495,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   Text(
                                     isArabic
                                         ? 'Ù‡Ø°Ù‡ Ø¨ÙˆØ§Ø¨Ø© Ù…Ø§Ù„ÙŠØ© ØªØ­Øª Ø¥Ø´Ø±Ø§Ù Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©ØŒ ÙˆÙ„ÙŠØ³Øª Ø§Ø¹ØªÙ…Ø§Ø¯Ù‹Ø§ Ù„Ù„Ø¯ÙØ¹ Ø£Ùˆ ØªÙ†ÙÙŠØ°Ù‹Ø§ Ù„Ù„Ø±Ø¹Ø§ÙŠØ©.'
-                                        : 'This is an admin-supervised financial gate, not payment approval or care execution.',
+                                        : 'This is a control-room financial exception gate, not payment approval or care execution.',
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodySmall

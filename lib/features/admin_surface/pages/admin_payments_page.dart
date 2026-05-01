@@ -68,8 +68,8 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                     ? 'ØªÙ… Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ø³Ø¯Ø§Ø¯ ÙˆØªØ­ÙˆÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨ Ø¥Ù„Ù‰ Ø¥Ù‚Ø§Ù…Ø© Ù…Ø¨Ø¯Ø¦ÙŠØ© Ù…Ø¬Ø¯ÙˆÙ„Ø©'
                     : 'ØªÙ… Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ø³Ø¯Ø§Ø¯ ÙˆØªØ­ÙˆÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨ Ø¥Ù„Ù‰ Ù‚Ø³Ù… Ø§Ù„Ø¬Ù„Ø³Ø§Øª')
                 : (result.isCenterRequest
-                    ? 'Payment approved and request moved to preliminary residency scheduled'
-                    : 'Payment approved and moved to sessions setup'),
+                    ? 'Payment signal confirmed; next step updated to preliminary residency scheduled'
+                    : 'Payment signal confirmed; next step updated to sessions setup'),
           ),
         ),
       );
@@ -89,7 +89,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
           content: Text(
             _isArabic(context)
                 ? 'ØªÙ… Ø±ÙØ¶ Ø¥Ø«Ø¨Ø§Øª Ø§Ù„Ø³Ø¯Ø§Ø¯ ÙˆØ¥Ø±Ø¬Ø§Ø¹ Ø§Ù„Ø·Ù„Ø¨ Ù„Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø¯ÙØ¹'
-                : 'Payment proof rejected and returned to awaiting payment',
+                : 'Payment issue flagged and returned to awaiting payment',
           ),
         ),
       );
@@ -493,8 +493,8 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
 
     if (_isInPaymentReview(data) || status == 'payout_pending') {
       return isArabic
-          ? 'بوابة مالية إدارية'
-          : 'Admin financial gate';
+          ? 'بوابة مالية استثنائية'
+          : 'Financial exception gate';
     }
     if (status == 'completed_success') {
       return isArabic
@@ -831,7 +831,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                 child: Text(
                                   isArabic
                                       ? 'تاريخ اعتماد السداد: $approvedAt'
-                                      : 'Payment approved at: $approvedAt',
+                                      : 'Payment signal confirmed at: $approvedAt',
                                 ),
                               ),
                             if (payoutTransferredAt.isNotEmpty)

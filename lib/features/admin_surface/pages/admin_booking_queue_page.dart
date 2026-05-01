@@ -152,13 +152,13 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     },
     {
       'key': 'rejected_admin',
-      'labelAr': 'مرفوضة إداريًا',
-      'labelEn': 'Admin rejected'
+      'labelAr': 'مرفوضة خارج المسار الطبيعي',
+      'labelEn': 'Rejected outside normal flow'
     },
     {
       'key': 'clinician_rejected',
-      'labelAr': 'مرفوضة من الأخصائي',
-      'labelEn': 'Clinician rejected'
+      'labelAr': 'مرفوضة خارج المسار الطبيعي',
+      'labelEn': 'Rejected outside normal flow'
     },
   ];
 
@@ -546,15 +546,15 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       await _appendSystemMessage(
         requestId: requestId,
         text: isArabic
-            ? 'تم رفض الطلب من الإدارة.'
-            : 'The request was rejected by admin.',
+            ? 'تم وسم الحالة كمشكلة خارج المسار الطبيعي.'
+            : 'The request was flagged as an issue outside the normal flow.',
       );
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isArabic ? 'تم رفض الطلب' : 'Request rejected',
+            isArabic ? 'تم وسم الحالة كمشكلة' : 'Issue flagged',
           ),
         ),
       );
@@ -575,8 +575,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       await _appendSystemMessage(
         requestId: requestId,
         text: isArabic
-            ? 'تمت إعادة الطلب إلى انتظار الإدارة.'
-            : 'The request was returned to pending admin.',
+            ? 'تمت إعادة الطلب إلى حالة تتطلب الانتباه.'
+            : 'The request was returned to requires-attention state.',
       );
 
       if (!mounted) return;
@@ -584,8 +584,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         SnackBar(
           content: Text(
             isArabic
-                ? 'تم إرجاع الطلب إلى انتظار الإدارة'
-                : 'Request returned to pending admin',
+                ? 'تم إرجاع الطلب إلى حالة تتطلب الانتباه'
+                : 'Request returned to requires attention',
           ),
         ),
       );
@@ -881,11 +881,11 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         requestId: requestId,
         text: isArabic
             ? (result.isCenterRequest
-                ? 'تم اعتماد السداد وتحويل الطلب إلى إقامة مبدئية مجدولة.'
-                : 'تم اعتماد السداد وتحويل الطلب إلى مرحلة تجهيز الجلسة.')
+                ? 'تم تأكيد إشارة السداد وتحديث الخطوة التالية إلى إقامة مبدئية مجدولة.'
+                : 'تم تأكيد إشارة السداد وتحديث الخطوة التالية إلى تجهيز الجلسة.')
             : (result.isCenterRequest
-                ? 'Payment approved and request moved to preliminary residency scheduled.'
-                : 'Payment approved and request moved to session setup.'),
+                ? 'Payment signal confirmed; next step updated to preliminary residency scheduled.'
+                : 'Payment signal confirmed; next step updated to session setup.'),
       );
 
       if (!mounted) return;
@@ -894,11 +894,11 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
           content: Text(
             isArabic
                 ? (result.isCenterRequest
-                    ? 'تم اعتماد السداد وتحويل الطلب إلى إقامة مبدئية مجدولة'
-                    : 'تم اعتماد السداد وتحويل الطلب إلى تجهيز الجلسة')
+                    ? 'تم تأكيد إشارة السداد وتحديث الخطوة التالية إلى إقامة مبدئية مجدولة'
+                    : 'تم تأكيد إشارة السداد وتحديث الخطوة التالية إلى تجهيز الجلسة')
                 : (result.isCenterRequest
-                    ? 'Payment approved and moved to preliminary residency scheduled'
-                    : 'Payment approved and moved to session setup'),
+                    ? 'Payment signal confirmed; next step updated to preliminary residency scheduled'
+                    : 'Payment signal confirmed; next step updated to session setup'),
           ),
         ),
       );
@@ -919,7 +919,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         requestId: requestId,
         text: isArabic
             ? 'تم رفض إثبات السداد وإرجاع الطلب إلى انتظار الدفع.'
-            : 'Payment proof rejected and request returned to awaiting payment.',
+            : 'Payment issue flagged and request returned to awaiting payment.',
       );
 
       if (!mounted) return;
@@ -928,7 +928,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
           content: Text(
             isArabic
                 ? 'تم رفض إثبات السداد وإرجاع الطلب لانتظار الدفع'
-                : 'Payment proof rejected and returned to awaiting payment',
+                : 'Payment issue flagged and returned to awaiting payment',
           ),
         ),
       );
@@ -1060,7 +1060,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         requestId: requestId,
         text: isArabic
             ? 'تم تحويل الطلب إلى الأخصائي: ${result.clinicianName}'
-            : 'The request was assigned to clinician: ${result.clinicianName}',
+            : 'Clinician assignment recorded as exception: ${result.clinicianName}',
       );
 
       if (!mounted) return;
@@ -1068,8 +1068,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         SnackBar(
           content: Text(
             isArabic
-                ? 'تم تحويل الطلب إلى الأخصائي'
-                : 'Request assigned to clinician',
+                ? 'تم تسجيل تحويل الأخصائي كإجراء استثنائي'
+                : 'Clinician assignment recorded as exception',
           ),
         ),
       );
@@ -1093,7 +1093,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
             ? 'بانتظار توصية المركز'
             : 'Awaiting center recommendation';
       case 'approved':
-        return isArabic ? 'طلب مركز معتمد' : 'Approved center request';
+        return isArabic
+            ? 'طلب مركز جرى تمريره للخطوة التالية'
+            : 'Center request cleared for next step';
       case 'assigned_clinician':
         return isArabic ? 'بانتظار رد الأخصائي' : 'Awaiting clinician response';
       case 'awaiting_payment':
@@ -1115,9 +1117,13 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       case 'completed_success':
         return isArabic ? 'مكتملة بنجاح' : 'Completed successfully';
       case 'rejected_admin':
-        return isArabic ? 'مرفوضة إداريًا' : 'Admin rejected';
+        return isArabic
+            ? 'مرفوضة خارج المسار الطبيعي'
+            : 'Rejected outside normal flow';
       case 'clinician_rejected':
-        return isArabic ? 'مرفوضة من الأخصائي' : 'Clinician rejected';
+        return isArabic
+            ? 'مرفوضة خارج المسار الطبيعي'
+            : 'Rejected outside normal flow';
       case 'reschedule_pending':
         return isArabic ? 'إعادة جدولة' : 'Reschedule pending';
       case 'cancellation_pending':
@@ -1125,7 +1131,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       case 'dispute_pending':
         return isArabic ? 'نزاع' : 'Dispute pending';
       default:
-        return isArabic ? 'بانتظار الإدارة' : 'Pending admin';
+        return isArabic ? 'تتطلب الانتباه' : 'Requires attention';
     }
   }
 
@@ -1458,8 +1464,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       case 'payment_review':
       case 'payout_pending':
         return isArabic
-            ? 'المالك الحالي: بوابة مالية إدارية'
-            : 'Current owner: admin financial gate';
+            ? 'المالك الحالي: بوابة مالية استثنائية'
+            : 'Current owner: financial exception gate';
       case 'pending_admin':
       case 'rejected_admin':
       case 'clinician_rejected':
@@ -2084,7 +2090,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                 context: context,
                 isArabic: isArabic,
                 arLabel: 'سبب الرفض',
-                enLabel: 'Reject reason',
+                enLabel: 'Issue note',
                 value: rejectReason,
               ),
               _buildDetailLine(
@@ -2207,7 +2213,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
               if (hasRequiredAdminGate) ...[
                 const SizedBox(height: 12),
                 Text(
-                  isArabic ? 'بوابة إدارية مطلوبة' : 'Required Admin Gate',
+                  isArabic
+                      ? 'بوابة استثنائية مطلوبة'
+                      : 'Required Exception Gate',
                   textAlign: isArabic ? TextAlign.right : TextAlign.left,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w800,
@@ -2229,7 +2237,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                                   isCenterRequest: isCenterRequest,
                                 ),
                         icon: const Icon(Icons.cancel_outlined),
-                        label: Text(isArabic ? 'رفض' : 'Reject'),
+                        label: Text(isArabic ? 'وسم مشكلة' : 'Flag issue'),
                       ),
                     if (canReviewPayment)
                       FilledButton.icon(
@@ -2318,7 +2326,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                                   isCenterRequest: true,
                                 ),
                         icon: const Icon(Icons.cancel_outlined),
-                        label: Text(isArabic ? 'رفض' : 'Reject'),
+                        label: Text(isArabic ? 'وسم مشكلة' : 'Flag issue'),
                       ),
                   ],
                 ),
