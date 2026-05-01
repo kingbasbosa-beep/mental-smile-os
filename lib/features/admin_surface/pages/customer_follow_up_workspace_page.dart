@@ -23,70 +23,93 @@ class CustomerFollowUpWorkspacePage extends StatelessWidget {
         appBar: AppShellActions.buildAppBar(
           context,
           title: 'Customer Follow-up Workspace',
-          bottom: const TabBar(
-            isScrollable: true,
-            tabs: [
-              Tab(text: 'دعم التعافي'),
-              Tab(text: 'دعم الأسرة'),
-              Tab(text: 'العملاء'),
-              Tab(text: 'المراكز'),
-              Tab(text: 'الأخصائيين'),
-              Tab(text: 'بلاغات خطر'),
-            ],
-          ),
         ),
         body: AppPageBackground(
-          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: requestsStream,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
+          child: Column(
+            children: [
+              const Material(
+                color: Colors.transparent,
+                child: TabBar(
+                  isScrollable: true,
+                  tabs: [
+                    Tab(text: 'دعم التعافي'),
+                    Tab(text: 'دعم الأسرة'),
+                    Tab(text: 'العملاء'),
+                    Tab(text: 'المراكز'),
+                    Tab(text: 'الأخصائيين'),
+                    Tab(text: 'بلاغات خطر'),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: requestsStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
 
-              if (snapshot.hasError) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Text(
-                      'Unable to load support requests.',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: const Color(0xFFEAEAEA),
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          child: Text(
+                            'Unable to load support requests.',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: const Color(0xFFEAEAEA),
+                                ),
+                            textAlign: TextAlign.center,
                           ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                );
-              }
+                        ),
+                      );
+                    }
 
-              final docs = snapshot.data?.docs ?? const [];
-              final requests = docs.map((doc) => doc.data()).toList();
+                    final docs = snapshot.data?.docs ?? const [];
+                    final requests = docs.map((doc) => doc.data()).toList();
 
-              return TabBarView(
-                children: [
-                  _SupportRequestsTab(
-                    requests: _filterBySupportType(requests, 'recovery_support'),
-                  ),
-                  _SupportRequestsTab(
-                    requests: _filterBySupportType(requests, 'family_support'),
-                  ),
-                  _SupportRequestsTab(
-                    requests: _filterBySupportType(requests, 'client_support'),
-                  ),
-                  _SupportRequestsTab(
-                    requests: _filterBySupportType(requests, 'center_support'),
-                  ),
-                  _SupportRequestsTab(
-                    requests:
-                        _filterBySupportType(requests, 'clinician_support'),
-                  ),
-                  _SupportRequestsTab(
-                    requests: _filterRiskRequests(requests),
-                  ),
-                ],
-              );
-            },
+                    return TabBarView(
+                      children: [
+                        _SupportRequestsTab(
+                          requests: _filterBySupportType(
+                            requests,
+                            'recovery_support',
+                          ),
+                        ),
+                        _SupportRequestsTab(
+                          requests: _filterBySupportType(
+                            requests,
+                            'family_support',
+                          ),
+                        ),
+                        _SupportRequestsTab(
+                          requests: _filterBySupportType(
+                            requests,
+                            'client_support',
+                          ),
+                        ),
+                        _SupportRequestsTab(
+                          requests: _filterBySupportType(
+                            requests,
+                            'center_support',
+                          ),
+                        ),
+                        _SupportRequestsTab(
+                          requests: _filterBySupportType(
+                            requests,
+                            'clinician_support',
+                          ),
+                        ),
+                        _SupportRequestsTab(
+                          requests: _filterRiskRequests(requests),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ),

@@ -9,6 +9,11 @@ class Routes {
   static const clientRegister = '/register/client';
   static const clinicianRegister = '/register/clinician';
   static const centerRegister = '/register/center';
+  static const followUpRegistration = '/follow-up/register';
+  static const followUpTemplates = '/workspace/external-follow-up/templates';
+  static const followUpCampaigns = '/workspace/external-follow-up/campaigns';
+  static const followUpCampaignDetails =
+      '/workspace/external-follow-up/campaigns/details';
 
   static const clinicianOperations = '/clinician/operations';
   static const clinicianSessions = '/clinician/sessions';
@@ -31,6 +36,7 @@ class Routes {
 
   static const addiction = '/module/addiction';
   static const specialNeeds = '/module/special_needs';
+  static const supportIssueSelector = '/module/support-issue-selector';
   static const familyStress = '/module/family_stress';
   static const specialists = '/module/specialists';
   static const specialistsList = '/module/specialists/list';
@@ -71,6 +77,7 @@ class Routes {
   static const adminAiDevOpsCenter = '/admin/ai-devops';
   static const adminDomainAvailability = '/admin/domain-availability';
   static const adminFunctionalWorkspaces = '/admin/functional-workspaces';
+  static const externalFollowUpWorkspace = '/workspace/external-follow-up';
   static const customerFollowUpWorkspace = '/workspace/customer-follow-up';
   static const technicalSupportWorkspace = '/workspace/technical-support';
   static const marketingWorkspace = '/workspace/marketing';

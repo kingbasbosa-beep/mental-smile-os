@@ -147,7 +147,7 @@ class AdminFunctionalWorkspacesPage extends StatelessWidget {
               title: 'Customer Follow-up Workspace',
               arabicTitle: 'قسم المتابعة وخدمة العملاء',
               mission:
-                  'Handles WhatsApp, web requests, emails, customer communication, follow-up, and request tracking.',
+                  'Handles customer follow-up, external communication, and request tracking.',
               route: Routes.customerFollowUpWorkspace,
             ),
             const SizedBox(height: AppSpacing.md),

@@ -940,7 +940,9 @@ class AppRouter {
             args is Map ? args['supportType']?.toString() : null;
         if (supportType != 'recovery_support' &&
             supportType != 'family_support' &&
-            supportType != 'client_support') {
+            supportType != 'client_support' &&
+            supportType != 'center_support' &&
+            supportType != 'clinician_support') {
           return MaterialPageRoute(
             builder: (ctx) => Scaffold(
               body: Center(
