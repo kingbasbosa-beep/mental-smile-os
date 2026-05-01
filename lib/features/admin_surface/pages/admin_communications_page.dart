@@ -21,14 +21,16 @@ class AdminCommunicationsPage extends StatelessWidget {
             _CommunicationsIntroCard(),
             SizedBox(height: AppSpacing.md),
             _CommunicationsEntryCard(
-              title: 'Support Inbox',
-              summary: 'Open human support chats and active admin conversations.',
+              title: 'Legacy Support Threads',
+              summary:
+                  'This section shows historical chat threads. New support requests are handled via structured support requests.',
               route: Routes.adminSupportChats,
             ),
             SizedBox(height: AppSpacing.md),
             _CommunicationsEntryCard(
-              title: 'Escalations',
-              summary: 'Open escalated conversations and review routed cases.',
+              title: 'Escalated Cases (Historical)',
+              summary:
+                  'Escalated Cases (Historical). This section shows historical chat threads. New support requests are handled via structured support requests.',
               route: Routes.chatEscalations,
             ),
           ],
@@ -55,7 +57,7 @@ class _CommunicationsIntroCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'This landing page is an entry point for human conversations and escalations only. External channel connectors remain under Gateway Layer.',
+            'This landing page is for historical chat threads and escalated cases only. New support requests are handled via structured support requests. External channel connectors remain under Gateway Layer.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppColors.obsidian.withValues(alpha: 0.72),
                 ),

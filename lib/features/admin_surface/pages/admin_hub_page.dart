@@ -63,7 +63,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
   static const int openIssuesCount = 3;
   static const int aiDevOpsCount = 4;
   static const int domainAvailabilityCount = 2;
-  static const int whatsAppSignalsCount = 2;
+  static const int externalFollowUpCount = 2;
   late final Stream<int> _clinicianPendingStream;
   late final Stream<int> _clinicianProfileRequestsStream;
   late final Stream<int> _centersPendingStream;
@@ -497,7 +497,7 @@ $gatewayLines
         route: Routes.adminSessions,
       ),
       _QuickStatItem(
-        title: isArabic ? 'حالات دعم مصعّدة' : 'Escalated Support Cases',
+        title: isArabic ? 'حالات مصعّدة (سجل قديم)' : 'Escalated Cases (Historical)',
         group: AdminVisualGroup.support,
         stream: _escalationsOpenStream,
         crossSignalStream: _bookingOpenStream,
@@ -528,9 +528,9 @@ $gatewayLines
         route: Routes.adminDomainAvailability,
       ),
       _QuickStatItem(
-        title: isArabic ? 'إشارات واتساب' : 'WhatsApp Signals',
+        title: isArabic ? 'رسائل متابعة' : 'Follow-up Messages',
         group: AdminVisualGroup.support,
-        staticCount: whatsAppSignalsCount,
+        staticCount: externalFollowUpCount,
         route: Routes.adminCommunicationGateway,
       ),
       _QuickStatItem(
@@ -558,10 +558,10 @@ $gatewayLines
       ),
       _AdminSectionLaunchCardData(
         title: isArabic
-            ? 'المراجعة البشرية والتصعيد' : 'Human Review & Escalated Support',
+            ? 'المراجعة البشرية والسجل القديم' : 'Human Review & Historical Cases',
         subtitle: isArabic
-            ? 'مراجعة بشرية مطلوبة وحالات دعم مصعّدة للمتابعة فقط'
-            : 'Human review needed and escalated support cases for visibility only',
+            ? 'هذا القسم يعرض محادثات قديمة فقط. طلبات الدعم الجديدة تتم عبر نظام الطلبات المنظمة.'
+            : 'This section shows historical chat threads only. New support requests are handled via structured support requests.',
         icon: Icons.support_agent_outlined,
         group: AdminVisualGroup.support,
         route: Routes.adminCommunications,
@@ -621,7 +621,7 @@ $gatewayLines
         title: isArabic ? 'المتابعة وخدمة العملاء' : 'Customer Follow-up',
         subtitle: isArabic
             ? 'واتساب وطلبات الويب والبريد والمتابعة التشغيلية'
-            : 'WhatsApp, web requests, email, and operational follow-up',
+            : 'Web requests, email, and operational follow-up',
         icon: Icons.support_agent_outlined,
         group: AdminVisualGroup.support,
         route: Routes.customerFollowUpWorkspace,
@@ -643,6 +643,15 @@ $gatewayLines
         icon: Icons.campaign_outlined,
         group: AdminVisualGroup.analytics,
         route: Routes.marketingWorkspace,
+      ),
+      _AdminSectionLaunchCardData(
+        title: isArabic ? 'المتابعة الخارجية' : 'External Follow-up',
+        subtitle: isArabic
+            ? 'إدارة تسجيلات المتابعة والدعم والتهنئة والتوعية'
+            : 'Manage follow-up, support, greeting, and awareness registrations',
+        icon: Icons.mark_email_read_outlined,
+        group: AdminVisualGroup.support,
+        route: Routes.externalFollowUpWorkspace,
       ),
     ];
 
@@ -2296,8 +2305,8 @@ class _AdminDepartmentSection extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           Text(
             isArabic
-                ? 'مساحات تشغيل مستقلة للمتابعة والدعم التقني والتسويق.'
-                : 'Independent operating surfaces for follow-up, technical support, and marketing.',
+                ? 'مساحات تشغيل مستقلة للمتابعة والدعم التقني والتسويق والمتابعة الخارجية.'
+                : 'Independent operating surfaces for follow-up, technical support, marketing, and external follow-up.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: const Color(0xFFD6D8DA).withValues(alpha: 0.78),
             ),
@@ -3264,8 +3273,9 @@ class _ActiveConversationsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _ControlRoomCardShell(
-      title: 'Human Review Needed',
-      subtitle: 'Open support-only threads requiring human review',
+      title: 'Historical Conversations',
+      subtitle:
+          'This section shows historical chat threads. New support requests are handled via structured support requests.',
       group: AdminVisualGroup.support,
       child: _ControlRoomBodyFrame(
         child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -3296,15 +3306,15 @@ class _ActiveConversationsCard extends StatelessWidget {
                     runSpacing: AppSpacing.md,
                     children: const [
                       _StaticInfoChip(
-                        label: 'Human Review Needed: â€”',
+                        label: 'Historical Conversations: -',
                         group: AdminVisualGroup.support,
                       ),
                       _StaticInfoChip(
-                        label: 'Center Chats: â€”',
+                        label: 'Center Threads: -',
                         group: AdminVisualGroup.support,
                       ),
                       _StaticInfoChip(
-                        label: 'Client Chats: â€”',
+                        label: 'Client Threads: -',
                         group: AdminVisualGroup.support,
                       ),
                     ],
@@ -3312,7 +3322,7 @@ class _ActiveConversationsCard extends StatelessWidget {
                 else if (snapshot.connectionState == ConnectionState.active &&
                     docs.isEmpty)
                   const _ControlRoomEmptyState(
-                    message: 'No active conversations',
+                    message: 'No historical conversations',
                   )
                 else
                   Column(
@@ -3323,17 +3333,17 @@ class _ActiveConversationsCard extends StatelessWidget {
                         runSpacing: AppSpacing.md,
                         children: [
                           _ConversationCountChip(
-                            label: 'Human Review Needed',
+                            label: 'Historical Conversations',
                             count: '$humanSupportCount',
                             group: AdminVisualGroup.support,
                           ),
                           _ConversationCountChip(
-                            label: 'Center Chats',
+                            label: 'Center Threads',
                             count: '$centerChatsCount',
                             group: AdminVisualGroup.support,
                           ),
                           _ConversationCountChip(
-                            label: 'Client Chats',
+                            label: 'Client Threads',
                             count: '$clientChatsCount',
                             group: AdminVisualGroup.support,
                           ),
@@ -3596,7 +3606,7 @@ class _CriticalAlertsCard extends StatelessWidget {
                                   ),
                                   _StaticInfoChip(
                                     label:
-                                        'Human Review Needed: $unresolvedSupportChatsCount',
+                                        'Historical Conversations: $unresolvedSupportChatsCount',
                                     group: AdminVisualGroup.support,
                                   ),
                                   _StaticInfoChip(
@@ -3874,9 +3884,9 @@ class _BackendAnalyticsSummaryView extends StatelessWidget {
             ),
             _AnalyticsSummaryCard(
               title:
-                  isArabic ? 'توزيع فتح الشات حسب السياق' : 'Chat Context Mix',
+                  isArabic ? 'توزيع المحادثات السابقة حسب السياق' : 'Historical Conversation Mix',
               helper: isArabic
-                  ? 'سياقات فتح الشات من الملخص المحفوظ.' : 'Chat open contexts from the latest stored summary.',
+                  ? 'سياقات المحادثات السابقة من الملخص المحفوظ.' : 'Historical chat contexts from the latest stored summary.',
               child: _ChatContextSummary(
                 isArabic: isArabic,
                 counts: chatSplit,
@@ -3956,9 +3966,9 @@ class _LocalAnalyticsSummaryView extends StatelessWidget {
                 ),
                 _AnalyticsSummaryCard(
                   title:
-                      isArabic ? 'توزيع فتح الشات حسب السياق' : 'Chat Context Mix',
+                      isArabic ? 'توزيع المحادثات السابقة حسب السياق' : 'Historical Conversation Mix',
                   helper: isArabic
-                      ? 'الشات العام، والأسرة، والتعافي داخل هذه الجلسة.' : 'General, family, and recovery chat openings in this session.',
+                      ? 'الشات العام، والأسرة، والتعافي داخل هذه الجلسة كسجل تاريخي.' : 'General, family, and recovery chat openings in this session as historical context.',
                   child: _ChatContextSummary(
                     isArabic: isArabic,
                     counts: chatSplit,

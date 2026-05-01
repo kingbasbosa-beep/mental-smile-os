@@ -213,22 +213,24 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
             isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
-            isArabic ? 'مراجعة بشرية مطلوبة' : 'Human Review Needed',
+            isArabic
+                ? 'دعم إداري قديم (أرشيف)'
+                : 'Legacy Admin Support (Historical)',
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             isArabic
-                ? 'يعرض هذا السطح محادثات تحتاج مراجعة بشرية، مع تمييز الدعم المباشر من الإدارة عن التصعيد المكتشف بواسطة النظام.'
-                : 'This surface shows structured admin support requests and admin replies inside the app.',
+                ? 'هذا القسم يعرض محادثات قديمة فقط، مع تمييز الدعم الإداري القديم عن الحالات المصعّدة التاريخية.'
+                : 'This section shows historical chat threads only, separating legacy admin support from historical escalated cases.',
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             isArabic
-                ? 'يرجى الرد للإرشاد فقط، وتحويل أي طلب تغييري إلى الإجراءات داخل النظام.'
-                : 'Use this inbox for structured admin support requests and replies, not as an escalation path.',
+                ? 'هذا القسم يعرض محادثات قديمة فقط. طلبات الدعم الجديدة تتم عبر نظام الطلبات المنظمة.'
+                : 'This section shows historical chat threads. New support requests are handled via structured support requests.',
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.obsidian.withValues(alpha: 0.72),
@@ -250,7 +252,7 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
         backgroundColor: const Color(0xFF0F1316),
         appBar: AppShellActions.buildAppBar(
           context,
-          title: isArabic ? 'رسائل الإدارة' : 'Admin Messages',
+          title: isArabic ? 'محادثات الدعم القديمة' : 'Legacy Support Threads',
           canLogout: false,
         ),
         body: Container(
@@ -271,8 +273,8 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
               if (snapshot.hasError) {
                 return AppEmptyState(
                   message: isArabic
-                      ? 'تعذر تحميل رسائل الإدارة'
-                      : 'Unable to load admin chats',
+                      ? 'تعذر تحميل محادثات الدعم القديمة'
+                      : 'Unable to load legacy support threads',
                   icon: Icons.error_outline,
                 );
               }
@@ -286,8 +288,8 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
               if (threads.isEmpty) {
                 return AppEmptyState(
                   message: isArabic
-                      ? 'لا توجد محادثات تتطلب مراجعة بشرية'
-                      : 'No structured admin support requests',
+                      ? 'لا توجد محادثات دعم قديمة'
+                      : 'No legacy support threads',
                   icon: Icons.support_agent_outlined,
                 );
               }

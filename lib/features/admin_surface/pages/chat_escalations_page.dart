@@ -263,10 +263,17 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('حالات دعم مصعّدة'),
+          title: const Text('حالات مصعّدة (سجل قديم)'),
         ),
         body: Column(
           children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: Text(
+                'هذا القسم يعرض محادثات قديمة فقط. طلبات الدعم الجديدة تتم عبر نظام الطلبات المنظمة.',
+                textAlign: TextAlign.right,
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: Wrap(
@@ -318,7 +325,7 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
                           if (snapshot.hasError) {
                             return Center(
                               child: Text(
-                                  'فشل تحميل حالات الدعم المصعّدة: ${snapshot.error}'),
+                                  'فشل تحميل الحالات المصعّدة التاريخية: ${snapshot.error}'),
                             );
                           }
 
@@ -330,7 +337,7 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
                           final items = _applyFilter(snapshot.data ?? []);
                           if (items.isEmpty) {
                             return const Center(
-                              child: Text('لا توجد حالات مطابقة لهذا الفلتر'),
+                              child: Text('لا توجد حالات تاريخية مطابقة لهذا الفلتر'),
                             );
                           }
 
@@ -480,7 +487,7 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
                                                 },
                                               );
                                             },
-                                            child: const Text('فتح الشات'),
+                                            child: const Text('فتح المحادثة القديمة'),
                                           ),
                                           if (isAdminUser &&
                                               (e.status == 'open' ||

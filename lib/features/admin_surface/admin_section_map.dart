@@ -57,15 +57,17 @@ const List<AdminSectionEntry> adminSectionEntries = [
   ),
   AdminSectionEntry(
     route: Routes.adminSupportChats,
-    title: 'Messages & Support',
+    title: 'Legacy Support Threads',
     section: AdminTopLevelSection.communications,
-    purpose: 'Human support inbox and direct admin conversations.',
+    purpose:
+        'Historical chat threads only. New support requests are handled via structured support requests.',
   ),
   AdminSectionEntry(
     route: Routes.chatEscalations,
-    title: 'Chat Escalations',
+    title: 'Escalated Cases (Historical)',
     section: AdminTopLevelSection.communications,
-    purpose: 'Escalated conversation cases and communication triage.',
+    purpose:
+        'Historical escalated cases only. New support requests are handled via structured support requests.',
   ),
   AdminSectionEntry(
     route: Routes.adminClinicianRequests,
