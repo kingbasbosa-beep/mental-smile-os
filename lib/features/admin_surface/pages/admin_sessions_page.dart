@@ -733,7 +733,9 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
       child: Scaffold(
         appBar: AppShellActions.buildAppBar(
           context,
-          title: isArabic ? 'الجلسات والإقامات' : 'Sessions & Residencies',
+          title: isArabic
+              ? 'مراقبة الجلسات والإقامات والاستثناءات'
+              : 'Sessions Monitoring & Exception Control',
         ),
         body: AppPageBackground(
           child:
@@ -784,8 +786,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                         const SizedBox(height: AppSpacing.xs),
                         Text(
                           isArabic
-                              ? 'التركيز: جاهزية الجلسات، العوائق، تأكيدات البدء، وحالات الاسترداد.'
-                              : 'Focus: session readiness, blockers, start confirmations, and recovery cases.',
+                              ? 'هذا القسم مخصص لمراقبة سير النظام. الإجراءات هنا استثنائية ولا تمثل المسار الطبيعي للتشغيل.'
+                              : 'This section monitors system flows. Actions here are exception-based and should not replace normal workflow progression.',
                           textAlign: isArabic ? TextAlign.right : TextAlign.left,
                           style:
                               Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -803,7 +805,9 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                             ChoiceChip(
                               selected: _tab == 'session_setup_pending',
                               label: Text(
-                                isArabic ? 'بانتظار التجهيز' : 'Setup pending',
+                                isArabic
+                                    ? 'جاهزية الجلسات'
+                                    : 'Session readiness',
                               ),
                               onSelected: (_) => setState(
                                   () => _tab = 'session_setup_pending'),
@@ -811,7 +815,9 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                             ChoiceChip(
                               selected: _tab == 'reschedule_pending',
                               label: Text(
-                                isArabic ? 'إعادة جدولة' : 'Reschedule',
+                                isArabic
+                                    ? 'استثناءات إعادة الجدولة'
+                                    : 'Reschedule exceptions',
                               ),
                               onSelected: (_) =>
                                   setState(() => _tab = 'reschedule_pending'),
@@ -830,7 +836,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                               label: Text(
                                 isArabic
                                     ? 'بانتظار التقارير/التقييمات'
-                                    : 'Pending reviews',
+                                    : 'Requests needing review',
                               ),
                               onSelected: (_) => setState(
                                 () =>
@@ -1236,7 +1242,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   Text(
                                     isArabic
                                         ? 'Ø§Ù„Ø®Ø·ÙˆØ© Ø§Ù„Ù…Ù†Ø¸Ù…Ø© Ø§Ù„ØªØ§Ù„ÙŠØ©: $nextStructuredStep'
-                                        : 'Next structured step: $nextStructuredStep',
+                                        : 'Next expected step: $nextStructuredStep',
                                     textAlign: isArabic
                                         ? TextAlign.right
                                         : TextAlign.left,
@@ -1245,7 +1251,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   Text(
                                     isArabic
                                         ? 'Ø¥Ø´Ø§Ø±Ø© Ø§Ù„Ù…Ù„ÙƒÙŠØ©: $ownershipCue'
-                                        : 'Ownership cue: $ownershipCue',
+                                        : 'Current owner: $ownershipCue',
                                     textAlign: isArabic
                                         ? TextAlign.right
                                         : TextAlign.left,
@@ -1755,7 +1761,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                   title: Text(
                                     isArabic
                                         ? 'Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª Ø§Ø³ØªØ«Ù†Ø§Ø¦ÙŠØ© / Ø§Ø³ØªØ±Ø¯Ø§Ø¯ Ø§Ù„Ù…Ø³Ø§Ø±'
-                                        : 'Fallback / Recovery Actions',
+                                        : 'Exception / Recovery Actions',
                                     textAlign:
                                         isArabic ? TextAlign.right : TextAlign.left,
                                     style: Theme.of(context)
@@ -1790,7 +1796,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                             label: Text(
                                               isArabic
                                                   ? 'Ø¥Ù†Ø´Ø§Ø¡/Ø¬Ø¯ÙˆÙ„Ø© Ø§Ù„Ø¬Ù„Ø³Ø©'
-                                                  : 'Schedule session',
+                                                  : 'Prepare session (Exception)',
                                             ),
                                           ),
                                         if (canMarkInProgressAction)
@@ -1808,8 +1814,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                                       ? 'ØªØ¹Ù„ÙŠÙ… ÙƒØ¥Ù‚Ø§Ù…Ø© Ø¬Ø§Ø±ÙŠØ©'
                                                       : 'ØªØ¹Ù„ÙŠÙ… ÙƒØ¬Ù„Ø³Ø© Ø¬Ø§Ø±ÙŠØ©')
                                                   : (isCenterRequest
-                                                      ? 'Mark residency in progress'
-                                                      : 'Mark in progress'),
+                                                      ? 'Mark residency as in progress (Override)'
+                                                      : 'Mark session as in progress (Override)'),
                                             ),
                                           ),
                                         if (canShowResidencyStartHint)
@@ -1838,8 +1844,8 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                                       ? 'ØªØ¹Ù„ÙŠÙ… ÙƒØ¥Ù‚Ø§Ù…Ø© Ù…ÙƒØªÙ…Ù„Ø©'
                                                       : 'ØªØ¹Ù„ÙŠÙ… ÙƒÙ…ÙƒØªÙ…Ù„Ø©')
                                                   : (isCenterRequest
-                                                      ? 'Mark residency completed'
-                                                      : 'Mark completed'),
+                                                      ? 'Mark residency completed (Override)'
+                                                      : 'Mark session completed (Override)'),
                                             ),
                                           ),
                                         if (canRescheduleAction)
@@ -1853,7 +1859,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
                                             label: Text(
                                               isArabic
                                                   ? 'Ø¥Ø¹Ø§Ø¯Ø© Ø¬Ø¯ÙˆÙ„Ø©'
-                                                  : 'Reschedule',
+                                                  : 'Move to reschedule (Exception)',
                                             ),
                                           ),
                                       ],

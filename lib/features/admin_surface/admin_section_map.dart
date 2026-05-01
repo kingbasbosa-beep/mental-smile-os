@@ -33,21 +33,24 @@ const List<AdminSectionEntry> adminSectionEntries = [
   ),
   AdminSectionEntry(
     route: '/admin/booking-queue',
-    title: 'Booking Requests',
+    title: 'Booking Monitoring & Exception Board',
     section: AdminTopLevelSection.operations,
-    purpose: 'Primary operational intake and workflow queue.',
+    purpose:
+        'Monitoring and exception review for booking flow signals. Normal workflow progression should remain with the core owners.',
   ),
   AdminSectionEntry(
     route: Routes.adminPayments,
-    title: 'Payments & Transfers',
+    title: 'Payment Monitoring & Financial Gate',
     section: AdminTopLevelSection.operations,
-    purpose: 'Payment review, approvals, and payout-related actions.',
+    purpose:
+        'Monitoring, financial gate review, and exception-only payout confirmation. Normal flow ownership should remain outside Control Room.',
   ),
   AdminSectionEntry(
     route: Routes.adminSessions,
-    title: 'Sessions & Links',
+    title: 'Sessions Monitoring & Exception Control',
     section: AdminTopLevelSection.operations,
-    purpose: 'Scheduling, session links, codes, and session state actions.',
+    purpose:
+        'Session readiness monitoring, link visibility, and exception-only state correction. Normal workflow progression should remain with the core owners.',
   ),
   AdminSectionEntry(
     route: Routes.adminSessionReport,
@@ -109,7 +112,8 @@ const List<AdminSectionEntry> adminSectionEntries = [
     route: '/admin/alerts-review',
     title: 'Alerts Review',
     section: AdminTopLevelSection.controlRoom,
-    purpose: 'Detailed review of generated operational alerts.',
+    purpose:
+        'Detailed review of generated operational alerts for monitoring and exception handling.',
   ),
   AdminSectionEntry(
     route: Routes.adminArchive,

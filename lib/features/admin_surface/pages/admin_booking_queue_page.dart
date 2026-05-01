@@ -76,8 +76,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
   static const List<Map<String, String>> _tabs = [
     {
       'key': 'pending_admin',
-      'labelAr': 'بانتظار الإدارة',
-      'labelEn': 'Pending admin'
+      'labelAr': 'طلبات تحتاج انتباه',
+      'labelEn': 'Requests requiring attention'
     },
     {
       'key': 'client_update_required',
@@ -91,13 +91,13 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     },
     {
       'key': 'payment_review',
-      'labelAr': 'مراجعة السداد',
-      'labelEn': 'Payment review'
+      'labelAr': 'بوابة مراقبة السداد',
+      'labelEn': 'Payment monitoring gate'
     },
     {
       'key': 'reschedule_pending',
-      'labelAr': 'إعادة جدولة',
-      'labelEn': 'Reschedule'
+      'labelAr': 'استثناءات إعادة الجدولة',
+      'labelEn': 'Reschedule exceptions'
     },
     {
       'key': 'cancellation_pending',
@@ -127,23 +127,23 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     },
     {
       'key': 'session_setup_pending',
-      'labelAr': 'تجهيز الجلسة',
-      'labelEn': 'Session setup'
+      'labelAr': 'جاهزية الجلسات',
+      'labelEn': 'Session readiness'
     },
     {
       'key': 'session_scheduled',
-      'labelAr': 'جلسات مجدولة',
-      'labelEn': 'Scheduled sessions'
+      'labelAr': 'جلسات تحت المراقبة',
+      'labelEn': 'Scheduled monitoring'
     },
     {
       'key': 'session_completed_pending_reviews',
-      'labelAr': 'بانتظار التقييمات',
-      'labelEn': 'Pending reviews'
+      'labelAr': 'طلبات تحتاج مراجعة',
+      'labelEn': 'Requests needing review'
     },
     {
       'key': 'payout_pending',
-      'labelAr': 'بانتظار تحويل المستحق',
-      'labelEn': 'Payout pending'
+      'labelAr': 'مستحقات تحتاج تأكيد',
+      'labelEn': 'Payout confirmation pending'
     },
     {
       'key': 'completed_success',
@@ -1099,7 +1099,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       case 'awaiting_payment':
         return isArabic ? 'بانتظار التحويل المالي' : 'Awaiting payment';
       case 'payment_review':
-        return isArabic ? 'مراجعة السداد' : 'Payment review';
+        return isArabic ? 'مراقبة السداد' : 'Payment monitoring';
       case 'session_setup_pending':
         return isArabic
             ? 'تجهيز إقامة بعد توصية المركز'
@@ -1305,7 +1305,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                 ? 'بانتظار رفع إثبات السداد من العميل'
                 : 'Waiting for client payment proof');
       case 'payment_review':
-        return isArabic ? 'بانتظار مراجعة السداد' : 'Waiting for payment review';
+        return isArabic
+            ? 'بانتظار مراقبة السداد'
+            : 'Waiting for payment monitoring';
       case 'session_setup_pending':
         return isArabic
             ? 'بانتظار تجهيز ما قبل فتح الدفع أو الجلسة'
@@ -1396,7 +1398,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                 ? 'العميل يرفع إثبات السداد'
                 : 'Client uploads payment proof');
       case 'payment_review':
-        return isArabic ? 'اعتماد أو رفض السداد' : 'Approve or reject payment';
+        return isArabic
+            ? 'تأكيد إشارة السداد أو وسم المشكلة'
+            : 'Confirm payment signal or flag an issue';
       case 'session_setup_pending':
         return isArabic
             ? 'مراجعة التجهيز أو فتح الدفع'
@@ -1810,14 +1814,14 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                       context: context,
                       isArabic: isArabic,
                       arLabel: 'الخطوة المنظمة التالية',
-                      enLabel: 'Next structured step',
+                      enLabel: 'Next expected step',
                       value: nextStructuredStep,
                     ),
                     _buildDetailLine(
                       context: context,
                       isArabic: isArabic,
                       arLabel: 'إشارة الملكية',
-                      enLabel: 'Ownership cue',
+                      enLabel: 'Current owner',
                       value: ownershipCue,
                     ),
                   ],
@@ -2233,7 +2237,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                             busy ? null : () => _approvePayment(requestId),
                         icon: const Icon(Icons.verified_outlined),
                         label: Text(
-                          isArabic ? 'اعتماد السداد' : 'Approve payment',
+                          isArabic
+                              ? 'تأكيد إشارة السداد'
+                              : 'Confirm payment signal',
                         ),
                       ),
                     if (canReviewPayment)
@@ -2242,7 +2248,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                             busy ? null : () => _rejectPayment(requestId),
                         icon: const Icon(Icons.cancel_outlined),
                         label: Text(
-                          isArabic ? 'رفض السداد' : 'Reject payment',
+                          isArabic ? 'وسم مشكلة السداد' : 'Flag payment issue',
                         ),
                       ),
                     if (!isCenterRequest && status == 'payout_pending')
@@ -2254,7 +2260,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                         label: Text(
                           isArabic
                               ? 'تم تحويل مستحق الأخصائي'
-                              : 'Confirm clinician payout',
+                              : 'Confirm payout transfer',
                         ),
                       ),
                     if (canRunAccountingReview)
@@ -2265,7 +2271,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                                 _confirmCenterAccountingReview(requestId, data),
                         icon: const Icon(Icons.calculate_outlined),
                         label: Text(
-                          isArabic ? 'مراجعة محاسبية' : 'Accounting review',
+                          isArabic
+                              ? 'تأكيد المراجعة المحاسبية'
+                              : 'Confirm accounting review',
                         ),
                       ),
                     if (canConfirmCenterPayout)
@@ -2277,7 +2285,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                         label: Text(
                           isArabic
                               ? 'تم تحويل مستحق المركز'
-                              : 'Confirm center payout',
+                              : 'Confirm payout transfer',
                         ),
                       ),
                     if (status == 'completed_success' && !archived)
@@ -2337,7 +2345,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                     title: Text(
                       isArabic
                           ? 'إجراءات الاسترداد / التوافق'
-                          : 'Fallback / Compatibility Actions',
+                          : 'Exception / Compatibility Actions',
                       textAlign: isArabic ? TextAlign.right : TextAlign.left,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w800,
@@ -2365,7 +2373,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                               label: Text(
                                 isArabic
                                     ? 'نقل للمتابعة'
-                                    : 'Move to follow-up',
+                                    : 'Route to follow-up (Exception)',
                               ),
                             ),
                           if (canAssignClinician)
@@ -2381,8 +2389,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                                   const Icon(Icons.forward_to_inbox_outlined),
                               label: Text(
                                 isArabic
-                                    ? 'استعادة توافق: تحويل للأخصائي'
-                                    : 'Compatibility forward',
+                                    ? 'تحويل للأخصائي (استثناء)'
+                                    : 'Assign clinician (Exception)',
                               ),
                             ),
                           if (canApproveCenter)
@@ -2394,7 +2402,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                               label: Text(
                                 isArabic
                                     ? 'اعتماد وفتح الجدولة'
-                                    : 'Approve and open scheduling',
+                                    : 'Review and open scheduling',
                               ),
                             ),
                           if (canOpenCenterIntake)
@@ -2461,7 +2469,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
       child: Scaffold(
         appBar: AppShellActions.buildAppBar(
           context,
-          title: isArabic ? 'لوحة متابعة الطلبات' : 'Booking workflow pipeline',
+          title: isArabic
+              ? 'لوحة مراقبة الحجوزات والاستثناءات'
+              : 'Booking Monitoring & Exception Board',
           canLogout: false,
         ),
         body: AppPageBackground(
@@ -2561,8 +2571,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                             const SizedBox(height: AppSpacing.xs),
                             Text(
                               isArabic
-                                  ? 'هذه الصفحة لمراقبة الطلبات والعوائق والبوابات المالية والاستثناءات؛ وليست ملكية تشغيل يومية للمسارات المنظمة.'
-                                  : 'This page monitors requests, blockers, financial gates, and exceptions; it is not daily operational ownership of structured flows.',
+                                  ? 'هذا القسم مخصص لمراقبة سير النظام. الإجراءات هنا استثنائية ولا تمثل المسار الطبيعي للتشغيل.'
+                                  : 'This section monitors system flows. Actions here are exception-based and should not replace normal workflow progression.',
                               textAlign:
                                   isArabic ? TextAlign.right : TextAlign.left,
                               style: Theme.of(context)
@@ -2606,8 +2616,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                             color: const Color(0xFFF8FAFC),
                             child: Text(
                               isArabic
-                                  ? 'تعرض هذه المرحلة طلبات المراكز وحالات الأخصائي القديمة فقط. طلبات الأخصائي الجديدة تظهر مباشرة في تبويب بانتظار رد الأخصائي.'
-                                  : 'This stage shows center requests and legacy clinician fallback records only. New clinician requests appear directly under Awaiting clinician.',
+                                  ? 'تعرض هذه المرحلة الحالات التي تحتاج انتباهًا أو معالجة استثنائية فقط. المسارات الطبيعية تستمر مع المالك الأساسي للحالة.'
+                                  : 'This stage shows requests that need attention or exception handling only. Normal workflow progression remains with the current owner.',
                               textAlign:
                                   isArabic ? TextAlign.right : TextAlign.left,
                               style: Theme.of(context)
@@ -2625,8 +2635,8 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                             color: const Color(0xFFF8FAFC),
                             child: Text(
                               isArabic
-                                  ? 'هذا هو المسار الطبيعي لطلبات الأخصائي الجديدة. مسار التحويل الإداري باقٍ فقط لاستعادة التوافق مع السجلات القديمة.'
-                                  : 'This is the normal path for new clinician requests. Admin forwarding remains only as a compatibility fallback for older records.',
+                                  ? 'هذا هو المسار الطبيعي لطلبات الأخصائي الجديدة. أي تدخل إداري هنا يظل استثنائيًا فقط لاستعادة التوافق مع السجلات القديمة.'
+                                  : 'This is the normal path for new clinician requests. Any admin action here remains exception-only for older compatibility records.',
                               textAlign:
                                   isArabic ? TextAlign.right : TextAlign.left,
                               style: Theme.of(context)

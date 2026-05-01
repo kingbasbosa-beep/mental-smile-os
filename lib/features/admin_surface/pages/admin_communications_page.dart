@@ -12,7 +12,7 @@ class AdminCommunicationsPage extends StatelessWidget {
       backgroundColor: AppColors.warmIvory,
       appBar: AppShellActions.buildAppBar(
         context,
-        title: 'Communications',
+        title: 'Control Room Communications (Historical)',
       ),
       body: AppPageBackground(
         child: ListView(
@@ -30,7 +30,7 @@ class AdminCommunicationsPage extends StatelessWidget {
             _CommunicationsEntryCard(
               title: 'Escalated Cases (Historical)',
               summary:
-                  'Escalated Cases (Historical). This section shows historical chat threads. New support requests are handled via structured support requests.',
+                  'This section shows historical escalated cases only. New support requests are handled via structured support requests.',
               route: Routes.chatEscalations,
             ),
           ],
@@ -50,14 +50,14 @@ class _CommunicationsIntroCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Communications',
+            'Control Room Communications (Historical)',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'This landing page is for historical chat threads and escalated cases only. New support requests are handled via structured support requests. External channel connectors remain under Gateway Layer.',
+            'This section monitors historical communication records only. New support requests are handled via structured support requests, and actions here are exception-based rather than normal workflow ownership.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppColors.obsidian.withValues(alpha: 0.72),
                 ),

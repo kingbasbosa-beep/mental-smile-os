@@ -333,7 +333,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
         (data['accountingReviewStatus'] ?? '').toString();
 
     if (_isInPaymentReview(data)) {
-      return isArabic ? 'بانتظار مراجعة السداد' : 'Payment review';
+      return isArabic ? 'بانتظار مراقبة السداد' : 'Payment monitoring';
     }
 
     if (status == 'payout_pending') {
@@ -445,13 +445,13 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
     if (_isInPaymentReview(data)) {
       return isArabic
           ? 'اعتماد أو رفض إثبات السداد'
-          : 'Approve or reject payment proof';
+          : 'Confirm payment signal or flag an issue';
     }
     if (status == 'payout_pending') {
       if (requestKind == 'center' && accountingReviewStatus != 'confirmed') {
         return isArabic
             ? 'مراجعة محاسبية قبل التحويل'
-            : 'Accounting review before payout';
+            : 'Confirm accounting review before payout';
       }
       return isArabic
           ? 'تأكيد تحويل المستحق'
@@ -478,7 +478,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
       if (requestKind == 'center' && accountingReviewStatus != 'confirmed') {
         return isArabic
             ? 'إكمال المراجعة المحاسبية'
-            : 'Complete accounting review';
+            : 'Complete accounting review exception';
       }
       return isArabic ? 'تأكيد التحويل' : 'Confirm payout';
     }
@@ -568,8 +568,8 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
         appBar: AppShellActions.buildAppBar(
           context,
           title: isArabic
-              ? 'بوابات السداد والمحاسبة'
-              : 'Payment & Accounting Gates',
+              ? 'مراقبة المدفوعات والبوابة المالية'
+              : 'Payment Monitoring & Financial Gate',
         ),
         body: AppPageBackground(
           child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -625,8 +625,8 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                       children: [
                         Text(
                           isArabic
-                              ? 'بوابة مالية من غرفة التحكم'
-                              : 'Control-Room Financial Gate',
+                              ? 'مراقبة المدفوعات والبوابة المالية'
+                              : 'Payment Monitoring & Financial Gate',
                           textAlign:
                               isArabic ? TextAlign.right : TextAlign.left,
                           style:
@@ -637,8 +637,8 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                         const SizedBox(height: AppSpacing.xs),
                         Text(
                           isArabic
-                              ? 'التركيز: المدفوعات التي تحتاج مراجعة أو اعتماد. تبقى المراحل الأخرى للمستحقات والإغلاق المالي.'
-                              : 'Focus: payments requiring review or approval. Later stages remain available for payout and financial closeout.',
+                              ? 'هذا القسم مخصص لمراقبة سير النظام. الإجراءات هنا استثنائية ولا تمثل المسار الطبيعي للتشغيل.'
+                              : 'This section monitors system flows. Actions here are exception-based and should not replace normal workflow progression.',
                           textAlign:
                               isArabic ? TextAlign.right : TextAlign.left,
                           style:
@@ -658,8 +658,8 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                               selected: _tab == 'payment_review',
                               label: Text(
                                 isArabic
-                                    ? 'بوابة مراجعة السداد'
-                                    : 'Payment review gate',
+                                    ? 'بوابة مراقبة السداد'
+                                    : 'Payment monitoring gate',
                               ),
                               onSelected: (_) =>
                                   setState(() => _tab = 'payment_review'),
@@ -882,7 +882,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                   Text(
                                     isArabic
                                         ? 'بوابة مالية / الخطوة التالية'
-                                        : 'Financial Gate / Next Step',
+                                    : 'Why this is here / Next expected step',
                                     textAlign: isArabic
                                         ? TextAlign.right
                                         : TextAlign.left,
@@ -906,7 +906,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                   Text(
                                     isArabic
                                         ? 'البوابة المالية المطلوبة: $requiredGate'
-                                        : 'Required financial/admin gate: $requiredGate',
+                                        : 'Exception action (if needed): $requiredGate',
                                     textAlign: isArabic
                                         ? TextAlign.right
                                         : TextAlign.left,
@@ -915,7 +915,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                   Text(
                                     isArabic
                                         ? 'الخطوة المنظمة التالية: $nextStructuredStep'
-                                        : 'Next structured step: $nextStructuredStep',
+                                        : 'Next expected step: $nextStructuredStep',
                                     textAlign: isArabic
                                         ? TextAlign.right
                                         : TextAlign.left,
@@ -924,7 +924,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                   Text(
                                     isArabic
                                         ? 'إشارة الملكية: $ownershipCue'
-                                        : 'Ownership cue: $ownershipCue',
+                                        : 'Current owner: $ownershipCue',
                                     textAlign: isArabic
                                         ? TextAlign.right
                                         : TextAlign.left,
@@ -977,7 +977,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                               Text(
                                 isArabic
                                     ? 'إجراءات البوابة المالية'
-                                    : 'Financial Gate Actions',
+                                    : 'Exception Actions (if needed)',
                                 textAlign:
                                     isArabic ? TextAlign.right : TextAlign.left,
                                 style: Theme.of(context)
@@ -1002,7 +1002,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                       label: Text(
                                         isArabic
                                             ? 'اعتماد السداد'
-                                            : 'Approve payment',
+                                            : 'Confirm payment signal',
                                       ),
                                     ),
                                   if (_isInPaymentReview(data))
@@ -1014,7 +1014,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                       label: Text(
                                         isArabic
                                             ? 'رفض السداد'
-                                            : 'Reject payment',
+                                            : 'Flag payment issue',
                                       ),
                                       style: appDestructiveButtonStyle(),
                                     ),
@@ -1029,7 +1029,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                       label: Text(
                                         isArabic
                                             ? 'تم تحويل مستحق الأخصائي'
-                                            : 'Confirm clinician payout',
+                                            : 'Confirm payout transfer',
                                       ),
                                     ),
                                   if (status == 'payout_pending' &&
@@ -1047,7 +1047,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                       label: Text(
                                         isArabic
                                             ? 'مراجعة محاسبية'
-                                            : 'Accounting review',
+                                            : 'Confirm accounting review',
                                       ),
                                     ),
                                   if (status == 'payout_pending' &&
@@ -1065,7 +1065,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                       label: Text(
                                         isArabic
                                             ? 'تم تحويل مستحق المركز'
-                                            : 'Confirm center payout',
+                                            : 'Confirm payout transfer',
                                       ),
                                     ),
                                 ],
@@ -1076,7 +1076,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                               Text(
                                 isArabic
                                     ? 'بوابة الإغلاق والأرشفة'
-                                    : 'Closeout / Archive Gate',
+                                    : 'Archive / Historical Closeout',
                                 textAlign:
                                     isArabic ? TextAlign.right : TextAlign.left,
                                 style: Theme.of(context)

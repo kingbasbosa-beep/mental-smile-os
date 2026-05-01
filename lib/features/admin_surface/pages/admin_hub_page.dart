@@ -485,7 +485,7 @@ $gatewayLines
         route: Routes.adminOperations,
       ),
       _QuickStatItem(
-        title: isArabic ? 'السداد تحت المراجعة' : 'Payment review',
+        title: isArabic ? 'بوابة مراقبة السداد' : 'Payment monitoring gate',
         group: AdminVisualGroup.payments,
         stream: _paymentsReviewStream,
         route: Routes.adminPayments,
@@ -504,7 +504,7 @@ $gatewayLines
         route: Routes.adminSupportChats,
       ),
       _QuickStatItem(
-        title: isArabic ? 'بوابات اعتماد معلقة' : 'Pending approval gates',
+        title: isArabic ? 'طلبات تحتاج انتباه' : 'Requests Requiring Attention',
         group: AdminVisualGroup.requests,
         stream: _pendingApprovalsStream,
         route: Routes.adminClinicianRequests,
@@ -4199,7 +4199,7 @@ class _ControlRoomIntro extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'System awareness for health, blockers, gates, support signals, and exceptions.',
+            'System awareness for health, blockers, gates, support signals, and exceptions. This section monitors system flows. Actions here are exception-based and should not replace normal workflow progression.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: const Color(0xFF314A5C).withValues(alpha: 0.88),
                 ),
