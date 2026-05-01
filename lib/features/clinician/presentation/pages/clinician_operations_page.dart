@@ -542,17 +542,19 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
       builder: (context, msgSnapshot) {
         final count = msgSnapshot.data ?? 0;
         return _SectionCard(
-          title: isArabic ? 'الشات مع الإدارة' : 'Chat with admin',
+          title: isArabic ? 'طلب دعم' : 'Support Request',
           subtitle: isArabic
-              ? 'عدد المحادثات المفتوحة مع الإدارة: $count'
-              : 'Open conversations with admin: $count',
+              ? 'عدد طلبات الدعم الحالية: $count'
+              : 'Current support requests count: $count',
           icon: Icons.chat_bubble_outline_rounded,
-          actionLabel: isArabic ? 'فتح الشات' : 'Open chat',
+          actionLabel: isArabic
+              ? 'إرسال طلب دعم'
+              : 'Send support request',
           onTap: _clinicianHomeActionsEnabled
               ? () {
                   Navigator.of(context).pushNamed(
-                    Routes.chat,
-                    arguments: const {'mode': 'admin_support'},
+                    Routes.supportIssueSelector,
+                    arguments: const {'supportType': 'clinician_support'},
                   );
                 }
               : null,

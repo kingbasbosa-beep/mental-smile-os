@@ -383,11 +383,11 @@ class ClientDashboardPage extends StatelessWidget {
                       final count = snap.data ?? 0;
                       return _SectionCard(
                         title: isArabic
-                            ? 'الرسائل مع الإدارة'
-                            : 'Messages with Admin',
+                            ? 'طلبات الدعم'
+                            : 'Support Requests',
                         subtitle: isArabic
-                            ? 'عدد محادثات الإدارة المفتوحة: $count'
-                            : 'Open admin conversations count: $count',
+                            ? 'عدد طلبات الدعم الحالية: $count'
+                            : 'Current support requests count: $count',
                         icon: Icons.chat_bubble_outline_rounded,
                         actionLabel: isArabic
                             ? 'إرسال طلب دعم'

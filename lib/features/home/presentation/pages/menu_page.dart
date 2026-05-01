@@ -206,8 +206,8 @@ class MenuPage extends StatelessWidget {
       _MenuCardData(
         title: isArabic ? 'دعم المدمن المتعافي' : 'Recovered Addict Support',
         subtitle: isArabic
-            ? 'دعم هادئ للتعافي مع المختصين والمراكز والشات'
-            : 'A calm recovery path across specialists, centers, and support chat',
+            ? 'دعم هادئ للتعافي مع المختصين والمراكز وطلب دعم منظم'
+            : 'A calm recovery path across specialists, centers, and structured support',
         icon: Icons.healing_outlined,
         route: Routes.addiction,
         assetPath: 'c7_branding/home/home_bg.png',

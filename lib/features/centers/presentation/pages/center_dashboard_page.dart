@@ -334,19 +334,21 @@ class CenterDashboardPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   _SectionCard(
-                    title: isArabic ? 'الشات مع الإدارة' : 'Chat with Admin',
+                    title: isArabic ? 'طلب دعم' : 'Support Request',
                     subtitle: isArabic
                         ? 'قناة مباشرة وآمنة للتواصل مع الإدارة والمتابعة'
-                        : 'A direct and safe channel to communicate with admin',
+                        : 'Choose the issue type so it can be received as a structured support request',
                     icon: Icons.chat_bubble_outline_rounded,
                     accent: const Color(0xFF496D7C),
-                    badgeLabel: isArabic ? 'دعم إداري' : 'Admin Support',
+                    badgeLabel: isArabic ? 'دعم منظم' : 'Structured Support',
                     assetPath: 'c7_branding/logo/logo_mark.png',
-                    actionLabel: isArabic ? 'فتح الشات' : 'Open chat',
+                    actionLabel: isArabic
+                        ? 'إرسال طلب دعم'
+                        : 'Send support request',
                     onTap: () => Navigator.pushNamed(
                       context,
-                      Routes.chat,
-                      arguments: const {'mode': 'admin_support'},
+                      Routes.supportIssueSelector,
+                      arguments: const {'supportType': 'center_support'},
                     ),
                   ),
                   const SizedBox(height: 12),

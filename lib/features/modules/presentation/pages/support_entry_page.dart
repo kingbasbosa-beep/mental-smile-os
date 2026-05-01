@@ -10,9 +10,9 @@ class SupportEntryPage extends StatelessWidget {
       : _titleAr = 'ابدأ مسار دعم التعافي',
         _titleEn = 'Start Recovery Support',
         _subtitleAr =
-            'نقطة بداية هادئة لاختيار الدعم المناسب: مختص، مركز، مواد مفيدة، أو شات عند الحاجة.',
+            'نقطة بداية هادئة لاختيار الدعم المناسب: مختص، مركز، مواد مفيدة، أو طلب دعم منظم عند الحاجة.',
         _subtitleEn =
-            'A calm starting point to choose support: specialist, center, helpful materials, or chat when needed.',
+            'A calm starting point to choose support: specialist, center, helpful materials, or a structured support request when needed.',
         _chatEntryContext = 'recovery_support',
         _accent = const Color(0xFFE58667),
         _heroAsset = 'c7_branding/home/hero_art.png',
@@ -56,13 +56,13 @@ class SupportEntryPage extends StatelessWidget {
             titleAr: 'تحدث مع الدعم عند الحاجة',
             titleEn: 'Talk to support when needed',
             bodyAr:
-                'ابدأ محادثة داعمة وآمنة إذا احتجت إلى توجيه أو مساندة.',
+                'ابدأ طلب دعم منظم إذا احتجت إلى توجيه أو مساندة.',
             bodyEn:
-                'Start a safe supportive conversation if you need guidance or help.',
+                'Start a structured support request if you need guidance or help.',
             icon: Icons.chat_bubble_outline_rounded,
-            route: Routes.chat,
-            analyticsPath: 'chat',
-            arguments: {'entryContext': 'recovery_support'},
+            route: Routes.supportIssueSelector,
+            analyticsPath: 'issue_selector',
+            arguments: {'supportType': 'recovery_support'},
           ),
         ];
 
@@ -70,9 +70,9 @@ class SupportEntryPage extends StatelessWidget {
       : _titleAr = 'ابدأ مسار دعم الأسرة',
         _titleEn = 'Start Family Support',
         _subtitleAr =
-            'نقطة بداية للأسرة لاختيار الدعم المناسب: مختص، مركز، مواد مفيدة، أو شات عند الحاجة.',
+            'نقطة بداية للأسرة لاختيار الدعم المناسب: مختص، مركز، مواد مفيدة، أو طلب دعم منظم عند الحاجة.',
         _subtitleEn =
-            'A starting point for families to choose support: specialist, center, helpful materials, or chat when needed.',
+            'A starting point for families to choose support: specialist, center, helpful materials, or a structured support request when needed.',
         _chatEntryContext = 'family_support',
         _accent = const Color(0xFF37B8B0),
         _heroAsset = 'c7_branding/home/hero_art.png',
@@ -113,13 +113,13 @@ class SupportEntryPage extends StatelessWidget {
             titleAr: 'تحدث مع الدعم عند الحاجة',
             titleEn: 'Talk to support when needed',
             bodyAr:
-                'ابدأ محادثة داعمة لفهم الخطوة التالية أو طلب مساندة بسيطة.',
+                'اختر نوع طلب الدعم لفهم الخطوة التالية أو طلب مساندة بسيطة.',
             bodyEn:
-                'Start a supportive chat to clarify your next step or ask for simple help.',
+                'Choose a support request type to clarify your next step or ask for simple help.',
             icon: Icons.support_agent_outlined,
-            route: Routes.chat,
-            analyticsPath: 'chat',
-            arguments: {'entryContext': 'family_support'},
+            route: Routes.supportIssueSelector,
+            analyticsPath: 'issue_selector',
+            arguments: {'supportType': 'family_support'},
           ),
         ];
 
@@ -132,8 +132,8 @@ class SupportEntryPage extends StatelessWidget {
   final String _heroAsset;
   final List<_SupportPathCard> _cards;
 
-  Map<String, dynamic> get _chatEntryArguments => {
-        'entryContext': _chatEntryContext,
+  Map<String, dynamic> get _issueSelectorArguments => {
+        'supportType': _chatEntryContext,
       };
 
   bool _isArabic(BuildContext context) =>
@@ -212,8 +212,8 @@ class SupportEntryPage extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         isArabic
-                            ? 'اختر المسار الأنسب الآن: شات، مختص، مركز، أو مواد مفيدة.'
-                            : 'Choose the most helpful path now: chat, specialist, center, or helpful materials.',
+                            ? 'اختر المسار الأنسب الآن: طلب دعم، مختص، مركز، أو مواد مفيدة.'
+                            : 'Choose the most helpful path now: support request, specialist, center, or helpful materials.',
                         textAlign: isArabic ? TextAlign.right : TextAlign.left,
                       ),
                     ],
@@ -257,17 +257,18 @@ class SupportEntryPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _HeroActionButton(
-                        label: isArabic ? 'فتح الشات' : 'Open chat',
+                        label: isArabic
+                            ? 'اختيار نوع المساعدة'
+                            : 'Choose Support Type',
                         asset: 'c7_branding/buttons/primary_button.png',
                         onTap: () {
                           AppAnalytics.logPathSelected(
                             _chatEntryContext,
-                            'chat',
+                            'issue_selector',
                           );
-                          AppAnalytics.logChatOpened(_chatEntryContext);
                           Navigator.of(context).pushNamed(
-                            Routes.chat,
-                            arguments: _chatEntryArguments,
+                            Routes.supportIssueSelector,
+                            arguments: _issueSelectorArguments,
                           );
                         },
                       ),
