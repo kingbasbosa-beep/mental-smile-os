@@ -293,8 +293,8 @@ class _AdminArchivePaymentsPageState extends State<AdminArchivePaymentsPage> {
         appBar: AppShellActions.buildAppBar(
           context,
           title: isArabic
-              ? 'أرشيف المدفوعات المتقدم'
-              : 'Advanced Payments Archive',
+              ? 'سجل المدفوعات'
+              : 'Payments Ledger',
           canLogout: false,
         ),
         body: AppPageBackground(
@@ -401,8 +401,8 @@ class _AdminArchivePaymentsPageState extends State<AdminArchivePaymentsPage> {
                           children: [
                             Text(
                               isArabic
-                                  ? 'أرشيف المدفوعات المتقدم'
-                                  : 'Advanced Payments Archive',
+                                  ? 'سجل المدفوعات'
+                                  : 'Payments Ledger',
                               style: Theme.of(context)
                                   .textTheme
                                   .titleLarge

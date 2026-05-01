@@ -42,8 +42,8 @@ class AccountingWorkspacePage extends StatelessWidget {
           children: [
             Text(
               isArabic
-                  ? 'هذا القسم يربط بين مراجعة السداد، التحويلات، والسجل المحاسبي.'
-                  : 'This workspace connects payment review, payouts, and accounting archive.',
+                  ? 'هذا القسم يجمع مراجعة السداد، متابعة التحويلات، وإغلاق العمليات المالية في مساحة واحدة.'
+                  : 'This workspace groups payment review, payout tracking, and financial closeout in one place.',
             ),
             const SizedBox(height: 16),
             Expanded(
