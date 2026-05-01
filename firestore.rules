@@ -2197,6 +2197,13 @@ service cloud.firestore {
       allow read, create, update, delete: if false;
     }
 
+    // Legacy/internal chat domain:
+    // - Not used for new support intake.
+    // - New support requests must use `support_requests`.
+    // - `chat_threads` remains for general menu chat and legacy/internal
+    //   historical viewers.
+    // - Booking-linked chat usage here is legacy and should not spread to
+    //   new intake flows.
     match /chat_threads/{threadId} {
       allow read: if canReadThreadDoc();
 
@@ -2208,6 +2215,12 @@ service cloud.firestore {
 
       allow delete: if false;
 
+      // Legacy/internal message history under `chat_threads`:
+      // - Not used for new support intake.
+      // - New support requests must use `support_requests`.
+      // - These nested `messages` remain for general menu chat and
+      //   legacy/internal historical viewers only.
+      // - Booking-linked message usage is legacy and should not spread.
       match /messages/{messageId} {
         allow read: if canReadThreadById(threadId);
 
@@ -2322,6 +2335,13 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Legacy/internal escalation domain:
+    // - Not used for new support intake.
+    // - New support requests must use `support_requests`.
+    // - `chat_escalations` remains for general menu chat escalation handling
+    //   and legacy/internal historical viewers.
+    // - Booking-linked chat usage is legacy and should not spread into new
+    //   support intake paths.
     match /chat_escalations/{escalationId} {
       allow read: if isAdmin() || clinicianCanReadEscalation();
       allow update: if isAdmin();
@@ -2405,8 +2425,8 @@ service cloud.firestore {
         && request.resource.data.id == requestId
         && (request.resource.data.createdByUid is string)
         && request.resource.data.createdByUid == request.auth.uid
-        && request.resource.data.userRole in ['guest', 'client']
-        && request.resource.data.supportType in ['recovery_support', 'family_support', 'client_support']
+        && request.resource.data.userRole in ['guest', 'client', 'center', 'clinician']
+        && request.resource.data.supportType in ['recovery_support', 'family_support', 'client_support', 'center_support', 'clinician_support']
         && request.resource.data.issueType in [
           'need_specialist',
           'need_center',
@@ -2422,7 +2442,17 @@ service cloud.firestore {
           'account_profile_issue',
           'complaint_bad_experience',
           'need_human_follow_up',
-          'general_admin_question'
+          'general_admin_question',
+          'client_no_show',
+          'scheduling_problem',
+          'system_issue',
+          'payout_question',
+          'general_admin_request',
+          'case_issue',
+          'session_problem',
+          'assignment_problem',
+          'payment_question',
+          'need_admin_support'
         ]
         && request.resource.data.status == 'new'
         && request.resource.data.source == 'structured_support'
