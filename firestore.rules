@@ -2360,6 +2360,72 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    match /external_follow_up_registry/{entryId} {
+      allow read: if isAdmin();
+
+      allow create: if signedIn()
+        && request.resource.data.id == entryId
+        && request.resource.data.source == 'client_request'
+        && request.resource.data.status == 'active'
+        && (
+          !request.resource.data.keys().hasAny(['registeredByUid'])
+          || request.resource.data.registeredByUid == uid()
+        );
+
+      allow update, delete: if false;
+    }
+
+    match /external_follow_up_message_templates/{templateId} {
+      allow read: if isAdmin();
+
+      allow create: if isAdmin()
+        && request.resource.data.id == templateId
+        && request.resource.data.isActive == true;
+
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    match /external_follow_up_campaigns/{campaignId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['status'])
+        && (
+          (resource.data.status == 'draft' && request.resource.data.status == 'ready')
+          || (resource.data.status == 'ready' && request.resource.data.status == 'sent')
+        );
+      allow delete: if false;
+    }
+
+    match /support_requests/{requestId} {
+      allow read: if isAdmin();
+
+      allow create: if request.auth != null
+        && request.resource.data.id == requestId
+        && (request.resource.data.createdByUid is string)
+        && request.resource.data.createdByUid == request.auth.uid
+        && request.resource.data.userRole in ['guest', 'client']
+        && request.resource.data.supportType in ['recovery_support', 'family_support']
+        && request.resource.data.issueType in [
+          'need_specialist',
+          'need_center',
+          'recovery_support',
+          'relapse_concern',
+          'family_guidance',
+          'special_case_support',
+          'risk_report',
+          'general_help'
+        ]
+        && request.resource.data.status == 'new'
+        && request.resource.data.source == 'structured_support'
+        && request.resource.data.priority in ['normal', 'high']
+        && (request.resource.data.createdAt is timestamp);
+
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
