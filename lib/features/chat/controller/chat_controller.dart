@@ -110,21 +110,10 @@ class ChatController {
     final existingThreads =
         await _firestoreService.getThreadsForOwner(user.uid);
     _debugMeasureLegacyBookingFollowupThreads(user.uid, existingThreads);
-    final aiThreads = existingThreads
-        .where((thread) =>
-            !_isAdminSupportThread(thread) && !_isBookingFollowupThread(thread))
-        .toList()
-      ..sort((a, b) {
-        final aDate = a.updatedAt ??
-            a.createdAt ??
-            DateTime.fromMillisecondsSinceEpoch(0);
-        final bDate = b.updatedAt ??
-            b.createdAt ??
-            DateTime.fromMillisecondsSinceEpoch(0);
-        return bDate.compareTo(aDate);
-      });
 
-    if (aiThreads.isNotEmpty) return aiThreads.first;
+    final activeAiThread =
+        await _firestoreService.getActiveAiSupportThreadForUser(user.uid);
+    if (activeAiThread != null) return activeAiThread;
 
     final isAnonymous = user.isAnonymous;
     return _firestoreService.createThread(
