@@ -77,9 +77,16 @@ class ClientDashboardPage extends StatelessWidget {
         .snapshots()
         .map((snapshot) => snapshot.docs.where((doc) {
               final data = doc.data();
+              final threadType = (data['threadType'] ?? '').toString().trim();
+              if (threadType.isNotEmpty) {
+                return threadType == 'admin_support';
+              }
+
+              final handoffState =
+                  (data['handoffState'] ?? '').toString().trim();
               return (data['needsHumanSupport'] ?? false) == true ||
-                  (data['handoffState'] ?? '').toString() == 'admin_review' ||
-                  (data['handoffState'] ?? '').toString() == 'admin_replying';
+                  handoffState == 'admin_review' ||
+                  handoffState == 'admin_replying';
             }).length)
         .handleError((_) => 0);
   }
@@ -411,6 +418,21 @@ class ClientDashboardPage extends StatelessWidget {
                     actionLabel: isArabic ? 'فتح الجلسات' : 'Open sessions',
                     onTap: () =>
                         Navigator.of(context).pushNamed(Routes.clientSessions),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  _SectionCard(
+                    title: isArabic
+                        ? 'رسائل متابعة اختيارية'
+                        : 'Optional Follow-up Messages',
+                    subtitle: isArabic
+                        ? 'اختر لو تحب تستقبل تهنئة، دعم، أو محتوى توعوي من Mental Smile.'
+                        : 'Choose if you want greetings, support, or awareness content from Mental Smile.',
+                    icon: Icons.mark_email_read_outlined,
+                    actionLabel: isArabic
+                        ? 'إدارة تفضيلات المتابعة'
+                        : 'Manage follow-up preferences',
+                    onTap: () => Navigator.of(context)
+                        .pushNamed(Routes.followUpRegistration),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   StreamBuilder<Map<String, double>>(
