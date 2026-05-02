@@ -525,7 +525,10 @@ class AppRouter {
 
       case Routes.adminAccountingWorkspace:
         return _adminProtectedRoute(
-          child: const AccountingWorkspacePage(),
+          child: Scaffold(
+            appBar: AppBar(title: const Text("FORCED ACCOUNTING PAGE")),
+            body: const Center(child: Text("THIS MUST SHOW")),
+          ),
           settings: settings,
         );
 
