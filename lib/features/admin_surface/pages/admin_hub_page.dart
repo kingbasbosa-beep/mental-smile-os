@@ -606,14 +606,6 @@ $gatewayLines
         group: AdminVisualGroup.system,
         route: Routes.adminGatewayLayer,
       ),
-      _AdminSectionLaunchCardData(
-        title: isArabic ? 'الأرشيف' : 'Archive',
-        subtitle: isArabic
-            ? 'مرجع تاريخي وتقارير مؤرشفة' : 'Historical lookup and archived reporting',
-        icon: Icons.archive_outlined,
-        group: AdminVisualGroup.system,
-        route: Routes.adminArchive,
-      ),
     ];
 
     final departmentSectionCards = <_AdminSectionLaunchCardData>[
@@ -4761,3 +4753,6 @@ class _QuickStatCard extends StatelessWidget {
     );
   }
 }
+
+
+
