@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/core/ui/value_label_mapper.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
@@ -228,11 +229,11 @@ class _AdminArchivePaymentsPageState extends State<AdminArchivePaymentsPage> {
             ? 'معرف الأخصائي: $clinicianId'
             : 'Clinician ID: $clinicianId'),
       (isArabic
-          ? 'حالة الدفع: ${_paymentLabel(paymentStatus, isArabic)}'
-          : 'Payment status: ${_paymentLabel(paymentStatus, isArabic)}'),
+          ? 'حالة الدفع: ${ValueLabelMapper.map(paymentStatus, isArabic: isArabic)}'
+          : 'Payment status: ${ValueLabelMapper.map(paymentStatus, isArabic: isArabic)}'),
       (isArabic
-          ? 'حالة التحويل: ${_payoutLabel(payoutStatus, isArabic)}'
-          : 'Payout status: ${_payoutLabel(payoutStatus, isArabic)}'),
+          ? 'حالة التحويل: ${ValueLabelMapper.map(payoutStatus, isArabic: isArabic)}'
+          : 'Payout status: ${ValueLabelMapper.map(payoutStatus, isArabic: isArabic)}'),
       if (receiptFile.isNotEmpty)
         (isArabic
             ? 'اسم ملف الإثبات: $receiptFile'
@@ -462,7 +463,7 @@ class _AdminArchivePaymentsPageState extends State<AdminArchivePaymentsPage> {
                                         (e) => DropdownMenuItem(
                                           value: e,
                                           child:
-                                              Text(_paymentLabel(e, isArabic)),
+                                              Text(ValueLabelMapper.map(e, isArabic: isArabic)),
                                         ),
                                       ),
                                     ],
@@ -497,7 +498,7 @@ class _AdminArchivePaymentsPageState extends State<AdminArchivePaymentsPage> {
                                         (e) => DropdownMenuItem(
                                           value: e,
                                           child:
-                                              Text(_payoutLabel(e, isArabic)),
+                                              Text(ValueLabelMapper.map(e, isArabic: isArabic)),
                                         ),
                                       ),
                                     ],
@@ -698,16 +699,16 @@ class _AdminArchivePaymentsPageState extends State<AdminArchivePaymentsPage> {
                                         runSpacing: 8,
                                         children: [
                                           AppStatusBadge(
-                                            label: _paymentLabel(
+                                            label: ValueLabelMapper.map(
                                               paymentStatus,
-                                              isArabic,
+                                              isArabic: isArabic,
                                             ),
                                             color: _paymentColor(paymentStatus),
                                           ),
                                           AppStatusBadge(
-                                            label: _payoutLabel(
+                                            label: ValueLabelMapper.map(
                                               payoutStatus,
-                                              isArabic,
+                                              isArabic: isArabic,
                                             ),
                                             color: _payoutColor(payoutStatus),
                                           ),
