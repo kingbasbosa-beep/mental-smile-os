@@ -6,6 +6,15 @@ class AccountingWorkspacePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("ACCOUNTING WORKSPACE TEST"),
+      ),
+      body: const Center(
+        child: Text("IF YOU SEE THIS, YOU ARE IN THE CORRECT PAGE"),
+      ),
+    );
+
     final isArabic = Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
     final sections = <_SectionData>[
