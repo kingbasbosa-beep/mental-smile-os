@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/core/auth/presentation/pages/account_blocked_page.dart';
@@ -525,10 +525,7 @@ class AppRouter {
 
       case Routes.adminAccountingWorkspace:
         return _adminProtectedRoute(
-          child: Scaffold(
-            appBar: AppBar(title: const Text("FORCED ACCOUNTING PAGE")),
-            body: const Center(child: Text("THIS MUST SHOW")),
-          ),
+          child: const AccountingWorkspacePage(),
           settings: settings,
         );
 
@@ -808,7 +805,7 @@ class AppRouter {
               appBar: AppBar(
                 title: Text(
                   Localizations.localeOf(ctx).languageCode.toLowerCase() == 'ar'
-                      ? 'طلب حجز'
+                      ? 'Ø·Ù„Ø¨ Ø­Ø¬Ø²'
                       : 'Booking request',
                 ),
               ),
@@ -818,7 +815,7 @@ class AppRouter {
                   child: Text(
                     Localizations.localeOf(ctx).languageCode.toLowerCase() ==
                             'ar'
-                        ? 'تعذر فتح صفحة الحجز مباشرة. ارجع إلى صفحة الأخصائيين ثم اختر الأخصائي مرة أخرى.'
+                        ? 'ØªØ¹Ø°Ø± ÙØªØ­ ØµÙØ­Ø© Ø§Ù„Ø­Ø¬Ø² Ù…Ø¨Ø§Ø´Ø±Ø©. Ø§Ø±Ø¬Ø¹ Ø¥Ù„Ù‰ ØµÙØ­Ø© Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠÙŠÙ† Ø«Ù… Ø§Ø®ØªØ± Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.'
                         : 'Unable to open the booking page directly. Please go back to specialists and choose the specialist again.',
                     textAlign: TextAlign.center,
                   ),
@@ -1145,7 +1142,7 @@ class _RouteAccessGate extends StatelessWidget {
                   'ar';
           return Scaffold(
             appBar: AppBar(
-              title: Text(isArabic ? 'الوصول غير متاح' : 'Access unavailable'),
+              title: Text(isArabic ? 'Ø§Ù„ÙˆØµÙˆÙ„ ØºÙŠØ± Ù…ØªØ§Ø­' : 'Access unavailable'),
             ),
             body: Center(
               child: Padding(
@@ -1157,7 +1154,7 @@ class _RouteAccessGate extends StatelessWidget {
                     const SizedBox(height: 12),
                     Text(
                       isArabic
-                          ? 'هذه الصفحة غير متاحة لهذا الحساب.'
+                          ? 'Ù‡Ø°Ù‡ Ø§Ù„ØµÙØ­Ø© ØºÙŠØ± Ù…ØªØ§Ø­Ø© Ù„Ù‡Ø°Ø§ Ø§Ù„Ø­Ø³Ø§Ø¨.'
                           : 'This page is not available for this account.',
                       textAlign: TextAlign.center,
                     ),
@@ -1169,7 +1166,7 @@ class _RouteAccessGate extends StatelessWidget {
                           (route) => false,
                         );
                       },
-                      child: Text(isArabic ? 'العودة للقائمة' : 'Back to menu'),
+                      child: Text(isArabic ? 'Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„Ù‚Ø§Ø¦Ù…Ø©' : 'Back to menu'),
                     ),
                   ],
                 ),
@@ -1257,3 +1254,4 @@ class _RouteAccessDecision {
   final bool isAdmin;
   final String redirectTarget;
 }
+
