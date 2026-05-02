@@ -293,9 +293,7 @@ class _AdminArchivePaymentsPageState extends State<AdminArchivePaymentsPage> {
       child: Scaffold(
         appBar: AppShellActions.buildAppBar(
           context,
-          title: isArabic
-              ? 'سجل المدفوعات'
-              : 'Payments Ledger',
+          title: isArabic ? 'سجل المدفوعات' : 'Payments Ledger',
           canLogout: false,
         ),
         body: AppPageBackground(
@@ -304,543 +302,501 @@ class _AdminArchivePaymentsPageState extends State<AdminArchivePaymentsPage> {
                 .collection('booking_requests')
                 .where('archived', isEqualTo: true)
                 .snapshots(),
-            builder: (context, snapA) {
-              return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance
-                    .collection('bookingRequests')
-                    .where('archived', isEqualTo: true)
-                    .snapshots(),
-                builder: (context, snapB) {
-                  if (snapA.hasError && snapB.hasError) {
-                    return AppEmptyState(
-                      message: isArabic
-                          ? 'تعذر تحميل أرشيف المدفوعات'
-                          : 'Unable to load payments archive',
-                      icon: Icons.error_outline,
-                    );
-                  }
+            builder: (context, snap) {
+              if (snap.hasError) {
+                return AppEmptyState(
+                  message: isArabic
+                      ? 'تعذر تحميل أرشيف المدفوعات'
+                      : 'Unable to load payments archive',
+                  icon: Icons.error_outline,
+                );
+              }
 
-                  if (!snapA.hasData && !snapB.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+              if (!snap.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-                  final all = <Map<String, dynamic>>[];
+              final items = _normalizeDocs(snap.data!.docs, 'booking_requests')
+                  .where(_isPaymentArchiveRelevant)
+                  .toList()
+                ..sort((a, b) {
+                  final aTs =
+                      a['archivedAt'] ?? a['updatedAt'] ?? a['createdAt'];
+                  final bTs =
+                      b['archivedAt'] ?? b['updatedAt'] ?? b['createdAt'];
 
-                  if (snapA.hasData) {
-                    all.addAll(
-                        _normalizeDocs(snapA.data!.docs, 'booking_requests'));
-                  }
-                  if (snapB.hasData) {
-                    all.addAll(
-                        _normalizeDocs(snapB.data!.docs, 'bookingRequests'));
-                  }
+                  DateTime ad = DateTime.fromMillisecondsSinceEpoch(0);
+                  DateTime bd = DateTime.fromMillisecondsSinceEpoch(0);
 
-                  final unique = <String, Map<String, dynamic>>{};
-                  for (final item in all) {
-                    final id = (item['_id'] ?? '').toString();
-                    if (id.isNotEmpty) unique[id] = item;
-                  }
+                  if (aTs is Timestamp) ad = aTs.toDate();
+                  if (bTs is Timestamp) bd = bTs.toDate();
 
-                  final items = unique.values
-                      .where(_isPaymentArchiveRelevant)
-                      .toList()
-                    ..sort((a, b) {
-                      final aTs =
-                          a['archivedAt'] ?? a['updatedAt'] ?? a['createdAt'];
-                      final bTs =
-                          b['archivedAt'] ?? b['updatedAt'] ?? b['createdAt'];
+                  return bd.compareTo(ad);
+                });
 
-                      DateTime ad = DateTime.fromMillisecondsSinceEpoch(0);
-                      DateTime bd = DateTime.fromMillisecondsSinceEpoch(0);
-
-                      if (aTs is Timestamp) ad = aTs.toDate();
-                      if (bTs is Timestamp) bd = bTs.toDate();
-
-                      return bd.compareTo(ad);
-                    });
-
-                  final clinicianNames = items
-                      .map((e) => (e['assignedClinicianName'] ??
-                              e['clinicianName'] ??
-                              '')
+              final clinicianNames = items
+                  .map((e) =>
+                      (e['assignedClinicianName'] ?? e['clinicianName'] ?? '')
                           .toString()
                           .trim())
-                      .where((e) => e.isNotEmpty)
-                      .toSet()
-                      .toList()
-                    ..sort();
+                  .where((e) => e.isNotEmpty)
+                  .toSet()
+                  .toList()
+                ..sort();
 
-                  final filtered = items.where(_matchesFilters).toList();
+              final filtered = items.where(_matchesFilters).toList();
 
-                  final approvedPayments = items
-                      .where((e) =>
-                          (e['paymentStatus'] ?? '').toString() == 'approved')
-                      .length;
+              final approvedPayments = items
+                  .where((e) =>
+                      (e['paymentStatus'] ?? '').toString() == 'approved')
+                  .length;
 
-                  final paidPayouts = items
-                      .where((e) =>
-                          (e['payoutStatus'] ?? '').toString() ==
-                          'paid_to_clinician')
-                      .length;
+              final paidPayouts = items
+                  .where((e) =>
+                      (e['payoutStatus'] ?? '').toString() ==
+                      'paid_to_clinician')
+                  .length;
 
-                  final submittedProofs = items
-                      .where((e) => (e['paymentReceiptFileName'] ?? '')
-                          .toString()
-                          .trim()
-                          .isNotEmpty)
-                      .length;
+              final submittedProofs = items
+                  .where((e) => (e['paymentReceiptFileName'] ?? '')
+                      .toString()
+                      .trim()
+                      .isNotEmpty)
+                  .length;
 
-                  return ListView(
+              return ListView(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                children: [
+                  AppSurfaceCard(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    children: [
-                      AppSurfaceCard(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        child: Column(
-                          crossAxisAlignment: isArabic
-                              ? CrossAxisAlignment.end
-                              : CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isArabic
-                                  ? 'سجل المدفوعات'
-                                  : 'Payments Ledger',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              isArabic
-                                  ? 'عرض مالي فقط لمسار السداد: من إثبات الدفع المرفوع من العميل وحتى تحويل مستحق الأخصائي.'
-                                  : 'Financial-only archive view for the payment path from client proof submission to clinician payout.',
-                              textAlign:
-                                  isArabic ? TextAlign.right : TextAlign.left,
-                            ),
-                            const SizedBox(height: 16),
-                            TextField(
-                              controller: _searchController,
-                              onChanged: (value) {
-                                setState(() => _search = value.trim());
-                              },
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: isArabic ? 'بحث' : 'Search',
-                                icon: Icons.search,
-                                hintText: isArabic
-                                    ? 'ابحث بالعميل أو الأخصائي أو المعرف أو الملف'
-                                    : 'Search by client, clinician, id, or file',
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
-                              children: [
-                                SizedBox(
-                                  width: 260,
-                                  child: DropdownButtonFormField<String>(
-                                    initialValue: _paymentFilter,
-                                    decoration: appInputDecoration(
-                                      context: context,
-                                      label: isArabic
-                                          ? 'حالة الدفع'
-                                          : 'Payment status',
-                                      icon: Icons.payments_outlined,
-                                    ),
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: 'all',
-                                        child: Text(isArabic ? 'الكل' : 'All'),
-                                      ),
-                                      ...[
-                                        'approved',
-                                        'submitted_by_client',
-                                        'rejected',
-                                      ].map(
-                                        (e) => DropdownMenuItem(
-                                          value: e,
-                                          child:
-                                              Text(ValueLabelMapper.map(e, isArabic: isArabic)),
-                                        ),
-                                      ),
-                                    ],
-                                    onChanged: (value) {
-                                      setState(() =>
-                                          _paymentFilter = value ?? 'all');
-                                    },
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 260,
-                                  child: DropdownButtonFormField<String>(
-                                    initialValue: _payoutFilter,
-                                    decoration: appInputDecoration(
-                                      context: context,
-                                      label: isArabic
-                                          ? 'حالة التحويل'
-                                          : 'Payout status',
-                                      icon:
-                                          Icons.account_balance_wallet_outlined,
-                                    ),
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: 'all',
-                                        child: Text(isArabic ? 'الكل' : 'All'),
-                                      ),
-                                      ...[
-                                        'paid_to_clinician',
-                                        'blocked',
-                                        'pending',
-                                      ].map(
-                                        (e) => DropdownMenuItem(
-                                          value: e,
-                                          child:
-                                              Text(ValueLabelMapper.map(e, isArabic: isArabic)),
-                                        ),
-                                      ),
-                                    ],
-                                    onChanged: (value) {
-                                      setState(
-                                          () => _payoutFilter = value ?? 'all');
-                                    },
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 260,
-                                  child: DropdownButtonFormField<String>(
-                                    initialValue: _clinicianFilter,
-                                    decoration: appInputDecoration(
-                                      context: context,
-                                      label:
-                                          isArabic ? 'الأخصائي' : 'Clinician',
-                                      icon: Icons.medical_services_outlined,
-                                    ),
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: 'all',
-                                        child: Text(isArabic ? 'الكل' : 'All'),
-                                      ),
-                                      ...clinicianNames.map(
-                                        (e) => DropdownMenuItem(
-                                          value: e,
-                                          child: Text(e),
-                                        ),
-                                      ),
-                                    ],
-                                    onChanged: (value) {
-                                      setState(() =>
-                                          _clinicianFilter = value ?? 'all');
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          int count = 4;
-                          if (constraints.maxWidth < 1100) count = 2;
-                          if (constraints.maxWidth < 650) count = 1;
-
-                          return GridView.count(
-                            crossAxisCount: count,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            childAspectRatio: 2.1,
-                            children: [
-                              _summaryCard(
-                                context,
-                                title:
-                                    isArabic ? 'إجمالي العناصر' : 'Total items',
-                                value: '${items.length}',
-                                color: const Color(0xFF9A7A6E),
-                              ),
-                              _summaryCard(
-                                context,
-                                title: isArabic
-                                    ? 'مدفوعات معتمدة'
-                                    : 'Approved payments',
-                                value: '$approvedPayments',
-                                color: const Color(0xFF1F9D63),
-                              ),
-                              _summaryCard(
-                                context,
-                                title: isArabic
-                                    ? 'تحويلات مكتملة'
-                                    : 'Completed payouts',
-                                value: '$paidPayouts',
-                                color: const Color(0xFF2E5AAC),
-                              ),
-                              _summaryCard(
-                                context,
-                                title: isArabic
-                                    ? 'إثباتات مرفوعة'
-                                    : 'Submitted proofs',
-                                value: '$submittedProofs',
-                                color: const Color(0xFF6C55B3),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      AppSectionPanel(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        child: Text(
-                          isArabic
-                              ? 'عدد النتائج بعد الفلترة: ${filtered.length}'
-                              : 'Filtered results: ${filtered.length}',
+                    child: Column(
+                      crossAxisAlignment: isArabic
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isArabic ? 'سجل المدفوعات' : 'Payments Ledger',
                           style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.w800,
                                   ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          isArabic
+                              ? 'عرض مالي فقط لمسار السداد: من إثبات الدفع المرفوع من العميل وحتى تحويل مستحق الأخصائي.'
+                              : 'Financial-only archive view for the payment path from client proof submission to clinician payout.',
                           textAlign:
                               isArabic ? TextAlign.right : TextAlign.left,
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      if (filtered.isEmpty)
-                        AppEmptyState(
-                          message: isArabic
-                              ? 'لا توجد نتائج مطابقة'
-                              : 'No matching results',
-                          icon: Icons.search_off_rounded,
-                        )
-                      else
-                        ...filtered.map((item) {
-                          final id = (item['_id'] ?? '').toString();
-                          final source = (item['_source'] ?? '').toString();
-                          final clientName =
-                              (item['clientName'] ?? '').toString();
-                          final clientEmail =
-                              (item['clientEmail'] ?? '').toString();
-                          final clientId = (item['clientId'] ?? '').toString();
-                          final clinicianName =
-                              (item['assignedClinicianName'] ??
-                                      item['clinicianName'] ??
-                                      '')
-                                  .toString();
-                          final clinicianId = (item['assignedClinicianId'] ??
-                                  item['clinicianId'] ??
-                                  '')
-                              .toString();
-                          final paymentStatus =
-                              (item['paymentStatus'] ?? '').toString();
-                          final payoutStatus =
-                              (item['payoutStatus'] ?? '').toString();
-                          final receiptFile =
-                              (item['paymentReceiptFileName'] ?? '').toString();
-                          final clientNote =
-                              (item['paymentClientNote'] ?? '').toString();
-                          final createdAt = _dateText(item['createdAt']);
-                          final submittedAt =
-                              _dateText(item['paymentSubmittedAt']);
-                          final approvedAt =
-                              _dateText(item['paymentApprovedAt']);
-                          final payoutTransferredAt =
-                              _dateText(item['payoutTransferredAt']);
-                          final archivedAt = _dateText(item['archivedAt']);
-                          final archiveSection =
-                              (item['archiveSection'] ?? '').toString();
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _searchController,
+                          onChanged: (value) {
+                            setState(() => _search = value.trim());
+                          },
+                          decoration: appInputDecoration(
+                            context: context,
+                            label: isArabic ? 'بحث' : 'Search',
+                            icon: Icons.search,
+                            hintText: isArabic
+                                ? 'ابحث بالعميل أو الأخصائي أو المعرف أو الملف'
+                                : 'Search by client, clinician, id, or file',
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: [
+                            SizedBox(
+                              width: 260,
+                              child: DropdownButtonFormField<String>(
+                                initialValue: _paymentFilter,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: isArabic
+                                      ? 'حالة الدفع'
+                                      : 'Payment status',
+                                  icon: Icons.payments_outlined,
+                                ),
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'all',
+                                    child: Text(isArabic ? 'الكل' : 'All'),
+                                  ),
+                                  ...[
+                                    'approved',
+                                    'submitted_by_client',
+                                    'rejected',
+                                  ].map(
+                                    (e) => DropdownMenuItem(
+                                      value: e,
+                                      child: Text(ValueLabelMapper.map(e,
+                                          isArabic: isArabic)),
+                                    ),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  setState(
+                                      () => _paymentFilter = value ?? 'all');
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              width: 260,
+                              child: DropdownButtonFormField<String>(
+                                initialValue: _payoutFilter,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: isArabic
+                                      ? 'حالة التحويل'
+                                      : 'Payout status',
+                                  icon: Icons.account_balance_wallet_outlined,
+                                ),
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'all',
+                                    child: Text(isArabic ? 'الكل' : 'All'),
+                                  ),
+                                  ...[
+                                    'paid_to_clinician',
+                                    'blocked',
+                                    'pending',
+                                  ].map(
+                                    (e) => DropdownMenuItem(
+                                      value: e,
+                                      child: Text(ValueLabelMapper.map(e,
+                                          isArabic: isArabic)),
+                                    ),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  setState(
+                                      () => _payoutFilter = value ?? 'all');
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              width: 260,
+                              child: DropdownButtonFormField<String>(
+                                initialValue: _clinicianFilter,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: isArabic ? 'الأخصائي' : 'Clinician',
+                                  icon: Icons.medical_services_outlined,
+                                ),
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'all',
+                                    child: Text(isArabic ? 'الكل' : 'All'),
+                                  ),
+                                  ...clinicianNames.map(
+                                    (e) => DropdownMenuItem(
+                                      value: e,
+                                      child: Text(e),
+                                    ),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  setState(
+                                      () => _clinicianFilter = value ?? 'all');
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      int count = 4;
+                      if (constraints.maxWidth < 1100) count = 2;
+                      if (constraints.maxWidth < 650) count = 1;
 
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 14),
-                            child: AppSurfaceCard(
-                              padding: const EdgeInsets.all(AppSpacing.lg),
-                              child: Column(
-                                crossAxisAlignment: isArabic
-                                    ? CrossAxisAlignment.end
-                                    : CrossAxisAlignment.start,
+                      return GridView.count(
+                        crossAxisCount: count,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        childAspectRatio: 2.1,
+                        children: [
+                          _summaryCard(
+                            context,
+                            title: isArabic ? 'إجمالي العناصر' : 'Total items',
+                            value: '${items.length}',
+                            color: const Color(0xFF9A7A6E),
+                          ),
+                          _summaryCard(
+                            context,
+                            title: isArabic
+                                ? 'مدفوعات معتمدة'
+                                : 'Approved payments',
+                            value: '$approvedPayments',
+                            color: const Color(0xFF1F9D63),
+                          ),
+                          _summaryCard(
+                            context,
+                            title: isArabic
+                                ? 'تحويلات مكتملة'
+                                : 'Completed payouts',
+                            value: '$paidPayouts',
+                            color: const Color(0xFF2E5AAC),
+                          ),
+                          _summaryCard(
+                            context,
+                            title: isArabic
+                                ? 'إثباتات مرفوعة'
+                                : 'Submitted proofs',
+                            value: '$submittedProofs',
+                            color: const Color(0xFF6C55B3),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  AppSectionPanel(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Text(
+                      isArabic
+                          ? 'عدد النتائج بعد الفلترة: ${filtered.length}'
+                          : 'Filtered results: ${filtered.length}',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                      textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  if (filtered.isEmpty)
+                    AppEmptyState(
+                      message: isArabic
+                          ? 'لا توجد نتائج مطابقة'
+                          : 'No matching results',
+                      icon: Icons.search_off_rounded,
+                    )
+                  else
+                    ...filtered.map((item) {
+                      final id = (item['_id'] ?? '').toString();
+                      final source = (item['_source'] ?? '').toString();
+                      final clientName = (item['clientName'] ?? '').toString();
+                      final clientEmail =
+                          (item['clientEmail'] ?? '').toString();
+                      final clientId = (item['clientId'] ?? '').toString();
+                      final clinicianName = (item['assignedClinicianName'] ??
+                              item['clinicianName'] ??
+                              '')
+                          .toString();
+                      final clinicianId = (item['assignedClinicianId'] ??
+                              item['clinicianId'] ??
+                              '')
+                          .toString();
+                      final paymentStatus =
+                          (item['paymentStatus'] ?? '').toString();
+                      final payoutStatus =
+                          (item['payoutStatus'] ?? '').toString();
+                      final receiptFile =
+                          (item['paymentReceiptFileName'] ?? '').toString();
+                      final clientNote =
+                          (item['paymentClientNote'] ?? '').toString();
+                      final createdAt = _dateText(item['createdAt']);
+                      final submittedAt = _dateText(item['paymentSubmittedAt']);
+                      final approvedAt = _dateText(item['paymentApprovedAt']);
+                      final payoutTransferredAt =
+                          _dateText(item['payoutTransferredAt']);
+                      final archivedAt = _dateText(item['archivedAt']);
+                      final archiveSection =
+                          (item['archiveSection'] ?? '').toString();
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: AppSurfaceCard(
+                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          child: Column(
+                            crossAxisAlignment: isArabic
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
+                            children: [
+                              Row(
                                 children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: isArabic
-                                              ? CrossAxisAlignment.end
-                                              : CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              clientName.trim().isNotEmpty
-                                                  ? clientName
-                                                  : (isArabic
-                                                      ? 'عميل'
-                                                      : 'Client'),
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleLarge
-                                                  ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w800),
-                                            ),
-                                            if (clinicianName
-                                                .trim()
-                                                .isNotEmpty) ...[
-                                              const SizedBox(height: 6),
-                                              Text(
-                                                isArabic
-                                                    ? 'الأخصائي: $clinicianName'
-                                                    : 'Clinician: $clinicianName',
-                                              ),
-                                            ],
-                                          ],
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: isArabic
+                                          ? CrossAxisAlignment.end
+                                          : CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          clientName.trim().isNotEmpty
+                                              ? clientName
+                                              : (isArabic ? 'عميل' : 'Client'),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge
+                                              ?.copyWith(
+                                                  fontWeight: FontWeight.w800),
                                         ),
-                                      ),
-                                      Wrap(
-                                        spacing: 8,
-                                        runSpacing: 8,
-                                        children: [
-                                          AppStatusBadge(
-                                            label: ValueLabelMapper.map(
-                                              paymentStatus,
-                                              isArabic: isArabic,
-                                            ),
-                                            color: _paymentColor(paymentStatus),
-                                          ),
-                                          AppStatusBadge(
-                                            label: ValueLabelMapper.map(
-                                              payoutStatus,
-                                              isArabic: isArabic,
-                                            ),
-                                            color: _payoutColor(payoutStatus),
+                                        if (clinicianName
+                                            .trim()
+                                            .isNotEmpty) ...[
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            isArabic
+                                                ? 'الأخصائي: $clinicianName'
+                                                : 'Clinician: $clinicianName',
                                           ),
                                         ],
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                  const SizedBox(height: 12),
-                                  Text('ID: $id'),
-                                  Text('source: $source'),
-                                  if (archiveSection.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'قسم الأرشفة الأصلي: $archiveSection'
-                                            : 'Archive source section: $archiveSection',
-                                      ),
-                                    ),
-                                  if (clientEmail.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'بريد العميل: $clientEmail'
-                                            : 'Client email: $clientEmail',
-                                      ),
-                                    ),
-                                  if (clientId.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'معرف العميل: $clientId'
-                                            : 'Client ID: $clientId',
-                                      ),
-                                    ),
-                                  if (clinicianId.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'معرف الأخصائي: $clinicianId'
-                                            : 'Clinician ID: $clinicianId',
-                                      ),
-                                    ),
-                                  if (createdAt.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'تاريخ الإنشاء: $createdAt'
-                                            : 'Created at: $createdAt',
-                                      ),
-                                    ),
-                                  if (submittedAt.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'تاريخ رفع الإثبات: $submittedAt'
-                                            : 'Proof submitted at: $submittedAt',
-                                      ),
-                                    ),
-                                  if (approvedAt.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'تاريخ اعتماد السداد: $approvedAt'
-                                            : 'Payment approved at: $approvedAt',
-                                      ),
-                                    ),
-                                  if (payoutTransferredAt.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'تاريخ تحويل المستحق: $payoutTransferredAt'
-                                            : 'Payout transferred at: $payoutTransferredAt',
-                                      ),
-                                    ),
-                                  if (archivedAt.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'تاريخ الأرشفة: $archivedAt'
-                                            : 'Archived at: $archivedAt',
-                                      ),
-                                    ),
-                                  if (receiptFile.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'ملف الإثبات: $receiptFile'
-                                            : 'Receipt file: $receiptFile',
-                                      ),
-                                    ),
-                                  if (clientNote.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'ملاحظة العميل: $clientNote'
-                                            : 'Client note: $clientNote',
-                                      ),
-                                    ),
-                                  const SizedBox(height: 14),
                                   Wrap(
-                                    spacing: 10,
-                                    runSpacing: 10,
+                                    spacing: 8,
+                                    runSpacing: 8,
                                     children: [
-                                      FilledButton.tonalIcon(
-                                        onPressed: () =>
-                                            _printPaymentItem(context, item),
-                                        icon: const Icon(Icons.print_outlined),
-                                        label: Text(
-                                          isArabic ? 'طباعة' : 'Print',
+                                      AppStatusBadge(
+                                        label: ValueLabelMapper.map(
+                                          paymentStatus,
+                                          isArabic: isArabic,
                                         ),
+                                        color: _paymentColor(paymentStatus),
+                                      ),
+                                      AppStatusBadge(
+                                        label: ValueLabelMapper.map(
+                                          payoutStatus,
+                                          isArabic: isArabic,
+                                        ),
+                                        color: _payoutColor(payoutStatus),
                                       ),
                                     ],
                                   ),
                                 ],
                               ),
-                            ),
-                          );
-                        }),
-                    ],
-                  );
-                },
+                              const SizedBox(height: 12),
+                              Text('ID: $id'),
+                              Text('source: $source'),
+                              if (archiveSection.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'قسم الأرشفة الأصلي: $archiveSection'
+                                        : 'Archive source section: $archiveSection',
+                                  ),
+                                ),
+                              if (clientEmail.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'بريد العميل: $clientEmail'
+                                        : 'Client email: $clientEmail',
+                                  ),
+                                ),
+                              if (clientId.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'معرف العميل: $clientId'
+                                        : 'Client ID: $clientId',
+                                  ),
+                                ),
+                              if (clinicianId.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'معرف الأخصائي: $clinicianId'
+                                        : 'Clinician ID: $clinicianId',
+                                  ),
+                                ),
+                              if (createdAt.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'تاريخ الإنشاء: $createdAt'
+                                        : 'Created at: $createdAt',
+                                  ),
+                                ),
+                              if (submittedAt.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'تاريخ رفع الإثبات: $submittedAt'
+                                        : 'Proof submitted at: $submittedAt',
+                                  ),
+                                ),
+                              if (approvedAt.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'تاريخ اعتماد السداد: $approvedAt'
+                                        : 'Payment approved at: $approvedAt',
+                                  ),
+                                ),
+                              if (payoutTransferredAt.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'تاريخ تحويل المستحق: $payoutTransferredAt'
+                                        : 'Payout transferred at: $payoutTransferredAt',
+                                  ),
+                                ),
+                              if (archivedAt.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'تاريخ الأرشفة: $archivedAt'
+                                        : 'Archived at: $archivedAt',
+                                  ),
+                                ),
+                              if (receiptFile.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'ملف الإثبات: $receiptFile'
+                                        : 'Receipt file: $receiptFile',
+                                  ),
+                                ),
+                              if (clientNote.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'ملاحظة العميل: $clientNote'
+                                        : 'Client note: $clientNote',
+                                  ),
+                                ),
+                              const SizedBox(height: 14),
+                              Wrap(
+                                spacing: 10,
+                                runSpacing: 10,
+                                children: [
+                                  FilledButton.tonalIcon(
+                                    onPressed: () =>
+                                        _printPaymentItem(context, item),
+                                    icon: const Icon(Icons.print_outlined),
+                                    label: Text(
+                                      isArabic ? 'طباعة' : 'Print',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                ],
               );
             },
           ),

@@ -646,6 +646,15 @@ $gatewayLines
         route: Routes.adminAccountingWorkspace,
       ),
       _AdminSectionLaunchCardData(
+        title: isArabic ? 'الأرشيف' : 'Archive',
+        subtitle: isArabic
+            ? 'اختصار لسجلات الأقسام المؤرشفة'
+            : 'Shortcut to archived department records',
+        icon: Icons.archive_outlined,
+        group: AdminVisualGroup.system,
+        route: Routes.adminArchive,
+      ),
+      _AdminSectionLaunchCardData(
         title: isArabic ? 'المتابعة الخارجية' : 'External Follow-up',
         subtitle: isArabic
             ? 'إدارة تسجيلات المتابعة والدعم والتهنئة والتوعية'
@@ -4753,6 +4762,5 @@ class _QuickStatCard extends StatelessWidget {
     );
   }
 }
-
 
 

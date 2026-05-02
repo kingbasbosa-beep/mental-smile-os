@@ -1468,285 +1468,252 @@ class _AdminArchiveReportsPageState extends State<AdminArchiveReportsPage> {
                 .collection('booking_requests')
                 .where('archived', isEqualTo: true)
                 .snapshots(),
-            builder: (context, snapA) {
-              return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance
-                    .collection('bookingRequests')
-                    .where('archived', isEqualTo: true)
-                    .snapshots(),
-                builder: (context, snapB) {
-                  if (snapA.hasError && snapB.hasError) {
-                    return AppEmptyState(
-                      message: isArabic
-                          ? 'تعذر تحميل أرشيف التقارير'
-                          : 'Unable to load reports archive',
-                      icon: Icons.error_outline,
-                    );
-                  }
+            builder: (context, snap) {
+              if (snap.hasError) {
+                return AppEmptyState(
+                  message: isArabic
+                      ? 'تعذر تحميل أرشيف التقارير'
+                      : 'Unable to load reports archive',
+                  icon: Icons.error_outline,
+                );
+              }
 
-                  if (!snapA.hasData && !snapB.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+              if (!snap.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-                  final all = <Map<String, dynamic>>[];
-                  if (snapA.hasData) {
-                    all.addAll(
-                        _normalizeDocs(snapA.data!.docs, 'booking_requests'));
-                  }
-                  if (snapB.hasData) {
-                    all.addAll(
-                        _normalizeDocs(snapB.data!.docs, 'bookingRequests'));
-                  }
+              final items = _normalizeDocs(snap.data!.docs, 'booking_requests')
+                  .where((item) => (item['archived'] ?? false) == true)
+                  .toList()
+                ..sort((a, b) {
+                  final aTs =
+                      a['archivedAt'] ?? a['updatedAt'] ?? a['createdAt'];
+                  final bTs =
+                      b['archivedAt'] ?? b['updatedAt'] ?? b['createdAt'];
+                  DateTime ad = DateTime.fromMillisecondsSinceEpoch(0);
+                  DateTime bd = DateTime.fromMillisecondsSinceEpoch(0);
+                  if (aTs is Timestamp) ad = aTs.toDate();
+                  if (bTs is Timestamp) bd = bTs.toDate();
+                  return bd.compareTo(ad);
+                });
 
-                  final unique = <String, Map<String, dynamic>>{};
-                  for (final item in all) {
-                    final id = (item['_id'] ?? '').toString();
-                    if (id.isNotEmpty) unique[id] = item;
-                  }
-
-                  final items = unique.values
-                      .where((item) => (item['archived'] ?? false) == true)
-                      .toList()
-                    ..sort((a, b) {
-                      final aTs =
-                          a['archivedAt'] ?? a['updatedAt'] ?? a['createdAt'];
-                      final bTs =
-                          b['archivedAt'] ?? b['updatedAt'] ?? b['createdAt'];
-                      DateTime ad = DateTime.fromMillisecondsSinceEpoch(0);
-                      DateTime bd = DateTime.fromMillisecondsSinceEpoch(0);
-                      if (aTs is Timestamp) ad = aTs.toDate();
-                      if (bTs is Timestamp) bd = bTs.toDate();
-                      return bd.compareTo(ad);
-                    });
-
-                  final clientNames = items
-                      .map((e) => (e['clientName'] ?? '').toString().trim())
-                      .where((e) => e.isNotEmpty)
-                      .toSet()
-                      .toList()
-                    ..sort();
-                  final clinicianNames = items
-                      .map((e) => (e['assignedClinicianName'] ??
-                              e['clinicianName'] ??
-                              '')
+              final clientNames = items
+                  .map((e) => (e['clientName'] ?? '').toString().trim())
+                  .where((e) => e.isNotEmpty)
+                  .toSet()
+                  .toList()
+                ..sort();
+              final clinicianNames = items
+                  .map((e) =>
+                      (e['assignedClinicianName'] ?? e['clinicianName'] ?? '')
                           .toString()
                           .trim())
-                      .where((e) => e.isNotEmpty)
-                      .toSet()
-                      .toList()
-                    ..sort();
+                  .where((e) => e.isNotEmpty)
+                  .toSet()
+                  .toList()
+                ..sort();
 
-                  final filtered = items.where(_matchesFilters).toList();
+              final filtered = items.where(_matchesFilters).toList();
 
-                  return ListView(
+              return ListView(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                children: [
+                  AppSurfaceCard(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    children: [
-                      AppSurfaceCard(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        child: Column(
-                          crossAxisAlignment: isArabic
-                              ? CrossAxisAlignment.end
-                              : CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isArabic
-                                  ? 'أرشيف التقارير الشامل'
-                                  : 'Comprehensive Reports Archive',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(fontWeight: FontWeight.w800),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              isArabic
-                                  ? 'هذا القسم فقط يعرض التقرير الكامل الشامل. الطباعة المالية هنا مختصرة لحماية خصوصية العميل والأخصائي.'
-                                  : 'Only this section shows the complete report. Accounting print here is intentionally limited for privacy.',
-                            ),
-                            const SizedBox(height: 16),
-                            TextField(
-                              controller: _searchController,
-                              onChanged: (value) =>
-                                  setState(() => _search = value.trim()),
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: isArabic ? 'بحث' : 'Search',
-                                icon: Icons.search,
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            LayoutBuilder(
-                              builder: (context, constraints) {
-                                final filterFieldWidth =
-                                    constraints.maxWidth < 240
-                                        ? constraints.maxWidth
-                                        : 220.0;
-                                return Wrap(
-                                  spacing: 10,
-                                  runSpacing: 10,
-                                  children: [
-                                    SizedBox(
-                                      width: filterFieldWidth,
-                                      child: DropdownButtonFormField<String>(
-                                        isExpanded: true,
-                                        initialValue: _sectionFilter,
-                                        decoration: appInputDecoration(
-                                          context: context,
-                                          label: isArabic ? 'القسم' : 'Section',
-                                          icon: Icons.category_outlined,
-                                        ),
-                                        items: [
-                                          DropdownMenuItem(
-                                            value: 'all',
-                                            child:
-                                                Text(isArabic ? 'الكل' : 'All'),
-                                          ),
-                                          ...['sessions', 'payments'].map(
-                                            (e) => DropdownMenuItem(
-                                              value: e,
-                                              child: Text(
-                                                _sectionLabel(e, isArabic),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                        onChanged: (value) => setState(
-                                          () => _sectionFilter = value ?? 'all',
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: filterFieldWidth,
-                                      child: DropdownButtonFormField<String>(
-                                        isExpanded: true,
-                                        initialValue: _statusFilter,
-                                        decoration: appInputDecoration(
-                                          context: context,
-                                          label: isArabic ? 'الحالة' : 'Status',
-                                          icon: Icons.filter_alt_outlined,
-                                        ),
-                                        items: [
-                                          DropdownMenuItem(
-                                            value: 'all',
-                                            child:
-                                                Text(isArabic ? 'الكل' : 'All'),
-                                          ),
-                                          ...[
-                                            'completed_success',
-                                            'payout_pending',
-                                            'session_completed_pending_reviews',
-                                            'session_scheduled',
-                                            'session_in_progress',
-                                            'session_setup_pending',
-                                          ].map(
-                                            (e) => DropdownMenuItem(
-                                              value: e,
-                                              child: Text(
-                                                _statusLabel(e, isArabic),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                        onChanged: (value) => setState(
-                                          () => _statusFilter = value ?? 'all',
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: filterFieldWidth,
-                                      child: DropdownButtonFormField<String>(
-                                        isExpanded: true,
-                                        initialValue: _clientFilter,
-                                        decoration: appInputDecoration(
-                                          context: context,
-                                          label: isArabic ? 'العميل' : 'Client',
-                                          icon: Icons.person_outline,
-                                        ),
-                                        items: [
-                                          DropdownMenuItem(
-                                            value: 'all',
-                                            child:
-                                                Text(isArabic ? 'الكل' : 'All'),
-                                          ),
-                                          ...clientNames.map(
-                                            (e) => DropdownMenuItem(
-                                              value: e,
-                                              child: Text(e),
-                                            ),
-                                          ),
-                                        ],
-                                        onChanged: (value) => setState(
-                                          () => _clientFilter = value ?? 'all',
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: filterFieldWidth,
-                                      child: DropdownButtonFormField<String>(
-                                        isExpanded: true,
-                                        initialValue: _clinicianFilter,
-                                        decoration: appInputDecoration(
-                                          context: context,
-                                          label: isArabic
-                                              ? 'الأخصائي'
-                                              : 'Clinician',
-                                          icon: Icons.medical_services_outlined,
-                                        ),
-                                        items: [
-                                          DropdownMenuItem(
-                                            value: 'all',
-                                            child:
-                                                Text(isArabic ? 'الكل' : 'All'),
-                                          ),
-                                          ...clinicianNames.map(
-                                            (e) => DropdownMenuItem(
-                                              value: e,
-                                              child: Text(e),
-                                            ),
-                                          ),
-                                        ],
-                                        onChanged: (value) => setState(
-                                          () =>
-                                              _clinicianFilter = value ?? 'all',
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      AppSectionPanel(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        child: Text(
+                    child: Column(
+                      crossAxisAlignment: isArabic
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Text(
                           isArabic
-                              ? 'عدد النتائج بعد الفلترة: ${filtered.length}'
-                              : 'Filtered results: ${filtered.length}',
+                              ? 'أرشيف التقارير الشامل'
+                              : 'Comprehensive Reports Archive',
                           style: Theme.of(context)
                               .textTheme
-                              .titleMedium
+                              .titleLarge
                               ?.copyWith(fontWeight: FontWeight.w800),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      _assistantPanel(context, filtered),
-                      const SizedBox(height: 16),
-                      if (filtered.isEmpty)
-                        AppEmptyState(
-                          message: isArabic
-                              ? 'لا توجد نتائج مطابقة'
-                              : 'No matching results',
-                          icon: Icons.search_off_rounded,
-                        )
-                      else
-                        ...filtered
-                            .map((item) => _buildReportCard(context, item)),
-                    ],
-                  );
-                },
+                        const SizedBox(height: 10),
+                        Text(
+                          isArabic
+                              ? 'هذا القسم فقط يعرض التقرير الكامل الشامل. الطباعة المالية هنا مختصرة لحماية خصوصية العميل والأخصائي.'
+                              : 'Only this section shows the complete report. Accounting print here is intentionally limited for privacy.',
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _searchController,
+                          onChanged: (value) =>
+                              setState(() => _search = value.trim()),
+                          decoration: appInputDecoration(
+                            context: context,
+                            label: isArabic ? 'بحث' : 'Search',
+                            icon: Icons.search,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final filterFieldWidth = constraints.maxWidth < 240
+                                ? constraints.maxWidth
+                                : 220.0;
+                            return Wrap(
+                              spacing: 10,
+                              runSpacing: 10,
+                              children: [
+                                SizedBox(
+                                  width: filterFieldWidth,
+                                  child: DropdownButtonFormField<String>(
+                                    isExpanded: true,
+                                    initialValue: _sectionFilter,
+                                    decoration: appInputDecoration(
+                                      context: context,
+                                      label: isArabic ? 'القسم' : 'Section',
+                                      icon: Icons.category_outlined,
+                                    ),
+                                    items: [
+                                      DropdownMenuItem(
+                                        value: 'all',
+                                        child: Text(isArabic ? 'الكل' : 'All'),
+                                      ),
+                                      ...['sessions', 'payments'].map(
+                                        (e) => DropdownMenuItem(
+                                          value: e,
+                                          child: Text(
+                                            _sectionLabel(e, isArabic),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                    onChanged: (value) => setState(
+                                      () => _sectionFilter = value ?? 'all',
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: filterFieldWidth,
+                                  child: DropdownButtonFormField<String>(
+                                    isExpanded: true,
+                                    initialValue: _statusFilter,
+                                    decoration: appInputDecoration(
+                                      context: context,
+                                      label: isArabic ? 'الحالة' : 'Status',
+                                      icon: Icons.filter_alt_outlined,
+                                    ),
+                                    items: [
+                                      DropdownMenuItem(
+                                        value: 'all',
+                                        child: Text(isArabic ? 'الكل' : 'All'),
+                                      ),
+                                      ...[
+                                        'completed_success',
+                                        'payout_pending',
+                                        'session_completed_pending_reviews',
+                                        'session_scheduled',
+                                        'session_in_progress',
+                                        'session_setup_pending',
+                                      ].map(
+                                        (e) => DropdownMenuItem(
+                                          value: e,
+                                          child: Text(
+                                            _statusLabel(e, isArabic),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                    onChanged: (value) => setState(
+                                      () => _statusFilter = value ?? 'all',
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: filterFieldWidth,
+                                  child: DropdownButtonFormField<String>(
+                                    isExpanded: true,
+                                    initialValue: _clientFilter,
+                                    decoration: appInputDecoration(
+                                      context: context,
+                                      label: isArabic ? 'العميل' : 'Client',
+                                      icon: Icons.person_outline,
+                                    ),
+                                    items: [
+                                      DropdownMenuItem(
+                                        value: 'all',
+                                        child: Text(isArabic ? 'الكل' : 'All'),
+                                      ),
+                                      ...clientNames.map(
+                                        (e) => DropdownMenuItem(
+                                          value: e,
+                                          child: Text(e),
+                                        ),
+                                      ),
+                                    ],
+                                    onChanged: (value) => setState(
+                                      () => _clientFilter = value ?? 'all',
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: filterFieldWidth,
+                                  child: DropdownButtonFormField<String>(
+                                    isExpanded: true,
+                                    initialValue: _clinicianFilter,
+                                    decoration: appInputDecoration(
+                                      context: context,
+                                      label:
+                                          isArabic ? 'الأخصائي' : 'Clinician',
+                                      icon: Icons.medical_services_outlined,
+                                    ),
+                                    items: [
+                                      DropdownMenuItem(
+                                        value: 'all',
+                                        child: Text(isArabic ? 'الكل' : 'All'),
+                                      ),
+                                      ...clinicianNames.map(
+                                        (e) => DropdownMenuItem(
+                                          value: e,
+                                          child: Text(e),
+                                        ),
+                                      ),
+                                    ],
+                                    onChanged: (value) => setState(
+                                      () => _clinicianFilter = value ?? 'all',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  AppSectionPanel(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Text(
+                      isArabic
+                          ? 'عدد النتائج بعد الفلترة: ${filtered.length}'
+                          : 'Filtered results: ${filtered.length}',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _assistantPanel(context, filtered),
+                  const SizedBox(height: 16),
+                  if (filtered.isEmpty)
+                    AppEmptyState(
+                      message: isArabic
+                          ? 'لا توجد نتائج مطابقة'
+                          : 'No matching results',
+                      icon: Icons.search_off_rounded,
+                    )
+                  else
+                    ...filtered.map((item) => _buildReportCard(context, item)),
+                ],
               );
             },
           ),

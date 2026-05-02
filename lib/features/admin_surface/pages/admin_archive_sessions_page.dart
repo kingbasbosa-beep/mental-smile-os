@@ -269,45 +269,22 @@ class _AdminArchiveSessionsPageState extends State<AdminArchiveSessionsPage> {
                 .where('archived', isEqualTo: true)
                 .where('archiveSection', isEqualTo: 'sessions')
                 .snapshots(),
-            builder: (context, snapA) {
-              return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance
-                    .collection('bookingRequests')
-                    .where('archived', isEqualTo: true)
-                    .where('archiveSection', isEqualTo: 'sessions')
-                    .snapshots(),
-                builder: (context, snapB) {
-                  if (snapA.hasError && snapB.hasError) {
-                    return AppEmptyState(
-                      message: isArabic
-                          ? 'تعذر تحميل أرشيف الجلسات'
-                          : 'Unable to load sessions archive',
-                      icon: Icons.error_outline,
-                    );
-                  }
+            builder: (context, snap) {
+              if (snap.hasError) {
+                return AppEmptyState(
+                  message: isArabic
+                      ? 'تعذر تحميل أرشيف الجلسات'
+                      : 'Unable to load sessions archive',
+                  icon: Icons.error_outline,
+                );
+              }
 
-                  if (!snapA.hasData && !snapB.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+              if (!snap.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-                  final all = <Map<String, dynamic>>[];
-
-                  if (snapA.hasData) {
-                    all.addAll(
-                        _normalizeDocs(snapA.data!.docs, 'booking_requests'));
-                  }
-                  if (snapB.hasData) {
-                    all.addAll(
-                        _normalizeDocs(snapB.data!.docs, 'bookingRequests'));
-                  }
-
-                  final unique = <String, Map<String, dynamic>>{};
-                  for (final item in all) {
-                    final id = (item['_id'] ?? '').toString();
-                    if (id.isNotEmpty) unique[id] = item;
-                  }
-
-                  final items = unique.values.toList()
+              final items =
+                  _normalizeDocs(snap.data!.docs, 'booking_requests').toList()
                     ..sort((a, b) {
                       final aTs =
                           a['archivedAt'] ?? a['updatedAt'] ?? a['createdAt'];
@@ -323,470 +300,454 @@ class _AdminArchiveSessionsPageState extends State<AdminArchiveSessionsPage> {
                       return bd.compareTo(ad);
                     });
 
-                  final clinicianNames = items
-                      .map((e) => (e['assignedClinicianName'] ??
-                              e['clinicianName'] ??
-                              '')
+              final clinicianNames = items
+                  .map((e) =>
+                      (e['assignedClinicianName'] ?? e['clinicianName'] ?? '')
                           .toString()
                           .trim())
-                      .where((e) => e.isNotEmpty)
-                      .toSet()
-                      .toList()
-                    ..sort();
+                  .where((e) => e.isNotEmpty)
+                  .toSet()
+                  .toList()
+                ..sort();
 
-                  final clientNames = items
-                      .map((e) => (e['clientName'] ?? '').toString().trim())
-                      .where((e) => e.isNotEmpty)
-                      .toSet()
-                      .toList()
-                    ..sort();
+              final clientNames = items
+                  .map((e) => (e['clientName'] ?? '').toString().trim())
+                  .where((e) => e.isNotEmpty)
+                  .toSet()
+                  .toList()
+                ..sort();
 
-                  final filtered = items.where(_matchesFilters).toList();
+              final filtered = items.where(_matchesFilters).toList();
 
-                  final completedCount = items
-                      .where((e) =>
-                          (e['status'] ?? '').toString() == 'completed_success')
-                      .length;
+              final completedCount = items
+                  .where((e) =>
+                      (e['status'] ?? '').toString() == 'completed_success')
+                  .length;
 
-                  final avgFinal = filtered.isEmpty
-                      ? 0.0
-                      : filtered
-                              .map((e) =>
-                                  ((e['finalReviewPercentage'] ?? 0) as num)
-                                      .toDouble())
-                              .fold<double>(0, (a, b) => a + b) /
-                          filtered.length;
+              final avgFinal = filtered.isEmpty
+                  ? 0.0
+                  : filtered
+                          .map((e) => ((e['finalReviewPercentage'] ?? 0) as num)
+                              .toDouble())
+                          .fold<double>(0, (a, b) => a + b) /
+                      filtered.length;
 
-                  return ListView(
+              return ListView(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                children: [
+                  AppSurfaceCard(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    children: [
-                      AppSurfaceCard(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        child: Column(
-                          crossAxisAlignment: isArabic
-                              ? CrossAxisAlignment.end
-                              : CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isArabic
-                                  ? 'أرشيف الجلسات المتقدم'
-                                  : 'Advanced Sessions Archive',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              isArabic
-                                  ? 'عرض جلسي فقط للعمليات المؤرشفة: بيانات الجلسة والتنفيذ والتقييم النهائي، بدون تفاصيل الدفع والتحويل.'
-                                  : 'Session-only archive view for execution and review data, without payment or payout details.',
-                              textAlign:
-                                  isArabic ? TextAlign.right : TextAlign.left,
-                            ),
-                            const SizedBox(height: 16),
-                            TextField(
-                              controller: _searchController,
-                              onChanged: (value) {
-                                setState(() => _search = value.trim());
-                              },
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: isArabic ? 'بحث' : 'Search',
-                                icon: Icons.search,
-                                hintText: isArabic
-                                    ? 'ابحث بالعميل أو الأخصائي أو المعرف أو التاريخ'
-                                    : 'Search by client, clinician, id, or date',
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
-                              children: [
-                                SizedBox(
-                                  width: 260,
-                                  child: DropdownButtonFormField<String>(
-                                    initialValue: _statusFilter,
-                                    decoration: appInputDecoration(
-                                      context: context,
-                                      label: isArabic ? 'الحالة' : 'Status',
-                                      icon: Icons.filter_alt_outlined,
-                                    ),
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: 'all',
-                                        child: Text(isArabic ? 'الكل' : 'All'),
-                                      ),
-                                      ...[
-                                        'completed_success',
-                                        'payout_pending',
-                                        'session_completed_pending_reviews',
-                                        'session_scheduled',
-                                        'session_in_progress',
-                                        'session_setup_pending',
-                                      ].map(
-                                        (e) => DropdownMenuItem(
-                                          value: e,
-                                          child:
-                                              Text(_statusLabel(e, isArabic)),
-                                        ),
-                                      ),
-                                    ],
-                                    onChanged: (value) {
-                                      setState(
-                                          () => _statusFilter = value ?? 'all');
-                                    },
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 260,
-                                  child: DropdownButtonFormField<String>(
-                                    initialValue: _clinicianFilter,
-                                    decoration: appInputDecoration(
-                                      context: context,
-                                      label:
-                                          isArabic ? 'الأخصائي' : 'Clinician',
-                                      icon: Icons.medical_services_outlined,
-                                    ),
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: 'all',
-                                        child: Text(isArabic ? 'الكل' : 'All'),
-                                      ),
-                                      ...clinicianNames.map(
-                                        (e) => DropdownMenuItem(
-                                          value: e,
-                                          child: Text(e),
-                                        ),
-                                      ),
-                                    ],
-                                    onChanged: (value) {
-                                      setState(() =>
-                                          _clinicianFilter = value ?? 'all');
-                                    },
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 260,
-                                  child: DropdownButtonFormField<String>(
-                                    initialValue: _clientFilter,
-                                    decoration: appInputDecoration(
-                                      context: context,
-                                      label: isArabic ? 'العميل' : 'Client',
-                                      icon: Icons.person_outline_rounded,
-                                    ),
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: 'all',
-                                        child: Text(isArabic ? 'الكل' : 'All'),
-                                      ),
-                                      ...clientNames.map(
-                                        (e) => DropdownMenuItem(
-                                          value: e,
-                                          child: Text(e),
-                                        ),
-                                      ),
-                                    ],
-                                    onChanged: (value) {
-                                      setState(
-                                          () => _clientFilter = value ?? 'all');
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          int count = 3;
-                          if (constraints.maxWidth < 950) count = 2;
-                          if (constraints.maxWidth < 650) count = 1;
-
-                          return GridView.count(
-                            crossAxisCount: count,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            childAspectRatio: 2.2,
-                            children: [
-                              _summaryCard(
-                                context,
-                                title:
-                                    isArabic ? 'إجمالي العناصر' : 'Total items',
-                                value: '${items.length}',
-                                color: const Color(0xFF6F9DC7),
-                              ),
-                              _summaryCard(
-                                context,
-                                title: isArabic ? 'مكتمل ومغلق' : 'Completed',
-                                value: '$completedCount',
-                                color: const Color(0xFF1F9D63),
-                              ),
-                              _summaryCard(
-                                context,
-                                title: isArabic
-                                    ? 'متوسط النسبة الحالية'
-                                    : 'Current average %',
-                                value: '${avgFinal.toStringAsFixed(1)}%',
-                                color: const Color(0xFF6C55B3),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      AppSectionPanel(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        child: Text(
+                    child: Column(
+                      crossAxisAlignment: isArabic
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Text(
                           isArabic
-                              ? 'عدد النتائج بعد الفلترة: ${filtered.length}'
-                              : 'Filtered results: ${filtered.length}',
+                              ? 'أرشيف الجلسات المتقدم'
+                              : 'Advanced Sessions Archive',
                           style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.w800,
                                   ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          isArabic
+                              ? 'عرض جلسي فقط للعمليات المؤرشفة: بيانات الجلسة والتنفيذ والتقييم النهائي، بدون تفاصيل الدفع والتحويل.'
+                              : 'Session-only archive view for execution and review data, without payment or payout details.',
                           textAlign:
                               isArabic ? TextAlign.right : TextAlign.left,
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      if (filtered.isEmpty)
-                        AppEmptyState(
-                          message: isArabic
-                              ? 'لا توجد نتائج مطابقة'
-                              : 'No matching results',
-                          icon: Icons.search_off_rounded,
-                        )
-                      else
-                        ...filtered.map((item) {
-                          final id = (item['_id'] ?? '').toString();
-                          final source = (item['_source'] ?? '').toString();
-                          final clientName =
-                              (item['clientName'] ?? '').toString();
-                          final clientEmail =
-                              (item['clientEmail'] ?? '').toString();
-                          final clientId = (item['clientId'] ?? '').toString();
-                          final clinicianName =
-                              (item['assignedClinicianName'] ??
-                                      item['clinicianName'] ??
-                                      '')
-                                  .toString();
-                          final clinicianId = (item['assignedClinicianId'] ??
-                                  item['clinicianId'] ??
-                                  '')
-                              .toString();
-                          final status = (item['status'] ?? '').toString();
-                          final sessionStatus =
-                              (item['sessionStatus'] ?? '').toString();
-                          final reviewStatus =
-                              (item['reviewStatus'] ?? '').toString();
-                          final sessionDate =
-                              (item['sessionDateText'] ?? '').toString();
-                          final sessionLink =
-                              (item['sessionLink'] ?? '').toString();
-                          final sessionCode =
-                              (item['sessionCode'] ?? '').toString();
-                          final adminNotes =
-                              (item['sessionAdminNotes'] ?? '').toString();
-                          final createdAt = _dateText(item['createdAt']);
-                          final archivedAt = _dateText(item['archivedAt']);
-                          final finalReviewPercentage =
-                              ((item['finalReviewPercentage'] ?? 0) as num)
-                                  .toDouble();
-
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 14),
-                            child: AppSurfaceCard(
-                              padding: const EdgeInsets.all(AppSpacing.lg),
-                              child: Column(
-                                crossAxisAlignment: isArabic
-                                    ? CrossAxisAlignment.end
-                                    : CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: isArabic
-                                              ? CrossAxisAlignment.end
-                                              : CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              clientName.trim().isNotEmpty
-                                                  ? clientName
-                                                  : (isArabic
-                                                      ? 'عميل'
-                                                      : 'Client'),
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleLarge
-                                                  ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w800),
-                                            ),
-                                            if (clinicianName
-                                                .trim()
-                                                .isNotEmpty) ...[
-                                              const SizedBox(height: 6),
-                                              Text(
-                                                isArabic
-                                                    ? 'الأخصائي: $clinicianName'
-                                                    : 'Clinician: $clinicianName',
-                                              ),
-                                            ],
-                                          ],
-                                        ),
-                                      ),
-                                      AppStatusBadge(
-                                        label: _statusLabel(status, isArabic),
-                                        color: _statusColor(status),
-                                      ),
-                                    ],
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _searchController,
+                          onChanged: (value) {
+                            setState(() => _search = value.trim());
+                          },
+                          decoration: appInputDecoration(
+                            context: context,
+                            label: isArabic ? 'بحث' : 'Search',
+                            icon: Icons.search,
+                            hintText: isArabic
+                                ? 'ابحث بالعميل أو الأخصائي أو المعرف أو التاريخ'
+                                : 'Search by client, clinician, id, or date',
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: [
+                            SizedBox(
+                              width: 260,
+                              child: DropdownButtonFormField<String>(
+                                initialValue: _statusFilter,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: isArabic ? 'الحالة' : 'Status',
+                                  icon: Icons.filter_alt_outlined,
+                                ),
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'all',
+                                    child: Text(isArabic ? 'الكل' : 'All'),
                                   ),
-                                  const SizedBox(height: 12),
-                                  Text('ID: $id'),
-                                  Text('source: $source'),
-                                  if (clientEmail.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'بريد العميل: $clientEmail'
-                                            : 'Client email: $clientEmail',
-                                      ),
+                                  ...[
+                                    'completed_success',
+                                    'payout_pending',
+                                    'session_completed_pending_reviews',
+                                    'session_scheduled',
+                                    'session_in_progress',
+                                    'session_setup_pending',
+                                  ].map(
+                                    (e) => DropdownMenuItem(
+                                      value: e,
+                                      child: Text(_statusLabel(e, isArabic)),
                                     ),
-                                  if (clientId.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'معرف العميل: $clientId'
-                                            : 'Client ID: $clientId',
-                                      ),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  setState(
+                                      () => _statusFilter = value ?? 'all');
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              width: 260,
+                              child: DropdownButtonFormField<String>(
+                                initialValue: _clinicianFilter,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: isArabic ? 'الأخصائي' : 'Clinician',
+                                  icon: Icons.medical_services_outlined,
+                                ),
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'all',
+                                    child: Text(isArabic ? 'الكل' : 'All'),
+                                  ),
+                                  ...clinicianNames.map(
+                                    (e) => DropdownMenuItem(
+                                      value: e,
+                                      child: Text(e),
                                     ),
-                                  if (clinicianId.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'معرف الأخصائي: $clinicianId'
-                                            : 'Clinician ID: $clinicianId',
-                                      ),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  setState(
+                                      () => _clinicianFilter = value ?? 'all');
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              width: 260,
+                              child: DropdownButtonFormField<String>(
+                                initialValue: _clientFilter,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: isArabic ? 'العميل' : 'Client',
+                                  icon: Icons.person_outline_rounded,
+                                ),
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'all',
+                                    child: Text(isArabic ? 'الكل' : 'All'),
+                                  ),
+                                  ...clientNames.map(
+                                    (e) => DropdownMenuItem(
+                                      value: e,
+                                      child: Text(e),
                                     ),
-                                  if (createdAt.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'تاريخ الإنشاء: $createdAt'
-                                            : 'Created at: $createdAt',
-                                      ),
-                                    ),
-                                  if (sessionDate.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'موعد الجلسة: $sessionDate'
-                                            : 'Session date: $sessionDate',
-                                      ),
-                                    ),
-                                  if (sessionStatus.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'حالة الجلسة: $sessionStatus'
-                                            : 'Session status: $sessionStatus',
-                                      ),
-                                    ),
-                                  if (reviewStatus.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'حالة التقييم: $reviewStatus'
-                                            : 'Review status: $reviewStatus',
-                                      ),
-                                    ),
-                                  if (archivedAt.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'تاريخ الأرشفة: $archivedAt'
-                                            : 'Archived at: $archivedAt',
-                                      ),
-                                    ),
-                                  if (sessionLink.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'رابط الجلسة: $sessionLink'
-                                            : 'Session link: $sessionLink',
-                                      ),
-                                    ),
-                                  if (sessionCode.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'كود الجلسة: $sessionCode'
-                                            : 'Session code: $sessionCode',
-                                      ),
-                                    ),
-                                  if (finalReviewPercentage > 0)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'المتوسط النهائي: ${finalReviewPercentage.toStringAsFixed(1)}%'
-                                            : 'Final average: ${finalReviewPercentage.toStringAsFixed(1)}%',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w800,
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  setState(
+                                      () => _clientFilter = value ?? 'all');
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      int count = 3;
+                      if (constraints.maxWidth < 950) count = 2;
+                      if (constraints.maxWidth < 650) count = 1;
+
+                      return GridView.count(
+                        crossAxisCount: count,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        childAspectRatio: 2.2,
+                        children: [
+                          _summaryCard(
+                            context,
+                            title: isArabic ? 'إجمالي العناصر' : 'Total items',
+                            value: '${items.length}',
+                            color: const Color(0xFF6F9DC7),
+                          ),
+                          _summaryCard(
+                            context,
+                            title: isArabic ? 'مكتمل ومغلق' : 'Completed',
+                            value: '$completedCount',
+                            color: const Color(0xFF1F9D63),
+                          ),
+                          _summaryCard(
+                            context,
+                            title: isArabic
+                                ? 'متوسط النسبة الحالية'
+                                : 'Current average %',
+                            value: '${avgFinal.toStringAsFixed(1)}%',
+                            color: const Color(0xFF6C55B3),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  AppSectionPanel(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Text(
+                      isArabic
+                          ? 'عدد النتائج بعد الفلترة: ${filtered.length}'
+                          : 'Filtered results: ${filtered.length}',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                      textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  if (filtered.isEmpty)
+                    AppEmptyState(
+                      message: isArabic
+                          ? 'لا توجد نتائج مطابقة'
+                          : 'No matching results',
+                      icon: Icons.search_off_rounded,
+                    )
+                  else
+                    ...filtered.map((item) {
+                      final id = (item['_id'] ?? '').toString();
+                      final source = (item['_source'] ?? '').toString();
+                      final clientName = (item['clientName'] ?? '').toString();
+                      final clientEmail =
+                          (item['clientEmail'] ?? '').toString();
+                      final clientId = (item['clientId'] ?? '').toString();
+                      final clinicianName = (item['assignedClinicianName'] ??
+                              item['clinicianName'] ??
+                              '')
+                          .toString();
+                      final clinicianId = (item['assignedClinicianId'] ??
+                              item['clinicianId'] ??
+                              '')
+                          .toString();
+                      final status = (item['status'] ?? '').toString();
+                      final sessionStatus =
+                          (item['sessionStatus'] ?? '').toString();
+                      final reviewStatus =
+                          (item['reviewStatus'] ?? '').toString();
+                      final sessionDate =
+                          (item['sessionDateText'] ?? '').toString();
+                      final sessionLink =
+                          (item['sessionLink'] ?? '').toString();
+                      final sessionCode =
+                          (item['sessionCode'] ?? '').toString();
+                      final adminNotes =
+                          (item['sessionAdminNotes'] ?? '').toString();
+                      final createdAt = _dateText(item['createdAt']);
+                      final archivedAt = _dateText(item['archivedAt']);
+                      final finalReviewPercentage =
+                          ((item['finalReviewPercentage'] ?? 0) as num)
+                              .toDouble();
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: AppSurfaceCard(
+                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          child: Column(
+                            crossAxisAlignment: isArabic
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: isArabic
+                                          ? CrossAxisAlignment.end
+                                          : CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          clientName.trim().isNotEmpty
+                                              ? clientName
+                                              : (isArabic ? 'عميل' : 'Client'),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge
+                                              ?.copyWith(
+                                                  fontWeight: FontWeight.w800),
                                         ),
-                                      ),
+                                        if (clinicianName
+                                            .trim()
+                                            .isNotEmpty) ...[
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            isArabic
+                                                ? 'الأخصائي: $clinicianName'
+                                                : 'Clinician: $clinicianName',
+                                          ),
+                                        ],
+                                      ],
                                     ),
-                                  if (adminNotes.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'ملاحظات الإدارة: $adminNotes'
-                                            : 'Admin notes: $adminNotes',
-                                      ),
-                                    ),
-                                  const SizedBox(height: 14),
-                                  Wrap(
-                                    spacing: 10,
-                                    runSpacing: 10,
-                                    children: [
-                                      FilledButton.tonalIcon(
-                                        onPressed: () =>
-                                            _printArchiveItem(context, item),
-                                        icon: const Icon(Icons.print_outlined),
-                                        label: Text(
-                                          isArabic ? 'طباعة' : 'Print',
-                                        ),
-                                      ),
-                                    ],
+                                  ),
+                                  AppStatusBadge(
+                                    label: _statusLabel(status, isArabic),
+                                    color: _statusColor(status),
                                   ),
                                 ],
                               ),
-                            ),
-                          );
-                        }),
-                    ],
-                  );
-                },
+                              const SizedBox(height: 12),
+                              Text('ID: $id'),
+                              Text('source: $source'),
+                              if (clientEmail.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'بريد العميل: $clientEmail'
+                                        : 'Client email: $clientEmail',
+                                  ),
+                                ),
+                              if (clientId.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'معرف العميل: $clientId'
+                                        : 'Client ID: $clientId',
+                                  ),
+                                ),
+                              if (clinicianId.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'معرف الأخصائي: $clinicianId'
+                                        : 'Clinician ID: $clinicianId',
+                                  ),
+                                ),
+                              if (createdAt.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'تاريخ الإنشاء: $createdAt'
+                                        : 'Created at: $createdAt',
+                                  ),
+                                ),
+                              if (sessionDate.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'موعد الجلسة: $sessionDate'
+                                        : 'Session date: $sessionDate',
+                                  ),
+                                ),
+                              if (sessionStatus.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'حالة الجلسة: $sessionStatus'
+                                        : 'Session status: $sessionStatus',
+                                  ),
+                                ),
+                              if (reviewStatus.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'حالة التقييم: $reviewStatus'
+                                        : 'Review status: $reviewStatus',
+                                  ),
+                                ),
+                              if (archivedAt.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'تاريخ الأرشفة: $archivedAt'
+                                        : 'Archived at: $archivedAt',
+                                  ),
+                                ),
+                              if (sessionLink.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'رابط الجلسة: $sessionLink'
+                                        : 'Session link: $sessionLink',
+                                  ),
+                                ),
+                              if (sessionCode.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'كود الجلسة: $sessionCode'
+                                        : 'Session code: $sessionCode',
+                                  ),
+                                ),
+                              if (finalReviewPercentage > 0)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'المتوسط النهائي: ${finalReviewPercentage.toStringAsFixed(1)}%'
+                                        : 'Final average: ${finalReviewPercentage.toStringAsFixed(1)}%',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                              if (adminNotes.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'ملاحظات الإدارة: $adminNotes'
+                                        : 'Admin notes: $adminNotes',
+                                  ),
+                                ),
+                              const SizedBox(height: 14),
+                              Wrap(
+                                spacing: 10,
+                                runSpacing: 10,
+                                children: [
+                                  FilledButton.tonalIcon(
+                                    onPressed: () =>
+                                        _printArchiveItem(context, item),
+                                    icon: const Icon(Icons.print_outlined),
+                                    label: Text(
+                                      isArabic ? 'طباعة' : 'Print',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                ],
               );
             },
           ),

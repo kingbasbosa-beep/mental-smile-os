@@ -118,297 +118,272 @@ class _AdminArchiveCentersPageState extends State<AdminArchiveCentersPage> {
                 .collection('booking_requests')
                 .where('archived', isEqualTo: true)
                 .snapshots(),
-            builder: (context, snapA) {
-              return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance
-                    .collection('bookingRequests')
-                    .where('archived', isEqualTo: true)
-                    .snapshots(),
-                builder: (context, snapB) {
-                  if (snapA.hasError && snapB.hasError) {
-                    return AppEmptyState(
-                      message: isArabic
-                          ? 'تعذر تحميل أرشيف المراكز'
-                          : 'Unable to load centers archive',
-                      icon: Icons.error_outline,
-                    );
-                  }
+            builder: (context, snap) {
+              if (snap.hasError) {
+                return AppEmptyState(
+                  message: isArabic
+                      ? 'تعذر تحميل أرشيف المراكز'
+                      : 'Unable to load centers archive',
+                  icon: Icons.error_outline,
+                );
+              }
 
-                  if (!snapA.hasData && !snapB.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+              if (!snap.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-                  final all = <Map<String, dynamic>>[];
-                  if (snapA.hasData) {
-                    all.addAll(
-                        _normalizeDocs(snapA.data!.docs, 'booking_requests'));
-                  }
-                  if (snapB.hasData) {
-                    all.addAll(
-                        _normalizeDocs(snapB.data!.docs, 'bookingRequests'));
-                  }
+              final items = _normalizeDocs(snap.data!.docs, 'booking_requests')
+                  .where(_isCenterArchiveRelevant)
+                  .toList()
+                ..sort((a, b) {
+                  final aTs =
+                      a['archivedAt'] ?? a['updatedAt'] ?? a['createdAt'];
+                  final bTs =
+                      b['archivedAt'] ?? b['updatedAt'] ?? b['createdAt'];
+                  DateTime ad = DateTime.fromMillisecondsSinceEpoch(0);
+                  DateTime bd = DateTime.fromMillisecondsSinceEpoch(0);
+                  if (aTs is Timestamp) ad = aTs.toDate();
+                  if (bTs is Timestamp) bd = bTs.toDate();
+                  return bd.compareTo(ad);
+                });
 
-                  final unique = <String, Map<String, dynamic>>{};
-                  for (final item in all) {
-                    final id = (item['_id'] ?? '').toString();
-                    if (id.isNotEmpty) unique[id] = item;
-                  }
+              final centerNames = items
+                  .map((e) => (e['centerName'] ?? e['displayName'] ?? '')
+                      .toString()
+                      .trim())
+                  .where((e) => e.isNotEmpty)
+                  .toSet()
+                  .toList()
+                ..sort();
 
-                  final items = unique.values
-                      .where(_isCenterArchiveRelevant)
-                      .toList()
-                    ..sort((a, b) {
-                      final aTs =
-                          a['archivedAt'] ?? a['updatedAt'] ?? a['createdAt'];
-                      final bTs =
-                          b['archivedAt'] ?? b['updatedAt'] ?? b['createdAt'];
-                      DateTime ad = DateTime.fromMillisecondsSinceEpoch(0);
-                      DateTime bd = DateTime.fromMillisecondsSinceEpoch(0);
-                      if (aTs is Timestamp) ad = aTs.toDate();
-                      if (bTs is Timestamp) bd = bTs.toDate();
-                      return bd.compareTo(ad);
-                    });
+              final filtered = items.where(_matchesFilters).toList();
 
-                  final centerNames = items
-                      .map((e) => (e['centerName'] ?? e['displayName'] ?? '')
-                          .toString()
-                          .trim())
-                      .where((e) => e.isNotEmpty)
-                      .toSet()
-                      .toList()
-                    ..sort();
-
-                  final filtered = items.where(_matchesFilters).toList();
-
-                  return ListView(
+              return ListView(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                children: [
+                  AppSurfaceCard(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    children: [
-                      AppSurfaceCard(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        child: Column(
-                          crossAxisAlignment: isArabic
-                              ? CrossAxisAlignment.end
-                              : CrossAxisAlignment.start,
+                    child: Column(
+                      crossAxisAlignment: isArabic
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isArabic ? 'أرشيف المراكز' : 'Centers Archive',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          isArabic
+                              ? 'عرض خاص بطلبات المراكز المؤرشفة وسير الموافقة والمتابعة الخاصة بها.'
+                              : 'A center-focused archive view for archived center requests and their approval/follow-up trail.',
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _searchController,
+                          onChanged: (value) =>
+                              setState(() => _search = value.trim()),
+                          decoration: appInputDecoration(
+                            context: context,
+                            label: isArabic ? 'بحث' : 'Search',
+                            icon: Icons.search,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
                           children: [
-                            Text(
-                              isArabic ? 'أرشيف المراكز' : 'Centers Archive',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(fontWeight: FontWeight.w800),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              isArabic
-                                  ? 'عرض خاص بطلبات المراكز المؤرشفة وسير الموافقة والمتابعة الخاصة بها.'
-                                  : 'A center-focused archive view for archived center requests and their approval/follow-up trail.',
-                            ),
-                            const SizedBox(height: 16),
-                            TextField(
-                              controller: _searchController,
-                              onChanged: (value) =>
-                                  setState(() => _search = value.trim()),
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: isArabic ? 'بحث' : 'Search',
-                                icon: Icons.search,
+                            SizedBox(
+                              width: 260,
+                              child: DropdownButtonFormField<String>(
+                                initialValue: _centerFilter,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: isArabic ? 'المركز' : 'Center',
+                                  icon: Icons.apartment_outlined,
+                                ),
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'all',
+                                    child: Text(isArabic ? 'الكل' : 'All'),
+                                  ),
+                                  ...centerNames.map(
+                                    (e) => DropdownMenuItem(
+                                      value: e,
+                                      child: Text(e),
+                                    ),
+                                  ),
+                                ],
+                                onChanged: (value) => setState(
+                                  () => _centerFilter = value ?? 'all',
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 14),
-                            Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
-                              children: [
-                                SizedBox(
-                                  width: 260,
-                                  child: DropdownButtonFormField<String>(
-                                    initialValue: _centerFilter,
-                                    decoration: appInputDecoration(
-                                      context: context,
-                                      label: isArabic ? 'المركز' : 'Center',
-                                      icon: Icons.apartment_outlined,
-                                    ),
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: 'all',
-                                        child: Text(isArabic ? 'الكل' : 'All'),
-                                      ),
-                                      ...centerNames.map(
-                                        (e) => DropdownMenuItem(
-                                          value: e,
-                                          child: Text(e),
-                                        ),
-                                      ),
-                                    ],
-                                    onChanged: (value) => setState(
-                                      () => _centerFilter = value ?? 'all',
+                            SizedBox(
+                              width: 260,
+                              child: DropdownButtonFormField<String>(
+                                initialValue: _statusFilter,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: isArabic ? 'الحالة' : 'Status',
+                                  icon: Icons.filter_alt_outlined,
+                                ),
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'all',
+                                    child: Text(isArabic ? 'الكل' : 'All'),
+                                  ),
+                                  ...[
+                                    'approved',
+                                    'center_follow_up',
+                                    'completed_success',
+                                  ].map(
+                                    (e) => DropdownMenuItem(
+                                      value: e,
+                                      child: Text(_statusLabel(e, isArabic)),
                                     ),
                                   ),
+                                ],
+                                onChanged: (value) => setState(
+                                  () => _statusFilter = value ?? 'all',
                                 ),
-                                SizedBox(
-                                  width: 260,
-                                  child: DropdownButtonFormField<String>(
-                                    initialValue: _statusFilter,
-                                    decoration: appInputDecoration(
-                                      context: context,
-                                      label: isArabic ? 'الحالة' : 'Status',
-                                      icon: Icons.filter_alt_outlined,
-                                    ),
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: 'all',
-                                        child: Text(isArabic ? 'الكل' : 'All'),
-                                      ),
-                                      ...[
-                                        'approved',
-                                        'center_follow_up',
-                                        'completed_success',
-                                      ].map(
-                                        (e) => DropdownMenuItem(
-                                          value: e,
-                                          child:
-                                              Text(_statusLabel(e, isArabic)),
-                                        ),
-                                      ),
-                                    ],
-                                    onChanged: (value) => setState(
-                                      () => _statusFilter = value ?? 'all',
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      AppSectionPanel(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        child: Text(
-                          isArabic
-                              ? 'عدد النتائج بعد الفلترة: ${filtered.length}'
-                              : 'Filtered results: ${filtered.length}',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(fontWeight: FontWeight.w800),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      if (filtered.isEmpty)
-                        AppEmptyState(
-                          message: isArabic
-                              ? 'لا توجد نتائج مطابقة'
-                              : 'No matching results',
-                          icon: Icons.search_off_rounded,
-                        )
-                      else
-                        ...filtered.map((item) {
-                          final centerName =
-                              (item['centerName'] ?? item['displayName'] ?? '')
-                                  .toString()
-                                  .trim();
-                          final status = (item['status'] ?? '').toString();
-                          final requestKind =
-                              (item['requestKind'] ?? '').toString();
-                          final centerId = (item['centerId'] ?? '').toString();
-                          final clientName =
-                              (item['clientName'] ?? '').toString().trim();
-                          final note = (item['note'] ?? '').toString().trim();
-                          final archivedAt = _dateText(item['archivedAt']);
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  AppSectionPanel(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Text(
+                      isArabic
+                          ? 'عدد النتائج بعد الفلترة: ${filtered.length}'
+                          : 'Filtered results: ${filtered.length}',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  if (filtered.isEmpty)
+                    AppEmptyState(
+                      message: isArabic
+                          ? 'لا توجد نتائج مطابقة'
+                          : 'No matching results',
+                      icon: Icons.search_off_rounded,
+                    )
+                  else
+                    ...filtered.map((item) {
+                      final centerName =
+                          (item['centerName'] ?? item['displayName'] ?? '')
+                              .toString()
+                              .trim();
+                      final status = (item['status'] ?? '').toString();
+                      final requestKind =
+                          (item['requestKind'] ?? '').toString();
+                      final centerId = (item['centerId'] ?? '').toString();
+                      final clientName =
+                          (item['clientName'] ?? '').toString().trim();
+                      final note = (item['note'] ?? '').toString().trim();
+                      final archivedAt = _dateText(item['archivedAt']);
 
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 14),
-                            child: AppSurfaceCard(
-                              padding: const EdgeInsets.all(AppSpacing.lg),
-                              child: Column(
-                                crossAxisAlignment: isArabic
-                                    ? CrossAxisAlignment.end
-                                    : CrossAxisAlignment.start,
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: AppSurfaceCard(
+                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          child: Column(
+                            crossAxisAlignment: isArabic
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
+                            children: [
+                              Row(
                                 children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          centerName.isNotEmpty
-                                              ? centerName
-                                              : (isArabic ? 'مركز' : 'Center'),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge
-                                              ?.copyWith(
-                                                  fontWeight: FontWeight.w800),
-                                        ),
-                                      ),
-                                      AppStatusBadge(
-                                        label: _statusLabel(status, isArabic),
-                                        color: const Color(0xFF37B8B0),
-                                      ),
-                                    ],
+                                  Expanded(
+                                    child: Text(
+                                      centerName.isNotEmpty
+                                          ? centerName
+                                          : (isArabic ? 'مركز' : 'Center'),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge
+                                          ?.copyWith(
+                                              fontWeight: FontWeight.w800),
+                                    ),
                                   ),
-                                  const SizedBox(height: 12),
-                                  if (centerId.trim().isNotEmpty)
-                                    Text(
-                                      isArabic
-                                          ? 'معرف المركز: $centerId'
-                                          : 'Center ID: $centerId',
-                                    ),
-                                  if (requestKind.trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'نوع الطلب: $requestKind'
-                                            : 'Request kind: $requestKind',
-                                      ),
-                                    ),
-                                  if (clientName.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'العميل المرتبط: $clientName'
-                                            : 'Related client: $clientName',
-                                      ),
-                                    ),
-                                  if (note.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'ملاحظة الطلب: $note'
-                                            : 'Request note: $note',
-                                      ),
-                                    ),
-                                  if ((item['archiveSection'] ?? '')
-                                      .toString()
-                                      .trim()
-                                      .isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'قسم الأرشفة الأصلي: ${(item['archiveSection'] ?? '').toString()}'
-                                            : 'Archive source section: ${(item['archiveSection'] ?? '').toString()}',
-                                      ),
-                                    ),
-                                  if (archivedAt.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        isArabic
-                                            ? 'تاريخ الأرشفة: $archivedAt'
-                                            : 'Archived at: $archivedAt',
-                                      ),
-                                    ),
+                                  AppStatusBadge(
+                                    label: _statusLabel(status, isArabic),
+                                    color: const Color(0xFF37B8B0),
+                                  ),
                                 ],
                               ),
-                            ),
-                          );
-                        }),
-                    ],
-                  );
-                },
+                              const SizedBox(height: 12),
+                              if (centerId.trim().isNotEmpty)
+                                Text(
+                                  isArabic
+                                      ? 'معرف المركز: $centerId'
+                                      : 'Center ID: $centerId',
+                                ),
+                              if (requestKind.trim().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'نوع الطلب: $requestKind'
+                                        : 'Request kind: $requestKind',
+                                  ),
+                                ),
+                              if (clientName.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'العميل المرتبط: $clientName'
+                                        : 'Related client: $clientName',
+                                  ),
+                                ),
+                              if (note.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'ملاحظة الطلب: $note'
+                                        : 'Request note: $note',
+                                  ),
+                                ),
+                              if ((item['archiveSection'] ?? '')
+                                  .toString()
+                                  .trim()
+                                  .isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'قسم الأرشفة الأصلي: ${(item['archiveSection'] ?? '').toString()}'
+                                        : 'Archive source section: ${(item['archiveSection'] ?? '').toString()}',
+                                  ),
+                                ),
+                              if (archivedAt.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    isArabic
+                                        ? 'تاريخ الأرشفة: $archivedAt'
+                                        : 'Archived at: $archivedAt',
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                ],
               );
             },
           ),

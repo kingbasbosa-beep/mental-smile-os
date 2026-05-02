@@ -13,6 +13,8 @@ class AdminArchivePage extends StatefulWidget {
 }
 
 class _AdminArchivePageState extends State<AdminArchivePage> {
+  int _selectedSectionIndex = 0;
+
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
@@ -305,6 +307,8 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
                   }
                 }
               }
+              final selectedSection = sectionKeys[_selectedSectionIndex];
+              final selectedColor = _sectionColor(selectedSection);
 
               return ListView(
                 padding: const EdgeInsets.all(AppSpacing.lg),
@@ -344,122 +348,140 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final width = constraints.maxWidth;
-                      int crossAxisCount = 3;
-                      double childAspectRatio = 1.45;
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: List.generate(sectionKeys.length, (index) {
+                      final key = sectionKeys[index];
+                      final color = _sectionColor(key);
+                      final isSelected = _selectedSectionIndex == index;
 
-                      if (width < 1150) {
-                        crossAxisCount = 2;
-                        childAspectRatio = 1.38;
-                      }
-                      if (width < 760) {
-                        crossAxisCount = 1;
-                        childAspectRatio = 2.0;
-                      }
-
-                      return GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: sectionKeys.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: childAspectRatio,
-                        ),
-                        itemBuilder: (context, index) {
-                          final key = sectionKeys[index];
-                          final color = _sectionColor(key);
-
-                          return InkWell(
-                            borderRadius: BorderRadius.circular(28),
-                            onTap: () => _openSection(context, key),
-                            child: Container(
-                              padding: const EdgeInsets.all(18),
-                              decoration: BoxDecoration(
-                                color: color,
-                                borderRadius: BorderRadius.circular(28),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: isArabic
-                                    ? CrossAxisAlignment.end
-                                    : CrossAxisAlignment.start,
-                                children: [
-                                  Align(
-                                    alignment: isArabic
-                                        ? Alignment.topLeft
-                                        : Alignment.topRight,
-                                    child: Container(
-                                      width: 68,
-                                      height: 68,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white
-                                            .withValues(alpha: 0.18),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        _sectionIcon(key),
-                                        color: Colors.white,
-                                        size: 34,
-                                      ),
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Text(
-                                    _sectionTitle(key, isArabic),
-                                    textAlign: isArabic
-                                        ? TextAlign.right
-                                        : TextAlign.left,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w800,
-                                      height: 1.08,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    _sectionSubtitle(key, isArabic),
-                                    textAlign: isArabic
-                                        ? TextAlign.right
-                                        : TextAlign.left,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      height: 1.2,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 14),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          Colors.white.withValues(alpha: 0.18),
-                                      borderRadius: BorderRadius.circular(999),
-                                    ),
-                                    child: Text(
-                                      isArabic
-                                          ? '${counts[key] ?? 0} عنصر'
-                                          : '${counts[key] ?? 0} items',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () =>
+                            setState(() => _selectedSectionIndex = index),
+                        child: Container(
+                          width: 142,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: isSelected
+                                  ? color
+                                  : AppColors.mutedGold.withValues(alpha: 0.22),
                             ),
-                          );
-                        },
+                            color: isSelected
+                                ? color.withValues(alpha: 0.08)
+                                : null,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircleAvatar(
+                                radius: 24,
+                                backgroundColor:
+                                    isSelected ? color : AppColors.sandstone,
+                                child: Icon(
+                                  _sectionIcon(key),
+                                  color: isSelected
+                                      ? Colors.white
+                                      : AppColors.mist,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                _sectionTitle(key, isArabic),
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      color: isSelected ? color : null,
+                                    ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                isArabic
+                                    ? '${counts[key] ?? 0} عنصر'
+                                    : '${counts[key] ?? 0} items',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
+                                      color: AppColors.mist,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
                       );
-                    },
+                    }),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppSurfaceCard(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: isArabic
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 28,
+                          backgroundColor: selectedColor,
+                          child: Icon(
+                            _sectionIcon(selectedSection),
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          _sectionTitle(selectedSection, isArabic),
+                          textAlign:
+                              isArabic ? TextAlign.right : TextAlign.left,
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          _sectionSubtitle(selectedSection, isArabic),
+                          textAlign:
+                              isArabic ? TextAlign.right : TextAlign.left,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.mist,
+                                  ),
+                        ),
+                        const SizedBox(height: 12),
+                        AppStatusBadge(
+                          label: isArabic
+                              ? '${counts[selectedSection] ?? 0} عنصر'
+                              : '${counts[selectedSection] ?? 0} items',
+                          color: selectedColor,
+                        ),
+                        const SizedBox(height: 14),
+                        Align(
+                          alignment: isArabic
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
+                          child: FilledButton.icon(
+                            onPressed: () =>
+                                _openSection(context, selectedSection),
+                            icon: const Icon(Icons.arrow_forward),
+                            label: Text(
+                              isArabic ? 'فتح القسم' : 'Open section',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               );
