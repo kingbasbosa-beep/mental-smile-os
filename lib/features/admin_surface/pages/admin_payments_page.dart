@@ -1,6 +1,7 @@
 ﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/core/ui/value_label_mapper.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/admin_surface/data/services/admin_payment_decision_adapter.dart';
 import 'package:flutterprojects/features/booking/data/services/booking_health_service.dart';
@@ -786,9 +787,13 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                             Text('ID: $requestId'),
                             Text('source: $source'),
                             Text('status: $status'),
-                            Text('paymentStatus: $paymentStatus'),
+                            Text(
+                              'paymentStatus: ${ValueLabelMapper.map(paymentStatus, isArabic: isArabic)}',
+                            ),
                             if (payoutStatus.isNotEmpty)
-                              Text('payoutStatus: $payoutStatus'),
+                              Text(
+                                'payoutStatus: ${ValueLabelMapper.map(payoutStatus, isArabic: isArabic)}',
+                              ),
                             if (accountingReviewStatus.isNotEmpty)
                               Text(
                                 'accountingReviewStatus: $accountingReviewStatus',

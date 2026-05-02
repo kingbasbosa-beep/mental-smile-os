@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/core/ui/value_label_mapper.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
@@ -222,7 +223,7 @@ class _AdminArchiveAccountingPageState
                                       ].map(
                                         (e) => DropdownMenuItem(
                                           value: e,
-                                          child: Text(e),
+                                          child: Text(ValueLabelMapper.map(e, isArabic: isArabic)),
                                         ),
                                       ),
                                     ],
@@ -255,7 +256,7 @@ class _AdminArchiveAccountingPageState
                                       ].map(
                                         (e) => DropdownMenuItem(
                                           value: e,
-                                          child: Text(e),
+                                          child: Text(ValueLabelMapper.map(e, isArabic: isArabic)),
                                         ),
                                       ),
                                     ],
@@ -347,8 +348,8 @@ class _AdminArchiveAccountingPageState
                                       padding: const EdgeInsets.only(top: 6),
                                       child: Text(
                                         isArabic
-                                            ? 'حالة الدفع: $paymentStatus'
-                                            : 'Payment status: $paymentStatus',
+                                            ? 'حالة الدفع: ${ValueLabelMapper.map(paymentStatus, isArabic: isArabic)}'
+                                            : 'Payment status: ${ValueLabelMapper.map(paymentStatus, isArabic: isArabic)}',
                                       ),
                                     ),
                                   if (payoutStatus.trim().isNotEmpty)
@@ -356,8 +357,8 @@ class _AdminArchiveAccountingPageState
                                       padding: const EdgeInsets.only(top: 6),
                                       child: Text(
                                         isArabic
-                                            ? 'حالة التحويل: $payoutStatus'
-                                            : 'Payout status: $payoutStatus',
+                                            ? 'حالة التحويل: ${ValueLabelMapper.map(payoutStatus, isArabic: isArabic)}'
+                                            : 'Payout status: ${ValueLabelMapper.map(payoutStatus, isArabic: isArabic)}',
                                       ),
                                     ),
                                   if (receipt.trim().isNotEmpty)
