@@ -45,6 +45,7 @@ import 'package:flutterprojects/features/centers/presentation/pages/center_detai
 import 'package:flutterprojects/features/admin_surface/pages/admin_centers_page.dart';
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_hub_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_control_room_placeholder_pages.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_blueprint_handoff_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_workspace_page.dart';
@@ -141,6 +142,10 @@ class AppRouter {
     Routes.adminAiDevOpsCenter,
     Routes.adminWorkspaceCommandCenter,
     Routes.contentWorkspace,
+    Routes.adminGuidedWorkflows,
+    Routes.adminReferences,
+    Routes.adminDetailedMonitoring,
+    Routes.adminAnalyticsDetails,
     Routes.adminBlueprintHandoff,
     Routes.adminComplianceCheckpoints,
     Routes.adminExposureRules,
@@ -459,6 +464,30 @@ class AppRouter {
       case Routes.contentWorkspace:
         return _adminProtectedRoute(
           child: const ContentWorkspacePage(),
+          settings: settings,
+        );
+
+      case Routes.adminGuidedWorkflows:
+        return _adminProtectedRoute(
+          child: const AdminGuidedWorkflowsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminReferences:
+        return _adminProtectedRoute(
+          child: const AdminReferencesPage(),
+          settings: settings,
+        );
+
+      case Routes.adminDetailedMonitoring:
+        return _adminProtectedRoute(
+          child: const AdminDetailedMonitoringPage(),
+          settings: settings,
+        );
+
+      case Routes.adminAnalyticsDetails:
+        return _adminProtectedRoute(
+          child: const AdminAnalyticsDetailsPage(),
           settings: settings,
         );
 
@@ -1254,4 +1283,3 @@ class _RouteAccessDecision {
   final bool isAdmin;
   final String redirectTarget;
 }
-

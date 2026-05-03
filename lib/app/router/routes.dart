@@ -84,6 +84,11 @@ class Routes {
   static const adminWorkspaceCommandCenter =
       '/admin/workspace-command-center';
   static const contentWorkspace = '/workspace/content';
+  static const adminGuidedWorkflows = '/admin/control-room/guided-workflows';
+  static const adminReferences = '/admin/control-room/references';
+  static const adminDetailedMonitoring =
+      '/admin/control-room/detailed-monitoring';
+  static const adminAnalyticsDetails = '/admin/control-room/analytics-details';
   static const adminBlueprintHandoff = '/admin/blueprint-handoff';
   static const adminComplianceCheckpoints = '/admin/compliance-checkpoints';
   static const adminExposureRules = '/admin/exposure-rules';
