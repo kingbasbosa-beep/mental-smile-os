@@ -38,6 +38,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/branding/
     - assets/c5/avatars/
     - assets/c5/icons/
     - assets/c5/ui/buttons/
@@ -71,5 +72,4 @@ flutter:
     - assets/animations/
     - assets/icons/
     - assets/images/
-
 
