@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -13,9 +13,6 @@ import 'package:flutterprojects/features/gateway_layer/core/gateway_monitor.dart
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_health_level.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_status.dart';
-import 'package:flutterprojects/features/admin_surface/models/analytics_summary_models.dart';
-import 'package:flutterprojects/features/admin_surface/services/analytics_summary_repository.dart';
-import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/branding/mental_smile_logo.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 
@@ -215,185 +212,6 @@ class _AdminHubPageState extends State<AdminHubPage> {
     });
   }
 
-  String _buildMonitoringSnapshotText({
-    required DocumentSnapshot<Map<String, dynamic>>? operationalAlertsDoc,
-    required DocumentSnapshot<Map<String, dynamic>>? systemHealthDoc,
-    required int stuckFollowUpsCount,
-    required int humanReviewCount,
-    required int pendingPayoutsCount,
-    required List<GatewayStatus> gatewayStatuses,
-  }) {
-    final operationalData = operationalAlertsDoc?.data();
-    final systemHealthData = systemHealthDoc?.data();
-    final hasOperationalSnapshot =
-        operationalAlertsDoc != null && operationalAlertsDoc.exists &&
-        operationalData != null;
-    final hasSystemHealthSnapshot =
-        systemHealthDoc != null && systemHealthDoc.exists && systemHealthData != null;
-    final hasAnyFallback = !hasOperationalSnapshot || !hasSystemHealthSnapshot;
-
-    final centerFollowUp = hasOperationalSnapshot
-        ? (operationalData?['centerFollowUpCount'] ?? 0).toString()
-        : stuckFollowUpsCount.toString();
-    final clientUpdateRequired = hasOperationalSnapshot
-        ? (operationalData?['clientUpdateRequiredCount'] ?? 0).toString()
-        : '0';
-    final operationalPayoutPending = hasOperationalSnapshot
-        ? (operationalData?['payoutPendingCount'] ?? 0).toString()
-        : pendingPayoutsCount.toString();
-
-    final fallbackIssuesCount =
-        stuckFollowUpsCount + humanReviewCount + pendingPayoutsCount;
-    final systemStatus = hasSystemHealthSnapshot
-        ? (systemHealthData?['status'] ?? 'unknown').toString()
-        : (fallbackIssuesCount > 0 ? 'Degraded' : 'OK');
-    final issuesCount = hasSystemHealthSnapshot
-        ? (systemHealthData?['issuesCount'] ?? 0).toString()
-        : fallbackIssuesCount.toString();
-    final rawLastScan = hasSystemHealthSnapshot
-        ? (systemHealthData?['timestamp'])
-        : DateTime.now().toIso8601String();
-    final lastScan = rawLastScan is Timestamp
-        ? rawLastScan.toDate().toIso8601String()
-        : rawLastScan?.toString().trim() ?? DateTime.now().toIso8601String();
-    final gatewayLines = gatewayStatuses.map((status) {
-      final level = status.level.name;
-      final label = status.label ?? status.key ?? 'Gateway';
-      return '- $label: $level';
-    }).join('\n');
-
-    return '''
-Detailed Monitoring Snapshot
-
-${hasAnyFallback ? 'Source: Fallback (no system snapshot found)\n' : ''}
-
-Operational Alerts
-- Center Follow-up: $centerFollowUp
-- Client Update Required: $clientUpdateRequired
-- Payout Pending: $operationalPayoutPending
-
-Critical Alerts
-- Stuck Follow-ups: $stuckFollowUpsCount
-- Human Review Needed: $humanReviewCount
-- Pending Payouts: $pendingPayoutsCount
-
-System Health
-- Status: $systemStatus
-- Issues Count: $issuesCount
-- Last Scan: ${lastScan.isEmpty ? 'N/A' : lastScan}
-
-Gateway Signals
-$gatewayLines
-''';
-  }
-
-  Future<void> _showMonitoringSnapshotDialog(
-    BuildContext context, {
-    required Stream<DocumentSnapshot<Map<String, dynamic>>> operationalAlertsStream,
-    required Stream<DocumentSnapshot<Map<String, dynamic>>> systemHealthStream,
-    required Stream<QuerySnapshot<Map<String, dynamic>>> stuckFollowUpsStream,
-    required Stream<QuerySnapshot<Map<String, dynamic>>> unresolvedSupportChatsStream,
-    required Stream<QuerySnapshot<Map<String, dynamic>>> pendingPayoutsStream,
-    required List<GatewayStatus> gatewayStatuses,
-  }) async {
-    try {
-      Future<int> safeInt(Future<int> future) async {
-        try {
-          return await future.timeout(const Duration(milliseconds: 800));
-        } catch (_) {
-          return 0;
-        }
-      }
-
-      Future<dynamic> safeValue(Future future) async {
-        try {
-          return await future.timeout(const Duration(milliseconds: 800));
-        } catch (_) {
-          return null;
-        }
-      }
-
-      final operationalAlertsDoc =
-          await safeValue(operationalAlertsStream.first);
-      final systemHealthDoc = await safeValue(systemHealthStream.first);
-      final stuckFollowUpsCount = await safeInt(
-        stuckFollowUpsStream.first.then((snapshot) => snapshot.docs.length),
-      );
-      final humanReviewCount = await safeInt(
-        unresolvedSupportChatsStream.first.then((snapshot) => snapshot.docs.length),
-      );
-      final pendingPayoutsCount = await safeInt(
-        pendingPayoutsStream.first.then((snapshot) => snapshot.docs.length),
-      );
-
-      final text = _buildMonitoringSnapshotText(
-        operationalAlertsDoc: operationalAlertsDoc,
-        systemHealthDoc: systemHealthDoc,
-        stuckFollowUpsCount: stuckFollowUpsCount,
-        humanReviewCount: humanReviewCount,
-        pendingPayoutsCount: pendingPayoutsCount,
-        gatewayStatuses: gatewayStatuses,
-      );
-
-      if (!context.mounted) return;
-
-      await showDialog<void>(
-        context: context,
-        builder: (dialogContext) {
-          return AlertDialog(
-            backgroundColor: const Color(0xFF10161A),
-            title: const Text('Monitoring TXT Snapshot'),
-            content: SingleChildScrollView(
-              child: SelectableText(text),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  await Clipboard.setData(ClipboardData(text: text));
-                  if (dialogContext.mounted) {
-                    Navigator.of(dialogContext).pop();
-                  }
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Copied')),
-                    );
-                  }
-                },
-                child: const Text('Copy'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(),
-                child: const Text('Close'),
-              ),
-            ],
-          );
-        },
-      );
-    } catch (error, stack) {
-      debugPrint('Monitoring export error: $error');
-      debugPrint('$stack');
-      if (!context.mounted) return;
-      await showDialog<void>(
-        context: context,
-        builder: (dialogContext) {
-          return AlertDialog(
-            backgroundColor: const Color(0xFF10161A),
-            title: const Text('Monitoring export error'),
-            content: SingleChildScrollView(
-              child: Text(error.toString()),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(),
-                child: const Text('Close'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
-
   Stream<int> _openEscalationsStream() {
     return FirebaseFirestore.instance
         .collection('chat_escalations')
@@ -455,93 +273,71 @@ $gatewayLines
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
 
-    final gatewayStatuses = AdminHubPage._gatewayMonitor.familyStatuses();
-    final operationalAlertsStream = FirebaseFirestore.instance
-        .collection('system_alerts')
-        .doc('latest')
-        .snapshots();
-    final systemHealthStream = FirebaseFirestore.instance
-        .collection('system_health')
-        .doc('latest')
-        .snapshots();
-    final monitoringBookingRequests =
-        FirebaseFirestore.instance.collection('booking_requests');
-    final monitoringChatThreads =
-        FirebaseFirestore.instance.collection('chat_threads');
-    final stuckFollowUpsStream = monitoringBookingRequests
-        .where('status', isEqualTo: 'center_follow_up')
-        .snapshots();
-    final unresolvedSupportChatsStream =
-        monitoringChatThreads.where('needsHumanSupport', isEqualTo: true).snapshots();
-    final pendingPayoutsStream = monitoringBookingRequests
-        .where('status', isEqualTo: 'payout_pending')
-        .snapshots();
-
     final compactCounters = <_QuickStatItem>[
       _QuickStatItem(
-        title: isArabic ? 'إشارات طلبات مفتوحة' : 'Open request signals',
+        title: isArabic ? '?????? ????? ??????' : 'Open request signals',
         group: AdminVisualGroup.requests,
         stream: _bookingOpenStream,
         crossSignalStream: _escalationsOpenStream,
         route: Routes.adminOperations,
       ),
       _QuickStatItem(
-        title: isArabic ? 'بوابة مراقبة السداد' : 'Payment monitoring gate',
+        title: isArabic ? '????? ?????? ??????' : 'Payment monitoring gate',
         group: AdminVisualGroup.payments,
         stream: _paymentsReviewStream,
         route: Routes.adminPayments,
       ),
       _QuickStatItem(
-        title: isArabic ? 'إشارات جاهزية الجلسات' : 'Session readiness signals',
+        title: isArabic ? '?????? ?????? ???????' : 'Session readiness signals',
         group: AdminVisualGroup.sessions,
         stream: _sessionsActionStream,
         route: Routes.adminSessions,
       ),
       _QuickStatItem(
-        title: isArabic ? 'حالات مصعّدة (سجل قديم)' : 'Escalated Cases (Historical)',
+        title: isArabic ? '????? ?????? (??? ????)' : 'Escalated Cases (Historical)',
         group: AdminVisualGroup.support,
         stream: _escalationsOpenStream,
         crossSignalStream: _bookingOpenStream,
         route: Routes.adminSupportChats,
       ),
       _QuickStatItem(
-        title: isArabic ? 'طلبات تحتاج انتباه' : 'Requests Requiring Attention',
+        title: isArabic ? '????? ????? ??????' : 'Requests Requiring Attention',
         group: AdminVisualGroup.requests,
         stream: _pendingApprovalsStream,
         route: Routes.adminClinicianRequests,
       ),
       _QuickStatItem(
-        title: isArabic ? 'إشارات بوابات/أجهزة' : 'Gateway/device signals',
+        title: isArabic ? '?????? ??????/?????' : 'Gateway/device signals',
         group: AdminVisualGroup.system,
         stream: _gatewayAttentionStream,
         route: Routes.adminGatewayLayer,
       ),
       _QuickStatItem(
-        title: isArabic ? 'مشاكل مفتوحة' : 'Open Issues',
+        title: isArabic ? '????? ??????' : 'Open Issues',
         group: AdminVisualGroup.system,
         staticCount: openIssuesCount,
         route: Routes.adminMaintenanceSystem,
       ),
       _QuickStatItem(
-        title: isArabic ? 'حالة الأقسام' : 'Domains',
+        title: isArabic ? '???? ???????' : 'Domains',
         group: AdminVisualGroup.system,
         staticCount: domainAvailabilityCount,
         route: Routes.adminDomainAvailability,
       ),
       _QuickStatItem(
-        title: isArabic ? 'رسائل متابعة' : 'Follow-up Messages',
+        title: isArabic ? '????? ??????' : 'Follow-up Messages',
         group: AdminVisualGroup.support,
         staticCount: externalFollowUpCount,
         route: Routes.adminCommunicationGateway,
       ),
       _QuickStatItem(
-        title: isArabic ? 'تشغيل الذكاء والكود' : 'AI DevOps',
+        title: isArabic ? '????? ?????? ??????' : 'AI DevOps',
         group: AdminVisualGroup.analytics,
         staticCount: aiDevOpsCount,
         route: Routes.adminAiDevOpsCenter,
       ),
       _QuickStatItem(
-        title: isArabic ? 'محتوى قيد التنفيذ' : 'Pending Content',
+        title: isArabic ? '????? ??? ???????' : 'Pending Content',
         group: AdminVisualGroup.analytics,
         staticCount: pendingContentCount,
         route: Routes.contentWorkspace,
@@ -550,59 +346,59 @@ $gatewayLines
 
     final mainSectionCards = <_AdminSectionLaunchCardData>[
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'مراقبة الطلبات والبوابات' : 'Requests & Gates',
+        title: isArabic ? '?????? ??????? ?????????' : 'Requests & Gates',
         subtitle: isArabic
-            ? 'مراقبة الطلبات والمدفوعات والجلسات دون ملكية تشغيل يومية' : 'Monitor requests, payments, and sessions without daily operational ownership',
+            ? '?????? ??????? ?????????? ???????? ??? ????? ????? ?????' : 'Monitor requests, payments, and sessions without daily operational ownership',
         icon: Icons.assignment_outlined,
         group: AdminVisualGroup.requests,
         route: Routes.adminOperations,
       ),
       _AdminSectionLaunchCardData(
         title: isArabic
-            ? 'المراجعة البشرية والسجل القديم' : 'Human Review & Historical Cases',
+            ? '???????? ??????? ?????? ??????' : 'Human Review & Historical Cases',
         subtitle: isArabic
-            ? 'هذا القسم يعرض محادثات قديمة فقط. طلبات الدعم الجديدة تتم عبر نظام الطلبات المنظمة.'
+            ? '??? ????? ???? ??????? ????? ???. ????? ????? ??????? ??? ??? ???? ??????? ???????.'
             : 'This section shows historical chat threads only. New support requests are handled via structured support requests.',
         icon: Icons.support_agent_outlined,
         group: AdminVisualGroup.support,
         route: Routes.adminCommunications,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'الدليل وبوابات الاعتماد' : 'Directory & Approval Gates',
+        title: isArabic ? '?????? ??????? ????????' : 'Directory & Approval Gates',
         subtitle: isArabic
-            ? 'العملاء والمراكز وإشارات الاعتماد' : 'Clients, centers, and approval-gate visibility',
+            ? '??????? ???????? ??????? ????????' : 'Clients, centers, and approval-gate visibility',
         icon: Icons.apartment_outlined,
         group: AdminVisualGroup.requests,
         route: Routes.adminClinicianRequests,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'الحوكمة' : 'Governance',
+        title: isArabic ? '???????' : 'Governance',
         subtitle: isArabic
-            ? 'سياسات الذكاء وحالة النطاقات' : 'Policies, domains, and governance visibility',
+            ? '?????? ?????? ????? ????????' : 'Policies, domains, and governance visibility',
         icon: Icons.policy_outlined,
         group: AdminVisualGroup.system,
         route: Routes.adminDomainStatus,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'برامج المحتوى والرعاية' : 'Content & Care Programs',
+        title: isArabic ? '????? ??????? ????????' : 'Content & Care Programs',
         subtitle: isArabic
-            ? 'حوكمة المحتوى والرسائل والمتابعة الداعمة' : 'Governance for content, support messaging, and follow-up care',
+            ? '????? ??????? ???????? ????????? ???????' : 'Governance for content, support messaging, and follow-up care',
         icon: Icons.menu_book_outlined,
         group: AdminVisualGroup.support,
         route: Routes.adminContentCarePrograms,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'النمو والانتشار' : 'Growth & Awareness',
+        title: isArabic ? '????? ?????????' : 'Growth & Awareness',
         subtitle: isArabic
-            ? 'التوعية، التوزيع، وخطط الظهور المدروسة' : 'Awareness, distribution, and supervised exposure planning',
+            ? '???????? ???????? ???? ?????? ????????' : 'Awareness, distribution, and supervised exposure planning',
         icon: Icons.campaign_outlined,
         group: AdminVisualGroup.analytics,
         route: Routes.adminGrowthLayer,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
+        title: isArabic ? '???? ????????' : 'Gateway Layer',
         subtitle: isArabic
-            ? 'قنوات وتكاملات وأجهزة وصيانة' : 'Channels, tools, devices, and maintenance',
+            ? '????? ???????? ?????? ??????' : 'Channels, tools, devices, and maintenance',
         icon: Icons.hub_outlined,
         group: AdminVisualGroup.system,
         route: Routes.adminGatewayLayer,
@@ -611,54 +407,54 @@ $gatewayLines
 
     final departmentSectionCards = <_AdminSectionLaunchCardData>[
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'المتابعة وخدمة العملاء' : 'Customer Follow-up',
+        title: isArabic ? '???????? ????? ???????' : 'Customer Follow-up',
         subtitle: isArabic
-            ? 'واتساب وطلبات الويب والبريد والمتابعة التشغيلية'
+            ? '?????? ?????? ????? ??????? ????????? ?????????'
             : 'Web requests, email, and operational follow-up',
         icon: Icons.support_agent_outlined,
         group: AdminVisualGroup.support,
         route: Routes.customerFollowUpWorkspace,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'الدعم التقني والصيانة' : 'Technical Support',
+        title: isArabic ? '????? ?????? ????????' : 'Technical Support',
         subtitle: isArabic
-            ? 'الأعطال والصيانة والتشخيص وصحة النظام'
+            ? '??????? ???????? ???????? ???? ??????'
             : 'Diagnostics, maintenance, issue handling, and system health',
         icon: Icons.build_circle_outlined,
         group: AdminVisualGroup.system,
         route: Routes.technicalSupportWorkspace,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'الدعاية والمحتوى' : 'Marketing',
+        title: isArabic ? '??????? ????????' : 'Marketing',
         subtitle: isArabic
-            ? 'المحتوى والحملات وتجهيز النشر والمواد التعليمية'
+            ? '??????? ???????? ?????? ????? ??????? ?????????'
             : 'Content, campaigns, publish prep, and educational materials',
         icon: Icons.campaign_outlined,
         group: AdminVisualGroup.analytics,
         route: Routes.marketingWorkspace,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'قسم المحاسبة' : 'Accounting',
+        title: isArabic ? '??? ????????' : 'Accounting',
         subtitle: isArabic
-            ? 'مراجعة السداد والتحويلات، سجل المدفوعات، والسجل المحاسبي'
+            ? '?????? ?????? ??????????? ??? ?????????? ?????? ????????'
             : 'Payment Review & Payouts, Payments Ledger, and Accounting Ledger',
         icon: Icons.account_balance_wallet_outlined,
         group: AdminVisualGroup.payments,
         route: Routes.adminAccountingWorkspace,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'الأرشيف' : 'Archive',
+        title: isArabic ? '???????' : 'Archive',
         subtitle: isArabic
-            ? 'اختصار لسجلات الأقسام المؤرشفة'
+            ? '?????? ?????? ??????? ????????'
             : 'Shortcut to archived department records',
         icon: Icons.archive_outlined,
         group: AdminVisualGroup.system,
         route: Routes.adminArchive,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'المتابعة الخارجية' : 'External Follow-up',
+        title: isArabic ? '???????? ????????' : 'External Follow-up',
         subtitle: isArabic
-            ? 'إدارة تسجيلات المتابعة والدعم والتهنئة والتوعية'
+            ? '????? ??????? ???????? ?????? ???????? ????????'
             : 'Manage follow-up, support, greeting, and awareness registrations',
         icon: Icons.mark_email_read_outlined,
         group: AdminVisualGroup.support,
@@ -693,167 +489,41 @@ $gatewayLines
       ),
     ];
 
-    final keyReferences = <_AdminQuickActionItem>[
-      _AdminQuickActionItem(
-        label: isArabic ? 'System Activation Pack' : 'System Activation Pack',
-        icon: Icons.inventory_2_outlined,
-        group: AdminVisualGroup.system,
-        route: Routes.adminSystemActivationPack,
-      ),
-      _AdminQuickActionItem(
-        label: isArabic ? 'Blueprint Handoff' : 'Blueprint Handoff',
-        icon: Icons.map_outlined,
-        group: AdminVisualGroup.system,
-        route: Routes.adminBlueprintHandoff,
-      ),
-      _AdminQuickActionItem(
-        label: isArabic ? 'Compliance Checkpoints' : 'Compliance Checkpoints',
-        icon: Icons.verified_outlined,
-        group: AdminVisualGroup.system,
-        route: Routes.adminComplianceCheckpoints,
-      ),
-      _AdminQuickActionItem(
-        label: isArabic ? 'Exposure Rules' : 'Exposure Rules',
-        icon: Icons.visibility_outlined,
-        group: AdminVisualGroup.analytics,
-        route: Routes.adminExposureRules,
-      ),
-    ];
-
-    final guidedWorkflows = <_AdminGuidedWorkflowCardData>[
-      _AdminGuidedWorkflowCardData(
-        title: isArabic ? 'معالجة الدعم' : 'Support Handling',
-        subtitle: isArabic
-            ? 'ابدأ من حدود القناة ثم راجع حوكمة الرسائل الداعمة.' : 'Start with channel boundaries, then review support messaging governance.',
-        primaryActionLabel:
-            isArabic ? 'Communication Gateway' : 'Communication Gateway',
-        primaryRoute: Routes.adminCommunicationGateway,
-        secondaryActionLabel:
-            isArabic ? 'Messaging Governance' : 'Messaging Governance',
-        secondaryRoute: Routes.adminSupportMessagingGovernance,
-        group: AdminVisualGroup.support,
-      ),
-      _AdminGuidedWorkflowCardData(
-        title: isArabic ? 'جاهزية المتابعة' : 'Follow-Up Readiness',
-        subtitle: isArabic
-            ? 'راجع حوكمة المتابعة ثم حدود الذكاء قبل أي توسع لاحق.' : 'Review follow-up governance, then AI boundaries before any later expansion.',
-        primaryActionLabel:
-            isArabic ? 'Follow-Up Care Governance' : 'Follow-Up Care Governance',
-        primaryRoute: Routes.adminFollowupCareGovernance,
-        secondaryActionLabel:
-            isArabic ? 'AI Follow-Up Boundaries' : 'AI Follow-Up Boundaries',
-        secondaryRoute: Routes.adminAiFollowupBoundaries,
-        group: AdminVisualGroup.sessions,
-      ),
-      _AdminGuidedWorkflowCardData(
-        title: isArabic ? 'مراجعة إدخال المحتوى' : 'Content Intake Review',
-        subtitle: isArabic
-            ? 'راجع حوكمة المكتبة ثم ارجع إلى سطح برامج المحتوى والرعاية.' : 'Review library governance, then return to the content and care surface.',
-        primaryActionLabel:
-            isArabic ? 'Library Governance' : 'Library Governance',
-        primaryRoute: Routes.adminLibraryGovernance,
-        secondaryActionLabel:
-            isArabic ? 'برامج المحتوى والرعاية' : 'Content & Care Programs',
-        secondaryRoute: Routes.adminContentCarePrograms,
-        group: AdminVisualGroup.support,
-      ),
-    ];
-
     final detailSections = <_AdminDetailPanelSection>[
       _AdminDetailPanelSection(
-        title: isArabic ? 'المسارات الموجهة' : 'Guided Workflows',
+        title: isArabic ? '???????? ???????' : 'Guided Workflows',
         subtitle: isArabic
-            ? 'إظهار المسارات الموجهة فقط عند الحاجة.' : 'Guided review paths kept available without stretching the main hub.',
+            ? '????? ???????? ??????? ??? ??? ??????.' : 'Guided review paths kept available without stretching the main hub.',
         icon: Icons.route_outlined,
         route: Routes.adminGuidedWorkflows,
-        child: _AdminGuidedWorkflowsSection(
-          title: isArabic ? 'مسارات مراجعة موجهة' : 'Guided Review Paths',
-          subtitle: isArabic
-              ? 'تجميعات تنقل خفيفة للمراجعة والوعي فقط، وليست مسار تشغيل جديد.' : 'Compact route groupings for review and awareness only, not a new operating workflow.',
-          workflows: guidedWorkflows,
-        ),
       ),
       _AdminDetailPanelSection(
-        title: isArabic ? 'المراجع' : 'References',
+        title: isArabic ? '???????' : 'References',
         subtitle: isArabic
-            ? 'الروابط المرجعية والسياسات في قسم منفصل قابل للطي.' : 'Reference pages and policy shortcuts kept below the fold.',
+            ? '??????? ???????? ????????? ?? ??? ????? ???? ????.' : 'Reference pages and policy shortcuts kept below the fold.',
         icon: Icons.menu_book_outlined,
         route: Routes.adminReferences,
-        child: _AdminReferencesSection(
-          isArabic: isArabic,
-          title: isArabic ? 'مراجع أساسية' : 'Key References',
-          subtitle: isArabic
-              ? 'صفحات مرجعية تساعد غرفة التحكم على فهم الحدود والسياسات.' : 'Reference pages that help the control room understand boundaries and policy.',
-          actions: keyReferences,
-        ),
       ),
       _AdminDetailPanelSection(
-        title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
+        title: isArabic ? '???? ????????' : 'Gateway Layer',
         subtitle: isArabic
-            ? 'حالة البوابات والاتصالات في قسم مضغوط.' : 'Gateway status and connectivity details in a condensed section.',
+            ? '???? ???????? ?????????? ?? ??? ?????.' : 'Gateway status and connectivity details in a condensed section.',
         icon: Icons.hub_outlined,
         route: Routes.adminGatewayLayer,
-        child: _GatewaySummaryStrip(statuses: gatewayStatuses),
       ),
       _AdminDetailPanelSection(
-        title: isArabic ? 'متابعة تفصيلية' : 'Detailed Monitoring',
+        title: isArabic ? '?????? ???????' : 'Detailed Monitoring',
         subtitle: isArabic
-            ? 'بطاقات التنبيه والصحة وإشارات البوابات في قسم واحد قابل للطي.' : 'Alerts, health, and gateway signals in one collapsible section.',
+            ? '?????? ??????? ?????? ??????? ???????? ?? ??? ???? ???? ????.' : 'Alerts, health, and gateway signals in one collapsible section.',
         icon: Icons.monitor_heart_outlined,
         route: Routes.adminDetailedMonitoring,
-        child: Column(
-          children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Monitoring export started'),
-                    ),
-                  );
-                  _showMonitoringSnapshotDialog(
-                    context,
-                    operationalAlertsStream: operationalAlertsStream,
-                    systemHealthStream: systemHealthStream,
-                    stuckFollowUpsStream: stuckFollowUpsStream,
-                    unresolvedSupportChatsStream: unresolvedSupportChatsStream,
-                    pendingPayoutsStream: pendingPayoutsStream,
-                    gatewayStatuses: gatewayStatuses,
-                  );
-                },
-                icon: const Icon(Icons.copy_all_outlined, size: 18),
-                label: const Text('Export Monitoring TXT'),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            const _ControlRoomIntro(),
-            const SizedBox(height: 2),
-            _ControlRoomDashboardLayout(
-              leftCards: [
-                _OperationalAlertsCard(alertsStream: operationalAlertsStream),
-                _AdminSystemHealthCard(healthStream: systemHealthStream),
-                _CriticalAlertsCard(
-                  stuckFollowUpsStream: stuckFollowUpsStream,
-                  unresolvedSupportChatsStream: unresolvedSupportChatsStream,
-                  pendingPayoutsStream: pendingPayoutsStream,
-                ),
-              ],
-              supervisoryCard: _GatewaySignalsCard(
-                statuses: gatewayStatuses,
-                gatewayMonitor: AdminHubPage._gatewayMonitor,
-              ),
-            ),
-          ],
-        ),
       ),
       _AdminDetailPanelSection(
-        title: isArabic ? 'تفاصيل التحليلات' : 'Analytics Details',
+        title: isArabic ? '?????? ?????????' : 'Analytics Details',
         subtitle: isArabic
-            ? 'ملخص السلوك ومؤشرات المراقبة في قسم مختصر.' : 'Behavior and monitoring analytics kept available without stretching the main page.',
+            ? '???? ?????? ??????? ???????? ?? ??? ?????.' : 'Behavior and monitoring analytics kept available without stretching the main page.',
         icon: Icons.analytics_outlined,
         route: Routes.adminAnalyticsDetails,
-        child: _UserBehaviorAnalyticsPlaceholder(isArabic: isArabic),
       ),
     ];
 
@@ -901,9 +571,7 @@ $gatewayLines
                   final width = constraints.maxWidth;
 
                   return ListView(
-                    physics: width >= 960
-                        ? const NeverScrollableScrollPhysics()
-                        : null,
+                    physics: const ClampingScrollPhysics(),
                     padding: const EdgeInsets.fromLTRB(
                       AppSpacing.sm,
                       2,
@@ -975,6 +643,8 @@ $gatewayLines
                       cards: departmentSectionCards,
                     ),
                   const SizedBox(height: 2),
+                  // This stream is intentionally left build-scoped for now;
+                  // moving it needs a lifecycle refactor outside this cleanup.
                   _SystemAdvisoryCard(
                     advisoryStream: _systemAdvisoryStream(),
                   ),
@@ -994,7 +664,6 @@ class _AdminDetailPanelSection {
   const _AdminDetailPanelSection({
     required this.title,
     required this.subtitle,
-    required this.child,
     required this.icon,
     this.route,
     this.missingRouteTodo,
@@ -1002,7 +671,6 @@ class _AdminDetailPanelSection {
 
   final String title;
   final String subtitle;
-  final Widget child;
   final IconData icon;
   final String? route;
   final String? missingRouteTodo;
@@ -1145,174 +813,6 @@ class _AdminDetailNavigationPill extends StatelessWidget {
   }
 }
 
-class _AdminHubAmbientBackground extends StatelessWidget {
-  const _AdminHubAmbientBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned(
-          top: 40,
-          left: 80,
-          child: _AmbientDisc(
-            size: 320,
-            glowColor: const Color(0xFFD8B26A).withValues(alpha: 0.16),
-            ringColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
-          ),
-        ),
-        Positioned(
-          top: 260,
-          left: 220,
-          child: _AmbientDisc(
-            size: 336,
-            glowColor: const Color(0xFFD8B26A).withValues(alpha: 0.09),
-            ringColor: const Color(0xFF3E9B90).withValues(alpha: 0.14),
-          ),
-        ),
-        Positioned(
-          top: 84,
-          right: 48,
-          child: Container(
-            width: 1,
-            height: 280,
-            color: const Color(0xFF3E9B90).withValues(alpha: 0.12),
-          ),
-        ),
-        Positioned(
-          top: 112,
-          left: 52,
-          child: Container(
-            width: 1,
-            height: 240,
-            color: const Color(0xFF3E9B90).withValues(alpha: 0.09),
-          ),
-        ),
-        Positioned(
-          top: 96,
-          right: 20,
-          child: _EdgeTempleHint(
-            height: 320,
-            color: const Color(0xFFD8B26A).withValues(alpha: 0.03),
-          ),
-        ),
-        Positioned(
-          top: 124,
-          left: 20,
-          child: _EdgeTempleHint(
-            height: 280,
-            color: const Color(0xFFD8B26A).withValues(alpha: 0.024),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _AmbientDisc extends StatelessWidget {
-  const _AmbientDisc({
-    required this.size,
-    required this.glowColor,
-    required this.ringColor,
-  });
-
-  final double size;
-  final Color glowColor;
-  final Color ringColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  glowColor,
-                  glowColor.withValues(alpha: glowColor.a * 0.35),
-                  Colors.transparent,
-                ],
-                stops: const [0.0, 0.42, 1.0],
-              ),
-            ),
-          ),
-          Container(
-            width: size * 0.74,
-            height: size * 0.74,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: ringColor, width: 1),
-            ),
-          ),
-          Container(
-            width: size * 0.52,
-            height: size * 0.52,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: ringColor.withValues(alpha: ringColor.a * 0.75),
-                width: 0.8,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EdgeTempleHint extends StatelessWidget {
-  const _EdgeTempleHint({
-    required this.height,
-    required this.color,
-  });
-
-  final double height;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 18,
-      height: height,
-      child: Column(
-        children: [
-          Container(
-            width: 18,
-            height: 3,
-            color: color,
-          ),
-          const SizedBox(height: 6),
-          Expanded(
-            child: Container(
-              width: 10,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(999),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    color,
-                    color.withValues(alpha: color.a * 0.55),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _AdminSectionLaunchCardData {
   const _AdminSectionLaunchCardData({
     required this.title,
@@ -1341,26 +841,6 @@ class _AdminQuickActionItem {
   final IconData icon;
   final AdminVisualGroup? group;
   final String route;
-}
-
-class _AdminGuidedWorkflowCardData {
-  const _AdminGuidedWorkflowCardData({
-    required this.title,
-    required this.subtitle,
-    required this.primaryActionLabel,
-    required this.primaryRoute,
-    required this.secondaryActionLabel,
-    required this.secondaryRoute,
-    this.group,
-  });
-
-  final String title;
-  final String subtitle;
-  final String primaryActionLabel;
-  final String primaryRoute;
-  final String secondaryActionLabel;
-  final String secondaryRoute;
-  final AdminVisualGroup? group;
 }
 
 class _AdminHeaderShortcutBar extends StatelessWidget {
@@ -1538,7 +1018,7 @@ class _AdminGovernanceToolsButton extends StatelessWidget {
                     isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isArabic ? 'أدوات الحوكمة' : 'Governance Tools',
+                    isArabic ? '????? ???????' : 'Governance Tools',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: const Color(0xFFF1E5C8),
                           fontWeight: FontWeight.w800,
@@ -1582,7 +1062,7 @@ class _AdminGovernanceToolsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: isArabic ? 'أدوات الحوكمة' : 'Governance Tools',
+      message: isArabic ? '????? ???????' : 'Governance Tools',
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadii.xl),
         onTap: () => _showTools(context),
@@ -1633,7 +1113,7 @@ class _AdminGovernanceToolsButton extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                isArabic ? 'أدوات الحوكمة' : 'Governance Tools',
+                isArabic ? '????? ???????' : 'Governance Tools',
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
@@ -1647,498 +1127,6 @@ class _AdminGovernanceToolsButton extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _AdminQuickActionsStrip extends StatelessWidget {
-  const _AdminQuickActionsStrip({
-    required this.title,
-    required this.subtitle,
-    required this.actions,
-    this.vertical = false,
-  });
-
-  final String title;
-  final String subtitle;
-  final List<_AdminQuickActionItem> actions;
-  final bool vertical;
-
-  @override
-  Widget build(BuildContext context) {
-    final isRtl = Directionality.of(context) == TextDirection.rtl;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 1),
-      child: Column(
-        crossAxisAlignment:
-            isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
-          if (vertical)
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final chipWidth = constraints.maxWidth >= 360
-                    ? (constraints.maxWidth - 4) / 2
-                    : constraints.maxWidth;
-                return Align(
-                  alignment:
-                      isRtl ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Wrap(
-                    alignment: isRtl ? WrapAlignment.end : WrapAlignment.start,
-                    spacing: 4,
-                    runSpacing: 4,
-                    children: actions.map((action) {
-                      final color = _adminVisualGroupColor(action.group);
-                      return SizedBox(
-                        width: chipWidth,
-                        child: ActionChip(
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          visualDensity: const VisualDensity(
-                            horizontal: -2,
-                            vertical: -2,
-                          ),
-                          backgroundColor:
-                              const Color(0xFF182026).withValues(alpha: 0.88),
-                          side: BorderSide(
-                            color: const Color(0xFFD8B26A).withValues(alpha: 0.20),
-                          ),
-                          avatar: Icon(
-                            action.icon,
-                            size: 18,
-                            color: color,
-                          ),
-                          label: Text(
-                            action.label,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Color(0xFFF1E5C8),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          onPressed: () =>
-                              Navigator.of(context).pushNamed(action.route),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                );
-              },
-            )
-          else
-            Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
-              children: actions
-                  .map(
-                    (action) {
-                      final color = _adminVisualGroupColor(action.group);
-                      return ActionChip(
-                        backgroundColor:
-                            const Color(0xFF182026).withValues(alpha: 0.88),
-                        side: BorderSide(
-                          color: const Color(0xFFD8B26A).withValues(alpha: 0.18),
-                        ),
-                        avatar: Icon(
-                          action.icon,
-                          size: 18,
-                          color: color,
-                        ),
-                        label: Text(
-                          action.label,
-                          style: const TextStyle(
-                            color: Color(0xFFF1E5C8),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        onPressed: () =>
-                            Navigator.of(context).pushNamed(action.route),
-                      );
-                    },
-                  )
-                  .toList(),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AdminReferencesSection extends StatelessWidget {
-  const _AdminReferencesSection({
-    required this.isArabic,
-    required this.title,
-    required this.subtitle,
-    required this.actions,
-  });
-
-  final bool isArabic;
-  final String title;
-  final String subtitle;
-  final List<_AdminQuickActionItem> actions;
-
-  String _referencePurpose(_AdminQuickActionItem item) {
-    switch (item.route) {
-      case Routes.adminSystemActivationPack:
-        return 'Activation reference for control-room setup readiness.';
-      case Routes.adminBlueprintHandoff:
-        return 'Boundary handoff reference between planning and implementation.';
-      case Routes.adminComplianceCheckpoints:
-        return 'Compliance and approval checkpoints reference for governance review.';
-      case Routes.adminExposureRules:
-        return 'Exposure and visibility guardrails reference for rollout decisions.';
-      default:
-        return 'Reference entry for control-room review.';
-    }
-  }
-
-  Future<void> _showReferenceSnapshotDialog(
-    BuildContext context,
-    _AdminQuickActionItem item,
-  ) async {
-    final text = [
-      item.label,
-      '',
-      'Purpose: ${_referencePurpose(item)}',
-      'Route: ${item.route}',
-      'Current status: Reference entry active',
-      'Manual notes: ...',
-    ].join('\n');
-
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF10161A),
-          title: Text(
-            isArabic ? 'تصدير مرجع نصي' : 'Export TXT Reference',
-            style: const TextStyle(
-              color: Color(0xFFF1E5C8),
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          content: SizedBox(
-            width: 420,
-            child: SingleChildScrollView(
-              child: SelectableText(
-                text,
-                style: const TextStyle(
-                  color: Color(0xFFE5D6B2),
-                  height: 1.45,
-                ),
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(isArabic ? 'إغلاق' : 'Close'),
-            ),
-            FilledButton.tonal(
-              onPressed: () async {
-                await Clipboard.setData(ClipboardData(text: text));
-                if (!dialogContext.mounted) return;
-                Navigator.of(dialogContext).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      isArabic ? 'تم نسخ النص' : 'Reference snapshot copied',
-                    ),
-                  ),
-                );
-              },
-              child: Text(isArabic ? 'نسخ النص' : 'Copy text'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isRtl = Directionality.of(context) == TextDirection.rtl;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 1),
-      child: Column(
-        crossAxisAlignment:
-            isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            alignment: isRtl ? WrapAlignment.end : WrapAlignment.start,
-            children: actions.map((action) {
-              final color = _adminVisualGroupColor(action.group);
-              return Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  ActionChip(
-                    backgroundColor:
-                        const Color(0xFF182026).withValues(alpha: 0.88),
-                    side: BorderSide(
-                      color: const Color(0xFFD8B26A).withValues(alpha: 0.18),
-                    ),
-                    avatar: Icon(
-                      action.icon,
-                      size: 18,
-                      color: color,
-                    ),
-                    label: Text(
-                      action.label,
-                      style: const TextStyle(
-                        color: Color(0xFFF1E5C8),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    onPressed: () =>
-                        Navigator.of(context).pushNamed(action.route),
-                  ),
-                  ActionChip(
-                    backgroundColor:
-                        const Color(0xFF182026).withValues(alpha: 0.90),
-                    side: BorderSide(
-                      color: const Color(0xFF3E9B90).withValues(alpha: 0.34),
-                    ),
-                    avatar: const Icon(
-                      Icons.text_snippet_outlined,
-                      size: 16,
-                      color: Color(0xFF3E9B90),
-                    ),
-                    label: Text(
-                      isArabic ? 'تصدير TXT' : 'Export TXT',
-                      style: const TextStyle(
-                        color: Color(0xFFF1E5C8),
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    onPressed: () => _showReferenceSnapshotDialog(context, action),
-                  ),
-                ],
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AdminGuidedWorkflowsSection extends StatelessWidget {
-  const _AdminGuidedWorkflowsSection({
-    required this.title,
-    required this.subtitle,
-    required this.workflows,
-  });
-  final String title;
-  final String subtitle;
-  final List<_AdminGuidedWorkflowCardData> workflows;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppSurfaceCard(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      color: const Color(0xFF0B1014).withValues(alpha: 0.96),
-      borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xFFC9A75B),
-                ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            subtitle,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
-                ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final isNarrow = constraints.maxWidth < 980;
-              if (isNarrow) {
-                return Column(
-                  children: [
-                    for (int i = 0; i < workflows.length; i++) ...[
-                      _AdminGuidedWorkflowCard(item: workflows[i]),
-                      if (i != workflows.length - 1)
-                        const SizedBox(height: AppSpacing.md),
-                    ],
-                  ],
-                );
-              }
-
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (int i = 0; i < workflows.length; i++) ...[
-                    Expanded(
-                      child: _AdminGuidedWorkflowCard(item: workflows[i]),
-                    ),
-                    if (i != workflows.length - 1)
-                      const SizedBox(width: AppSpacing.md),
-                  ],
-                ],
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AdminGuidedWorkflowCard extends StatelessWidget {
-  const _AdminGuidedWorkflowCard({
-    required this.item,
-  });
-
-  final _AdminGuidedWorkflowCardData item;
-
-  String _buildWorkflowExportText() {
-    final expectedOutcome = switch (item.title) {
-      'Support Handling' || 'معالجة الدعم' =>
-        'Clear support boundary review with channel governance and escalation-safe handling awareness.',
-      'Follow-Up Readiness' || 'جاهزية المتابعة' =>
-        'Follow-up governance is reviewed before any AI-assisted expansion or readiness decision.',
-      'Content Intake Review' || 'مراجعة إدخال المحتوى' =>
-        'Content intake and library governance are reviewed before returning to the program surface.',
-      _ => 'Workflow reference captured for guided review.',
-    };
-
-    return '''
-Workflow: ${item.title}
-
-Entry Points
-- ${item.primaryActionLabel}: ${item.primaryRoute}
-- ${item.secondaryActionLabel}: ${item.secondaryRoute}
-
-Logical Steps
-1. Open ${item.primaryActionLabel}
-2. Review its boundary and current guidance
-3. Open ${item.secondaryActionLabel}
-4. Cross-check governance alignment
-5. Return to Control Room with review awareness only
-
-Expected Outcome
-$expectedOutcome
-
-Observations
-Manual notes: ...
-''';
-  }
-
-  Future<void> _showWorkflowExportDialog(BuildContext context) async {
-    final text = _buildWorkflowExportText();
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF10161A),
-          title: const Text('Workflow TXT Snapshot'),
-          content: SingleChildScrollView(
-            child: SelectableText(text),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                await Clipboard.setData(ClipboardData(text: text));
-                if (dialogContext.mounted) {
-                  Navigator.of(dialogContext).pop();
-                }
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Copied')),
-                  );
-                }
-              },
-              child: const Text('Copy'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final color = _adminVisualGroupColor(item.group);
-    return AppSectionPanel(
-      color: const Color(0xFF10161A).withValues(alpha: 0.94),
-      borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.20),
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            item.title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xFFC9A75B),
-                ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            item.subtitle,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
-                  height: 1.3,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: [
-              OutlinedButton(
-                onPressed: () => Navigator.of(context).pushNamed(item.primaryRoute),
-                style: OutlinedButton.styleFrom(
-                                  foregroundColor: const Color(0xFFC9A75B),
-                  side: BorderSide(
-                    color: color.withValues(alpha: 0.42),
-                  ),
-                ),
-                child: Text(item.primaryActionLabel),
-              ),
-              OutlinedButton(
-                onPressed: () =>
-                    Navigator.of(context).pushNamed(item.secondaryRoute),
-                style: OutlinedButton.styleFrom(
-                                  foregroundColor: const Color(0xFFC9A75B),
-                  side: BorderSide(
-                    color: const Color(0xFFD8B26A).withValues(alpha: 0.28),
-                  ),
-                ),
-                child: Text(item.secondaryActionLabel),
-              ),
-              OutlinedButton(
-                onPressed: () => _showWorkflowExportDialog(context),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFFC9A75B),
-                  side: BorderSide(
-                    color: const Color(0xFFD8B26A).withValues(alpha: 0.22),
-                  ),
-                ),
-                child: const Text('Export Workflow TXT'),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -2425,254 +1413,6 @@ class _SystemAdvisoryCard extends StatelessWidget {
   }
 }
 
-class _AdminQuickAction {
-  final String label;
-  final IconData icon;
-  final String route;
-  final Color color;
-
-  const _AdminQuickAction({
-    required this.label,
-    required this.icon,
-    required this.route,
-    required this.color,
-  });
-}
-
-class _AdminQuickActionsSection extends StatelessWidget {
-  const _AdminQuickActionsSection({
-    required this.actions,
-  });
-
-  final List<_AdminQuickAction> actions;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppSurfaceCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Admin Control Center',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Fast access to the current admin surfaces',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.obsidian.withValues(alpha: 0.70),
-                ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Wrap(
-            spacing: AppSpacing.md,
-            runSpacing: AppSpacing.md,
-            children: actions.map((action) {
-              return InkWell(
-                borderRadius: BorderRadius.circular(AppRadii.lg),
-                onTap: () => Navigator.pushNamed(context, action.route),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
-                  ),
-                  decoration: BoxDecoration(
-                    color: action.color.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(AppRadii.lg),
-                    border: Border.all(
-                      color: action.color.withValues(alpha: 0.22),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(action.icon, color: action.color, size: 20),
-                      const SizedBox(width: AppSpacing.xs),
-                      Text(
-                        action.label,
-                        style: TextStyle(
-                          color: action.color,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AdminHubItem {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final String route;
-  final Color color;
-  final Stream<int> countStream;
-  final String countLabel;
-
-  const _AdminHubItem({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.route,
-    required this.color,
-    required this.countStream,
-    required this.countLabel,
-  });
-}
-
-class _AdminHubCard extends StatelessWidget {
-  const _AdminHubCard({
-    required this.item,
-    required this.isArabic,
-  });
-
-  final _AdminHubItem item;
-  final bool isArabic;
-
-  @override
-  Widget build(BuildContext context) {
-    final labelAlign = isArabic ? Alignment.topRight : Alignment.topLeft;
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(AppRadii.xl),
-      onTap: () => Navigator.of(context).pushNamed(item.route),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: item.color,
-          borderRadius: BorderRadius.circular(AppRadii.xl),
-          boxShadow: AppShadows.card,
-        ),
-        child: Column(
-          crossAxisAlignment:
-              isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
-              children: [
-                Expanded(
-                  child: StreamBuilder<int>(
-                    stream: item.countStream,
-                    builder: (context, snapshot) {
-                      final waiting =
-                          snapshot.connectionState == ConnectionState.waiting &&
-                              !snapshot.hasData;
-                      final hasError = snapshot.hasError;
-                      final count = snapshot.data;
-                      final badgeText = hasError
-                          ? (isArabic ? '! خطأ' : '! Error')
-                          : (waiting
-                              ? '...'
-                              : (count == null
-                                  ? 'â€”'
-                                  : (isArabic
-                                      ? '$count عنصر'
-                                      : '$count items')));
-
-                      return Column(
-                        crossAxisAlignment: isArabic
-                            ? CrossAxisAlignment.start
-                            : CrossAxisAlignment.end,
-                        children: [
-                          Align(
-                            alignment: labelAlign,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.md,
-                                vertical: 9,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.20),
-                                borderRadius:
-                                    BorderRadius.circular(AppRadii.pill),
-                              ),
-                              child: Text(
-                                badgeText,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Align(
-                            alignment: labelAlign,
-                            child: Text(
-                              hasError
-                                  ? (isArabic
-                                      ? 'تعذر تحميل العداد'
-                                      : 'Failed to load count')
-                                  : item.countLabel,
-                              textAlign:
-                                  isArabic ? TextAlign.right : TextAlign.left,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                height: 1.15,
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Container(
-                  width: 76,
-                  height: 76,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.18),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    item.icon,
-                    color: item.color,
-                    size: 38,
-                  ),
-                ),
-              ],
-            ),
-            const Spacer(),
-            Text(
-              item.title,
-              textAlign: isArabic ? TextAlign.right : TextAlign.left,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 26,
-                fontWeight: FontWeight.w800,
-                height: 1.08,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              item.subtitle,
-              textAlign: isArabic ? TextAlign.right : TextAlign.left,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                height: 1.2,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _AdminHomeCountersSection extends StatelessWidget {
   const _AdminHomeCountersSection({
     required this.isArabic,
@@ -2751,1686 +1491,6 @@ class _AdminHomeCountersSection extends StatelessWidget {
   }
 }
 
-class _GatewaySummaryStrip extends StatelessWidget {
-  const _GatewaySummaryStrip({
-    required this.statuses,
-  });
-
-  final List<GatewayStatus> statuses;
-
-  @override
-  Widget build(BuildContext context) {
-    final items = [
-      _GatewaySummaryItem(
-        title: 'Communication Gateway',
-        status: _statusFor('communication'),
-        route: Routes.adminCommunicationGateway,
-      ),
-      _GatewaySummaryItem(
-        title: 'Engineering Gateway',
-        status: _statusFor('engineering'),
-        route: Routes.adminEngineeringGateway,
-      ),
-      _GatewaySummaryItem(
-        title: 'Device / Storage Gateway',
-        status: _statusFor('device_storage'),
-        route: Routes.adminDeviceStorageGateway,
-      ),
-    ];
-
-    return AppSurfaceCard(
-      color: const Color(0xFF121A1F).withValues(alpha: 0.95),
-      borderColor: const Color(0xFFE0C174).withValues(alpha: 0.28),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Gateway Layer',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: const Color(0xFFF1E5C8),
-                  fontWeight: FontWeight.w800,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Shell-level supervision for channels, tools, devices, and storage boundaries.',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
-                ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children:
-                items.map((item) => _GatewaySummaryPill(item: item)).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  GatewayStatus _statusFor(String key) {
-    return statuses.firstWhere(
-      (status) => status.key == key,
-      orElse: () => const GatewayStatus(
-        key: 'unknown',
-        label: 'Unknown Gateway',
-        level: GatewayHealthLevel.planned,
-        summary: 'Gateway shell is defined.',
-      ),
-    );
-  }
-}
-
-class _GatewaySummaryItem {
-  const _GatewaySummaryItem({
-    required this.title,
-    required this.status,
-    required this.route,
-  });
-
-  final String title;
-  final GatewayStatus status;
-  final String route;
-}
-
-class _GatewaySummaryPill extends StatelessWidget {
-  const _GatewaySummaryPill({
-    required this.item,
-  });
-
-  final _GatewaySummaryItem item;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = gatewayHealthColor(item.status.level);
-    return InkWell(
-      borderRadius: BorderRadius.circular(AppRadii.pill),
-      onTap: () => Navigator.of(context).pushNamed(item.route),
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 44),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
-        decoration: BoxDecoration(
-          color: const Color(0xFF141D22).withValues(alpha: 0.94),
-          borderRadius: BorderRadius.circular(AppRadii.pill),
-          border: Border.all(
-            color: const Color(0xFFE0C174).withValues(alpha: 0.30),
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.hub_outlined, color: color, size: 18),
-            const SizedBox(width: AppSpacing.xs),
-            Text(
-              item.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Color(0xFFE0C174),
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.xs),
-            GatewayHealthBadge(level: item.status.level),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _GatewaySignalsCard extends StatelessWidget {
-  const _GatewaySignalsCard({
-    required this.statuses,
-    required this.gatewayMonitor,
-  });
-
-  final List<GatewayStatus> statuses;
-  final GatewayMonitor gatewayMonitor;
-
-  @override
-  Widget build(BuildContext context) {
-    return _ControlRoomCardShell(
-      title: 'Gateway Signals',
-      subtitle: 'Gateway-layer supervision by family',
-      group: AdminVisualGroup.system,
-      minHeight: 360,
-      child: _ControlRoomBodyFrame(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Wrap(
-              spacing: AppSpacing.md,
-              runSpacing: AppSpacing.md,
-              children: statuses.map((status) {
-                return _GatewaySignalChip(
-                  label: status.label ?? status.key ?? 'Gateway',
-                  alertType:
-                      gatewayMonitor.alertTypeFor(status.key ?? 'unknown'),
-                  level: status.level,
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              'Gateway health reflects shell readiness and isolation boundaries, without triggering external integrations.',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFFB8C7CD).withValues(alpha: 0.88),
-                  ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _GatewaySignalChip extends StatelessWidget {
-  const _GatewaySignalChip({
-    required this.label,
-    required this.alertType,
-    required this.level,
-  });
-
-  final String label;
-  final String alertType;
-  final GatewayHealthLevel level;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = gatewayHealthColor(level);
-    return Container(
-      constraints: const BoxConstraints(minWidth: 180, maxWidth: 240),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: const Color(0xFF141D22).withValues(alpha: 0.94),
-        borderRadius: BorderRadius.circular(AppRadii.lg),
-        border: Border.all(
-          color: const Color(0xFFE0C174).withValues(alpha: 0.28),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xFFE0C174),
-                ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          GatewayHealthBadge(level: level),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Boundary signal: $alertType',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: const Color(0xFFB8C7CD).withValues(alpha: 0.88),
-                ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AdminSystemHealthCard extends StatelessWidget {
-  const _AdminSystemHealthCard({
-    required this.healthStream,
-  });
-
-  final Stream<DocumentSnapshot<Map<String, dynamic>>> healthStream;
-
-  String _dateText(dynamic value) {
-    if (value is Timestamp) {
-      return value.toDate().toIso8601String();
-    }
-    return value?.toString().trim() ?? '';
-  }
-
-  Color _statusColor(String status) {
-    switch (status.trim().toLowerCase()) {
-      case 'ok':
-        return const Color(0xFF1F9D63);
-      case 'warning':
-        return const Color(0xFFE39B2E);
-      case 'error':
-        return const Color(0xFFC74646);
-      default:
-        return AppColors.info;
-    }
-  }
-
-  Widget _buildSystemHealthFallback(String statusText) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AppStatusBadge(
-          label: 'Status: $statusText',
-          color: _adminVisualGroupColor(AdminVisualGroup.system),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        const Text(
-          'Issues: â€”',
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        const _ControlRoomEmptyState(
-          message: 'No audit data yet',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSystemHealthContent({
-    required dynamic status,
-    required dynamic issues,
-    required dynamic summary,
-    required dynamic timestamp,
-  }) {
-    final statusText = status.toString().trim();
-    final issuesText = issues.toString().trim();
-    final summaryText = summary.toString().trim();
-    final timestampText = _dateText(timestamp);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AppStatusBadge(
-          label: 'Status: $statusText',
-          color: _statusColor(statusText),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Text(
-          'Issues: $issuesText',
-          style: const TextStyle(
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        if (timestampText.isNotEmpty) ...[
-          Text('Last Scan: $timestampText'),
-          const SizedBox(height: AppSpacing.sm),
-        ],
-        Text('Summary: $summaryText'),
-      ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _ControlRoomCardShell(
-      title: 'System Health',
-      subtitle: 'Python QA snapshot',
-      group: AdminVisualGroup.system,
-      minHeight: 224,
-      child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        stream: healthStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return _buildSystemHealthFallback("جارٍ التحديث...");
-          }
-
-          if (!snapshot.hasData ||
-              snapshot.data == null ||
-              !snapshot.data!.exists) {
-            return _buildSystemHealthFallback("Awaiting QA snapshot");
-          }
-
-          final data = snapshot.data!.data();
-          if (data == null) {
-            return _buildSystemHealthFallback("No audit data yet");
-          }
-
-          final status = data['status'] ?? 'unknown';
-          final issues = data['issuesCount'] ?? 0;
-          final summary = data['summary'] ?? '';
-          final timestamp = data['timestamp'] ?? '';
-
-          return _buildSystemHealthContent(
-            status: status,
-            issues: issues,
-            summary: summary,
-            timestamp: timestamp,
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _PendingActionsCard extends StatelessWidget {
-  const _PendingActionsCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final bookingRequests =
-        FirebaseFirestore.instance.collection('booking_requests');
-    final centers = FirebaseFirestore.instance.collection('centers');
-    final clientUpdatesStream = bookingRequests
-        .where('status', isEqualTo: 'client_update_required')
-        .snapshots();
-    final centerFollowUpStream = bookingRequests
-        .where('status', isEqualTo: 'center_follow_up')
-        .snapshots();
-    final payoutPendingStream = bookingRequests
-        .where('status', isEqualTo: 'payout_pending')
-        .snapshots();
-    final centersPendingStream =
-        centers.where('approvalStatus', isEqualTo: 'pending_admin').snapshots();
-
-    return _ControlRoomCardShell(
-      title: 'Attention Signals',
-      subtitle: 'Requests, gates, and blockers needing control-room awareness',
-      group: AdminVisualGroup.requests,
-      child: _ControlRoomBodyFrame(
-        child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: clientUpdatesStream,
-          builder: (context, clientSnapshot) {
-            return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: centerFollowUpStream,
-              builder: (context, followUpSnapshot) {
-                return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: payoutPendingStream,
-                  builder: (context, payoutSnapshot) {
-                    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: centersPendingStream,
-                      builder: (context, centersSnapshot) {
-                        final waiting = clientSnapshot.connectionState ==
-                                ConnectionState.waiting ||
-                            followUpSnapshot.connectionState ==
-                                ConnectionState.waiting ||
-                            payoutSnapshot.connectionState ==
-                                ConnectionState.waiting ||
-                            centersSnapshot.connectionState ==
-                                ConnectionState.waiting ||
-                            !clientSnapshot.hasData ||
-                            !followUpSnapshot.hasData ||
-                            !payoutSnapshot.hasData ||
-                            !centersSnapshot.hasData;
-
-                        final clientCount =
-                            clientSnapshot.data?.docs.length ?? 0;
-                        final followUpCount =
-                            followUpSnapshot.data?.docs.length ?? 0;
-                        final payoutCount =
-                            payoutSnapshot.data?.docs.length ?? 0;
-                        final centersCount =
-                            centersSnapshot.data?.docs.length ?? 0;
-                        final totalCount = clientCount +
-                            followUpCount +
-                            payoutCount +
-                            centersCount;
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (waiting)
-                              Wrap(
-                                spacing: AppSpacing.md,
-                                runSpacing: AppSpacing.md,
-                                children: const [
-                                  _StaticInfoChip(
-                                    label: 'Client Updates: â€”',
-                                    group: AdminVisualGroup.requests,
-                                  ),
-                                  _StaticInfoChip(
-                                    label: 'Center Follow-up: â€”',
-                                    group: AdminVisualGroup.requests,
-                                  ),
-                                  _StaticInfoChip(
-                                    label: 'Payout Pending: â€”',
-                                    group: AdminVisualGroup.payments,
-                                  ),
-                                  _StaticInfoChip(
-                                    label: 'Centers Pending Admin: â€”',
-                                    group: AdminVisualGroup.requests,
-                                  ),
-                                ],
-                              )
-                            else if (totalCount == 0)
-                              const _ControlRoomEmptyState(
-                                message: 'No pending actions',
-                              )
-                            else
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Wrap(
-                                    spacing: AppSpacing.md,
-                                    runSpacing: AppSpacing.md,
-                                    children: [
-                                      _StaticInfoChip(
-                                        label: 'Client Updates: $clientCount',
-                                        group: AdminVisualGroup.requests,
-                                      ),
-                                      _StaticInfoChip(
-                                        label:
-                                            'Center Follow-up: $followUpCount',
-                                        group: AdminVisualGroup.requests,
-                                      ),
-                                      _StaticInfoChip(
-                                        label: 'Payout Pending: $payoutCount',
-                                        group: AdminVisualGroup.payments,
-                                      ),
-                                      _StaticInfoChip(
-                                        label:
-                                            'Centers Pending Admin: $centersCount',
-                                        group: AdminVisualGroup.requests,
-                                      ),
-                                    ],
-                                  ),
-                                  if (totalCount > 0) ...[
-                                    const SizedBox(height: AppSpacing.sm),
-                                    _ControlRoomActionButton(
-                                      label: 'Open Request Monitoring',
-                                      onPressed: () {
-                                        Navigator.pushNamed(
-                                          context,
-                                          AdminHubPage._adminBookingQueueRoute,
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ],
-                              ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                );
-              },
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _ActiveConversationsCard extends StatelessWidget {
-  const _ActiveConversationsCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return _ControlRoomCardShell(
-      title: 'Historical Conversations',
-      subtitle:
-          'This section shows historical chat threads. New support requests are handled via structured support requests.',
-      group: AdminVisualGroup.support,
-      child: _ControlRoomBodyFrame(
-        child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: FirebaseFirestore.instance
-              .collection('chat_threads')
-              .where('needsHumanSupport', isEqualTo: true)
-              .snapshots(),
-          builder: (context, snapshot) {
-            final docs = snapshot.data?.docs ?? const [];
-            final humanSupportCount = docs.length;
-            final centerChatsCount = docs.where((doc) {
-              final ownerType =
-                  (doc.data()['ownerType'] ?? '').toString().toLowerCase();
-              return ownerType.contains('center');
-            }).length;
-            final clientChatsCount = docs.where((doc) {
-              final ownerType =
-                  (doc.data()['ownerType'] ?? '').toString().toLowerCase();
-              return !ownerType.contains('center');
-            }).length;
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (snapshot.connectionState == ConnectionState.waiting)
-                  Wrap(
-                    spacing: AppSpacing.md,
-                    runSpacing: AppSpacing.md,
-                    children: const [
-                      _StaticInfoChip(
-                        label: 'Historical Conversations: -',
-                        group: AdminVisualGroup.support,
-                      ),
-                      _StaticInfoChip(
-                        label: 'Center Threads: -',
-                        group: AdminVisualGroup.support,
-                      ),
-                      _StaticInfoChip(
-                        label: 'Client Threads: -',
-                        group: AdminVisualGroup.support,
-                      ),
-                    ],
-                  )
-                else if (snapshot.connectionState == ConnectionState.active &&
-                    docs.isEmpty)
-                  const _ControlRoomEmptyState(
-                    message: 'No historical conversations',
-                  )
-                else
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Wrap(
-                        spacing: AppSpacing.md,
-                        runSpacing: AppSpacing.md,
-                        children: [
-                          _ConversationCountChip(
-                            label: 'Historical Conversations',
-                            count: '$humanSupportCount',
-                            group: AdminVisualGroup.support,
-                          ),
-                          _ConversationCountChip(
-                            label: 'Center Threads',
-                            count: '$centerChatsCount',
-                            group: AdminVisualGroup.support,
-                          ),
-                          _ConversationCountChip(
-                            label: 'Client Threads',
-                            count: '$clientChatsCount',
-                            group: AdminVisualGroup.support,
-                          ),
-                        ],
-                      ),
-                      if (humanSupportCount > 0) ...[
-                        const SizedBox(height: AppSpacing.sm),
-                        _ControlRoomActionButton(
-                          label: 'Open Human Review Threads',
-                          onPressed: () {
-                            Navigator.pushNamed(
-                              context,
-                              Routes.adminSupportChats,
-                            );
-                          },
-                        ),
-                      ],
-                    ],
-                  ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _OperationalAlertsCard extends StatelessWidget {
-  const _OperationalAlertsCard({
-    required this.alertsStream,
-  });
-
-  final Stream<DocumentSnapshot<Map<String, dynamic>>> alertsStream;
-
-  String _dateText(dynamic value) {
-    if (value is Timestamp) {
-      return value.toDate().toIso8601String();
-    }
-    return value?.toString().trim() ?? '';
-  }
-
-  Color _statusColor(String status) {
-    switch (status.trim().toLowerCase()) {
-      case 'ok':
-        return const Color(0xFF1F9D63);
-      case 'warning':
-        return const Color(0xFFE39B2E);
-      case 'error':
-        return const Color(0xFFC74646);
-      default:
-        return AppColors.info;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _ControlRoomCardShell(
-      title: 'System Attention Signals',
-      subtitle: 'Generated monitoring signals for blockers and exceptions',
-      group: AdminVisualGroup.system,
-      minHeight: 224,
-      child: _ControlRoomBodyFrame(
-        child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          stream: alertsStream,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Wrap(
-                spacing: AppSpacing.md,
-                runSpacing: AppSpacing.md,
-                children: const [
-                  _StaticInfoChip(
-                    label: 'Center Follow-up: â€”',
-                    group: AdminVisualGroup.requests,
-                  ),
-                  _StaticInfoChip(
-                    label: 'Client Update Required: â€”',
-                    group: AdminVisualGroup.requests,
-                  ),
-                  _StaticInfoChip(
-                    label: 'Payout Pending: â€”',
-                    group: AdminVisualGroup.payments,
-                  ),
-                ],
-              );
-            }
-
-            if (!snapshot.hasData ||
-                snapshot.data == null ||
-                !snapshot.data!.exists) {
-              return const _ControlRoomEmptyState(
-                message: 'No alert snapshot available',
-              );
-            }
-
-            final data = snapshot.data!.data();
-            if (data == null) {
-              return const _ControlRoomEmptyState(
-                message: 'No alert snapshot available',
-              );
-            }
-
-            final status = (data['status'] ?? 'unknown').toString();
-            final summary = (data['summary'] ?? '').toString().trim();
-            final timestamp = _dateText(data['timestamp']);
-            final centerFollowUpCount =
-                (data['centerFollowUpCount'] ?? 0).toString();
-            final clientUpdateRequiredCount =
-                (data['clientUpdateRequiredCount'] ?? 0).toString();
-            final payoutPendingCount =
-                (data['payoutPendingCount'] ?? 0).toString();
-            final alertsCount = (int.tryParse(centerFollowUpCount) ?? 0) +
-                (int.tryParse(clientUpdateRequiredCount) ?? 0) +
-                (int.tryParse(payoutPendingCount) ?? 0);
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AppStatusBadge(
-                  label: 'Status: $status',
-                  color: _statusColor(status),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Wrap(
-                  spacing: AppSpacing.md,
-                  runSpacing: AppSpacing.md,
-                  children: [
-                    _StaticInfoChip(
-                      label: 'Center Follow-up: $centerFollowUpCount',
-                      group: AdminVisualGroup.requests,
-                    ),
-                    _StaticInfoChip(
-                      label:
-                          'Client Update Required: $clientUpdateRequiredCount',
-                      group: AdminVisualGroup.requests,
-                    ),
-                    _StaticInfoChip(
-                      label: 'Payout Pending: $payoutPendingCount',
-                      group: AdminVisualGroup.payments,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text('Summary: $summary'),
-                if (timestamp.isNotEmpty) ...[
-                  const SizedBox(height: AppSpacing.sm),
-                  Text('Last Scan: $timestamp'),
-                ],
-                if (alertsCount > 0) ...[
-                  const SizedBox(height: AppSpacing.sm),
-                  _ControlRoomActionButton(
-                    label: 'Review Alert Signals',
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        AdminHubPage._adminAlertsReviewRoute,
-                      );
-                    },
-                  ),
-                ],
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _CriticalAlertsCard extends StatelessWidget {
-  const _CriticalAlertsCard({
-    required this.stuckFollowUpsStream,
-    required this.unresolvedSupportChatsStream,
-    required this.pendingPayoutsStream,
-  });
-
-  final Stream<QuerySnapshot<Map<String, dynamic>>> stuckFollowUpsStream;
-  final Stream<QuerySnapshot<Map<String, dynamic>>> unresolvedSupportChatsStream;
-  final Stream<QuerySnapshot<Map<String, dynamic>>> pendingPayoutsStream;
-
-  @override
-  Widget build(BuildContext context) {
-    return _ControlRoomCardShell(
-      title: 'Safety / Urgent Attention',
-      subtitle:
-          'High-attention human review, payout, and stuck-flow indicators',
-      group: AdminVisualGroup.support,
-      minHeight: 224,
-      child: _ControlRoomBodyFrame(
-        child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: stuckFollowUpsStream,
-          builder: (context, followUpsSnapshot) {
-            return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: unresolvedSupportChatsStream,
-              builder: (context, chatsSnapshot) {
-                return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: pendingPayoutsStream,
-                  builder: (context, payoutsSnapshot) {
-                    final waiting = followUpsSnapshot.connectionState ==
-                            ConnectionState.waiting ||
-                        chatsSnapshot.connectionState ==
-                            ConnectionState.waiting ||
-                        payoutsSnapshot.connectionState ==
-                            ConnectionState.waiting;
-
-                    final stuckFollowUpsCount =
-                        followUpsSnapshot.data?.docs.length ?? 0;
-                    final unresolvedSupportChatsCount =
-                        chatsSnapshot.data?.docs.length ?? 0;
-                    final pendingPayoutsCount =
-                        payoutsSnapshot.data?.docs.length ?? 0;
-                    final totalCount = stuckFollowUpsCount +
-                        unresolvedSupportChatsCount +
-                        pendingPayoutsCount;
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (waiting)
-                          Wrap(
-                            spacing: AppSpacing.md,
-                            runSpacing: AppSpacing.md,
-                            children: const [
-                              _StaticInfoChip(
-                                label: 'Stuck Follow-ups: â€”',
-                                group: AdminVisualGroup.sessions,
-                              ),
-                              _StaticInfoChip(
-                                label: 'Human Review Needed: â€”',
-                                group: AdminVisualGroup.support,
-                              ),
-                              _StaticInfoChip(
-                                label: 'Pending Payouts: â€”',
-                                group: AdminVisualGroup.payments,
-                              ),
-                            ],
-                          )
-                        else if (followUpsSnapshot.connectionState ==
-                                ConnectionState.active &&
-                            chatsSnapshot.connectionState ==
-                                ConnectionState.active &&
-                            payoutsSnapshot.connectionState ==
-                                ConnectionState.active &&
-                            totalCount == 0)
-                          const _ControlRoomEmptyState(
-                            message: 'No critical alerts',
-                          )
-                        else
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Wrap(
-                                spacing: AppSpacing.md,
-                                runSpacing: AppSpacing.md,
-                                children: [
-                                  _StaticInfoChip(
-                                    label:
-                                        'Stuck Follow-ups: $stuckFollowUpsCount',
-                                    group: AdminVisualGroup.sessions,
-                                  ),
-                                  _StaticInfoChip(
-                                    label:
-                                        'Historical Conversations: $unresolvedSupportChatsCount',
-                                    group: AdminVisualGroup.support,
-                                  ),
-                                  _StaticInfoChip(
-                                    label:
-                                        'Pending Payouts: $pendingPayoutsCount',
-                                    group: AdminVisualGroup.payments,
-                                  ),
-                                ],
-                              ),
-                              if (totalCount > 0) ...[
-                                const SizedBox(height: AppSpacing.sm),
-                                _ControlRoomActionButton(
-                                  label: 'Review Alert Signals',
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      AdminHubPage._adminAlertsReviewRoute,
-                                    );
-                                  },
-                                ),
-                              ],
-                            ],
-                          ),
-                      ],
-                    );
-                  },
-                );
-              },
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _UserBehaviorAnalyticsPlaceholder extends StatefulWidget {
-  const _UserBehaviorAnalyticsPlaceholder({
-    required this.isArabic,
-  });
-
-  final bool isArabic;
-
-  @override
-  State<_UserBehaviorAnalyticsPlaceholder> createState() =>
-      _UserBehaviorAnalyticsPlaceholderState();
-}
-
-class _UserBehaviorAnalyticsPlaceholderState
-    extends State<_UserBehaviorAnalyticsPlaceholder> {
-  static const AnalyticsSummaryRepository _repository =
-      AnalyticsSummaryRepository();
-
-  late final Future<AnalyticsSummaryBundle> _backendSummaryFuture;
-
-  String _buildAnalyticsSnapshotText({
-    required String source,
-    required List<MapEntry<String, int>> topModules,
-    required List<MapEntry<String, int>> topPaths,
-    required Map<String, int> chatSplit,
-  }) {
-    String formatEntries(List<MapEntry<String, int>> entries) {
-      if (entries.isEmpty) return 'No activity yet';
-      return entries.map((entry) => '- ${entry.key}: ${entry.value}').join('\n');
-    }
-
-    String formatChatMix(Map<String, int> counts) {
-      if (counts.values.fold<int>(0, (sum, value) => sum + value) <= 0) {
-        return 'No activity yet';
-      }
-      const contexts = ['general', 'family_support', 'recovery_support'];
-      return contexts
-          .map((context) => '- $context: ${counts[context] ?? 0}')
-          .join('\n');
-    }
-
-    return '''
-Analytics Snapshot
-
-Source
-$source
-
-Top Entry Modules
-${formatEntries(topModules)}
-
-Top Selected Paths
-${formatEntries(topPaths)}
-
-Chat Context Mix
-${formatChatMix(chatSplit)}
-''';
-  }
-
-  Future<void> _showAnalyticsSnapshotDialog(BuildContext context) async {
-    AnalyticsSummaryBundle? bundle;
-    try {
-      bundle = await _backendSummaryFuture;
-    } catch (_) {
-      bundle = null;
-    }
-
-    final hasBackend = bundle?.hasAnyData == true;
-    final topModules = hasBackend
-        ? (bundle!.topEntryModules?.items ?? const <TopEntryModuleItem>[])
-            .map((item) => MapEntry(item.key, item.count))
-            .toList()
-        : AppAnalytics.getTopModules().take(5).toList();
-    final topPaths = hasBackend
-        ? (bundle!.topSelectedPaths?.items ?? const <TopSelectedPathItem>[])
-            .map((item) => MapEntry(item.key, item.count))
-            .toList()
-        : AppAnalytics.getTopPaths().take(5).toList();
-    final chatSplit = hasBackend
-        ? {
-            for (final item
-                in bundle!.chatOpensByContext?.items ??
-                    const <ChatContextCountItem>[])
-              item.context: item.count,
-          }
-        : AppAnalytics.getChatContextSplit();
-    final text = _buildAnalyticsSnapshotText(
-      source: hasBackend ? 'Backend' : 'Local fallback',
-      topModules: topModules,
-      topPaths: topPaths,
-      chatSplit: chatSplit,
-    );
-
-    if (!context.mounted) return;
-
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF10161A),
-          title: const Text('Analytics TXT Snapshot'),
-          content: SingleChildScrollView(
-            child: SelectableText(text),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                await Clipboard.setData(ClipboardData(text: text));
-                if (dialogContext.mounted) {
-                  Navigator.of(dialogContext).pop();
-                }
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Copied')),
-                  );
-                }
-              },
-              child: const Text('Copy'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _backendSummaryFuture = _repository.fetchBundle();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _ControlRoomCardShell(
-      title: widget.isArabic
-          ? 'تحليلات سلوك المستخدمين' : 'User Behavior Analytics',
-      subtitle: widget.isArabic
-          ? 'قراءة هادئة لأنماط دخول المستخدمين واختياراتهم داخل المسارات الأساسية.' : 'Passive awareness of user entry patterns and support-path choices across core modules.',
-      group: AdminVisualGroup.analytics,
-      minHeight: 232,
-      child: _ControlRoomBodyFrame(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: OutlinedButton.icon(
-                onPressed: () => _showAnalyticsSnapshotDialog(context),
-                icon: const Icon(Icons.copy_all_outlined, size: 18),
-                label: const Text('Export Analytics TXT'),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            FutureBuilder<AnalyticsSummaryBundle>(
-              future: _backendSummaryFuture,
-              builder: (context, snapshot) {
-                if (snapshot.data?.hasAnyData == true) {
-                  return _BackendAnalyticsSummaryView(
-                    isArabic: widget.isArabic,
-                    bundle: snapshot.data!,
-                  );
-                }
-
-                return _LocalAnalyticsSummaryView(
-                  isArabic: widget.isArabic,
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _BackendAnalyticsSummaryView extends StatelessWidget {
-  const _BackendAnalyticsSummaryView({
-    required this.isArabic,
-    required this.bundle,
-  });
-
-  final bool isArabic;
-  final AnalyticsSummaryBundle bundle;
-
-  @override
-  Widget build(BuildContext context) {
-    final List<MapEntry<String, int>> topModules =
-        (bundle.topEntryModules?.items ?? const <TopEntryModuleItem>[])
-        .map((item) => MapEntry(item.key, item.count))
-        .toList();
-    final List<MapEntry<String, int>> topPaths =
-        (bundle.topSelectedPaths?.items ?? const <TopSelectedPathItem>[])
-        .map((item) => MapEntry(item.key, item.count))
-        .toList();
-    final Map<String, int> chatSplit = {
-      for (final item
-          in bundle.chatOpensByContext?.items ?? const <ChatContextCountItem>[])
-        item.context: item.count,
-    };
-    final totalChatOpens = bundle.chatOpensByContext?.total ??
-        chatSplit.values.fold<int>(0, (sum, value) => sum + value);
-    final hasData =
-        topModules.isNotEmpty || topPaths.isNotEmpty || totalChatOpens > 0;
-
-    return Column(
-      crossAxisAlignment:
-          isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-      children: [
-        AppStatusBadge(
-          label: isArabic ? 'أحدث ملخص محفوظ' : 'Latest summary',
-          color: _adminVisualGroupColor(AdminVisualGroup.analytics),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Wrap(
-          spacing: AppSpacing.md,
-          runSpacing: AppSpacing.md,
-          children: [
-            _AnalyticsSummaryCard(
-              title: isArabic ? 'مصادر الدخول' : 'Top Entry Modules',
-              helper: isArabic
-                  ? 'أكثر الأقسام دخولًا من الملخص المحفوظ.' : 'Most entered modules from the latest stored summary.',
-              child: _AnalyticsEntryList(
-                isArabic: isArabic,
-                entries: topModules,
-                emptyLabel: isArabic ? 'لا توجد بيانات بعد' : 'No data yet',
-              ),
-            ),
-            _AnalyticsSummaryCard(
-              title: isArabic ? 'أكثر المسارات اختيارًا' : 'Top Selected Paths',
-              helper: isArabic
-                  ? 'أكثر المسارات ظهورًا من الملخص المحفوظ.' : 'Most selected paths from the latest stored summary.',
-              child: _AnalyticsEntryList(
-                isArabic: isArabic,
-                entries: topPaths,
-                emptyLabel: isArabic ? 'لا توجد بيانات بعد' : 'No data yet',
-              ),
-            ),
-            _AnalyticsSummaryCard(
-              title:
-                  isArabic ? 'توزيع المحادثات السابقة حسب السياق' : 'Historical Conversation Mix',
-              helper: isArabic
-                  ? 'سياقات المحادثات السابقة من الملخص المحفوظ.' : 'Historical chat contexts from the latest stored summary.',
-              child: _ChatContextSummary(
-                isArabic: isArabic,
-                counts: chatSplit,
-                totalOverride: totalChatOpens,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.md),
-        if (!hasData)
-          Text(
-            isArabic ? 'لا توجد بيانات بعد' : 'No data yet',
-            textAlign: isArabic ? TextAlign.right : TextAlign.left,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-      ],
-    );
-  }
-}
-
-class _LocalAnalyticsSummaryView extends StatelessWidget {
-  const _LocalAnalyticsSummaryView({
-    required this.isArabic,
-  });
-
-  final bool isArabic;
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<int>(
-      valueListenable: AppAnalytics.listenable,
-      builder: (context, _, __) {
-        final topModules = AppAnalytics.getTopModules().take(5).toList();
-        final topPaths = AppAnalytics.getTopPaths().take(5).toList();
-        final chatSplit = AppAnalytics.getChatContextSplit();
-        final totalChatOpens =
-            chatSplit.values.fold<int>(0, (sum, value) => sum + value);
-        final hasData =
-            topModules.isNotEmpty || topPaths.isNotEmpty || totalChatOpens > 0;
-
-        return Column(
-          crossAxisAlignment:
-              isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: [
-            AppStatusBadge(
-              label: isArabic
-                  ? 'معاينة الجلسة الحالية' : 'Current session preview',
-              color: _adminVisualGroupColor(AdminVisualGroup.analytics),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Wrap(
-              spacing: AppSpacing.md,
-              runSpacing: AppSpacing.md,
-              children: [
-                _AnalyticsSummaryCard(
-                  title: isArabic ? 'مصادر الدخول' : 'Top Entry Modules',
-                  helper: isArabic
-                      ? 'أكثر الأقسام دخولًا في هذه الجلسة.' : 'Most entered modules in this session.',
-                  child: _AnalyticsEntryList(
-                    isArabic: isArabic,
-                    entries: topModules,
-                    emptyLabel: isArabic ? 'لا توجد بيانات بعد' : 'No data yet',
-                  ),
-                ),
-                _AnalyticsSummaryCard(
-                  title: isArabic ? 'أكثر المسارات اختيارًا' : 'Top Selected Paths',
-                  helper: isArabic
-                      ? 'أكثر المسارات التي تم اختيارها داخل هذه الجلسة.' : 'Most selected paths in this session.',
-                  child: _AnalyticsEntryList(
-                    isArabic: isArabic,
-                    entries: topPaths,
-                    emptyLabel: isArabic ? 'لا توجد بيانات بعد' : 'No data yet',
-                  ),
-                ),
-                _AnalyticsSummaryCard(
-                  title:
-                      isArabic ? 'توزيع المحادثات السابقة حسب السياق' : 'Historical Conversation Mix',
-                  helper: isArabic
-                      ? 'الشات العام، والأسرة، والتعافي داخل هذه الجلسة كسجل تاريخي.' : 'General, family, and recovery chat openings in this session as historical context.',
-                  child: _ChatContextSummary(
-                    isArabic: isArabic,
-                    counts: chatSplit,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            if (!hasData)
-              Text(
-                isArabic ? 'لا توجد بيانات بعد' : 'No data yet',
-                textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: const Color(0xFF314A5C).withValues(alpha: 0.88),
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _AnalyticsSummaryCard extends StatelessWidget {
-  const _AnalyticsSummaryCard({
-    required this.title,
-    required this.helper,
-    required this.child,
-  });
-
-  final String title;
-  final String helper;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 260,
-      child: AppSurfaceCard(
-        color: const Color(0xFF10161A).withValues(alpha: 0.94),
-        borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xFFC9A75B),
-                  ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              helper,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: const Color(0xFF314A5C).withValues(alpha: 0.88),
-                    height: 1.25,
-                  ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            child,
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _AnalyticsEntryList extends StatelessWidget {
-  const _AnalyticsEntryList({
-    required this.isArabic,
-    required this.entries,
-    required this.emptyLabel,
-  });
-
-  final bool isArabic;
-  final List<MapEntry<String, int>> entries;
-  final String emptyLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    if (entries.isEmpty) {
-      return Text(
-        emptyLabel,
-        textAlign: isArabic ? TextAlign.right : TextAlign.left,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: const Color(0xFF314A5C).withValues(alpha: 0.88),
-              fontWeight: FontWeight.w600,
-            ),
-      );
-    }
-
-    return Column(
-      crossAxisAlignment:
-          isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-      children: [
-        for (int i = 0; i < entries.length; i++) ...[
-          _AnalyticsLineItem(
-            isArabic: isArabic,
-            label: entries[i].key,
-            value: '${entries[i].value}',
-          ),
-          if (i != entries.length - 1) const SizedBox(height: AppSpacing.xs),
-        ],
-      ],
-    );
-  }
-}
-
-class _ChatContextSummary extends StatelessWidget {
-  const _ChatContextSummary({
-    required this.isArabic,
-    required this.counts,
-    this.totalOverride,
-  });
-
-  final bool isArabic;
-  final Map<String, int> counts;
-  final int? totalOverride;
-
-  @override
-  Widget build(BuildContext context) {
-    const contexts = ['general', 'family_support', 'recovery_support'];
-    final total =
-        totalOverride ?? counts.values.fold<int>(0, (sum, value) => sum + value);
-
-    if (total == 0) {
-      return Text(
-        isArabic ? 'لا يوجد نشاط بعد' : 'No activity yet',
-        textAlign: isArabic ? TextAlign.right : TextAlign.left,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: const Color(0xFF314A5C).withValues(alpha: 0.88),
-              fontWeight: FontWeight.w600,
-            ),
-      );
-    }
-
-    return Column(
-      crossAxisAlignment:
-          isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-      children: [
-        for (int i = 0; i < contexts.length; i++) ...[
-          _AnalyticsLineItem(
-            isArabic: isArabic,
-            label: contexts[i],
-            value: _formatCountWithPercent(
-              count: counts[contexts[i]] ?? 0,
-              total: total,
-            ),
-          ),
-          if (i != contexts.length - 1) const SizedBox(height: AppSpacing.xs),
-        ],
-      ],
-    );
-  }
-
-  String _formatCountWithPercent({
-    required int count,
-    required int total,
-  }) {
-    if (total <= 0) return '$count';
-    final percent = ((count / total) * 100).round();
-    return '$count ($percent%)';
-  }
-}
-
-class _AnalyticsLineItem extends StatelessWidget {
-  const _AnalyticsLineItem({
-    required this.isArabic,
-    required this.label,
-    required this.value,
-  });
-
-  final bool isArabic;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          value,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: const Color(0xFFC9A75B),
-              ),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Text(
-            label,
-            textAlign: isArabic ? TextAlign.right : TextAlign.left,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
-                  fontWeight: FontWeight.w600,
-                  height: 1.2,
-                ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ControlRoomIntro extends StatelessWidget {
-  const _ControlRoomIntro();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              const MentalSmileLogo(
-                variant: MentalSmileLogoVariant.primary,
-                size: MentalSmileLogoSize.small,
-                light: true,
-                height: 38,
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Flexible(
-                child: Text(
-                  'Control Room',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: const Color(0xFFC9A75B),
-                      ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'System awareness for health, blockers, gates, support signals, and exceptions. This section monitors system flows. Actions here are exception-based and should not replace normal workflow progression.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: const Color(0xFF314A5C).withValues(alpha: 0.88),
-                ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ControlRoomDashboardLayout extends StatelessWidget {
-  const _ControlRoomDashboardLayout({
-    required this.leftCards,
-    required this.supervisoryCard,
-  });
-
-  final List<Widget> leftCards;
-  final Widget supervisoryCard;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const gap = AppSpacing.md;
-        if (constraints.maxWidth < 1040) {
-          return Column(
-            children: [
-              for (final card in leftCards) ...[
-                card,
-                const SizedBox(height: gap),
-              ],
-              supervisoryCard,
-            ],
-          );
-        }
-
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 3,
-              child: Column(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(child: leftCards[0]),
-                      const SizedBox(width: gap),
-                      Expanded(child: leftCards[1]),
-                    ],
-                  ),
-                  const SizedBox(height: gap),
-                  leftCards[2],
-                ],
-              ),
-            ),
-            const SizedBox(width: gap),
-            Expanded(
-              flex: 2,
-              child: supervisoryCard,
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _ControlRoomCardShell extends StatelessWidget {
-  const _ControlRoomCardShell({
-    required this.title,
-    required this.subtitle,
-    required this.child,
-    this.group,
-    this.minHeight = 264,
-  });
-
-  final String title;
-  final String subtitle;
-  final Widget child;
-  final AdminVisualGroup? group;
-  final double minHeight;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = _adminVisualGroupColor(group);
-    return AppSurfaceCard(
-      color: const Color(0xFF10161A).withValues(alpha: 0.94),
-      borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            child: Container(
-              width: 44,
-              height: 3,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(999),
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFFE0C174).withValues(alpha: 0.92),
-                    color.withValues(alpha: 0.78),
-                    const Color(0xFF54A997).withValues(alpha: 0.62),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          ConstrainedBox(
-            constraints: BoxConstraints(minHeight: minHeight),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: const Color(0xFFE0C174),
-                      ),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  subtitle,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: const Color(0xFFB8C7CD).withValues(alpha: 0.88),
-                      ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                child,
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ControlRoomEmptyState extends StatelessWidget {
-  const _ControlRoomEmptyState({
-    required this.message,
-  });
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: AlignmentDirectional.topStart,
-      child: Text(
-        message,
-        maxLines: 3,
-        overflow: TextOverflow.ellipsis,
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: const Color(0xFF314A5C).withValues(alpha: 0.88),
-              fontWeight: FontWeight.w500,
-              height: 1.25,
-            ),
-      ),
-    );
-  }
-}
-
-class _ControlRoomBodyFrame extends StatelessWidget {
-  const _ControlRoomBodyFrame({
-    required this.child,
-  });
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 144),
-      child: Align(
-        alignment: AlignmentDirectional.topStart,
-        child: child,
-      ),
-    );
-  }
-}
-
-class _ControlRoomActionButton extends StatelessWidget {
-  const _ControlRoomActionButton({
-    required this.label,
-    required this.onPressed,
-  });
-
-  final String label;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: AlignmentDirectional.centerStart,
-      child: TextButton(
-        onPressed: onPressed,
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: AppSpacing.xs,
-          ),
-          foregroundColor: const Color(0xFFE8D7A5),
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
-        ),
-        child: Text(label),
-      ),
-    );
-  }
-}
-
 void _showControlRoomSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
@@ -4439,80 +1499,6 @@ void _showControlRoomSnackBar(BuildContext context, String message) {
       duration: const Duration(seconds: 2),
     ),
   );
-}
-
-class _StaticInfoChip extends StatelessWidget {
-  const _StaticInfoChip({
-    required this.label,
-    this.group,
-  });
-
-  final String label;
-  final AdminVisualGroup? group;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = _adminVisualGroupColor(group);
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.md,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFF12181D).withValues(alpha: 0.90),
-        borderRadius: BorderRadius.circular(AppRadii.lg),
-        border: Border.all(
-          color: color.withValues(alpha: 0.28),
-        ),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              height: 1.2,
-              color: const Color(0xFFC9A75B),
-            ),
-      ),
-    );
-  }
-}
-
-class _ConversationCountChip extends StatelessWidget {
-  const _ConversationCountChip({
-    required this.label,
-    required this.count,
-    this.group,
-  });
-
-  final String label;
-  final String count;
-  final AdminVisualGroup? group;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = _adminVisualGroupColor(group);
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.md,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFF12181D).withValues(alpha: 0.90),
-        borderRadius: BorderRadius.circular(AppRadii.lg),
-        border: Border.all(
-          color: color.withValues(alpha: 0.28),
-        ),
-      ),
-      child: Text(
-        '$label: $count',
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              height: 1.2,
-              color: const Color(0xFFC9A75B),
-            ),
-      ),
-    );
-  }
 }
 
 class _QuickStatItem {
@@ -4559,20 +1545,20 @@ class _QuickStatCard extends StatelessWidget {
       final isHumanReviewCounter = item.group == AdminVisualGroup.support;
       final isGatewaySignalsCounter = item.group == AdminVisualGroup.system;
       final openRequestsCountText =
-          hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
-      final countText = hasError ? '!' : (count == null ? 'â€”' : '$count');
+          hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
+      final countText = hasError ? '!' : (count == null ? '—' : '$count');
       final humanReviewCountText =
-          hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
+          hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
       final paymentReviewCountText =
-          hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
+          hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
       final sessionReadinessCountText =
-          hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
+          hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
       final gatewaySignalsCountText =
-          hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
+          hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
       final statusText = hasError
-          ? (isArabic ? 'تعذر التحميل' : 'Load failed')
+          ? (isArabic ? '???? ???????' : 'Load failed')
           : (waiting
-              ? (isArabic ? 'جارٍ التحديث' : 'Updating')
+              ? (isArabic ? '???? ???????' : 'Updating')
               : item.title);
       final displayCountText = isOpenRequestsCounter
           ? openRequestsCountText
