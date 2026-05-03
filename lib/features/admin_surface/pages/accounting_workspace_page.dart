@@ -5,7 +5,8 @@ class AccountingWorkspacePage extends StatefulWidget {
   const AccountingWorkspacePage({super.key});
 
   @override
-  State<AccountingWorkspacePage> createState() => _AccountingWorkspacePageState();
+  State<AccountingWorkspacePage> createState() =>
+      _AccountingWorkspacePageState();
 }
 
 class _AccountingWorkspacePageState extends State<AccountingWorkspacePage> {
@@ -13,15 +14,18 @@ class _AccountingWorkspacePageState extends State<AccountingWorkspacePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isArabic = Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+    final isArabic =
+        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
     final sections = <_SectionData>[
       _SectionData(
         titleAr: 'الجلسات والإقامة',
         titleEn: 'Sessions & Residency',
         icon: Icons.event_available,
+        status: _SectionStatus.partial,
         subtitleAr: 'حسابات جلسات الأخصائيين وإقامات المراكز',
-        subtitleEn: 'Clinician session accounting and center residency accounting',
+        subtitleEn:
+            'Clinician session accounting and center residency accounting',
         actions: const [
           _ActionData(
             labelAr: 'حسابات جلسات الأخصائيين',
@@ -43,6 +47,7 @@ class _AccountingWorkspacePageState extends State<AccountingWorkspacePage> {
         titleAr: 'مراجعة السداد والتحويلات',
         titleEn: 'Payment & Transfer Review',
         icon: Icons.payments_outlined,
+        status: _SectionStatus.active,
         actions: const [
           _ActionData(
             labelAr: 'إثباتات السداد من العملاء',
@@ -65,6 +70,7 @@ class _AccountingWorkspacePageState extends State<AccountingWorkspacePage> {
         titleAr: 'المستحقات والإغلاق المالي',
         titleEn: 'Dues & Financial Close',
         icon: Icons.account_balance_wallet_outlined,
+        status: _SectionStatus.partial,
         actions: const [
           _ActionData(labelAr: 'مستحقات المراكز', labelEn: 'Center Dues'),
           _ActionData(
@@ -87,6 +93,7 @@ class _AccountingWorkspacePageState extends State<AccountingWorkspacePage> {
         titleAr: 'السجلات المالية',
         titleEn: 'Financial Records',
         icon: Icons.receipt_long_outlined,
+        status: _SectionStatus.partial,
         actions: const [
           _ActionData(
             labelAr: 'سجل المدفوعات',
@@ -109,21 +116,26 @@ class _AccountingWorkspacePageState extends State<AccountingWorkspacePage> {
         titleAr: 'الدعاية ومصادر الدخل',
         titleEn: 'Marketing & Revenue Sources',
         icon: Icons.campaign_outlined,
+        status: _SectionStatus.comingSoon,
         actions: const [
-          _ActionData(labelAr: 'Google / Meta / Ads', labelEn: 'Google / Meta / Ads'),
+          _ActionData(
+              labelAr: 'Google / Meta / Ads', labelEn: 'Google / Meta / Ads'),
           _ActionData(labelAr: 'رعايات', labelEn: 'Sponsorships'),
-          _ActionData(labelAr: 'اشتراكات مستقبلية', labelEn: 'Future Subscriptions'),
+          _ActionData(
+              labelAr: 'اشتراكات مستقبلية', labelEn: 'Future Subscriptions'),
         ],
       ),
       _SectionData(
         titleAr: 'المصروفات والتشغيل',
         titleEn: 'Expenses & Operations',
         icon: Icons.build_outlined,
+        status: _SectionStatus.comingSoon,
         actions: const [
           _ActionData(labelAr: 'صيانة', labelEn: 'Maintenance'),
           _ActionData(labelAr: 'أجهزة', labelEn: 'Equipment'),
           _ActionData(labelAr: 'اشتراكات أدوات', labelEn: 'Tool Subscriptions'),
-          _ActionData(labelAr: 'رواتب / تشغيل', labelEn: 'Payroll / Operations'),
+          _ActionData(
+              labelAr: 'رواتب / تشغيل', labelEn: 'Payroll / Operations'),
         ],
       ),
     ];
@@ -132,7 +144,8 @@ class _AccountingWorkspacePageState extends State<AccountingWorkspacePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isArabic ? 'مساحة العمل المحاسبية' : 'Accounting Workspace'),
+        title:
+            Text(isArabic ? 'مساحة العمل المحاسبية' : 'Accounting Workspace'),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -143,7 +156,8 @@ class _AccountingWorkspacePageState extends State<AccountingWorkspacePage> {
             isArabic: isArabic,
             sections: sections,
             selectedIndex: _selectedSectionIndex,
-            onSelected: (index) => setState(() => _selectedSectionIndex = index),
+            onSelected: (index) =>
+                setState(() => _selectedSectionIndex = index),
           ),
           const SizedBox(height: 16),
           _SelectedSectionPanel(isArabic: isArabic, section: selectedSection),
@@ -169,13 +183,14 @@ class _IntroCard extends StatelessWidget {
           children: [
             Text(
               isArabic ? 'قسم المحاسبة' : 'Accounting Section',
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleLarge
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               isArabic
-                  ? 'مساحة تشغيل مستقلة لمتابعة السداد، التحويلات، السجلات، المستحقات، الدخل، والمصروفات.'
-                  : 'A dedicated operational space to track payments, transfers, records, dues, income, and expenses.',
+                  ? 'مساحة تشغيل لمتابعة السداد والتحويلات والسجلات المتصلة، مع توضيح ما هو جزئي أو غير متصل بعد.'
+                  : 'An operational space for connected payment, transfer, and record views, with clear labels for partial or unconnected areas.',
               style: theme.textTheme.bodyMedium,
             ),
           ],
@@ -234,7 +249,15 @@ class _SectionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final accent = isSelected ? colorScheme.primary : colorScheme.outline;
+    final isComingSoon = section.status == _SectionStatus.comingSoon;
+    final accent = isSelected
+        ? colorScheme.primary
+        : isComingSoon
+            ? colorScheme.outlineVariant
+            : colorScheme.outline;
+    final textColor = isComingSoon
+        ? colorScheme.onSurfaceVariant.withValues(alpha: 0.62)
+        : null;
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
@@ -245,18 +268,25 @@ class _SectionButton extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: accent),
-          color: isSelected ? colorScheme.primary.withValues(alpha: 0.08) : null,
+          color: isComingSoon
+              ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.35)
+              : isSelected
+                  ? colorScheme.primary.withValues(alpha: 0.08)
+                  : null,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             CircleAvatar(
               radius: 24,
-              backgroundColor:
-                  isSelected ? colorScheme.primary : colorScheme.surfaceContainerHighest,
+              backgroundColor: isSelected && !isComingSoon
+                  ? colorScheme.primary
+                  : colorScheme.surfaceContainerHighest,
               child: Icon(
                 section.icon,
-                color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                color: isSelected && !isComingSoon
+                    ? colorScheme.onPrimary
+                    : colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),
@@ -265,9 +295,14 @@ class _SectionButton extends StatelessWidget {
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: isSelected ? colorScheme.primary : null,
+                color: isSelected && !isComingSoon
+                    ? colorScheme.primary
+                    : textColor,
               ),
             ),
+            const SizedBox(height: 8),
+            _StatusChip(
+                isArabic: isArabic, status: section.status, compact: true),
           ],
         ),
       ),
@@ -292,12 +327,17 @@ class _SelectedSectionPanel extends StatelessWidget {
           children: [
             Text(
               isArabic ? section.titleAr : section.titleEn,
-              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w700),
             ),
+            const SizedBox(height: 8),
+            _StatusChip(isArabic: isArabic, status: section.status),
             if (section.subtitleAr != null || section.subtitleEn != null) ...[
               const SizedBox(height: 4),
               Text(
-                isArabic ? (section.subtitleAr ?? '') : (section.subtitleEn ?? ''),
+                isArabic
+                    ? (section.subtitleAr ?? '')
+                    : (section.subtitleEn ?? ''),
                 style: theme.textTheme.bodySmall,
               ),
             ],
@@ -326,7 +366,9 @@ class _ActionTile extends StatelessWidget {
     final isEnabled = action.route != null;
     return ListTile(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      tileColor: isEnabled ? null : Theme.of(context).disabledColor.withValues(alpha: 0.08),
+      tileColor: isEnabled
+          ? null
+          : Theme.of(context).disabledColor.withValues(alpha: 0.08),
       title: Text(isArabic ? action.labelAr : action.labelEn),
       trailing: isEnabled
           ? const Icon(Icons.arrow_forward_ios, size: 16)
@@ -334,7 +376,9 @@ class _ActionTile extends StatelessWidget {
               isArabic ? 'قريبًا' : 'Soon',
               style: Theme.of(context).textTheme.bodySmall,
             ),
-      onTap: isEnabled ? () => Navigator.of(context).pushNamed(action.route!) : null,
+      onTap: isEnabled
+          ? () => Navigator.of(context).pushNamed(action.route!)
+          : null,
     );
   }
 }
@@ -344,6 +388,7 @@ class _SectionData {
     required this.titleAr,
     required this.titleEn,
     required this.icon,
+    required this.status,
     this.subtitleAr,
     this.subtitleEn,
     required this.actions,
@@ -352,6 +397,7 @@ class _SectionData {
   final String titleAr;
   final String titleEn;
   final IconData icon;
+  final _SectionStatus status;
   final String? subtitleAr;
   final String? subtitleEn;
   final List<_ActionData> actions;
@@ -363,4 +409,68 @@ class _ActionData {
   final String labelAr;
   final String labelEn;
   final String? route;
+}
+
+enum _SectionStatus { active, partial, comingSoon }
+
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({
+    required this.isArabic,
+    required this.status,
+    this.compact = false,
+  });
+
+  final bool isArabic;
+  final _SectionStatus status;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final Color background;
+    final Color foreground;
+    final String statusText;
+    final String dataText;
+
+    switch (status) {
+      case _SectionStatus.active:
+        background = colorScheme.primaryContainer;
+        foreground = colorScheme.onPrimaryContainer;
+        statusText = isArabic ? 'نشط' : 'Active';
+        dataText = isArabic ? 'بيانات حقيقية' : 'Real data';
+        break;
+      case _SectionStatus.partial:
+        background = colorScheme.tertiaryContainer;
+        foreground = colorScheme.onTertiaryContainer;
+        statusText = isArabic ? 'عرض جزئي' : 'Partial view';
+        dataText = isArabic ? 'عرض تجريبي' : 'Demo view';
+        break;
+      case _SectionStatus.comingSoon:
+        background = colorScheme.surfaceContainerHighest;
+        foreground = colorScheme.onSurfaceVariant;
+        statusText = isArabic ? 'قريبًا' : 'Coming soon';
+        dataText = isArabic ? 'غير متصل بعد' : 'Not connected yet';
+        break;
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 8 : 10,
+        vertical: compact ? 4 : 6,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: background,
+      ),
+      child: Text(
+        compact ? '$statusText\n$dataText' : '$statusText · $dataText',
+        textAlign: TextAlign.center,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: foreground,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
 }
