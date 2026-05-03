@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/core/branding/app_assets.dart';
 import 'package:flutterprojects/core/system/domain_registry.dart';
 import 'package:flutterprojects/core/system/domain_status.dart';
 import 'package:flutterprojects/core/system/domain_status_service.dart';
@@ -15,6 +16,7 @@ import 'package:flutterprojects/features/gateway_layer/shared/gateway_status.dar
 import 'package:flutterprojects/features/admin_surface/models/analytics_summary_models.dart';
 import 'package:flutterprojects/features/admin_surface/services/analytics_summary_repository.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
+import 'package:flutterprojects/shared/branding/mental_smile_logo.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 
 enum AdminVisualGroup {
@@ -665,7 +667,7 @@ $gatewayLines
       ),
     ];
 
-    final quickActions = <_AdminQuickActionItem>[
+    final governanceActions = <_AdminQuickActionItem>[
       _AdminQuickActionItem(
         label: isArabic ? 'Support Email' : 'Support Email',
         icon: Icons.email_outlined,
@@ -873,22 +875,52 @@ $gatewayLines
           ),
         ),
         body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFF13191D),
-                Color(0xFF0F1316),
-                Color(0xFF151B1F),
-              ],
-            ),
-          ),
+          color: const Color(0xFF0B0F14),
           child: Stack(
             children: [
-              const Positioned.fill(
+              Positioned(
+                right: 165,
+                top: 115,
                 child: IgnorePointer(
-                  child: _AdminHubAmbientBackground(),
+                  child: Container(
+                    width: 150,
+                    height: 150,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFF10161A).withValues(alpha: 0.58),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFD8B26A).withValues(alpha: 0.18),
+                          blurRadius: 28,
+                          spreadRadius: 1.5,
+                        ),
+                      ],
+                    ),
+                    child: const Opacity(
+                      opacity: 0.72,
+                      child: ClipOval(
+                        child: SizedBox(
+                          width: 150,
+                          height: 150,
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: FittedBox(
+                              fit: BoxFit.cover,
+                              child: Image(
+                                image: AssetImage(AppAssets.logoIcon),
+                                width: 600,
+                                height: 600,
+                                fit: BoxFit.contain,
+                                color: Colors.white,
+                                colorBlendMode: BlendMode.dstATop,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
               LayoutBuilder(
@@ -908,13 +940,7 @@ $gatewayLines
                     children: [
                       Expanded(
                         flex: 5,
-                        child: _AdminQuickActionsStrip(
-                    title: isArabic ? 'اختصارات مرجعية' : 'Reference Shortcuts',
-                    subtitle: isArabic
-                        ? 'وصول سريع لأسطح الحوكمة والدعم دون تحويل الصفحة إلى سطح تنفيذ.' : 'Fast access to governance and support surfaces without turning the hub into an execution console.',
-                    actions: quickActions,
-                    vertical: true,
-                        ),
+                        child: const SizedBox.shrink(),
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
@@ -926,7 +952,7 @@ $gatewayLines
                       ),
                     ],
                   ),
-                  SizedBox(height: width >= 960 ? 1 : 2),
+                  SizedBox(height: width >= 960 ? 56 : 48),
                   if (width >= 960)
                     Row(
                       textDirection: TextDirection.ltr,
@@ -936,14 +962,15 @@ $gatewayLines
                           flex: 7,
                           child: Column(
                             children: [
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: _AdminSectionLaunchpad(cards: mainSectionCards),
-                              ),
-                              const SizedBox(height: AppSpacing.md),
                               _AdminDepartmentSection(
                                 isArabic: isArabic,
                                 cards: departmentSectionCards,
+                              ),
+                              const SizedBox(height: 20),
+                              _AdminHeaderShortcutBar(
+                                isArabic: isArabic,
+                                governanceActions: governanceActions,
+                                entryActions: mainSectionCards,
                               ),
                             ],
                           ),
@@ -1125,12 +1152,16 @@ $gatewayLines
                       ],
                     ),
                   if (width < 960)
-                    _AdminSectionLaunchpad(cards: mainSectionCards),
-                  if (width < 960) const SizedBox(height: AppSpacing.md),
-                  if (width < 960)
                     _AdminDepartmentSection(
                       isArabic: isArabic,
                       cards: departmentSectionCards,
+                    ),
+                  if (width < 960) const SizedBox(height: 20),
+                  if (width < 960)
+                    _AdminHeaderShortcutBar(
+                      isArabic: isArabic,
+                      governanceActions: governanceActions,
+                      entryActions: mainSectionCards,
                     ),
                   const SizedBox(height: 2),
                   _SystemAdvisoryCard(
@@ -1663,6 +1694,268 @@ class _AdminGuidedWorkflowCardData {
   final String secondaryActionLabel;
   final String secondaryRoute;
   final AdminVisualGroup? group;
+}
+
+class _AdminHeaderShortcutBar extends StatelessWidget {
+  const _AdminHeaderShortcutBar({
+    required this.isArabic,
+    required this.governanceActions,
+    required this.entryActions,
+  });
+
+  final bool isArabic;
+  final List<_AdminQuickActionItem> governanceActions;
+  final List<_AdminSectionLaunchCardData> entryActions;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Wrap(
+        alignment: WrapAlignment.end,
+        spacing: 10,
+        runSpacing: 9,
+        children: [
+          _AdminGovernanceToolsButton(
+            isArabic: isArabic,
+            actions: governanceActions,
+          ),
+          for (final action in entryActions)
+            _AdminHeaderEntryShortcut(item: action),
+        ],
+      ),
+    );
+  }
+}
+
+class _AdminHeaderEntryShortcut extends StatelessWidget {
+  const _AdminHeaderEntryShortcut({
+    required this.item,
+  });
+
+  final _AdminSectionLaunchCardData item;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _adminVisualGroupColor(item.group);
+
+    return Tooltip(
+      message: item.subtitle,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.xl),
+        onTap: () => Navigator.of(context).pushNamed(item.route),
+        child: SizedBox(
+          width: 112,
+          height: 96,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF151C21),
+                  border: Border.all(
+                    color: const Color(0xFFD8B26A).withValues(alpha: 0.34),
+                    width: 1.4,
+                  ),
+                  boxShadow: [
+                    ...AppShadows.card,
+                    BoxShadow(
+                      color: const Color(0xFFD8B26A).withValues(alpha: 0.14),
+                      blurRadius: 16,
+                      spreadRadius: 0.4,
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFF0F1519),
+                      border: Border.all(
+                        color: const Color(0xFFD8B26A).withValues(alpha: 0.38),
+                        width: 1.1,
+                      ),
+                    ),
+                    child: Icon(
+                      item.icon,
+                      color: color,
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                item.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFFF1E5C8),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  height: 1.12,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AdminGovernanceToolsButton extends StatelessWidget {
+  const _AdminGovernanceToolsButton({
+    required this.isArabic,
+    required this.actions,
+  });
+
+  final bool isArabic;
+  final List<_AdminQuickActionItem> actions;
+
+  void _showTools(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return Directionality(
+          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+          child: SafeArea(
+            child: Container(
+              margin: const EdgeInsets.all(AppSpacing.sm),
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: const Color(0xFF10161A),
+                borderRadius: BorderRadius.circular(AppRadii.lg),
+                border: Border.all(
+                  color: const Color(0xFFD8B26A).withValues(alpha: 0.24),
+                ),
+                boxShadow: AppShadows.card,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment:
+                    isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isArabic ? 'أدوات الحوكمة' : 'Governance Tools',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: const Color(0xFFF1E5C8),
+                          fontWeight: FontWeight.w800,
+                        ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  for (final action in actions)
+                    ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        action.icon,
+                        color: _adminVisualGroupColor(action.group),
+                      ),
+                      title: Text(
+                        action.label,
+                        style: const TextStyle(
+                          color: Color(0xFFF1E5C8),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        color: Color(0xFFD8B26A),
+                        size: 14,
+                      ),
+                      onTap: () {
+                        Navigator.of(sheetContext).pop();
+                        Navigator.of(context).pushNamed(action.route);
+                      },
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: isArabic ? 'أدوات الحوكمة' : 'Governance Tools',
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.xl),
+        onTap: () => _showTools(context),
+        child: SizedBox(
+          width: 112,
+          height: 96,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF151C21),
+                  border: Border.all(
+                    color: const Color(0xFFD8B26A).withValues(alpha: 0.34),
+                    width: 1.4,
+                  ),
+                  boxShadow: [
+                    ...AppShadows.card,
+                    BoxShadow(
+                      color: const Color(0xFFD8B26A).withValues(alpha: 0.14),
+                      blurRadius: 16,
+                      spreadRadius: 0.4,
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFF0F1519),
+                      border: Border.all(
+                        color: const Color(0xFFD8B26A).withValues(alpha: 0.38),
+                        width: 1.1,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.admin_panel_settings_outlined,
+                      color: Color(0xFFD8B26A),
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                isArabic ? 'أدوات الحوكمة' : 'Governance Tools',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFFF1E5C8),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  height: 1.12,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _AdminQuickActionsStrip extends StatelessWidget {
@@ -2713,7 +3006,7 @@ class _AdminHomeCountersSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.only(top: 56, bottom: 2),
       child: _buildCounterWrap(0, const []),
     );
   }
@@ -4200,12 +4493,28 @@ class _ControlRoomIntro extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Control Room',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xFFC9A75B),
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              const MentalSmileLogo(
+                variant: MentalSmileLogoVariant.primary,
+                size: MentalSmileLogoSize.small,
+                light: true,
+                height: 38,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Flexible(
+                child: Text(
+                  'Control Room',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFFC9A75B),
+                      ),
                 ),
+              ),
+            ],
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
@@ -4762,5 +5071,3 @@ class _QuickStatCard extends StatelessWidget {
     );
   }
 }
-
-
