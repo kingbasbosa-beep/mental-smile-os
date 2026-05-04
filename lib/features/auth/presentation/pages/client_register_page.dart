@@ -1,6 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
@@ -30,9 +31,11 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
     'images/avatar_clinician_male.png',
   ];
 
+  String _normalizeEmail(String value) => value.trim().toLowerCase();
+
   Future<void> _register() async {
     final name = _nameController.text.trim();
-    final email = _emailController.text.trim();
+    final email = _normalizeEmail(_emailController.text);
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
@@ -43,6 +46,11 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
 
     if (email.isEmpty) {
       setState(() => _error = 'اكتب البريد الإلكتروني');
+      return;
+    }
+
+    if (!email.contains('@')) {
+      setState(() => _error = 'البريد الإلكتروني غير صالح');
       return;
     }
 
@@ -69,11 +77,14 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
         password: password,
       );
 
-      await cred.user?.updateDisplayName(name);
-      await FirebaseFirestore.instance
-          .collection('clients')
-          .doc(cred.user!.uid)
-          .set({
+      final user = cred.user;
+      if (user == null) {
+        throw Exception('User not found after registration');
+      }
+
+      await user.updateDisplayName(name);
+
+      await FirebaseFirestore.instance.collection('clients').doc(user.uid).set({
         'role': 'client',
         'displayName': name,
         'email': email,
@@ -81,11 +92,13 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
-      await cred.user?.reload();
+
+      await user.reload();
 
       if (!mounted) return;
+
       Navigator.of(context).pushNamedAndRemoveUntil(
-        '/menu',
+        Routes.menu,
         (route) => false,
       );
     } on FirebaseAuthException catch (e) {
@@ -94,7 +107,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
       });
     } catch (e) {
       setState(() {
-        _error = 'فشل إنشاء حساب العميل: $e';
+        _error = 'فشل إنشاء حساب العميل: ';
       });
     } finally {
       if (mounted) {
@@ -132,7 +145,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
                     const AppHeroHeader(
                       title: 'حساب عميل جديد',
                       subtitle:
-                          'ابدأ حسابًا بسيطًا وواضحًا بنفس الطابع البصري الهادئ، مع صورة شخصية وإعدادات أساسية جاهزة للمتابعة لاحقًا.',
+                          'ابدأ حسابًا بسيطًا وواضحًا بنفس الطابع البصري الهادئ، مع صورة شخصية وإعدادات أساسية جاهزة للمتابعة لاحقًا.',
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     AppSurfaceCard(
@@ -165,8 +178,9 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
                                     border: Border.all(
                                       color: isSelected
                                           ? AppColors.deepTeal
-                                          : AppColors.mutedGold
-                                              .withValues(alpha: 0.20),
+                                          : AppColors.mutedGold.withValues(
+                                              alpha: 0.20,
+                                            ),
                                       width: isSelected ? 3 : 1.2,
                                     ),
                                     boxShadow: isSelected
@@ -183,9 +197,9 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
                                     child: Image.asset(
                                       normalizeAssetPath(avatar),
                                       fit: BoxFit.cover,
-                                      errorBuilder: (context, error,
-                                              stackTrace) =>
-                                          const AppMissingAssetPlaceholder(),
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const AppMissingAssetPlaceholder(),
                                     ),
                                   ),
                                 ),
@@ -263,8 +277,9 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
                             alignment: Alignment.centerRight,
                             child: TextButton(
                               onPressed: () => Navigator.of(context).pop(),
-                              child:
-                                  const Text('لديك حساب بالفعل؟ تسجيل الدخول'),
+                              child: const Text(
+                                'لديك حساب بالفعل؟ تسجيل الدخول',
+                              ),
                             ),
                           ),
                         ],
