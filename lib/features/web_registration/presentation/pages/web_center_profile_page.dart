@@ -52,8 +52,10 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile saved')),
+        const SnackBar(content: Text('Profile saved successfully')),
       );
+
+      Navigator.of(context).pushReplacementNamed('/web/register/success');
     } catch (e) {
       setState(() {
         _error = 'Failed to save profile';
@@ -153,3 +155,4 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
     );
   }
 }
+
