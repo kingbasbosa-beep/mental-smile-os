@@ -68,7 +68,7 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
       if (!mounted) return;
 
       Navigator.of(context).pushNamedAndRemoveUntil(
-        Routes.webRegistrationSuccess,
+        Routes.webCenterPricing,
         (route) => false,
       );
     } catch (e) {
@@ -170,6 +170,7 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
     );
   }
 }
+
 
 
 
