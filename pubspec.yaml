@@ -39,6 +39,8 @@ flutter:
 
   assets:
     - assets/branding/
+    - assets/branding/splash/
+    - assets/branding/login/
     - assets/c5/avatars/
     - assets/c5/icons/
     - assets/c5/ui/buttons/

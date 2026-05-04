@@ -1,9 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
+﻿import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/shared/contracts/role_names.dart';
-import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -19,247 +18,182 @@ class _LoginPageState extends State<LoginPage> {
   bool _loading = false;
   bool _obscurePassword = true;
   String? _error;
-  String _normalizeEmail(String value) => value.trim().toLowerCase();
 
-  String _translateAuthError(FirebaseAuthException e) {
+  String _normalizeEmail(String v) => v.trim().toLowerCase();
+
+  String _bg(BuildContext context) {
+    final w = MediaQuery.of(context).size.width;
+    if (w < 600) return 'assets/branding/login/login_mobile_v1.png';
+    if (w < 1100) return 'assets/branding/login/login_tablet_v1.png';
+    return 'assets/branding/login/login_web_v1.png';
+  }
+
+  String _err(FirebaseAuthException e) {
     switch (e.code) {
-      case 'invalid-email':
-        return 'البريد الإلكتروني غير صالح';
-      case 'user-disabled':
-        return 'هذا الحساب موقوف';
-      case 'user-not-found':
-        return 'هذا الحساب غير موجود في Firebase Auth';
-      case 'wrong-password':
-        return 'كلمة المرور غير صحيحة';
-      case 'invalid-credential':
-        return 'بيانات الدخول غير صحيحة أو الحساب غير موجود في Firebase Auth';
-      case 'network-request-failed':
-        return 'فشل الاتصال بالشبكة، حاول مرة أخرى';
-      case 'too-many-requests':
-        return 'تمت محاولات كثيرة، انتظر قليلًا ثم حاول مرة أخرى';
-      default:
-        return e.message ?? 'فشل تسجيل الدخول';
+      case 'invalid-email': return 'البريد الإلكتروني غير صالح';
+      case 'user-disabled': return 'هذا الحساب موقوف';
+      case 'user-not-found': return 'الحساب غير موجود';
+      case 'wrong-password': return 'كلمة المرور غير صحيحة';
+      case 'network-request-failed': return 'مشكلة في الاتصال';
+      default: return 'فشل تسجيل الدخول';
     }
   }
 
-  Future<String> _resolveLandingRoute(
-    User user,
-    SignedInAccessState access,
-  ) async {
-    if (access.isBlocked && !access.isAdmin) {
-      return Routes.blockedAccount;
-    }
-
-    switch (access.role) {
-      case RoleNames.admin:
-        return Routes.adminHub;
-      case RoleNames.clinician:
-        return Routes.clinicianOperations;
-      case RoleNames.center:
-        return Routes.centerDashboard;
-      case RoleNames.client:
-        return Routes.clientDashboard;
-    }
-
-    if ((user.email ?? '').trim().isNotEmpty) {
-      return Routes.clientDashboard;
+  Future<String> _resolve(User u, SignedInAccessState a) async {
+    if (a.isBlocked && !a.isAdmin) return Routes.blockedAccount;
+    switch (a.role) {
+      case RoleNames.admin: return Routes.adminHub;
+      case RoleNames.clinician: return Routes.clinicianOperations;
+      case RoleNames.center: return Routes.centerDashboard;
+      case RoleNames.client: return Routes.clientDashboard;
     }
     return Routes.menu;
   }
 
   Future<void> _login() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-
+    setState(() { _loading = true; _error = null; });
     try {
-      final auth = FirebaseAuth.instance;
-
-      final cred = await auth.signInWithEmailAndPassword(
+      final cred = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _normalizeEmail(_emailController.text),
         password: _passwordController.text,
       );
-
-      final user = cred.user;
-      if (user == null) {
-        throw Exception('User not found after login');
-      }
-
-      final access = await AccountAccessService().resolve(user);
-      final landingRoute = await _resolveLandingRoute(user, access);
+      final u = cred.user!;
+      final a = await AccountAccessService().resolve(u);
+      final r = await _resolve(u, a);
       if (!mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        landingRoute,
-        (route) => false,
-        arguments:
-            landingRoute == Routes.blockedAccount ? access.blockReason : null,
-      );
+      Navigator.of(context).pushNamedAndRemoveUntil(r, (route) => false);
     } on FirebaseAuthException catch (e) {
-      setState(() => _error = _translateAuthError(e));
-    } catch (e) {
-      setState(() => _error = 'فشل تسجيل الدخول: $e');
+      setState(() => _error = _err(e));
+    } catch (_) {
+      setState(() => _error = 'خطأ غير متوقع');
     } finally {
-      if (mounted) {
-        setState(() => _loading = false);
-      }
+      if (mounted) setState(() => _loading = false);
     }
   }
 
-  Widget _registerNavButton({
+  Widget _field({
+    required TextEditingController c,
     required String label,
     required IconData icon,
-    required VoidCallback onTap,
+    bool obscure = false,
+    Widget? suffix,
   }) {
-    return SizedBox(
-      width: double.infinity,
-      height: 52,
-      child: OutlinedButton.icon(
-        onPressed: onTap,
-        icon: Icon(icon),
-        label: Text(label),
+    return TextField(
+      controller: c,
+      obscureText: obscure,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Color(0xFFFFE8A3)),
+        prefixIcon: Icon(icon, color: const Color(0xFFFFE8A3)),
+        suffixIcon: suffix,
+        filled: true,
+        fillColor: Colors.black.withOpacity(0.4),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
       ),
     );
   }
 
   @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final isArabic =
-        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
-
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        body: AppPageBackground(
-          child: SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 620),
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.xl,
-                    vertical: AppSpacing.xxl,
-                  ),
-                  children: [
-                    const SizedBox(height: AppSpacing.lg),
-                    const AppHeroHeader(
-                      title: 'تسجيل الدخول',
-                      subtitle:
-                          'بوابة واحدة هادئة وواضحة للوصول إلى حسابات العميل والأخصائي والمركز بنفس الهوية البصرية للمشروع.',
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.asset(_bg(context), fit: BoxFit.cover),
+            ),
+            Positioned.fill(
+              child: Container(color: Colors.black.withOpacity(0.5)),
+            ),
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 450),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(25),
                     ),
-                    const SizedBox(height: AppSpacing.lg),
-                    AppSurfaceCard(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextField(
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: appInputDecoration(
-                              context: context,
-                              label: 'البريد الإلكتروني',
-                              icon: Icons.alternate_email,
+                    child: Column(
+                      children: [
+                        const Text(
+                          'تسجيل الدخول',
+                          style: TextStyle(
+                            color: Color(0xFFFFE8A3),
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        _field(
+                          c: _emailController,
+                          label: 'البريد الإلكتروني',
+                          icon: Icons.email,
+                        ),
+                        const SizedBox(height: 12),
+
+                        _field(
+                          c: _passwordController,
+                          label: 'كلمة المرور',
+                          icon: Icons.lock,
+                          obscure: _obscurePassword,
+                          suffix: IconButton(
+                            onPressed: () {
+                              setState(() => _obscurePassword = !_obscurePassword);
+                            },
+                            icon: Icon(
+                              _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                              color: Colors.white,
                             ),
                           ),
-                          const SizedBox(height: AppSpacing.md),
-                          TextField(
-                            controller: _passwordController,
-                            obscureText: _obscurePassword,
-                            decoration: appInputDecoration(
-                              context: context,
-                              label: 'كلمة المرور',
-                              icon: Icons.lock_outline,
-                              suffixIcon: IconButton(
-                                tooltip: _obscurePassword
-                                    ? 'إظهار كلمة المرور'
-                                    : 'إخفاء كلمة المرور',
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
-                                icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  color: AppColors.deepTeal,
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (_error != null) ...[
-                            const SizedBox(height: AppSpacing.md),
-                            AppMessageBanner(message: _error!),
-                          ],
-                          const SizedBox(height: AppSpacing.md),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 56,
-                            child: FilledButton.icon(
-                              onPressed: _loading ? null : _login,
-                              icon: _loading
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const Icon(Icons.login),
-                              label: Text(_loading ? 'جارٍ الدخول...' : 'دخول'),
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-                          Text(
-                            isArabic
-                                ? 'إنشاء حساب جديد'
-                                : 'Create a new account',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          _registerNavButton(
-                            label: 'تسجيل عميل جديد',
-                            icon: Icons.person_add_alt_1_outlined,
-                            onTap: () {
-                              Navigator.of(context)
-                                  .pushNamed(Routes.clientRegister);
-                            },
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          _registerNavButton(
-                            label: 'تسجيل أخصائي جديد',
-                            icon: Icons.medical_services_outlined,
-                            onTap: () {
-                              Navigator.of(context)
-                                  .pushNamed(Routes.clinicianRegister);
-                            },
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          _registerNavButton(
-                            label: 'تسجيل مركز جديد',
-                            icon: Icons.business_outlined,
-                            onTap: () {
-                              Navigator.of(context)
-                                  .pushNamed(Routes.centerRegister);
-                            },
-                          ),
+                        ),
+
+                        if (_error != null) ...[
+                          const SizedBox(height: 12),
+                          Text(_error!, style: const TextStyle(color: Colors.red)),
                         ],
-                      ),
+
+                        const SizedBox(height: 20),
+
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: _loading ? null : _login,
+                            child: _loading
+                                ? const CircularProgressIndicator()
+                                : const Text('دخول'),
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        TextButton(
+                          onPressed: () => Navigator.pushNamed(context, Routes.clientRegister),
+                          child: const Text('تسجيل عميل'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pushNamed(context, Routes.clinicianRegister),
+                          child: const Text('تسجيل أخصائي'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pushNamed(context, Routes.centerRegister),
+                          child: const Text('تسجيل مركز'),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: AppSpacing.xl),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
