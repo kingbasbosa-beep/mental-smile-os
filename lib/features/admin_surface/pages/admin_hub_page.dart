@@ -275,69 +275,69 @@ class _AdminHubPageState extends State<AdminHubPage> {
 
     final compactCounters = <_QuickStatItem>[
       _QuickStatItem(
-        title: isArabic ? '?????? ????? ??????' : 'Open request signals',
+        title: isArabic ? 'إشارات الطلبات المفتوحة' : 'Open request signals',
         group: AdminVisualGroup.requests,
         stream: _bookingOpenStream,
         crossSignalStream: _escalationsOpenStream,
         route: Routes.adminOperations,
       ),
       _QuickStatItem(
-        title: isArabic ? '????? ?????? ??????' : 'Payment monitoring gate',
+        title: isArabic ? 'بوابة مراقبة السداد' : 'Payment monitoring gate',
         group: AdminVisualGroup.payments,
         stream: _paymentsReviewStream,
         route: Routes.adminPayments,
       ),
       _QuickStatItem(
-        title: isArabic ? '?????? ?????? ???????' : 'Session readiness signals',
+        title: isArabic ? 'إشارات جاهزية الجلسات' : 'Session readiness signals',
         group: AdminVisualGroup.sessions,
         stream: _sessionsActionStream,
         route: Routes.adminSessions,
       ),
       _QuickStatItem(
-        title: isArabic ? '????? ?????? (??? ????)' : 'Escalated Cases (Historical)',
+        title: isArabic ? 'حالات مصعّدة (سجل قديم)' : 'Escalated Cases (Historical)',
         group: AdminVisualGroup.support,
         stream: _escalationsOpenStream,
         crossSignalStream: _bookingOpenStream,
         route: Routes.adminSupportChats,
       ),
       _QuickStatItem(
-        title: isArabic ? '????? ????? ??????' : 'Requests Requiring Attention',
+        title: isArabic ? 'طلبات تحتاج انتباه' : 'Requests Requiring Attention',
         group: AdminVisualGroup.requests,
         stream: _pendingApprovalsStream,
         route: Routes.adminClinicianRequests,
       ),
       _QuickStatItem(
-        title: isArabic ? '?????? ??????/?????' : 'Gateway/device signals',
+        title: isArabic ? 'إشارات بوابات/أجهزة' : 'Gateway/device signals',
         group: AdminVisualGroup.system,
         stream: _gatewayAttentionStream,
         route: Routes.adminGatewayLayer,
       ),
       _QuickStatItem(
-        title: isArabic ? '????? ??????' : 'Open Issues',
+        title: isArabic ? 'مشاكل مفتوحة' : 'Open Issues',
         group: AdminVisualGroup.system,
         staticCount: openIssuesCount,
         route: Routes.adminMaintenanceSystem,
       ),
       _QuickStatItem(
-        title: isArabic ? '???? ???????' : 'Domains',
+        title: isArabic ? 'حالة الأقسام' : 'Domains',
         group: AdminVisualGroup.system,
         staticCount: domainAvailabilityCount,
         route: Routes.adminDomainAvailability,
       ),
       _QuickStatItem(
-        title: isArabic ? '????? ??????' : 'Follow-up Messages',
+        title: isArabic ? 'رسائل متابعة' : 'Follow-up Messages',
         group: AdminVisualGroup.support,
         staticCount: externalFollowUpCount,
         route: Routes.adminCommunicationGateway,
       ),
       _QuickStatItem(
-        title: isArabic ? '????? ?????? ??????' : 'AI DevOps',
+        title: isArabic ? 'تشغيل الذكاء والكود' : 'AI DevOps',
         group: AdminVisualGroup.analytics,
         staticCount: aiDevOpsCount,
         route: Routes.adminAiDevOpsCenter,
       ),
       _QuickStatItem(
-        title: isArabic ? '????? ??? ???????' : 'Pending Content',
+        title: isArabic ? 'محتوى قيد التنفيذ' : 'Pending Content',
         group: AdminVisualGroup.analytics,
         staticCount: pendingContentCount,
         route: Routes.contentWorkspace,
@@ -346,59 +346,59 @@ class _AdminHubPageState extends State<AdminHubPage> {
 
     final mainSectionCards = <_AdminSectionLaunchCardData>[
       _AdminSectionLaunchCardData(
-        title: isArabic ? '?????? ??????? ?????????' : 'Requests & Gates',
+        title: isArabic ? 'مراقبة الطلبات والبوابات' : 'Requests & Gates',
         subtitle: isArabic
-            ? '?????? ??????? ?????????? ???????? ??? ????? ????? ?????' : 'Monitor requests, payments, and sessions without daily operational ownership',
+            ? 'مراقبة الطلبات والمدفوعات والجلسات دون ملكية التشغيل اليومي' : 'Monitor requests, payments, and sessions without daily operational ownership',
         icon: Icons.assignment_outlined,
         group: AdminVisualGroup.requests,
         route: Routes.adminOperations,
       ),
       _AdminSectionLaunchCardData(
         title: isArabic
-            ? '???????? ??????? ?????? ??????' : 'Human Review & Historical Cases',
+            ? 'المراجعة البشرية والسجل القديم' : 'Human Review & Historical Cases',
         subtitle: isArabic
-            ? '??? ????? ???? ??????? ????? ???. ????? ????? ??????? ??? ??? ???? ??????? ???????.'
+            ? 'هذا القسم يعرض محادثات الشات القديمة فقط. طلبات الدعم الجديدة تتم عبر طلبات دعم منظّمة.'
             : 'This section shows historical chat threads only. New support requests are handled via structured support requests.',
         icon: Icons.support_agent_outlined,
         group: AdminVisualGroup.support,
         route: Routes.adminCommunications,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? '?????? ??????? ????????' : 'Directory & Approval Gates',
+        title: isArabic ? 'الدليل وبوابات الاعتماد' : 'Directory & Approval Gates',
         subtitle: isArabic
-            ? '??????? ???????? ??????? ????????' : 'Clients, centers, and approval-gate visibility',
+            ? 'العملاء والمراكز وبوابات الاعتماد' : 'Clients, centers, and approval-gate visibility',
         icon: Icons.apartment_outlined,
         group: AdminVisualGroup.requests,
         route: Routes.adminClinicianRequests,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? '???????' : 'Governance',
+        title: isArabic ? 'الحوكمة' : 'Governance',
         subtitle: isArabic
-            ? '?????? ?????? ????? ????????' : 'Policies, domains, and governance visibility',
+            ? 'السياسات وحالة الأقسام ورؤية الحوكمة' : 'Policies, domains, and governance visibility',
         icon: Icons.policy_outlined,
         group: AdminVisualGroup.system,
         route: Routes.adminDomainStatus,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? '????? ??????? ????????' : 'Content & Care Programs',
+        title: isArabic ? 'برامج المحتوى والرعاية' : 'Content & Care Programs',
         subtitle: isArabic
-            ? '????? ??????? ???????? ????????? ???????' : 'Governance for content, support messaging, and follow-up care',
+            ? 'حوكمة المحتوى ورسائل الدعم والرعاية اللاحقة' : 'Governance for content, support messaging, and follow-up care',
         icon: Icons.menu_book_outlined,
         group: AdminVisualGroup.support,
         route: Routes.adminContentCarePrograms,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? '????? ?????????' : 'Growth & Awareness',
+        title: isArabic ? 'النمو والانتشار' : 'Growth & Awareness',
         subtitle: isArabic
-            ? '???????? ???????? ???? ?????? ????????' : 'Awareness, distribution, and supervised exposure planning',
+            ? 'التوعية والتوزيع وتخطيط الظهور الموجّه' : 'Awareness, distribution, and supervised exposure planning',
         icon: Icons.campaign_outlined,
         group: AdminVisualGroup.analytics,
         route: Routes.adminGrowthLayer,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? '???? ????????' : 'Gateway Layer',
+        title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
         subtitle: isArabic
-            ? '????? ???????? ?????? ??????' : 'Channels, tools, devices, and maintenance',
+            ? 'القنوات والأدوات والأجهزة والصيانة' : 'Channels, tools, devices, and maintenance',
         icon: Icons.hub_outlined,
         group: AdminVisualGroup.system,
         route: Routes.adminGatewayLayer,
@@ -407,54 +407,54 @@ class _AdminHubPageState extends State<AdminHubPage> {
 
     final departmentSectionCards = <_AdminSectionLaunchCardData>[
       _AdminSectionLaunchCardData(
-        title: isArabic ? '???????? ????? ???????' : 'Customer Follow-up',
+        title: isArabic ? 'المتابعة وخدمة العملاء' : 'Customer Follow-up',
         subtitle: isArabic
-            ? '?????? ?????? ????? ??????? ????????? ?????????'
+            ? 'طلبات الويب والبريد والمتابعة التشغيلية'
             : 'Web requests, email, and operational follow-up',
         icon: Icons.support_agent_outlined,
         group: AdminVisualGroup.support,
         route: Routes.customerFollowUpWorkspace,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? '????? ?????? ????????' : 'Technical Support',
+        title: isArabic ? 'الدعم التقني والصيانة' : 'Technical Support',
         subtitle: isArabic
-            ? '??????? ???????? ???????? ???? ??????'
+            ? 'التشخيص والصيانة ومعالجة المشاكل وصحة النظام'
             : 'Diagnostics, maintenance, issue handling, and system health',
         icon: Icons.build_circle_outlined,
         group: AdminVisualGroup.system,
         route: Routes.technicalSupportWorkspace,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? '??????? ????????' : 'Marketing',
+        title: isArabic ? 'الدعاية والمحتوى' : 'Marketing',
         subtitle: isArabic
-            ? '??????? ???????? ?????? ????? ??????? ?????????'
+            ? 'المحتوى والحملات وتجهيز النشر والمواد التعليمية'
             : 'Content, campaigns, publish prep, and educational materials',
         icon: Icons.campaign_outlined,
         group: AdminVisualGroup.analytics,
         route: Routes.marketingWorkspace,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? '??? ????????' : 'Accounting',
+        title: isArabic ? 'قسم المحاسبة' : 'Accounting',
         subtitle: isArabic
-            ? '?????? ?????? ??????????? ??? ?????????? ?????? ????????'
+            ? 'مراجعة السداد والمستحقات ودفاتر المحاسبة'
             : 'Payment Review & Payouts, Payments Ledger, and Accounting Ledger',
         icon: Icons.account_balance_wallet_outlined,
         group: AdminVisualGroup.payments,
         route: Routes.adminAccountingWorkspace,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? '???????' : 'Archive',
+        title: isArabic ? 'الأرشيف' : 'Archive',
         subtitle: isArabic
-            ? '?????? ?????? ??????? ????????'
+            ? 'اختصار لسجلات الأقسام المؤرشفة'
             : 'Shortcut to archived department records',
         icon: Icons.archive_outlined,
         group: AdminVisualGroup.system,
         route: Routes.adminArchive,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? '???????? ????????' : 'External Follow-up',
+        title: isArabic ? 'المتابعة الخارجية' : 'External Follow-up',
         subtitle: isArabic
-            ? '????? ??????? ???????? ?????? ???????? ????????'
+            ? 'إدارة تسجيلات المتابعة والدعم والتهنئة والتوعية'
             : 'Manage follow-up, support, greeting, and awareness registrations',
         icon: Icons.mark_email_read_outlined,
         group: AdminVisualGroup.support,
@@ -491,37 +491,37 @@ class _AdminHubPageState extends State<AdminHubPage> {
 
     final detailSections = <_AdminDetailPanelSection>[
       _AdminDetailPanelSection(
-        title: isArabic ? '???????? ???????' : 'Guided Workflows',
+        title: isArabic ? 'المسارات الموجّهة' : 'Guided Workflows',
         subtitle: isArabic
-            ? '????? ???????? ??????? ??? ??? ??????.' : 'Guided review paths kept available without stretching the main hub.',
+            ? 'مسارات مراجعة موجّهة متاحة دون تمديد الهب الرئيسي.' : 'Guided review paths kept available without stretching the main hub.',
         icon: Icons.route_outlined,
         route: Routes.adminGuidedWorkflows,
       ),
       _AdminDetailPanelSection(
-        title: isArabic ? '???????' : 'References',
+        title: isArabic ? 'المراجع' : 'References',
         subtitle: isArabic
-            ? '??????? ???????? ????????? ?? ??? ????? ???? ????.' : 'Reference pages and policy shortcuts kept below the fold.',
+            ? 'صفحات المراجع واختصارات السياسات محفوظة أسفل الصفحة.' : 'Reference pages and policy shortcuts kept below the fold.',
         icon: Icons.menu_book_outlined,
         route: Routes.adminReferences,
       ),
       _AdminDetailPanelSection(
-        title: isArabic ? '???? ????????' : 'Gateway Layer',
+        title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
         subtitle: isArabic
-            ? '???? ???????? ?????????? ?? ??? ?????.' : 'Gateway status and connectivity details in a condensed section.',
+            ? 'حالة البوابات وتفاصيل الاتصال في قسم مختصر.' : 'Gateway status and connectivity details in a condensed section.',
         icon: Icons.hub_outlined,
         route: Routes.adminGatewayLayer,
       ),
       _AdminDetailPanelSection(
-        title: isArabic ? '?????? ???????' : 'Detailed Monitoring',
+        title: isArabic ? 'متابعة تفصيلية' : 'Detailed Monitoring',
         subtitle: isArabic
-            ? '?????? ??????? ?????? ??????? ???????? ?? ??? ???? ???? ????.' : 'Alerts, health, and gateway signals in one collapsible section.',
+            ? 'التنبيهات والصحة وإشارات البوابات في قسم واحد قابل للطي.' : 'Alerts, health, and gateway signals in one collapsible section.',
         icon: Icons.monitor_heart_outlined,
         route: Routes.adminDetailedMonitoring,
       ),
       _AdminDetailPanelSection(
-        title: isArabic ? '?????? ?????????' : 'Analytics Details',
+        title: isArabic ? 'تفاصيل التحليلات' : 'Analytics Details',
         subtitle: isArabic
-            ? '???? ?????? ??????? ???????? ?? ??? ?????.' : 'Behavior and monitoring analytics kept available without stretching the main page.',
+            ? 'تحليلات السلوك والمراقبة متاحة دون تمديد الصفحة الرئيسية.' : 'Behavior and monitoring analytics kept available without stretching the main page.',
         icon: Icons.analytics_outlined,
         route: Routes.adminAnalyticsDetails,
       ),
@@ -1018,7 +1018,7 @@ class _AdminGovernanceToolsButton extends StatelessWidget {
                     isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isArabic ? '????? ???????' : 'Governance Tools',
+                    isArabic ? 'أدوات الحوكمة' : 'Governance Tools',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: const Color(0xFFF1E5C8),
                           fontWeight: FontWeight.w800,
@@ -1062,7 +1062,7 @@ class _AdminGovernanceToolsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: isArabic ? '????? ???????' : 'Governance Tools',
+      message: isArabic ? 'أدوات الحوكمة' : 'Governance Tools',
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadii.xl),
         onTap: () => _showTools(context),
@@ -1113,7 +1113,7 @@ class _AdminGovernanceToolsButton extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                isArabic ? '????? ???????' : 'Governance Tools',
+                isArabic ? 'أدوات الحوكمة' : 'Governance Tools',
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
@@ -1556,9 +1556,9 @@ class _QuickStatCard extends StatelessWidget {
       final gatewaySignalsCountText =
           hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
       final statusText = hasError
-          ? (isArabic ? '???? ???????' : 'Load failed')
+          ? (isArabic ? 'فشل التحميل' : 'Load failed')
           : (waiting
-              ? (isArabic ? '???? ???????' : 'Updating')
+              ? (isArabic ? 'جارٍ التحديث' : 'Updating')
               : item.title);
       final displayCountText = isOpenRequestsCounter
           ? openRequestsCountText
