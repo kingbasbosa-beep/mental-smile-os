@@ -66,7 +66,7 @@ class _WebCenterRegisterPortalPageState
 
       if (!mounted) return;
       Navigator.of(context).pushReplacementNamed(
-        Routes.webRegistrationSuccess,
+        Routes.webCenterProfile,
       );
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -208,4 +208,5 @@ class _WebCenterRegisterPortalPageState
     );
   }
 }
+
 

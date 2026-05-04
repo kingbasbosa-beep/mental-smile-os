@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/app/router/routes.dart';
 
 class WebCenterProfilePage extends StatefulWidget {
   const WebCenterProfilePage({super.key});
@@ -30,8 +31,16 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) return;
+    final user = FirebaseAuth.instance.currentUser ??
+        await FirebaseAuth.instance.authStateChanges().first;
+    final uid = user?.uid;
+
+    if (uid == null) {
+      setState(() {
+        _error = 'Please register or sign in before saving profile.';
+      });
+      return;
+    }
 
     setState(() {
       _isSaving = true;
@@ -55,7 +64,13 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
         const SnackBar(content: Text('Profile saved successfully')),
       );
 
-      Navigator.of(context).pushReplacementNamed('/web/register/success');
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+      if (!mounted) return;
+
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        Routes.webRegistrationSuccess,
+        (route) => false,
+      );
     } catch (e) {
       setState(() {
         _error = 'Failed to save profile';
@@ -155,4 +170,8 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
     );
   }
 }
+
+
+
+
 
