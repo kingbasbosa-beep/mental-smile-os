@@ -7,6 +7,7 @@ import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'routes.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_register_portal_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_profile_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_pricing_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_register_portal_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_registration_success_page.dart';
 
@@ -676,6 +677,12 @@ class AppRouter {
           settings: settings,
         );
 
+      case Routes.webCenterPricing:
+        return MaterialPageRoute(
+          builder: (_) => const WebCenterPricingPage(),
+          settings: settings,
+        );
+
       case Routes.webClinicianRegister:
         return MaterialPageRoute(
           builder: (_) => const WebClinicianRegisterPortalPage(),
@@ -1310,6 +1317,8 @@ class _RouteAccessDecision {
   final bool isAdmin;
   final String redirectTarget;
 }
+
+
 
 
 

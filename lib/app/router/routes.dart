@@ -2,6 +2,7 @@ class Routes {
   // Web Registration Portal
   static const webCenterRegister = '/web/center/register';
   static const webCenterProfile = '/web/center/profile';
+  static const webCenterPricing = '/web/center/pricing';
   static const webClinicianRegister = '/web/clinician/register';
   static const webRegistrationSuccess = '/web/register/success';
   static const splash = '/';
@@ -119,5 +120,6 @@ class Routes {
 
   static const sessionReview = '/session/review';
 }
+
 
 
