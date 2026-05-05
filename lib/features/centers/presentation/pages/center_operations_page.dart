@@ -304,26 +304,28 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
     _lastPricingSeed = nextSeed;
   }
 
-  Future<void> _saveImages() async {
+  Future<void> _saveImages({
+    required Map<String, dynamic> currentData,
+    required List<Map<String, dynamic>> currentDocs,
+  }) async {
     final uid = _uid;
     if (uid == null) return;
 
     setState(() => _savingImages = true);
     try {
-      final items = _buildGalleryItems();
-      final uploadedCount = items
-          .where((e) => (e['url'] ?? '').toString().trim().isNotEmpty)
-          .length;
+      _requestedFrontImageController.text = _frontImageController.text.trim();
+      _requestedReceptionImageController.text =
+          _receptionImageController.text.trim();
+      _requestedInside1ImageController.text =
+          _inside1ImageController.text.trim();
+      _requestedInside2ImageController.text =
+          _inside2ImageController.text.trim();
 
-      await FirebaseFirestore.instance.collection('centers').doc(uid).update({
-        'galleryItems': items,
-        'galleryImages': items
-            .map((e) => (e['url'] ?? '').toString())
-            .where((e) => e.trim().isNotEmpty)
-            .toList(),
-        'imagesReady': uploadedCount == 4,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      await _submitCenterChangeRequest(
+        currentData: currentData,
+        currentDocs: currentDocs,
+      );
+      /*
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -333,12 +335,16 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
           ),
         ),
       );
+      */
     } finally {
       if (mounted) setState(() => _savingImages = false);
     }
   }
 
-  Future<void> _addDocument(List<Map<String, dynamic>> currentDocs) async {
+  Future<void> _addDocument({
+    required Map<String, dynamic> currentData,
+    required List<Map<String, dynamic>> currentDocs,
+  }) async {
     final uid = _uid;
     if (uid == null) return;
 
@@ -377,16 +383,16 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
         },
       ];
 
-      await FirebaseFirestore.instance.collection('centers').doc(uid).update({
-        'documentItems': updated,
-        'documentsReady': updated.isNotEmpty,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      await _submitCenterChangeRequest(
+        currentData: currentData,
+        currentDocs: updated,
+      );
 
       _docFileNameController.clear();
       _docUrlController.clear();
       _docReviewNoteController.clear();
       _selectedDocType = null;
+      /*
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -396,6 +402,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
           ),
         ),
       );
+      */
     } finally {
       if (mounted) setState(() => _savingDocument = false);
     }
@@ -403,6 +410,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
 
   Future<void> _removeDocument({
     required int index,
+    required Map<String, dynamic> currentData,
     required List<Map<String, dynamic>> currentDocs,
   }) async {
     final uid = _uid;
@@ -417,11 +425,11 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
         }
       }
 
-      await FirebaseFirestore.instance.collection('centers').doc(uid).update({
-        'documentItems': updated,
-        'documentsReady': updated.isNotEmpty,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      await _submitCenterChangeRequest(
+        currentData: currentData,
+        currentDocs: updated,
+      );
+      /*
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -431,6 +439,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
           ),
         ),
       );
+      */
     } finally {
       if (mounted) setState(() => _savingDocument = false);
     }
@@ -1339,7 +1348,12 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                           width: double.infinity,
                           height: 52,
                           child: FilledButton.icon(
-                            onPressed: _savingImages ? null : _saveImages,
+                            onPressed: _savingImages
+                                ? null
+                                : () => _saveImages(
+                                      currentData: data,
+                                      currentDocs: docs,
+                                    ),
                             icon: _savingImages
                                 ? const SizedBox(
                                     width: 18,
@@ -1471,7 +1485,10 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                           child: FilledButton.icon(
                             onPressed: _savingDocument
                                 ? null
-                                : () => _addDocument(docs),
+                                : () => _addDocument(
+                                      currentData: data,
+                                      currentDocs: docs,
+                                    ),
                             icon: _savingDocument
                                 ? const SizedBox(
                                     width: 18,
@@ -1596,6 +1613,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                           ? null
                                           : () => _removeDocument(
                                                 index: index,
+                                                currentData: data,
                                                 currentDocs: docs,
                                               ),
                                       icon: const Icon(Icons.delete_outline),
