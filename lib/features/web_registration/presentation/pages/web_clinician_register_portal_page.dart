@@ -22,6 +22,9 @@ class _WebClinicianRegisterPortalPageState
   final _bioController = TextEditingController();
   final _sessionPriceController = TextEditingController();
   final _sessionDurationController = TextEditingController();
+  final _identityFileNameController = TextEditingController();
+  final _certificateFileNameController = TextEditingController();
+  final _extraFileNameController = TextEditingController();
 
   bool _offersOnline = true;
   bool _offersInPerson = true;
@@ -55,6 +58,9 @@ class _WebClinicianRegisterPortalPageState
     _bioController.dispose();
     _sessionPriceController.dispose();
     _sessionDurationController.dispose();
+    _identityFileNameController.dispose();
+    _certificateFileNameController.dispose();
+    _extraFileNameController.dispose();
     super.dispose();
   }
 
@@ -101,6 +107,11 @@ class _WebClinicianRegisterPortalPageState
       final titleLabelAr = title?['labelAr'] ?? '';
       final titleLabelEn = title?['labelEn'] ?? '';
       final specialtyLabel = specialty?['label'] ?? '';
+      final identityFileName = _identityFileNameController.text.trim();
+      final certificateFileName = _certificateFileNameController.text.trim();
+      final extraFileName = _extraFileNameController.text.trim();
+      final documentsSubmitted =
+          identityFileName.isNotEmpty && certificateFileName.isNotEmpty;
 
       final credential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -139,12 +150,12 @@ class _WebClinicianRegisterPortalPageState
         'photoAsset': '',
         'createdAt': now,
         'updatedAt': now,
-        'documentsSubmitted': false,
+        'documentsSubmitted': documentsSubmitted,
         'documentsUploadMode': 'web_registration',
         'approvalStatus': 'pending_review',
-        'identityFileName': '',
-        'certificateFileName': '',
-        'extraFileName': '',
+        'identityFileName': identityFileName,
+        'certificateFileName': certificateFileName,
+        'extraFileName': extraFileName,
         'identityDocumentUrl': '',
         'certificateDocumentUrl': '',
         'extraDocumentUrl': '',
@@ -311,6 +322,23 @@ class _WebClinicianRegisterPortalPageState
                         },
                         title: const Text('Offers group sessions'),
                         controlAffinity: ListTileControlAffinity.leading,
+                      ),
+                      const SizedBox(height: 14),
+                      _textField(
+                        _identityFileNameController,
+                        'Identity file name',
+                        validator: _required,
+                      ),
+                      const SizedBox(height: 14),
+                      _textField(
+                        _certificateFileNameController,
+                        'Certificate file name',
+                        validator: _required,
+                      ),
+                      const SizedBox(height: 14),
+                      _textField(
+                        _extraFileNameController,
+                        'Extra file name (optional)',
                       ),
                       if (_error != null) ...[
                         const SizedBox(height: 14),
