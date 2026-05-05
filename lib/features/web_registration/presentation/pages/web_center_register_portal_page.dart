@@ -54,9 +54,11 @@ class _WebCenterRegisterPortalPageState
 
       await FirebaseFirestore.instance.collection('centers').doc(uid).set({
         'role': 'center',
+        'name': _centerNameController.text.trim(),
         'centerName': _centerNameController.text.trim(),
         'displayName': _centerNameController.text.trim(),
         'email': _emailController.text.trim(),
+        'sortOrder': 0,
         'approvalStatus': 'pending_admin',
         'active': false,
         'isActive': false,

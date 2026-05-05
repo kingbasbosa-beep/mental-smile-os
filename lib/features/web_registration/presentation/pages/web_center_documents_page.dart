@@ -32,11 +32,14 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
         return;
       }
 
-      await FirebaseFirestore.instance
-          .collection('centers')
-          .doc(uid)
-          .update({
-        'documentsReady': true,
+      final centerRef = FirebaseFirestore.instance.collection('centers').doc(uid);
+      final centerDoc = await centerRef.get();
+      final data = centerDoc.data() ?? const <String, dynamic>{};
+      final documentItems = data['documentItems'];
+      final hasDocuments = documentItems is List && documentItems.isNotEmpty;
+
+      await centerRef.update({
+        'documentsReady': hasDocuments,
         'updatedAt': FieldValue.serverTimestamp(),
       });
 

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
 
 class WebCenterPricingPage extends StatefulWidget {
@@ -47,10 +48,41 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
     });
 
     try {
+      final accommodationPrice =
+          double.tryParse(_accommodationCostController.text.trim()) ?? 0;
+      final autismSessionPrice =
+          double.tryParse(_sessionCostController.text.trim()) ?? 0;
+      final accommodationCosts = defaultAccommodationCostItems()
+          .map(
+            (item) => item.key == 'shared_room'
+                ? item.copyWith(
+                    enabled: accommodationPrice > 0,
+                    price: accommodationPrice,
+                    pricingUnit: 'month',
+                  )
+                : item,
+          )
+          .map((item) => item.toMap())
+          .toList();
+      final autismCareCosts = defaultAutismCareCostItems()
+          .map(
+            (item) => item.key == 'daily_hosting_at_center'
+                ? item.copyWith(
+                    enabled: autismSessionPrice > 0,
+                    price: autismSessionPrice,
+                    pricingUnit: 'day',
+                  )
+                : item,
+          )
+          .map((item) => item.toMap())
+          .toList();
+
       await FirebaseFirestore.instance.collection('centers').doc(uid).update({
         'accommodationCostText': _accommodationCostController.text.trim(),
         'sessionCostText': _sessionCostController.text.trim(),
         'pricingNotes': _notesController.text.trim(),
+        'accommodationCosts': accommodationCosts,
+        'autismCareCosts': autismCareCosts,
         'pricingReady': true,
         'updatedAt': FieldValue.serverTimestamp(),
       });
