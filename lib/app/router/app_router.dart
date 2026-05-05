@@ -718,7 +718,7 @@ class AppRouter {
 
       case Routes.centerRegister:
         return MaterialPageRoute(
-          builder: (_) => const CenterRegisterPage(),
+          builder: (_) => const WebCenterRegisterPortalPage(),
           settings: settings,
         );
 
@@ -760,7 +760,7 @@ class AppRouter {
 
       case Routes.clinicianRegister:
         return MaterialPageRoute(
-          builder: (_) => const ClinicianRegisterPage(),
+          builder: (_) => const WebClinicianRegisterPortalPage(),
           settings: settings,
         );
 
