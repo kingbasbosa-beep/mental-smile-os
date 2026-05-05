@@ -8,6 +8,7 @@ import 'routes.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_register_portal_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_profile_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_pricing_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_documents_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_register_portal_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_registration_success_page.dart';
 
@@ -683,9 +684,9 @@ class AppRouter {
           settings: settings,
         );
 
-      case Routes.webClinicianRegister:
+      case Routes.webCenterDocuments:
         return MaterialPageRoute(
-          builder: (_) => const WebClinicianRegisterPortalPage(),
+          builder: (_) => const WebCenterDocumentsPage(),
           settings: settings,
         );
 
@@ -694,6 +695,13 @@ class AppRouter {
           builder: (_) => const WebRegistrationSuccessPage(),
           settings: settings,
         );
+
+      case Routes.webClinicianRegister:
+        return MaterialPageRoute(
+          builder: (_) => const WebClinicianRegisterPortalPage(),
+          settings: settings,
+        );
+
       case Routes.login:
         return MaterialPageRoute(
           builder: (_) => const LoginPage(),
@@ -1282,6 +1290,34 @@ class _RouteAccessGate extends StatelessWidget {
       );
     }
 
+    final protectsCenterOrClinician =
+        allowedRoles?.contains(_roleClinician) == true ||
+            allowedRoles?.contains(_roleCenter) == true;
+    final needsApproval = protectsCenterOrClinician &&
+        (access.role == _roleClinician || access.role == _roleCenter);
+    if (needsApproval &&
+        (access.approvalStatus.trim().toLowerCase() != 'approved' ||
+            !access.isActive)) {
+      debugPrint(
+        'ADMIN_GUARD route=$routeName '
+        'isAdminRoute=$isAdminRoute '
+        'signedIn=true '
+        'isAdmin=$isAdmin '
+        'allowed=false '
+        'redirect=approval_required '
+        'role=${access.role} '
+        'approvalStatus=${access.approvalStatus} '
+        'isActive=${access.isActive}',
+      );
+      return _RouteAccessDecision(
+        allowed: false,
+        isBlocked: true,
+        blockReason: 'Account is pending admin approval or inactive.',
+        isAdmin: isAdmin,
+        redirectTarget: 'approval_required',
+      );
+    }
+
     if (allowedRoles == null || allowedRoles!.isEmpty) {
       return _RouteAccessDecision(
         allowed: true,
@@ -1317,6 +1353,9 @@ class _RouteAccessDecision {
   final bool isAdmin;
   final String redirectTarget;
 }
+
+
+
 
 
 

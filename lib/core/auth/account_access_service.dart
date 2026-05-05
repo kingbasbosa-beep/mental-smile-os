@@ -10,6 +10,8 @@ class SignedInAccessState {
     this.role,
     this.isBlocked = false,
     this.blockReason = '',
+    this.approvalStatus = '',
+    this.isActive = false,
     this.collection,
     this.docId,
   });
@@ -17,6 +19,8 @@ class SignedInAccessState {
   final String? role;
   final bool isBlocked;
   final String blockReason;
+  final String approvalStatus;
+  final bool isActive;
   final String? collection;
   final String? docId;
 
@@ -155,6 +159,8 @@ class AccountAccessService {
       role: role,
       isBlocked: (data['isBlocked'] ?? false) == true,
       blockReason: (data['blockReason'] ?? '').toString().trim(),
+      approvalStatus: (data['approvalStatus'] ?? '').toString().trim(),
+      isActive: (data['isActive'] ?? false) == true,
       collection: collection,
       docId: docId,
     );

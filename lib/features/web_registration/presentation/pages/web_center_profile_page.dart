@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
 
 class WebCenterProfilePage extends StatefulWidget {
   const WebCenterProfilePage({super.key});
@@ -31,9 +32,8 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final user = FirebaseAuth.instance.currentUser ??
-        await FirebaseAuth.instance.authStateChanges().first;
-    final uid = user?.uid;
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user?.uid ?? WebRegistrationDraftStore.centerUid;
 
     if (uid == null) {
       setState(() {
@@ -170,6 +170,7 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
     );
   }
 }
+
 
 
 

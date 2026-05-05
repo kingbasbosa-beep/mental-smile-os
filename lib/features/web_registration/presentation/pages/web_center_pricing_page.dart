@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
 
 class WebCenterPricingPage extends StatefulWidget {
   const WebCenterPricingPage({super.key});
@@ -30,9 +31,8 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final user = FirebaseAuth.instance.currentUser ??
-        await FirebaseAuth.instance.authStateChanges().first;
-    final uid = user?.uid;
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user?.uid ?? WebRegistrationDraftStore.centerUid;
 
     if (uid == null) {
       setState(() {
@@ -65,7 +65,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
       if (!mounted) return;
 
       Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
-        Routes.webRegistrationSuccess,
+        Routes.webCenterDocuments,
         (route) => false,
       );
     } catch (_) {
@@ -161,5 +161,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
     );
   }
 }
+
+
 
 

@@ -3,6 +3,7 @@ class Routes {
   static const webCenterRegister = '/web/center/register';
   static const webCenterProfile = '/web/center/profile';
   static const webCenterPricing = '/web/center/pricing';
+  static const webCenterDocuments = '/web/center/documents';
   static const webClinicianRegister = '/web/clinician/register';
   static const webRegistrationSuccess = '/web/register/success';
   static const splash = '/';
@@ -120,6 +121,7 @@ class Routes {
 
   static const sessionReview = '/session/review';
 }
+
 
 
 

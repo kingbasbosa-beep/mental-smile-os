@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
 
 class WebCenterRegisterPortalPage extends StatefulWidget {
   const WebCenterRegisterPortalPage({super.key});
@@ -48,6 +49,7 @@ class _WebCenterRegisterPortalPageState
       );
 
       final uid = credential.user!.uid;
+      WebRegistrationDraftStore.setCenterUid(uid);
       final now = FieldValue.serverTimestamp();
 
       await FirebaseFirestore.instance.collection('centers').doc(uid).set({
@@ -208,5 +210,6 @@ class _WebCenterRegisterPortalPageState
     );
   }
 }
+
 
 

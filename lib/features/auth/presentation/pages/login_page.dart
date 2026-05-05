@@ -40,27 +40,60 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<String> _resolve(User u, SignedInAccessState a) async {
-    if (a.isBlocked && !a.isAdmin) return Routes.blockedAccount;
-    switch (a.role) {
-      case RoleNames.admin: return Routes.adminHub;
-      case RoleNames.clinician: return Routes.clinicianOperations;
-      case RoleNames.center: return Routes.centerDashboard;
-      case RoleNames.client: return Routes.clientDashboard;
+    // Blocked users
+    if (a.isBlocked && !a.isAdmin) {
+      return Routes.blockedAccount;
     }
-    return Routes.menu;
+
+    // Approval gate for center & clinician
+    final needsApproval =
+        a.role == RoleNames.clinician || a.role == RoleNames.center;
+
+    if (needsApproval) {
+      final status = a.approvalStatus.trim().toLowerCase();
+
+      if (status == 'rejected' || status == 'rejected_admin') {
+        return Routes.blockedAccount;
+      }
+
+      if (status != 'approved' || !a.isActive) {
+        return Routes.blockedAccount;
+      }
+    }
+
+    // Normal routing
+    switch (a.role) {
+      case RoleNames.admin:
+        return Routes.adminHub;
+      case RoleNames.clinician:
+        return Routes.clinicianOperations;
+      case RoleNames.center:
+        return Routes.centerDashboard;
+      case RoleNames.client:
+        return Routes.clientDashboard;
+      default:
+        return Routes.menu;
+    }
   }
 
   Future<void> _login() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+
     try {
       final cred = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _normalizeEmail(_emailController.text),
         password: _passwordController.text,
       );
+
       final u = cred.user!;
       final a = await AccountAccessService().resolve(u);
       final r = await _resolve(u, a);
+
       if (!mounted) return;
+
       Navigator.of(context).pushNamedAndRemoveUntil(r, (route) => false);
     } on FirebaseAuthException catch (e) {
       setState(() => _error = _err(e));
@@ -146,10 +179,13 @@ class _LoginPageState extends State<LoginPage> {
                           obscure: _obscurePassword,
                           suffix: IconButton(
                             onPressed: () {
-                              setState(() => _obscurePassword = !_obscurePassword);
+                              setState(() =>
+                                  _obscurePassword = !_obscurePassword);
                             },
                             icon: Icon(
-                              _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                              _obscurePassword
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                               color: Colors.white,
                             ),
                           ),
@@ -157,7 +193,8 @@ class _LoginPageState extends State<LoginPage> {
 
                         if (_error != null) ...[
                           const SizedBox(height: 12),
-                          Text(_error!, style: const TextStyle(color: Colors.red)),
+                          Text(_error!,
+                              style: const TextStyle(color: Colors.red)),
                         ],
 
                         const SizedBox(height: 20),
@@ -175,17 +212,25 @@ class _LoginPageState extends State<LoginPage> {
 
                         const SizedBox(height: 20),
 
+                        // Client still allowed in app
                         TextButton(
-                          onPressed: () => Navigator.pushNamed(context, Routes.clientRegister),
+                          onPressed: () =>
+                              Navigator.pushNamed(context, Routes.clientRegister),
                           child: const Text('تسجيل عميل'),
                         ),
+
+                        // Clinician moved to web
                         TextButton(
-                          onPressed: () => Navigator.pushNamed(context, Routes.clinicianRegister),
-                          child: const Text('تسجيل أخصائي'),
+                          onPressed: () => Navigator.pushNamed(
+                              context, Routes.webClinicianRegister),
+                          child: const Text('تسجيل أخصائي (عن طريق الويب)'),
                         ),
+
+                        // Center moved to web
                         TextButton(
-                          onPressed: () => Navigator.pushNamed(context, Routes.centerRegister),
-                          child: const Text('تسجيل مركز'),
+                          onPressed: () => Navigator.pushNamed(
+                              context, Routes.webCenterRegister),
+                          child: const Text('تسجيل مركز (عن طريق الويب)'),
                         ),
                       ],
                     ),
