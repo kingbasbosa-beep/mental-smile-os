@@ -17,7 +17,13 @@ class AdminClinicianRequestsPage extends StatefulWidget {
 
 class _AdminClinicianRequestsPageState
     extends State<AdminClinicianRequestsPage> {
+  String _sectionTab = 'clinicians';
   String _tab = 'pending';
+  String _search = '';
+  String _approvalFilter = 'all';
+  String _activityFilter = 'all';
+  String _sort = 'newest';
+  final _searchController = TextEditingController();
   final _blockingService = AccountBlockingService();
 
   bool _isArabic(BuildContext context) =>
@@ -165,6 +171,57 @@ class _AdminClinicianRequestsPageState
     return (value ?? '').toString().trim();
   }
 
+  DateTime _moment(dynamic value) {
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value) ?? DateTime(1970);
+    return DateTime(1970);
+  }
+
+  bool _matchesSearch(Map<String, dynamic> data) {
+    final q = _search.trim().toLowerCase();
+    if (q.isEmpty) return true;
+    final values = [
+      data['displayName'],
+      data['fullDisplayNameAr'],
+      data['fullDisplayNameEn'],
+      data['email'],
+      data['phone'],
+      data['phoneNumber'],
+      data['specialty'],
+    ].map((value) => (value ?? '').toString().toLowerCase());
+    return values.any((value) => value.contains(q));
+  }
+
+  bool _matchesApprovalFilter(Map<String, dynamic> data) {
+    if (_approvalFilter == 'all') return true;
+    final status = (data['approvalStatus'] ?? 'pending_review').toString();
+    return status == _approvalFilter;
+  }
+
+  bool _matchesActivityFilter(Map<String, dynamic> data) {
+    final isActive = (data['isActive'] ?? false) == true;
+    final isBlocked = (data['isBlocked'] ?? false) == true;
+    switch (_activityFilter) {
+      case 'active':
+        return isActive && !isBlocked;
+      case 'inactive':
+        return !isActive && !isBlocked;
+      case 'blocked':
+        return isBlocked;
+      case 'unblocked':
+        return !isBlocked;
+      default:
+        return true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
@@ -199,7 +256,14 @@ class _AdminClinicianRequestsPageState
                 return const Center(child: CircularProgressIndicator());
               }
 
-              final allDocs = snapshot.data!.docs;
+              final allDocs = snapshot.data!.docs.toList()
+                ..sort((a, b) {
+                  final aCreated = _moment(a.data()['createdAt']);
+                  final bCreated = _moment(b.data()['createdAt']);
+                  return _sort == 'oldest'
+                      ? aCreated.compareTo(bCreated)
+                      : bCreated.compareTo(aCreated);
+                });
               final pendingCount = allDocs.where((doc) {
                 final data = doc.data();
                 final isBlocked = (data['isBlocked'] ?? false) == true;
@@ -232,6 +296,9 @@ class _AdminClinicianRequestsPageState
               final docs = allDocs.where((doc) {
                 final data = doc.data();
                 final isBlocked = (data['isBlocked'] ?? false) == true;
+                if (!_matchesSearch(data)) return false;
+                if (!_matchesApprovalFilter(data)) return false;
+                if (!_matchesActivityFilter(data)) return false;
                 if (_tab == 'blocked') return isBlocked;
                 if (isBlocked) return false;
                 final status =
@@ -246,6 +313,42 @@ class _AdminClinicianRequestsPageState
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 children: [
                   AppSurfaceCard(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Wrap(
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.sm,
+                      alignment: WrapAlignment.end,
+                      children: [
+                        ChoiceChip(
+                          selected: _sectionTab == 'clinicians',
+                          label: const Text('الأخصائيين'),
+                          onSelected: (_) =>
+                              setState(() => _sectionTab = 'clinicians'),
+                        ),
+                        ChoiceChip(
+                          selected: _sectionTab == 'centers',
+                          label: const Text('المراكز'),
+                          onSelected: (_) =>
+                              setState(() => _sectionTab = 'centers'),
+                        ),
+                        ChoiceChip(
+                          selected: _sectionTab == 'clients',
+                          label: const Text('العملاء'),
+                          onSelected: (_) =>
+                              setState(() => _sectionTab = 'clients'),
+                        ),
+                        ChoiceChip(
+                          selected: _sectionTab == 'rules',
+                          label: const Text('القواعد الحاكمة'),
+                          onSelected: (_) =>
+                              setState(() => _sectionTab = 'rules'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  if (_sectionTab == 'rules') ...[
+                    AppSurfaceCard(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -458,8 +561,141 @@ class _AdminClinicianRequestsPageState
                       ],
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                  AppSurfaceCard(
+                  ],
+                  if (_sectionTab == 'centers') ...[
+                    AppSurfaceCard(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Center(
+                        child: FilledButton.icon(
+                          onPressed: () => Navigator.of(context).pushNamed(
+                            Routes.adminCenters,
+                          ),
+                          icon: const Icon(Icons.apartment_outlined),
+                          label: const Text('فتح اعتماد المراكز'),
+                        ),
+                      ),
+                    ),
+                  ],
+                  if (_sectionTab == 'clients') ...[
+                    AppSurfaceCard(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Center(
+                        child: FilledButton.icon(
+                          onPressed: () => Navigator.of(context).pushNamed(
+                            Routes.adminClients,
+                          ),
+                          icon: const Icon(Icons.people_alt_outlined),
+                          label: const Text('فتح متابعة العملاء'),
+                        ),
+                      ),
+                    ),
+                  ],
+                  if (_sectionTab == 'clinicians') ...[
+                    AppSurfaceCard(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: _searchController,
+                            onChanged: (value) =>
+                                setState(() => _search = value),
+                            textDirection:
+                                isArabic ? TextDirection.rtl : TextDirection.ltr,
+                            decoration: appInputDecoration(
+                              context: context,
+                              label: isArabic
+                                  ? 'بحث بالاسم / البريد / الهاتف'
+                                  : 'Search by name, email, or phone',
+                              icon: Icons.search,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Wrap(
+                            spacing: AppSpacing.sm,
+                            runSpacing: AppSpacing.sm,
+                            children: [
+                              DropdownButton<String>(
+                                value: _approvalFilter,
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'all',
+                                    child: Text(isArabic
+                                        ? 'كل حالات الاعتماد'
+                                        : 'All approval statuses'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'pending_review',
+                                    child: Text(isArabic ? 'قيد المراجعة' : 'Pending'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'approved',
+                                    child: Text(isArabic ? 'مقبول' : 'Approved'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'rejected',
+                                    child: Text(isArabic ? 'مرفوض' : 'Rejected'),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  if (value == null) return;
+                                  setState(() => _approvalFilter = value);
+                                },
+                              ),
+                              DropdownButton<String>(
+                                value: _activityFilter,
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'all',
+                                    child: Text(isArabic
+                                        ? 'كل حالات الحساب'
+                                        : 'All account states'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'active',
+                                    child: Text(isArabic ? 'نشط' : 'Active'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'inactive',
+                                    child: Text(isArabic ? 'غير نشط' : 'Inactive'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'blocked',
+                                    child: Text(isArabic ? 'محظور' : 'Blocked'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'unblocked',
+                                    child: Text(isArabic ? 'غير محظور' : 'Unblocked'),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  if (value == null) return;
+                                  setState(() => _activityFilter = value);
+                                },
+                              ),
+                              DropdownButton<String>(
+                                value: _sort,
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'newest',
+                                    child: Text(isArabic ? 'الأحدث' : 'Newest'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'oldest',
+                                    child: Text(isArabic ? 'الأقدم' : 'Oldest'),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  if (value == null) return;
+                                  setState(() => _sort = value);
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    AppSurfaceCard(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     child: Wrap(
                       spacing: AppSpacing.sm,
@@ -707,6 +943,7 @@ class _AdminClinicianRequestsPageState
                         ),
                       );
                     }),
+                  ],
                 ],
               );
             },

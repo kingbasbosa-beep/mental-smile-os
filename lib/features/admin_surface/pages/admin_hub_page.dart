@@ -11,9 +11,6 @@ import 'package:flutterprojects/core/system/domain_status_service.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_firestore_service.dart';
 import 'package:flutterprojects/features/gateway_layer/core/gateway_monitor.dart';
 import 'package:flutterprojects/features/gateway_layer/shared/gateway_health_level.dart';
-import 'package:flutterprojects/features/gateway_layer/shared/gateway_shell_widgets.dart';
-import 'package:flutterprojects/features/gateway_layer/shared/gateway_status.dart';
-import 'package:flutterprojects/shared/branding/mental_smile_logo.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 
 enum AdminVisualGroup {
@@ -48,8 +45,6 @@ Color _adminVisualGroupColor(AdminVisualGroup? group) {
 class AdminHubPage extends StatefulWidget {
   const AdminHubPage({super.key});
 
-  static const String _adminBookingQueueRoute = '/admin/booking-queue';
-  static const String _adminAlertsReviewRoute = '/admin/alerts-review';
   static const DomainStatusService _domainStatusService = DomainStatusService();
   static const GatewayMonitor _gatewayMonitor = GatewayMonitor();
 
@@ -63,9 +58,6 @@ class _AdminHubPageState extends State<AdminHubPage> {
   static const int aiDevOpsCount = 4;
   static const int domainAvailabilityCount = 2;
   static const int externalFollowUpCount = 2;
-  late final Stream<int> _clinicianPendingStream;
-  late final Stream<int> _clinicianProfileRequestsStream;
-  late final Stream<int> _centersPendingStream;
   late final Stream<int> _bookingOpenStream;
   late final Stream<int> _paymentsReviewStream;
   late final Stream<int> _sessionsActionStream;
@@ -76,32 +68,6 @@ class _AdminHubPageState extends State<AdminHubPage> {
   @override
   void initState() {
     super.initState();
-    _clinicianPendingStream = FirebaseFirestore.instance
-        .collection('clinicians')
-        .snapshots()
-        .map((snapshot) => snapshot.docs.where((doc) {
-              final data = doc.data();
-              final status =
-                  (data['approvalStatus'] ?? 'pending_review').toString();
-              return status == 'pending_review';
-            }).length)
-        .asBroadcastStream();
-
-    _clinicianProfileRequestsStream = _profileChangeRequestsCountStream();
-
-    _centersPendingStream = FirebaseFirestore.instance
-        .collection('centers')
-        .snapshots()
-        .map((snapshot) => snapshot.docs.where((doc) {
-              final data = doc.data();
-              final status =
-                  (data['approvalStatus'] ?? 'pending_admin').toString();
-              return status == 'pending_admin' ||
-                  status == 'pending_review' ||
-                  status == 'center_follow_up';
-            }).length)
-        .asBroadcastStream();
-
     _bookingOpenStream = FirebaseFirestore.instance
         .collection('booking_requests')
         .where('archived', isEqualTo: false)
@@ -192,9 +158,9 @@ class _AdminHubPageState extends State<AdminHubPage> {
       }
 
       for (final domain in domainRegistry) {
-        final sub =
-            AdminHubPage._domainStatusService.watchDomainStatus(domain.key)
-                .listen(
+        final sub = AdminHubPage._domainStatusService
+            .watchDomainStatus(domain.key)
+            .listen(
           (status) {
             statuses[domain.key] = status;
             emit();
@@ -212,61 +178,8 @@ class _AdminHubPageState extends State<AdminHubPage> {
     });
   }
 
-  Stream<int> _openEscalationsStream() {
-    return FirebaseFirestore.instance
-        .collection('chat_escalations')
-        .snapshots()
-        .map((snapshot) => snapshot.docs.where((doc) {
-              final data = doc.data();
-              final status = (data['status'] ?? 'open').toString();
-              return status != 'resolved';
-            }).length);
-  }
-
   bool _isArabic(BuildContext context) {
     return Directionality.of(context) == TextDirection.rtl;
-  }
-
-  Stream<int> _profileChangeRequestsCountStream() {
-    final db = FirebaseFirestore.instance;
-
-    return Stream<int>.multi((controller) {
-      int clinicianCount = 0;
-      int centerCount = 0;
-
-      void emit() {
-        controller.add(clinicianCount + centerCount);
-      }
-
-      final clinicianSub =
-          db.collection('clinician_profile_change_requests').snapshots().listen(
-        (snapshot) {
-          clinicianCount = snapshot.docs.where((doc) {
-            final data = doc.data();
-            return (data['status'] ?? 'pending').toString() == 'pending';
-          }).length;
-          emit();
-        },
-        onError: controller.addError,
-      );
-
-      final centerSub =
-          db.collection('center_profile_change_requests').snapshots().listen(
-        (snapshot) {
-          centerCount = snapshot.docs.where((doc) {
-            final data = doc.data();
-            return (data['status'] ?? 'pending').toString() == 'pending';
-          }).length;
-          emit();
-        },
-        onError: controller.addError,
-      );
-
-      controller.onCancel = () async {
-        await clinicianSub.cancel();
-        await centerSub.cancel();
-      };
-    }).asBroadcastStream();
   }
 
   @override
@@ -294,7 +207,9 @@ class _AdminHubPageState extends State<AdminHubPage> {
         route: Routes.adminSessions,
       ),
       _QuickStatItem(
-        title: isArabic ? 'حالات مصعّدة (سجل قديم)' : 'Escalated Cases (Historical)',
+        title: isArabic
+            ? 'حالات مصعّدة (سجل قديم)'
+            : 'Escalated Cases (Historical)',
         group: AdminVisualGroup.support,
         stream: _escalationsOpenStream,
         crossSignalStream: _bookingOpenStream,
@@ -348,14 +263,16 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminSectionLaunchCardData(
         title: isArabic ? 'مراقبة الطلبات والبوابات' : 'Requests & Gates',
         subtitle: isArabic
-            ? 'مراقبة الطلبات والمدفوعات والجلسات دون ملكية التشغيل اليومي' : 'Monitor requests, payments, and sessions without daily operational ownership',
+            ? 'مراقبة الطلبات والمدفوعات والجلسات دون ملكية التشغيل اليومي'
+            : 'Monitor requests, payments, and sessions without daily operational ownership',
         icon: Icons.assignment_outlined,
         group: AdminVisualGroup.requests,
         route: Routes.adminOperations,
       ),
       _AdminSectionLaunchCardData(
         title: isArabic
-            ? 'المراجعة البشرية والسجل القديم' : 'Human Review & Historical Cases',
+            ? 'المراجعة البشرية والسجل القديم'
+            : 'Human Review & Historical Cases',
         subtitle: isArabic
             ? 'هذا القسم يعرض محادثات الشات القديمة فقط. طلبات الدعم الجديدة تتم عبر طلبات دعم منظّمة.'
             : 'This section shows historical chat threads only. New support requests are handled via structured support requests.',
@@ -364,9 +281,11 @@ class _AdminHubPageState extends State<AdminHubPage> {
         route: Routes.adminCommunications,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'الدليل وبوابات الاعتماد' : 'Directory & Approval Gates',
+        title:
+            isArabic ? 'الدليل وبوابات الاعتماد' : 'Directory & Approval Gates',
         subtitle: isArabic
-            ? 'العملاء والمراكز وبوابات الاعتماد' : 'Clients, centers, and approval-gate visibility',
+            ? 'العملاء والمراكز وبوابات الاعتماد'
+            : 'Clients, centers, and approval-gate visibility',
         icon: Icons.apartment_outlined,
         group: AdminVisualGroup.requests,
         route: Routes.adminClinicianRequests,
@@ -374,7 +293,8 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminSectionLaunchCardData(
         title: isArabic ? 'الحوكمة' : 'Governance',
         subtitle: isArabic
-            ? 'السياسات وحالة الأقسام ورؤية الحوكمة' : 'Policies, domains, and governance visibility',
+            ? 'السياسات وحالة الأقسام ورؤية الحوكمة'
+            : 'Policies, domains, and governance visibility',
         icon: Icons.policy_outlined,
         group: AdminVisualGroup.system,
         route: Routes.adminDomainStatus,
@@ -382,7 +302,8 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminSectionLaunchCardData(
         title: isArabic ? 'برامج المحتوى والرعاية' : 'Content & Care Programs',
         subtitle: isArabic
-            ? 'حوكمة المحتوى ورسائل الدعم والرعاية اللاحقة' : 'Governance for content, support messaging, and follow-up care',
+            ? 'حوكمة المحتوى ورسائل الدعم والرعاية اللاحقة'
+            : 'Governance for content, support messaging, and follow-up care',
         icon: Icons.menu_book_outlined,
         group: AdminVisualGroup.support,
         route: Routes.adminContentCarePrograms,
@@ -390,7 +311,8 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminSectionLaunchCardData(
         title: isArabic ? 'النمو والانتشار' : 'Growth & Awareness',
         subtitle: isArabic
-            ? 'التوعية والتوزيع وتخطيط الظهور الموجّه' : 'Awareness, distribution, and supervised exposure planning',
+            ? 'التوعية والتوزيع وتخطيط الظهور الموجّه'
+            : 'Awareness, distribution, and supervised exposure planning',
         icon: Icons.campaign_outlined,
         group: AdminVisualGroup.analytics,
         route: Routes.adminGrowthLayer,
@@ -398,7 +320,8 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminSectionLaunchCardData(
         title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
         subtitle: isArabic
-            ? 'القنوات والأدوات والأجهزة والصيانة' : 'Channels, tools, devices, and maintenance',
+            ? 'القنوات والأدوات والأجهزة والصيانة'
+            : 'Channels, tools, devices, and maintenance',
         icon: Icons.hub_outlined,
         group: AdminVisualGroup.system,
         route: Routes.adminGatewayLayer,
@@ -462,6 +385,46 @@ class _AdminHubPageState extends State<AdminHubPage> {
       ),
     ];
 
+    final registrationSectionCards = <_AdminSectionLaunchCardData>[
+      _AdminSectionLaunchCardData(
+        title: isArabic ? 'العملاء' : 'Clients',
+        subtitle: isArabic
+            ? 'متابعة حسابات العملاء وحالات الحظر'
+            : 'Review client accounts and block status',
+        icon: Icons.people_alt_outlined,
+        group: AdminVisualGroup.requests,
+        route: Routes.adminClients,
+      ),
+      _AdminSectionLaunchCardData(
+        title: isArabic ? 'المراكز' : 'Centers',
+        subtitle: isArabic
+            ? 'اعتماد ومتابعة تسجيلات المراكز'
+            : 'Approve and follow center registrations',
+        icon: Icons.apartment_outlined,
+        group: AdminVisualGroup.requests,
+        route: Routes.adminCenters,
+      ),
+      _AdminSectionLaunchCardData(
+        title: isArabic ? 'الأخصائيين' : 'Clinicians',
+        subtitle: isArabic
+            ? 'اعتماد ومتابعة تسجيلات الأخصائيين'
+            : 'Approve and follow clinician registrations',
+        icon: Icons.medical_services_outlined,
+        group: AdminVisualGroup.requests,
+        route: Routes.adminClinicianRequests,
+      ),
+      _AdminSectionLaunchCardData(
+        title:
+            isArabic ? 'تقارير التسجيل والصيانة' : 'Registration Maintenance',
+        subtitle: isArabic
+            ? 'تقارير صحة التسجيل والحسابات'
+            : 'Registration health and account reports',
+        icon: Icons.fact_check_outlined,
+        group: AdminVisualGroup.system,
+        route: Routes.adminRegistrationMaintenance,
+      ),
+    ];
+
     final governanceActions = <_AdminQuickActionItem>[
       _AdminQuickActionItem(
         label: isArabic ? 'Support Email' : 'Support Email',
@@ -493,35 +456,40 @@ class _AdminHubPageState extends State<AdminHubPage> {
       _AdminDetailPanelSection(
         title: isArabic ? 'المسارات الموجّهة' : 'Guided Workflows',
         subtitle: isArabic
-            ? 'مسارات مراجعة موجّهة متاحة دون تمديد الهب الرئيسي.' : 'Guided review paths kept available without stretching the main hub.',
+            ? 'مسارات مراجعة موجّهة متاحة دون تمديد الهب الرئيسي.'
+            : 'Guided review paths kept available without stretching the main hub.',
         icon: Icons.route_outlined,
         route: Routes.adminGuidedWorkflows,
       ),
       _AdminDetailPanelSection(
         title: isArabic ? 'المراجع' : 'References',
         subtitle: isArabic
-            ? 'صفحات المراجع واختصارات السياسات محفوظة أسفل الصفحة.' : 'Reference pages and policy shortcuts kept below the fold.',
+            ? 'صفحات المراجع واختصارات السياسات محفوظة أسفل الصفحة.'
+            : 'Reference pages and policy shortcuts kept below the fold.',
         icon: Icons.menu_book_outlined,
         route: Routes.adminReferences,
       ),
       _AdminDetailPanelSection(
         title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
         subtitle: isArabic
-            ? 'حالة البوابات وتفاصيل الاتصال في قسم مختصر.' : 'Gateway status and connectivity details in a condensed section.',
+            ? 'حالة البوابات وتفاصيل الاتصال في قسم مختصر.'
+            : 'Gateway status and connectivity details in a condensed section.',
         icon: Icons.hub_outlined,
         route: Routes.adminGatewayLayer,
       ),
       _AdminDetailPanelSection(
         title: isArabic ? 'متابعة تفصيلية' : 'Detailed Monitoring',
         subtitle: isArabic
-            ? 'التنبيهات والصحة وإشارات البوابات في قسم واحد قابل للطي.' : 'Alerts, health, and gateway signals in one collapsible section.',
+            ? 'التنبيهات والصحة وإشارات البوابات في قسم واحد قابل للطي.'
+            : 'Alerts, health, and gateway signals in one collapsible section.',
         icon: Icons.monitor_heart_outlined,
         route: Routes.adminDetailedMonitoring,
       ),
       _AdminDetailPanelSection(
         title: isArabic ? 'تفاصيل التحليلات' : 'Analytics Details',
         subtitle: isArabic
-            ? 'تحليلات السلوك والمراقبة متاحة دون تمديد الصفحة الرئيسية.' : 'Behavior and monitoring analytics kept available without stretching the main page.',
+            ? 'تحليلات السلوك والمراقبة متاحة دون تمديد الصفحة الرئيسية.'
+            : 'Behavior and monitoring analytics kept available without stretching the main page.',
         icon: Icons.analytics_outlined,
         route: Routes.adminAnalyticsDetails,
       ),
@@ -579,75 +547,97 @@ class _AdminHubPageState extends State<AdminHubPage> {
                       0,
                     ),
                     children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 7,
-                        child: width >= 960
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  _AdminHeaderShortcutBar(
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 7,
+                            child: width >= 960
+                                ? Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      _AdminHeaderShortcutBar(
+                                        isArabic: isArabic,
+                                        governanceActions: governanceActions,
+                                        entryActions: mainSectionCards,
+                                      ),
+                                      const SizedBox(height: 18),
+                                      Align(
+                                        alignment: Alignment.topRight,
+                                        child: FractionallySizedBox(
+                                          widthFactor: 0.52,
+                                          child: _AdminDepartmentSection(
+                                            isArabic: isArabic,
+                                            cards: departmentSectionCards,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 14),
+                                      Align(
+                                        alignment: Alignment.topRight,
+                                        child: FractionallySizedBox(
+                                          widthFactor: 0.52,
+                                          child: _AdminTitledLaunchpad(
+                                            title: isArabic
+                                                ? 'متابعة التسجيلات والحسابات'
+                                                : 'Registration & Account Follow-up',
+                                            cards: registrationSectionCards,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : _AdminHeaderShortcutBar(
                                     isArabic: isArabic,
                                     governanceActions: governanceActions,
                                     entryActions: mainSectionCards,
                                   ),
-                                  const SizedBox(height: 18),
-                                  Align(
-                                    alignment: Alignment.topRight,
-                                    child: FractionallySizedBox(
-                                      widthFactor: 0.52,
-                                      child: _AdminDepartmentSection(
-                                        isArabic: isArabic,
-                                        cards: departmentSectionCards,
-                                      ),
-                                    ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            flex: 5,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _AdminHomeCountersSection(
+                                  isArabic: isArabic,
+                                  cards: compactCounters,
+                                ),
+                                const SizedBox(height: 10),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 18),
+                                  child: _AdminFixedDetailPanel(
+                                    isArabic: isArabic,
+                                    sections: detailSections,
                                   ),
-                                ],
-                              )
-                            : _AdminHeaderShortcutBar(
-                                isArabic: isArabic,
-                                governanceActions: governanceActions,
-                                entryActions: mainSectionCards,
-                              ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        flex: 5,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _AdminHomeCountersSection(
-                              isArabic: isArabic,
-                              cards: compactCounters,
-                            ),
-                            const SizedBox(height: 10),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 18),
-                              child: _AdminFixedDetailPanel(
-                                isArabic: isArabic,
-                                sections: detailSections,
-                              ),
-                            ),
-                          ],
+                      SizedBox(height: width >= 960 ? 12 : 48),
+                      if (width >= 960) const SizedBox(height: AppSpacing.sm),
+                      if (width < 960)
+                        _AdminDepartmentSection(
+                          isArabic: isArabic,
+                          cards: departmentSectionCards,
                         ),
+                      if (width < 960) ...[
+                        const SizedBox(height: 14),
+                        _AdminTitledLaunchpad(
+                          title: isArabic
+                              ? 'متابعة التسجيلات والحسابات'
+                              : 'Registration & Account Follow-up',
+                          cards: registrationSectionCards,
+                        ),
+                      ],
+                      const SizedBox(height: 2),
+                      // This stream is intentionally left build-scoped for now;
+                      // moving it needs a lifecycle refactor outside this cleanup.
+                      _SystemAdvisoryCard(
+                        advisoryStream: _systemAdvisoryStream(),
                       ),
-                    ],
-                  ),
-                  SizedBox(height: width >= 960 ? 12 : 48),
-                  if (width >= 960) const SizedBox(height: AppSpacing.sm),
-                  if (width < 960)
-                    _AdminDepartmentSection(
-                      isArabic: isArabic,
-                      cards: departmentSectionCards,
-                    ),
-                  const SizedBox(height: 2),
-                  // This stream is intentionally left build-scoped for now;
-                  // moving it needs a lifecycle refactor outside this cleanup.
-                  _SystemAdvisoryCard(
-                    advisoryStream: _systemAdvisoryStream(),
-                  ),
                     ],
                   );
                 },
@@ -861,7 +851,8 @@ class _AdminHeaderShortcutBar extends StatelessWidget {
         isArabic: isArabic,
         actions: governanceActions,
       ),
-      for (final action in entryActions) _AdminHeaderEntryShortcut(item: action),
+      for (final action in entryActions)
+        _AdminHeaderEntryShortcut(item: action),
     ];
     final rows = [
       shortcuts.take(3).toList(),
@@ -1014,8 +1005,9 @@ class _AdminGovernanceToolsButton extends StatelessWidget {
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment:
-                    isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                crossAxisAlignment: isArabic
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
                 children: [
                   Text(
                     isArabic ? 'أدوات الحوكمة' : 'Governance Tools',
@@ -1158,7 +1150,9 @@ class _AdminSectionLaunchpad extends StatelessWidget {
                 Row(
                   textDirection: Directionality.of(context),
                   children: [
-                    for (int index = 0; index < rows[rowIndex].length; index++) ...[
+                    for (int index = 0;
+                        index < rows[rowIndex].length;
+                        index++) ...[
                       SizedBox(
                         width: itemWidth,
                         child: _AdminSectionLaunchCard(
@@ -1239,7 +1233,8 @@ class _AdminSectionLaunchCard extends StatelessWidget {
                           shape: BoxShape.circle,
                           color: color.withValues(alpha: 0.18),
                           border: Border.all(
-                            color: const Color(0xFF54A997).withValues(alpha: 0.34),
+                            color:
+                                const Color(0xFF54A997).withValues(alpha: 0.34),
                             width: 1,
                           ),
                         ),
@@ -1286,6 +1281,41 @@ class _AdminDepartmentSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _AdminSectionLaunchpad(cards: cards);
+  }
+}
+
+class _AdminTitledLaunchpad extends StatelessWidget {
+  const _AdminTitledLaunchpad({
+    required this.title,
+    required this.cards,
+  });
+
+  final String title;
+  final List<_AdminSectionLaunchCardData> cards;
+
+  @override
+  Widget build(BuildContext context) {
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+    return Column(
+      crossAxisAlignment:
+          isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Text(
+            title,
+            textAlign: isRtl ? TextAlign.right : TextAlign.left,
+            style: const TextStyle(
+              color: Color(0xFFE8D7A5),
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        _AdminSectionLaunchpad(cards: cards),
+      ],
+    );
   }
 }
 
@@ -1345,66 +1375,67 @@ class _SystemAdvisoryCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-              Container(
-                width: 12,
-                height: 12,
-                margin: const EdgeInsets.only(top: 6),
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'System Advisory',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: const Color(0xFFF1E5C8),
-                          ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      '${summary.affectedCount} domains require attention (highest: ${summary.highestSeverity})',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color:
-                                const Color(0xFFD6D8DA).withValues(alpha: 0.84),
-                          ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      'This is an informational advisory. No actions are blocked.',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color:
-                                const Color(0xFFD6D8DA).withValues(alpha: 0.72),
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, Routes.adminDomainStatus);
-                },
-                child: const Text(
-                  'View details',
-                  style: TextStyle(
-                    color: Color(0xFFE8D7A5),
-                    fontWeight: FontWeight.w700,
+                Container(
+                  width: 12,
+                  height: 12,
+                  margin: const EdgeInsets.only(top: 6),
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'System Advisory',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFFF1E5C8),
+                                ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        '${summary.affectedCount} domains require attention (highest: ${summary.highestSeverity})',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: const Color(0xFFD6D8DA)
+                                  .withValues(alpha: 0.84),
+                            ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        'This is an informational advisory. No actions are blocked.',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: const Color(0xFFD6D8DA)
+                                  .withValues(alpha: 0.72),
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, Routes.adminDomainStatus);
+                  },
+                  child: const Text(
+                    'View details',
+                    style: TextStyle(
+                      color: Color(0xFFE8D7A5),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );
@@ -1540,8 +1571,7 @@ class _QuickStatCard extends StatelessWidget {
     }) {
       final isOpenRequestsCounter = item.group == AdminVisualGroup.requests;
       final isPaymentReviewCounter = item.group == AdminVisualGroup.payments;
-      final isSessionReadinessCounter =
-          item.group == AdminVisualGroup.sessions;
+      final isSessionReadinessCounter = item.group == AdminVisualGroup.sessions;
       final isHumanReviewCounter = item.group == AdminVisualGroup.support;
       final isGatewaySignalsCounter = item.group == AdminVisualGroup.system;
       final openRequestsCountText =
@@ -1557,9 +1587,7 @@ class _QuickStatCard extends StatelessWidget {
           hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
       final statusText = hasError
           ? (isArabic ? 'فشل التحميل' : 'Load failed')
-          : (waiting
-              ? (isArabic ? 'جارٍ التحديث' : 'Updating')
-              : item.title);
+          : (waiting ? (isArabic ? 'جارٍ التحديث' : 'Updating') : item.title);
       final displayCountText = isOpenRequestsCounter
           ? openRequestsCountText
           : (isPaymentReviewCounter
@@ -1639,8 +1667,7 @@ class _QuickStatCard extends StatelessWidget {
                       height: 42,
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       decoration: BoxDecoration(
-                        color:
-                            const Color(0xFF10161A).withValues(alpha: 0.92),
+                        color: const Color(0xFF10161A).withValues(alpha: 0.92),
                         borderRadius: BorderRadius.circular(999),
                         border: Border.all(
                           color: const Color(0xFFD8B26A).withValues(

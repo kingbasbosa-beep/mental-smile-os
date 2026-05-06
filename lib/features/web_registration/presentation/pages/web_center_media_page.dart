@@ -5,46 +5,73 @@ import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
 
-class WebCenterProfilePage extends StatefulWidget {
-  const WebCenterProfilePage({super.key});
+class WebCenterMediaPage extends StatefulWidget {
+  const WebCenterMediaPage({super.key});
 
   @override
-  State<WebCenterProfilePage> createState() => _WebCenterProfilePageState();
+  State<WebCenterMediaPage> createState() => _WebCenterMediaPageState();
 }
 
-class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
+class _WebCenterMediaPageState extends State<WebCenterMediaPage> {
   final _formKey = GlobalKey<FormState>();
-  final _managerNameController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _whatsappController = TextEditingController();
-  final _cityController = TextEditingController();
-  final _areaController = TextEditingController();
-  final _addressController = TextEditingController();
-  final _descriptionController = TextEditingController();
-
+  final _frontImageController = TextEditingController();
+  final _receptionImageController = TextEditingController();
+  final _inside1ImageController = TextEditingController();
+  final _inside2ImageController = TextEditingController();
   bool _isSaving = false;
-  bool _hasDetoxUnit = false;
   String? _error;
 
   @override
   void dispose() {
-    _managerNameController.dispose();
-    _phoneController.dispose();
-    _whatsappController.dispose();
-    _cityController.dispose();
-    _areaController.dispose();
-    _addressController.dispose();
-    _descriptionController.dispose();
+    _frontImageController.dispose();
+    _receptionImageController.dispose();
+    _inside1ImageController.dispose();
+    _inside2ImageController.dispose();
     super.dispose();
+  }
+
+  List<Map<String, dynamic>> _galleryItems() {
+    return [
+      {
+        'slotKey': 'front',
+        'label': 'Front View',
+        'url': _frontImageController.text.trim(),
+        'status':
+            _frontImageController.text.trim().isEmpty ? 'pending' : 'uploaded',
+      },
+      {
+        'slotKey': 'reception',
+        'label': 'Reception',
+        'url': _receptionImageController.text.trim(),
+        'status': _receptionImageController.text.trim().isEmpty
+            ? 'pending'
+            : 'uploaded',
+      },
+      {
+        'slotKey': 'inside_1',
+        'label': 'Inside 1',
+        'url': _inside1ImageController.text.trim(),
+        'status': _inside1ImageController.text.trim().isEmpty
+            ? 'pending'
+            : 'uploaded',
+      },
+      {
+        'slotKey': 'inside_2',
+        'label': 'Inside 2',
+        'url': _inside2ImageController.text.trim(),
+        'status': _inside2ImageController.text.trim().isEmpty
+            ? 'pending'
+            : 'uploaded',
+      },
+    ];
   }
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-
-    final user = FirebaseAuth.instance.currentUser;
-    final uid = user?.uid ?? WebRegistrationDraftStore.centerUid;
+    final uid =
+        FirebaseAuth.instance.currentUser?.uid ?? WebRegistrationDraftStore.centerUid;
     if (uid == null) {
-      setState(() => _error = 'Please register or sign in before saving.');
+      setState(() => _error = 'Missing center session');
       return;
     }
 
@@ -54,35 +81,28 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
     });
 
     try {
-      final ref = FirebaseFirestore.instance.collection('centers').doc(uid);
-      final snap = await ref.get();
-      final data = snap.data() ?? const <String, dynamic>{};
-      final centerType = (data['centerType'] ?? '').toString();
+      final galleryItems = _galleryItems();
+      final galleryImages = galleryItems
+          .map((item) => (item['url'] ?? '').toString().trim())
+          .where((url) => url.isNotEmpty)
+          .toList();
 
-      await ref.update({
-        'managerName': _managerNameController.text.trim(),
-        'phone': _phoneController.text.trim(),
-        'whatsapp': _whatsappController.text.trim(),
-        'city': _cityController.text.trim(),
-        'area': _areaController.text.trim(),
-        'address': _addressController.text.trim(),
-        'description': _descriptionController.text.trim(),
-        'hasDetoxUnit': _hasDetoxUnit || centerType == 'detox',
+      await FirebaseFirestore.instance.collection('centers').doc(uid).update({
+        'galleryItems': galleryItems,
+        'galleryImages': galleryImages,
+        'imageUrl': galleryImages.isEmpty ? '' : galleryImages.first,
+        'coverImageUrl': galleryImages.isEmpty ? '' : galleryImages.first,
+        'imagesReady': galleryImages.isNotEmpty,
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
       if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed(Routes.webCenterMedia);
+      Navigator.of(context).pushReplacementNamed(Routes.webCenterPricing);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Failed to save profile');
+      if (mounted) setState(() => _error = 'Failed to save media');
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
-  }
-
-  String? _required(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Required';
-    return null;
   }
 
   @override
@@ -98,7 +118,7 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
             webRegistrationBackgroundAsset(
               context,
               roleFolder: 'centers',
-              fileName: 'centers_step_2_profile.png',
+              fileName: 'centers_step_3_media.png',
             ),
             fit: BoxFit.contain,
           ),
@@ -132,7 +152,7 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Text(
-                        'Center Registration - Basic Info',
+                        'Center Registration - Media & Gallery',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 22,
@@ -140,38 +160,13 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      _textField(_managerNameController, 'Manager name'),
+                      _textField(_frontImageController, 'Front image URL'),
                       _textField(
-                        _phoneController,
-                        'Phone',
-                        keyboardType: TextInputType.phone,
+                        _receptionImageController,
+                        'Reception image URL',
                       ),
-                      _textField(
-                        _whatsappController,
-                        'WhatsApp',
-                        keyboardType: TextInputType.phone,
-                      ),
-                      _textField(_cityController, 'City'),
-                      _textField(
-                        _areaController,
-                        'Area',
-                        required: false,
-                      ),
-                      _textField(_addressController, 'Address'),
-                      _textField(
-                        _descriptionController,
-                        'Description',
-                        maxLines: 3,
-                      ),
-                      CheckboxListTile(
-                        value: _hasDetoxUnit,
-                        onChanged: _isSaving
-                            ? null
-                            : (value) {
-                                setState(() => _hasDetoxUnit = value ?? false);
-                              },
-                        title: const Text('Has detox unit'),
-                      ),
+                      _textField(_inside1ImageController, 'Inside image 1 URL'),
+                      _textField(_inside2ImageController, 'Inside image 2 URL'),
                       if (_error != null) ...[
                         const SizedBox(height: 10),
                         Text(
@@ -190,7 +185,7 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
                           onPressed: _isSaving ? null : _save,
                           child: _isSaving
                               ? const CircularProgressIndicator()
-                              : const Text('Next: Media & Gallery'),
+                              : const Text('Next: Pricing & Capabilities'),
                         ),
                       ),
                     ],
@@ -208,27 +203,15 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
     );
   }
 
-  Widget _textField(
-    TextEditingController controller,
-    String label, {
-    bool required = true,
-    int maxLines = 1,
-    TextInputType? keyboardType,
-  }) {
+  Widget _textField(TextEditingController controller, String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
         controller: controller,
-        maxLines: maxLines,
-        keyboardType: keyboardType,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
         ),
-        validator: (value) {
-          if (!required) return null;
-          return _required(value);
-        },
       ),
     );
   }

@@ -2,9 +2,13 @@ class Routes {
   // Web Registration Portal
   static const webCenterRegister = '/web/center/register';
   static const webCenterProfile = '/web/center/profile';
+  static const webCenterMedia = '/web/center/media';
   static const webCenterPricing = '/web/center/pricing';
   static const webCenterDocuments = '/web/center/documents';
   static const webClinicianRegister = '/web/clinician/register';
+  static const webClinicianProfile = '/web/clinician/profile';
+  static const webClinicianSessions = '/web/clinician/sessions';
+  static const webClinicianDocuments = '/web/clinician/documents';
   static const webRegistrationSuccess = '/web/register/success';
   static const splash = '/';
   static const language = '/language';
@@ -63,6 +67,7 @@ class Routes {
   static const adminOperations = '/admin/operations';
   static const adminCommunications = '/admin/communications';
   static const adminClients = '/admin/clients';
+  static const adminRegistrationMaintenance = '/admin/registration-maintenance';
   static const adminClinicianRequests = '/admin/clinician-requests';
   static const adminClinicianWorkspace = '/admin/clinician-workspace';
   static const adminClinicianProfileRequests =
@@ -106,6 +111,7 @@ class Routes {
   static const adminEngineeringGateway = '/admin/gateways/engineering';
   static const adminDeviceStorageGateway = '/admin/gateways/device-storage';
   static const adminCenters = '/admin/centers';
+  static const adminCenterDetails = '/admin/centers/details';
   static const adminArchive = '/admin/archive';
   static const adminArchiveSessions = '/admin/archive/sessions';
   static const adminArchivePayments = '/admin/archive/payments';

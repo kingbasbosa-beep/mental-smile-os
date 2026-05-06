@@ -7,9 +7,13 @@ import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'routes.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_register_portal_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_profile_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_media_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_pricing_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_documents_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_register_portal_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_profile_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_sessions_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_documents_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_registration_success_page.dart';
 
 import 'package:flutterprojects/features/booking/presentation/pages/booking_page.dart';
@@ -34,7 +38,6 @@ import 'package:flutterprojects/features/specialists/presentation/specialists_li
 import 'package:flutterprojects/features/specialists/presentation/specialist_details_page.dart';
 import 'package:flutterprojects/features/auth/presentation/pages/login_page.dart';
 import 'package:flutterprojects/features/auth/presentation/pages/client_register_page.dart';
-import 'package:flutterprojects/features/auth/presentation/pages/clinician_register_page.dart';
 import 'package:flutterprojects/features/external_follow_up/presentation/pages/follow_up_registration_page.dart';
 import 'package:flutterprojects/features/external_follow_up/presentation/pages/external_follow_up_workspace_page.dart';
 import 'package:flutterprojects/features/external_follow_up/presentation/pages/follow_up_templates_page.dart';
@@ -48,12 +51,14 @@ import 'package:flutterprojects/features/chat/presentation/pages/clinician_chat_
 import 'package:flutterprojects/features/centers/presentation/pages/centers_landing_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/centers_list_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_details_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_center_details_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_centers_page.dart';
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_hub_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_control_room_placeholder_pages.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_blueprint_handoff_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.dart';
+import 'package:flutterprojects/features/admin_surface/pages/admin_registration_maintenance_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_workspace_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_content_care_programs_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_ai_followup_boundaries_page.dart';
@@ -103,7 +108,6 @@ import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_req
 import 'package:flutterprojects/features/admin_surface/pages/admin_support_chat_page.dart';
 import 'package:flutterprojects/features/clinician/presentation/pages/clinician_operations_page.dart';
 import 'package:flutterprojects/features/client/presentation/pages/client_dashboard_page.dart';
-import 'package:flutterprojects/features/centers/presentation/pages/center_register_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_dashboard_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_operations_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_residencies_page.dart';
@@ -125,6 +129,7 @@ class AppRouter {
     Routes.adminClinicianWorkspace,
     Routes.adminClinicianProfileRequests,
     Routes.adminClients,
+    Routes.adminRegistrationMaintenance,
     Routes.adminPayments,
     Routes.adminSessions,
     Routes.adminSupportChats,
@@ -321,6 +326,12 @@ class AppRouter {
       case Routes.adminClients:
         return _adminProtectedRoute(
           child: const AdminClientsPage(),
+          settings: settings,
+        );
+
+      case Routes.adminRegistrationMaintenance:
+        return _adminProtectedRoute(
+          child: const AdminRegistrationMaintenancePage(),
           settings: settings,
         );
 
@@ -678,6 +689,12 @@ class AppRouter {
           settings: settings,
         );
 
+      case Routes.webCenterMedia:
+        return MaterialPageRoute(
+          builder: (_) => const WebCenterMediaPage(),
+          settings: settings,
+        );
+
       case Routes.webCenterPricing:
         return MaterialPageRoute(
           builder: (_) => const WebCenterPricingPage(),
@@ -699,6 +716,24 @@ class AppRouter {
       case Routes.webClinicianRegister:
         return MaterialPageRoute(
           builder: (_) => const WebClinicianRegisterPortalPage(),
+          settings: settings,
+        );
+
+      case Routes.webClinicianProfile:
+        return MaterialPageRoute(
+          builder: (_) => const WebClinicianProfilePage(),
+          settings: settings,
+        );
+
+      case Routes.webClinicianSessions:
+        return MaterialPageRoute(
+          builder: (_) => const WebClinicianSessionsPage(),
+          settings: settings,
+        );
+
+      case Routes.webClinicianDocuments:
+        return MaterialPageRoute(
+          builder: (_) => const WebClinicianDocumentsPage(),
           settings: settings,
         );
 
@@ -1144,6 +1179,26 @@ class AppRouter {
         }
         return _adminProtectedRoute(
           child: const AdminCentersPage(),
+          settings: settings,
+        );
+
+      case Routes.adminCenterDetails:
+        final args = settings.arguments;
+        final centerId = args is String
+            ? args
+            : args is Map
+                ? args['centerId']?.toString()
+                : null;
+        if (centerId == null || centerId.isEmpty) {
+          return MaterialPageRoute(
+            builder: (ctx) => const Scaffold(
+              body: Center(child: Text('Missing center id')),
+            ),
+            settings: settings,
+          );
+        }
+        return _adminProtectedRoute(
+          child: AdminCenterDetailsPage(centerId: centerId),
           settings: settings,
         );
 

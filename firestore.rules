@@ -170,31 +170,62 @@ service cloud.firestore {
         && request.resource.data.isActive == false;
     }
 
+    /// center self registration editable fields
     function ownCenterUpdateValid(uidDoc) {
       return signedIn()
         && uidDoc == uid()
         && request.resource.data.diff(resource.data).changedKeys()
             .hasOnly([
+              'name',
               'displayName',
               'centerName',
+              'email',
+              'category',
+              'categoryLabelAr',
+              'categoryLabelEn',
+              'centerType',
+              'centerTypeLabelAr',
+              'centerTypeLabelEn',
+              'sortOrder',
+              'managerName',
               'phone',
+              'phoneNumber',
+              'whatsapp',
+              'whatsappNumber',
+              'countryCode',
               'city',
+              'area',
               'address',
               'description',
-              'managerName',
+              'hasDetoxUnit',
               'galleryItems',
               'galleryImages',
+              'imageUrl',
+              'coverImageUrl',
               'imagesReady',
+              'accommodationCosts',
+              'autismCareCosts',
+              'centerCapabilities',
+              'services',
+              'pricingReady',
               'documentItems',
               'documentsReady',
-              'updatedAt'
+              'identityDocumentUrl',
+              'licenseDocumentUrl',
+              'commercialDocumentUrl',
+              'taxDocumentUrl',
+              'identityFileName',
+              'licenseFileName',
+              'commercialFileName',
+              'taxFileName',
+              'documentsUploadMode',
+              'updatedAt',
+              'createdAt'
             ])
         && request.resource.data.role == resource.data.role
-        && request.resource.data.email == resource.data.email
         && request.resource.data.approvalStatus == resource.data.approvalStatus
         && request.resource.data.isActive == resource.data.isActive
-        && request.resource.data.active == resource.data.active
-        && request.resource.data.createdAt == resource.data.createdAt;
+        && request.resource.data.active == resource.data.active;
     }
 
     function ownClinicianUpdateValid(uidDoc) {
@@ -210,6 +241,46 @@ service cloud.firestore {
         && request.resource.data.blockedBy == resource.data.blockedBy
         && request.resource.data.blockReason == resource.data.blockReason
         && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    /// clinician self registration editable fields
+    function ownClinicianProfileRegistrationUpdateValid(uidDoc) {
+      return signedIn()
+        && uid() == uidDoc
+        && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly([
+              'fullName',
+              'displayName',
+              'fullDisplayNameAr',
+              'fullDisplayNameEn',
+              'email',
+              'professionalTitle',
+              'professionalTitleKey',
+              'professionalTitleLabelAr',
+              'professionalTitleLabelEn',
+              'specialty',
+              'specialtyKey',
+              'specialtyLabel',
+              'phoneNumber',
+              'countryCode',
+              'photoUrl',
+              'photoAsset',
+              'bio',
+              'sessionPriceText',
+              'sessionDurationText',
+              'sessionModes',
+              'offersGroupSessions',
+              'identityFileName',
+              'certificateFileName',
+              'extraFileName',
+              'documentsSubmitted',
+              'documentsUploadMode',
+              'identityDocumentUrl',
+              'certificateDocumentUrl',
+              'extraDocumentUrl',
+              'updatedAt',
+              'createdAt'
+            ]);
     }
 
     function ownClientUpdateValid(uidDoc) {
@@ -2257,7 +2328,9 @@ service cloud.firestore {
     match /clinicians/{uidDoc} {
       allow read: if signedIn();
       allow create: if signedIn() && uid() == uidDoc;
-      allow update: if ownClinicianUpdateValid(uidDoc) || isAdmin();
+      allow update: if ownClinicianUpdateValid(uidDoc)
+        || ownClinicianProfileRegistrationUpdateValid(uidDoc)
+        || isAdmin();
       allow delete: if false;
     }
 

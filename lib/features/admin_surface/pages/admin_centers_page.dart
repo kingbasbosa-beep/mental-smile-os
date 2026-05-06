@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/features/centers/presentation/center_document_requirements.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -14,6 +15,11 @@ class AdminCentersPage extends StatefulWidget {
 
 class _AdminCentersPageState extends State<AdminCentersPage> {
   String _tab = 'pending';
+  String _search = '';
+  String _approvalFilter = 'all';
+  String _activityFilter = 'all';
+  String _sort = 'newest';
+  final _searchController = TextEditingController();
   final _blockingService = AccountBlockingService();
 
   bool _isArabic(BuildContext context) =>
@@ -202,6 +208,58 @@ class _AdminCentersPageState extends State<AdminCentersPage> {
     return DateTime(1970);
   }
 
+  bool _matchesSearch(Map<String, dynamic> data) {
+    final q = _search.trim().toLowerCase();
+    if (q.isEmpty) return true;
+    final values = [
+      data['centerName'],
+      data['displayName'],
+      data['name'],
+      data['email'],
+      data['phone'],
+      data['phoneNumber'],
+      data['whatsapp'],
+      data['whatsappNumber'],
+      data['managerName'],
+    ].map((value) => (value ?? '').toString().toLowerCase());
+    return values.any((value) => value.contains(q));
+  }
+
+  bool _matchesApprovalFilter(Map<String, dynamic> data) {
+    if (_approvalFilter == 'all') return true;
+    final status = _effectiveApprovalStatus(data);
+    if (_approvalFilter == 'pending') {
+      return status == 'pending_admin' || status == 'pending_review';
+    }
+    if (_approvalFilter == 'rejected') {
+      return status == 'rejected_admin' || status == 'rejected';
+    }
+    return status == _approvalFilter;
+  }
+
+  bool _matchesActivityFilter(Map<String, dynamic> data) {
+    final isActive = (data['isActive'] ?? false) == true;
+    final isBlocked = (data['isBlocked'] ?? false) == true;
+    switch (_activityFilter) {
+      case 'active':
+        return isActive && !isBlocked;
+      case 'inactive':
+        return !isActive && !isBlocked;
+      case 'blocked':
+        return isBlocked;
+      case 'unblocked':
+        return !isBlocked;
+      default:
+        return true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _openDocumentUrl(String rawUrl) async {
     final url = rawUrl.trim();
     if (url.isEmpty) return;
@@ -388,12 +446,14 @@ class _AdminCentersPageState extends State<AdminCentersPage> {
 
             final allDocs = snapshot.data!.docs.toList()
               ..sort((a, b) {
+                final aCreated = _moment(a.data()['createdAt']);
+                final bCreated = _moment(b.data()['createdAt']);
+                if (_sort == 'oldest') {
+                  return aCreated.compareTo(bCreated);
+                }
                 final sortCompare = _sortOrderValue(a.data())
                     .compareTo(_sortOrderValue(b.data()));
                 if (sortCompare != 0) return sortCompare;
-
-                final aCreated = _moment(a.data()['createdAt']);
-                final bCreated = _moment(b.data()['createdAt']);
                 return bCreated.compareTo(aCreated);
               });
             final pendingCount = allDocs.where((doc) {
@@ -432,6 +492,9 @@ class _AdminCentersPageState extends State<AdminCentersPage> {
             final docs = allDocs.where((doc) {
               final data = doc.data();
               final isBlocked = (data['isBlocked'] ?? false) == true;
+              if (!_matchesSearch(data)) return false;
+              if (!_matchesApprovalFilter(data)) return false;
+              if (!_matchesActivityFilter(data)) return false;
               if (_tab == 'blocked') return isBlocked;
               if (isBlocked) return false;
               final status = _effectiveApprovalStatus(data);
@@ -447,6 +510,114 @@ class _AdminCentersPageState extends State<AdminCentersPage> {
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      children: [
+                        TextField(
+                          controller: _searchController,
+                          onChanged: (value) =>
+                              setState(() => _search = value),
+                          decoration: InputDecoration(
+                            prefixIcon: const Icon(Icons.search),
+                            labelText: isArabic
+                                ? 'بحث بالاسم / البريد / الهاتف'
+                                : 'Search by name, email, or phone',
+                            border: const OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: [
+                            DropdownButton<String>(
+                              value: _approvalFilter,
+                              items: [
+                                DropdownMenuItem(
+                                  value: 'all',
+                                  child: Text(isArabic
+                                      ? 'كل حالات الاعتماد'
+                                      : 'All approval statuses'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'pending',
+                                  child: Text(isArabic ? 'قيد المراجعة' : 'Pending'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'center_follow_up',
+                                  child: Text(isArabic ? 'متابعة' : 'Follow-up'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'approved',
+                                  child: Text(isArabic ? 'مقبول' : 'Approved'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'rejected',
+                                  child: Text(isArabic ? 'مرفوض' : 'Rejected'),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                if (value == null) return;
+                                setState(() => _approvalFilter = value);
+                              },
+                            ),
+                            DropdownButton<String>(
+                              value: _activityFilter,
+                              items: [
+                                DropdownMenuItem(
+                                  value: 'all',
+                                  child: Text(isArabic
+                                      ? 'كل حالات الحساب'
+                                      : 'All account states'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'active',
+                                  child: Text(isArabic ? 'نشط' : 'Active'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'inactive',
+                                  child: Text(isArabic ? 'غير نشط' : 'Inactive'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'blocked',
+                                  child: Text(isArabic ? 'محظور' : 'Blocked'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'unblocked',
+                                  child: Text(isArabic ? 'غير محظور' : 'Unblocked'),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                if (value == null) return;
+                                setState(() => _activityFilter = value);
+                              },
+                            ),
+                            DropdownButton<String>(
+                              value: _sort,
+                              items: [
+                                DropdownMenuItem(
+                                  value: 'newest',
+                                  child: Text(isArabic ? 'الأحدث' : 'Newest'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'oldest',
+                                  child: Text(isArabic ? 'الأقدم' : 'Oldest'),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                if (value == null) return;
+                                setState(() => _sort = value);
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 Wrap(
                   spacing: 10,
                   runSpacing: 10,
@@ -556,15 +727,24 @@ class _AdminCentersPageState extends State<AdminCentersPage> {
                           Row(
                             children: [
                               Expanded(
-                                child: Text(
-                                  name,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge
-                                      ?.copyWith(fontWeight: FontWeight.w800),
-                                  textAlign: isArabic
-                                      ? TextAlign.right
-                                      : TextAlign.left,
+                                child: InkWell(
+                                  onTap: () => Navigator.of(context).pushNamed(
+                                    Routes.adminCenterDetails,
+                                    arguments: id,
+                                  ),
+                                  child: Text(
+                                    name,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                    textAlign: isArabic
+                                        ? TextAlign.right
+                                        : TextAlign.left,
+                                  ),
                                 ),
                               ),
                               Container(

@@ -39,6 +39,14 @@ flutter:
 
   assets:
     - assets/branding/
+    - assets/branding/web_registration/centers/
+    - assets/branding/web_registration/centers/desktop/
+    - assets/branding/web_registration/centers/tablet/
+    - assets/branding/web_registration/centers/mobile/
+    - assets/branding/web_registration/clinicians/
+    - assets/branding/web_registration/clinicians/desktop/
+    - assets/branding/web_registration/clinicians/tablet/
+    - assets/branding/web_registration/clinicians/mobile/
     - assets/branding/splash/
     - assets/branding/login/
     - assets/c5/avatars/
@@ -74,4 +82,3 @@ flutter:
     - assets/animations/
     - assets/icons/
     - assets/images/
-

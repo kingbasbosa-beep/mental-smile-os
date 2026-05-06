@@ -19,6 +19,8 @@ class _AdminClientsPageState extends State<AdminClientsPage> {
 
   String _tab = 'all';
   String _search = '';
+  String _approvalFilter = 'all';
+  String _sort = 'newest';
 
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
@@ -126,8 +128,22 @@ class _AdminClientsPageState extends State<AdminClientsPage> {
       (data['name'] ?? '').toString().trim().toLowerCase(),
       (data['fullName'] ?? '').toString().trim().toLowerCase(),
       (data['email'] ?? '').toString().trim().toLowerCase(),
+      (data['phone'] ?? '').toString().trim().toLowerCase(),
+      (data['phoneNumber'] ?? '').toString().trim().toLowerCase(),
     ];
     return values.any((value) => value.contains(q));
+  }
+
+  bool _matchesApprovalFilter(Map<String, dynamic> data) {
+    if (_approvalFilter == 'all') return true;
+    return (data['approvalStatus'] ?? '').toString() == _approvalFilter;
+  }
+
+  DateTime _moment(dynamic value) {
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value) ?? DateTime(1970);
+    return DateTime(1970);
   }
 
   @override
@@ -168,7 +184,14 @@ class _AdminClientsPageState extends State<AdminClientsPage> {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              final allDocs = snapshot.data!.docs;
+              final allDocs = snapshot.data!.docs.toList()
+                ..sort((a, b) {
+                  final aCreated = _moment(a.data()['createdAt']);
+                  final bCreated = _moment(b.data()['createdAt']);
+                  return _sort == 'oldest'
+                      ? aCreated.compareTo(bCreated)
+                      : bCreated.compareTo(aCreated);
+                });
               final blockedCount = allDocs.where((doc) {
                 final data = doc.data();
                 return (data['isBlocked'] ?? false) == true;
@@ -179,6 +202,7 @@ class _AdminClientsPageState extends State<AdminClientsPage> {
                 final data = doc.data();
                 final isBlocked = (data['isBlocked'] ?? false) == true;
                 if (!_matchesSearch(data)) return false;
+                if (!_matchesApprovalFilter(data)) return false;
                 if (_tab == 'blocked') return isBlocked;
                 if (_tab == 'active') return !isBlocked;
                 return true;
@@ -203,7 +227,7 @@ class _AdminClientsPageState extends State<AdminClientsPage> {
                             context: context,
                             label: isArabic
                                 ? 'بحث بالاسم أو البريد'
-                                : 'Search by name or email',
+                                : 'Search by name, email, or phone',
                             icon: Icons.search,
                           ),
                         ),
@@ -241,6 +265,62 @@ class _AdminClientsPageState extends State<AdminClientsPage> {
                               ),
                               onSelected: (_) =>
                                   setState(() => _tab = 'blocked'),
+                            ),
+                            DropdownButton<String>(
+                              value: _approvalFilter,
+                              items: [
+                                DropdownMenuItem(
+                                  value: 'all',
+                                  child: Text(
+                                    isArabic
+                                        ? 'ÙƒÙ„ Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯'
+                                        : 'All approval statuses',
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'pending_review',
+                                  child: Text(
+                                    isArabic ? 'Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©' : 'Pending',
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'approved',
+                                  child: Text(
+                                    isArabic ? 'Ù…Ù‚Ø¨ÙˆÙ„' : 'Approved',
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'rejected',
+                                  child: Text(
+                                    isArabic ? 'Ù…Ø±ÙÙˆØ¶' : 'Rejected',
+                                  ),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                if (value == null) return;
+                                setState(() => _approvalFilter = value);
+                              },
+                            ),
+                            DropdownButton<String>(
+                              value: _sort,
+                              items: [
+                                DropdownMenuItem(
+                                  value: 'newest',
+                                  child: Text(
+                                    isArabic ? 'Ø§Ù„Ø£Ø­Ø¯Ø«' : 'Newest',
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'oldest',
+                                  child: Text(
+                                    isArabic ? 'Ø§Ù„Ø£Ù‚Ø¯Ù…' : 'Oldest',
+                                  ),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                if (value == null) return;
+                                setState(() => _sort = value);
+                              },
                             ),
                           ],
                         ),
