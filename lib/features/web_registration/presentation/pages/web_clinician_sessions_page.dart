@@ -68,7 +68,10 @@ class _WebClinicianSessionsPageState extends State<WebClinicianSessionsPage> {
     });
 
     try {
-      await FirebaseFirestore.instance.collection('clinicians').doc(uid).update({
+      await FirebaseFirestore.instance
+          .collection('clinicians')
+          .doc(uid)
+          .update({
         'sessionPriceText': _sessionPriceController.text.trim(),
         'sessionDurationText': _sessionDurationController.text.trim(),
         'sessionModes': _sessionModes(),
@@ -92,128 +95,167 @@ class _WebClinicianSessionsPageState extends State<WebClinicianSessionsPage> {
       body: webRegistrationCompactFormTheme(
         context,
         child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            webRegistrationBackgroundAsset(
-              context,
-              roleFolder: 'clinicians',
-              fileName: 'clinicians_step_3_sessions.png',
-            ),
-            fit: BoxFit.contain,
-          ),
-          Container(color: Colors.black.withValues(alpha: 0.10)),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SafeArea(
-              child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                20,
-                20,
-                20,
-                webRegistrationFormBottomPadding(context),
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              webRegistrationBackgroundAsset(
+                context,
+                roleFolder: 'clinicians',
+                fileName: 'clinicians_step_3_sessions.png',
               ),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 440),
-                child: Card(
-                  elevation: 6,
-                  color: webRegistrationPanelNavy.withValues(alpha: 0.18),
-                  shadowColor: Colors.black.withValues(alpha: 0.32),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    side: BorderSide(
-                      color: webRegistrationBorderTurquoise.withValues(alpha: 0.28),
-                    ),
+              fit: BoxFit.contain,
+            ),
+            Container(color: Colors.black.withValues(alpha: 0.10)),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    20,
+                    20,
+                    webRegistrationFormBottomPadding(context),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'Clinician Registration - Sessions',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 440),
+                    child: Card(
+                      elevation: 6,
+                      color: webRegistrationPanelNavy.withValues(alpha: 0.18),
+                      shadowColor: Colors.black.withValues(alpha: 0.32),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                        side: BorderSide(
+                          color: webRegistrationBorderTurquoise.withValues(
+                              alpha: 0.28),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      _textField(_sessionPriceController, 'Session price'),
-                      const SizedBox(height: 10),
-                      _textField(
-                        _sessionDurationController,
-                        'Session duration',
-                      ),
-                      const SizedBox(height: 10),
-                      CheckboxListTile(
-                        value: _offersOnline,
-                        onChanged: _isSaving
-                            ? null
-                            : (value) {
-                                setState(() => _offersOnline = value ?? false);
-                              },
-                        title: const Text('Online sessions'),
-                        controlAffinity: ListTileControlAffinity.leading,
-                      ),
-                      CheckboxListTile(
-                        value: _offersInPerson,
-                        onChanged: _isSaving
-                            ? null
-                            : (value) {
-                                setState(
-                                  () => _offersInPerson = value ?? false,
-                                );
-                              },
-                        title: const Text('In-person sessions'),
-                        controlAffinity: ListTileControlAffinity.leading,
-                      ),
-                      CheckboxListTile(
-                        value: _offersGroupSessions,
-                        onChanged: _isSaving
-                            ? null
-                            : (value) {
-                                setState(
-                                  () => _offersGroupSessions = value ?? false,
-                                );
-                              },
-                        title: const Text('Offers group sessions'),
-                        controlAffinity: ListTileControlAffinity.leading,
-                      ),
-                      if (_error != null) ...[
-                        const SizedBox(height: 10),
-                        Text(
-                          _error!,
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.w700,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(
+                                'Clinician Registration - Sessions',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              OutlinedButton.icon(
+                                onPressed: () =>
+                                    Navigator.of(context).pushNamed(
+                                  Routes.webLibrary,
+                                ),
+                                icon: const Icon(Icons.menu_book_outlined,
+                                    size: 16),
+                                label: const Text('مكتبة الإرشاد'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: webRegistrationTextTurquoise,
+                                  side: BorderSide(
+                                    color: webRegistrationBorderTurquoise
+                                        .withValues(
+                                      alpha: 0.55,
+                                    ),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  textStyle: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    shadows: webRegistrationTextShadows,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              _textField(
+                                  _sessionPriceController, 'Session price'),
+                              const SizedBox(height: 10),
+                              _textField(
+                                _sessionDurationController,
+                                'Session duration',
+                              ),
+                              const SizedBox(height: 10),
+                              CheckboxListTile(
+                                value: _offersOnline,
+                                onChanged: _isSaving
+                                    ? null
+                                    : (value) {
+                                        setState(() =>
+                                            _offersOnline = value ?? false);
+                                      },
+                                title: const Text('Online sessions'),
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                              ),
+                              CheckboxListTile(
+                                value: _offersInPerson,
+                                onChanged: _isSaving
+                                    ? null
+                                    : (value) {
+                                        setState(
+                                          () =>
+                                              _offersInPerson = value ?? false,
+                                        );
+                                      },
+                                title: const Text('In-person sessions'),
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                              ),
+                              CheckboxListTile(
+                                value: _offersGroupSessions,
+                                onChanged: _isSaving
+                                    ? null
+                                    : (value) {
+                                        setState(
+                                          () => _offersGroupSessions =
+                                              value ?? false,
+                                        );
+                                      },
+                                title: const Text('Offers group sessions'),
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                              ),
+                              if (_error != null) ...[
+                                const SizedBox(height: 10),
+                                Text(
+                                  _error!,
+                                  style: const TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(height: 16),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 44,
+                                child: ElevatedButton(
+                                  onPressed:
+                                      _isSaving || _uid == null ? null : _save,
+                                  child: _isSaving
+                                      ? const CircularProgressIndicator()
+                                      : const Text('Next: Documents'),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 44,
-                        child: ElevatedButton(
-                          onPressed:
-                              _isSaving || _uid == null ? null : _save,
-                          child: _isSaving
-                              ? const CircularProgressIndicator()
-                              : const Text('Next: Documents'),
-                        ),
                       ),
-                    ],
-                  ),
                     ),
                   ),
                 ),
               ),
-              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }

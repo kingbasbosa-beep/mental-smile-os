@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
@@ -325,9 +325,6 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
 
     await _setBusy(requestId, true);
     try {
-      debugPrint(
-        'CENTER_START_TRACE requestId=$requestId role=client status_before=${data['status']} centerArrivalConfirmed=${(data['centerArrivalConfirmed'] ?? false) == true} clientCheckInConfirmed=${(data['clientCheckInConfirmed'] ?? false) == true}',
-      );
       final updates = <String, dynamic>{
         'clientCheckInConfirmed': true,
         'clientCheckInConfirmedAt': FieldValue.serverTimestamp(),
@@ -370,8 +367,6 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
         ),
       );
     } catch (e) {
-      debugPrint(
-          'CENTER_START_TRACE_ERROR requestId=$requestId role=client error=$e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -780,3 +775,6 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
     );
   }
 }
+
+
+

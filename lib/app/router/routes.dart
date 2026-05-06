@@ -9,6 +9,7 @@ class Routes {
   static const webClinicianProfile = '/web/clinician/profile';
   static const webClinicianSessions = '/web/clinician/sessions';
   static const webClinicianDocuments = '/web/clinician/documents';
+  static const webLibrary = '/web/library';
   static const webRegistrationSuccess = '/web/register/success';
   static const splash = '/';
   static const language = '/language';

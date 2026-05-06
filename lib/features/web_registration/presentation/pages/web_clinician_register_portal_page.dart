@@ -93,10 +93,15 @@ class _WebClinicianRegisterPortalPageState
       await user.reload();
 
       final now = FieldValue.serverTimestamp();
-      await FirebaseFirestore.instance.collection('clinicians').doc(user.uid).set({
+      await FirebaseFirestore.instance
+          .collection('clinicians')
+          .doc(user.uid)
+          .set({
         'displayName': name,
-        'fullDisplayNameAr': titleLabelAr.isEmpty ? name : '$titleLabelAr $name',
-        'fullDisplayNameEn': titleLabelEn.isEmpty ? name : '$titleLabelEn $name',
+        'fullDisplayNameAr':
+            titleLabelAr.isEmpty ? name : '$titleLabelAr $name',
+        'fullDisplayNameEn':
+            titleLabelEn.isEmpty ? name : '$titleLabelEn $name',
         'professionalTitleKey': _selectedProfessionalTitleKey,
         'professionalTitleLabelAr': titleLabelAr,
         'professionalTitleLabelEn': titleLabelEn,
@@ -150,167 +155,206 @@ class _WebClinicianRegisterPortalPageState
       body: webRegistrationCompactFormTheme(
         context,
         child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            webRegistrationBackgroundAsset(
-              context,
-              roleFolder: 'clinicians',
-              fileName: 'clinicians_step_1_account.png',
-            ),
-            fit: BoxFit.contain,
-          ),
-          Container(color: Colors.black.withValues(alpha: 0.10)),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SafeArea(
-              child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                20,
-                20,
-                20,
-                webRegistrationFormBottomPadding(context),
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              webRegistrationBackgroundAsset(
+                context,
+                roleFolder: 'clinicians',
+                fileName: 'clinicians_step_1_account.png',
               ),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 440),
-                child: Card(
-                  elevation: 6,
-                  color: webRegistrationPanelNavy.withValues(alpha: 0.18),
-                  shadowColor: Colors.black.withValues(alpha: 0.32),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    side: BorderSide(
-                      color: webRegistrationBorderTurquoise.withValues(alpha: 0.28),
-                    ),
+              fit: BoxFit.contain,
+            ),
+            Container(color: Colors.black.withValues(alpha: 0.10)),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    20,
+                    20,
+                    webRegistrationFormBottomPadding(context),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'Clinician Registration - Account',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 440),
+                    child: Card(
+                      elevation: 6,
+                      color: webRegistrationPanelNavy.withValues(alpha: 0.18),
+                      shadowColor: Colors.black.withValues(alpha: 0.32),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                        side: BorderSide(
+                          color: webRegistrationBorderTurquoise.withValues(
+                              alpha: 0.28),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      _textField(_nameController, 'Name', validator: _required),
-                      const SizedBox(height: 10),
-                      DropdownButtonFormField<String>(
-                        initialValue: _selectedProfessionalTitleKey,
-                        decoration: const InputDecoration(
-                          labelText: 'Professional title',
-                          border: OutlineInputBorder(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(
+                                'Clinician Registration - Account',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              OutlinedButton.icon(
+                                onPressed: () =>
+                                    Navigator.of(context).pushNamed(
+                                  Routes.webLibrary,
+                                ),
+                                icon: const Icon(Icons.menu_book_outlined,
+                                    size: 16),
+                                label: const Text('مكتبة الإرشاد'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: webRegistrationTextTurquoise,
+                                  side: BorderSide(
+                                    color: webRegistrationBorderTurquoise
+                                        .withValues(
+                                      alpha: 0.55,
+                                    ),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  textStyle: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    shadows: webRegistrationTextShadows,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              _textField(_nameController, 'Name',
+                                  validator: _required),
+                              const SizedBox(height: 10),
+                              DropdownButtonFormField<String>(
+                                initialValue: _selectedProfessionalTitleKey,
+                                decoration: const InputDecoration(
+                                  labelText: 'Professional title',
+                                  border: OutlineInputBorder(),
+                                ),
+                                items: _professionalTitles
+                                    .map((title) => DropdownMenuItem(
+                                          value: title['key'],
+                                          child: Text(title['labelAr'] ?? ''),
+                                        ))
+                                    .toList(),
+                                validator: (value) =>
+                                    value == null || value.isEmpty
+                                        ? 'مطلوب'
+                                        : null,
+                                onChanged: (value) {
+                                  setState(() =>
+                                      _selectedProfessionalTitleKey = value);
+                                },
+                              ),
+                              const SizedBox(height: 10),
+                              DropdownButtonFormField<String>(
+                                initialValue: _selectedSpecialtyKey,
+                                decoration: const InputDecoration(
+                                  labelText: 'Specialty',
+                                  border: OutlineInputBorder(),
+                                ),
+                                items: _specialties
+                                    .map((specialty) => DropdownMenuItem(
+                                          value: specialty['key'],
+                                          child: Text(specialty['label'] ?? ''),
+                                        ))
+                                    .toList(),
+                                validator: (value) =>
+                                    value == null || value.isEmpty
+                                        ? 'مطلوب'
+                                        : null,
+                                onChanged: (value) {
+                                  setState(() => _selectedSpecialtyKey = value);
+                                },
+                              ),
+                              const SizedBox(height: 10),
+                              _textField(
+                                _emailController,
+                                'Email',
+                                keyboardType: TextInputType.emailAddress,
+                                validator: (value) {
+                                  final email = value?.trim() ?? '';
+                                  if (email.isEmpty) return 'مطلوب';
+                                  if (!email.contains('@'))
+                                    return 'Email invalid';
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 10),
+                              _textField(
+                                _passwordController,
+                                'Password',
+                                obscureText: true,
+                                validator: (value) {
+                                  if (value == null || value.length < 6) {
+                                    return 'Password must be at least 6 characters';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 10),
+                              _textField(
+                                _confirmPasswordController,
+                                'Confirm password',
+                                obscureText: true,
+                                validator: (value) {
+                                  if (value != _passwordController.text) {
+                                    return 'Passwords do not match';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              if (_error != null) ...[
+                                const SizedBox(height: 10),
+                                Text(
+                                  _error!,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(height: 16),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 44,
+                                child: ElevatedButton(
+                                  onPressed: _isSubmitting ? null : _submit,
+                                  child: _isSubmitting
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2),
+                                        )
+                                      : const Text('Next: Profile'),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        items: _professionalTitles
-                            .map((title) => DropdownMenuItem(
-                                  value: title['key'],
-                                  child: Text(title['labelAr'] ?? ''),
-                                ))
-                            .toList(),
-                        validator: (value) =>
-                            value == null || value.isEmpty ? 'مطلوب' : null,
-                        onChanged: (value) {
-                          setState(() => _selectedProfessionalTitleKey = value);
-                        },
                       ),
-                      const SizedBox(height: 10),
-                      DropdownButtonFormField<String>(
-                        initialValue: _selectedSpecialtyKey,
-                        decoration: const InputDecoration(
-                          labelText: 'Specialty',
-                          border: OutlineInputBorder(),
-                        ),
-                        items: _specialties
-                            .map((specialty) => DropdownMenuItem(
-                                  value: specialty['key'],
-                                  child: Text(specialty['label'] ?? ''),
-                                ))
-                            .toList(),
-                        validator: (value) =>
-                            value == null || value.isEmpty ? 'مطلوب' : null,
-                        onChanged: (value) {
-                          setState(() => _selectedSpecialtyKey = value);
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      _textField(
-                        _emailController,
-                        'Email',
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          final email = value?.trim() ?? '';
-                          if (email.isEmpty) return 'مطلوب';
-                          if (!email.contains('@')) return 'Email invalid';
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      _textField(
-                        _passwordController,
-                        'Password',
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.length < 6) {
-                            return 'Password must be at least 6 characters';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      _textField(
-                        _confirmPasswordController,
-                        'Confirm password',
-                        obscureText: true,
-                        validator: (value) {
-                          if (value != _passwordController.text) {
-                            return 'Passwords do not match';
-                          }
-                          return null;
-                        },
-                      ),
-                      if (_error != null) ...[
-                        const SizedBox(height: 10),
-                        Text(
-                          _error!,
-                          textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.w700,
-                            ),
-                        ),
-                      ],
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 44,
-                        child: ElevatedButton(
-                          onPressed: _isSubmitting ? null : _submit,
-                          child: _isSubmitting
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child:
-                                      CircularProgressIndicator(strokeWidth: 2),
-                                )
-                              : const Text('Next: Profile'),
-                        ),
-                      ),
-                    ],
-                  ),
                     ),
                   ),
                 ),
               ),
-              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }

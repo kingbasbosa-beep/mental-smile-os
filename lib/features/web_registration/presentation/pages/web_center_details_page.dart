@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -33,10 +33,7 @@ class _WebCenterDetailsPageState extends State<WebCenterDetailsPage> {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception('User not logged in');
 
-      await FirebaseFirestore.instance
-          .collection('centers')
-          .doc(uid)
-          .update({
+      await FirebaseFirestore.instance.collection('centers').doc(uid).update({
         'centerType': centerType,
         'residency': residency,
         'roomsCount': int.tryParse(roomsController.text.trim()) ?? 0,
@@ -93,20 +90,19 @@ class _WebCenterDetailsPageState extends State<WebCenterDetailsPage> {
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
-
                 DropdownButtonFormField<String>(
                   value: centerType,
                   decoration: const InputDecoration(labelText: 'Center Type'),
                   items: const [
-                    DropdownMenuItem(value: 'addiction', child: Text('Addiction')),
-                    DropdownMenuItem(value: 'mental', child: Text('Mental Health')),
+                    DropdownMenuItem(
+                        value: 'addiction', child: Text('Addiction')),
+                    DropdownMenuItem(
+                        value: 'mental', child: Text('Mental Health')),
                     DropdownMenuItem(value: 'both', child: Text('Both')),
                   ],
                   onChanged: (v) => setState(() => centerType = v!),
                 ),
-
                 const SizedBox(height: 12),
-
                 DropdownButtonFormField<String>(
                   value: residency,
                   decoration: const InputDecoration(labelText: 'Residency'),
@@ -117,34 +113,24 @@ class _WebCenterDetailsPageState extends State<WebCenterDetailsPage> {
                   ],
                   onChanged: (v) => setState(() => residency = v!),
                 ),
-
                 const SizedBox(height: 12),
-
                 TextFormField(
                   controller: roomsController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(labelText: 'Rooms Count'),
-                  validator: (v) =>
-                      v == null || v.isEmpty ? 'Required' : null,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                 ),
-
                 const SizedBox(height: 12),
-
                 TextFormField(
                   controller: bedsController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(labelText: 'Beds Count'),
-                  validator: (v) =>
-                      v == null || v.isEmpty ? 'Required' : null,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                 ),
-
                 const SizedBox(height: 16),
-
                 if (_error != null)
                   Text(_error!, style: const TextStyle(color: Colors.red)),
-
                 const SizedBox(height: 12),
-
                 ElevatedButton(
                   onPressed: _isSaving ? null : _save,
                   child: _isSaving

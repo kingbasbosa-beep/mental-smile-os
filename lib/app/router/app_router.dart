@@ -737,6 +737,12 @@ class AppRouter {
           settings: settings,
         );
 
+      case Routes.webLibrary:
+        return MaterialPageRoute(
+          builder: (_) => const LibraryPage(),
+          settings: settings,
+        );
+
       case Routes.login:
         return MaterialPageRoute(
           builder: (_) => const LoginPage(),

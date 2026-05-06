@@ -148,6 +148,37 @@ class _WebClinicianProfilePageState extends State<WebClinicianProfilePage> {
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
+                              const SizedBox(height: 6),
+                              OutlinedButton.icon(
+                                onPressed: () =>
+                                    Navigator.of(context).pushNamed(
+                                  Routes.webLibrary,
+                                ),
+                                icon: const Icon(
+                                  Icons.menu_book_outlined,
+                                  size: 16,
+                                ),
+                                label: const Text('مكتبة الإرشاد'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: webRegistrationTextTurquoise,
+                                  side: BorderSide(
+                                    color: webRegistrationBorderTurquoise
+                                        .withValues(alpha: 0.55),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  textStyle: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    shadows: webRegistrationTextShadows,
+                                  ),
+                                ),
+                              ),
                               const SizedBox(height: 16),
                               _textField(_photoUrlController, 'Photo URL'),
                               const SizedBox(height: 10),

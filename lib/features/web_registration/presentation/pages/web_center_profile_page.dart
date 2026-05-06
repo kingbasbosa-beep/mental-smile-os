@@ -92,118 +92,152 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
       body: webRegistrationCompactFormTheme(
         context,
         child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            webRegistrationBackgroundAsset(
-              context,
-              roleFolder: 'centers',
-              fileName: 'centers_step_2_profile.png',
-            ),
-            fit: BoxFit.contain,
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SafeArea(
-              child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                20,
-                20,
-                20,
-                webRegistrationFormBottomPadding(context),
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              webRegistrationBackgroundAsset(
+                context,
+                roleFolder: 'centers',
+                fileName: 'centers_step_2_profile.png',
               ),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 460),
-                child: Card(
-                  elevation: 6,
-                  color: webRegistrationPanelNavy.withValues(alpha: 0.18),
-                  shadowColor: Colors.black.withValues(alpha: 0.32),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    side: BorderSide(
-                      color: webRegistrationBorderTurquoise.withValues(alpha: 0.28),
-                    ),
+              fit: BoxFit.contain,
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    20,
+                    20,
+                    webRegistrationFormBottomPadding(context),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'Center Registration - Basic Info',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 460),
+                    child: Card(
+                      elevation: 6,
+                      color: webRegistrationPanelNavy.withValues(alpha: 0.18),
+                      shadowColor: Colors.black.withValues(alpha: 0.32),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                        side: BorderSide(
+                          color: webRegistrationBorderTurquoise.withValues(
+                              alpha: 0.28),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      _textField(_managerNameController, 'Manager name'),
-                      _textField(
-                        _phoneController,
-                        'Phone',
-                        keyboardType: TextInputType.phone,
-                      ),
-                      _textField(
-                        _whatsappController,
-                        'WhatsApp',
-                        keyboardType: TextInputType.phone,
-                      ),
-                      _textField(_cityController, 'City'),
-                      _textField(
-                        _areaController,
-                        'Area',
-                        required: false,
-                      ),
-                      _textField(_addressController, 'Address'),
-                      _textField(
-                        _descriptionController,
-                        'Description',
-                        maxLines: 3,
-                      ),
-                      CheckboxListTile(
-                        value: _hasDetoxUnit,
-                        onChanged: _isSaving
-                            ? null
-                            : (value) {
-                                setState(() => _hasDetoxUnit = value ?? false);
-                              },
-                        title: const Text('Has detox unit'),
-                      ),
-                      if (_error != null) ...[
-                        const SizedBox(height: 10),
-                        Text(
-                          _error!,
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.w700,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(
+                                'Center Registration - Basic Info',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              OutlinedButton.icon(
+                                onPressed: () =>
+                                    Navigator.of(context).pushNamed(
+                                  Routes.webLibrary,
+                                ),
+                                icon: const Icon(Icons.menu_book_outlined,
+                                    size: 16),
+                                label: const Text('مكتبة الإرشاد'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: webRegistrationTextTurquoise,
+                                  side: BorderSide(
+                                    color: webRegistrationBorderTurquoise
+                                        .withValues(
+                                      alpha: 0.55,
+                                    ),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  textStyle: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    shadows: webRegistrationTextShadows,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              _textField(
+                                  _managerNameController, 'Manager name'),
+                              _textField(
+                                _phoneController,
+                                'Phone',
+                                keyboardType: TextInputType.phone,
+                              ),
+                              _textField(
+                                _whatsappController,
+                                'WhatsApp',
+                                keyboardType: TextInputType.phone,
+                              ),
+                              _textField(_cityController, 'City'),
+                              _textField(
+                                _areaController,
+                                'Area',
+                                required: false,
+                              ),
+                              _textField(_addressController, 'Address'),
+                              _textField(
+                                _descriptionController,
+                                'Description',
+                                maxLines: 3,
+                              ),
+                              CheckboxListTile(
+                                value: _hasDetoxUnit,
+                                onChanged: _isSaving
+                                    ? null
+                                    : (value) {
+                                        setState(() =>
+                                            _hasDetoxUnit = value ?? false);
+                                      },
+                                title: const Text('Has detox unit'),
+                              ),
+                              if (_error != null) ...[
+                                const SizedBox(height: 10),
+                                Text(
+                                  _error!,
+                                  style: const TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(height: 16),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 44,
+                                child: ElevatedButton(
+                                  onPressed: _isSaving ? null : _save,
+                                  child: _isSaving
+                                      ? const CircularProgressIndicator()
+                                      : const Text('Next: Media & Gallery'),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 44,
-                        child: ElevatedButton(
-                          onPressed: _isSaving ? null : _save,
-                          child: _isSaving
-                              ? const CircularProgressIndicator()
-                              : const Text('Next: Media & Gallery'),
-                        ),
                       ),
-                    ],
-                  ),
                     ),
                   ),
                 ),
               ),
-              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }

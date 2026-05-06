@@ -73,8 +73,8 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    final uid =
-        FirebaseAuth.instance.currentUser?.uid ?? WebRegistrationDraftStore.centerUid;
+    final uid = FirebaseAuth.instance.currentUser?.uid ??
+        WebRegistrationDraftStore.centerUid;
     if (uid == null) {
       setState(() => _error = 'Please register or sign in before saving.');
       return;
@@ -112,123 +112,157 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
       body: webRegistrationCompactFormTheme(
         context,
         child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            webRegistrationBackgroundAsset(
-              context,
-              roleFolder: 'centers',
-              fileName: 'centers_step_4_pricing.png',
-            ),
-            fit: BoxFit.contain,
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SafeArea(
-              child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                20,
-                20,
-                20,
-                webRegistrationFormBottomPadding(context),
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              webRegistrationBackgroundAsset(
+                context,
+                roleFolder: 'centers',
+                fileName: 'centers_step_4_pricing.png',
               ),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 560),
-                child: Card(
-                  elevation: 6,
-                  color: webRegistrationPanelNavy.withValues(alpha: 0.18),
-                  shadowColor: Colors.black.withValues(alpha: 0.32),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    side: BorderSide(
-                      color: webRegistrationBorderTurquoise.withValues(alpha: 0.28),
-                    ),
+              fit: BoxFit.contain,
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    20,
+                    20,
+                    webRegistrationFormBottomPadding(context),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'Center Registration - Pricing & Capabilities',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 560),
+                    child: Card(
+                      elevation: 6,
+                      color: webRegistrationPanelNavy.withValues(alpha: 0.18),
+                      shadowColor: Colors.black.withValues(alpha: 0.32),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                        side: BorderSide(
+                          color: webRegistrationBorderTurquoise.withValues(
+                              alpha: 0.28),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      _capabilityTile(
-                        'Supports addiction cases with HIV',
-                        _capabilities.supportsAddictionCasesWithHiv,
-                        (value) {
-                          setState(() {
-                            _capabilities = _capabilities.copyWith(
-                              supportsAddictionCasesWithHiv: value,
-                            );
-                          });
-                        },
-                      ),
-                      _capabilityTile(
-                        'Accepts addiction cases',
-                        _capabilities.acceptsAddictionCases,
-                        (value) {
-                          setState(() {
-                            _capabilities = _capabilities.copyWith(
-                              acceptsAddictionCases: value,
-                            );
-                          });
-                        },
-                      ),
-                      _capabilityTile(
-                        'Accepts psychiatric cases without addiction',
-                        _capabilities.acceptsPsychiatricCasesWithoutAddiction,
-                        (value) {
-                          setState(() {
-                            _capabilities = _capabilities.copyWith(
-                              acceptsPsychiatricCasesWithoutAddiction: value,
-                            );
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      ..._accommodationCosts.map(_accommodationTile),
-                      const SizedBox(height: 8),
-                      ..._autismCareCosts.map(_autismTile),
-                      if (_error != null) ...[
-                        const SizedBox(height: 10),
-                        Text(
-                          _error!,
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.w700,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(
+                                'Center Registration - Pricing & Capabilities',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              OutlinedButton.icon(
+                                onPressed: () =>
+                                    Navigator.of(context).pushNamed(
+                                  Routes.webLibrary,
+                                ),
+                                icon: const Icon(Icons.menu_book_outlined,
+                                    size: 16),
+                                label: const Text('مكتبة الإرشاد'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: webRegistrationTextTurquoise,
+                                  side: BorderSide(
+                                    color: webRegistrationBorderTurquoise
+                                        .withValues(
+                                      alpha: 0.55,
+                                    ),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  textStyle: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    shadows: webRegistrationTextShadows,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              _capabilityTile(
+                                'Supports addiction cases with HIV',
+                                _capabilities.supportsAddictionCasesWithHiv,
+                                (value) {
+                                  setState(() {
+                                    _capabilities = _capabilities.copyWith(
+                                      supportsAddictionCasesWithHiv: value,
+                                    );
+                                  });
+                                },
+                              ),
+                              _capabilityTile(
+                                'Accepts addiction cases',
+                                _capabilities.acceptsAddictionCases,
+                                (value) {
+                                  setState(() {
+                                    _capabilities = _capabilities.copyWith(
+                                      acceptsAddictionCases: value,
+                                    );
+                                  });
+                                },
+                              ),
+                              _capabilityTile(
+                                'Accepts psychiatric cases without addiction',
+                                _capabilities
+                                    .acceptsPsychiatricCasesWithoutAddiction,
+                                (value) {
+                                  setState(() {
+                                    _capabilities = _capabilities.copyWith(
+                                      acceptsPsychiatricCasesWithoutAddiction:
+                                          value,
+                                    );
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              ..._accommodationCosts.map(_accommodationTile),
+                              const SizedBox(height: 8),
+                              ..._autismCareCosts.map(_autismTile),
+                              if (_error != null) ...[
+                                const SizedBox(height: 10),
+                                Text(
+                                  _error!,
+                                  style: const TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(height: 16),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 44,
+                                child: ElevatedButton(
+                                  onPressed: _isSaving ? null : _save,
+                                  child: _isSaving
+                                      ? const CircularProgressIndicator()
+                                      : const Text('Next: Documents'),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 44,
-                        child: ElevatedButton(
-                          onPressed: _isSaving ? null : _save,
-                          child: _isSaving
-                              ? const CircularProgressIndicator()
-                              : const Text('Next: Documents'),
-                        ),
                       ),
-                    ],
-                  ),
                     ),
                   ),
                 ),
               ),
-              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }

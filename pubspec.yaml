@@ -39,6 +39,10 @@ flutter:
 
   assets:
     - assets/branding/
+    - assets/branding/client_dashboard/
+    - assets/branding/client_dashboard/desktop/
+    - assets/branding/client_dashboard/tablet/
+    - assets/branding/client_dashboard/mobile/
     - assets/branding/web_registration/centers/
     - assets/branding/web_registration/centers/desktop/
     - assets/branding/web_registration/centers/tablet/
@@ -47,6 +51,10 @@ flutter:
     - assets/branding/web_registration/clinicians/desktop/
     - assets/branding/web_registration/clinicians/tablet/
     - assets/branding/web_registration/clinicians/mobile/
+    - assets/branding/web_registration/clients/
+    - assets/branding/web_registration/clients/desktop/
+    - assets/branding/web_registration/clients/tablet/
+    - assets/branding/web_registration/clients/mobile/
     - assets/branding/splash/
     - assets/branding/login/
     - assets/c5/avatars/

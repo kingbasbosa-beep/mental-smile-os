@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
-import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
@@ -162,24 +161,22 @@ class MenuPage extends StatelessWidget {
 
     final cards = <_MenuCardData>[
       _MenuCardData(
-        title: isArabic ? 'المراكز' : 'Centers',
-        subtitle: isArabic
-            ? 'استعرض المراكز والخدمات المتاحة'
-            : 'Browse centers and available services',
-        icon: Icons.apartment_outlined,
-        route: Routes.centers,
-        assetPath: 'c7_branding/home/hero_art.png',
-        accent: AppColors.mutedGold,
-      ),
-      _MenuCardData(
         title: isArabic ? 'الأخصائيون' : 'Specialists',
         subtitle: isArabic
             ? 'استعرض التخصصات وابدأ طلب الحجز'
             : 'Browse specialists and request a booking',
         icon: Icons.psychology_alt_outlined,
         route: Routes.specialists,
-        assetPath: 'c7_branding/logo/logo_mark.png',
         accent: AppColors.accentLavender,
+      ),
+      _MenuCardData(
+        title: isArabic ? 'المراكز' : 'Centers',
+        subtitle: isArabic
+            ? 'استعرض المراكز والخدمات المتاحة'
+            : 'Browse centers and available services',
+        icon: Icons.apartment_outlined,
+        route: Routes.centers,
+        accent: AppColors.mutedGold,
       ),
       _MenuCardData(
         title: isArabic ? 'المكتبة' : 'Library',
@@ -188,8 +185,16 @@ class MenuPage extends StatelessWidget {
             : 'Supportive and educational content',
         icon: Icons.auto_stories_outlined,
         route: Routes.library,
-        assetPath: 'c7_branding/home/home_bg.png',
         accent: AppColors.softTerracotta,
+      ),
+      _MenuCardData(
+        title: isArabic ? 'دعم المتعافي' : 'Recovered Support',
+        subtitle: isArabic
+            ? 'دعم هادئ للتعافي مع المختصين والمراكز وطلب دعم منظم'
+            : 'A calm recovery path across specialists, centers, and structured support',
+        icon: Icons.healing_outlined,
+        route: Routes.addiction,
+        accent: AppColors.success,
       ),
       _MenuCardData(
         title: isArabic
@@ -200,18 +205,7 @@ class MenuPage extends StatelessWidget {
             : 'A family-aware support path with clear next steps',
         icon: Icons.family_restroom_outlined,
         route: Routes.specialNeeds,
-        assetPath: 'c7_branding/home/hero_art.png',
         accent: AppColors.info,
-      ),
-      _MenuCardData(
-        title: isArabic ? 'دعم المدمن المتعافي' : 'Recovered Addict Support',
-        subtitle: isArabic
-            ? 'دعم هادئ للتعافي مع المختصين والمراكز وطلب دعم منظم'
-            : 'A calm recovery path across specialists, centers, and structured support',
-        icon: Icons.healing_outlined,
-        route: Routes.addiction,
-        assetPath: 'c7_branding/home/home_bg.png',
-        accent: AppColors.success,
       ),
     ];
 
@@ -299,110 +293,39 @@ class MenuPage extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        Row(
-                          textDirection: textDirection,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: isArabic
-                                    ? CrossAxisAlignment.start
-                                    : CrossAxisAlignment.start,
-                                children: [
-                                  const AppLogoWordmark(width: 170, height: 72),
-                                  const SizedBox(height: AppSpacing.sm),
-                                  Text(
-                                    isArabic
-                                        ? 'اختر المسار المناسب للبدء. جميع الطلبات تمر عبر الإدارة لضمان المتابعة والتنظيم.'
-                                        : 'Choose the right path to begin. All requests go through admins for safe coordination.',
-                                    textAlign: isArabic
-                                        ? TextAlign.right
-                                        : TextAlign.left,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(
-                                          color: AppColors.obsidian,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.md),
                         InkWell(
-                          borderRadius: BorderRadius.circular(AppRadii.xl),
+                          borderRadius: BorderRadius.circular(999),
                           onTap: () {
                             AppAnalytics.logChatOpened('general');
                             Navigator.of(context).pushNamed(Routes.chat);
                           },
-                          child: AppSurfaceCard(
-                            color: Colors.white.withValues(alpha: 0.84),
-                            child: Row(
-                              textDirection: textDirection,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: isArabic
-                                        ? CrossAxisAlignment.end
-                                        : CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        isArabic
-                                            ? 'شات Mental Smile'
-                                            : 'Mental Smile Chat',
-                                        textAlign: isArabic
-                                            ? TextAlign.right
-                                            : TextAlign.left,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge,
-                                      ),
-                                      const SizedBox(height: AppSpacing.xs),
-                                      Text(
-                                        isArabic
-                                            ? 'ابدأ محادثة دعم أولي آمنة، مع تصعيد بشري عند الحاجة.'
-                                            : 'Start a safe first-line support chat with human escalation when needed.',
-                                        textAlign: isArabic
-                                            ? TextAlign.right
-                                            : TextAlign.left,
-                                      ),
-                                    ],
-                                  ),
+                          child: CircleAvatar(
+                            radius: 36,
+                            backgroundColor:
+                                AppColors.deepTeal.withValues(alpha: 0.10),
+                            child: ClipOval(
+                              child: Image.asset(
+                                normalizeAssetPath(
+                                  'assets/c5/avatars/avatar_admin_support.png',
                                 ),
-                                const SizedBox(width: AppSpacing.md),
-                                CircleAvatar(
-                                  radius: 36,
-                                  backgroundColor: AppColors.deepTeal
-                                      .withValues(alpha: 0.10),
-                                  child: ClipOval(
-                                    child: Image.asset(
-                                      normalizeAssetPath(
-                                        'assets/c5/avatars/avatar_admin_support.png',
-                                      ),
-                                      width: 72,
-                                      height: 72,
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                        return Container(
-                                          width: 72,
-                                          height: 72,
-                                          color: AppColors.deepTeal
-                                              .withValues(alpha: 0.10),
-                                          alignment: Alignment.center,
-                                          child: const Icon(
-                                            Icons.support_agent_rounded,
-                                            color: AppColors.deepTeal,
-                                            size: 28,
-                                          ),
-                                        );
-                                      },
+                                width: 72,
+                                height: 72,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 72,
+                                    height: 72,
+                                    color: AppColors.deepTeal
+                                        .withValues(alpha: 0.10),
+                                    alignment: Alignment.center,
+                                    child: const Icon(
+                                      Icons.support_agent_rounded,
+                                      color: AppColors.deepTeal,
+                                      size: 28,
                                     ),
-                                  ),
-                                ),
-                              ],
+                                  );
+                                },
+                              ),
                             ),
                           ),
                         ),
@@ -411,30 +334,35 @@ class MenuPage extends StatelessWidget {
                           child: LayoutBuilder(
                             builder: (context, constraints) {
                               final width = constraints.maxWidth;
-                              int crossAxisCount = 2;
-                              double childAspectRatio = 1.55;
+                              final isMobile = width < 620;
+                              final itemWidth = isMobile
+                                  ? ((width - AppSpacing.lg) / 2)
+                                      .clamp(112.0, 150.0)
+                                  : width < 980
+                                      ? 138.0
+                                      : 146.0;
+                              final spacing = isMobile
+                                  ? AppSpacing.md
+                                  : width < 980
+                                      ? AppSpacing.lg
+                                      : AppSpacing.xl;
 
-                              if (width < 920) {
-                                crossAxisCount = 1;
-                                childAspectRatio = 2.0;
-                              }
-
-                              return GridView.builder(
-                                itemCount: cards.length,
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: crossAxisCount,
-                                  crossAxisSpacing: AppSpacing.md,
-                                  mainAxisSpacing: AppSpacing.md,
-                                  childAspectRatio: childAspectRatio,
+                              return Center(
+                                child: SingleChildScrollView(
+                                  child: Wrap(
+                                    alignment: WrapAlignment.center,
+                                    runAlignment: WrapAlignment.center,
+                                    spacing: spacing,
+                                    runSpacing: AppSpacing.lg,
+                                    children: [
+                                      for (final item in cards)
+                                        SizedBox(
+                                          width: itemWidth,
+                                          child: _MenuCircleButton(item: item),
+                                        ),
+                                    ],
+                                  ),
                                 ),
-                                itemBuilder: (context, index) {
-                                  final item = cards[index];
-                                  return _MenuCard(
-                                    item: item,
-                                    isArabic: isArabic,
-                                  );
-                                },
                               );
                             },
                           ),
@@ -457,7 +385,6 @@ class _MenuCardData {
   final String subtitle;
   final IconData icon;
   final String route;
-  final String assetPath;
   final Color accent;
 
   const _MenuCardData({
@@ -465,135 +392,99 @@ class _MenuCardData {
     required this.subtitle,
     required this.icon,
     required this.route,
-    required this.assetPath,
     required this.accent,
   });
 }
 
-class _MenuCard extends StatelessWidget {
-  const _MenuCard({
-    required this.item,
-    required this.isArabic,
-  });
+class _MenuCircleButton extends StatefulWidget {
+  const _MenuCircleButton({required this.item});
 
   final _MenuCardData item;
-  final bool isArabic;
+
+  @override
+  State<_MenuCircleButton> createState() => _MenuCircleButtonState();
+}
+
+class _MenuCircleButtonState extends State<_MenuCircleButton> {
+  bool _hovered = false;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(AppRadii.xl),
-      onTap: () => Navigator.of(context).pushNamed(item.route),
-      child: Container(
-        decoration: AppDecorations.surfaceCard(
-          color: Colors.white.withValues(alpha: 0.82),
-        ),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Positioned.fill(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppRadii.xl),
-                child: Opacity(
-                  opacity: 0.14,
-                  child: Image.asset(
-                    normalizeAssetPath(item.assetPath),
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const AppMissingAssetPlaceholder(),
+    final item = widget.item;
+
+    return Tooltip(
+      message: item.subtitle,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: AnimatedScale(
+          scale: _hovered ? 1.06 : 1.0,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOut,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(999),
+            onTap: () => Navigator.of(context).pushNamed(item.route),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  width: 74,
+                  height: 74,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        AppColors.mutedGold.withValues(alpha: 0.96),
+                        item.accent.withValues(alpha: 0.62),
+                        AppColors.deepTeal.withValues(alpha: 0.34),
+                      ],
+                    ),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.72),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: item.accent.withValues(
+                          alpha: _hovered ? 0.46 : 0.26,
+                        ),
+                        blurRadius: _hovered ? 26 : 18,
+                        spreadRadius: _hovered ? 2 : 0,
+                      ),
+                      BoxShadow(
+                        color: AppColors.deepTeal.withValues(alpha: 0.24),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    item.icon,
+                    color: AppColors.deepTeal,
+                    size: 31,
                   ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.xl),
-              child: Row(
-                textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
-                children: [
-                  Container(
-                    width: 74,
-                    height: 74,
-                    decoration: BoxDecoration(
-                      color: item.accent.withValues(alpha: 0.14),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: item.accent.withValues(alpha: 0.18),
+                const SizedBox(height: 10),
+                Text(
+                  item.title,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: AppColors.deepTeal,
+                    fontWeight: FontWeight.w900,
+                    shadows: [
+                      Shadow(
+                        color: Colors.white.withValues(alpha: 0.44),
+                        blurRadius: 8,
                       ),
-                    ),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(24),
-                          child: Opacity(
-                            opacity: 0.20,
-                            child: Image.asset(
-                              normalizeAssetPath(item.assetPath),
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const AppMissingAssetPlaceholder(),
-                            ),
-                          ),
-                        ),
-                        Center(
-                          child: Icon(
-                            item.icon,
-                            color: AppColors.deepTeal,
-                            size: 33,
-                          ),
-                        ),
-                      ],
-                    ),
+                    ],
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: isArabic
-                          ? CrossAxisAlignment.end
-                          : CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: item.accent.withValues(alpha: 0.10),
-                            borderRadius: BorderRadius.circular(AppRadii.pill),
-                          ),
-                          child: Text(
-                            isArabic ? 'مسار رئيسي' : 'Main track',
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelLarge
-                                ?.copyWith(
-                                  color: item.accent,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          item.title,
-                          textAlign:
-                              isArabic ? TextAlign.right : TextAlign.left,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          item.subtitle,
-                          textAlign:
-                              isArabic ? TextAlign.right : TextAlign.left,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
