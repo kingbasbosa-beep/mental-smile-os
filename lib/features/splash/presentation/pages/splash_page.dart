@@ -35,7 +35,7 @@ class SplashPage extends StatelessWidget {
             ),
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.25),
+                color: Colors.black.withValues(alpha: 0.25),
               ),
             ),
 
@@ -49,7 +49,7 @@ class SplashPage extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFE8A3).withOpacity(0.88),
+                    color: const Color(0xFFFFE8A3).withValues(alpha: 0.88),
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(
                       color: const Color(0xFFFFF4C2),
@@ -57,7 +57,7 @@ class SplashPage extends StatelessWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFD4AF37).withOpacity(0.35),
+                        color: const Color(0xFFD4AF37).withValues(alpha: 0.35),
                         blurRadius: 14,
                         spreadRadius: 1,
                       ),
@@ -112,7 +112,7 @@ class SplashPage extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFD4AF37).withOpacity(0.65),
+                          color: const Color(0xFFD4AF37).withValues(alpha: 0.65),
                           blurRadius: 24,
                           spreadRadius: 3,
                         ),

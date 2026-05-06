@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
+import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
 
 class WebCenterPricingPage extends StatefulWidget {
   const WebCenterPricingPage({super.key});
@@ -14,31 +15,68 @@ class WebCenterPricingPage extends StatefulWidget {
 
 class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
   final _formKey = GlobalKey<FormState>();
-  final _accommodationCostController = TextEditingController();
-  final _sessionCostController = TextEditingController();
-  final _notesController = TextEditingController();
-
+  final Map<String, TextEditingController> _accommodationPriceControllers = {};
+  final Map<String, TextEditingController> _autismPriceControllers = {};
+  late List<AccommodationCostItem> _accommodationCosts;
+  late List<AutismCareCostItem> _autismCareCosts;
+  CenterCapabilityFlags _capabilities = const CenterCapabilityFlags();
   bool _isSaving = false;
   String? _error;
 
   @override
+  void initState() {
+    super.initState();
+    _accommodationCosts = defaultAccommodationCostItems();
+    _autismCareCosts = defaultAutismCareCostItems();
+    for (final item in _accommodationCosts) {
+      _accommodationPriceControllers[item.key] = TextEditingController();
+    }
+    for (final item in _autismCareCosts) {
+      _autismPriceControllers[item.key] = TextEditingController();
+    }
+  }
+
+  @override
   void dispose() {
-    _accommodationCostController.dispose();
-    _sessionCostController.dispose();
-    _notesController.dispose();
+    for (final controller in _accommodationPriceControllers.values) {
+      controller.dispose();
+    }
+    for (final controller in _autismPriceControllers.values) {
+      controller.dispose();
+    }
     super.dispose();
+  }
+
+  double _readPrice(TextEditingController? controller) {
+    return double.tryParse((controller?.text ?? '').trim()) ?? 0;
+  }
+
+  List<AccommodationCostItem> _currentAccommodationCosts() {
+    return _accommodationCosts
+        .map(
+          (item) => item.copyWith(
+            price: _readPrice(_accommodationPriceControllers[item.key]),
+          ),
+        )
+        .toList();
+  }
+
+  List<AutismCareCostItem> _currentAutismCareCosts() {
+    return _autismCareCosts
+        .map(
+          (item) => item.copyWith(
+            price: _readPrice(_autismPriceControllers[item.key]),
+          ),
+        )
+        .toList();
   }
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-
-    final user = FirebaseAuth.instance.currentUser;
-    final uid = user?.uid ?? WebRegistrationDraftStore.centerUid;
-
+    final uid =
+        FirebaseAuth.instance.currentUser?.uid ?? WebRegistrationDraftStore.centerUid;
     if (uid == null) {
-      setState(() {
-        _error = 'Please register or sign in before saving pricing.';
-      });
+      setState(() => _error = 'Please register or sign in before saving.');
       return;
     }
 
@@ -48,152 +86,378 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
     });
 
     try {
-      final accommodationPrice =
-          double.tryParse(_accommodationCostController.text.trim()) ?? 0;
-      final autismSessionPrice =
-          double.tryParse(_sessionCostController.text.trim()) ?? 0;
-      final accommodationCosts = defaultAccommodationCostItems()
-          .map(
-            (item) => item.key == 'shared_room'
-                ? item.copyWith(
-                    enabled: accommodationPrice > 0,
-                    price: accommodationPrice,
-                    pricingUnit: 'month',
-                  )
-                : item,
-          )
-          .map((item) => item.toMap())
-          .toList();
-      final autismCareCosts = defaultAutismCareCostItems()
-          .map(
-            (item) => item.key == 'daily_hosting_at_center'
-                ? item.copyWith(
-                    enabled: autismSessionPrice > 0,
-                    price: autismSessionPrice,
-                    pricingUnit: 'day',
-                  )
-                : item,
-          )
-          .map((item) => item.toMap())
-          .toList();
-
       await FirebaseFirestore.instance.collection('centers').doc(uid).update({
-        'accommodationCostText': _accommodationCostController.text.trim(),
-        'sessionCostText': _sessionCostController.text.trim(),
-        'pricingNotes': _notesController.text.trim(),
-        'accommodationCosts': accommodationCosts,
-        'autismCareCosts': autismCareCosts,
+        'accommodationCosts':
+            _currentAccommodationCosts().map((item) => item.toMap()).toList(),
+        'autismCareCosts':
+            _currentAutismCareCosts().map((item) => item.toMap()).toList(),
+        'centerCapabilities': _capabilities.toMap(),
         'pricingReady': true,
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
       if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pricing saved successfully')),
-      );
-
-      await Future<void>.delayed(const Duration(milliseconds: 350));
-      if (!mounted) return;
-
-      Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
-        Routes.webCenterDocuments,
-        (route) => false,
-      );
+      Navigator.of(context).pushReplacementNamed(Routes.webCenterDocuments);
     } catch (_) {
-      if (!mounted) return;
-      setState(() {
-        _error = 'Failed to save pricing.';
-      });
+      if (mounted) setState(() => _error = 'Failed to save pricing.');
     } finally {
-      if (mounted) {
-        setState(() => _isSaving = false);
-      }
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F3EA),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 520),
-          child: Card(
-            elevation: 8,
-            margin: const EdgeInsets.all(24),
-            child: Padding(
-              padding: const EdgeInsets.all(28),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Center Pricing',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                      ),
+      backgroundColor: Colors.black,
+      body: webRegistrationCompactFormTheme(
+        context,
+        child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            webRegistrationBackgroundAsset(
+              context,
+              roleFolder: 'centers',
+              fileName: 'centers_step_4_pricing.png',
+            ),
+            fit: BoxFit.contain,
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: SafeArea(
+              child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                20,
+                20,
+                webRegistrationFormBottomPadding(context),
+              ),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 560),
+                child: Card(
+                  elevation: 6,
+                  color: webRegistrationPanelNavy.withValues(alpha: 0.18),
+                  shadowColor: Colors.black.withValues(alpha: 0.32),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                    side: BorderSide(
+                      color: webRegistrationBorderTurquoise.withValues(alpha: 0.28),
                     ),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      controller: _accommodationCostController,
-                      decoration: const InputDecoration(
-                        labelText: 'Accommodation cost',
-                        border: OutlineInputBorder(),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Center Registration - Pricing & Capabilities',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                      validator: (v) =>
-                          v == null || v.trim().isEmpty ? 'Required' : null,
-                    ),
-                    const SizedBox(height: 14),
-                    TextFormField(
-                      controller: _sessionCostController,
-                      decoration: const InputDecoration(
-                        labelText: 'Session cost',
-                        border: OutlineInputBorder(),
+                      const SizedBox(height: 16),
+                      _capabilityTile(
+                        'Supports addiction cases with HIV',
+                        _capabilities.supportsAddictionCasesWithHiv,
+                        (value) {
+                          setState(() {
+                            _capabilities = _capabilities.copyWith(
+                              supportsAddictionCasesWithHiv: value,
+                            );
+                          });
+                        },
                       ),
-                      validator: (v) =>
-                          v == null || v.trim().isEmpty ? 'Required' : null,
-                    ),
-                    const SizedBox(height: 14),
-                    TextFormField(
-                      controller: _notesController,
-                      decoration: const InputDecoration(
-                        labelText: 'Pricing notes',
-                        border: OutlineInputBorder(),
+                      _capabilityTile(
+                        'Accepts addiction cases',
+                        _capabilities.acceptsAddictionCases,
+                        (value) {
+                          setState(() {
+                            _capabilities = _capabilities.copyWith(
+                              acceptsAddictionCases: value,
+                            );
+                          });
+                        },
                       ),
-                      maxLines: 3,
-                    ),
-                    if (_error != null) ...[
-                      const SizedBox(height: 14),
-                      Text(
-                        _error!,
-                        style: const TextStyle(color: Colors.red),
+                      _capabilityTile(
+                        'Accepts psychiatric cases without addiction',
+                        _capabilities.acceptsPsychiatricCasesWithoutAddiction,
+                        (value) {
+                          setState(() {
+                            _capabilities = _capabilities.copyWith(
+                              acceptsPsychiatricCasesWithoutAddiction: value,
+                            );
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      ..._accommodationCosts.map(_accommodationTile),
+                      const SizedBox(height: 8),
+                      ..._autismCareCosts.map(_autismTile),
+                      if (_error != null) ...[
+                        const SizedBox(height: 10),
+                        Text(
+                          _error!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 44,
+                        child: ElevatedButton(
+                          onPressed: _isSaving ? null : _save,
+                          child: _isSaving
+                              ? const CircularProgressIndicator()
+                              : const Text('Next: Documents'),
+                        ),
                       ),
                     ],
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed: _isSaving ? null : _save,
-                        child: _isSaving
-                            ? const CircularProgressIndicator()
-                            : const Text('Save Pricing'),
-                      ),
+                  ),
                     ),
-                  ],
+                  ),
                 ),
+              ),
               ),
             ),
           ),
-        ),
+        ],
+      ),
       ),
     );
   }
+
+  Widget _capabilityTile(
+    String title,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) {
+    return CheckboxListTile(
+      value: value,
+      onChanged: _isSaving ? null : (next) => onChanged(next ?? false),
+      title: Text(title),
+      controlAffinity: ListTileControlAffinity.leading,
+    );
+  }
+
+  Widget _accommodationTile(AccommodationCostItem item) {
+    return ExpansionTile(
+      title: Text(item.labelEn),
+      childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      children: [
+        CheckboxListTile(
+          value: item.enabled,
+          onChanged: _isSaving
+              ? null
+              : (value) {
+                  setState(() {
+                    _accommodationCosts = _accommodationCosts
+                        .map((current) => current.key == item.key
+                            ? current.copyWith(enabled: value ?? false)
+                            : current)
+                        .toList();
+                  });
+                },
+          title: const Text('Enabled'),
+          controlAffinity: ListTileControlAffinity.leading,
+        ),
+        _priceField(_accommodationPriceControllers[item.key], 'Price'),
+        const SizedBox(height: 12),
+        _dropdown(
+          value: item.pricingUnit.isEmpty ? null : item.pricingUnit,
+          label: 'Pricing unit',
+          items: const ['day', 'week', 'month'],
+          onChanged: (value) {
+            setState(() {
+              _accommodationCosts = _accommodationCosts
+                  .map((current) => current.key == item.key
+                      ? current.copyWith(pricingUnit: value ?? '')
+                      : current)
+                  .toList();
+            });
+          },
+        ),
+        const SizedBox(height: 12),
+        _dropdown(
+          value: item.acMode.isEmpty ? null : item.acMode,
+          label: 'AC mode',
+          items: const ['included', 'extra', 'not_available'],
+          onChanged: (value) {
+            setState(() {
+              _accommodationCosts = _accommodationCosts
+                  .map((current) => current.key == item.key
+                      ? current.copyWith(acMode: value ?? '')
+                      : current)
+                  .toList();
+            });
+          },
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            _accommodationChip(
+              item,
+              'Medication',
+              item.includesMedication,
+              (value) => item.copyWith(includesMedication: value),
+            ),
+            _accommodationChip(
+              item,
+              'Meals',
+              item.includesMeals,
+              (value) => item.copyWith(includesMeals: value),
+            ),
+            _accommodationChip(
+              item,
+              'Outdoor',
+              item.includesOutdoorActivities,
+              (value) => item.copyWith(includesOutdoorActivities: value),
+            ),
+            _accommodationChip(
+              item,
+              'Tests',
+              item.includesRequiredTests,
+              (value) => item.copyWith(includesRequiredTests: value),
+            ),
+            _accommodationChip(
+              item,
+              'Airport',
+              item.includesAirportPickup,
+              (value) => item.copyWith(includesAirportPickup: value),
+            ),
+            _accommodationChip(
+              item,
+              'Outings',
+              item.includesTourismOrExternalOutings,
+              (value) => item.copyWith(
+                includesTourismOrExternalOutings: value,
+              ),
+            ),
+            _accommodationChip(
+              item,
+              'Tax included',
+              item.taxIncluded,
+              (value) => item.copyWith(taxIncluded: value),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _autismTile(AutismCareCostItem item) {
+    return ExpansionTile(
+      title: Text(item.labelEn),
+      childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      children: [
+        CheckboxListTile(
+          value: item.enabled,
+          onChanged: _isSaving
+              ? null
+              : (value) {
+                  setState(() {
+                    _autismCareCosts = _autismCareCosts
+                        .map((current) => current.key == item.key
+                            ? current.copyWith(enabled: value ?? false)
+                            : current)
+                        .toList();
+                  });
+                },
+          title: const Text('Enabled'),
+          controlAffinity: ListTileControlAffinity.leading,
+        ),
+        _priceField(_autismPriceControllers[item.key], 'Price'),
+        const SizedBox(height: 12),
+        _dropdown(
+          value: item.pricingUnit.isEmpty ? null : item.pricingUnit,
+          label: 'Pricing unit',
+          items: const ['session', 'day', 'month'],
+          onChanged: (value) {
+            setState(() {
+              _autismCareCosts = _autismCareCosts
+                  .map((current) => current.key == item.key
+                      ? current.copyWith(pricingUnit: value ?? '')
+                      : current)
+                  .toList();
+            });
+          },
+        ),
+        FilterChip(
+          label: const Text('Tax included'),
+          selected: item.taxIncluded,
+          onSelected: _isSaving
+              ? null
+              : (value) {
+                  setState(() {
+                    _autismCareCosts = _autismCareCosts
+                        .map((current) => current.key == item.key
+                            ? current.copyWith(taxIncluded: value)
+                            : current)
+                        .toList();
+                  });
+                },
+        ),
+      ],
+    );
+  }
+
+  Widget _accommodationChip(
+    AccommodationCostItem item,
+    String label,
+    bool selected,
+    AccommodationCostItem Function(bool value) update,
+  ) {
+    return FilterChip(
+      label: Text(label),
+      selected: selected,
+      onSelected: _isSaving
+          ? null
+          : (value) {
+              setState(() {
+                _accommodationCosts = _accommodationCosts
+                    .map((current) =>
+                        current.key == item.key ? update(value) : current)
+                    .toList();
+              });
+            },
+    );
+  }
+
+  Widget _priceField(TextEditingController? controller, String label) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+    );
+  }
+
+  Widget _dropdown({
+    required String? value,
+    required String label,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return DropdownButtonFormField<String>(
+      initialValue: value,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+      items: items
+          .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+          .toList(),
+      onChanged: _isSaving ? null : onChanged,
+    );
+  }
 }
-
-
-
-

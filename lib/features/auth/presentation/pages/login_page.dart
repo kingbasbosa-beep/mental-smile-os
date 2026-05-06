@@ -1,4 +1,4 @@
-﻿import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
@@ -12,6 +12,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  static const _cyberNavy = Color(0xFF061A26);
+  static const _cyberTurquoise = Color(0xFF00E5FF);
+  static const _cyberText = Color(0xFF7DF9FF);
+  static const _cyberGold = Color(0xFFE0C174);
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -30,12 +35,18 @@ class _LoginPageState extends State<LoginPage> {
 
   String _err(FirebaseAuthException e) {
     switch (e.code) {
-      case 'invalid-email': return 'البريد الإلكتروني غير صالح';
-      case 'user-disabled': return 'هذا الحساب موقوف';
-      case 'user-not-found': return 'الحساب غير موجود';
-      case 'wrong-password': return 'كلمة المرور غير صحيحة';
-      case 'network-request-failed': return 'مشكلة في الاتصال';
-      default: return 'فشل تسجيل الدخول';
+      case 'invalid-email':
+        return 'البريد الإلكتروني غير صالح';
+      case 'user-disabled':
+        return 'هذا الحساب موقوف';
+      case 'user-not-found':
+        return 'الحساب غير موجود';
+      case 'wrong-password':
+        return 'كلمة المرور غير صحيحة';
+      case 'network-request-failed':
+        return 'مشكلة في الاتصال';
+      default:
+        return 'فشل تسجيل الدخول';
     }
   }
 
@@ -121,9 +132,117 @@ class _LoginPageState extends State<LoginPage> {
         prefixIcon: Icon(icon, color: const Color(0xFFFFE8A3)),
         suffixIcon: suffix,
         filled: true,
-        fillColor: Colors.black.withOpacity(0.4),
+        fillColor: Colors.black.withValues(alpha: 0.4),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+    );
+  }
+
+  Widget _loginButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _cyberNavy,
+          foregroundColor: _cyberText,
+          disabledBackgroundColor: _cyberNavy.withValues(alpha: 0.55),
+          disabledForegroundColor: _cyberText.withValues(alpha: 0.55),
+          side:
+              BorderSide(color: _cyberGold.withValues(alpha: 0.9), width: 1.2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+          ),
+          elevation: 0,
+        ),
+        onPressed: _loading ? null : _login,
+        child: _loading
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.4,
+                  color: _cyberText,
+                ),
+              )
+            : const Text('دخول | Login'),
+      ),
+    );
+  }
+
+  Widget _registrationEntry({
+    required IconData icon,
+    required String label,
+    required String subtitle,
+    required String route,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          backgroundColor: _cyberNavy.withValues(alpha: 0.72),
+          foregroundColor: _cyberText,
+          side: BorderSide(color: _cyberTurquoise.withValues(alpha: 0.75)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        ),
+        onPressed: () => Navigator.pushNamed(context, route),
+        child: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.black.withValues(alpha: 0.22),
+                border: Border.all(color: _cyberGold.withValues(alpha: 0.76)),
+              ),
+              child: Icon(icon, color: _cyberGold, size: 19),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: _cyberText,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: _cyberGold.withValues(alpha: 0.88),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: _cyberTurquoise,
+              size: 16,
+            ),
+          ],
         ),
       ),
     );
@@ -140,7 +259,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Image.asset(_bg(context), fit: BoxFit.cover),
             ),
             Positioned.fill(
-              child: Container(color: Colors.black.withOpacity(0.5)),
+              child: Container(color: Colors.black.withValues(alpha: 0.5)),
             ),
             Center(
               child: SingleChildScrollView(
@@ -150,7 +269,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
+                      color: Colors.black.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: Column(
@@ -164,14 +283,12 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         const SizedBox(height: 20),
-
                         _field(
                           c: _emailController,
                           label: 'البريد الإلكتروني',
                           icon: Icons.email,
                         ),
                         const SizedBox(height: 12),
-
                         _field(
                           c: _passwordController,
                           label: 'كلمة المرور',
@@ -179,8 +296,8 @@ class _LoginPageState extends State<LoginPage> {
                           obscure: _obscurePassword,
                           suffix: IconButton(
                             onPressed: () {
-                              setState(() =>
-                                  _obscurePassword = !_obscurePassword);
+                              setState(
+                                  () => _obscurePassword = !_obscurePassword);
                             },
                             icon: Icon(
                               _obscurePassword
@@ -190,47 +307,33 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-
                         if (_error != null) ...[
                           const SizedBox(height: 12),
                           Text(_error!,
                               style: const TextStyle(color: Colors.red)),
                         ],
-
                         const SizedBox(height: 20),
-
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: _loading ? null : _login,
-                            child: _loading
-                                ? const CircularProgressIndicator()
-                                : const Text('دخول'),
-                          ),
-                        ),
-
+                        _loginButton(),
                         const SizedBox(height: 20),
-
-                        // Client still allowed in app
-                        TextButton(
-                          onPressed: () =>
-                              Navigator.pushNamed(context, Routes.clientRegister),
-                          child: const Text('تسجيل عميل'),
+                        _registrationEntry(
+                          icon: Icons.person_add_alt_1_outlined,
+                          label: 'تسجيل عميل',
+                          subtitle: 'Client registration',
+                          route: Routes.clientRegister,
                         ),
-
-                        // Clinician moved to web
-                        TextButton(
-                          onPressed: () => Navigator.pushNamed(
-                              context, Routes.webClinicianRegister),
-                          child: const Text('تسجيل أخصائي (عن طريق الويب)'),
+                        const SizedBox(height: 10),
+                        _registrationEntry(
+                          icon: Icons.medical_services_outlined,
+                          label: 'تسجيل أخصائي عبر الويب',
+                          subtitle: 'Clinician web registration',
+                          route: Routes.webClinicianRegister,
                         ),
-
-                        // Center moved to web
-                        TextButton(
-                          onPressed: () => Navigator.pushNamed(
-                              context, Routes.webCenterRegister),
-                          child: const Text('تسجيل مركز (عن طريق الويب)'),
+                        const SizedBox(height: 10),
+                        _registrationEntry(
+                          icon: Icons.apartment_outlined,
+                          label: 'تسجيل مركز عبر الويب',
+                          subtitle: 'Center web registration',
+                          route: Routes.webCenterRegister,
                         ),
                       ],
                     ),

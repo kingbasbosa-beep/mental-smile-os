@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
+import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
 
 class WebClinicianRegisterPortalPage extends StatefulWidget {
   const WebClinicianRegisterPortalPage({super.key});
@@ -18,17 +20,7 @@ class _WebClinicianRegisterPortalPageState
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _photoUrlController = TextEditingController();
-  final _bioController = TextEditingController();
-  final _sessionPriceController = TextEditingController();
-  final _sessionDurationController = TextEditingController();
-  final _identityFileNameController = TextEditingController();
-  final _certificateFileNameController = TextEditingController();
-  final _extraFileNameController = TextEditingController();
 
-  bool _offersOnline = true;
-  bool _offersInPerson = true;
-  bool _offersGroupSessions = false;
   bool _isSubmitting = false;
   String? _error;
   String? _selectedProfessionalTitleKey;
@@ -42,7 +34,7 @@ class _WebClinicianRegisterPortalPageState
   static const List<Map<String, String>> _specialties = [
     {'key': 'psychologist', 'label': 'أخصائي نفسي'},
     {'key': 'clinical_psychologist', 'label': 'دكتور نفسي إكلينيكي'},
-    {'key': 'addiction_counselor', 'label': 'مشير علاج سلوكيات إدمانية'},
+    {'key': 'addiction_counselor', 'label': 'مستشار علاج إدمان'},
     {'key': 'speech_specialist', 'label': 'أخصائي تخاطب'},
     {'key': 'family_counselor', 'label': 'أخصائي مشورة أسرية'},
     {'key': 'coach', 'label': 'كوتش'},
@@ -54,17 +46,8 @@ class _WebClinicianRegisterPortalPageState
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _photoUrlController.dispose();
-    _bioController.dispose();
-    _sessionPriceController.dispose();
-    _sessionDurationController.dispose();
-    _identityFileNameController.dispose();
-    _certificateFileNameController.dispose();
-    _extraFileNameController.dispose();
     super.dispose();
   }
-
-  String _normalizeEmail(String value) => value.trim().toLowerCase();
 
   Map<String, String>? _selectedTitle() {
     for (final title in _professionalTitles) {
@@ -80,19 +63,8 @@ class _WebClinicianRegisterPortalPageState
     return null;
   }
 
-  List<String> _sessionModes() {
-    final items = <String>[];
-    if (_offersInPerson) items.add('In person');
-    if (_offersOnline) items.add('Online');
-    return items;
-  }
-
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    if (!_offersOnline && !_offersInPerson) {
-      setState(() => _error = 'اختر طريقة جلسة واحدة على الأقل');
-      return;
-    }
 
     setState(() {
       _isSubmitting = true;
@@ -101,17 +73,12 @@ class _WebClinicianRegisterPortalPageState
 
     try {
       final name = _nameController.text.trim();
-      final email = _normalizeEmail(_emailController.text);
+      final email = _emailController.text.trim().toLowerCase();
       final title = _selectedTitle();
       final specialty = _selectedSpecialty();
       final titleLabelAr = title?['labelAr'] ?? '';
       final titleLabelEn = title?['labelEn'] ?? '';
       final specialtyLabel = specialty?['label'] ?? '';
-      final identityFileName = _identityFileNameController.text.trim();
-      final certificateFileName = _certificateFileNameController.text.trim();
-      final extraFileName = _extraFileNameController.text.trim();
-      final documentsSubmitted =
-          identityFileName.isNotEmpty && certificateFileName.isNotEmpty;
 
       final credential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -119,10 +86,9 @@ class _WebClinicianRegisterPortalPageState
         password: _passwordController.text,
       );
       final user = credential.user;
-      if (user == null) {
-        throw Exception('Unable to create clinician account');
-      }
+      if (user == null) throw Exception('Unable to create clinician account');
 
+      WebRegistrationDraftStore.setClinicianUid(user.uid);
       await user.updateDisplayName(name);
       await user.reload();
 
@@ -138,43 +104,37 @@ class _WebClinicianRegisterPortalPageState
         'specialty': specialtyLabel,
         'specialtyKey': _selectedSpecialtyKey,
         'specialtyLabel': specialtyLabel,
-        'offersGroupSessions': _offersGroupSessions,
-        'bio': _bioController.text.trim(),
-        'sessionPriceText': _sessionPriceController.text.trim(),
-        'sessionDurationText': _sessionDurationController.text.trim(),
-        'sessionModes': _sessionModes(),
+        'offersGroupSessions': false,
+        'bio': '',
+        'sessionPriceText': '',
+        'sessionDurationText': '',
+        'sessionModes': <String>[],
         'role': 'clinician',
         'isActive': false,
         'isAdmin': false,
-        'photoUrl': _photoUrlController.text.trim(),
+        'photoUrl': '',
         'photoAsset': '',
         'createdAt': now,
         'updatedAt': now,
-        'documentsSubmitted': documentsSubmitted,
+        'documentsSubmitted': false,
         'documentsUploadMode': 'web_registration',
         'approvalStatus': 'pending_review',
-        'identityFileName': identityFileName,
-        'certificateFileName': certificateFileName,
-        'extraFileName': extraFileName,
+        'identityFileName': '',
+        'certificateFileName': '',
+        'extraFileName': '',
         'identityDocumentUrl': '',
         'certificateDocumentUrl': '',
         'extraDocumentUrl': '',
       });
 
       if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed(Routes.webRegistrationSuccess);
+      Navigator.of(context).pushReplacementNamed(Routes.webClinicianProfile);
     } on FirebaseAuthException catch (e) {
-      setState(() {
-        _error = e.message ?? 'فشل إنشاء حساب الأخصائي';
-      });
+      setState(() => _error = e.message ?? 'فشل إنشاء حساب الأخصائي');
     } catch (_) {
-      setState(() {
-        _error = 'فشل إنشاء حساب الأخصائي';
-      });
+      setState(() => _error = 'فشل إنشاء حساب الأخصائي');
     } finally {
-      if (mounted) {
-        setState(() => _isSubmitting = false);
-      }
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
@@ -186,44 +146,71 @@ class _WebClinicianRegisterPortalPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F3EA),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 560),
-            child: Card(
-              elevation: 8,
-              child: Padding(
-                padding: const EdgeInsets.all(28),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
+      backgroundColor: Colors.black,
+      body: webRegistrationCompactFormTheme(
+        context,
+        child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            webRegistrationBackgroundAsset(
+              context,
+              roleFolder: 'clinicians',
+              fileName: 'clinicians_step_1_account.png',
+            ),
+            fit: BoxFit.contain,
+          ),
+          Container(color: Colors.black.withValues(alpha: 0.10)),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: SafeArea(
+              child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                20,
+                20,
+                webRegistrationFormBottomPadding(context),
+              ),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 440),
+                child: Card(
+                  elevation: 6,
+                  color: webRegistrationPanelNavy.withValues(alpha: 0.18),
+                  shadowColor: Colors.black.withValues(alpha: 0.32),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                    side: BorderSide(
+                      color: webRegistrationBorderTurquoise.withValues(alpha: 0.28),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Text(
-                        'Clinician Registration Portal',
+                        'Clinician Registration - Account',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 22,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       _textField(_nameController, 'Name', validator: _required),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 10),
                       DropdownButtonFormField<String>(
-                        value: _selectedProfessionalTitleKey,
+                        initialValue: _selectedProfessionalTitleKey,
                         decoration: const InputDecoration(
                           labelText: 'Professional title',
                           border: OutlineInputBorder(),
                         ),
                         items: _professionalTitles
-                            .map(
-                              (title) => DropdownMenuItem(
-                                value: title['key'],
-                                child: Text(title['labelAr'] ?? ''),
-                              ),
-                            )
+                            .map((title) => DropdownMenuItem(
+                                  value: title['key'],
+                                  child: Text(title['labelAr'] ?? ''),
+                                ))
                             .toList(),
                         validator: (value) =>
                             value == null || value.isEmpty ? 'مطلوب' : null,
@@ -231,20 +218,18 @@ class _WebClinicianRegisterPortalPageState
                           setState(() => _selectedProfessionalTitleKey = value);
                         },
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 10),
                       DropdownButtonFormField<String>(
-                        value: _selectedSpecialtyKey,
+                        initialValue: _selectedSpecialtyKey,
                         decoration: const InputDecoration(
                           labelText: 'Specialty',
                           border: OutlineInputBorder(),
                         ),
                         items: _specialties
-                            .map(
-                              (specialty) => DropdownMenuItem(
-                                value: specialty['key'],
-                                child: Text(specialty['label'] ?? ''),
-                              ),
-                            )
+                            .map((specialty) => DropdownMenuItem(
+                                  value: specialty['key'],
+                                  child: Text(specialty['label'] ?? ''),
+                                ))
                             .toList(),
                         validator: (value) =>
                             value == null || value.isEmpty ? 'مطلوب' : null,
@@ -252,7 +237,7 @@ class _WebClinicianRegisterPortalPageState
                           setState(() => _selectedSpecialtyKey = value);
                         },
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 10),
                       _textField(
                         _emailController,
                         'Email',
@@ -264,7 +249,7 @@ class _WebClinicianRegisterPortalPageState
                           return null;
                         },
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 10),
                       _textField(
                         _passwordController,
                         'Password',
@@ -276,7 +261,7 @@ class _WebClinicianRegisterPortalPageState
                           return null;
                         },
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 10),
                       _textField(
                         _confirmPasswordController,
                         'Confirm password',
@@ -288,90 +273,44 @@ class _WebClinicianRegisterPortalPageState
                           return null;
                         },
                       ),
-                      const SizedBox(height: 14),
-                      _textField(_photoUrlController, 'Photo URL'),
-                      const SizedBox(height: 14),
-                      _textField(_bioController, 'Bio', maxLines: 3),
-                      const SizedBox(height: 14),
-                      _textField(_sessionPriceController, 'Session price'),
-                      const SizedBox(height: 14),
-                      _textField(_sessionDurationController, 'Session duration'),
-                      const SizedBox(height: 14),
-                      CheckboxListTile(
-                        value: _offersOnline,
-                        onChanged: (value) {
-                          setState(() => _offersOnline = value ?? false);
-                        },
-                        title: const Text('Online sessions'),
-                        controlAffinity: ListTileControlAffinity.leading,
-                      ),
-                      CheckboxListTile(
-                        value: _offersInPerson,
-                        onChanged: (value) {
-                          setState(() => _offersInPerson = value ?? false);
-                        },
-                        title: const Text('In-person sessions'),
-                        controlAffinity: ListTileControlAffinity.leading,
-                      ),
-                      CheckboxListTile(
-                        value: _offersGroupSessions,
-                        onChanged: (value) {
-                          setState(
-                            () => _offersGroupSessions = value ?? false,
-                          );
-                        },
-                        title: const Text('Offers group sessions'),
-                        controlAffinity: ListTileControlAffinity.leading,
-                      ),
-                      const SizedBox(height: 14),
-                      _textField(
-                        _identityFileNameController,
-                        'Identity file name',
-                        validator: _required,
-                      ),
-                      const SizedBox(height: 14),
-                      _textField(
-                        _certificateFileNameController,
-                        'Certificate file name',
-                        validator: _required,
-                      ),
-                      const SizedBox(height: 14),
-                      _textField(
-                        _extraFileNameController,
-                        'Extra file name (optional)',
-                      ),
                       if (_error != null) ...[
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 10),
                         Text(
                           _error!,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.red),
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.w700,
+                            ),
                         ),
                       ],
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       SizedBox(
                         width: double.infinity,
-                        height: 48,
+                        height: 44,
                         child: ElevatedButton(
                           onPressed: _isSubmitting ? null : _submit,
                           child: _isSubmitting
                               ? const SizedBox(
                                   width: 20,
                                   height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 2),
                                 )
-                              : const Text('Submit for review'),
+                              : const Text('Next: Profile'),
                         ),
                       ),
                     ],
                   ),
+                    ),
+                  ),
                 ),
+              ),
               ),
             ),
           ),
-        ),
+        ],
+      ),
       ),
     );
   }
@@ -380,14 +319,12 @@ class _WebClinicianRegisterPortalPageState
     TextEditingController controller,
     String label, {
     bool obscureText = false,
-    int maxLines = 1,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
   }) {
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
-      maxLines: maxLines,
       keyboardType: keyboardType,
       validator: validator,
       decoration: InputDecoration(
