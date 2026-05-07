@@ -273,26 +273,26 @@ class _AdminClientsPageState extends State<AdminClientsPage> {
                                   value: 'all',
                                   child: Text(
                                     isArabic
-                                        ? 'ÙƒÙ„ Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯'
+                                        ? 'كل حالات الاعتماد'
                                         : 'All approval statuses',
                                   ),
                                 ),
                                 DropdownMenuItem(
                                   value: 'pending_review',
                                   child: Text(
-                                    isArabic ? 'Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©' : 'Pending',
+                                    isArabic ? 'قيد المراجعة' : 'Pending',
                                   ),
                                 ),
                                 DropdownMenuItem(
                                   value: 'approved',
                                   child: Text(
-                                    isArabic ? 'Ù…Ù‚Ø¨ÙˆÙ„' : 'Approved',
+                                    isArabic ? 'مقبول' : 'Approved',
                                   ),
                                 ),
                                 DropdownMenuItem(
                                   value: 'rejected',
                                   child: Text(
-                                    isArabic ? 'Ù…Ø±ÙÙˆØ¶' : 'Rejected',
+                                    isArabic ? 'مرفوض' : 'Rejected',
                                   ),
                                 ),
                               ],
@@ -307,13 +307,13 @@ class _AdminClientsPageState extends State<AdminClientsPage> {
                                 DropdownMenuItem(
                                   value: 'newest',
                                   child: Text(
-                                    isArabic ? 'Ø§Ù„Ø£Ø­Ø¯Ø«' : 'Newest',
+                                    isArabic ? 'الأحدث' : 'Newest',
                                   ),
                                 ),
                                 DropdownMenuItem(
                                   value: 'oldest',
                                   child: Text(
-                                    isArabic ? 'Ø§Ù„Ø£Ù‚Ø¯Ù…' : 'Oldest',
+                                    isArabic ? 'الأقدم' : 'Oldest',
                                   ),
                                 ),
                               ],

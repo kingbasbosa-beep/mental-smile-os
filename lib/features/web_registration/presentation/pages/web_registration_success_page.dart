@@ -5,18 +5,22 @@ import 'package:flutterprojects/features/web_registration/presentation/web_regis
 class WebRegistrationSuccessPage extends StatelessWidget {
   const WebRegistrationSuccessPage({super.key});
 
-  bool _isClinicianSource(BuildContext context) {
+  String _source(BuildContext context) {
     final args = ModalRoute.of(context)?.settings.arguments;
-    if (args == 'clinician') return true;
+    if (args == 'clinician' || args == 'center') return args.toString();
     if (args is Map) {
-      return args['source'] == 'clinician' || args['role'] == 'clinician';
+      final source = args['source']?.toString().trim().toLowerCase();
+      if (source == 'clinician' || source == 'center') return source!;
+      final role = args['role']?.toString().trim().toLowerCase();
+      if (role == 'clinician' || role == 'center') return role!;
     }
-    return false;
+    return 'center';
   }
 
   @override
   Widget build(BuildContext context) {
-    final isClinician = _isClinicianSource(context);
+    final source = _source(context);
+    final isClinician = source == 'clinician';
 
     return Scaffold(
       backgroundColor: Colors.black,

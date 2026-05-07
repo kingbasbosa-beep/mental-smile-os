@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/app/router/routes.dart';
 
 class WebCenterDetailsPage extends StatefulWidget {
   const WebCenterDetailsPage({super.key});
@@ -44,7 +45,11 @@ class _WebCenterDetailsPageState extends State<WebCenterDetailsPage> {
 
       if (!mounted) return;
 
-      Navigator.pushReplacementNamed(context, '/web/register/success');
+      Navigator.pushReplacementNamed(
+        context,
+        Routes.webRegistrationSuccess,
+        arguments: const {'source': 'center'},
+      );
     } catch (e) {
       setState(() {
         _error = 'Failed to save details';

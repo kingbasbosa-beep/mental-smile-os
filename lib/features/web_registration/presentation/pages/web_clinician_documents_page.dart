@@ -74,7 +74,10 @@ class _WebClinicianDocumentsPageState extends State<WebClinicianDocumentsPage> {
 
       WebRegistrationDraftStore.clearClinicianUid();
       if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed(Routes.webRegistrationSuccess);
+      Navigator.of(context).pushReplacementNamed(
+        Routes.webRegistrationSuccess,
+        arguments: const {'source': 'clinician'},
+      );
     } catch (_) {
       if (mounted) setState(() => _error = 'Failed to submit documents');
     } finally {
