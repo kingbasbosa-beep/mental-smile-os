@@ -4,6 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'firebase_options.dart';
 import 'package:flutterprojects/app/app.dart';
+import 'package:flutterprojects/app/locale_provider.dart';
+import 'package:flutterprojects/core/storage/locale_storage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,5 +18,17 @@ Future<void> main() async {
     debugPrint('🔥 Firebase init failed: $e');
   }
 
-  runApp(const ProviderScope(child: MentalKeyApp()));
+  final savedLanguageCode = await LocaleStorage().read();
+  final savedLocale = savedLanguageCode == 'ar' || savedLanguageCode == 'en'
+      ? Locale(savedLanguageCode!)
+      : null;
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        localeProvider.overrideWith((ref) => savedLocale),
+      ],
+      child: const MentalKeyApp(),
+    ),
+  );
 }
