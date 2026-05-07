@@ -84,12 +84,13 @@ class ChatFirestoreService {
     final query = await _threads
         .where('ownerUid', isEqualTo: ownerUid)
         .where('archived', isEqualTo: false)
-        .orderBy('updatedAt', descending: true)
-        .limit(1)
         .get();
 
-    if (query.docs.isEmpty) return null;
-    return ChatThreadModel.fromFirestore(query.docs.first);
+    final threads = query.docs.map(ChatThreadModel.fromFirestore).toList()
+      ..sort(_compareNewestThreadFirst);
+
+    if (threads.isEmpty) return null;
+    return threads.first;
   }
 
   /// AI-support-safe lookup.
@@ -112,11 +113,12 @@ class ChatFirestoreService {
     final query = await _threads
         .where('ownerUid', isEqualTo: ownerUid)
         .where('archived', isEqualTo: false)
-        .orderBy('updatedAt', descending: true)
         .get();
 
-    for (final doc in query.docs) {
-      final thread = ChatThreadModel.fromFirestore(doc);
+    final threads = query.docs.map(ChatThreadModel.fromFirestore).toList()
+      ..sort(_compareNewestThreadFirst);
+
+    for (final thread in threads) {
       final threadType = thread.threadType?.trim() ?? '';
 
       if (threadType == 'ai_support') {
@@ -130,6 +132,16 @@ class ChatFirestoreService {
     }
 
     return null;
+  }
+
+  int _compareNewestThreadFirst(ChatThreadModel a, ChatThreadModel b) {
+    final aTime = a.updatedAt ?? a.createdAt;
+    final bTime = b.updatedAt ?? b.createdAt;
+
+    if (aTime == null && bTime == null) return 0;
+    if (aTime == null) return 1;
+    if (bTime == null) return -1;
+    return bTime.compareTo(aTime);
   }
 
   Future<List<ChatThreadModel>> getThreadsForOwner(String ownerUid) async {

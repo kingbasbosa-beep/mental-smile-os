@@ -1,11 +1,157 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
+
+  Future<bool> _isAdminResolved() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user?.uid;
+    if (uid == null || uid.isEmpty || user?.isAnonymous == true) return false;
+
+    if (uid == kKnownPrimaryAdminUid) return true;
+
+    try {
+      final adminDoc =
+          await FirebaseFirestore.instance.collection('admins').doc(uid).get();
+      final data = adminDoc.data();
+      if (data != null && (data['active'] ?? false) == true) {
+        return true;
+      }
+    } on FirebaseException {
+      return false;
+    }
+    return false;
+  }
+
+  Future<bool> _isClinicianResolved() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user?.uid;
+    final email = (user?.email ?? '').trim().toLowerCase();
+    if (uid == null || uid.isEmpty || user?.isAnonymous == true) return false;
+
+    try {
+      final clinicianDoc = await FirebaseFirestore.instance
+          .collection('clinicians')
+          .doc(uid)
+          .get();
+      final data = clinicianDoc.data();
+      if (data != null) {
+        return (data['role'] ?? '') == 'clinician';
+      }
+    } on FirebaseException {
+      return false;
+    }
+
+    if (email.isEmpty) return false;
+
+    try {
+      final byEmail = await FirebaseFirestore.instance
+          .collection('clinicians')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (byEmail.docs.isEmpty) return false;
+      final emailData = byEmail.docs.first.data();
+      return (emailData['role'] ?? '') == 'clinician';
+    } on FirebaseException {
+      return false;
+    }
+  }
+
+  Future<bool> _isCenterResolved() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user?.uid;
+    if (uid == null || uid.isEmpty || user?.isAnonymous == true) return false;
+
+    try {
+      final doc =
+          await FirebaseFirestore.instance.collection('centers').doc(uid).get();
+      final data = doc.data();
+      if (data == null) return false;
+      return (data['role'] ?? '') == 'center';
+    } on FirebaseException {
+      return false;
+    }
+  }
+
+  Future<({String label, IconData icon, String route})?> _resolvePrimaryAction(
+    bool isArabic,
+  ) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return null;
+
+    final isAdmin = await _isAdminResolved();
+    if (isAdmin) {
+      return (
+        label: isArabic ? 'لوحة الإدارة' : 'Admin Hub',
+        icon: Icons.admin_panel_settings_outlined,
+        route: Routes.adminHub,
+      );
+    }
+
+    final isClinician = await _isClinicianResolved();
+    if (isClinician) {
+      return (
+        label: isArabic ? 'غرفة العمليات' : 'Operations Room',
+        icon: Icons.medical_services_outlined,
+        route: Routes.clinicianOperations,
+      );
+    }
+
+    final isCenter = await _isCenterResolved();
+    if (isCenter) {
+      return (
+        label: isArabic ? 'صفحة المركز' : 'Center Dashboard',
+        icon: Icons.business_outlined,
+        route: Routes.centerDashboard,
+      );
+    }
+
+    if (_isClientLoggedIn()) {
+      return (
+        label: isArabic ? 'صفحتي الشخصية' : 'My Dashboard',
+        icon: Icons.person_outline_rounded,
+        route: Routes.clientDashboard,
+      );
+    }
+
+    return null;
+  }
+
+  bool _isClientLoggedIn() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return false;
+    final email = (user.email ?? '').trim();
+    return email.isNotEmpty;
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    if (!context.mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      Routes.login,
+      (route) => false,
+    );
+  }
+
+  void _goBack(BuildContext context) {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).maybePop();
+    } else {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        Routes.menu,
+        (route) => false,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,15 +215,80 @@ class MenuPage extends StatelessWidget {
         body: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(
-              _menuBackgroundAsset(context),
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return const ColoredBox(color: Color(0xFF02070C));
-              },
+            Positioned.fill(
+              child: Transform.scale(
+                scale: 0.985,
+                child: Image.asset(
+                  _menuBackgroundAsset(context),
+                  fit: BoxFit.cover,
+                  alignment: _menuBackgroundAlignment(context),
+                  errorBuilder: (context, error, stackTrace) {
+                    return const ColoredBox(color: Color(0xFF02070C));
+                  },
+                ),
+              ),
             ),
             ColoredBox(
-              color: Colors.black.withValues(alpha: 0.36),
+              color: Colors.black.withValues(alpha: 0.28),
+            ),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _FloatingMenuIcon(
+                      tooltip: isArabic ? 'رجوع' : 'Back',
+                      icon: Icons.arrow_back_rounded,
+                      onPressed: () => _goBack(context),
+                    ),
+                    const SizedBox(width: 8),
+                    _FloatingMenuIcon(
+                      tooltip: isArabic ? 'تسجيل الخروج' : 'Logout',
+                      icon: Icons.logout_rounded,
+                      onPressed: () => _logout(context),
+                    ),
+                    const SizedBox(width: 8),
+                    _FloatingMenuIcon(
+                      tooltip: isArabic ? 'اللغة' : 'Language',
+                      icon: Icons.language_outlined,
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(Routes.language);
+                      },
+                    ),
+                    const Spacer(),
+                    FutureBuilder<
+                        ({String label, IconData icon, String route})?>(
+                      future: _resolvePrimaryAction(isArabic),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState != ConnectionState.done) {
+                          if (!_isClientLoggedIn()) {
+                            return const SizedBox.shrink();
+                          }
+
+                          return const _FloatingMenuSpinner();
+                        }
+
+                        final action = snapshot.data;
+                        if (action == null) {
+                          return const SizedBox.shrink();
+                        }
+
+                        return Transform.translate(
+                          offset: const Offset(38, 0),
+                          child: _FloatingProfileButton(
+                            label: action.label,
+                            icon: action.icon,
+                            onPressed: () {
+                              Navigator.of(context).pushNamed(action.route);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ),
             SafeArea(
               child: LayoutBuilder(
@@ -87,13 +298,15 @@ class MenuPage extends StatelessWidget {
                   final isMobile = width < 700;
                   final usePentagon = width >= 700 && height >= 420;
                   final avatarSize = isMobile ? 74.0 : 90.0;
-                  final avatarTop = isMobile ? 54.0 : height * 0.13;
+                  final avatarTop = isMobile ? 66.0 : 72.0;
+                  final avatarLeft = isMobile ? 78.0 : 82.0;
 
                   return Stack(
                     alignment: Alignment.center,
                     children: [
                       Positioned(
                         top: avatarTop,
+                        left: avatarLeft,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(999),
                           onTap: () {
@@ -102,32 +315,54 @@ class MenuPage extends StatelessWidget {
                           },
                           child: CircleAvatar(
                             radius: avatarSize / 2,
-                            backgroundColor: AppColors.mutedGold.withValues(
-                              alpha: 0.34,
-                            ),
-                            child: ClipOval(
-                              child: Image.asset(
-                                normalizeAssetPath(
-                                  'assets/c5/avatars/avatar_admin_support.png',
+                            backgroundColor:
+                                const Color(0xFFE7B75F).withValues(alpha: 0.42),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(0xFFE9C878)
+                                      .withValues(alpha: 0.86),
+                                  width: 2,
                                 ),
-                                width: avatarSize,
-                                height: avatarSize,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    width: avatarSize,
-                                    height: avatarSize,
-                                    color: AppColors.deepTeal.withValues(
-                                      alpha: 0.20,
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: const Icon(
-                                      Icons.support_agent_rounded,
-                                      color: AppColors.deepTeal,
-                                      size: 28,
-                                    ),
-                                  );
-                                },
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFFFB347)
+                                        .withValues(alpha: 0.28),
+                                    blurRadius: 24,
+                                    spreadRadius: 2,
+                                  ),
+                                  BoxShadow(
+                                    color: const Color(0xFF5A2D0C)
+                                        .withValues(alpha: 0.34),
+                                    blurRadius: 18,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  normalizeAssetPath(
+                                    'assets/images/avatar_clinician_male.png',
+                                  ),
+                                  width: avatarSize,
+                                  height: avatarSize,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: avatarSize,
+                                      height: avatarSize,
+                                      color: const Color(0xFF2D2114)
+                                          .withValues(alpha: 0.72),
+                                      alignment: Alignment.center,
+                                      child: const Icon(
+                                        Icons.support_agent_rounded,
+                                        color: Color(0xFFE9C878),
+                                        size: 28,
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ),
@@ -184,6 +419,139 @@ String _menuBackgroundAsset(BuildContext context) {
     return 'assets/branding/menu/tablet/menu_tablet_bg.png';
   }
   return 'assets/branding/menu/mobile/menu_mobile_bg.png';
+}
+
+Alignment _menuBackgroundAlignment(BuildContext context) {
+  final width = MediaQuery.sizeOf(context).width;
+  if (width < 700) return Alignment.topCenter;
+  return Alignment.center;
+}
+
+class _FloatingMenuIcon extends StatelessWidget {
+  const _FloatingMenuIcon({
+    required this.tooltip,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final String tooltip;
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: AppColors.obsidian.withValues(alpha: 0.48),
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onPressed,
+          child: Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColors.mutedGold.withValues(alpha: 0.58),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.deepTeal.withValues(alpha: 0.18),
+                  blurRadius: 14,
+                ),
+              ],
+            ),
+            child: Icon(
+              icon,
+              color: AppColors.mutedGold,
+              size: 22,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FloatingProfileButton extends StatelessWidget {
+  const _FloatingProfileButton({
+    required this.label,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.obsidian.withValues(alpha: 0.48),
+      borderRadius: BorderRadius.circular(999),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: onPressed,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: AppColors.mutedGold.withValues(alpha: 0.58),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.deepTeal.withValues(alpha: 0.18),
+                blurRadius: 14,
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: AppColors.mutedGold, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: AppColors.mutedGold,
+                      fontWeight: FontWeight.w900,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FloatingMenuSpinner extends StatelessWidget {
+  const _FloatingMenuSpinner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 42,
+      height: 42,
+      decoration: BoxDecoration(
+        color: AppColors.obsidian.withValues(alpha: 0.48),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: AppColors.mutedGold.withValues(alpha: 0.58),
+        ),
+      ),
+      child: const Center(
+        child: SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+    );
+  }
 }
 
 class _MenuPentagonLayout extends StatelessWidget {
@@ -338,34 +706,49 @@ class _MenuCircleButtonState extends State<_MenuCircleButton> {
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        AppColors.mutedGold.withValues(alpha: 0.96),
-                        item.accent.withValues(alpha: 0.62),
-                        AppColors.deepTeal.withValues(alpha: 0.34),
+                        const Color(0xFFFFE8A3).withValues(alpha: 0.92),
+                        const Color(0xFFD79B36).withValues(alpha: 0.76),
+                        const Color(0xFF4A2A12).withValues(alpha: 0.58),
                       ],
                     ),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.72),
-                      width: 1.5,
+                      color: const Color(0xFFFFD98B).withValues(alpha: 0.62),
+                      width: 1.2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: item.accent.withValues(
-                          alpha: _hovered ? 0.46 : 0.26,
+                        color: const Color(0xFFFFB347).withValues(
+                          alpha: _hovered ? 0.34 : 0.20,
                         ),
-                        blurRadius: _hovered ? 26 : 18,
-                        spreadRadius: _hovered ? 2 : 0,
+                        blurRadius: _hovered ? 24 : 16,
+                        spreadRadius: _hovered ? 1.4 : 0,
                       ),
                       BoxShadow(
-                        color: AppColors.deepTeal.withValues(alpha: 0.24),
-                        blurRadius: 18,
+                        color: const Color(0xFF3A1E0B).withValues(alpha: 0.30),
+                        blurRadius: 14,
                         offset: const Offset(0, 8),
                       ),
                     ],
                   ),
-                  child: Icon(
-                    item.icon,
-                    color: AppColors.deepTeal,
-                    size: 31,
+                  child: Container(
+                    margin: const EdgeInsets.all(9),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFF2D2114).withValues(alpha: 0.34),
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              const Color(0xFFFFD98B).withValues(alpha: 0.14),
+                          blurRadius: 12,
+                          spreadRadius: -2,
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      item.icon,
+                      color: const Color(0xFF153E3B),
+                      size: 30,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -375,12 +758,17 @@ class _MenuCircleButtonState extends State<_MenuCircleButton> {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppColors.deepTeal,
+                    color: const Color(0xFFFFE8B8),
                     fontWeight: FontWeight.w900,
                     shadows: [
                       Shadow(
-                        color: Colors.white.withValues(alpha: 0.44),
-                        blurRadius: 8,
+                        color: const Color(0xFF2D1304).withValues(alpha: 0.90),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                      Shadow(
+                        color: const Color(0xFFFFB347).withValues(alpha: 0.22),
+                        blurRadius: 12,
                       ),
                     ],
                   ),

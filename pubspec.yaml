@@ -43,6 +43,10 @@ flutter:
     - assets/branding/client_dashboard/desktop/
     - assets/branding/client_dashboard/tablet/
     - assets/branding/client_dashboard/mobile/
+    - assets/branding/menu/
+    - assets/branding/menu/desktop/
+    - assets/branding/menu/tablet/
+    - assets/branding/menu/mobile/
     - assets/branding/web_registration/centers/
     - assets/branding/web_registration/centers/desktop/
     - assets/branding/web_registration/centers/tablet/

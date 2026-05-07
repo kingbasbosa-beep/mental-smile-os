@@ -236,7 +236,7 @@ class AppRouter {
       case Routes.centerBookingRequest:
       case Routes.sessionReview:
         return true;
-            default:
+      default:
         return false;
     }
   }
@@ -568,7 +568,6 @@ class AppRouter {
           settings: settings,
         );
 
-
       case Routes.adminAccountingWorkspace:
         return _adminProtectedRoute(
           child: const AccountingWorkspacePage(),
@@ -623,7 +622,7 @@ class AppRouter {
           settings: settings,
         );
 
-            default:
+      default:
         return null;
     }
   }
@@ -1039,7 +1038,7 @@ class AppRouter {
 
       case Routes.home:
         return MaterialPageRoute(
-          builder: (_) => const HomePage(),
+          builder: (_) => const MenuPage(),
           settings: settings,
         );
 
@@ -1214,7 +1213,7 @@ class AppRouter {
           settings: settings,
         );
 
-            default:
+      default:
         return MaterialPageRoute(
           builder: (context) => Scaffold(
             body: Center(
@@ -1414,13 +1413,3 @@ class _RouteAccessDecision {
   final bool isAdmin;
   final String redirectTarget;
 }
-
-
-
-
-
-
-
-
-
-
