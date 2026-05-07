@@ -1,157 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
-
-  Future<bool> _isAdminResolved() async {
-    final user = FirebaseAuth.instance.currentUser;
-    final uid = user?.uid;
-    if (uid == null || uid.isEmpty || user?.isAnonymous == true) return false;
-
-    if (uid == kKnownPrimaryAdminUid) return true;
-
-    try {
-      final adminDoc =
-          await FirebaseFirestore.instance.collection('admins').doc(uid).get();
-      final data = adminDoc.data();
-      if (data != null && (data['active'] ?? false) == true) {
-        return true;
-      }
-    } on FirebaseException {
-      return false;
-    }
-    return false;
-  }
-
-  Future<bool> _isClinicianResolved() async {
-    final user = FirebaseAuth.instance.currentUser;
-    final uid = user?.uid;
-    final email = (user?.email ?? '').trim().toLowerCase();
-    if (uid == null || uid.isEmpty || user?.isAnonymous == true) return false;
-
-    try {
-      final clinicianDoc = await FirebaseFirestore.instance
-          .collection('clinicians')
-          .doc(uid)
-          .get();
-      final data = clinicianDoc.data();
-      if (data != null) {
-        return (data['role'] ?? '') == 'clinician';
-      }
-    } on FirebaseException {
-      return false;
-    }
-
-    if (email.isEmpty) return false;
-
-    try {
-      final byEmail = await FirebaseFirestore.instance
-          .collection('clinicians')
-          .where('email', isEqualTo: email)
-          .limit(1)
-          .get();
-
-      if (byEmail.docs.isEmpty) return false;
-      final emailData = byEmail.docs.first.data();
-      return (emailData['role'] ?? '') == 'clinician';
-    } on FirebaseException {
-      return false;
-    }
-  }
-
-  Future<bool> _isCenterResolved() async {
-    final user = FirebaseAuth.instance.currentUser;
-    final uid = user?.uid;
-    if (uid == null || uid.isEmpty || user?.isAnonymous == true) return false;
-
-    try {
-      final doc =
-          await FirebaseFirestore.instance.collection('centers').doc(uid).get();
-      final data = doc.data();
-      if (data == null) return false;
-      return (data['role'] ?? '') == 'center';
-    } on FirebaseException {
-      return false;
-    }
-  }
-
-  Future<({String label, IconData icon, String route})?> _resolvePrimaryAction(
-    bool isArabic,
-  ) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return null;
-
-    final isAdmin = await _isAdminResolved();
-    if (isAdmin) {
-      return (
-        label: isArabic ? 'لوحة الإدارة' : 'Admin Hub',
-        icon: Icons.admin_panel_settings_outlined,
-        route: Routes.adminHub,
-      );
-    }
-
-    final isClinician = await _isClinicianResolved();
-    if (isClinician) {
-      return (
-        label: isArabic ? 'غرفة العمليات' : 'Operations Room',
-        icon: Icons.medical_services_outlined,
-        route: Routes.clinicianOperations,
-      );
-    }
-
-    final isCenter = await _isCenterResolved();
-    if (isCenter) {
-      return (
-        label: isArabic ? 'صفحة المركز' : 'Center Dashboard',
-        icon: Icons.business_outlined,
-        route: Routes.centerDashboard,
-      );
-    }
-
-    if (_isClientLoggedIn()) {
-      return (
-        label: isArabic ? 'صفحتي الشخصية' : 'My Dashboard',
-        icon: Icons.person_outline_rounded,
-        route: Routes.clientDashboard,
-      );
-    }
-
-    return null;
-  }
-
-  bool _isClientLoggedIn() {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return false;
-    final email = (user.email ?? '').trim();
-    return email.isNotEmpty;
-  }
-
-  Future<void> _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-    if (!context.mounted) return;
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      Routes.login,
-      (route) => false,
-    );
-  }
-
-  void _goBack(BuildContext context) {
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).maybePop();
-    } else {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        Routes.home,
-        (route) => false,
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -212,111 +66,60 @@ class MenuPage extends StatelessWidget {
     return Directionality(
       textDirection: textDirection,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Mental Smile'),
-          leading: IconButton(
-            tooltip: isArabic ? 'رجوع' : 'Back',
-            onPressed: () => _goBack(context),
-            icon: const Icon(Icons.arrow_back),
-          ),
-          actions: [
-            FutureBuilder<({String label, IconData icon, String route})?>(
-              future: _resolvePrimaryAction(isArabic),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState != ConnectionState.done) {
-                  if (!_isClientLoggedIn()) {
-                    return const SizedBox.shrink();
-                  }
-
-                  return const Padding(
-                    padding: EdgeInsetsDirectional.only(end: 8),
-                    child: SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  );
-                }
-
-                final action = snapshot.data;
-                if (action == null) {
-                  return const SizedBox.shrink();
-                }
-
-                return Padding(
-                  padding: const EdgeInsetsDirectional.only(end: 6),
-                  child: FilledButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed(action.route);
-                    },
-                    icon: Icon(action.icon),
-                    label: Text(action.label),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              tooltip: isArabic ? 'اللغة' : 'Language',
-              onPressed: () {
-                Navigator.of(context).pushNamed(Routes.language);
-              },
-              icon: const Icon(Icons.language_outlined),
-            ),
-            IconButton(
-              tooltip: isArabic ? 'تسجيل الخروج' : 'Logout',
-              onPressed: () => _logout(context),
-              icon: const Icon(Icons.logout_rounded),
-            ),
-          ],
-        ),
         body: Stack(
           fit: StackFit.expand,
           children: [
             Image.asset(
-              'c7_branding/home/home_bg.png',
+              _menuBackgroundAsset(context),
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
-                return Container(decoration: AppDecorations.pageBackground());
+                return const ColoredBox(color: Color(0xFF02070C));
               },
             ),
-            Container(
-              color: AppColors.warmIvory.withValues(alpha: 0.56),
+            ColoredBox(
+              color: Colors.black.withValues(alpha: 0.36),
             ),
             SafeArea(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1240),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg,
-                      vertical: AppSpacing.md,
-                    ),
-                    child: Column(
-                      children: [
-                        InkWell(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth;
+                  final height = constraints.maxHeight;
+                  final isMobile = width < 700;
+                  final usePentagon = width >= 700 && height >= 420;
+                  final avatarSize = isMobile ? 74.0 : 90.0;
+                  final avatarTop = isMobile ? 54.0 : height * 0.13;
+
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Positioned(
+                        top: avatarTop,
+                        child: InkWell(
                           borderRadius: BorderRadius.circular(999),
                           onTap: () {
                             AppAnalytics.logChatOpened('general');
                             Navigator.of(context).pushNamed(Routes.chat);
                           },
                           child: CircleAvatar(
-                            radius: 36,
-                            backgroundColor:
-                                AppColors.deepTeal.withValues(alpha: 0.10),
+                            radius: avatarSize / 2,
+                            backgroundColor: AppColors.mutedGold.withValues(
+                              alpha: 0.34,
+                            ),
                             child: ClipOval(
                               child: Image.asset(
                                 normalizeAssetPath(
                                   'assets/c5/avatars/avatar_admin_support.png',
                                 ),
-                                width: 72,
-                                height: 72,
+                                width: avatarSize,
+                                height: avatarSize,
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
                                   return Container(
-                                    width: 72,
-                                    height: 72,
-                                    color: AppColors.deepTeal
-                                        .withValues(alpha: 0.10),
+                                    width: avatarSize,
+                                    height: avatarSize,
+                                    color: AppColors.deepTeal.withValues(
+                                      alpha: 0.20,
+                                    ),
                                     alignment: Alignment.center,
                                     child: const Icon(
                                       Icons.support_agent_rounded,
@@ -329,48 +132,24 @@ class MenuPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.md),
-                        Expanded(
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              final width = constraints.maxWidth;
-                              final isMobile = width < 620;
-                              final itemWidth = isMobile
-                                  ? ((width - AppSpacing.lg) / 2)
-                                      .clamp(112.0, 150.0)
-                                  : width < 980
-                                      ? 138.0
-                                      : 146.0;
-                              final spacing = isMobile
-                                  ? AppSpacing.md
-                                  : width < 980
-                                      ? AppSpacing.lg
-                                      : AppSpacing.xl;
-
-                              return Center(
-                                child: SingleChildScrollView(
-                                  child: Wrap(
-                                    alignment: WrapAlignment.center,
-                                    runAlignment: WrapAlignment.center,
-                                    spacing: spacing,
-                                    runSpacing: AppSpacing.lg,
-                                    children: [
-                                      for (final item in cards)
-                                        SizedBox(
-                                          width: itemWidth,
-                                          child: _MenuCircleButton(item: item),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          isMobile ? 16 : 32,
+                          isMobile ? 140 : 110,
+                          isMobile ? 16 : 32,
+                          24,
                         ),
-                      ],
-                    ),
-                  ),
-                ),
+                        child: usePentagon
+                            ? _MenuPentagonLayout(
+                                cards: cards,
+                                compact: width < 1100,
+                              )
+                            : _MenuWrapLayout(cards: cards),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ],
@@ -394,6 +173,130 @@ class _MenuCardData {
     required this.route,
     required this.accent,
   });
+}
+
+String _menuBackgroundAsset(BuildContext context) {
+  final width = MediaQuery.sizeOf(context).width;
+  if (width >= 1100) {
+    return 'assets/branding/menu/desktop/menu_desktop_bg.png';
+  }
+  if (width >= 700) {
+    return 'assets/branding/menu/tablet/menu_tablet_bg.png';
+  }
+  return 'assets/branding/menu/mobile/menu_mobile_bg.png';
+}
+
+class _MenuPentagonLayout extends StatelessWidget {
+  const _MenuPentagonLayout({
+    required this.cards,
+    required this.compact,
+  });
+
+  final List<_MenuCardData> cards;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final layoutWidth = compact ? 620.0 : 760.0;
+    final layoutHeight = compact ? 390.0 : 430.0;
+    final itemWidth = compact ? 132.0 : 150.0;
+
+    return Center(
+      child: SizedBox(
+        width: layoutWidth,
+        height: layoutHeight,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            _MenuNode(
+              item: cards[2],
+              width: itemWidth,
+              left: (layoutWidth - itemWidth) / 2,
+              top: 0,
+            ),
+            _MenuNode(
+              item: cards[0],
+              width: itemWidth,
+              left: layoutWidth * 0.10,
+              top: layoutHeight * 0.34,
+            ),
+            _MenuNode(
+              item: cards[1],
+              width: itemWidth,
+              left: layoutWidth * 0.70,
+              top: layoutHeight * 0.34,
+            ),
+            _MenuNode(
+              item: cards[4],
+              width: itemWidth,
+              left: layoutWidth * 0.22,
+              top: layoutHeight * 0.68,
+            ),
+            _MenuNode(
+              item: cards[3],
+              width: itemWidth,
+              left: layoutWidth * 0.58,
+              top: layoutHeight * 0.68,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MenuNode extends StatelessWidget {
+  const _MenuNode({
+    required this.item,
+    required this.width,
+    required this.left,
+    required this.top,
+  });
+
+  final _MenuCardData item;
+  final double width;
+  final double left;
+  final double top;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: left,
+      top: top,
+      width: width,
+      child: _MenuCircleButton(item: item),
+    );
+  }
+}
+
+class _MenuWrapLayout extends StatelessWidget {
+  const _MenuWrapLayout({required this.cards});
+
+  final List<_MenuCardData> cards;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final itemWidth = width < 420 ? 124.0 : 140.0;
+
+    return Center(
+      child: SingleChildScrollView(
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          runAlignment: WrapAlignment.center,
+          spacing: AppSpacing.md,
+          runSpacing: AppSpacing.lg,
+          children: [
+            for (final item in cards)
+              SizedBox(
+                width: itemWidth,
+                child: _MenuCircleButton(item: item),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _MenuCircleButton extends StatefulWidget {
