@@ -217,7 +217,7 @@ class MenuPage extends StatelessWidget {
           children: [
             Positioned.fill(
               child: Transform.scale(
-                scale: 0.985,
+                scale: 1.0,
                 child: Image.asset(
                   _menuBackgroundAsset(context),
                   fit: BoxFit.cover,

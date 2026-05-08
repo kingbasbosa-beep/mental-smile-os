@@ -1,27 +1,85 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
-/// C6 Library UI (Hero + Categories + Buttons + States)
-/// DEV hooks are hidden behind: --dart-define=MK_DEV=true
-class LibraryPage extends StatelessWidget {
+/// C6 Library UI.
+class LibraryPage extends StatefulWidget {
   const LibraryPage({super.key});
 
-  static const bool _isDev = bool.fromEnvironment(
-    'MK_DEV',
-    defaultValue: false,
-  );
+  static void _showSnack(BuildContext context, String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  @override
+  State<LibraryPage> createState() => _LibraryPageState();
+}
+
+class _LibraryPageState extends State<LibraryPage> {
+  PageController? _pageController;
+  double _viewportFraction = 0.82;
+  double _page = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _syncPageController(_viewportFraction);
+  }
+
+  @override
+  void dispose() {
+    _pageController?.removeListener(_handlePageChange);
+    _pageController?.dispose();
+    super.dispose();
+  }
+
+  void _handlePageChange() {
+    if (!mounted) return;
+    setState(() => _page = _pageController?.page ?? 0);
+  }
+
+  void _syncPageController(double viewportFraction) {
+    if (_pageController != null && _viewportFraction == viewportFraction) {
+      return;
+    }
+
+    final oldPage = _pageController?.hasClients == true
+        ? (_pageController?.page ?? _page)
+        : _page;
+
+    _pageController?.removeListener(_handlePageChange);
+    _pageController?.dispose();
+    _viewportFraction = viewportFraction;
+    _pageController = PageController(
+      initialPage: oldPage.round().clamp(0, 5).toInt(),
+      viewportFraction: viewportFraction,
+    )..addListener(_handlePageChange);
+    _page = oldPage;
+  }
+
+  void _goToPage(int targetIndex, int itemCount) {
+    final clamped = targetIndex.clamp(0, itemCount - 1).toInt();
+    _pageController?.animateToPage(
+      clamped,
+      duration: const Duration(milliseconds: 360),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  void _nextPage(int itemCount) {
+    _goToPage((_pageController?.page ?? _page).round() + 1, itemCount);
+  }
+
+  void _previousPage(int itemCount) {
+    _goToPage((_pageController?.page ?? _page).round() - 1, itemCount);
+  }
 
   @override
   Widget build(BuildContext context) {
     final lang = Localizations.localeOf(context).languageCode.toLowerCase();
     final isAr = lang == 'ar';
-
-    final title = isAr ? 'مكتبة الإرشاد والتأهيل' : 'Mental Smile Guide';
-    final subtitle = isAr
-        ? 'دليل عام يساعد الأخصائيين والمراكز على فهم خطوات التسجيل والاستعداد للمراجعة.'
-        : 'A public onboarding guide for clinicians and centers preparing for registration review.';
 
     final categories = <_LibCat>[
       const _LibCat(
@@ -65,276 +123,140 @@ class LibraryPage extends StatelessWidget {
     return Directionality(
       textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
+        backgroundColor: Colors.black,
         body: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(
-              normalizeAssetPath('c7_branding/home/home_bg.png'),
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  const ColoredBox(color: Color(0xFF03080D)),
-            ),
-            const ColoredBox(color: Color(0xB303080D)),
-            const _ModuleEntryLogger(module: 'library'),
-            SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final width = constraints.maxWidth;
-                  final isWide = width >= 980;
-                  final gridColumns = width >= 1080
-                      ? 3
-                      : width >= 680
-                          ? 2
-                          : 1;
-                  final gridAspect = width >= 1080
-                      ? 1.35
-                      : width >= 680
-                          ? 1.25
-                          : 2.35;
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                final height = constraints.maxHeight;
+                final isMobile = width < 700;
+                final isTablet = width >= 700 && width < 1100;
+                final viewportFraction = isMobile
+                    ? 0.82
+                    : isTablet
+                        ? 0.56
+                        : 0.31;
+                _syncPageController(viewportFraction);
+                final pageController = _pageController!;
 
-                  return SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isWide ? 42 : 18,
-                      vertical: isWide ? 28 : 18,
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      _libraryBackgroundAsset(width),
+                      fit: BoxFit.cover,
+                      alignment:
+                          isMobile ? Alignment.topCenter : Alignment.center,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const ColoredBox(color: Color(0xFF03080D)),
                     ),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 1220),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            _LibraryTopBar(isAr: isAr),
-                            const SizedBox(height: 22),
-                            if (isWide)
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    flex: 6,
-                                    child: _HeroCard(
-                                      title: title,
-                                      subtitle: subtitle,
-                                      isAr: isAr,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 18),
-                                  Expanded(
-                                    flex: 4,
-                                    child: _RegistrationCtaPanel(isAr: isAr),
-                                  ),
-                                ],
-                              )
-                            else ...[
-                              _HeroCard(
-                                title: title,
-                                subtitle: subtitle,
-                                isAr: isAr,
-                              ),
-                              const SizedBox(height: 14),
-                              _RegistrationCtaPanel(isAr: isAr),
-                            ],
-                            const SizedBox(height: 22),
-                            Row(
-                              children: [
-                                Text(
-                                  isAr
-                                      ? 'أدلة ومسارات مساعدة'
-                                      : 'Guides and resources',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge
-                                      ?.copyWith(
-                                        color: const Color(0xFF7DF9FF),
-                                        fontWeight: FontWeight.w900,
-                                        shadows: _webTextShadows,
-                                      ),
-                                ),
-                                const Spacer(),
-                                const _Badge(
-                                  labelAr: 'جديد',
-                                  labelEn: 'New',
-                                  asset: 'c6_library/ui/badges/badge_new.png',
-                                ),
-                                const SizedBox(width: 8),
-                                const _Badge(
-                                  labelAr: 'برو',
-                                  labelEn: 'Pro',
-                                  asset: 'c6_library/ui/badges/badge_pro.png',
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: categories.length,
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: gridColumns,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                                childAspectRatio: gridAspect,
-                              ),
-                              itemBuilder: (context, i) {
-                                final cat = categories[i];
-                                return _CategoryTile(
-                                  title: isAr ? cat.titleAr : cat.titleEn,
-                                  asset: cat.asset,
-                                  onTap: () {
-                                    AppAnalytics.logPathSelected(
-                                      'library',
-                                      'open_content',
-                                    );
-                                    _showSnack(
-                                      context,
-                                      isAr
-                                          ? 'فتح: ${cat.titleAr}'
-                                          : 'Open: ${cat.titleEn}',
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                            if (_isDev) ...[
-                              const SizedBox(height: 18),
-                              Text(
-                                'States (DEV preview)',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleSmall
-                                    ?.copyWith(
-                                      color: const Color(0xFF7DF9FF),
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                              ),
-                              const SizedBox(height: 10),
-                              const _StatePreview(
-                                titleAr: 'مكتبة فارغة',
-                                titleEn: 'Empty library',
-                                asset: 'c6_library/states/empty_library.png',
-                              ),
-                              const SizedBox(height: 12),
-                              const _StatePreview(
-                                titleAr: 'الأطباء مقفولين',
-                                titleEn: 'Locked clinicians',
-                                asset:
-                                    'c6_library/states/locked_clinicians.png',
-                              ),
-                            ],
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.26),
+                            Colors.black.withValues(alpha: 0.18),
+                            Colors.black.withValues(alpha: 0.48),
                           ],
                         ),
                       ),
                     ),
-                  );
-                },
-              ),
+                    SafeArea(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(
+                              isMobile ? 18 : 34,
+                              isMobile ? 18 : 28,
+                              isMobile ? 18 : 34,
+                              isMobile ? 10 : 18,
+                            ),
+                            child: _LibraryHeader(isAr: isAr),
+                          ),
+                          Expanded(
+                            child: isMobile || isTablet
+                                ? _LibraryCarousel(
+                                    controller: pageController,
+                                    page: _page,
+                                    categories: categories,
+                                    isAr: isAr,
+                                    height: height,
+                                  )
+                                : _LibraryDesktopStage(
+                                    controller: pageController,
+                                    page: _page,
+                                    categories: categories,
+                                    isAr: isAr,
+                                  ),
+                          ),
+                          _LibraryCarouselControls(
+                            compact: isMobile,
+                            onPrevious: () => _previousPage(categories.length),
+                            onNext: () => _nextPage(categories.length),
+                          ),
+                          SizedBox(height: isMobile ? 16 : 28),
+                        ],
+                      ),
+                    ),
+                    SafeArea(
+                      child: Align(
+                        alignment: AlignmentDirectional.topStart,
+                        child: Padding(
+                          padding: EdgeInsetsDirectional.only(
+                            start: isMobile ? 14 : 22,
+                            top: isMobile ? 12 : 18,
+                          ),
+                          child: _LibraryBackButton(compact: isMobile),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
+            const _ModuleEntryLogger(module: 'library'),
           ],
         ),
       ),
     );
   }
 
-  static void _showSnack(BuildContext context, String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  String _libraryBackgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/images/backgrounds/specialists_bg_mobile.png';
+    }
+    if (width < 1100) {
+      return 'assets/images/backgrounds/specialists_bg_tablet.png';
+    }
+    return 'assets/images/backgrounds/specialists_bg_desktop.png';
   }
 }
 
-const List<Shadow> _webTextShadows = [
-  Shadow(
-    color: Colors.black,
-    blurRadius: 8,
-    offset: Offset(0, 1),
-  ),
-];
-
-class _LibraryTopBar extends StatelessWidget {
-  const _LibraryTopBar({required this.isAr});
+class _LibraryHeader extends StatelessWidget {
+  const _LibraryHeader({required this.isAr});
 
   final bool isAr;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Image.asset(
-          normalizeAssetPath('c6_library/brand/logo_mark.png'),
-          height: 34,
-          errorBuilder: (context, error, stackTrace) =>
-              const SizedBox(height: 34, width: 34),
-        ),
-        const SizedBox(width: 10),
-        Text(
-          isAr ? 'دليل منصة Mental Smile' : 'Mental Smile Guide',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: const Color(0xFFE7C766),
-                fontWeight: FontWeight.w900,
-                shadows: _webTextShadows,
-              ),
-        ),
-        const Spacer(),
-        if (LibraryPage._isDev) const _DevPill(),
-      ],
-    );
-  }
-}
-
-class _RegistrationCtaPanel extends StatelessWidget {
-  const _RegistrationCtaPanel({required this.isAr});
-
-  final bool isAr;
-
-  @override
-  Widget build(BuildContext context) {
-    return _GlassPanel(
-      child: Column(
-        crossAxisAlignment:
-            isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
-          Text(
-            isAr ? 'ابدأ من المسار المناسب' : 'Start with the right path',
-            textAlign: isAr ? TextAlign.right : TextAlign.left,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: const Color(0xFFE7C766),
-                  fontWeight: FontWeight.w900,
-                  shadows: _webTextShadows,
-                ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            isAr
-                ? 'المكتبة تساعدك على فهم متطلبات التسجيل قبل إرسال الطلب للمراجعة.'
-                : 'Use the library to understand onboarding requirements before review.',
-            textAlign: isAr ? TextAlign.right : TextAlign.left,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: const Color(0xFF7DF9FF),
-                  fontWeight: FontWeight.w700,
-                  height: 1.35,
-                  shadows: _webTextShadows,
-                ),
-          ),
-          const SizedBox(height: 16),
-          _GlassCtaButton(
-            label: isAr ? 'تسجيل أخصائي' : 'Clinician registration',
-            icon: Icons.psychology_alt_outlined,
-            onTap: () => Navigator.of(context).pushNamed(
-              Routes.webClinicianRegister,
-            ),
-          ),
-          const SizedBox(height: 10),
-          _GlassCtaButton(
-            label: isAr ? 'تسجيل مركز' : 'Center registration',
-            icon: Icons.business_outlined,
-            onTap: () => Navigator.of(context).pushNamed(
-              Routes.webCenterRegister,
-            ),
-          ),
-          const SizedBox(height: 10),
-          _GlassCtaButton(
-            label: isAr ? 'العودة للمنيو' : 'Back to menu',
-            icon: Icons.apps_rounded,
-            onTap: () => Navigator.of(context).pushNamed(Routes.menu),
-            secondary: true,
+    return Text(
+      isAr ? 'المكتبة' : 'Library',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        color: const Color(0xFFFFD47A),
+        fontSize: MediaQuery.sizeOf(context).width < 700 ? 38 : 56,
+        fontWeight: FontWeight.w900,
+        height: 1,
+        shadows: const [
+          Shadow(
+            color: Colors.black,
+            blurRadius: 16,
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -342,66 +264,465 @@ class _RegistrationCtaPanel extends StatelessWidget {
   }
 }
 
-class _GlassPanel extends StatelessWidget {
-  const _GlassPanel({required this.child});
+class _LibraryBackButton extends StatefulWidget {
+  const _LibraryBackButton({required this.compact});
 
-  final Widget child;
+  final bool compact;
+
+  @override
+  State<_LibraryBackButton> createState() => _LibraryBackButtonState();
+}
+
+class _LibraryBackButtonState extends State<_LibraryBackButton> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = widget.compact ? 44.0 : 52.0;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedScale(
+        scale: _hovered ? 1.04 : 1.0,
+        duration: const Duration(milliseconds: 160),
+        curve: Curves.easeOutCubic,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: () => Navigator.of(context).pushNamed(Routes.menu),
+          child: Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFF1B1007).withValues(alpha: 0.50),
+              border: Border.all(
+                color: const Color(0xFFFFD98A).withValues(alpha: 0.56),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFE7A94C).withValues(
+                    alpha: _hovered ? 0.28 : 0.16,
+                  ),
+                  blurRadius: _hovered ? 18 : 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Icon(
+              Icons.arrow_back_rounded,
+              color: const Color(0xFFFFE7B2),
+              size: widget.compact ? 22 : 26,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryCarousel extends StatelessWidget {
+  const _LibraryCarousel({
+    required this.controller,
+    required this.page,
+    required this.categories,
+    required this.isAr,
+    required this.height,
+  });
+
+  final PageController controller;
+  final double page;
+  final List<_LibCat> categories;
+  final bool isAr;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final cardHeight = math.min(height * 0.66, 580.0);
+
+    return Center(
+      child: SizedBox(
+        height: cardHeight,
+        child: PageView.builder(
+          controller: controller,
+          itemCount: categories.length,
+          padEnds: true,
+          itemBuilder: (context, index) {
+            final distance = (page - index).abs().clamp(0.0, 1.0);
+            final scale = 1.0 - (distance * 0.075);
+            return AnimatedScale(
+              scale: scale,
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: _LibraryCarouselCard(
+                  category: categories[index],
+                  isAr: isAr,
+                  compact: MediaQuery.sizeOf(context).width < 700,
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryDesktopStage extends StatelessWidget {
+  const _LibraryDesktopStage({
+    required this.controller,
+    required this.page,
+    required this.categories,
+    required this.isAr,
+  });
+
+  final PageController controller;
+  final double page;
+  final List<_LibCat> categories;
+  final bool isAr;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1360),
+        child: SizedBox(
+          height: 560,
+          child: PageView.builder(
+            controller: controller,
+            itemCount: categories.length,
+            padEnds: true,
+            itemBuilder: (context, index) {
+              final distance = (page - index).abs().clamp(0.0, 1.0);
+              final scale = 1.0 - (distance * 0.055);
+              return AnimatedScale(
+                scale: scale,
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  child: _LibraryCarouselCard(
+                    category: categories[index],
+                    isAr: isAr,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryCarouselCard extends StatefulWidget {
+  const _LibraryCarouselCard({
+    required this.category,
+    required this.isAr,
+    this.compact = false,
+  });
+
+  final _LibCat category;
+  final bool isAr;
+  final bool compact;
+
+  @override
+  State<_LibraryCarouselCard> createState() => _LibraryCarouselCardState();
+}
+
+class _LibraryCarouselCardState extends State<_LibraryCarouselCard> {
+  bool _hovered = false;
+
+  Color get _accent {
+    switch (widget.category.keyName) {
+      case 'audio':
+        return const Color(0xFF67B7C8);
+      case 'exercises':
+        return const Color(0xFFD8A75F);
+      case 'articles':
+        return const Color(0xFFE0B86E);
+      case 'saved':
+        return const Color(0xFFBBA2FF);
+      case 'tools':
+        return const Color(0xFF7DF9FF);
+      case 'videos':
+        return const Color(0xFFE58667);
+      default:
+        return const Color(0xFFD8A75F);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = widget.compact ? 30.0 : 36.0;
+    final title =
+        widget.isAr ? widget.category.titleAr : widget.category.titleEn;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedScale(
+        scale: _hovered ? 1.025 : 1.0,
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(radius),
+          onTap: () {
+            AppAnalytics.logPathSelected('library', 'open_content');
+            LibraryPage._showSnack(
+              context,
+              widget.isAr
+                  ? 'فتح: ${widget.category.titleAr}'
+                  : 'Open: ${widget.category.titleEn}',
+            );
+          },
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOutCubic,
+                  width: widget.compact ? 230 : 300,
+                  height: widget.compact ? 230 : 300,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: _accent.withValues(
+                          alpha: _hovered ? 0.26 : 0.16,
+                        ),
+                        blurRadius: _hovered ? 34 : 24,
+                        spreadRadius: _hovered ? 1 : 0,
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(widget.compact ? 12 : 16),
+                    child: Image.asset(
+                      normalizeAssetPath(widget.category.asset),
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.auto_stories_outlined,
+                        color: const Color(0xFFFFE7B2),
+                        size: widget.compact ? 72 : 92,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: widget.compact ? 14 : 20,
+                right: widget.compact ? 14 : 20,
+                bottom: widget.compact ? 18 : 26,
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: const Color(0xFFFFE7B2),
+                    fontSize: widget.compact ? 27 : 34,
+                    fontWeight: FontWeight.w900,
+                    height: 1.02,
+                    shadows: const [
+                      Shadow(
+                        color: Colors.black,
+                        blurRadius: 16,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryCarouselControls extends StatelessWidget {
+  const _LibraryCarouselControls({
+    required this.compact,
+    required this.onPrevious,
+    required this.onNext,
+  });
+
+  final bool compact;
+  final VoidCallback onPrevious;
+  final VoidCallback onNext;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: compact ? 14 : 22,
+        right: compact ? 14 : 22,
+        top: compact ? 4 : 8,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        textDirection: TextDirection.ltr,
+        children: [
+          _LibraryLogoNavControl(
+            icon: Icons.arrow_forward_ios_rounded,
+            compact: compact,
+            arrowOnLeft: false,
+            onTap: onNext,
+          ),
+          SizedBox(width: compact ? 18 : 26),
+          _LibraryLogoNavControl(
+            icon: Icons.arrow_back_ios_new_rounded,
+            compact: compact,
+            arrowOnLeft: true,
+            onTap: onPrevious,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LibraryLogoNavControl extends StatefulWidget {
+  const _LibraryLogoNavControl({
+    required this.icon,
+    required this.compact,
+    required this.arrowOnLeft,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final bool compact;
+  final bool arrowOnLeft;
+  final VoidCallback onTap;
+
+  @override
+  State<_LibraryLogoNavControl> createState() => _LibraryLogoNavControlState();
+}
+
+class _LibraryLogoNavControlState extends State<_LibraryLogoNavControl> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final logoSize = widget.compact ? 50.0 : 60.0;
+    final arrowSize = widget.compact ? 30.0 : 36.0;
+    final arrow = _LibraryArrowCircle(
+      icon: widget.icon,
+      size: arrowSize,
+      compact: widget.compact,
+    );
+    final logo = _LibraryLogoCircle(
+      size: logoSize,
+      compact: widget.compact,
+      hovered: _hovered,
+    );
+    final gap = SizedBox(width: widget.compact ? 6 : 8);
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedScale(
+        scale: _hovered ? 1.06 : 1.0,
+        duration: const Duration(milliseconds: 170),
+        curve: Curves.easeOutCubic,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(999),
+          onTap: widget.onTap,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children:
+                widget.arrowOnLeft ? [arrow, gap, logo] : [logo, gap, arrow],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryArrowCircle extends StatelessWidget {
+  const _LibraryArrowCircle({
+    required this.icon,
+    required this.size,
+    required this.compact,
+  });
+
+  final IconData icon;
+  final double size;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      width: size,
+      height: size,
       decoration: BoxDecoration(
-        color: const Color(0xCC061A26),
-        borderRadius: BorderRadius.circular(18),
-        border:
-            Border.all(color: const Color(0xFF00E5FF).withValues(alpha: 0.42)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.24),
-            blurRadius: 22,
-            offset: const Offset(0, 12),
+        shape: BoxShape.circle,
+        color: const Color(0xFF1B1007).withValues(alpha: 0.42),
+        border: Border.all(
+          color: const Color(0xFFFFD98A).withValues(alpha: 0.38),
+        ),
+      ),
+      child: Icon(
+        icon,
+        color: const Color(0xFFFFE7B2),
+        size: compact ? 15 : 17,
+        shadows: const [
+          Shadow(
+            color: Colors.black,
+            blurRadius: 8,
+            offset: Offset(0, 1),
           ),
         ],
       ),
-      child: child,
     );
   }
 }
 
-class _GlassCtaButton extends StatelessWidget {
-  const _GlassCtaButton({
-    required this.label,
-    required this.icon,
-    required this.onTap,
-    this.secondary = false,
+class _LibraryLogoCircle extends StatelessWidget {
+  const _LibraryLogoCircle({
+    required this.size,
+    required this.compact,
+    required this.hovered,
   });
 
-  final String label;
-  final IconData icon;
-  final VoidCallback onTap;
-  final bool secondary;
+  final double size;
+  final bool compact;
+  final bool hovered;
 
   @override
   Widget build(BuildContext context) {
-    final fg = secondary ? const Color(0xFF7DF9FF) : const Color(0xFF061A26);
-    final bg = secondary ? const Color(0x2200E5FF) : const Color(0xFFE7C766);
-
-    return SizedBox(
-      width: double.infinity,
-      child: FilledButton.icon(
-        onPressed: onTap,
-        icon: Icon(icon),
-        label: Text(label),
-        style: FilledButton.styleFrom(
-          backgroundColor: bg,
-          foregroundColor: fg,
-          side: BorderSide(
-              color: const Color(0xFF00E5FF).withValues(alpha: 0.44)),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w900,
-              ),
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: const Color(0xFF1B1007).withValues(alpha: 0.48),
+        border: Border.all(
+          color: const Color(0xFFFFD98A).withValues(
+            alpha: hovered ? 0.68 : 0.46,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE7A94C).withValues(
+              alpha: hovered ? 0.20 : 0.10,
+            ),
+            blurRadius: hovered ? 14 : 9,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(compact ? 6 : 7),
+        child: Image.asset(
+          'assets/branding/logo_primary_dark.png',
+          fit: BoxFit.contain,
         ),
       ),
     );
@@ -426,250 +747,6 @@ class _ModuleEntryLoggerState extends State<_ModuleEntryLogger> {
 
   @override
   Widget build(BuildContext context) => const SizedBox.shrink();
-}
-
-class _HeroCard extends StatelessWidget {
-  const _HeroCard({
-    required this.title,
-    required this.subtitle,
-    required this.isAr,
-  });
-
-  final String title;
-  final String subtitle;
-  final bool isAr;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(18),
-      child: Stack(
-        children: [
-          // Mobile-ish hero height even on desktop/web
-          LayoutBuilder(
-            builder: (context, c) {
-              final w = c.maxWidth;
-              final h = (w * 0.52).clamp(210.0, 280.0);
-              return SizedBox(
-                height: h,
-                child: Image.asset(
-                  normalizeAssetPath('c6_library/hero/library_hero.png'),
-                  fit: BoxFit.cover,
-                  alignment: Alignment.topCenter,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.surfaceContainerHighest,
-                  ),
-                ),
-              );
-            },
-          ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: AlignmentDirectional.bottomStart,
-                  end: AlignmentDirectional.topEnd,
-                  colors: [
-                    Colors.black.withValues(alpha: 0.65),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-          PositionedDirectional(
-            start: 14,
-            end: 14,
-            bottom: 14,
-            child: Column(
-              crossAxisAlignment:
-                  isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                      ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  subtitle,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.92),
-                        height: 1.2,
-                      ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CategoryTile extends StatelessWidget {
-  const _CategoryTile({
-    required this.title,
-    required this.asset,
-    required this.onTap,
-  });
-
-  final String title;
-  final String asset;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(18),
-      elevation: 0,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xCC061A26),
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: const Color(0xFF00E5FF).withValues(alpha: 0.32),
-            ),
-          ),
-          child: Column(
-            children: [
-              Expanded(
-                child: Center(
-                  child: Image.asset(
-                    normalizeAssetPath(asset),
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.image_not_supported),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleSmall?.copyWith(
-                      color: const Color(0xFF7DF9FF),
-                      fontWeight: FontWeight.w900,
-                      shadows: _webTextShadows,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Badge extends StatelessWidget {
-  const _Badge({
-    required this.labelAr,
-    required this.labelEn,
-    required this.asset,
-  });
-
-  final String labelAr;
-  final String labelEn;
-  final String asset;
-
-  @override
-  Widget build(BuildContext context) {
-    final isAr =
-        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
-    final label = isAr ? labelAr : labelEn;
-
-    return Tooltip(
-      message: label,
-      child: Image.asset(
-        normalizeAssetPath(asset),
-        height: 26,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) =>
-            const SizedBox(height: 26, width: 26),
-      ),
-    );
-  }
-}
-
-class _StatePreview extends StatelessWidget {
-  const _StatePreview({
-    required this.titleAr,
-    required this.titleEn,
-    required this.asset,
-  });
-
-  final String titleAr;
-  final String titleEn;
-  final String asset;
-
-  @override
-  Widget build(BuildContext context) {
-    final isAr =
-        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
-    final title = isAr ? titleAr : titleEn;
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        color: Theme.of(context).colorScheme.surfaceContainerLowest,
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                title,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-              ),
-            ),
-            const SizedBox(width: 10),
-            SizedBox(
-              width: 140,
-              height: 80,
-              child: Image.asset(
-                normalizeAssetPath(asset),
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.image),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _DevPill extends StatelessWidget {
-  const _DevPill();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.deepOrange.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: const Text(
-        'DEV',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
-      ),
-    );
-  }
 }
 
 class _LibCat {

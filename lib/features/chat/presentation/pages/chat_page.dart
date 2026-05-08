@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/gateways/role_access_gateway.dart';
@@ -80,6 +81,12 @@ class _ChatPageState extends State<ChatPage> {
       default:
         return null;
     }
+  }
+
+  String _friendlyChatError(bool isArabic) {
+    return isArabic
+        ? 'تعذر فتح الشات الآن. حاول إعادة المحاولة بعد لحظات.'
+        : 'Unable to open chat right now. Please try again shortly.';
   }
 
   bool get _isRequestLinkedThread {
@@ -505,9 +512,12 @@ class _ChatPageState extends State<ChatPage> {
         _loading = false;
       });
     } catch (e) {
+      if (kDebugMode) {
+        debugPrint('CHAT_OPEN_FAILED $e');
+      }
       if (!mounted) return;
       setState(() {
-        _error = 'تعذر فتح الشات: $e';
+        _error = _friendlyChatError(_isArabic());
         _loading = false;
       });
     }
@@ -600,11 +610,16 @@ class _ChatPageState extends State<ChatPage> {
         );
       }
     } catch (e) {
+      if (kDebugMode) {
+        debugPrint('CHAT_SEND_FAILED $e');
+      }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isArabic ? 'فشل إرسال الرسالة: $e' : 'Failed to send message: $e',
+            isArabic
+                ? 'تعذر إرسال الرسالة الآن. حاول مرة أخرى.'
+                : 'Unable to send the message right now. Please try again.',
           ),
         ),
       );
@@ -634,9 +649,12 @@ class _ChatPageState extends State<ChatPage> {
         _loading = false;
       });
     } catch (e) {
+      if (kDebugMode) {
+        debugPrint('CHAT_START_FRESH_FAILED $e');
+      }
       if (!mounted) return;
       setState(() {
-        _error = 'تعذر بدء محادثة جديدة: $e';
+        _error = _friendlyChatError(_isArabic());
         _loading = false;
       });
     }

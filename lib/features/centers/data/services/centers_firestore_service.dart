@@ -15,13 +15,17 @@ class CentersFirestoreService {
     return _centers
         .where('isActive', isEqualTo: true)
         .where('category', isEqualTo: category)
-        .orderBy('sortOrder')
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => CenterModel.fromFirestore(doc))
-              .toList(),
-        );
+        .map((snapshot) {
+      final centers =
+          snapshot.docs.map((doc) => CenterModel.fromFirestore(doc)).toList();
+      centers.sort((a, b) {
+        final byOrder = a.sortOrder.compareTo(b.sortOrder);
+        if (byOrder != 0) return byOrder;
+        return a.name.compareTo(b.name);
+      });
+      return centers;
+    });
   }
 
   Stream<CenterModel?> streamCenterById(String centerId) {
