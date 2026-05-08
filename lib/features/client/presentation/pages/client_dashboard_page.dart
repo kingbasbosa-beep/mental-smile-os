@@ -442,6 +442,7 @@ class ClientDashboardPage extends StatelessWidget {
                                           initials: _initials(name),
                                           showGreeting: false,
                                           avatarSize: 88,
+                                          showLogo: true,
                                         ),
                                         const SizedBox(height: 12),
                                         Expanded(
@@ -457,10 +458,24 @@ class ClientDashboardPage extends StatelessWidget {
                                       right: 40,
                                       top: 0,
                                       width: 230,
-                                      child: _GreetingText(
-                                        isArabic: isArabic,
-                                        name: name,
-                                        textTheme: Theme.of(context).textTheme,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          _GreetingText(
+                                            isArabic: isArabic,
+                                            name: name,
+                                            textTheme:
+                                                Theme.of(context).textTheme,
+                                          ),
+                                          const SizedBox(height: 14),
+                                          _ClientAvatarBadge(
+                                            avatarAsset: avatarAsset,
+                                            isActive: isActive,
+                                            initials: _initials(name),
+                                            size: 82,
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     Positioned(
@@ -624,6 +639,7 @@ class _ProfileBanner extends StatelessWidget {
   final String initials;
   final bool showGreeting;
   final double avatarSize;
+  final bool showLogo;
 
   const _ProfileBanner({
     required this.isArabic,
@@ -633,15 +649,12 @@ class _ProfileBanner extends StatelessWidget {
     required this.initials,
     required this.showGreeting,
     required this.avatarSize,
+    this.showLogo = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-
-    final imageSize = avatarSize - 6;
-    final badgeSize = avatarSize >= 80 ? 22.0 : 18.0;
-    final initialsSize = avatarSize >= 80 ? 26.0 : 22.0;
 
     return SizedBox(
       height: avatarSize + 26,
@@ -649,74 +662,16 @@ class _ProfileBanner extends StatelessWidget {
         textDirection: TextDirection.ltr,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 19),
-                child: Container(
-                  width: avatarSize,
-                  height: avatarSize,
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.mutedGold, width: 1.6),
-                    color: Colors.white.withValues(alpha: 0.28),
+          Padding(
+            padding: const EdgeInsets.only(left: 19),
+            child: showLogo
+                ? _DashboardLogoBadge(size: avatarSize)
+                : _ClientAvatarBadge(
+                    avatarAsset: avatarAsset,
+                    isActive: isActive,
+                    initials: initials,
+                    size: avatarSize,
                   ),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white.withValues(alpha: 0.90),
-                    child: avatarAsset.isNotEmpty
-                        ? ClipOval(
-                            child: Image.asset(
-                              normalizeAssetPath(avatarAsset),
-                              width: imageSize,
-                              height: imageSize,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  AppMissingAssetPlaceholder(
-                                width: imageSize,
-                                height: imageSize,
-                              ),
-                            ),
-                          )
-                        : Text(
-                            initials,
-                            style: TextStyle(
-                              color: AppColors.deepTeal,
-                              fontWeight: FontWeight.w900,
-                              fontSize: initialsSize,
-                            ),
-                          ),
-                  ),
-                ),
-              ),
-              Positioned(
-                right: isArabic ? null : -1,
-                left: isArabic ? 18 : null,
-                bottom: 4,
-                child: Container(
-                  width: badgeSize,
-                  height: badgeSize,
-                  decoration: BoxDecoration(
-                    color: isActive
-                        ? const Color(0xFF00E5C3)
-                        : const Color(0xFFD16A6A),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (isActive
-                                ? const Color(0xFF00E5C3)
-                                : const Color(0xFFD16A6A))
-                            .withValues(alpha: 0.55),
-                        blurRadius: 10,
-                        spreadRadius: 1,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
           ),
           const SizedBox(width: AppSpacing.md),
           if (showGreeting)
@@ -790,6 +745,132 @@ class _GreetingText extends StatelessWidget {
           textAlign: TextAlign.right,
         ),
       ],
+    );
+  }
+}
+
+class _ClientAvatarBadge extends StatelessWidget {
+  final String avatarAsset;
+  final bool isActive;
+  final String initials;
+  final double size;
+
+  const _ClientAvatarBadge({
+    required this.avatarAsset,
+    required this.isActive,
+    required this.initials,
+    required this.size,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final imageSize = size - 6;
+    final badgeSize = size >= 80 ? 22.0 : 18.0;
+    final initialsSize = size >= 80 ? 26.0 : 22.0;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: size,
+          height: size,
+          padding: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.mutedGold, width: 1.6),
+            color: Colors.white.withValues(alpha: 0.28),
+          ),
+          child: CircleAvatar(
+            backgroundColor: Colors.white.withValues(alpha: 0.90),
+            child: avatarAsset.isNotEmpty
+                ? ClipOval(
+                    child: Image.asset(
+                      normalizeAssetPath(avatarAsset),
+                      width: imageSize,
+                      height: imageSize,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          AppMissingAssetPlaceholder(
+                        width: imageSize,
+                        height: imageSize,
+                      ),
+                    ),
+                  )
+                : Text(
+                    initials,
+                    style: TextStyle(
+                      color: AppColors.deepTeal,
+                      fontWeight: FontWeight.w900,
+                      fontSize: initialsSize,
+                    ),
+                  ),
+          ),
+        ),
+        PositionedDirectional(
+          start: -2,
+          bottom: 4,
+          child: Container(
+            width: badgeSize,
+            height: badgeSize,
+            decoration: BoxDecoration(
+              color:
+                  isActive ? const Color(0xFF00E5C3) : const Color(0xFFD16A6A),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: (isActive
+                          ? const Color(0xFF00E5C3)
+                          : const Color(0xFFD16A6A))
+                      .withValues(alpha: 0.55),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DashboardLogoBadge extends StatelessWidget {
+  final double size;
+
+  const _DashboardLogoBadge({required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    final imageSize = size - 10;
+
+    return Container(
+      width: size,
+      height: size,
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: AppColors.mutedGold, width: 1.6),
+        color: Colors.black.withValues(alpha: 0.18),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.mutedGold.withValues(alpha: 0.18),
+            blurRadius: 16,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Image.asset(
+        'assets/branding/logo_primary_dark.png',
+        width: imageSize,
+        height: imageSize,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) =>
+            AppMissingAssetPlaceholder(
+          width: imageSize,
+          height: imageSize,
+        ),
+      ),
     );
   }
 }
