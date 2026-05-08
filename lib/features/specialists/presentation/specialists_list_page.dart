@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/features/specialists/data/clinician_specialty_catalog.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
@@ -29,24 +30,11 @@ class SpecialistsListPage extends StatelessWidget {
   }
 
   bool _matchesCategory(Map<String, dynamic> data) {
-    final category = _categoryKey();
     final specialtyKey = (data['specialtyKey'] ?? '').toString().trim();
-
-    switch (category) {
-      case 'psychologists':
-        return specialtyKey == 'psychologist' ||
-            specialtyKey == 'clinical_psychologist';
-      case 'family_counseling':
-        return specialtyKey == 'family_counselor';
-      case 'speech_specialists':
-        return specialtyKey == 'speech_specialist';
-      case 'coaching':
-        return specialtyKey == 'coach';
-      case 'addiction':
-        return specialtyKey == 'addiction_counselor';
-      default:
-        return true;
-    }
+    return ClinicianSpecialtyCatalog.specialtyMatchesCategory(
+      specialtyKey: specialtyKey,
+      categoryKey: _categoryKey(),
+    );
   }
 
   String _displayName(Map<String, dynamic> data, bool isArabic) {
@@ -66,6 +54,11 @@ class SpecialistsListPage extends StatelessWidget {
   }
 
   String _specialty(Map<String, dynamic> data, bool isArabic) {
+    final specialtyLabel = ClinicianSpecialtyCatalog.specialtyLabel(
+      specialtyKey: (data['specialtyKey'] ?? '').toString(),
+      isArabic: isArabic,
+    );
+    if (specialtyLabel.isNotEmpty) return specialtyLabel;
     final value = (data['specialty'] ?? '').toString().trim();
     if (value.isNotEmpty) return value;
     return isArabic ? 'بدون تخصص محدد' : 'No specialty specified';
@@ -122,6 +115,7 @@ class SpecialistsListPage extends StatelessWidget {
               stream: FirebaseFirestore.instance
                   .collection('clinicians')
                   .where('isActive', isEqualTo: true)
+                  .where('approvalStatus', isEqualTo: 'approved')
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {

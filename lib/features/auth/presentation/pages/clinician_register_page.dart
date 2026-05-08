@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/features/specialists/data/clinician_specialty_catalog.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 
 class ClinicianRegisterPage extends StatefulWidget {
@@ -52,32 +53,13 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
     },
   ];
 
-  static const List<Map<String, String>> _specialties = [
-    {
-      'key': 'psychologist',
-      'label': 'أخصائي نفسي',
-    },
-    {
-      'key': 'clinical_psychologist',
-      'label': 'دكتور نفسي إكلينيكي',
-    },
-    {
-      'key': 'addiction_counselor',
-      'label': 'مشير علاج سلوكيات إدمانية',
-    },
-    {
-      'key': 'speech_specialist',
-      'label': 'أخصائي تخاطب',
-    },
-    {
-      'key': 'family_counselor',
-      'label': 'أخصائي مشورة أسرية',
-    },
-    {
-      'key': 'coach',
-      'label': 'كوتش',
-    },
-  ];
+  static final List<Map<String, String>> _specialties =
+      ClinicianSpecialtyCatalog.specialties
+          .map((specialty) => {
+                'key': specialty.key,
+                'label': specialty.labelAr,
+              })
+          .toList(growable: false);
 
   String _selectedSpecialtyLabel() {
     final found = _specialties.where((e) => e['key'] == _selectedSpecialtyKey);

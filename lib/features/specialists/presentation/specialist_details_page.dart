@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/booking_request_page.dart';
+import 'package:flutterprojects/features/specialists/data/clinician_specialty_catalog.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
@@ -76,6 +77,29 @@ class SpecialistDetailsPage extends StatelessWidget {
     );
     if (prefix.isEmpty) return name;
     return '$prefix $name';
+  }
+
+  bool _canShowClinician(Map<String, dynamic> data) {
+    final role = _text(data['role'], '');
+    final approvalStatus = _text(data['approvalStatus'], '');
+    final isActive = _boolValue(data['isActive']);
+    return role == 'clinician' &&
+        approvalStatus == 'approved' &&
+        isActive == true;
+  }
+
+  Widget _safeUnavailable(BuildContext context, bool isArabic) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Text(
+          isArabic
+              ? 'هذا الأخصائي غير متاح للعرض حاليًا.'
+              : 'This specialist is not available right now.',
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
   }
 
   String _initials(String name) {
@@ -291,9 +315,13 @@ class SpecialistDetailsPage extends StatelessWidget {
     required String uid,
   }) {
     final name = _displayName(data, isArabic);
-    final specialty = _text(
-      data['specialty'],
-      isArabic ? 'بدون تخصص محدد' : 'No specific specialty',
+    final specialty = ClinicianSpecialtyCatalog.specialtyLabel(
+      specialtyKey: (data['specialtyKey'] ?? '').toString(),
+      isArabic: isArabic,
+      fallback: _text(
+        data['specialty'],
+        isArabic ? 'بدون تخصص محدد' : 'No specific specialty',
+      ),
     );
     final bio = _text(
       data['bio'],
@@ -566,20 +594,31 @@ class SpecialistDetailsPage extends StatelessWidget {
           title: Text(isArabic ? 'تفاصيل الأخصائي' : 'Specialist details'),
         ),
         body: uid.isEmpty
-            ? _buildContent(
-                context,
-                isArabic: isArabic,
-                scheme: scheme,
-                data: args,
-                uid: uid,
-              )
+            ? _safeUnavailable(context, isArabic)
             : StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                 stream: FirebaseFirestore.instance
                     .collection('clinicians')
                     .doc(uid)
                     .snapshots(),
                 builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return _safeUnavailable(context, isArabic);
+                  }
+
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (!snapshot.data!.exists) {
+                    return _safeUnavailable(context, isArabic);
+                  }
+
                   final firestoreData = snapshot.data?.data();
+                  if (firestoreData == null ||
+                      !_canShowClinician(firestoreData)) {
+                    return _safeUnavailable(context, isArabic);
+                  }
+
                   final mergedData = _mergedData(firestoreData);
 
                   return _buildContent(

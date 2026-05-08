@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/features/specialists/data/clinician_specialty_catalog.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
 
@@ -31,14 +32,13 @@ class _WebClinicianRegisterPortalPageState
     {'key': 'specialist', 'labelAr': 'أ.', 'labelEn': 'Spec.'},
   ];
 
-  static const List<Map<String, String>> _specialties = [
-    {'key': 'psychologist', 'label': 'أخصائي نفسي'},
-    {'key': 'clinical_psychologist', 'label': 'دكتور نفسي إكلينيكي'},
-    {'key': 'addiction_counselor', 'label': 'مستشار علاج إدمان'},
-    {'key': 'speech_specialist', 'label': 'أخصائي تخاطب'},
-    {'key': 'family_counselor', 'label': 'أخصائي مشورة أسرية'},
-    {'key': 'coach', 'label': 'كوتش'},
-  ];
+  static final List<Map<String, String>> _specialties =
+      ClinicianSpecialtyCatalog.specialties
+          .map((specialty) => {
+                'key': specialty.key,
+                'label': specialty.labelAr,
+              })
+          .toList(growable: false);
 
   @override
   void dispose() {
