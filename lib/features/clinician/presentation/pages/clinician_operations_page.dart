@@ -445,17 +445,75 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           ),
         ),
         const SizedBox(height: 12),
-        _buildProfileChangeRequestCard(
-          context: context,
-          isArabic: isArabic,
-          clinicianData: clinicianData,
-        ),
-        const SizedBox(height: 12),
-        _buildProfileChangeRequestsSection(
+        _buildProfileEditRequestEntryCard(
           context: context,
           isArabic: isArabic,
         ),
       ],
+    );
+  }
+
+  Widget _buildProfileEditRequestEntryCard({
+    required BuildContext context,
+    required bool isArabic,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: scheme.outline.withValues(alpha: 0.12),
+        ),
+      ),
+      child: Row(
+        textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+        children: [
+          Container(
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(
+              color: scheme.primary.withValues(alpha: 0.10),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.manage_accounts_outlined, color: scheme.primary),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+                  isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isArabic ? 'تعديل بياناتي' : 'Edit my profile',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w800),
+                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  isArabic
+                      ? 'إرسال طلب تعديل الصورة أو النبذة'
+                      : 'Send a photo or bio change request',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pushNamed(
+              Routes.clinicianProfileEditRequest,
+            ),
+            child: Text(isArabic ? 'فتح' : 'Open'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1340,6 +1398,347 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                       ),
                       const SizedBox(height: 12),
                       _buildAssignmentsSection(
+                        context: context,
+                        isArabic: isArabic,
+                        docs: docs,
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ClinicianProfileEditRequestPage extends StatefulWidget {
+  const ClinicianProfileEditRequestPage({super.key});
+
+  @override
+  State<ClinicianProfileEditRequestPage> createState() =>
+      _ClinicianProfileEditRequestPageState();
+}
+
+class _ClinicianProfileEditRequestPageState
+    extends State<ClinicianProfileEditRequestPage> {
+  final _requestedPhotoUrlController = TextEditingController();
+  final _requestedBioController = TextEditingController();
+
+  bool _submittingChangeRequest = false;
+
+  bool _isArabic(BuildContext context) =>
+      Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+
+  String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
+
+  Stream<Map<String, dynamic>?> _clinicianStream() {
+    if (_uid.isEmpty) return Stream.value(null);
+    return FirebaseFirestore.instance
+        .collection('clinicians')
+        .doc(_uid)
+        .snapshots()
+        .map((doc) => doc.exists ? doc.data() : null);
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> _requestsStream() {
+    return FirebaseFirestore.instance
+        .collection('clinician_profile_change_requests')
+        .where('clinicianId', isEqualTo: _uid)
+        .orderBy('createdAt', descending: true)
+        .snapshots();
+  }
+
+  String _requestStatusLabel(String status, bool isArabic) {
+    switch (status) {
+      case 'approved':
+        return isArabic ? 'مقبول' : 'Approved';
+      case 'rejected':
+        return isArabic ? 'مرفوض' : 'Rejected';
+      case 'pending':
+      default:
+        return isArabic ? 'قيد المراجعة' : 'Pending review';
+    }
+  }
+
+  Future<void> _submitProfileChangeRequest(
+    Map<String, dynamic> clinicianData,
+  ) async {
+    final requestedPhotoUrl = _requestedPhotoUrlController.text.trim();
+    final requestedBio = _requestedBioController.text.trim();
+
+    if (requestedPhotoUrl.isEmpty && requestedBio.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _isArabic(context)
+                ? 'أدخل رابط صورة أو نبذة جديدة أولًا'
+                : 'Enter a new photo URL or bio first',
+          ),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _submittingChangeRequest = true);
+    try {
+      final currentBio = (clinicianData['bio'] ?? '').toString().trim();
+      final currentPhotoUrl =
+          (clinicianData['photoUrl'] ?? '').toString().trim();
+      var requestType = 'profile_update';
+      if (requestedBio.isNotEmpty && requestedPhotoUrl.isNotEmpty) {
+        requestType = 'photo_and_bio_update';
+      } else if (requestedBio.isNotEmpty) {
+        requestType = 'bio_update';
+      } else if (requestedPhotoUrl.isNotEmpty && currentPhotoUrl.isEmpty) {
+        requestType = 'photo_upload';
+      } else if (requestedPhotoUrl.isNotEmpty) {
+        requestType = 'photo_update';
+      }
+
+      await FirebaseFirestore.instance
+          .collection('clinician_profile_change_requests')
+          .add({
+        'clinicianId': _uid,
+        'clinicianName': (clinicianData['displayName'] ?? '').toString(),
+        'clinicianEmail': (clinicianData['email'] ?? '').toString(),
+        'requestType': requestType,
+        'currentBio': currentBio,
+        'requestedBio': requestedBio,
+        'currentPhotoUrl': currentPhotoUrl,
+        'requestedPhotoUrl': requestedPhotoUrl,
+        'status': 'pending',
+        'adminDecision': '',
+        'adminNote': '',
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      _requestedPhotoUrlController.clear();
+      _requestedBioController.clear();
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _isArabic(context)
+                ? 'تم إرسال طلب تعديل البيانات للمراجعة'
+                : 'Profile change request sent for review',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _submittingChangeRequest = false);
+      }
+    }
+  }
+
+  Widget _buildRequestForm({
+    required BuildContext context,
+    required bool isArabic,
+    required Map<String, dynamic> clinicianData,
+  }) {
+    return AppSurfaceCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic
+                ? 'طلب تعديل الصورة أو النبذة'
+                : 'Request photo or bio update',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            isArabic
+                ? 'أي تعديل على الصورة الشخصية أو النبذة يذهب للمراجعة أولًا. الاسم والوثائق غير قابلة للتعديل من هنا.'
+                : 'Any update to the profile photo or bio is sent for review first. Name and documents cannot be edited here.',
+          ),
+          const SizedBox(height: 14),
+          TextField(
+            controller: _requestedPhotoUrlController,
+            decoration: InputDecoration(
+              labelText: isArabic ? 'رابط الصورة الجديدة' : 'New photo URL',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _requestedBioController,
+            maxLines: 4,
+            decoration: InputDecoration(
+              labelText: isArabic ? 'النبذة الجديدة' : 'New bio',
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: FilledButton.icon(
+              onPressed: _submittingChangeRequest
+                  ? null
+                  : () => _submitProfileChangeRequest(clinicianData),
+              icon: _submittingChangeRequest
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.fact_check_outlined),
+              label: Text(
+                _submittingChangeRequest
+                    ? (isArabic ? 'جارٍ إرسال الطلب...' : 'Sending request...')
+                    : (isArabic ? 'إرسال طلب التعديل' : 'Send change request'),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRequestsList({
+    required BuildContext context,
+    required bool isArabic,
+    required List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return AppSurfaceCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic ? 'طلبات التعديل السابقة' : 'Previous change requests',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: 12),
+          if (docs.isEmpty)
+            Text(isArabic
+                ? 'لا توجد طلبات تعديل حتى الآن'
+                : 'No change requests yet')
+          else
+            ...docs.map((doc) {
+              final data = doc.data();
+              final status = (data['status'] ?? 'pending').toString();
+              final requestedBio = (data['requestedBio'] ?? '').toString();
+              final requestedPhotoUrl =
+                  (data['requestedPhotoUrl'] ?? '').toString();
+              final adminNote = (data['adminNote'] ?? '').toString().trim();
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: scheme.primary.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  crossAxisAlignment: isArabic
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _requestStatusLabel(status, isArabic),
+                      style: TextStyle(
+                        color: scheme.primary,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    if (requestedPhotoUrl.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(isArabic
+                          ? 'الصورة المطلوبة: $requestedPhotoUrl'
+                          : 'Requested photo: $requestedPhotoUrl'),
+                    ],
+                    if (requestedBio.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(isArabic
+                          ? 'النبذة المطلوبة: $requestedBio'
+                          : 'Requested bio: $requestedBio'),
+                    ],
+                    if (adminNote.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(isArabic
+                          ? 'ملاحظة الإدارة: $adminNote'
+                          : 'Admin note: $adminNote'),
+                    ],
+                  ],
+                ),
+              );
+            }),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _requestedPhotoUrlController.dispose();
+    _requestedBioController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isArabic = _isArabic(context);
+
+    return Directionality(
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+      child: Scaffold(
+        appBar: AppShellActions.buildAppBar(
+          context,
+          title: isArabic ? 'تعديل بياناتي' : 'Edit my profile',
+        ),
+        body: AppPageBackground(
+          child: StreamBuilder<Map<String, dynamic>?>(
+            stream: _clinicianStream(),
+            builder: (context, clinicianSnapshot) {
+              final clinicianData =
+                  clinicianSnapshot.data ?? <String, dynamic>{};
+
+              return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: _requestsStream(),
+                builder: (context, requestSnapshot) {
+                  final docs = requestSnapshot.data?.docs ?? const [];
+                  final hasPending = docs.any(
+                    (doc) => (doc.data()['status'] ?? 'pending') == 'pending',
+                  );
+
+                  return ListView(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    children: [
+                      if (hasPending)
+                        AppSurfaceCard(
+                          padding: const EdgeInsets.all(18),
+                          child: Text(
+                            isArabic
+                                ? 'يوجد طلب تعديل قيد المراجعة. يمكنك متابعة حالته هنا.'
+                                : 'A profile change request is pending. You can track it here.',
+                            textAlign:
+                                isArabic ? TextAlign.right : TextAlign.left,
+                          ),
+                        )
+                      else
+                        _buildRequestForm(
+                          context: context,
+                          isArabic: isArabic,
+                          clinicianData: clinicianData,
+                        ),
+                      const SizedBox(height: 12),
+                      _buildRequestsList(
                         context: context,
                         isArabic: isArabic,
                         docs: docs,

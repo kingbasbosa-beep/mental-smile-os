@@ -185,6 +185,7 @@ class AppRouter {
 
   static const Set<String> _clinicianOnlyRoutes = {
     Routes.clinicianOperations,
+    Routes.clinicianProfileEditRequest,
     Routes.clinicianInbox,
     Routes.clinicianChatInbox,
     Routes.clinicianChatInboxLegacy,
@@ -194,6 +195,7 @@ class AppRouter {
   static const Set<String> _centerOnlyRoutes = {
     Routes.centerDashboard,
     Routes.centerOperations,
+    Routes.centerProfileEditRequest,
     Routes.centerInbox,
     Routes.centerResidencies,
   };
@@ -220,9 +222,11 @@ class AppRouter {
     switch (settings.name) {
       case Routes.centerDashboard:
       case Routes.centerOperations:
+      case Routes.centerProfileEditRequest:
       case Routes.centerInbox:
       case Routes.centerResidencies:
       case Routes.clinicianOperations:
+      case Routes.clinicianProfileEditRequest:
       case Routes.clinicianInbox:
       case Routes.clinicianChatInbox:
       case Routes.clinicianChatInboxLegacy:
@@ -664,6 +668,12 @@ class AppRouter {
           settings: settings,
         );
 
+      case Routes.clinicianProfileEditRequest:
+        return _protectedRoute(
+          child: const ClinicianProfileEditRequestPage(),
+          settings: settings,
+        );
+
       case Routes.clientDashboard:
         return _protectedRoute(
           child: const ClientDashboardPage(),
@@ -771,6 +781,12 @@ class AppRouter {
       case Routes.centerOperations:
         return _protectedRoute(
           child: const CenterOperationsPage(),
+          settings: settings,
+        );
+
+      case Routes.centerProfileEditRequest:
+        return _protectedRoute(
+          child: const CenterProfileEditRequestPage(),
           settings: settings,
         );
 

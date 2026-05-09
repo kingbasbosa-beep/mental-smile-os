@@ -28,6 +28,7 @@ class Routes {
       '/workspace/external-follow-up/campaigns/details';
 
   static const clinicianOperations = '/clinician/operations';
+  static const clinicianProfileEditRequest = '/clinician/profile-edit-request';
   static const clinicianSessions = '/clinician/sessions';
   static const clinicianInbox = '/clinician/inbox';
   static const clinicianChatInbox = '/clinician/chat-inbox';
@@ -39,6 +40,7 @@ class Routes {
 
   static const centerDashboard = '/center/dashboard';
   static const centerOperations = '/center/operations';
+  static const centerProfileEditRequest = '/center/profile-edit-request';
   static const centerInbox = '/center/inbox';
   static const centerResidencies = '/center/residencies';
 
@@ -80,10 +82,8 @@ class Routes {
   static const adminLibraryGovernance = '/admin/library-governance';
   static const adminSupportMessagingGovernance =
       '/admin/support-messaging-governance';
-  static const adminFollowupCareGovernance =
-      '/admin/followup-care-governance';
-  static const adminAiFollowupBoundaries =
-      '/admin/ai-followup-boundaries';
+  static const adminFollowupCareGovernance = '/admin/followup-care-governance';
+  static const adminAiFollowupBoundaries = '/admin/ai-followup-boundaries';
   static const adminGrowthLayer = '/admin/growth-layer';
   static const adminEmployeeSystem = '/admin/employee-system';
   static const adminMaintenanceSystem = '/admin/maintenance';
@@ -94,8 +94,7 @@ class Routes {
   static const customerFollowUpWorkspace = '/workspace/customer-follow-up';
   static const technicalSupportWorkspace = '/workspace/technical-support';
   static const marketingWorkspace = '/workspace/marketing';
-  static const adminWorkspaceCommandCenter =
-      '/admin/workspace-command-center';
+  static const adminWorkspaceCommandCenter = '/admin/workspace-command-center';
   static const contentWorkspace = '/workspace/content';
   static const adminGuidedWorkflows = '/admin/control-room/guided-workflows';
   static const adminReferences = '/admin/control-room/references';
@@ -128,7 +127,3 @@ class Routes {
 
   static const sessionReview = '/session/review';
 }
-
-
-
-

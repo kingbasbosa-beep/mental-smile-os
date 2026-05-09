@@ -529,6 +529,63 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
     }
   }
 
+  Widget _buildProfileEditRequestEntryCard({
+    required BuildContext context,
+    required bool isArabic,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return AppSurfaceCard(
+      padding: const EdgeInsets.all(18),
+      child: Row(
+        textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+        children: [
+          Container(
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(
+              color: scheme.primary.withValues(alpha: 0.10),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.manage_accounts_outlined, color: scheme.primary),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+                  isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isArabic ? 'تعديل بياناتي' : 'Edit my data',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w800),
+                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  isArabic
+                      ? 'إرسال طلب تعديل الصورة أو النبذة'
+                      : 'Send a photo or profile change request',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pushNamed(
+              Routes.centerProfileEditRequest,
+            ),
+            child: Text(isArabic ? 'فتح' : 'Open'),
+          ),
+        ],
+      ),
+    );
+  }
+
   String _docStatusLabel(String status, bool isArabic) {
     switch (status) {
       case 'approved':
@@ -1032,252 +1089,9 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  AppSurfaceCard(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      crossAxisAlignment: isArabic
-                          ? CrossAxisAlignment.end
-                          : CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          isArabic
-                              ? 'طلب تعديل بيانات المركز'
-                              : 'Center data change request',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                          textAlign:
-                              isArabic ? TextAlign.right : TextAlign.left,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          isArabic
-                              ? 'عدّل البيانات هنا ثم أرسلها للإدارة. سيشمل الطلب أيضًا أحدث الصور والوثائق المرفوعة.'
-                              : 'Update the fields here, then send them to admin. The request also includes the latest uploaded images and documents.',
-                          textAlign:
-                              isArabic ? TextAlign.right : TextAlign.left,
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        TextField(
-                          controller: _centerNameController,
-                          textAlign:
-                              isArabic ? TextAlign.right : TextAlign.left,
-                          decoration: appInputDecoration(
-                            context: context,
-                            label: isArabic ? 'اسم المركز' : 'Center name',
-                            icon: Icons.business_outlined,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: _managerNameController,
-                          textAlign:
-                              isArabic ? TextAlign.right : TextAlign.left,
-                          decoration: appInputDecoration(
-                            context: context,
-                            label: isArabic ? 'اسم المسؤول' : 'Manager name',
-                            icon: Icons.badge_outlined,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: _cityController,
-                          textAlign:
-                              isArabic ? TextAlign.right : TextAlign.left,
-                          decoration: appInputDecoration(
-                            context: context,
-                            label: isArabic ? 'المدينة' : 'City',
-                            icon: Icons.location_city_outlined,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: _addressController,
-                          textAlign:
-                              isArabic ? TextAlign.right : TextAlign.left,
-                          decoration: appInputDecoration(
-                            context: context,
-                            label: isArabic ? 'العنوان' : 'Address',
-                            icon: Icons.location_on_outlined,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: _descriptionController,
-                          maxLines: 4,
-                          textAlign:
-                              isArabic ? TextAlign.right : TextAlign.left,
-                          decoration: appInputDecoration(
-                            context: context,
-                            label:
-                                isArabic ? 'وصف المركز' : 'Center description',
-                            icon: Icons.notes_outlined,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          isArabic
-                              ? 'تكلفة الإقامة وقدرات المركز'
-                              : 'Cost of stay and center capabilities',
-                          textAlign:
-                              isArabic ? TextAlign.right : TextAlign.left,
-                          style:
-                              Theme.of(context).textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          usesAutismPricing
-                              ? (isArabic
-                                  ? 'يعتمد هذا النوع على الاستضافة اليومية والزيارات المنزلية بدل فئات الغرف.'
-                                  : 'This center type uses daily hosting and home visits instead of room categories.')
-                              : (isArabic
-                                  ? 'فعّل فقط الفئات المتاحة للمركز، وسيتم إرسالها ضمن طلب تعديل البيانات للإدارة.'
-                                  : 'Enable only the categories currently available at the center. They will be sent to admin in the profile update request.'),
-                          textAlign:
-                              isArabic ? TextAlign.right : TextAlign.left,
-                        ),
-                        const SizedBox(height: 12),
-                        _buildCapabilityEditor(context),
-                        const SizedBox(height: 12),
-                        ...(usesAutismPricing
-                            ? _requestedAutismCareCosts
-                                .map(
-                                  (item) => Padding(
-                                    padding: const EdgeInsets.only(bottom: 10),
-                                    child: _buildAutismPricingEditor(
-                                        context, item),
-                                  ),
-                                )
-                                .toList()
-                            : _requestedAccommodationCosts
-                                .map(
-                                  (item) => Padding(
-                                    padding: const EdgeInsets.only(bottom: 10),
-                                    child: _buildAccommodationEditor(
-                                        context, item),
-                                  ),
-                                )
-                                .toList()),
-                        const SizedBox(height: 16),
-                        AppSectionPanel(
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          color: scheme.primary.withValues(alpha: 0.06),
-                          borderColor: scheme.outline.withValues(alpha: 0.12),
-                          child: Column(
-                            crossAxisAlignment: isArabic
-                                ? CrossAxisAlignment.end
-                                : CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                isArabic
-                                    ? 'طلب استبدال صور المركز'
-                                    : 'Center image replacement request',
-                                textAlign:
-                                    isArabic ? TextAlign.right : TextAlign.left,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleSmall
-                                    ?.copyWith(fontWeight: FontWeight.w800),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                isArabic
-                                    ? 'أدخل روابط الصور البديلة التي تريد من الإدارة اعتمادها ضمن طلب التعديل.'
-                                    : 'Enter the replacement image URLs you want admin to review as part of this request.',
-                                textAlign:
-                                    isArabic ? TextAlign.right : TextAlign.left,
-                              ),
-                              const SizedBox(height: 12),
-                              TextField(
-                                controller: _requestedFrontImageController,
-                                textAlign:
-                                    isArabic ? TextAlign.right : TextAlign.left,
-                                decoration: appInputDecoration(
-                                  context: context,
-                                  label: isArabic
-                                      ? 'رابط صورة واجهة بديلة'
-                                      : 'Replacement front image URL',
-                                  icon: Icons.storefront_outlined,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              TextField(
-                                controller: _requestedReceptionImageController,
-                                textAlign:
-                                    isArabic ? TextAlign.right : TextAlign.left,
-                                decoration: appInputDecoration(
-                                  context: context,
-                                  label: isArabic
-                                      ? 'رابط صورة استقبال بديلة'
-                                      : 'Replacement reception image URL',
-                                  icon: Icons.meeting_room_outlined,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              TextField(
-                                controller: _requestedInside1ImageController,
-                                textAlign:
-                                    isArabic ? TextAlign.right : TextAlign.left,
-                                decoration: appInputDecoration(
-                                  context: context,
-                                  label: isArabic
-                                      ? 'رابط صورة داخلية بديلة 1'
-                                      : 'Replacement inside image 1 URL',
-                                  icon: Icons.photo_outlined,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              TextField(
-                                controller: _requestedInside2ImageController,
-                                textAlign:
-                                    isArabic ? TextAlign.right : TextAlign.left,
-                                decoration: appInputDecoration(
-                                  context: context,
-                                  label: isArabic
-                                      ? 'رابط صورة داخلية بديلة 2'
-                                      : 'Replacement inside image 2 URL',
-                                  icon: Icons.photo_library_outlined,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: FilledButton.icon(
-                            onPressed: _submittingChangeRequest
-                                ? null
-                                : () => _submitCenterChangeRequest(
-                                      currentData: data,
-                                      currentDocs: docs,
-                                    ),
-                            icon: _submittingChangeRequest
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Icon(Icons.send_outlined),
-                            label: Text(
-                              _submittingChangeRequest
-                                  ? (isArabic
-                                      ? 'جارٍ الإرسال...'
-                                      : 'Sending...')
-                                  : (isArabic
-                                      ? 'إرسال طلب تعديل البيانات'
-                                      : 'Send data change request'),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  _buildProfileEditRequestEntryCard(
+                    context: context,
+                    isArabic: isArabic,
                   ),
                   const SizedBox(height: 12),
                   AppSurfaceCard(
@@ -1637,6 +1451,505 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                     ),
                   ),
                 ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CenterProfileEditRequestPage extends StatefulWidget {
+  const CenterProfileEditRequestPage({super.key});
+
+  @override
+  State<CenterProfileEditRequestPage> createState() =>
+      _CenterProfileEditRequestPageState();
+}
+
+class _CenterProfileEditRequestPageState
+    extends State<CenterProfileEditRequestPage> {
+  final _centerNameController = TextEditingController();
+  final _managerNameController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _requestedFrontImageController = TextEditingController();
+  final _requestedReceptionImageController = TextEditingController();
+  final _requestedInside1ImageController = TextEditingController();
+  final _requestedInside2ImageController = TextEditingController();
+
+  bool _submitting = false;
+  String _lastSeed = '';
+
+  bool _isArabic(BuildContext context) =>
+      Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+
+  String? get _uid => FirebaseAuth.instance.currentUser?.uid;
+
+  Stream<Map<String, dynamic>?> _centerStream() {
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) return Stream.value(null);
+    return FirebaseFirestore.instance
+        .collection('centers')
+        .doc(uid)
+        .snapshots()
+        .map((doc) => doc.exists ? doc.data() : null);
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> _requestsStream() {
+    final uid = _uid ?? '';
+    return FirebaseFirestore.instance
+        .collection('center_profile_change_requests')
+        .where('centerId', isEqualTo: uid)
+        .orderBy('createdAt', descending: true)
+        .snapshots();
+  }
+
+  List<Map<String, dynamic>> _readDocs(Map<String, dynamic> data) {
+    final raw = data['documentItems'];
+    if (raw is List) {
+      return raw
+          .whereType<Map>()
+          .map((e) => e.map((k, v) => MapEntry('$k', v)))
+          .toList();
+    }
+    return [];
+  }
+
+  List<Map<String, dynamic>> _readGallery(Map<String, dynamic> data) {
+    final raw = data['galleryItems'];
+    if (raw is List) {
+      return raw
+          .whereType<Map>()
+          .map((e) => e.map((k, v) => MapEntry('$k', v)))
+          .toList();
+    }
+    final fallback = data['galleryImages'];
+    if (fallback is! List) return [];
+    return fallback.whereType<String>().map((e) => {'url': e}).toList();
+  }
+
+  void _seedFields(Map<String, dynamic> data) {
+    final seed = [
+      data['centerName'],
+      data['managerName'],
+      data['city'],
+      data['address'],
+      data['description'],
+      data['galleryItems'],
+      data['galleryImages'],
+    ].join('|');
+    if (seed == _lastSeed) return;
+    _lastSeed = seed;
+
+    _centerNameController.text =
+        (data['centerName'] ?? data['displayName'] ?? '').toString();
+    _managerNameController.text = (data['managerName'] ?? '').toString();
+    _cityController.text = (data['city'] ?? '').toString();
+    _addressController.text = (data['address'] ?? '').toString();
+    _descriptionController.text = (data['description'] ?? '').toString();
+
+    String readUrl(String key) {
+      final item = _readGallery(data).cast<Map<String, dynamic>?>().firstWhere(
+            (e) => (e?['slotKey'] ?? '').toString() == key,
+            orElse: () => null,
+          );
+      return (item?['url'] ?? '').toString();
+    }
+
+    _requestedFrontImageController.text = readUrl('front');
+    _requestedReceptionImageController.text = readUrl('reception');
+    _requestedInside1ImageController.text = readUrl('inside_1');
+    _requestedInside2ImageController.text = readUrl('inside_2');
+  }
+
+  List<Map<String, dynamic>> _buildRequestedGalleryItems() {
+    Map<String, dynamic> item(String key, String label, String url) => {
+          'slotKey': key,
+          'label': label,
+          'url': url.trim(),
+        };
+
+    return [
+      item('front', 'Front', _requestedFrontImageController.text),
+      item('reception', 'Reception', _requestedReceptionImageController.text),
+      item('inside_1', 'Inside 1', _requestedInside1ImageController.text),
+      item('inside_2', 'Inside 2', _requestedInside2ImageController.text),
+    ];
+  }
+
+  Future<void> _submit(Map<String, dynamic> currentData) async {
+    final uid = _uid;
+    if (uid == null || uid.isEmpty) return;
+
+    setState(() => _submitting = true);
+    try {
+      final requestedGalleryItems = _buildRequestedGalleryItems();
+      final requestedImagesReady = requestedGalleryItems
+              .where((item) => (item['url'] ?? '').toString().trim().isNotEmpty)
+              .length ==
+          4;
+
+      await FirebaseFirestore.instance
+          .collection('center_profile_change_requests')
+          .add({
+        'centerId': uid,
+        'centerName': _centerNameController.text.trim(),
+        'centerEmail': (currentData['email'] ?? '').toString().trim(),
+        'requestType': 'profile_update',
+        'currentCenterName':
+            (currentData['centerName'] ?? currentData['displayName'] ?? '')
+                .toString()
+                .trim(),
+        'requestedCenterName': _centerNameController.text.trim(),
+        'currentManagerName':
+            (currentData['managerName'] ?? '').toString().trim(),
+        'requestedManagerName': _managerNameController.text.trim(),
+        'currentDescription':
+            (currentData['description'] ?? '').toString().trim(),
+        'requestedDescription': _descriptionController.text.trim(),
+        'currentCity': (currentData['city'] ?? '').toString().trim(),
+        'requestedCity': _cityController.text.trim(),
+        'currentAddress': (currentData['address'] ?? '').toString().trim(),
+        'requestedAddress': _addressController.text.trim(),
+        'currentGalleryItems': _readGallery(currentData),
+        'requestedGalleryItems': requestedGalleryItems,
+        'currentDocumentItems': _readDocs(currentData),
+        'requestedDocumentItems': _readDocs(currentData),
+        'currentAccommodationCosts': mergeAccommodationCostItems(
+          currentData['accommodationCosts'],
+        ).map((e) => e.toMap()).toList(),
+        'requestedAccommodationCosts': mergeAccommodationCostItems(
+          currentData['accommodationCosts'],
+        ).map((e) => e.toMap()).toList(),
+        'currentAutismCareCosts': mergeAutismCareCostItems(
+          currentData['autismCareCosts'],
+        ).map((e) => e.toMap()).toList(),
+        'requestedAutismCareCosts': mergeAutismCareCostItems(
+          currentData['autismCareCosts'],
+        ).map((e) => e.toMap()).toList(),
+        'currentCenterCapabilities': CenterCapabilityFlags.fromMap(
+          currentData['centerCapabilities'] is Map
+              ? Map<String, dynamic>.from(currentData['centerCapabilities'])
+              : const <String, dynamic>{},
+        ).toMap(),
+        'requestedCenterCapabilities': CenterCapabilityFlags.fromMap(
+          currentData['centerCapabilities'] is Map
+              ? Map<String, dynamic>.from(currentData['centerCapabilities'])
+              : const <String, dynamic>{},
+        ).toMap(),
+        'requestedImagesReady': requestedImagesReady,
+        'requestedDocumentsReady': _readDocs(currentData).isNotEmpty,
+        'status': 'pending',
+        'adminDecision': '',
+        'adminNote': '',
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _isArabic(context)
+                ? 'تم إرسال طلب تعديل بيانات المركز للإدارة'
+                : 'Center data change request sent to admin',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
+
+  Widget _buildStatusList(
+    BuildContext context,
+    bool isArabic,
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+  ) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return AppSurfaceCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic ? 'طلبات التعديل السابقة' : 'Previous change requests',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: 12),
+          if (docs.isEmpty)
+            Text(isArabic
+                ? 'لا توجد طلبات تعديل حتى الآن'
+                : 'No change requests yet')
+          else
+            ...docs.map((doc) {
+              final data = doc.data();
+              final status = (data['status'] ?? 'pending').toString();
+              final note = (data['adminNote'] ?? '').toString().trim();
+              return Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: scheme.primary.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  crossAxisAlignment: isArabic
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      status == 'approved'
+                          ? (isArabic ? 'مقبول' : 'Approved')
+                          : status == 'rejected'
+                              ? (isArabic ? 'مرفوض' : 'Rejected')
+                              : (isArabic ? 'قيد المراجعة' : 'Pending review'),
+                      style: TextStyle(
+                        color: scheme.primary,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    if (note.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(isArabic
+                          ? 'ملاحظة الإدارة: $note'
+                          : 'Admin note: $note'),
+                    ],
+                  ],
+                ),
+              );
+            }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildForm(
+    BuildContext context,
+    bool isArabic,
+    Map<String, dynamic> data,
+  ) {
+    return AppSurfaceCard(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic ? 'طلب تعديل بيانات المركز' : 'Center data change request',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            isArabic
+                ? 'عدّل البيانات هنا ثم أرسلها للإدارة. سيبقى الطلب قيد المراجعة حتى يعتمد.'
+                : 'Update the fields here, then send them to admin for review.',
+          ),
+          const SizedBox(height: AppSpacing.md),
+          TextField(
+            controller: _centerNameController,
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            decoration: appInputDecoration(
+              context: context,
+              label: isArabic ? 'اسم المركز' : 'Center name',
+              icon: Icons.business_outlined,
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _managerNameController,
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            decoration: appInputDecoration(
+              context: context,
+              label: isArabic ? 'اسم المسؤول' : 'Manager name',
+              icon: Icons.badge_outlined,
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _cityController,
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            decoration: appInputDecoration(
+              context: context,
+              label: isArabic ? 'المدينة' : 'City',
+              icon: Icons.location_city_outlined,
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _addressController,
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            decoration: appInputDecoration(
+              context: context,
+              label: isArabic ? 'العنوان' : 'Address',
+              icon: Icons.location_on_outlined,
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _descriptionController,
+            maxLines: 4,
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            decoration: appInputDecoration(
+              context: context,
+              label: isArabic ? 'وصف المركز' : 'Center description',
+              icon: Icons.notes_outlined,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            isArabic
+                ? 'طلب استبدال صور المركز'
+                : 'Center image replacement request',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _requestedFrontImageController,
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            decoration: appInputDecoration(
+              context: context,
+              label: isArabic
+                  ? 'رابط صورة واجهة بديلة'
+                  : 'Replacement front image URL',
+              icon: Icons.storefront_outlined,
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _requestedReceptionImageController,
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            decoration: appInputDecoration(
+              context: context,
+              label: isArabic
+                  ? 'رابط صورة استقبال بديلة'
+                  : 'Replacement reception image URL',
+              icon: Icons.meeting_room_outlined,
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _requestedInside1ImageController,
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            decoration: appInputDecoration(
+              context: context,
+              label: isArabic
+                  ? 'رابط صورة داخلية بديلة 1'
+                  : 'Replacement inside image 1 URL',
+              icon: Icons.photo_outlined,
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _requestedInside2ImageController,
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            decoration: appInputDecoration(
+              context: context,
+              label: isArabic
+                  ? 'رابط صورة داخلية بديلة 2'
+                  : 'Replacement inside image 2 URL',
+              icon: Icons.photo_library_outlined,
+            ),
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: FilledButton.icon(
+              onPressed: _submitting ? null : () => _submit(data),
+              icon: _submitting
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.send_outlined),
+              label: Text(
+                _submitting
+                    ? (isArabic ? 'جارٍ الإرسال...' : 'Sending...')
+                    : (isArabic
+                        ? 'إرسال طلب تعديل البيانات'
+                        : 'Send data change request'),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _centerNameController.dispose();
+    _managerNameController.dispose();
+    _cityController.dispose();
+    _addressController.dispose();
+    _descriptionController.dispose();
+    _requestedFrontImageController.dispose();
+    _requestedReceptionImageController.dispose();
+    _requestedInside1ImageController.dispose();
+    _requestedInside2ImageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isArabic = _isArabic(context);
+
+    return Directionality(
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+      child: Scaffold(
+        appBar: AppShellActions.buildAppBar(
+          context,
+          title: isArabic ? 'تعديل بياناتي' : 'Edit my data',
+        ),
+        body: AppPageBackground(
+          child: StreamBuilder<Map<String, dynamic>?>(
+            stream: _centerStream(),
+            builder: (context, centerSnapshot) {
+              final data = centerSnapshot.data ?? <String, dynamic>{};
+              _seedFields(data);
+
+              return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: _requestsStream(),
+                builder: (context, requestSnapshot) {
+                  final docs = requestSnapshot.data?.docs ?? const [];
+                  final hasPending = docs.any(
+                    (doc) => (doc.data()['status'] ?? 'pending') == 'pending',
+                  );
+
+                  return ListView(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    children: [
+                      if (hasPending)
+                        AppSurfaceCard(
+                          padding: const EdgeInsets.all(18),
+                          child: Text(
+                            isArabic
+                                ? 'يوجد طلب تعديل بيانات مركز قيد المراجعة. يمكنك متابعة حالته هنا.'
+                                : 'A center data change request is pending. You can track it here.',
+                            textAlign:
+                                isArabic ? TextAlign.right : TextAlign.left,
+                          ),
+                        )
+                      else
+                        _buildForm(context, isArabic, data),
+                      const SizedBox(height: 12),
+                      _buildStatusList(context, isArabic, docs),
+                    ],
+                  );
+                },
               );
             },
           ),
