@@ -172,8 +172,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
   }
 
   bool _paymentConfirmedFrom(Map<String, dynamic> data) {
-    final explicitGate =
-        data['payment_confirmed'] ?? data['paymentConfirmed'];
+    final explicitGate = data['payment_confirmed'] ?? data['paymentConfirmed'];
     if (explicitGate is bool) return explicitGate;
 
     return false;
@@ -468,6 +467,9 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     required String clinicianPhotoUrl,
   }) {
     final scheme = Theme.of(context).colorScheme;
+    final photoUri = Uri.tryParse(clinicianPhotoUrl.trim());
+    final hasValidPhotoUrl = photoUri != null &&
+        (photoUri.scheme == 'http' || photoUri.scheme == 'https');
 
     return AppSurfaceCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -477,10 +479,10 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           CircleAvatar(
             radius: 32,
             backgroundColor: scheme.primary.withValues(alpha: 0.12),
-            backgroundImage: clinicianPhotoUrl.trim().isNotEmpty
-                ? NetworkImage(clinicianPhotoUrl)
+            backgroundImage: hasValidPhotoUrl
+                ? NetworkImage(clinicianPhotoUrl.trim())
                 : null,
-            child: clinicianPhotoUrl.trim().isNotEmpty
+            child: hasValidPhotoUrl
                 ? null
                 : Text(
                     clinicianName.isEmpty
@@ -540,9 +542,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
               ? 'عدد طلبات الدعم الحالية: $count'
               : 'Current support requests count: $count',
           icon: Icons.chat_bubble_outline_rounded,
-          actionLabel: isArabic
-              ? 'إرسال طلب دعم'
-              : 'Send support request',
+          actionLabel: isArabic ? 'إرسال طلب دعم' : 'Send support request',
           onTap: _clinicianHomeActionsEnabled
               ? () {
                   Navigator.of(context).pushNamed(
@@ -931,9 +931,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      isArabic
-                          ? 'طلب مخصص لك'
-                          : 'Request assigned to you',
+                      isArabic ? 'طلب مخصص لك' : 'Request assigned to you',
                     ),
                   ],
                 ),
