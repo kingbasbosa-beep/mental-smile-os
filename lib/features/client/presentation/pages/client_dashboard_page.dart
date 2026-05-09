@@ -250,7 +250,12 @@ class ClientDashboardPage extends StatelessWidget {
     if (width < 700) {
       return Alignment.topCenter;
     }
-    return Alignment.center;
+    return const Alignment(-0.08, 0);
+  }
+
+  double _dashboardBackgroundScale(double width) {
+    if (width <= 1100) return 1.0;
+    return 1.0;
   }
 
   double _dashboardOverlayAlpha(double width) {
@@ -274,10 +279,13 @@ class ClientDashboardPage extends StatelessWidget {
             return Stack(
               fit: StackFit.expand,
               children: [
-                Image.asset(
-                  _dashboardBackgroundAsset(width),
-                  fit: BoxFit.cover,
-                  alignment: _dashboardBackgroundAlignment(width),
+                Transform.scale(
+                  scale: _dashboardBackgroundScale(width),
+                  child: Image.asset(
+                    _dashboardBackgroundAsset(width),
+                    fit: BoxFit.cover,
+                    alignment: _dashboardBackgroundAlignment(width),
+                  ),
                 ),
                 ColoredBox(
                   color: Colors.black
@@ -307,10 +315,12 @@ class ClientDashboardPage extends StatelessWidget {
                             builder: (context, snap) {
                               final count = snap.data ?? 0;
                               return _ActionButton(
-                                title: isArabic ? 'طلباتي' : 'My Requests',
+                                title: isArabic ? 'طلبات الحجز' : 'Bookings',
                                 subtitle: isArabic
                                     ? 'طلبات الحجز: $count'
                                     : 'Booking requests: $count',
+                                asset:
+                                    'assets/images/client_dashboard/actions/client_bookings.png',
                                 icon: Icons.list_alt_outlined,
                                 onTap: () => Navigator.of(context)
                                     .pushNamed(Routes.myBookings),
@@ -326,6 +336,8 @@ class ClientDashboardPage extends StatelessWidget {
                                 subtitle: isArabic
                                     ? 'طلبات الدعم: $count'
                                     : 'Support requests: $count',
+                                asset:
+                                    'assets/images/client_dashboard/actions/client_support.png',
                                 icon: Icons.chat_bubble_outline_rounded,
                                 onTap: () => Navigator.of(context).pushNamed(
                                   Routes.supportIssueSelector,
@@ -337,10 +349,14 @@ class ClientDashboardPage extends StatelessWidget {
                             },
                           ),
                           _ActionButton(
-                            title: isArabic ? 'إثبات التحويل' : 'Payment Proof',
+                            title: isArabic
+                                ? 'إثبات التحويل النقدي'
+                                : 'Payment Proof',
                             subtitle: isArabic
                                 ? 'رفع إثبات التحويل'
                                 : 'Upload transfer proof',
+                            asset:
+                                'assets/images/client_dashboard/actions/client_payment_proof.png',
                             icon: Icons.receipt_long_outlined,
                             onTap: () => Navigator.of(context)
                                 .pushNamed(Routes.clientPaymentProof),
@@ -350,6 +366,8 @@ class ClientDashboardPage extends StatelessWidget {
                             subtitle: isArabic
                                 ? 'الروابط والأكواد'
                                 : 'Links and codes',
+                            asset:
+                                'assets/images/client_dashboard/actions/client_sessions.png',
                             icon: Icons.video_camera_front_outlined,
                             onTap: () => Navigator.of(context)
                                 .pushNamed(Routes.clientSessions),
@@ -359,6 +377,8 @@ class ClientDashboardPage extends StatelessWidget {
                             subtitle: isArabic
                                 ? 'تفضيلات الرسائل'
                                 : 'Message preferences',
+                            asset:
+                                'assets/images/client_dashboard/actions/client_follow_up.png',
                             icon: Icons.mark_email_read_outlined,
                             onTap: () => Navigator.of(context)
                                 .pushNamed(Routes.followUpRegistration),
@@ -366,16 +386,14 @@ class ClientDashboardPage extends StatelessWidget {
                         ];
 
                         final actionsWrap = Wrap(
-                          alignment: isArabic
-                              ? WrapAlignment.end
-                              : WrapAlignment.start,
+                          alignment: WrapAlignment.center,
                           runAlignment: WrapAlignment.center,
-                          spacing: isMobile ? AppSpacing.md : AppSpacing.lg,
+                          spacing: isMobile ? 12 : AppSpacing.lg,
                           runSpacing: AppSpacing.md,
                           children: actionButtons,
                         );
 
-                        final desktopActions = _DesktopTimelineActions(
+                        final desktopActions = _DesktopActionCards(
                           actions: actionButtons,
                           width: constraints.maxWidth,
                         );
@@ -434,17 +452,7 @@ class ClientDashboardPage extends StatelessWidget {
                                   children: [
                                     Column(
                                       children: [
-                                        _ProfileBanner(
-                                          isArabic: isArabic,
-                                          name: name,
-                                          avatarAsset: avatarAsset,
-                                          isActive: isActive,
-                                          initials: _initials(name),
-                                          showGreeting: false,
-                                          avatarSize: 88,
-                                          showLogo: true,
-                                        ),
-                                        const SizedBox(height: 12),
+                                        const SizedBox(height: 100),
                                         Expanded(
                                           child: Stack(
                                             children: [
@@ -453,6 +461,13 @@ class ClientDashboardPage extends StatelessWidget {
                                           ),
                                         ),
                                       ],
+                                    ),
+                                    Positioned(
+                                      left: 54,
+                                      top: 16,
+                                      child: const _DashboardLogoBadge(
+                                        size: 104,
+                                      ),
                                     ),
                                     Positioned(
                                       right: 40,
@@ -479,7 +494,7 @@ class ClientDashboardPage extends StatelessWidget {
                                       ),
                                     ),
                                     Positioned(
-                                      left: 110,
+                                      left: -22,
                                       top: 72,
                                       width: 520,
                                       child: ratingsPanel,
@@ -515,20 +530,8 @@ class _DashboardTopActions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       textDirection: TextDirection.ltr,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        _TopIconButton(
-          icon: Icons.logout_rounded,
-          tooltip: isArabic ? 'تسجيل الخروج' : 'Logout',
-          onTap: () async {
-            await FirebaseAuth.instance.signOut();
-            if (!context.mounted) return;
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              Routes.login,
-              (route) => false,
-            );
-          },
-        ),
         _TopIconButton(
           icon: Icons.arrow_back_rounded,
           tooltip: isArabic ? 'رجوع' : 'Back',
@@ -541,6 +544,19 @@ class _DashboardTopActions extends StatelessWidget {
                 (route) => false,
               );
             }
+          },
+        ),
+        const SizedBox(width: 12),
+        _TopIconButton(
+          icon: Icons.logout_rounded,
+          tooltip: isArabic ? 'تسجيل الخروج' : 'Logout',
+          onTap: () async {
+            await FirebaseAuth.instance.signOut();
+            if (!context.mounted) return;
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              Routes.login,
+              (route) => false,
+            );
           },
         ),
       ],
@@ -591,41 +607,30 @@ class _TopIconButton extends StatelessWidget {
   }
 }
 
-class _DesktopTimelineActions extends StatelessWidget {
+class _DesktopActionCards extends StatelessWidget {
   final List<Widget> actions;
   final double width;
 
-  const _DesktopTimelineActions({
+  const _DesktopActionCards({
     required this.actions,
     required this.width,
   });
 
   @override
   Widget build(BuildContext context) {
-    final timelineWidth = width >= 1200 ? 502.0 : 650.0;
-    final groupOffset = width >= 1200 ? 415.0 : 0.0;
-    final leftInset = width >= 1200 ? 18.0 : 28.0;
-    final topOffset = width >= 1200 ? 110.0 : 94.0;
-    final usableWidth = timelineWidth - (leftInset * 2);
+    final maxWidth = width >= 1200 ? 900.0 : 760.0;
 
-    return SizedBox(
-      width: timelineWidth + groupOffset,
-      height: 230,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          for (var i = 0; i < actions.length; i++)
-            Positioned(
-              left: groupOffset +
-                  leftInset +
-                  (usableWidth * i / (actions.length - 1)) -
-                  40 +
-                  (width >= 1200 && i > 0 ? 12 : 0),
-              top: topOffset,
-              width: width >= 1200 ? 80 : 112,
-              child: actions[i],
-            ),
-        ],
+    return Align(
+      alignment: Alignment.center,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxWidth),
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          runAlignment: WrapAlignment.center,
+          spacing: width >= 1200 ? 18 : 14,
+          runSpacing: 16,
+          children: actions,
+        ),
       ),
     );
   }
@@ -639,7 +644,6 @@ class _ProfileBanner extends StatelessWidget {
   final String initials;
   final bool showGreeting;
   final double avatarSize;
-  final bool showLogo;
 
   const _ProfileBanner({
     required this.isArabic,
@@ -649,7 +653,6 @@ class _ProfileBanner extends StatelessWidget {
     required this.initials,
     required this.showGreeting,
     required this.avatarSize,
-    this.showLogo = false,
   });
 
   @override
@@ -664,14 +667,12 @@ class _ProfileBanner extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 19),
-            child: showLogo
-                ? _DashboardLogoBadge(size: avatarSize)
-                : _ClientAvatarBadge(
-                    avatarAsset: avatarAsset,
-                    isActive: isActive,
-                    initials: initials,
-                    size: avatarSize,
-                  ),
+            child: _ClientAvatarBadge(
+              avatarAsset: avatarAsset,
+              isActive: isActive,
+              initials: initials,
+              size: avatarSize,
+            ),
           ),
           const SizedBox(width: AppSpacing.md),
           if (showGreeting)
@@ -842,33 +843,32 @@ class _DashboardLogoBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageSize = size - 10;
+    final imageSize = size;
 
-    return Container(
+    return SizedBox(
       width: size,
       height: size,
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: AppColors.mutedGold, width: 1.6),
-        color: Colors.black.withValues(alpha: 0.18),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.mutedGold.withValues(alpha: 0.18),
-            blurRadius: 16,
-            spreadRadius: 1,
-          ),
-        ],
-      ),
-      child: Image.asset(
-        'assets/branding/logo_primary_dark.png',
-        width: imageSize,
-        height: imageSize,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) =>
-            AppMissingAssetPlaceholder(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.mutedGold.withValues(alpha: 0.14),
+              blurRadius: 18,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child: Image.asset(
+          'assets/branding/logo_primary_dark.png',
           width: imageSize,
           height: imageSize,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) =>
+              AppMissingAssetPlaceholder(
+            width: imageSize,
+            height: imageSize,
+          ),
         ),
       ),
     );
@@ -878,12 +878,14 @@ class _DashboardLogoBadge extends StatelessWidget {
 class _ActionButton extends StatelessWidget {
   final String title;
   final String subtitle;
+  final String asset;
   final IconData icon;
   final VoidCallback onTap;
 
   const _ActionButton({
     required this.title,
     required this.subtitle,
+    required this.asset,
     required this.icon,
     required this.onTap,
   });
@@ -892,80 +894,174 @@ class _ActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isArabic =
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+    final width = MediaQuery.sizeOf(context).width;
+    final isMobile = width < 720;
+    final cardWidth = isMobile ? 150.0 : 158.0;
+    final cardHeight = isMobile ? 176.0 : 190.0;
 
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppRadii.pill),
-        hoverColor: AppColors.mutedGold.withValues(alpha: 0.12),
-        splashColor: AppColors.deepTeal.withValues(alpha: 0.10),
-        highlightColor: AppColors.mutedGold.withValues(alpha: 0.08),
-        child: SizedBox(
-          width: 80,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      const Color(0xFFFFF3C6).withValues(alpha: 0.98),
-                      AppColors.mutedGold.withValues(alpha: 0.88),
-                    ],
-                  ),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.72),
-                    width: 1.4,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.mutedGold.withValues(alpha: 0.24),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
+      child: _HoverScale(
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
+          hoverColor: AppColors.mutedGold.withValues(alpha: 0.10),
+          splashColor: AppColors.deepTeal.withValues(alpha: 0.10),
+          highlightColor: AppColors.mutedGold.withValues(alpha: 0.08),
+          child: SizedBox(
+            width: cardWidth,
+            height: cardHeight,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    asset,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: Colors.black.withValues(alpha: 0.42),
+                      alignment: Alignment.center,
+                      child: Icon(
+                        icon,
+                        color: AppColors.mutedGold,
+                        size: 34,
+                      ),
                     ),
-                  ],
+                  ),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.10),
+                          Colors.black.withValues(alpha: 0.16),
+                          Colors.black.withValues(alpha: 0.66),
+                        ],
+                      ),
+                    ),
+                  ),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: AppColors.mutedGold.withValues(alpha: 0.62),
+                        width: 1.1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.mutedGold.withValues(alpha: 0.18),
+                          blurRadius: 16,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                  ),
+                  PositionedDirectional(
+                    start: 12,
+                    end: 12,
+                    bottom: 12,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                            color: const Color(0xFFFFE7B2),
+                            fontWeight: FontWeight.w900,
+                            height: 1.05,
+                            shadows: const [
+                              Shadow(
+                                color: Colors.black,
+                                blurRadius: 10,
+                                offset: Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color:
+                                const Color(0xFFFFE7B2).withValues(alpha: 0.82),
+                            fontWeight: FontWeight.w700,
+                            height: 1.12,
+                            shadows: const [
+                              Shadow(
+                                color: Colors.black,
+                                blurRadius: 8,
+                                offset: Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 4),
+                        Icon(
+                          isArabic
+                              ? Icons.keyboard_arrow_left_rounded
+                              : Icons.keyboard_arrow_right_rounded,
+                          color: AppColors.mutedGold,
+                          size: 18,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HoverScale extends StatefulWidget {
+  final Widget child;
+
+  const _HoverScale({required this.child});
+
+  @override
+  State<_HoverScale> createState() => _HoverScaleState();
+}
+
+class _HoverScaleState extends State<_HoverScale> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedScale(
+        scale: _hovered ? 1.035 : 1.0,
+        duration: const Duration(milliseconds: 170),
+        curve: Curves.easeOutCubic,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.mutedGold.withValues(
+                  alpha: _hovered ? 0.30 : 0.18,
                 ),
-                child: Icon(icon, color: AppColors.deepTeal, size: 19),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: AppColors.deepTeal,
-                      fontWeight: FontWeight.w900,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 1),
-              Text(
-                subtitle,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppColors.deepTeal.withValues(alpha: 0.74),
-                      fontWeight: FontWeight.w700,
-                      height: 1.15,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 1),
-              Icon(
-                isArabic
-                    ? Icons.keyboard_arrow_left_rounded
-                    : Icons.keyboard_arrow_right_rounded,
-                color: AppColors.mutedGold,
-                size: 16,
+                blurRadius: _hovered ? 24 : 16,
+                offset: const Offset(0, 10),
               ),
             ],
           ),
+          child: widget.child,
         ),
       ),
     );

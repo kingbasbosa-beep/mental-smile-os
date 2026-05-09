@@ -113,13 +113,28 @@ class AccountAccessService {
     final centerDoc = await _safeGet('centers', uid);
     if (centerDoc?.exists == true) {
       final data = centerDoc?.data() ?? const <String, dynamic>{};
-      if (_normalizedRole(data['role']) == 'center') {
+      if (_matchesProviderRole(data['role'], 'center')) {
         return _stateForDoc(
           role: 'center',
           data: data,
           collection: 'centers',
           docId: centerDoc!.id,
         );
+      }
+    }
+
+    if (email.isNotEmpty) {
+      final centerByEmail = await _safeQueryByEmail('centers', email);
+      if (centerByEmail != null) {
+        final data = centerByEmail.data();
+        if (_matchesProviderRole(data['role'], 'center')) {
+          return _stateForDoc(
+            role: 'center',
+            data: data,
+            collection: 'centers',
+            docId: centerByEmail.id,
+          );
+        }
       }
     }
 
@@ -168,6 +183,11 @@ class AccountAccessService {
 
   String _normalizedRole(dynamic value) {
     return (value ?? '').toString().trim().toLowerCase();
+  }
+
+  bool _matchesProviderRole(dynamic value, String expectedRole) {
+    final role = _normalizedRole(value);
+    return role.isEmpty || role == expectedRole;
   }
 
   Future<DocumentSnapshot<Map<String, dynamic>>?> _safeGet(

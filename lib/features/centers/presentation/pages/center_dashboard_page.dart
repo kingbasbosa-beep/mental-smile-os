@@ -2,10 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
-import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class CenterDashboardPage extends StatelessWidget {
   const CenterDashboardPage({super.key});
@@ -291,65 +289,100 @@ class CenterDashboardPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  _SectionCard(
-                    title: isArabic ? 'وارد الطلبات' : 'Center Inbox',
-                    subtitle: isArabic
-                        ? 'الطلبات التي أحالتها الإدارة إلى المركز للرد على التوفر'
-                        : 'Requests routed by admin for availability response',
-                    icon: Icons.inbox_outlined,
-                    accent: const Color(0xFFB8860B),
-                    badgeLabel: isArabic ? 'بوابة الرد' : 'Response Gate',
-                    assetPath: 'c7_branding/logo/logo_mark.png',
-                    actionLabel: isArabic ? 'فتح الوارد' : 'Open inbox',
-                    onTap: () =>
-                        Navigator.of(context).pushNamed(Routes.centerInbox),
-                  ),
-                  const SizedBox(height: 12),
-                  _SectionCard(
-                    title: isArabic ? 'الإقامات والمتابعة' : 'Residencies',
-                    subtitle: isArabic
-                        ? 'متابعة الإقامات المجدولة والجارية وتقارير الخروج'
-                        : 'Track scheduled stays, active residencies, and discharge reports',
-                    icon: Icons.hotel_outlined,
-                    accent: const Color(0xFF2F6B5F),
-                    badgeLabel: isArabic ? 'إقامة' : 'Residency',
-                    assetPath: 'c7_branding/home/hero_art.png',
-                    actionLabel: isArabic ? 'فتح الإقامات' : 'Open residencies',
-                    onTap: () => Navigator.of(context)
-                        .pushNamed(Routes.centerResidencies),
-                  ),
-                  const SizedBox(height: 12),
-                  _SectionCard(
-                    title: isArabic ? 'غرفة العمليات' : 'Operations Room',
-                    subtitle: isArabic
-                        ? 'متابعة الطلبات والرسائل ورفع الصور والوثائق'
-                        : 'Track requests, messages, images, and documents',
-                    icon: Icons.dashboard_customize_outlined,
-                    accent: const Color(0xFF7A4E2D),
-                    badgeLabel: isArabic ? 'تشغيل' : 'Operations',
-                    assetPath: 'c7_branding/home/home_bg.png',
-                    actionLabel: isArabic ? 'فتح الغرفة' : 'Open room',
-                    onTap: () => Navigator.of(context)
-                        .pushNamed(Routes.centerOperations),
-                  ),
-                  const SizedBox(height: 12),
-                  _SectionCard(
-                    title: isArabic ? 'طلب دعم' : 'Support Request',
-                    subtitle: isArabic
-                        ? 'قناة مباشرة وآمنة للتواصل مع الإدارة والمتابعة'
-                        : 'Choose the issue type so it can be received as a structured support request',
-                    icon: Icons.chat_bubble_outline_rounded,
-                    accent: const Color(0xFF496D7C),
-                    badgeLabel: isArabic ? 'دعم منظم' : 'Structured Support',
-                    assetPath: 'c7_branding/logo/logo_mark.png',
-                    actionLabel: isArabic
-                        ? 'إرسال طلب دعم'
-                        : 'Send support request',
-                    onTap: () => Navigator.pushNamed(
-                      context,
-                      Routes.supportIssueSelector,
-                      arguments: const {'supportType': 'center_support'},
-                    ),
+                  _CenterActionCards(
+                    children: [
+                      _SectionCard(
+                        title: isArabic ? 'طلبات جديدة' : 'New requests',
+                        subtitle: isArabic
+                            ? 'وارد الطلبات بانتظار رد المركز'
+                            : 'Inbox requests awaiting center response',
+                        icon: Icons.inbox_outlined,
+                        accent: const Color(0xFFE7C766),
+                        imagePath:
+                            'assets/images/center_dashboard/actions/center_new_requests.png',
+                        onTap: () =>
+                            Navigator.of(context).pushNamed(Routes.centerInbox),
+                      ),
+                      _SectionCard(
+                        title: isArabic ? 'طلبات نشطة' : 'Active requests',
+                        subtitle: isArabic
+                            ? 'متابعة الطلبات الجارية'
+                            : 'Follow active center requests',
+                        icon: Icons.timelapse_outlined,
+                        accent: const Color(0xFF8EDBFF),
+                        imagePath:
+                            'assets/images/center_dashboard/actions/center_active_requests.png',
+                        onTap: () =>
+                            Navigator.of(context).pushNamed(Routes.centerInbox),
+                      ),
+                      _SectionCard(
+                        title: isArabic ? 'طلبات مكتملة' : 'Completed requests',
+                        subtitle: isArabic
+                            ? 'مراجعة الإقامات المكتملة'
+                            : 'Review completed residencies',
+                        icon: Icons.verified_outlined,
+                        accent: const Color(0xFF9FE6D7),
+                        imagePath:
+                            'assets/images/center_dashboard/actions/center_completed_requests.png',
+                        onTap: () => Navigator.of(context)
+                            .pushNamed(Routes.centerResidencies),
+                      ),
+                      _SectionCard(
+                        title: isArabic
+                            ? 'طلبات مرفوضة/ملغاة'
+                            : 'Rejected requests',
+                        subtitle: isArabic
+                            ? 'متابعة الطلبات غير المكتملة'
+                            : 'Review unavailable or cancelled requests',
+                        icon: Icons.cancel_outlined,
+                        accent: const Color(0xFFFF9A8A),
+                        imagePath:
+                            'assets/images/center_dashboard/actions/center_rejected_requests.png',
+                        onTap: () =>
+                            Navigator.of(context).pushNamed(Routes.centerInbox),
+                      ),
+                      _SectionCard(
+                        title: isArabic ? 'جلساتي' : 'My sessions',
+                        subtitle: isArabic
+                            ? 'الإقامات المجدولة والجارية'
+                            : 'Scheduled and active residencies',
+                        icon: Icons.hotel_outlined,
+                        accent: const Color(0xFF9FE6D7),
+                        imagePath:
+                            'assets/images/center_dashboard/actions/center_sessions.png',
+                        onTap: () => Navigator.of(context)
+                            .pushNamed(Routes.centerResidencies),
+                      ),
+                      _SectionCard(
+                        title: isArabic ? 'تحديث بياناتي' : 'Update profile',
+                        subtitle: isArabic
+                            ? 'الصور والوثائق وبيانات المركز'
+                            : 'Images, documents, and center data',
+                        icon: Icons.dashboard_customize_outlined,
+                        accent: const Color(0xFFFFB56B),
+                        imagePath:
+                            'assets/images/center_dashboard/actions/center_update_profile.png',
+                        onTap: () => Navigator.of(context)
+                            .pushNamed(Routes.centerOperations),
+                      ),
+                      _SectionCard(
+                        title: isArabic
+                            ? 'حالات الشات المحالة'
+                            : 'Transferred chats',
+                        subtitle: isArabic
+                            ? 'قناة الدعم والمتابعة مع الإدارة'
+                            : 'Support and admin follow-up channel',
+                        icon: Icons.chat_bubble_outline_rounded,
+                        accent: const Color(0xFF8EDBFF),
+                        imagePath:
+                            'assets/images/center_dashboard/actions/center_transferred_chats.png',
+                        onTap: () => Navigator.pushNamed(
+                          context,
+                          Routes.supportIssueSelector,
+                          arguments: const {'supportType': 'center_support'},
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   _CenterGalleryCard(
@@ -747,14 +780,31 @@ class _CenterReadinessBlock extends StatelessWidget {
   }
 }
 
+class _CenterActionCards extends StatelessWidget {
+  final List<Widget> children;
+
+  const _CenterActionCards({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        runAlignment: WrapAlignment.center,
+        spacing: 16,
+        runSpacing: 16,
+        children: children,
+      ),
+    );
+  }
+}
+
 class _SectionCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final IconData icon;
   final Color accent;
-  final String badgeLabel;
-  final String assetPath;
-  final String actionLabel;
+  final String imagePath;
   final VoidCallback onTap;
 
   const _SectionCard({
@@ -762,141 +812,173 @@ class _SectionCard extends StatelessWidget {
     required this.subtitle,
     required this.icon,
     required this.accent,
-    required this.badgeLabel,
-    required this.assetPath,
-    required this.actionLabel,
+    required this.imagePath,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final isArabic =
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [
-            accent.withValues(alpha: 0.18),
-            accent.withValues(alpha: 0.06),
-            scheme.surface,
-          ],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: accent.withValues(alpha: 0.25),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: accent.withValues(alpha: 0.08),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: -8,
-            right: isArabic ? null : -10,
-            left: isArabic ? -10 : null,
-            child: Opacity(
-              opacity: 0.10,
-              child: Image.asset(
-                normalizeAssetPath(assetPath),
-                width: 128,
-                height: 128,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) =>
-                    const AppMissingAssetPlaceholder(width: 128, height: 128),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 0,
-            left: isArabic ? null : 0,
-            right: isArabic ? 0 : null,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: accent.withValues(alpha: 0.24)),
-              ),
-              child: Text(
-                badgeLabel,
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: accent,
-                      fontWeight: FontWeight.w800,
+    return _CenterActionHover(
+      accent: accent,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
+          hoverColor: accent.withValues(alpha: 0.10),
+          splashColor: accent.withValues(alpha: 0.10),
+          highlightColor: accent.withValues(alpha: 0.08),
+          child: SizedBox(
+            width: 172,
+            height: 206,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    imagePath,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: Colors.black.withValues(alpha: 0.42),
+                      alignment: Alignment.center,
+                      child: Icon(icon, color: accent, size: 38),
                     ),
+                  ),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.08),
+                          Colors.black.withValues(alpha: 0.16),
+                          Colors.black.withValues(alpha: 0.70),
+                        ],
+                      ),
+                    ),
+                  ),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: accent.withValues(alpha: 0.62),
+                        width: 1.1,
+                      ),
+                    ),
+                  ),
+                  PositionedDirectional(
+                    start: 12,
+                    end: 12,
+                    bottom: 12,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                            color: const Color(0xFFFFE7B2),
+                            fontWeight: FontWeight.w900,
+                            height: 1.05,
+                            shadows: const [
+                              Shadow(
+                                color: Colors.black,
+                                blurRadius: 10,
+                                offset: Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color:
+                                const Color(0xFFFFE7B2).withValues(alpha: 0.84),
+                            fontWeight: FontWeight.w700,
+                            height: 1.12,
+                            shadows: const [
+                              Shadow(
+                                color: Colors.black,
+                                blurRadius: 8,
+                                offset: Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 4),
+                        Icon(
+                          isArabic
+                              ? Icons.keyboard_arrow_left_rounded
+                              : Icons.keyboard_arrow_right_rounded,
+                          color: accent,
+                          size: 18,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          Row(
-            children: [
-              Container(
-                width: 58,
-                height: 58,
-                decoration: BoxDecoration(
-                  color: accent.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: accent.withValues(alpha: 0.24)),
+        ),
+      ),
+    );
+  }
+}
+
+class _CenterActionHover extends StatefulWidget {
+  final Widget child;
+  final Color accent;
+
+  const _CenterActionHover({
+    required this.child,
+    required this.accent,
+  });
+
+  @override
+  State<_CenterActionHover> createState() => _CenterActionHoverState();
+}
+
+class _CenterActionHoverState extends State<_CenterActionHover> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedScale(
+        scale: _hovered ? 1.035 : 1.0,
+        duration: const Duration(milliseconds: 170),
+        curve: Curves.easeOutCubic,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: widget.accent.withValues(
+                  alpha: _hovered ? 0.30 : 0.18,
                 ),
-                child: Icon(icon, color: accent, size: 28),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 40),
-                  child: Column(
-                    crossAxisAlignment: isArabic
-                        ? CrossAxisAlignment.end
-                        : CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w900,
-                                  color: const Color(0xFF3F2B17),
-                                ),
-                        textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        subtitle,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: const Color(0xFF5B5348),
-                              height: 1.45,
-                            ),
-                        textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                      ),
-                      const SizedBox(height: 14),
-                      Align(
-                        alignment: isArabic
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        child: FilledButton.icon(
-                          onPressed: onTap,
-                          style: FilledButton.styleFrom(
-                            backgroundColor: accent,
-                            foregroundColor: Colors.white,
-                          ),
-                          icon: const Icon(Icons.arrow_forward_outlined),
-                          label: Text(actionLabel),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                blurRadius: _hovered ? 24 : 16,
+                offset: const Offset(0, 10),
               ),
             ],
           ),
-        ],
+          child: widget.child,
+        ),
       ),
     );
   }
