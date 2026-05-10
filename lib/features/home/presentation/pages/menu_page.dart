@@ -15,8 +15,6 @@ class MenuPage extends StatelessWidget {
     final uid = user?.uid;
     if (uid == null || uid.isEmpty || user?.isAnonymous == true) return false;
 
-    if (uid == kKnownPrimaryAdminUid) return true;
-
     try {
       final adminDoc =
           await FirebaseFirestore.instance.collection('admins').doc(uid).get();

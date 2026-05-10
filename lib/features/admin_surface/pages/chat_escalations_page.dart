@@ -118,8 +118,6 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null || uid.isEmpty) return false;
 
-    if (uid == kKnownPrimaryAdminUid) return true;
-
     final adminDoc =
         await FirebaseFirestore.instance.collection('admins').doc(uid).get();
     final data = adminDoc.data();
