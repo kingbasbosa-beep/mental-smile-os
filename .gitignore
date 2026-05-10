@@ -97,6 +97,20 @@ functions/.env
 functions/.env.*
 functions/node_modules/
 
+# Production secrets and generated files
+*.jks
+*.keystore
+key.properties
+.env
+.env.*
+serviceAccount*.json
+credentials*.json
+*-firebase-adminsdk-*.json
+google-services.json
+GoogleService-Info.plist
+node_modules/
+test/node_modules/
+
 # -----------------------------
 # Local generated reports / manifests
 # -----------------------------
