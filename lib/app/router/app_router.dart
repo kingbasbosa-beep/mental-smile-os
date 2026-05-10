@@ -902,18 +902,24 @@ class AppRouter {
         );
 
       case Routes.clinicianInbox:
-        String clinicianId = 'DEV_NO_UID';
+        final authUid = FirebaseAuth.instance.currentUser?.uid;
+        String clinicianId = (authUid != null && authUid.isNotEmpty)
+            ? authUid
+            : '';
         String clinicianName = 'DEV Clinician';
 
         final a = settings.arguments;
         if (a is Map) {
           final cid = a['clinicianId'];
           final cname = a['clinicianName'];
-          if (cid != null) clinicianId = cid.toString();
+          if (cid != null && cid.toString().trim().isNotEmpty) {
+            clinicianId = cid.toString();
+          }
           if (cname != null) clinicianName = cname.toString();
-        } else {
-          final uid = FirebaseAuth.instance.currentUser?.uid;
-          if (uid != null && uid.isNotEmpty) clinicianId = uid;
+        }
+
+        if (clinicianId.isEmpty) {
+          return _redirectToLogin(settings);
         }
 
         return _protectedRoute(
@@ -1267,8 +1273,8 @@ class _RouteAccessGate extends StatelessWidget {
         }
 
         final decision = snapshot.data!;
-        debugPrint(
-          'ADMIN_GUARD route=$routeName '
+        _adminGuardTrace(
+          'route=$routeName '
           'isAdminRoute=${AppRouter._isAdminRoute(routeName)} '
           'signedIn=${FirebaseAuth.instance.currentUser != null && !FirebaseAuth.instance.currentUser!.isAnonymous} '
           'isAdmin=${decision.isAdmin} '
@@ -1331,8 +1337,8 @@ class _RouteAccessGate extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
     final isAdminRoute = AppRouter._isAdminRoute(routeName);
     if (user == null || user.isAnonymous) {
-      debugPrint(
-        'ADMIN_GUARD route=$routeName '
+      _adminGuardTrace(
+        'route=$routeName '
         'isAdminRoute=$isAdminRoute '
         'signedIn=false '
         'isAdmin=false '
@@ -1349,8 +1355,8 @@ class _RouteAccessGate extends StatelessWidget {
     final access = await AccountAccessService().resolve(user);
     final isAdmin = access.isAdmin;
     if (access.isBlocked && !access.isAdmin) {
-      debugPrint(
-        'ADMIN_GUARD route=$routeName '
+      _adminGuardTrace(
+        'route=$routeName '
         'isAdminRoute=$isAdminRoute '
         'signedIn=true '
         'isAdmin=$isAdmin '
@@ -1366,21 +1372,23 @@ class _RouteAccessGate extends StatelessWidget {
       );
     }
 
+    final normalizedApprovalStatus = access.approvalStatus.trim().toLowerCase();
     final protectsCenterOrClinician =
         allowedRoles?.contains(_roleClinician) == true ||
             allowedRoles?.contains(_roleCenter) == true;
     final needsApproval = protectsCenterOrClinician &&
         (access.role == _roleClinician || access.role == _roleCenter);
     if (needsApproval &&
-        (access.approvalStatus.trim().toLowerCase() != 'approved' ||
-            !access.isActive)) {
-      debugPrint(
-        'ADMIN_GUARD route=$routeName '
+        (normalizedApprovalStatus != 'approved' || !access.isActive)) {
+      final rejectedStates = {'rejected', 'denied', 'declined'};
+      final isRejected = rejectedStates.contains(normalizedApprovalStatus);
+      _adminGuardTrace(
+        'route=$routeName '
         'isAdminRoute=$isAdminRoute '
         'signedIn=true '
         'isAdmin=$isAdmin '
         'allowed=false '
-        'redirect=approval_required '
+        'redirect=${isRejected ? 'approval_rejected' : 'approval_required'} '
         'role=${access.role} '
         'approvalStatus=${access.approvalStatus} '
         'isActive=${access.isActive}',
@@ -1388,9 +1396,13 @@ class _RouteAccessGate extends StatelessWidget {
       return _RouteAccessDecision(
         allowed: false,
         isBlocked: true,
-        blockReason: 'Account is pending admin approval or inactive.',
+        blockReason: isRejected
+            ? 'Account approval was rejected. Please contact support.'
+            : 'Account is pending admin approval or inactive.',
         isAdmin: isAdmin,
-        redirectTarget: 'approval_required',
+        redirectTarget: isRejected
+            ? 'approval_rejected'
+            : 'approval_required',
       );
     }
 
@@ -1410,6 +1422,11 @@ class _RouteAccessGate extends StatelessWidget {
       redirectTarget: isAllowed ? 'none' : Routes.menu,
     );
   }
+}
+
+void _adminGuardTrace(String message) {
+  if (!kDebugMode) return;
+  debugPrint('ADMIN_GUARD $message');
 }
 
 class _RouteAccessDecision {
