@@ -97,9 +97,10 @@ service cloud.firestore {
     function clinicianCreateValid(docId) {
       return ownDoc(docId)
         && request.resource.data.role == 'clinician'
-        && request.resource.data.isAdmin == false
+        && request.resource.data.isAdmin != true
         && request.resource.data.isActive == false
-        && request.resource.data.approvalStatus in ['pending_review', 'pending_admin'];
+        && request.resource.data.isBlocked != true
+        && request.resource.data.approvalStatus == 'pending_review';
     }
 
     function clinicianSelfRegistrationFields() {
@@ -150,7 +151,13 @@ service cloud.firestore {
     function centerCreateValid(docId) {
       return ownDoc(docId)
         && request.resource.data.role == 'center'
+        && request.resource.data.isAdmin != true
         && request.resource.data.isActive == false
+        && (
+          !request.resource.data.keys().hasAny(['active'])
+          || request.resource.data.active == false
+        )
+        && request.resource.data.isBlocked != true
         && request.resource.data.approvalStatus == 'pending_admin';
     }
 
@@ -294,7 +301,19 @@ service cloud.firestore {
       return signedIn()
         && request.resource.data[ownerField] == uid()
         && request.resource.data.status == 'pending'
+        && (
+          !request.resource.data.keys().hasAny(['ownerId'])
+          || request.resource.data.ownerId == uid()
+        )
         && !request.resource.data.keys().hasAny(protectedAccountFields());
+    }
+
+    function profileRequestAdminUpdateValid() {
+      return isAdmin()
+        && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['status'])
+          || request.resource.data.status in ['approved', 'rejected', 'applied']
+        );
     }
 
     function canReadRating() {
@@ -328,7 +347,7 @@ service cloud.firestore {
     match /clinicians/{clinicianId} {
       allow read: if isAdmin()
         || (signedIn() && clinicianId == uid())
-        || (signedIn() && approvedActive());
+        || approvedActive();
       allow create: if clinicianCreateValid(clinicianId) || isAdmin();
       allow update: if isAdmin() || clinicianSelfUpdateValid(clinicianId);
       allow delete: if false;
@@ -337,7 +356,7 @@ service cloud.firestore {
     match /centers/{centerId} {
       allow read: if isAdmin()
         || (signedIn() && centerId == uid())
-        || (signedIn() && approvedActive());
+        || approvedActive();
       allow create: if centerCreateValid(centerId) || isAdmin();
       allow update: if isAdmin() || centerSelfUpdateValid(centerId);
       allow delete: if false;
@@ -368,14 +387,14 @@ service cloud.firestore {
     match /clinician_profile_change_requests/{requestId} {
       allow read: if isAdmin() || ownClinicianProfileRequest();
       allow create: if profileRequestCreateValid('clinicianId');
-      allow update: if isAdmin();
+      allow update: if profileRequestAdminUpdateValid();
       allow delete: if false;
     }
 
     match /center_profile_change_requests/{requestId} {
       allow read: if isAdmin() || ownCenterProfileRequest();
       allow create: if profileRequestCreateValid('centerId');
-      allow update: if isAdmin();
+      allow update: if profileRequestAdminUpdateValid();
       allow delete: if false;
     }
 
