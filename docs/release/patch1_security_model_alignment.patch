@@ -1,0 +1,458 @@
+diff --git a/lib/app/router/app_router.dart b/lib/app/router/app_router.dart
+index 9bfc832f4f076d3391164fb922bf4bd0a7e6e2c6..42441922ba57dd5e95f5bdc24f32e60f5cdf77ea 100644
+--- a/lib/app/router/app_router.dart
++++ b/lib/app/router/app_router.dart
+@@ -864,62 +864,68 @@ class AppRouter {
+         );
+
+       case Routes.clinicianChatInbox:
+       case Routes.clinicianChatInboxLegacy:
+         final uid = FirebaseAuth.instance.currentUser?.uid;
+         if (uid == null || uid.isEmpty) {
+           return MaterialPageRoute(
+             builder: (ctx) => Scaffold(
+               body: Center(
+                 child: Text(AppLocalizations.of(ctx)!.routeNotFound),
+               ),
+             ),
+             settings: settings,
+           );
+         }
+         return MaterialPageRoute(
+           builder: (_) => _RouteAccessGate(
+             routeName: settings.name,
+             allowedRoles: _requiredRoles(settings.name),
+             child: ClinicianChatInboxPage(clinicianUid: uid),
+           ),
+           settings: settings,
+         );
+
+       case Routes.clinicianInbox:
+-        String clinicianId = 'DEV_NO_UID';
++        final authUid = FirebaseAuth.instance.currentUser?.uid;
++        String clinicianId = (authUid != null && authUid.isNotEmpty)
++            ? authUid
++            : '';
+         String clinicianName = 'DEV Clinician';
+
+         final a = settings.arguments;
+         if (a is Map) {
+           final cid = a['clinicianId'];
+           final cname = a['clinicianName'];
+-          if (cid != null) clinicianId = cid.toString();
++          if (cid != null && cid.toString().trim().isNotEmpty) {
++            clinicianId = cid.toString();
++          }
+           if (cname != null) clinicianName = cname.toString();
+-        } else {
+-          final uid = FirebaseAuth.instance.currentUser?.uid;
+-          if (uid != null && uid.isNotEmpty) clinicianId = uid;
++        }
++
++        if (clinicianId.isEmpty) {
++          return _redirectToLogin(settings);
+         }
+
+         return _protectedRoute(
+           child: ClinicianInboxPage(
+             clinicianId: clinicianId,
+             clinicianName: clinicianName,
+           ),
+           settings: settings,
+         );
+
+       case Routes.bookingRequest:
+         final rawArgs = settings.arguments;
+         if (rawArgs is! BookingRequestArgs) {
+           return MaterialPageRoute(
+             builder: (ctx) => Scaffold(
+               appBar: AppBar(
+                 title: Text(
+                   Localizations.localeOf(ctx).languageCode.toLowerCase() == 'ar'
+                       ? 'طلب حجز'
+                       : 'Booking request',
+                 ),
+               ),
+               body: Center(
+                 child: Padding(
+                   padding: const EdgeInsets.all(24),
+@@ -1229,52 +1235,52 @@ class AppRouter {
+ class _RouteAccessGate extends StatelessWidget {
+   const _RouteAccessGate({
+     required this.routeName,
+     required this.allowedRoles,
+     required this.child,
+   });
+
+   final String? routeName;
+   final Set<String>? allowedRoles;
+   final Widget child;
+
+   @override
+   Widget build(BuildContext context) {
+     return FutureBuilder<_RouteAccessDecision>(
+       future: _resolveRouteAccess(),
+       builder: (context, snapshot) {
+         if (!snapshot.hasData) {
+           return const Scaffold(
+             body: Center(
+               child: CircularProgressIndicator(),
+             ),
+           );
+         }
+
+         final decision = snapshot.data!;
+-        debugPrint(
+-          'ADMIN_GUARD route=$routeName '
++        _adminGuardTrace(
++          'route=$routeName '
+           'isAdminRoute=${AppRouter._isAdminRoute(routeName)} '
+           'signedIn=${FirebaseAuth.instance.currentUser != null && !FirebaseAuth.instance.currentUser!.isAnonymous} '
+           'isAdmin=${decision.isAdmin} '
+           'allowed=${decision.allowed} '
+           'redirect=${decision.redirectTarget}',
+         );
+         if (decision.redirectToLogin) {
+           return const LoginPage();
+         }
+
+         if (decision.isBlocked) {
+           return AccountBlockedPage(reason: decision.blockReason);
+         }
+
+         if (!decision.allowed) {
+           final isArabic =
+               Localizations.localeOf(context).languageCode.toLowerCase() ==
+                   'ar';
+           return Scaffold(
+             appBar: AppBar(
+               title: Text(isArabic ? 'الوصول غير متاح' : 'Access unavailable'),
+             ),
+             body: Center(
+               child: Padding(
+                 padding: const EdgeInsets.all(24),
+@@ -1293,123 +1299,134 @@ class _RouteAccessGate extends StatelessWidget {
+                     FilledButton(
+                       onPressed: () {
+                         Navigator.of(context).pushNamedAndRemoveUntil(
+                           Routes.menu,
+                           (route) => false,
+                         );
+                       },
+                       child: Text(isArabic ? 'العودة للقائمة' : 'Back to menu'),
+                     ),
+                   ],
+                 ),
+               ),
+             ),
+           );
+         }
+
+         return child;
+       },
+     );
+   }
+
+   Future<_RouteAccessDecision> _resolveRouteAccess() async {
+     final user = FirebaseAuth.instance.currentUser;
+     final isAdminRoute = AppRouter._isAdminRoute(routeName);
+     if (user == null || user.isAnonymous) {
+-      debugPrint(
+-        'ADMIN_GUARD route=$routeName '
++      _adminGuardTrace(
++        'route=$routeName '
+         'isAdminRoute=$isAdminRoute '
+         'signedIn=false '
+         'isAdmin=false '
+         'allowed=false '
+         'redirect=${Routes.login}',
+       );
+       return const _RouteAccessDecision(
+         allowed: false,
+         redirectToLogin: true,
+         redirectTarget: Routes.login,
+       );
+     }
+
+     final access = await AccountAccessService().resolve(user);
+     final isAdmin = access.isAdmin;
+     if (access.isBlocked && !access.isAdmin) {
+-      debugPrint(
+-        'ADMIN_GUARD route=$routeName '
++      _adminGuardTrace(
++        'route=$routeName '
+         'isAdminRoute=$isAdminRoute '
+         'signedIn=true '
+         'isAdmin=$isAdmin '
+         'allowed=false '
+         'redirect=blocked_account',
+       );
+       return _RouteAccessDecision(
+         allowed: false,
+         isBlocked: true,
+         blockReason: access.blockReason,
+         isAdmin: isAdmin,
+         redirectTarget: 'blocked_account',
+       );
+     }
+
++    final normalizedApprovalStatus = access.approvalStatus.trim().toLowerCase();
+     final protectsCenterOrClinician =
+         allowedRoles?.contains(_roleClinician) == true ||
+             allowedRoles?.contains(_roleCenter) == true;
+     final needsApproval = protectsCenterOrClinician &&
+         (access.role == _roleClinician || access.role == _roleCenter);
+     if (needsApproval &&
+-        (access.approvalStatus.trim().toLowerCase() != 'approved' ||
+-            !access.isActive)) {
+-      debugPrint(
+-        'ADMIN_GUARD route=$routeName '
++        (normalizedApprovalStatus != 'approved' || !access.isActive)) {
++      final rejectedStates = {'rejected', 'denied', 'declined'};
++      final isRejected = rejectedStates.contains(normalizedApprovalStatus);
++      _adminGuardTrace(
++        'route=$routeName '
+         'isAdminRoute=$isAdminRoute '
+         'signedIn=true '
+         'isAdmin=$isAdmin '
+         'allowed=false '
+-        'redirect=approval_required '
++        'redirect=${isRejected ? 'approval_rejected' : 'approval_required'} '
+         'role=${access.role} '
+         'approvalStatus=${access.approvalStatus} '
+         'isActive=${access.isActive}',
+       );
+       return _RouteAccessDecision(
+         allowed: false,
+         isBlocked: true,
+-        blockReason: 'Account is pending admin approval or inactive.',
++        blockReason: isRejected
++            ? 'Account approval was rejected. Please contact support.'
++            : 'Account is pending admin approval or inactive.',
+         isAdmin: isAdmin,
+-        redirectTarget: 'approval_required',
++        redirectTarget: isRejected
++            ? 'approval_rejected'
++            : 'approval_required',
+       );
+     }
+
+     if (allowedRoles == null || allowedRoles!.isEmpty) {
+       return _RouteAccessDecision(
+         allowed: true,
+         isAdmin: isAdmin,
+         redirectTarget: 'none',
+       );
+     }
+
+     final role = access.role;
+     final isAllowed = role != null && allowedRoles!.contains(role);
+     return _RouteAccessDecision(
+       allowed: isAllowed,
+       isAdmin: isAdmin,
+       redirectTarget: isAllowed ? 'none' : Routes.menu,
+     );
+   }
+ }
+
++void _adminGuardTrace(String message) {
++  if (!kDebugMode) return;
++  debugPrint('ADMIN_GUARD $message');
++}
++
+ class _RouteAccessDecision {
+   const _RouteAccessDecision({
+     required this.allowed,
+     this.redirectToLogin = false,
+     this.isBlocked = false,
+     this.blockReason = '',
+     this.isAdmin = false,
+     this.redirectTarget = 'none',
+   });
+
+   final bool allowed;
+   final bool redirectToLogin;
+   final bool isBlocked;
+   final String blockReason;
+   final bool isAdmin;
+   final String redirectTarget;
+ }
+diff --git a/lib/core/auth/account_access_service.dart b/lib/core/auth/account_access_service.dart
+index d3af8d70cf68aa94b64eabae765093b00bd7bec2..58a86daec271d023588a7208ffce0b89703984f3 100644
+--- a/lib/core/auth/account_access_service.dart
++++ b/lib/core/auth/account_access_service.dart
+@@ -1,109 +1,96 @@
+ import 'package:cloud_firestore/cloud_firestore.dart';
+ import 'package:firebase_auth/firebase_auth.dart';
+ import 'package:flutter/foundation.dart';
+ import 'package:flutterprojects/shared/contracts/role_names.dart';
+
+-const String kKnownPrimaryAdminUid = '1p1UEwzwXFYCHExp22bc0xGSjJj2';
+-
+ class SignedInAccessState {
+   const SignedInAccessState({
+     this.role,
+     this.isBlocked = false,
+     this.blockReason = '',
+     this.approvalStatus = '',
+     this.isActive = false,
+     this.collection,
+     this.docId,
+   });
+
+   final String? role;
+   final bool isBlocked;
+   final String blockReason;
+   final String approvalStatus;
+   final bool isActive;
+   final String? collection;
+   final String? docId;
+
+   bool get isAdmin => role == RoleNames.admin;
+ }
+
+ class AccountAccessService {
+   AccountAccessService({FirebaseFirestore? firestore})
+       : _firestore = firestore ?? FirebaseFirestore.instance;
+
+   final FirebaseFirestore _firestore;
+
+-  bool _isKnownPrimaryAdmin(String uid) => uid == kKnownPrimaryAdminUid;
+-
+   Future<SignedInAccessState> resolve(User user) async {
+     final uid = user.uid;
+     final email = (user.email ?? '').trim().toLowerCase();
+
+-    debugPrint('ACCESS_TRACE admin_check_start currentAuthUid=$uid');
++    _accessTrace('admin_check_start currentAuthUid=$uid');
+     final adminDoc = await _safeGet('admins', uid);
+     final adminExists = adminDoc?.exists == true;
+     final adminActive =
+         adminExists && ((adminDoc?.data()?['active'] ?? false) == true);
+-    debugPrint(
+-      'ACCESS_TRACE admin_check_result '
++    _accessTrace(
++      'admin_check_result '
+       'currentAuthUid=$uid '
+       'adminDocExists=$adminExists '
+       'adminActive=$adminActive',
+     );
+     if (adminDoc?.exists == true) {
+       final data = adminDoc?.data() ?? const <String, dynamic>{};
+       if ((data['active'] ?? false) == true) {
+-        debugPrint(
+-          'ACCESS_TRACE admin_check_decision '
++        _accessTrace(
++          'admin_check_decision '
+           'currentAuthUid=$uid '
+           'reason=admins_doc_active_true',
+         );
+         return const SignedInAccessState(role: 'admin');
+       }
+-      debugPrint(
+-        'ACCESS_TRACE admin_check_decision '
++      _accessTrace(
++        'admin_check_decision '
+         'currentAuthUid=$uid '
+         'reason=admins_doc_found_but_active_false',
+       );
+     } else {
+-      debugPrint(
+-        'ACCESS_TRACE admin_check_decision '
++      _accessTrace(
++        'admin_check_decision '
+         'currentAuthUid=$uid '
+         'reason=no_admins_doc_for_uid',
+       );
+     }
+
+-    if (_isKnownPrimaryAdmin(uid)) {
+-      debugPrint(
+-        'ACCESS_TRACE admin_check_decision '
+-        'currentAuthUid=$uid '
+-        'reason=known_primary_admin_fallback',
+-      );
+-      return const SignedInAccessState(role: 'admin');
+-    }
+-
+     final clinicianDoc = await _safeGet('clinicians', uid);
+     if (clinicianDoc?.exists == true) {
+       final data = clinicianDoc?.data() ?? const <String, dynamic>{};
+       if (_normalizedRole(data['role']) == 'clinician') {
+         return _stateForDoc(
+           role: 'clinician',
+           data: data,
+           collection: 'clinicians',
+           docId: clinicianDoc!.id,
+         );
+       }
+     }
+
+     if (email.isNotEmpty) {
+       final clinicianByEmail = await _safeQueryByEmail('clinicians', email);
+       if (clinicianByEmail != null) {
+         final data = clinicianByEmail.data();
+         if (_normalizedRole(data['role']) == 'clinician') {
+           return _stateForDoc(
+             role: 'clinician',
+             data: data,
+             collection: 'clinicians',
+             docId: clinicianByEmail.id,
+           );
+         }
+@@ -168,50 +155,55 @@ class AccountAccessService {
+     required String role,
+     required Map<String, dynamic> data,
+     required String collection,
+     required String docId,
+   }) {
+     return SignedInAccessState(
+       role: role,
+       isBlocked: (data['isBlocked'] ?? false) == true,
+       blockReason: (data['blockReason'] ?? '').toString().trim(),
+       approvalStatus: (data['approvalStatus'] ?? '').toString().trim(),
+       isActive: (data['isActive'] ?? false) == true,
+       collection: collection,
+       docId: docId,
+     );
+   }
+
+   String _normalizedRole(dynamic value) {
+     return (value ?? '').toString().trim().toLowerCase();
+   }
+
+   bool _matchesProviderRole(dynamic value, String expectedRole) {
+     final role = _normalizedRole(value);
+     return role.isEmpty || role == expectedRole;
+   }
+
++  void _accessTrace(String message) {
++    if (!kDebugMode) return;
++    debugPrint('ACCESS_TRACE $message');
++  }
++
+   Future<DocumentSnapshot<Map<String, dynamic>>?> _safeGet(
+     String collection,
+     String docId,
+   ) async {
+     try {
+       return await _firestore.collection(collection).doc(docId).get();
+     } on FirebaseException {
+       return null;
+     } catch (_) {
+       return null;
+     }
+   }
+
+   Future<QueryDocumentSnapshot<Map<String, dynamic>>?> _safeQueryByEmail(
+     String collection,
+     String email, {
+     Map<String, Object?> filters = const {},
+   }) async {
+     try {
+       Query<Map<String, dynamic>> query =
+           _firestore.collection(collection).where('email', isEqualTo: email);
+       filters.forEach((key, value) {
+         query = query.where(key, isEqualTo: value);
+       });
+       final snapshot = await query.limit(1).get();

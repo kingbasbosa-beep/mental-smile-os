@@ -11,7 +11,7 @@ const bool _legacyBookingRequestsWriteEnabled = false;
 
 // Controlled freeze: clinician home actions stay visible but inactive for now.
 // Rollback remains trivial by re-enabling this local guard.
-const bool _clinicianHomeActionsEnabled = false;
+const bool _clinicianHomeActionsEnabled = true;
 
 class ClinicianOperationsPage extends StatefulWidget {
   const ClinicianOperationsPage({super.key});
@@ -306,36 +306,67 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     required String clinicianBio,
     required String clinicianPhotoUrl,
   }) {
-    return Column(
-      children: [
-        _buildClinicianHeaderCard(
-          context: context,
-          isArabic: isArabic,
-          clinicianName: clinicianName,
-          clinicianBio: clinicianBio,
-          clinicianPhotoUrl: clinicianPhotoUrl,
+    return _buildOperationsActions(
+      context: context,
+      isArabic: isArabic,
+    );
+  }
+
+  Widget _buildOperationsActions({
+    required BuildContext context,
+    required bool isArabic,
+  }) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 920),
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          runAlignment: WrapAlignment.center,
+          spacing: 24,
+          runSpacing: 24,
+          children: [
+            _OperationActionButton(
+              label: isArabic ? 'فتح الحالات' : 'Open cases',
+              icon: Icons.forum_outlined,
+              primary: true,
+              onTap: _clinicianHomeActionsEnabled
+                  ? () {
+                      Navigator.of(context).pushNamed(
+                        Routes.clinicianChatInbox,
+                      );
+                    }
+                  : null,
+            ),
+            _OperationActionButton(
+              label: isArabic ? 'إرسال طلب دعم' : 'Send support request',
+              icon: Icons.chat_bubble_outline_rounded,
+              onTap: _clinicianHomeActionsEnabled
+                  ? () {
+                      Navigator.of(context).pushNamed(
+                        Routes.supportIssueSelector,
+                        arguments: const {'supportType': 'clinician_support'},
+                      );
+                    }
+                  : null,
+            ),
+            _OperationActionButton(
+              label: isArabic ? 'تعديل بياناتي' : 'Edit my profile',
+              icon: Icons.edit_outlined,
+              onTap: () => Navigator.of(context).pushNamed(
+                Routes.clinicianProfileEditRequest,
+              ),
+            ),
+            _OperationActionButton(
+              label: isArabic ? 'جلساتي' : 'My sessions',
+              icon: Icons.video_call_outlined,
+              primary: true,
+              onTap: () => Navigator.of(context).pushNamed(
+                Routes.clinicianSessions,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 14),
-        _buildChatCasesSummaryCard(
-          context: context,
-          isArabic: isArabic,
-        ),
-        const SizedBox(height: 12),
-        if (_clinicianHomeActionsEnabled) ...[
-          _buildAdminChatSummaryCard(
-            context: context,
-            isArabic: isArabic,
-          ),
-          const SizedBox(height: 12),
-        ],
-        _buildRatingsSummary(isArabic),
-        const SizedBox(height: 12),
-        _buildProfileWorkspaceSection(
-          context: context,
-          isArabic: isArabic,
-          clinicianData: clinicianData,
-        ),
-      ],
+      ),
     );
   }
 
@@ -346,27 +377,13 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
   }) {
     return Column(
       children: [
-        _buildAssignmentsIntro(
-          context: context,
-          isArabic: isArabic,
-        ),
-        const SizedBox(height: 12),
         _buildAssignmentsHeader(
           context: context,
           isArabic: isArabic,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         if (docs.isEmpty)
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Text(
-                isArabic
-                    ? 'لا توجد طلبات في هذا القسم'
-                    : 'No requests in this section',
-              ),
-            ),
-          )
+          const SizedBox.shrink()
         else
           ...docs.map((doc) {
             final data = doc.data();
@@ -895,37 +912,34 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     required BuildContext context,
     required bool isArabic,
   }) {
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: [
-        FilledButton.icon(
-          onPressed: () =>
-              Navigator.of(context).pushNamed(Routes.clinicianSessions),
-          icon: const Icon(Icons.video_call_outlined),
-          label: Text(isArabic ? 'جلساتي' : 'My Sessions'),
-        ),
-        ChoiceChip(
-          selected: _tab == 'assigned_clinician',
-          label: Text(isArabic ? 'طلبات جديدة' : 'New'),
-          onSelected: (_) => setState(() => _tab = 'assigned_clinician'),
-        ),
-        ChoiceChip(
-          selected: _tab == 'in_progress',
-          label: Text(isArabic ? 'طلبات نشطة' : 'In progress'),
-          onSelected: (_) => setState(() => _tab = 'in_progress'),
-        ),
-        ChoiceChip(
-          selected: _tab == 'completed',
-          label: Text(isArabic ? 'مكتملة' : 'Completed'),
-          onSelected: (_) => setState(() => _tab = 'completed'),
-        ),
-        ChoiceChip(
-          selected: _tab == 'closed',
-          label: Text(isArabic ? 'مرفوضة/ملغاة' : 'Closed'),
-          onSelected: (_) => setState(() => _tab = 'closed'),
-        ),
-      ],
+    return Center(
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        alignment: WrapAlignment.center,
+        children: [
+          _FilterPill(
+            selected: _tab == 'assigned_clinician',
+            label: isArabic ? 'طلبات جديدة' : 'New',
+            onTap: () => setState(() => _tab = 'assigned_clinician'),
+          ),
+          _FilterPill(
+            selected: _tab == 'in_progress',
+            label: isArabic ? 'طلبات نشطة' : 'In progress',
+            onTap: () => setState(() => _tab = 'in_progress'),
+          ),
+          _FilterPill(
+            selected: _tab == 'completed',
+            label: isArabic ? 'مكتملة' : 'Completed',
+            onTap: () => setState(() => _tab = 'completed'),
+          ),
+          _FilterPill(
+            selected: _tab == 'closed',
+            label: isArabic ? 'مرفوضة/مغلقة' : 'Closed',
+            onTap: () => setState(() => _tab = 'closed'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1099,6 +1113,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
       stream: FirebaseFirestore.instance
           .collection('sessionRatings')
           .where('clinicianId', isEqualTo: _uid)
+          .where('reviewerType', isEqualTo: 'client')
           .snapshots(),
       builder: (context, snapshot) {
         final scheme = Theme.of(context).colorScheme;
@@ -1316,10 +1331,6 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
       return Directionality(
         textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
         child: Scaffold(
-          appBar: AppShellActions.buildAppBar(
-            context,
-            title: isArabic ? 'غرفة عمليات الأخصائي' : 'Clinician operations',
-          ),
           body: AppPageBackground(
             child: Center(
               child: Text(
@@ -1334,10 +1345,6 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
-        appBar: AppShellActions.buildAppBar(
-          context,
-          title: isArabic ? 'غرفة عمليات الأخصائي' : 'Clinician operations',
-        ),
         body: AppPageBackground(
           child: StreamBuilder<Map<String, dynamic>?>(
             stream: _clinicianStream(),
@@ -1386,7 +1393,10 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                   }).toList();
 
                   return ListView(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                      vertical: 72,
+                    ),
                     children: [
                       _buildHomeSummary(
                         context: context,
@@ -1408,6 +1418,145 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
               );
             },
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OperationActionButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool primary;
+  final VoidCallback? onTap;
+
+  const _OperationActionButton({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+    this.primary = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onTap != null;
+    final background =
+        primary ? const Color(0xFF064C4C) : Colors.white.withValues(alpha: 0.92);
+    final foreground = primary ? Colors.white : const Color(0xFF064C4C);
+    final borderColor = primary
+        ? const Color(0xFF064C4C).withValues(alpha: 0.38)
+        : const Color(0xFFE8D7A3).withValues(alpha: 0.82);
+
+    return Opacity(
+      opacity: enabled ? 1 : 0.55,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(42),
+          child: Container(
+            width: 280,
+            height: 78,
+            padding: const EdgeInsets.symmetric(horizontal: 26),
+            decoration: BoxDecoration(
+              color: background,
+              borderRadius: BorderRadius.circular(42),
+              border: Border.all(color: borderColor),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: primary ? 0.16 : 0.08),
+                  blurRadius: 18,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, color: foreground, size: 28),
+                Container(
+                  width: 1,
+                  height: 34,
+                  margin: const EdgeInsets.symmetric(horizontal: 22),
+                  color: primary
+                      ? Colors.white.withValues(alpha: 0.45)
+                      : const Color(0xFFD8BE76).withValues(alpha: 0.70),
+                ),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: foreground,
+                          fontWeight: FontWeight.w900,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FilterPill extends StatelessWidget {
+  final bool selected;
+  final String label;
+  final VoidCallback onTap;
+
+  const _FilterPill({
+    required this.selected,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final background =
+        selected ? const Color(0xFFEAF3EF) : Colors.white.withValues(alpha: 0.78);
+    final border =
+        selected ? const Color(0xFFB9D4CB) : const Color(0xFFE4CF91);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(26),
+      child: Container(
+        height: 46,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        decoration: BoxDecoration(
+          color: background,
+          borderRadius: BorderRadius.circular(26),
+          border: Border.all(color: border.withValues(alpha: 0.86)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (selected) ...[
+              const Icon(
+                Icons.check_rounded,
+                size: 18,
+                color: Color(0xFF064C4C),
+              ),
+              const SizedBox(width: 8),
+            ],
+            Text(
+              label,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: const Color(0xFF0D3F3F),
+                    fontWeight: FontWeight.w800,
+                  ),
+            ),
+          ],
         ),
       ),
     );
