@@ -33,6 +33,56 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
+  String _dashboardBackgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/branding/client_dashboard/mobile/client_dashboard_mobile_bg.png';
+    }
+    if (width <= 1100) {
+      return 'assets/branding/client_dashboard/tablet/client_dashboard_tablet_bg.png';
+    }
+    return 'assets/branding/client_dashboard/desktop/client_dashboard_desktop_bg.png';
+  }
+
+  Alignment _dashboardBackgroundAlignment(double width) {
+    if (width < 700) {
+      return Alignment.topCenter;
+    }
+    return const Alignment(-0.08, 0);
+  }
+
+  double _dashboardOverlayAlpha(double width) {
+    if (width < 700) return 0.38;
+    if (width <= 1100) return 0.32;
+    return 0.28;
+  }
+
+  Widget _buildDashboardBackground({required Widget child}) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              _dashboardBackgroundAsset(width),
+              fit: BoxFit.cover,
+              alignment: _dashboardBackgroundAlignment(width),
+              errorBuilder: (context, error, stackTrace) =>
+                  const ColoredBox(color: Color(0xFF061D24)),
+            ),
+            ColoredBox(
+              color: Colors.black.withValues(
+                alpha: _dashboardOverlayAlpha(width),
+              ),
+            ),
+            child,
+          ],
+        );
+      },
+    );
+  }
+
   String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
 
   Future<void> _setBusy(String id, bool value) async {
@@ -306,9 +356,44 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     required String clinicianBio,
     required String clinicianPhotoUrl,
   }) {
-    return _buildOperationsActions(
-      context: context,
-      isArabic: isArabic,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildClinicianTopBar(
+          context: context,
+          isArabic: isArabic,
+          clinicianName: clinicianName,
+          clinicianPhotoUrl: clinicianPhotoUrl,
+        ),
+        const SizedBox(height: 8),
+        _buildRatingsSummary(isArabic),
+        const SizedBox(height: 16),
+        _buildOperationsActions(
+          context: context,
+          isArabic: isArabic,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildClinicianTopBar({
+    required BuildContext context,
+    required bool isArabic,
+    required String clinicianName,
+    required String clinicianPhotoUrl,
+  }) {
+    return Row(
+      textDirection: TextDirection.ltr,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _ClinicianGoldLogo(isArabic: isArabic),
+        const Spacer(),
+        _ClinicianCompactProfile(
+          isArabic: isArabic,
+          clinicianName: clinicianName,
+          clinicianPhotoUrl: clinicianPhotoUrl,
+        ),
+      ],
     );
   }
 
@@ -316,18 +401,13 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     required BuildContext context,
     required bool isArabic,
   }) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 920),
-        child: Wrap(
-          alignment: WrapAlignment.center,
-          runAlignment: WrapAlignment.center,
-          spacing: 24,
-          runSpacing: 24,
-          children: [
+    return _OperationActionsCarousel(
+      children: [
             _OperationActionButton(
               label: isArabic ? 'فتح الحالات' : 'Open cases',
               icon: Icons.forum_outlined,
+              imageAsset:
+                  'assets/images/clinicians_dashboard/actions/clinician_open_cases.png',
               primary: true,
               onTap: _clinicianHomeActionsEnabled
                   ? () {
@@ -340,6 +420,8 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
             _OperationActionButton(
               label: isArabic ? 'إرسال طلب دعم' : 'Send support request',
               icon: Icons.chat_bubble_outline_rounded,
+              imageAsset:
+                  'assets/images/clinicians_dashboard/actions/clinician_support_request.png',
               onTap: _clinicianHomeActionsEnabled
                   ? () {
                       Navigator.of(context).pushNamed(
@@ -352,6 +434,8 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
             _OperationActionButton(
               label: isArabic ? 'تعديل بياناتي' : 'Edit my profile',
               icon: Icons.edit_outlined,
+              imageAsset:
+                  'assets/images/clinicians_dashboard/actions/clinician_edit_profile.png',
               onTap: () => Navigator.of(context).pushNamed(
                 Routes.clinicianProfileEditRequest,
               ),
@@ -359,14 +443,14 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
             _OperationActionButton(
               label: isArabic ? 'جلساتي' : 'My sessions',
               icon: Icons.video_call_outlined,
+              imageAsset:
+                  'assets/images/clinicians_dashboard/actions/clinician_sessions.png',
               primary: true,
               onTap: () => Navigator.of(context).pushNamed(
                 Routes.clinicianSessions,
               ),
             ),
-          ],
-        ),
-      ),
+      ],
     );
   }
 
@@ -1116,126 +1200,86 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           .where('reviewerType', isEqualTo: 'client')
           .snapshots(),
       builder: (context, snapshot) {
-        final scheme = Theme.of(context).colorScheme;
-
         if (snapshot.hasError) {
-          return Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: scheme.surface,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: scheme.outline.withValues(alpha: 0.12),
-              ),
-            ),
-            child: Text(
-              isArabic
-                  ? 'تعذر تحميل التقييمات الآن'
-                  : 'Unable to load ratings right now',
-              textAlign: isArabic ? TextAlign.right : TextAlign.left,
-            ),
+          return _buildRatingsCompactCounters(
+            isArabic: isArabic,
+            count: '--',
+            avgStars: '--',
+            avgPercentage: '--',
           );
         }
 
         if (snapshot.connectionState == ConnectionState.waiting &&
             !snapshot.hasData) {
-          return Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: scheme.surface,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: scheme.outline.withValues(alpha: 0.12),
+          return const Center(
+            child: SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 1.6,
+                color: Color(0xFFE7C766),
               ),
-            ),
-            child: const Center(
-              child: CircularProgressIndicator(),
             ),
           );
         }
 
         final docs = snapshot.data?.docs ?? const [];
-        if (docs.isEmpty) {
-          return Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: scheme.surface,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: scheme.outline.withValues(alpha: 0.12),
-              ),
-            ),
-            child: Text(
-              isArabic
-                  ? 'لا توجد تقييمات ظاهرة حتى الآن'
-                  : 'No ratings are visible yet',
-              textAlign: isArabic ? TextAlign.right : TextAlign.left,
-            ),
-          );
-        }
-
-        final count = docs.length;
-
-        double totalStars = 0;
-        double totalPercentage = 0;
+        final compactCount = docs.length;
+        double compactTotalStars = 0;
+        double compactTotalPercentage = 0;
 
         for (final doc in docs) {
           final data = doc.data();
-          totalStars += ((data['derivedStars'] ?? 0) as num).toDouble();
-          totalPercentage += ((data['percentageScore'] ?? 0) as num).toDouble();
+          compactTotalStars += ((data['derivedStars'] ?? 0) as num).toDouble();
+          compactTotalPercentage +=
+              ((data['percentageScore'] ?? 0) as num).toDouble();
         }
 
-        final avgStars = count == 0 ? 0.0 : totalStars / count;
-        final avgPercentage = count == 0 ? 0.0 : totalPercentage / count;
+        final compactAvgStars =
+            compactCount == 0 ? 0.0 : compactTotalStars / compactCount;
+        final compactAvgPercentage =
+            compactCount == 0 ? 0.0 : compactTotalPercentage / compactCount;
 
-        return Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: scheme.surface,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: scheme.outline.withValues(alpha: 0.12),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment:
-                isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-            children: [
-              Text(
-                isArabic
-                    ? 'ملخص تقييمات الأخصائي'
-                    : 'Clinician ratings summary',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: _InfoMiniCard(
-                      title: isArabic ? 'عدد التقييمات' : 'Ratings count',
-                      value: '$count',
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _InfoMiniCard(
-                      title: isArabic ? 'متوسط النجوم' : 'Average stars',
-                      value: avgStars.toStringAsFixed(1),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _InfoMiniCard(
-                title: isArabic ? 'المتوسط العام' : 'Overall average',
-                value: '${avgPercentage.toStringAsFixed(1)}%',
-              ),
-            ],
-          ),
+        return _buildRatingsCompactCounters(
+          isArabic: isArabic,
+          count: '$compactCount',
+          avgStars: compactAvgStars.toStringAsFixed(1),
+          avgPercentage: '${compactAvgPercentage.toStringAsFixed(1)}%',
         );
       },
+    );
+  }
+
+  Widget _buildRatingsCompactCounters({
+    required bool isArabic,
+    required String count,
+    required String avgStars,
+    required String avgPercentage,
+  }) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 460),
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          runAlignment: WrapAlignment.center,
+          spacing: 7,
+          runSpacing: 7,
+          children: [
+            _RatingMetricChip(
+              title: isArabic ? 'عدد التقييمات' : 'Ratings',
+              value: count,
+            ),
+            _RatingMetricChip(
+              title: isArabic ? 'متوسط النجوم' : 'Stars',
+              value: avgStars,
+            ),
+            _RatingMetricChip(
+              title: isArabic ? 'المتوسط العام' : 'Overall',
+              value: avgPercentage,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -1331,7 +1375,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
       return Directionality(
         textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
         child: Scaffold(
-          body: AppPageBackground(
+          body: _buildDashboardBackground(
             child: Center(
               child: Text(
                 isArabic ? 'يجب تسجيل الدخول أولًا' : 'Please sign in first',
@@ -1345,7 +1389,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
-        body: AppPageBackground(
+        body: _buildDashboardBackground(
           child: StreamBuilder<Map<String, dynamic>?>(
             stream: _clinicianStream(),
             builder: (context, clinicianSnapshot) {
@@ -1424,15 +1468,209 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
   }
 }
 
+class _RatingMetricChip extends StatelessWidget {
+  final String title;
+  final String value;
+
+  const _RatingMetricChip({
+    required this.title,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(minWidth: 86),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.22),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE7C766).withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: const Color(0xFFFFE7B2),
+                  fontWeight: FontWeight.w900,
+                  height: 1.0,
+                  letterSpacing: 0,
+                ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.64),
+                  fontWeight: FontWeight.w600,
+                  height: 1.0,
+                  letterSpacing: 0,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ClinicianGoldLogo extends StatelessWidget {
+  final bool isArabic;
+
+  const _ClinicianGoldLogo({required this.isArabic});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFE7C766).withValues(alpha: 0.24),
+              blurRadius: 28,
+              spreadRadius: 2,
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.28),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Image.asset(
+          'assets/branding/logo_icon.png',
+          width: 82,
+          height: 82,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return const Icon(
+              Icons.auto_awesome_rounded,
+              color: Color(0xFFE7C766),
+              size: 78,
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _ClinicianCompactProfile extends StatelessWidget {
+  final bool isArabic;
+  final String clinicianName;
+  final String clinicianPhotoUrl;
+
+  const _ClinicianCompactProfile({
+    required this.isArabic,
+    required this.clinicianName,
+    required this.clinicianPhotoUrl,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final photoUri = Uri.tryParse(clinicianPhotoUrl.trim());
+    final hasValidPhotoUrl = photoUri != null &&
+        (photoUri.scheme == 'http' || photoUri.scheme == 'https');
+    final displayName = clinicianName.isEmpty
+        ? (isArabic ? 'أخصائي' : 'Clinician')
+        : clinicianName;
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 320),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFE7C766).withValues(alpha: 0.22),
+                    blurRadius: 24,
+                    spreadRadius: 1,
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.30),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: CircleAvatar(
+                radius: 46,
+                backgroundColor:
+                    const Color(0xFFE7C766).withValues(alpha: 0.18),
+                backgroundImage: hasValidPhotoUrl
+                    ? NetworkImage(clinicianPhotoUrl.trim())
+                    : null,
+                child: hasValidPhotoUrl
+                    ? null
+                    : Icon(
+                        Icons.person_rounded,
+                        color: const Color(0xFFE7C766),
+                        size: 50,
+                      ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Flexible(
+              child: Text(
+                displayName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: const Color(0xFFFFE7B2),
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0,
+                      shadows: const [
+                        Shadow(
+                          color: Colors.black,
+                          blurRadius: 12,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _OperationActionButton extends StatelessWidget {
   final String label;
   final IconData icon;
+  final String imageAsset;
   final bool primary;
   final VoidCallback? onTap;
 
   const _OperationActionButton({
     required this.label,
     required this.icon,
+    required this.imageAsset,
     required this.onTap,
     this.primary = false,
   });
@@ -1440,60 +1678,133 @@ class _OperationActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null;
-    final background =
-        primary ? const Color(0xFF064C4C) : Colors.white.withValues(alpha: 0.92);
-    final foreground = primary ? Colors.white : const Color(0xFF064C4C);
-    final borderColor = primary
-        ? const Color(0xFF064C4C).withValues(alpha: 0.38)
-        : const Color(0xFFE8D7A3).withValues(alpha: 0.82);
+    final accent = primary ? const Color(0xFFE7C766) : const Color(0xFF8EDBFF);
+    final isArabic =
+        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
     return Opacity(
       opacity: enabled ? 1 : 0.55,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(42),
-          child: Container(
-            width: 280,
-            height: 78,
-            padding: const EdgeInsets.symmetric(horizontal: 26),
-            decoration: BoxDecoration(
-              color: background,
-              borderRadius: BorderRadius.circular(42),
-              border: Border.all(color: borderColor),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: primary ? 0.16 : 0.08),
-                  blurRadius: 18,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, color: foreground, size: 28),
-                Container(
-                  width: 1,
-                  height: 34,
-                  margin: const EdgeInsets.symmetric(horizontal: 22),
-                  color: primary
-                      ? Colors.white.withValues(alpha: 0.45)
-                      : const Color(0xFFD8BE76).withValues(alpha: 0.70),
-                ),
-                Flexible(
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: foreground,
-                          fontWeight: FontWeight.w900,
+      child: _OperationActionHover(
+        accent: accent,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(24),
+            hoverColor: accent.withValues(alpha: 0.06),
+            splashColor: accent.withValues(alpha: 0.08),
+            highlightColor: accent.withValues(alpha: 0.04),
+            child: SizedBox(
+              width: double.infinity,
+              height: 226,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      imageAsset,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                const Color(0xFF061D24),
+                                const Color(0xFF0B3A3A),
+                                accent.withValues(alpha: 0.32),
+                              ],
+                            ),
+                          ),
+                          child: Center(
+                            child: Icon(
+                              icon,
+                              color: accent,
+                              size: 46,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.02),
+                            Colors.black.withValues(alpha: 0.12),
+                            Colors.black.withValues(alpha: 0.62),
+                          ],
                         ),
-                  ),
+                      ),
+                    ),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: RadialGradient(
+                          center: Alignment.topCenter,
+                          radius: 1.1,
+                          colors: [
+                            accent.withValues(alpha: 0.12),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: accent.withValues(alpha: 0.46),
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    PositionedDirectional(
+                      start: 14,
+                      end: 14,
+                      bottom: 14,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            label,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(
+                                  color: const Color(0xFFFFE7B2),
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.08,
+                                  shadows: const [
+                                    Shadow(
+                                      color: Colors.black,
+                                      blurRadius: 12,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 4),
+                          Icon(
+                            isArabic
+                                ? Icons.keyboard_arrow_left_rounded
+                                : Icons.keyboard_arrow_right_rounded,
+                            color: accent,
+                            size: 19,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -1502,6 +1813,258 @@ class _OperationActionButton extends StatelessWidget {
   }
 }
 
+class _OperationActionsCarousel extends StatefulWidget {
+  final List<Widget> children;
+
+  const _OperationActionsCarousel({required this.children});
+
+  @override
+  State<_OperationActionsCarousel> createState() =>
+      _OperationActionsCarouselState();
+}
+
+class _OperationActionsCarouselState extends State<_OperationActionsCarousel> {
+  PageController? _controller;
+  double _viewportFraction = 0.82;
+  double _page = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _syncController(_viewportFraction);
+  }
+
+  @override
+  void dispose() {
+    _controller?.removeListener(_handlePageChange);
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant _OperationActionsCarousel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.children.length != oldWidget.children.length) {
+      final maxIndex = widget.children.isEmpty ? 0 : widget.children.length - 1;
+      _page = _page.clamp(0, maxIndex).toDouble();
+    }
+  }
+
+  void _handlePageChange() {
+    if (!mounted) return;
+    setState(() => _page = _controller?.page ?? _page);
+  }
+
+  void _syncController(double viewportFraction) {
+    if (_controller != null && _viewportFraction == viewportFraction) return;
+
+    final oldPage = _controller?.hasClients == true
+        ? (_controller?.page ?? _page)
+        : _page;
+    final maxIndex = widget.children.isEmpty ? 0 : widget.children.length - 1;
+
+    _controller?.removeListener(_handlePageChange);
+    _controller?.dispose();
+    _viewportFraction = viewportFraction;
+    _page = oldPage.clamp(0, maxIndex).toDouble();
+    _controller = PageController(
+      initialPage: _page.round().clamp(0, maxIndex).toInt(),
+      viewportFraction: viewportFraction,
+    )..addListener(_handlePageChange);
+  }
+
+  void _goToPage(int targetIndex) {
+    if (widget.children.isEmpty) return;
+    final maxIndex = widget.children.length - 1;
+    final clamped = targetIndex.clamp(0, maxIndex).toInt();
+    _controller?.animateToPage(
+      clamped,
+      duration: const Duration(milliseconds: 420),
+      curve: Curves.easeOutQuart,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.children.isEmpty) return const SizedBox.shrink();
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final isMobile = width < 700;
+        final isTablet = width >= 700 && width <= 1100;
+        final viewportFraction = isMobile
+            ? 0.76
+            : isTablet
+                ? 0.50
+                : 0.30;
+        _syncController(viewportFraction);
+        final controller = _controller!;
+        final currentIndex = _page.round().clamp(0, widget.children.length - 1);
+        final canGoBack = currentIndex > 0;
+        final canGoForward = currentIndex < widget.children.length - 1;
+
+        return Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1040),
+            child: SizedBox(
+              height: isMobile ? 232 : 260,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  PageView.builder(
+                    controller: controller,
+                    itemCount: widget.children.length,
+                    padEnds: true,
+                    itemBuilder: (context, index) {
+                      final distance = (_page - index).abs().clamp(0.0, 1.0);
+                      final scale = 1.0 - (distance * 0.06);
+                      final opacity = 1.0 - (distance * 0.18);
+
+                      return AnimatedOpacity(
+                        opacity: opacity,
+                        duration: const Duration(milliseconds: 260),
+                        curve: Curves.easeOutQuart,
+                        child: AnimatedScale(
+                          scale: scale,
+                          duration: const Duration(milliseconds: 260),
+                          curve: Curves.easeOutQuart,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isMobile ? 6 : 10,
+                            ),
+                            child: Center(child: widget.children[index]),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  PositionedDirectional(
+                    start: isMobile ? 6 : 18,
+                    child: _OperationCarouselArrow(
+                      icon: Icons.chevron_left_rounded,
+                      enabled: canGoBack,
+                      onPressed: () => _goToPage(currentIndex - 1),
+                    ),
+                  ),
+                  PositionedDirectional(
+                    end: isMobile ? 6 : 18,
+                    child: _OperationCarouselArrow(
+                      icon: Icons.chevron_right_rounded,
+                      enabled: canGoForward,
+                      onPressed: () => _goToPage(currentIndex + 1),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _OperationCarouselArrow extends StatelessWidget {
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onPressed;
+
+  const _OperationCarouselArrow({
+    required this.icon,
+    required this.enabled,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE7C766).withValues(
+              alpha: enabled ? 0.12 : 0.04,
+            ),
+            blurRadius: enabled ? 12 : 6,
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: SizedBox(
+        width: 38,
+        height: 38,
+        child: IconButton.filledTonal(
+          onPressed: enabled ? onPressed : null,
+          icon: Icon(icon),
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.black.withValues(alpha: 0.30),
+            disabledBackgroundColor: Colors.black.withValues(alpha: 0.14),
+            foregroundColor: const Color(0xFFFFE7B2),
+            disabledForegroundColor: Colors.white.withValues(alpha: 0.30),
+            side: BorderSide(
+              color: const Color(0xFFE7C766).withValues(
+                alpha: enabled ? 0.30 : 0.10,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OperationActionHover extends StatefulWidget {
+  final Widget child;
+  final Color accent;
+
+  const _OperationActionHover({
+    required this.child,
+    required this.accent,
+  });
+
+  @override
+  State<_OperationActionHover> createState() => _OperationActionHoverState();
+}
+
+class _OperationActionHoverState extends State<_OperationActionHover> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedScale(
+        scale: _hovered ? 1.012 : 1.0,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutQuart,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: widget.accent.withValues(
+                  alpha: _hovered ? 0.20 : 0.10,
+                ),
+                blurRadius: _hovered ? 20 : 12,
+                offset: const Offset(0, 8),
+              ),
+              BoxShadow(
+                color: const Color(0xFFE7C766).withValues(
+                  alpha: _hovered ? 0.08 : 0.04,
+                ),
+                blurRadius: _hovered ? 22 : 14,
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: widget.child,
+        ),
+      ),
+    );
+  }
+}
 class _FilterPill extends StatelessWidget {
   final bool selected;
   final String label;
@@ -1515,26 +2078,32 @@ class _FilterPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final background =
-        selected ? const Color(0xFFEAF3EF) : Colors.white.withValues(alpha: 0.78);
-    final border =
-        selected ? const Color(0xFFB9D4CB) : const Color(0xFFE4CF91);
+    final background = selected
+        ? const Color(0xFFE7C766).withValues(alpha: 0.14)
+        : Colors.black.withValues(alpha: 0.18);
+    final border = selected
+        ? const Color(0xFFE7C766).withValues(alpha: 0.46)
+        : const Color(0xFFE7C766).withValues(alpha: 0.18);
+    final foreground =
+        selected ? const Color(0xFFFFE7B2) : Colors.white.withValues(alpha: 0.70);
 
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(26),
       child: Container(
-        height: 46,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        height: 34,
+        padding: const EdgeInsets.symmetric(horizontal: 13),
         decoration: BoxDecoration(
           color: background,
           borderRadius: BorderRadius.circular(26),
-          border: Border.all(color: border.withValues(alpha: 0.86)),
+          border: Border.all(color: border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: const Color(0xFFE7C766).withValues(
+                alpha: selected ? 0.07 : 0.02,
+              ),
+              blurRadius: selected ? 10 : 6,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -1544,16 +2113,17 @@ class _FilterPill extends StatelessWidget {
             if (selected) ...[
               const Icon(
                 Icons.check_rounded,
-                size: 18,
-                color: Color(0xFF064C4C),
+                size: 14,
+                color: Color(0xFFE7C766),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 5),
             ],
             Text(
               label,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: const Color(0xFF0D3F3F),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: foreground,
                     fontWeight: FontWeight.w800,
+                    letterSpacing: 0,
                   ),
             ),
           ],

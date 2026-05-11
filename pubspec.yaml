@@ -98,6 +98,7 @@ flutter:
     - assets/images/backgrounds/
     - assets/images/centers/
     - assets/images/client_dashboard/actions/
-    - assets/images/center_dashboard/actions/
+    - assets/images/clinicians_dashboard/
+    - assets/images/clinicians_dashboard/actions/
     - assets/images/family_support/
     - assets/images/specialists/
