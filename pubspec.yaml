@@ -97,6 +97,7 @@ flutter:
     - assets/images/addiction/
     - assets/images/backgrounds/
     - assets/images/centers/
+    - assets/images/center_dashboard/actions/
     - assets/images/client_dashboard/actions/
     - assets/images/clinicians_dashboard/
     - assets/images/clinicians_dashboard/actions/

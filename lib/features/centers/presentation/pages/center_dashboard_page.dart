@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
-import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class CenterDashboardPage extends StatelessWidget {
   const CenterDashboardPage({super.key});
@@ -171,6 +170,34 @@ class CenterDashboardPage extends StatelessWidget {
     }
   }
 
+  String _dashboardBackgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/branding/client_dashboard/mobile/client_dashboard_mobile_bg.png';
+    }
+    if (width <= 1100) {
+      return 'assets/branding/client_dashboard/tablet/client_dashboard_tablet_bg.png';
+    }
+    return 'assets/branding/client_dashboard/desktop/client_dashboard_desktop_bg.png';
+  }
+
+  Alignment _dashboardBackgroundAlignment(double width) {
+    if (width < 700) {
+      return Alignment.topCenter;
+    }
+    return const Alignment(-0.08, 0);
+  }
+
+  double _dashboardBackgroundScale(double width) {
+    if (width <= 1100) return 1.0;
+    return 1.0;
+  }
+
+  double _dashboardOverlayAlpha(double width) {
+    if (width < 700) return 0.50;
+    if (width <= 1100) return 0.42;
+    return 0.38;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
@@ -178,14 +205,28 @@ class CenterDashboardPage extends StatelessWidget {
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
-        appBar: AppShellActions.buildAppBar(
-          context,
-          title: isArabic ? 'الصفحة الشخصية للمركز' : 'Center Dashboard',
-        ),
-        body: AppPageBackground(
-          child: StreamBuilder<Map<String, dynamic>?>(
-            stream: _centerStream(),
-            builder: (context, snapshot) {
+        body: LayoutBuilder(
+          builder: (context, backgroundConstraints) {
+            final width = backgroundConstraints.maxWidth;
+
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                Transform.scale(
+                  scale: _dashboardBackgroundScale(width),
+                  child: Image.asset(
+                    _dashboardBackgroundAsset(width),
+                    fit: BoxFit.cover,
+                    alignment: _dashboardBackgroundAlignment(width),
+                  ),
+                ),
+                ColoredBox(
+                  color: Colors.black
+                      .withValues(alpha: _dashboardOverlayAlpha(width)),
+                ),
+                StreamBuilder<Map<String, dynamic>?>(
+                  stream: _centerStream(),
+                  builder: (context, snapshot) {
               final scheme = Theme.of(context).colorScheme;
               final data = snapshot.data ?? <String, dynamic>{};
 
@@ -194,6 +235,10 @@ class CenterDashboardPage extends StatelessWidget {
                       .toString()
                       .trim();
               final email = (data['email'] ?? '').toString().trim();
+              final imageUrl =
+                  (data['imageUrl'] ?? data['coverImageUrl'] ?? '')
+                      .toString()
+                      .trim();
               final phone = (data['phone'] ?? '').toString().trim();
               final city = (data['city'] ?? '').toString().trim();
               final address = (data['address'] ?? '').toString().trim();
@@ -209,86 +254,61 @@ class CenterDashboardPage extends StatelessWidget {
 
               final gallery = _readGallery(data);
               final documents = _readDocuments(data);
-
+              final galleryThumbs = gallery
+                  .map(
+                    (item) => (item['url'] ??
+                            item['imageUrl'] ??
+                            item['asset'] ??
+                            item['path'] ??
+                            '')
+                        .toString()
+                        .trim(),
+                  )
+                  .where((value) => value.isNotEmpty)
+                  .take(4)
+                  .toList();
               final statusLabel =
                   _approvalStatusLabel(approvalStatus, isArabic);
-
               return ListView(
-                padding: const EdgeInsets.all(AppSpacing.lg),
+                padding: EdgeInsets.fromLTRB(
+                  width < 700 ? 16 : 72,
+                  width < 700 ? 18 : 86,
+                  width < 700 ? 16 : 72,
+                  24,
+                ),
                 children: [
-                  AppSurfaceCard(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Row(
-                      textDirection:
-                          isArabic ? TextDirection.rtl : TextDirection.ltr,
-                      children: [
-                        CircleAvatar(
-                          radius: 34,
-                          backgroundColor:
-                              scheme.primary.withValues(alpha: 0.12),
-                          child: Text(
-                            _initials(
-                                centerName.isEmpty ? 'Center' : centerName),
-                            style: TextStyle(
-                              color: scheme.primary,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 20,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: isArabic
-                                ? CrossAxisAlignment.end
-                                : CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                centerName.isEmpty
-                                    ? (isArabic ? 'مركز' : 'Center')
-                                    : centerName,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(fontWeight: FontWeight.w800),
-                                textAlign:
-                                    isArabic ? TextAlign.right : TextAlign.left,
-                              ),
-                              const SizedBox(height: AppSpacing.xs),
-                              Text(
-                                email.isEmpty
-                                    ? (isArabic ? 'بدون بريد' : 'No email')
-                                    : email,
-                              ),
-                              const SizedBox(height: AppSpacing.xs),
-                              Wrap(
-                                spacing: AppSpacing.xs,
-                                runSpacing: AppSpacing.xs,
-                                children: [
-                                  _MiniBadge(
-                                    label: isArabic ? 'مركز' : 'Center',
-                                    color: const Color(0xFF6C55B3),
-                                  ),
-                                  _MiniBadge(
-                                    label:
-                                        _centerTypeLabel(centerType, isArabic),
-                                    color: const Color(0xFF2F6B5F),
-                                  ),
-                                  _MiniBadge(
-                                    label: statusLabel,
-                                    color: _approvalStatusColor(
-                                      approvalStatus,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                  Row(
+                    textDirection: TextDirection.ltr,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const _CenterBrandMark(),
+                      const Spacer(),
+                      _CenterFloatingProfile(
+                        isArabic: isArabic,
+                        centerName: centerName,
+                        imageUrl: imageUrl,
+                        onLogout: () => _logout(context),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 8),
+                  _CenterInfoChips(
+                    values: [
+                      centerName.isEmpty
+                          ? (isArabic ? 'مركز' : 'Center')
+                          : centerName,
+                      email.isEmpty
+                          ? (isArabic ? 'بدون بريد' : 'No email')
+                          : email,
+                      statusLabel,
+                      _centerTypeLabel(centerType, isArabic),
+                    ],
+                  ),
+                  const SizedBox(height: 22),
+                  if (galleryThumbs.isNotEmpty) ...[
+                    _CenterTopGallery(imageUrls: galleryThumbs),
+                    const SizedBox(height: 16),
+                  ],
                   _CenterActionCards(
                     children: [
                       _SectionCard(
@@ -384,134 +404,438 @@ class CenterDashboardPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  _CenterGalleryCard(
-                    title: isArabic ? 'صور المركز' : 'Center Gallery',
-                    subtitle: isArabic
-                        ? 'عرض الصور الأساسية داخل إطار واحد'
-                        : 'Main images in a single frame',
-                    items: gallery,
-                  ),
-                  const SizedBox(height: 12),
-                  _InfoBlock(
-                    title: isArabic ? 'الوثائق' : 'Documents',
-                    body: documents.isEmpty
-                        ? (isArabic
-                            ? 'لا توجد وثائق مرفوعة بعد.'
-                            : 'No uploaded documents yet.')
-                        : documents.map((doc) {
-                            final type = (doc['documentType'] ?? '').toString();
-                            final fileName = (doc['fileName'] ?? '').toString();
-                            final status =
-                                (doc['status'] ?? 'pending').toString();
-                            final reviewNote =
-                                (doc['reviewNote'] ?? '').toString().trim();
-
-                            final line = [
-                              if (type.isNotEmpty) type,
-                              if (fileName.isNotEmpty) fileName,
-                              _docStatusLabel(status, isArabic),
-                              if (reviewNote.isNotEmpty)
-                                (isArabic
-                                    ? 'ملاحظة: $reviewNote'
-                                    : 'Note: $reviewNote'),
-                            ].join(' - ');
-
-                            return line;
-                          }).join('\n'),
-                    icon: Icons.folder_open_outlined,
-                  ),
-                  const SizedBox(height: 12),
-                  _InfoBlock(
-                    title: isArabic ? 'بيانات المركز' : 'Center Details',
-                    body: [
-                      if (managerName.isNotEmpty)
-                        (isArabic ? 'المسؤول: ' : 'Manager: ') + managerName,
-                      if (centerType.isNotEmpty)
-                        (isArabic ? 'النوع التشغيلي: ' : 'Operational type: ') +
-                            _centerTypeLabel(centerType, isArabic),
-                      (isArabic
-                              ? 'قسم أعراض انسحاب داخلي: '
-                              : 'Internal withdrawal unit: ') +
-                          (hasDetoxUnit
-                              ? (isArabic ? 'نعم' : 'Yes')
-                              : (isArabic ? 'لا' : 'No')),
-                      if (phone.isNotEmpty)
-                        (isArabic ? 'الهاتف: ' : 'Phone: ') + phone,
-                      if (city.isNotEmpty)
-                        (isArabic ? 'المدينة: ' : 'City: ') + city,
-                      if (address.isNotEmpty)
-                        (isArabic ? 'العنوان: ' : 'Address: ') + address,
-                    ].isEmpty
-                        ? (isArabic
-                            ? 'لا توجد بيانات إضافية بعد.'
-                            : 'No extra details yet.')
-                        : [
-                            if (managerName.isNotEmpty)
-                              (isArabic ? 'المسؤول: ' : 'Manager: ') +
-                                  managerName,
-                            if (phone.isNotEmpty)
-                              (isArabic ? 'الهاتف: ' : 'Phone: ') + phone,
-                            if (city.isNotEmpty)
-                              (isArabic ? 'المدينة: ' : 'City: ') + city,
-                            if (address.isNotEmpty)
-                              (isArabic ? 'العنوان: ' : 'Address: ') + address,
-                          ].join('\n'),
-                    icon: Icons.business_outlined,
-                  ),
-                  const SizedBox(height: 12),
-                  _InfoBlock(
-                    title: isArabic ? 'وصف المركز' : 'Center Description',
-                    body: description.isEmpty
-                        ? (isArabic
-                            ? 'لم يتم إضافة وصف بعد.'
-                            : 'No description added yet.')
-                        : description,
-                    icon: Icons.notes_outlined,
-                  ),
-                  const SizedBox(height: 12),
-                  _CenterReadinessBlock(
-                    isArabic: isArabic,
-                    imagesReady: imagesReady,
-                    documentsReady: documentsReady,
-                  ),
-                  const SizedBox(height: 12),
-                  if (documents.isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: scheme.surface,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: scheme.outline.withValues(alpha: 0.12),
-                        ),
-                      ),
-                      child: Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: documents.map((doc) {
-                          final status =
-                              (doc['status'] ?? 'pending').toString();
-                          return _MiniBadge(
-                            label: _docStatusLabel(status, isArabic),
-                            color: _docStatusColor(status),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    height: 52,
-                    child: OutlinedButton.icon(
-                      onPressed: () => _logout(context),
-                      icon: const Icon(Icons.logout),
-                      label: Text(isArabic ? 'تسجيل الخروج' : 'Logout'),
-                    ),
-                  ),
                 ],
               );
-            },
+                  },
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _CenterBrandMark extends StatelessWidget {
+  const _CenterBrandMark();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE7C766).withValues(alpha: 0.24),
+            blurRadius: 28,
+            spreadRadius: 2,
           ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.28),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Image.asset(
+        'assets/branding/logo_icon.png',
+        width: 86,
+        height: 86,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return const Icon(
+            Icons.auto_awesome_rounded,
+            color: Color(0xFFE7C766),
+            size: 82,
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _CenterFloatingProfile extends StatelessWidget {
+  final bool isArabic;
+  final String centerName;
+  final String imageUrl;
+  final VoidCallback onLogout;
+
+  const _CenterFloatingProfile({
+    required this.isArabic,
+    required this.centerName,
+    required this.imageUrl,
+    required this.onLogout,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final displayName = centerName.isEmpty
+        ? (isArabic ? 'مركز' : 'Center')
+        : centerName;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      textDirection: TextDirection.rtl,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        SizedBox(
+          width: 112,
+          height: 148,
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              _CenterProfileImage(
+                imageUrl: imageUrl,
+                fallbackText: displayName,
+              ),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: _CenterLogoutButton(
+                    isArabic: isArabic,
+                    onPressed: onLogout,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 14),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 220),
+          child: Text(
+            displayName,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.right,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: const Color(0xFFFFE7B2),
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
+                  height: 1.05,
+                  shadows: const [
+                    Shadow(
+                      color: Colors.black,
+                      blurRadius: 12,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CenterProfileImage extends StatelessWidget {
+  final String imageUrl;
+  final String fallbackText;
+
+  const _CenterProfileImage({
+    required this.imageUrl,
+    required this.fallbackText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final trimmed = imageUrl.trim();
+    final uri = Uri.tryParse(trimmed);
+    final isNetwork =
+        uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
+    final isAsset = trimmed.startsWith('assets/');
+
+    Widget fallback() {
+      return Center(
+        child: Text(
+          fallbackText.trim().isEmpty ? 'C' : fallbackText.trim()[0],
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: const Color(0xFFE7C766),
+                fontWeight: FontWeight.w900,
+              ),
+        ),
+      );
+    }
+
+    Widget imageChild;
+    if (isNetwork) {
+      imageChild = Image.network(
+        trimmed,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => fallback(),
+      );
+    } else if (isAsset) {
+      imageChild = Image.asset(
+        trimmed,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => fallback(),
+      );
+    } else {
+      imageChild = fallback();
+    }
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE7C766).withValues(alpha: 0.22),
+            blurRadius: 24,
+            spreadRadius: 1,
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.30),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipOval(
+        child: Container(
+          width: 112,
+          height: 112,
+          color: const Color(0xFFE7C766).withValues(alpha: 0.18),
+          child: imageChild,
+        ),
+      ),
+    );
+  }
+}
+
+class _CenterLogoutButton extends StatelessWidget {
+  final bool isArabic;
+  final VoidCallback onPressed;
+
+  const _CenterLogoutButton({
+    required this.isArabic,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: isArabic ? 'تسجيل الخروج' : 'Sign out',
+      child: SizedBox(
+        height: 30,
+        child: OutlinedButton.icon(
+          onPressed: onPressed,
+          icon: const Icon(Icons.logout_rounded, size: 15),
+          label: Text(isArabic ? 'خروج' : 'Logout'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: const Color(0xFFFFE7B2),
+            side: BorderSide(
+              color: const Color(0xFFE7C766).withValues(alpha: 0.62),
+            ),
+            backgroundColor: Colors.black.withValues(alpha: 0.24),
+            minimumSize: const Size(0, 30),
+            padding: const EdgeInsets.symmetric(horizontal: 9),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            textStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
+                ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CenterInfoChips extends StatelessWidget {
+  final List<String> values;
+
+  const _CenterInfoChips({required this.values});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.center,
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 10,
+        runSpacing: 8,
+        children: values.map((value) => _CenterInfoChip(label: value)).toList(),
+      ),
+    );
+  }
+}
+
+class _CenterInfoChip extends StatelessWidget {
+  final String label;
+
+  const _CenterInfoChip({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 34,
+      constraints: const BoxConstraints(maxWidth: 240),
+      padding: const EdgeInsets.symmetric(horizontal: 13),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.38),
+        ),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: const Color(0xFFFFE7B2),
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0,
+            ),
+      ),
+    );
+  }
+}
+
+class _CenterTopGallery extends StatelessWidget {
+  final List<String> imageUrls;
+
+  const _CenterTopGallery({required this.imageUrls});
+
+  static Widget _image(String source, {BoxFit fit = BoxFit.cover}) {
+    final trimmed = source.trim();
+    final uri = Uri.tryParse(trimmed);
+    final isNetwork =
+        uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
+    final isAsset = trimmed.startsWith('assets/');
+
+    Widget fallback(BuildContext context) {
+      return ColoredBox(
+        color: Colors.black.withValues(alpha: 0.22),
+        child: Icon(
+          Icons.broken_image_outlined,
+          color: const Color(0xFFFFE7B2).withValues(alpha: 0.62),
+          size: 22,
+        ),
+      );
+    }
+
+    if (isNetwork) {
+      return Image.network(
+        trimmed,
+        fit: fit,
+        errorBuilder: (context, error, stackTrace) => fallback(context),
+      );
+    }
+
+    if (isAsset) {
+      return Image.asset(
+        trimmed,
+        fit: fit,
+        errorBuilder: (context, error, stackTrace) => fallback(context),
+      );
+    }
+
+    return Builder(builder: fallback);
+  }
+
+  void _openImage(BuildContext context, String source) {
+    showDialog<void>(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.72),
+      builder: (dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(18),
+          child: Stack(
+            children: [
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 980),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.42),
+                        border: Border.all(
+                          color:
+                              const Color(0xFFE7C766).withValues(alpha: 0.46),
+                        ),
+                      ),
+                      child: AspectRatio(
+                        aspectRatio: 16 / 10,
+                        child: _image(source, fit: BoxFit.contain),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              PositionedDirectional(
+                top: 10,
+                end: 10,
+                child: IconButton.filledTonal(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  icon: const Icon(Icons.close_rounded),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.black.withValues(alpha: 0.48),
+                    foregroundColor: const Color(0xFFFFE7B2),
+                    side: BorderSide(
+                      color: const Color(0xFFE7C766).withValues(alpha: 0.44),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final visibleImages = imageUrls.take(4).toList();
+    if (visibleImages.isEmpty) return const SizedBox.shrink();
+
+    return Align(
+      alignment: Alignment.center,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final source in visibleImages) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: InkWell(
+                  onTap: () => _openImage(context, source),
+                  borderRadius: BorderRadius.circular(14),
+                  child: Container(
+                    width: 104,
+                    height: 66,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: const Color(0xFFE7C766).withValues(alpha: 0.36),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              const Color(0xFFE7C766).withValues(alpha: 0.07),
+                          blurRadius: 14,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: _image(source),
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );
@@ -780,20 +1104,201 @@ class _CenterReadinessBlock extends StatelessWidget {
   }
 }
 
-class _CenterActionCards extends StatelessWidget {
+class _CenterActionCards extends StatefulWidget {
   final List<Widget> children;
 
   const _CenterActionCards({required this.children});
 
   @override
+  State<_CenterActionCards> createState() => _CenterActionCardsState();
+}
+
+class _CenterActionCardsState extends State<_CenterActionCards> {
+  PageController? _controller;
+  double _viewportFraction = 0.78;
+  double _page = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _syncController(_viewportFraction);
+  }
+
+  @override
+  void dispose() {
+    _controller?.removeListener(_handlePageChange);
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant _CenterActionCards oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.children.length != oldWidget.children.length) {
+      final maxIndex = widget.children.isEmpty ? 0 : widget.children.length - 1;
+      _page = _page.clamp(0, maxIndex).toDouble();
+    }
+  }
+
+  void _handlePageChange() {
+    if (!mounted) return;
+    setState(() => _page = _controller?.page ?? _page);
+  }
+
+  void _syncController(double viewportFraction) {
+    if (_controller != null && _viewportFraction == viewportFraction) return;
+
+    final oldPage = _controller?.hasClients == true
+        ? (_controller?.page ?? _page)
+        : _page;
+    final maxIndex = widget.children.isEmpty ? 0 : widget.children.length - 1;
+
+    _controller?.removeListener(_handlePageChange);
+    _controller?.dispose();
+    _viewportFraction = viewportFraction;
+    _page = oldPage.clamp(0, maxIndex).toDouble();
+    _controller = PageController(
+      initialPage: _page.round().clamp(0, maxIndex).toInt(),
+      viewportFraction: viewportFraction,
+    )..addListener(_handlePageChange);
+  }
+
+  void _goToPage(int targetIndex) {
+    if (widget.children.isEmpty) return;
+    final maxIndex = widget.children.length - 1;
+    final clamped = targetIndex.clamp(0, maxIndex).toInt();
+    _controller?.animateToPage(
+      clamped,
+      duration: const Duration(milliseconds: 420),
+      curve: Curves.easeOutQuart,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        runAlignment: WrapAlignment.center,
-        spacing: 16,
-        runSpacing: 16,
-        children: children,
+    if (widget.children.isEmpty) return const SizedBox.shrink();
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final isMobile = width < 700;
+        final isTablet = width >= 700 && width <= 1100;
+        final viewportFraction = isMobile
+            ? 0.82
+            : isTablet
+                ? 0.56
+                : 0.34;
+        _syncController(viewportFraction);
+        final controller = _controller!;
+        final currentIndex = _page.round().clamp(0, widget.children.length - 1);
+        final canGoBack = currentIndex > 0;
+        final canGoForward = currentIndex < widget.children.length - 1;
+
+        return Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1280),
+            child: SizedBox(
+              height: isMobile ? 270 : 306,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  PageView.builder(
+                    controller: controller,
+                    itemCount: widget.children.length,
+                    padEnds: true,
+                    itemBuilder: (context, index) {
+                      final distance = (_page - index).abs().clamp(0.0, 1.0);
+                      final scale = 1.0 - (distance * 0.06);
+                      final opacity = 1.0 - (distance * 0.18);
+
+                      return AnimatedOpacity(
+                        opacity: opacity,
+                        duration: const Duration(milliseconds: 260),
+                        curve: Curves.easeOutQuart,
+                        child: AnimatedScale(
+                          scale: scale,
+                          duration: const Duration(milliseconds: 260),
+                          curve: Curves.easeOutQuart,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isMobile ? 8 : 12,
+                            ),
+                            child: Center(child: widget.children[index]),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  PositionedDirectional(
+                    start: isMobile ? 2 : 10,
+                    child: _ActionCarouselArrow(
+                      icon: Icons.chevron_left_rounded,
+                      enabled: canGoBack,
+                      onPressed: () => _goToPage(currentIndex - 1),
+                    ),
+                  ),
+                  PositionedDirectional(
+                    end: isMobile ? 2 : 10,
+                    child: _ActionCarouselArrow(
+                      icon: Icons.chevron_right_rounded,
+                      enabled: canGoForward,
+                      onPressed: () => _goToPage(currentIndex + 1),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ActionCarouselArrow extends StatelessWidget {
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onPressed;
+
+  const _ActionCarouselArrow({
+    required this.icon,
+    required this.enabled,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE7C766).withValues(
+              alpha: enabled ? 0.22 : 0.08,
+            ),
+            blurRadius: enabled ? 18 : 8,
+            spreadRadius: enabled ? 1 : 0,
+          ),
+        ],
+      ),
+      child: SizedBox(
+        width: 46,
+        height: 46,
+        child: IconButton.filledTonal(
+          onPressed: enabled ? onPressed : null,
+          icon: Icon(icon),
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.black.withValues(alpha: 0.48),
+            disabledBackgroundColor: Colors.black.withValues(alpha: 0.20),
+            foregroundColor: const Color(0xFFFFE7B2),
+            disabledForegroundColor: Colors.white.withValues(alpha: 0.30),
+            side: BorderSide(
+              color: const Color(0xFFE7C766).withValues(
+                alpha: enabled ? 0.44 : 0.14,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -827,15 +1332,15 @@ class _SectionCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(24),
-          hoverColor: accent.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(28),
+          hoverColor: accent.withValues(alpha: 0.08),
           splashColor: accent.withValues(alpha: 0.10),
-          highlightColor: accent.withValues(alpha: 0.08),
+          highlightColor: accent.withValues(alpha: 0.06),
           child: SizedBox(
-            width: 172,
-            height: 206,
+            width: double.infinity,
+            height: 264,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(28),
               child: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -854,26 +1359,38 @@ class _SectionCard extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.black.withValues(alpha: 0.08),
-                          Colors.black.withValues(alpha: 0.16),
-                          Colors.black.withValues(alpha: 0.70),
+                          Colors.black.withValues(alpha: 0.05),
+                          Colors.black.withValues(alpha: 0.18),
+                          Colors.black.withValues(alpha: 0.76),
                         ],
                       ),
                     ),
                   ),
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24),
+                      gradient: RadialGradient(
+                        center: Alignment.topCenter,
+                        radius: 1.1,
+                        colors: [
+                          accent.withValues(alpha: 0.20),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(28),
                       border: Border.all(
-                        color: accent.withValues(alpha: 0.62),
-                        width: 1.1,
+                        color: accent.withValues(alpha: 0.68),
+                        width: 1.2,
                       ),
                     ),
                   ),
                   PositionedDirectional(
-                    start: 12,
-                    end: 12,
-                    bottom: 12,
+                    start: 16,
+                    end: 16,
+                    bottom: 16,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -883,14 +1400,14 @@ class _SectionCard extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style:
-                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: const Color(0xFFFFE7B2),
                             fontWeight: FontWeight.w900,
-                            height: 1.05,
+                            height: 1.08,
                             shadows: const [
                               Shadow(
                                 color: Colors.black,
-                                blurRadius: 10,
+                                blurRadius: 12,
                                 offset: Offset(0, 1),
                               ),
                             ],
@@ -903,11 +1420,11 @@ class _SectionCard extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style:
-                              Theme.of(context).textTheme.labelSmall?.copyWith(
+                              Theme.of(context).textTheme.labelMedium?.copyWith(
                             color:
-                                const Color(0xFFFFE7B2).withValues(alpha: 0.84),
+                                const Color(0xFFFFE7B2).withValues(alpha: 0.86),
                             fontWeight: FontWeight.w700,
-                            height: 1.12,
+                            height: 1.14,
                             shadows: const [
                               Shadow(
                                 color: Colors.black,
@@ -924,7 +1441,7 @@ class _SectionCard extends StatelessWidget {
                               ? Icons.keyboard_arrow_left_rounded
                               : Icons.keyboard_arrow_right_rounded,
                           color: accent,
-                          size: 18,
+                          size: 20,
                         ),
                       ],
                     ),
@@ -961,19 +1478,26 @@ class _CenterActionHoverState extends State<_CenterActionHover> {
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedScale(
-        scale: _hovered ? 1.035 : 1.0,
-        duration: const Duration(milliseconds: 170),
-        curve: Curves.easeOutCubic,
+        scale: _hovered ? 1.018 : 1.0,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutQuart,
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
                 color: widget.accent.withValues(
-                  alpha: _hovered ? 0.30 : 0.18,
+                  alpha: _hovered ? 0.34 : 0.18,
                 ),
-                blurRadius: _hovered ? 24 : 16,
-                offset: const Offset(0, 10),
+                blurRadius: _hovered ? 28 : 16,
+                offset: const Offset(0, 12),
+              ),
+              BoxShadow(
+                color: const Color(0xFFE7C766).withValues(
+                  alpha: _hovered ? 0.16 : 0.08,
+                ),
+                blurRadius: _hovered ? 34 : 20,
+                spreadRadius: _hovered ? 1 : 0,
               ),
             ],
           ),

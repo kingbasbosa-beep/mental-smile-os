@@ -64,6 +64,34 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
+  String _dashboardBackgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/branding/client_dashboard/mobile/client_dashboard_mobile_bg.png';
+    }
+    if (width <= 1100) {
+      return 'assets/branding/client_dashboard/tablet/client_dashboard_tablet_bg.png';
+    }
+    return 'assets/branding/client_dashboard/desktop/client_dashboard_desktop_bg.png';
+  }
+
+  Alignment _dashboardBackgroundAlignment(double width) {
+    if (width < 700) {
+      return Alignment.topCenter;
+    }
+    return const Alignment(-0.08, 0);
+  }
+
+  double _dashboardBackgroundScale(double width) {
+    if (width <= 1100) return 1.0;
+    return 1.0;
+  }
+
+  double _dashboardOverlayAlpha(double width) {
+    if (width < 700) return 0.50;
+    if (width <= 1100) return 0.42;
+    return 0.38;
+  }
+
   String? get _uid => FirebaseAuth.instance.currentUser?.uid;
 
   Stream<Map<String, dynamic>?> _centerStream() {
@@ -1035,10 +1063,28 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
           context,
           title: isArabic ? 'غرفة عمليات المركز' : 'Center Operations',
         ),
-        body: AppPageBackground(
-          child: StreamBuilder<Map<String, dynamic>?>(
-            stream: _centerStream(),
-            builder: (context, snapshot) {
+        body: LayoutBuilder(
+          builder: (context, backgroundConstraints) {
+            final width = backgroundConstraints.maxWidth;
+
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                Transform.scale(
+                  scale: _dashboardBackgroundScale(width),
+                  child: Image.asset(
+                    _dashboardBackgroundAsset(width),
+                    fit: BoxFit.cover,
+                    alignment: _dashboardBackgroundAlignment(width),
+                  ),
+                ),
+                ColoredBox(
+                  color: Colors.black
+                      .withValues(alpha: _dashboardOverlayAlpha(width)),
+                ),
+                StreamBuilder<Map<String, dynamic>?>(
+                  stream: _centerStream(),
+                  builder: (context, snapshot) {
               final scheme = Theme.of(context).colorScheme;
               final data = snapshot.data ?? <String, dynamic>{};
               final centerName =
@@ -1452,8 +1498,11 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                   ),
                 ],
               );
-            },
-          ),
+                  },
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
