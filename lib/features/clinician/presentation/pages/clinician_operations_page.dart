@@ -348,6 +348,16 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
         .handleError((_) => 0);
   }
 
+  Future<void> _signOut() async {
+    await FirebaseAuth.instance.signOut();
+    if (!mounted) return;
+
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      Routes.login,
+      (route) => false,
+    );
+  }
+
   Widget _buildHomeSummary({
     required BuildContext context,
     required bool isArabic,
@@ -392,6 +402,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           isArabic: isArabic,
           clinicianName: clinicianName,
           clinicianPhotoUrl: clinicianPhotoUrl,
+          onSignOut: _signOut,
         ),
       ],
     );
@@ -1530,6 +1541,48 @@ class _RatingMetricChip extends StatelessWidget {
   }
 }
 
+class _ClinicianLogoutButton extends StatelessWidget {
+  final bool isArabic;
+  final VoidCallback onPressed;
+
+  const _ClinicianLogoutButton({
+    required this.isArabic,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: isArabic ? 'تسجيل الخروج' : 'Sign out',
+      child: SizedBox(
+        height: 30,
+        child: OutlinedButton.icon(
+          onPressed: onPressed,
+          icon: const Icon(Icons.logout_rounded, size: 15),
+          label: Text(isArabic ? 'خروج' : 'Logout'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: const Color(0xFFFFE7B2),
+            side: BorderSide(
+              color: const Color(0xFFE7C766).withValues(alpha: 0.62),
+            ),
+            backgroundColor: Colors.black.withValues(alpha: 0.24),
+            minimumSize: const Size(0, 30),
+            padding: const EdgeInsets.symmetric(horizontal: 9),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            textStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
+                ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _ClinicianGoldLogo extends StatelessWidget {
   final bool isArabic;
 
@@ -1576,11 +1629,13 @@ class _ClinicianCompactProfile extends StatelessWidget {
   final bool isArabic;
   final String clinicianName;
   final String clinicianPhotoUrl;
+  final VoidCallback onSignOut;
 
   const _ClinicianCompactProfile({
     required this.isArabic,
     required this.clinicianName,
     required this.clinicianPhotoUrl,
+    required this.onSignOut,
   });
 
   @override
@@ -1599,37 +1654,59 @@ class _ClinicianCompactProfile extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFE7C766).withValues(alpha: 0.22),
-                    blurRadius: 24,
-                    spreadRadius: 1,
+            SizedBox(
+              width: 92,
+              height: 128,
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              const Color(0xFFE7C766).withValues(alpha: 0.22),
+                          blurRadius: 24,
+                          spreadRadius: 1,
+                        ),
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.30),
+                          blurRadius: 18,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: CircleAvatar(
+                      radius: 46,
+                      backgroundColor:
+                          const Color(0xFFE7C766).withValues(alpha: 0.18),
+                      backgroundImage: hasValidPhotoUrl
+                          ? NetworkImage(clinicianPhotoUrl.trim())
+                          : null,
+                      child: hasValidPhotoUrl
+                          ? null
+                          : Icon(
+                              Icons.person_rounded,
+                              color: const Color(0xFFE7C766),
+                              size: 50,
+                            ),
+                    ),
                   ),
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.30),
-                    blurRadius: 18,
-                    offset: const Offset(0, 8),
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: _ClinicianLogoutButton(
+                        isArabic: isArabic,
+                        onPressed: onSignOut,
+                      ),
+                    ),
                   ),
                 ],
-              ),
-              child: CircleAvatar(
-                radius: 46,
-                backgroundColor:
-                    const Color(0xFFE7C766).withValues(alpha: 0.18),
-                backgroundImage: hasValidPhotoUrl
-                    ? NetworkImage(clinicianPhotoUrl.trim())
-                    : null,
-                child: hasValidPhotoUrl
-                    ? null
-                    : Icon(
-                        Icons.person_rounded,
-                        color: const Color(0xFFE7C766),
-                        size: 50,
-                      ),
               ),
             ),
             const SizedBox(width: 14),
