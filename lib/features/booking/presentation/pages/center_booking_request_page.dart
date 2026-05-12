@@ -539,213 +539,408 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
     }
   }
 
+  String _backgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/images/backgrounds/specialists_bg_mobile.png';
+    }
+    if (width < 1100) {
+      return 'assets/images/backgrounds/specialists_bg_tablet.png';
+    }
+    return 'assets/images/backgrounds/specialists_bg_desktop.png';
+  }
+
+  Widget _glassCard({
+    required Widget child,
+    EdgeInsetsGeometry padding = const EdgeInsets.all(16),
+  }) {
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.34),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.32),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE7C766).withValues(alpha: 0.08),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: DefaultTextStyle.merge(
+        style: const TextStyle(color: Color(0xFFFFF4D4), height: 1.35),
+        child: IconTheme(
+          data: const IconThemeData(color: Color(0xFFE7C766)),
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  InputDecoration _fieldDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(
+        color: const Color(0xFFFFF4D4).withValues(alpha: 0.62),
+      ),
+      filled: true,
+      fillColor: Colors.black.withValues(alpha: 0.26),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.26),
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.56),
+        ),
+      ),
+      disabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.14),
+        ),
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
+        backgroundColor: Colors.black,
         appBar: AppBar(
+          backgroundColor: Colors.black.withValues(alpha: 0.30),
+          foregroundColor: const Color(0xFFFFE7B2),
+          elevation: 0,
           title: const Text('طلب حجز مركز'),
         ),
-        body: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 820),
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Container(
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                _backgroundAsset(MediaQuery.of(context).size.width),
+              ),
+              fit: BoxFit.cover,
+              alignment: MediaQuery.of(context).size.width < 700
+                  ? Alignment.topCenter
+                  : Alignment.center,
+            ),
+          ),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withValues(alpha: 0.52),
+                  Colors.black.withValues(alpha: 0.32),
+                  Colors.black.withValues(alpha: 0.68),
+                ],
+              ),
+            ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 860),
+                child: ListView(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: scheme.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: scheme.outline.withValues(alpha: 0.14),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 28,
-                        child: Text(
-                          widget.args.centerName.trim().isEmpty
-                              ? 'م'
-                              : widget.args.centerName.trim().characters.first,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w800,
+                  children: [
+                    _glassCard(
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundColor:
+                                const Color(0xFFE7C766).withValues(alpha: 0.18),
+                            foregroundColor: const Color(0xFFFFE7B2),
+                            child: Text(
+                              widget.args.centerName.trim().isEmpty
+                                  ? 'م'
+                                  : widget.args.centerName
+                                      .trim()
+                                      .characters
+                                      .first,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.args.centerName,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                        color: const Color(0xFFFFE7B2),
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'سيتم إرسال طلبك أولًا إلى الإدارة، وتظل المتابعة كلها عبر الإدارة فقط بدون تواصل مباشر مع المركز من جهة العميل.',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: const Color(0xFFFFF4D4)
+                                            .withValues(alpha: 0.82),
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                    ),
+                    const SizedBox(height: 16),
+                    _glassCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'ملاحظات إضافية',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(
+                                  color: const Color(0xFFFFE7B2),
+                                  fontWeight: FontWeight.w900,
+                                ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'اكتب أي تفاصيل تريد أن تصل إلى الإدارة بخصوص طلب المركز.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: const Color(0xFFFFF4D4)
+                                      .withValues(alpha: 0.82),
+                                ),
+                          ),
+                          const SizedBox(height: 12),
+                          if (_availableAccommodationOptions().isNotEmpty) ...[
                             Text(
-                              widget.args.centerName,
+                              'اختيار نوع الإقامة',
                               style: Theme.of(context)
                                   .textTheme
-                                  .titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.w800),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'سيتم إرسال طلبك أولًا إلى الإدارة، وتظل المتابعة كلها عبر الإدارة فقط بدون تواصل مباشر مع المركز من جهة العميل.',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: scheme.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: scheme.outline.withValues(alpha: 0.14),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'ملاحظات إضافية',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleSmall
-                            ?.copyWith(fontWeight: FontWeight.w800),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'اكتب أي تفاصيل تريد أن تصل إلى الإدارة بخصوص طلب المركز.',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                      const SizedBox(height: 12),
-                      if (_availableAccommodationOptions().isNotEmpty) ...[
-                        Text(
-                          'اختيار نوع الإقامة',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleSmall
-                              ?.copyWith(fontWeight: FontWeight.w800),
-                        ),
-                        const SizedBox(height: 8),
-                        DropdownButtonFormField<String>(
-                          initialValue: _selectedAccommodationKey.isEmpty
-                              ? null
-                              : _selectedAccommodationKey,
-                          isExpanded: true,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            hintText: 'اختر نوع الإقامة',
-                          ),
-                          items: _availableAccommodationOptions().map((item) {
-                            final unit = (item['pricingUnit'] ?? '').toString();
-                            final unitLabel = unit == 'month'
-                                ? 'شهري'
-                                : unit == 'day'
-                                    ? 'يومي'
-                                    : '';
-                            return DropdownMenuItem<String>(
-                              value: (item['key'] ?? '').toString(),
-                              child: Text(
-                                '${item['labelAr']} - ${item['price']}${unitLabel.isEmpty ? '' : ' / $unitLabel'}',
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: _submitting
-                              ? null
-                              : (value) {
-                                  setState(() {
-                                    _selectedAccommodationKey = value ?? '';
-                                  });
-                                },
-                        ),
-                        const SizedBox(height: 12),
-                      ],
-                      if (_lastCenterNote.isNotEmpty ||
-                          _lastSuggestedAlternativeLabelAr.isNotEmpty)
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: scheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'آخر ملاحظة من المركز',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleSmall
-                                    ?.copyWith(fontWeight: FontWeight.w800),
-                              ),
-                              const SizedBox(height: 6),
-                              if (_lastCenterNote.isNotEmpty)
-                                Text(_lastCenterNote),
-                              if (_lastSuggestedAlternativeLabelAr.isNotEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 6),
-                                  child: Text(
-                                    'البديل المقترح: $_lastSuggestedAlternativeLabelAr',
+                                  .titleSmall
+                                  ?.copyWith(
+                                    color: const Color(0xFFFFE7B2),
+                                    fontWeight: FontWeight.w900,
                                   ),
+                            ),
+                            const SizedBox(height: 8),
+                            DropdownButtonFormField<String>(
+                              initialValue: _selectedAccommodationKey.isEmpty
+                                  ? null
+                                  : _selectedAccommodationKey,
+                              isExpanded: true,
+                              dropdownColor: const Color(0xFF090704),
+                              iconEnabledColor: const Color(0xFFE7C766),
+                              style: const TextStyle(
+                                color: Color(0xFFFFF4D4),
+                                fontWeight: FontWeight.w800,
+                              ),
+                              decoration: const InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(18)),
+                                  borderSide:
+                                      BorderSide(color: Color(0x44E7C766)),
                                 ),
-                            ],
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(18)),
+                                  borderSide:
+                                      BorderSide(color: Color(0x88E7C766)),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(18)),
+                                ),
+                                filled: true,
+                                fillColor: Color(0x42000000),
+                                hintText: 'اختر نوع الإقامة',
+                              ),
+                              items:
+                                  _availableAccommodationOptions().map((item) {
+                                final unit =
+                                    (item['pricingUnit'] ?? '').toString();
+                                final unitLabel = unit == 'month'
+                                    ? 'شهري'
+                                    : unit == 'day'
+                                        ? 'يومي'
+                                        : '';
+                                return DropdownMenuItem<String>(
+                                  value: (item['key'] ?? '').toString(),
+                                  child: Text(
+                                    '${item['labelAr']} - ${item['price']}${unitLabel.isEmpty ? '' : ' / $unitLabel'}',
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: _submitting
+                                  ? null
+                                  : (value) {
+                                      setState(() {
+                                        _selectedAccommodationKey = value ?? '';
+                                      });
+                                    },
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                          if (_lastCenterNote.isNotEmpty ||
+                              _lastSuggestedAlternativeLabelAr.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.24),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: const Color(0xFFE7C766)
+                                      .withValues(alpha: 0.20),
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'آخر ملاحظة من المركز',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(
+                                          color: const Color(0xFFFFE7B2),
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  if (_lastCenterNote.isNotEmpty)
+                                    Text(
+                                      _lastCenterNote,
+                                      style: const TextStyle(
+                                        color: Color(0xFFFFF4D4),
+                                      ),
+                                    ),
+                                  if (_lastSuggestedAlternativeLabelAr
+                                      .isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 6),
+                                      child: Text(
+                                        'البديل المقترح: $_lastSuggestedAlternativeLabelAr',
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          if (_lastCenterNote.isNotEmpty ||
+                              _lastSuggestedAlternativeLabelAr.isNotEmpty)
+                            const SizedBox(height: 12),
+                          TextField(
+                            controller: _noteCtrl,
+                            style: const TextStyle(
+                              color: Color(0xFFFFF4D4),
+                              fontWeight: FontWeight.w700,
+                            ),
+                            decoration: const InputDecoration(
+                              hintText: 'اكتب ملاحظتك هنا...',
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(18)),
+                                borderSide:
+                                    BorderSide(color: Color(0x44E7C766)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(18)),
+                                borderSide:
+                                    BorderSide(color: Color(0x88E7C766)),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(18)),
+                              ),
+                              filled: true,
+                              fillColor: Color(0x42000000),
+                            ),
+                            maxLines: 5,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 54,
+                      child: FilledButton.icon(
+                        onPressed:
+                            (_submitting || _loadingDraft) ? null : _submit,
+                        style: FilledButton.styleFrom(
+                          backgroundColor:
+                              const Color(0xFFE7C766).withValues(alpha: 0.16),
+                          foregroundColor: const Color(0xFFFFE7B2),
+                          disabledBackgroundColor:
+                              Colors.black.withValues(alpha: 0.22),
+                          disabledForegroundColor:
+                              const Color(0xFFFFF4D4).withValues(alpha: 0.45),
+                          side: BorderSide(
+                            color:
+                                const Color(0xFFE7C766).withValues(alpha: 0.44),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
                           ),
                         ),
-                      if (_lastCenterNote.isNotEmpty ||
-                          _lastSuggestedAlternativeLabelAr.isNotEmpty)
-                        const SizedBox(height: 12),
-                      TextField(
-                        controller: _noteCtrl,
-                        decoration: const InputDecoration(
-                          hintText: 'اكتب ملاحظتك هنا...',
-                          border: OutlineInputBorder(),
+                        icon: _submitting
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.send_outlined),
+                        label: Text(
+                          _submitting
+                              ? 'جارٍ الإرسال...'
+                              : 'إرسال الطلب إلى الإدارة',
                         ),
-                        maxLines: 5,
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 12),
+                    if (_result != null)
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.34),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color:
+                                const Color(0xFFE7C766).withValues(alpha: 0.26),
+                          ),
+                        ),
+                        child: Text(
+                          _result!,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: const Color(0xFFFFF4D4),
+                                  ),
+                        ),
+                      ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  height: 54,
-                  child: FilledButton.icon(
-                    onPressed: (_submitting || _loadingDraft) ? null : _submit,
-                    icon: _submitting
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.send_outlined),
-                    label: Text(
-                      _submitting
-                          ? 'جارٍ الإرسال...'
-                          : 'إرسال الطلب إلى الإدارة',
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                if (_result != null)
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: scheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Text(
-                      _result!,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
-              ],
+              ),
             ),
           ),
         ),
