@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/external_follow_up/data/models/follow_up_registry_entry.dart';
 import 'package:flutterprojects/features/external_follow_up/data/services/follow_up_registry_service.dart';
 import 'package:flutterprojects/features/external_follow_up/domain/follow_up_registry_constants.dart';
@@ -42,8 +43,35 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
   bool get _isGeneralSupportSelected =>
       _selectedFollowUpTypes.contains(FollowUpRegistryType.generalSupport);
 
-  bool get _isEducationSelected =>
-      _selectedFollowUpTypes.contains(FollowUpRegistryType.educationalAwareness);
+  bool get _isEducationSelected => _selectedFollowUpTypes
+      .contains(FollowUpRegistryType.educationalAwareness);
+
+  String _backgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/images/backgrounds/specialists_bg_mobile.png';
+    }
+    if (width < 1100) {
+      return 'assets/images/backgrounds/specialists_bg_tablet.png';
+    }
+    return 'assets/images/backgrounds/specialists_bg_desktop.png';
+  }
+
+  BoxDecoration _glassDecoration({double alpha = 0.34, double radius = 22}) {
+    return BoxDecoration(
+      color: Colors.black.withValues(alpha: alpha),
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(
+        color: const Color(0xFFE7C766).withValues(alpha: 0.34),
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.08),
+          blurRadius: 24,
+          offset: const Offset(0, 12),
+        ),
+      ],
+    );
+  }
 
   List<int> get _yearOptions {
     final currentYear = DateTime.now().year;
@@ -213,190 +241,317 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        body: AppPageBackground(
-          child: SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 760),
-                child: Form(
-                  key: _formKey,
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.xl,
-                      vertical: AppSpacing.xxl,
+        backgroundColor: Colors.black,
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  _backgroundAsset(constraints.maxWidth),
+                  fit: BoxFit.cover,
+                  alignment: constraints.maxWidth < 700
+                      ? Alignment.topCenter
+                      : Alignment.center,
+                ),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.62),
+                        Colors.black.withValues(alpha: 0.38),
+                        Colors.black.withValues(alpha: 0.74),
+                      ],
                     ),
-                    children: [
-                      const AppHeroHeader(
-                        title: 'Follow-up Registration',
-                        subtitle:
-                            'Register once to receive the follow-up categories you choose later. This form creates a registry entry only.',
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      AppSurfaceCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Follow-up types',
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: AppSpacing.sm),
-                            Text(
-                              'Choose one or more categories.',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            _buildTypeSelector(
-                              title: 'Birthday greetings',
-                              value: FollowUpRegistryType.birthday,
-                            ),
-                            _buildTypeSelector(
-                              title: 'Recovery follow-up',
-                              value: FollowUpRegistryType.recoverySupport,
-                            ),
-                            _buildTypeSelector(
-                              title: 'General support messages',
-                              value: FollowUpRegistryType.generalSupport,
-                            ),
-                            _buildTypeSelector(
-                              title: 'Educational / awareness content',
-                              value:
-                                  FollowUpRegistryType.educationalAwareness,
-                            ),
-                          ],
+                  ),
+                ),
+                Positioned(
+                  top: AppSpacing.md,
+                  right: AppSpacing.md,
+                  child: SafeArea(
+                    child: TextButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          Routes.clientDashboard,
+                          (route) => false,
+                        );
+                      },
+                      icon: const Icon(Icons.arrow_back_rounded),
+                      label: const Text('رجوع للصفحة الشخصية'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFFFFE8A6),
+                        backgroundColor:
+                            Colors.black.withValues(alpha: 0.36),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.sm,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(999),
+                          side: BorderSide(
+                            color: const Color(0xFFE7C766)
+                                .withValues(alpha: 0.40),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.lg),
-                      AppSurfaceCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
+                  ),
+                ),
+                SafeArea(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 760),
+                      child: Form(
+                        key: _formKey,
+                        child: ListView(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.xl,
+                            vertical: AppSpacing.xxl,
+                          ),
                           children: [
-                            Text(
-                              'Contact details',
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _displayNameController,
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: 'Name or nickname',
-                                icon: Icons.person_outline,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _phoneNumberController,
-                              keyboardType: TextInputType.phone,
-                              onChanged: (_) => setState(() {}),
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: 'WhatsApp number',
-                                icon: Icons.phone_outlined,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _emailController,
-                              keyboardType: TextInputType.emailAddress,
-                              onChanged: (_) => setState(() {}),
-                              decoration: appInputDecoration(
-                                context: context,
-                                label: 'Email',
-                                icon: Icons.email_outlined,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            AppSectionPanel(
-                              child: Row(
+                            Container(
+                              padding: const EdgeInsets.all(AppSpacing.lg),
+                              decoration:
+                                  _glassDecoration(alpha: 0.34, radius: 24),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.link_outlined),
-                                  const SizedBox(width: AppSpacing.sm),
-                                  Expanded(
-                                    child: Text(
-                                      'Preferred contact channel: ${_preferredContactChannel ?? 'Not available yet'}',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium,
+                                  Text(
+                                    'Follow-up Registration',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall
+                                        ?.copyWith(
+                                          color: const Color(0xFFE7C766),
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.sm),
+                                  Text(
+                                    'Register once to receive the follow-up categories you choose later. This form creates a registry entry only.',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: const Color(0xFFFFF4D4),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                            Container(
+                              padding: const EdgeInsets.all(AppSpacing.lg),
+                              decoration: _glassDecoration(alpha: 0.34),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Follow-up types',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                          color: const Color(0xFFE7C766),
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.sm),
+                                  Text(
+                                    'Choose one or more categories.',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                            color: const Color(0xFFFFF4D4)),
+                                  ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  _buildTypeSelector(
+                                    title: 'Birthday greetings',
+                                    value: FollowUpRegistryType.birthday,
+                                  ),
+                                  _buildTypeSelector(
+                                    title: 'Recovery follow-up',
+                                    value: FollowUpRegistryType.recoverySupport,
+                                  ),
+                                  _buildTypeSelector(
+                                    title: 'General support messages',
+                                    value: FollowUpRegistryType.generalSupport,
+                                  ),
+                                  _buildTypeSelector(
+                                    title: 'Educational / awareness content',
+                                    value: FollowUpRegistryType
+                                        .educationalAwareness,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                            Container(
+                              padding: const EdgeInsets.all(AppSpacing.lg),
+                              decoration: _glassDecoration(alpha: 0.34),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Contact details',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                          color: const Color(0xFFE7C766),
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  TextFormField(
+                                    controller: _displayNameController,
+                                    decoration: appInputDecoration(
+                                      context: context,
+                                      label: 'Name or nickname',
+                                      icon: Icons.person_outline,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  TextFormField(
+                                    controller: _phoneNumberController,
+                                    keyboardType: TextInputType.phone,
+                                    onChanged: (_) => setState(() {}),
+                                    decoration: appInputDecoration(
+                                      context: context,
+                                      label: 'WhatsApp number',
+                                      icon: Icons.phone_outlined,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  TextFormField(
+                                    controller: _emailController,
+                                    keyboardType: TextInputType.emailAddress,
+                                    onChanged: (_) => setState(() {}),
+                                    decoration: appInputDecoration(
+                                      context: context,
+                                      label: 'Email',
+                                      icon: Icons.email_outlined,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  Container(
+                                    padding:
+                                        const EdgeInsets.all(AppSpacing.md),
+                                    decoration: _glassDecoration(
+                                      alpha: 0.28,
+                                      radius: 18,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.link_outlined),
+                                        const SizedBox(width: AppSpacing.sm),
+                                        Expanded(
+                                          child: Text(
+                                            'Preferred contact channel: ${_preferredContactChannel ?? 'Not available yet'}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                                  color:
+                                                      const Color(0xFFFFF4D4),
+                                                ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                      if (_isBirthdaySelected) ...[
-                        const SizedBox(height: AppSpacing.lg),
-                        _buildBirthdaySection(),
-                      ],
-                      if (_isRecoverySelected) ...[
-                        const SizedBox(height: AppSpacing.lg),
-                        _buildRecoverySection(),
-                      ],
-                      if (_isGeneralSupportSelected) ...[
-                        const SizedBox(height: AppSpacing.lg),
-                        _buildGeneralSupportSection(),
-                      ],
-                      if (_isEducationSelected) ...[
-                        const SizedBox(height: AppSpacing.lg),
-                        _buildEducationSection(),
-                      ],
-                      const SizedBox(height: AppSpacing.lg),
-                      AppSurfaceCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Consent',
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            CheckboxListTile(
-                              value: _consentAccepted,
-                              contentPadding: EdgeInsets.zero,
-                              controlAffinity: ListTileControlAffinity.leading,
-                              title: const Text(
-                                'I agree to receive follow-up, support, and awareness messages from Mental Smile.',
-                              ),
-                              onChanged: (value) {
-                                setState(() {
-                                  _consentAccepted = value == true;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: FilledButton.icon(
-                          onPressed: _submitting ? null : _submit,
-                          icon: _submitting
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
+                            if (_isBirthdaySelected) ...[
+                              const SizedBox(height: AppSpacing.lg),
+                              _buildBirthdaySection(),
+                            ],
+                            if (_isRecoverySelected) ...[
+                              const SizedBox(height: AppSpacing.lg),
+                              _buildRecoverySection(),
+                            ],
+                            if (_isGeneralSupportSelected) ...[
+                              const SizedBox(height: AppSpacing.lg),
+                              _buildGeneralSupportSection(),
+                            ],
+                            if (_isEducationSelected) ...[
+                              const SizedBox(height: AppSpacing.lg),
+                              _buildEducationSection(),
+                            ],
+                            const SizedBox(height: AppSpacing.lg),
+                            Container(
+                              padding: const EdgeInsets.all(AppSpacing.lg),
+                              decoration: _glassDecoration(alpha: 0.34),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Consent',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                          color: const Color(0xFFE7C766),
+                                          fontWeight: FontWeight.w900,
+                                        ),
                                   ),
-                                )
-                              : const Icon(Icons.how_to_reg_outlined),
-                          label: Text(
-                            _submitting
-                                ? 'Submitting...'
-                                : 'Submit registration',
-                          ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  CheckboxListTile(
+                                    value: _consentAccepted,
+                                    contentPadding: EdgeInsets.zero,
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
+                                    title: const Text(
+                                      'I agree to receive follow-up, support, and awareness messages from the support team.',
+                                      style:
+                                          TextStyle(color: Color(0xFFFFF4D4)),
+                                    ),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _consentAccepted = value == true;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 56,
+                              child: FilledButton.icon(
+                                onPressed: _submitting ? null : _submit,
+                                icon: _submitting
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : const Icon(Icons.how_to_reg_outlined),
+                                label: Text(
+                                  _submitting
+                                      ? 'Submitting...'
+                                      : 'Submit registration',
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -413,7 +568,10 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
         value: selected,
         contentPadding: EdgeInsets.zero,
         controlAffinity: ListTileControlAffinity.leading,
-        title: Text(title),
+        title: Text(
+          title,
+          style: const TextStyle(color: Color(0xFFFFF4D4)),
+        ),
         onChanged: (checked) {
           setState(() {
             if (checked == true) {
@@ -429,8 +587,7 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                 _recoveryStartYear = null;
               } else if (value == FollowUpRegistryType.generalSupport) {
                 _supportFrequency = null;
-              } else if (value ==
-                  FollowUpRegistryType.educationalAwareness) {
+              } else if (value == FollowUpRegistryType.educationalAwareness) {
                 _selectedEducationalTopics.clear();
               }
             }
@@ -441,11 +598,19 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
   }
 
   Widget _buildBirthdaySection() {
-    return AppSurfaceCard(
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: _glassDecoration(alpha: 0.34),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Birthday details', style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            'Birthday details',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: const Color(0xFFE7C766),
+                  fontWeight: FontWeight.w900,
+                ),
+          ),
           const SizedBox(height: AppSpacing.md),
           Row(
             children: [
@@ -496,11 +661,19 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
   }
 
   Widget _buildRecoverySection() {
-    return AppSurfaceCard(
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: _glassDecoration(alpha: 0.34),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Recovery follow-up', style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            'Recovery follow-up',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: const Color(0xFFE7C766),
+                  fontWeight: FontWeight.w900,
+                ),
+          ),
           const SizedBox(height: AppSpacing.md),
           DropdownButtonFormField<String>(
             value: _recoveryFrequency,
@@ -571,13 +744,18 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
   }
 
   Widget _buildGeneralSupportSection() {
-    return AppSurfaceCard(
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: _glassDecoration(alpha: 0.34),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'General support messages',
-            style: Theme.of(context).textTheme.titleLarge,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: const Color(0xFFE7C766),
+                  fontWeight: FontWeight.w900,
+                ),
           ),
           const SizedBox(height: AppSpacing.md),
           DropdownButtonFormField<String>(
@@ -603,18 +781,26 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
   }
 
   Widget _buildEducationSection() {
-    return AppSurfaceCard(
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: _glassDecoration(alpha: 0.34),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Educational topics',
-            style: Theme.of(context).textTheme.titleLarge,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: const Color(0xFFE7C766),
+                  fontWeight: FontWeight.w900,
+                ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
             'Choose one or more topics.',
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: const Color(0xFFFFF4D4)),
           ),
           const SizedBox(height: AppSpacing.md),
           Wrap(

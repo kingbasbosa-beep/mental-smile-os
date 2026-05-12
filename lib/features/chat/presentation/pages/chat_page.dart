@@ -55,6 +55,35 @@ class _ChatPageState extends State<ChatPage> {
     return value;
   }
 
+  String _backgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/images/backgrounds/specialists_bg_mobile.png';
+    }
+    if (width < 1100) {
+      return 'assets/images/backgrounds/specialists_bg_tablet.png';
+    }
+    return 'assets/images/backgrounds/specialists_bg_desktop.png';
+  }
+
+  BoxDecoration _glassDecoration({
+    double alpha = 0.38,
+    double radius = 24,
+    Color borderColor = const Color(0xFFE7C766),
+  }) {
+    return BoxDecoration(
+      color: Colors.black.withValues(alpha: alpha),
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(color: borderColor.withValues(alpha: 0.34)),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.08),
+          blurRadius: 24,
+          offset: const Offset(0, 12),
+        ),
+      ],
+    );
+  }
+
   String _pageSubtitle(bool isArabic) {
     if (widget.adminSupportMode) {
       return isArabic
@@ -194,7 +223,8 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  Widget _buildStructuredRequestMenu(bool isArabic, TextDirection textDirection) {
+  Widget _buildStructuredRequestMenu(
+      bool isArabic, TextDirection textDirection) {
     if (!widget.adminSupportMode ||
         _viewerIsAdmin == true ||
         _viewerIsAdmin == null) {
@@ -209,13 +239,7 @@ class _ChatPageState extends State<ChatPage> {
         AppSpacing.sm,
       ),
       child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.72),
-          borderRadius: BorderRadius.circular(AppRadii.md),
-          border: Border.all(
-            color: AppColors.mutedGold.withValues(alpha: 0.22),
-          ),
-        ),
+        decoration: _glassDecoration(alpha: 0.34, radius: 20),
         child: Column(
           crossAxisAlignment:
               isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
@@ -228,14 +252,15 @@ class _ChatPageState extends State<ChatPage> {
                 AppSpacing.xs,
               ),
               child: Column(
-                crossAxisAlignment:
-                    isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                crossAxisAlignment: isArabic
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
                 children: [
                   Text(
                     isArabic ? 'طلب منظم' : 'Structured Request',
                     textAlign: isArabic ? TextAlign.right : TextAlign.left,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: AppColors.obsidian,
+                          color: const Color(0xFFE7C766),
                           fontWeight: FontWeight.w800,
                         ),
                   ),
@@ -246,7 +271,8 @@ class _ChatPageState extends State<ChatPage> {
                         : 'Use structured requests for booking, clinician, center, follow-up, or account issues. Safety concerns should use the general support chat.',
                     textAlign: isArabic ? TextAlign.right : TextAlign.left,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.obsidian.withValues(alpha: 0.76),
+                          color:
+                              const Color(0xFFFFF4D4).withValues(alpha: 0.78),
                           fontWeight: FontWeight.w600,
                         ),
                   ),
@@ -272,8 +298,14 @@ class _ChatPageState extends State<ChatPage> {
                           avatar: const Icon(
                             Icons.add_comment_outlined,
                             size: 16,
-                            color: AppColors.deepTeal,
+                            color: Color(0xFFE7C766),
                           ),
+                          backgroundColor: Colors.black.withValues(alpha: 0.28),
+                          side: BorderSide(
+                            color:
+                                const Color(0xFFE7C766).withValues(alpha: 0.30),
+                          ),
+                          labelStyle: const TextStyle(color: Color(0xFFFFF4D4)),
                           label: Text(
                             isArabic ? option.arabic : option.english,
                             textAlign:
@@ -316,10 +348,10 @@ class _ChatPageState extends State<ChatPage> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFF7E8),
+                    color: Colors.black.withValues(alpha: 0.32),
                     borderRadius: BorderRadius.circular(AppRadii.md),
                     border: Border.all(
-                      color: const Color(0xFFD8B26A).withValues(alpha: 0.28),
+                      color: const Color(0xFFE7C766).withValues(alpha: 0.28),
                     ),
                   ),
                   child: Column(
@@ -331,7 +363,7 @@ class _ChatPageState extends State<ChatPage> {
                         isArabic ? 'معاينة الطلب' : 'Request Preview',
                         textAlign: isArabic ? TextAlign.right : TextAlign.left,
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              color: AppColors.obsidian,
+                              color: const Color(0xFFE7C766),
                               fontWeight: FontWeight.w800,
                             ),
                       ),
@@ -344,7 +376,7 @@ class _ChatPageState extends State<ChatPage> {
                         ),
                         textAlign: isArabic ? TextAlign.right : TextAlign.left,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.obsidian,
+                              color: const Color(0xFFFFF4D4),
                               fontWeight: FontWeight.w600,
                             ),
                       ),
@@ -403,9 +435,9 @@ class _ChatPageState extends State<ChatPage> {
         AppSpacing.md,
         AppSpacing.sm,
       ),
-      child: AppSurfaceCard(
-        color: const Color(0xFFFFF7E8),
+      child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: _glassDecoration(alpha: 0.30, radius: 22),
         child: Column(
           crossAxisAlignment:
               isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
@@ -415,7 +447,7 @@ class _ChatPageState extends State<ChatPage> {
               children: [
                 const Icon(
                   Icons.info_outline_rounded,
-                  color: Color(0xFF8A5A1F),
+                  color: Color(0xFFE7C766),
                   size: 20,
                 ),
                 const SizedBox(width: AppSpacing.xs),
@@ -426,7 +458,7 @@ class _ChatPageState extends State<ChatPage> {
                         : 'This chat is for support and guidance only. Requests, pricing, contracts, and payments cannot be changed through chat.',
                     textAlign: isArabic ? TextAlign.right : TextAlign.left,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.obsidian,
+                          color: const Color(0xFFFFF4D4),
                           fontWeight: FontWeight.w700,
                         ),
                   ),
@@ -457,7 +489,7 @@ class _ChatPageState extends State<ChatPage> {
             : 'To modify your request or details, please use the available actions in the system.',
         textAlign: isArabic ? TextAlign.right : TextAlign.left,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.obsidian.withValues(alpha: 0.72),
+              color: const Color(0xFFFFF4D4).withValues(alpha: 0.72),
               fontWeight: FontWeight.w600,
             ),
       ),
@@ -667,10 +699,10 @@ class _ChatPageState extends State<ChatPage> {
     final isAi = sender == 'ai';
 
     final bubbleColor = isUser
-        ? AppColors.deepTeal.withValues(alpha: 0.12)
+        ? const Color(0xFFE7C766).withValues(alpha: 0.16)
         : (isAdmin
-            ? const Color(0xFFEAF4FF)
-            : Colors.white.withValues(alpha: 0.92));
+            ? const Color(0xFF1C4E54).withValues(alpha: 0.28)
+            : Colors.black.withValues(alpha: 0.42));
 
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -686,8 +718,8 @@ class _ChatPageState extends State<ChatPage> {
           borderRadius: BorderRadius.circular(AppRadii.md),
           border: Border.all(
             color: isUser
-                ? AppColors.deepTeal.withValues(alpha: 0.16)
-                : AppColors.mutedGold.withValues(alpha: 0.10),
+                ? const Color(0xFFE7C766).withValues(alpha: 0.38)
+                : AppColors.mutedGold.withValues(alpha: 0.26),
           ),
         ),
         child: Column(
@@ -706,7 +738,7 @@ class _ChatPageState extends State<ChatPage> {
                           : (isArabic ? 'الدعم' : 'Support'))),
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: AppColors.mist,
+                    color: const Color(0xFFE7C766),
                   ),
             ),
             const SizedBox(height: AppSpacing.xxs),
@@ -714,7 +746,7 @@ class _ChatPageState extends State<ChatPage> {
               msg.text,
               textAlign: isArabic ? TextAlign.right : TextAlign.left,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: AppColors.obsidian,
+                    color: const Color(0xFFFFF4D4),
                   ),
             ),
           ],
@@ -727,7 +759,9 @@ class _ChatPageState extends State<ChatPage> {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
-        child: AppSurfaceCard(
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          decoration: _glassDecoration(alpha: 0.36, radius: 22),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -741,7 +775,7 @@ class _ChatPageState extends State<ChatPage> {
                 _error ?? (isArabic ? 'تعذر فتح الشات' : 'Unable to open chat'),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppColors.obsidian,
+                      color: const Color(0xFFFFF4D4),
                     ),
               ),
               const SizedBox(height: AppSpacing.md),
@@ -762,7 +796,7 @@ class _ChatPageState extends State<ChatPage> {
       child: Text(
         isArabic ? 'ابدأ أول رسالة الآن' : 'Start your first message now',
         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: AppColors.obsidian,
+              color: const Color(0xFFFFF4D4),
             ),
       ),
     );
@@ -785,7 +819,12 @@ class _ChatPageState extends State<ChatPage> {
     return Directionality(
       textDirection: textDirection,
       child: Scaffold(
+        backgroundColor: Colors.black,
         appBar: AppBar(
+          backgroundColor: Colors.black.withValues(alpha: 0.88),
+          elevation: 0,
+          foregroundColor: const Color(0xFFFFE8A6),
+          surfaceTintColor: Colors.transparent,
           title: Text(isArabic ? 'شات Mental Smile' : 'Mental Smile Chat'),
           actions: [
             if (!widget.adminSupportMode)
@@ -795,272 +834,408 @@ class _ChatPageState extends State<ChatPage> {
                     _loading || _sending ? null : _startFreshConversation,
                 icon: const Icon(
                   Icons.refresh_rounded,
-                  color: AppColors.deepTeal,
+                  color: Color(0xFFE7C766),
                 ),
               ),
           ],
         ),
-        body: AppPageBackground(
-          child: SafeArea(
-            child: _loading
-                ? const Center(child: CircularProgressIndicator())
-                : _error != null
-                    ? _buildErrorState(isArabic)
-                    : _thread == null
-                        ? Center(
-                            child: Text(
-                              isArabic
-                                  ? 'تعذر تحميل المحادثة'
-                                  : 'Unable to load conversation',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(color: AppColors.obsidian),
-                            ),
-                          )
-                        : Column(
-                            children: [
-                              const SizedBox(height: AppSpacing.sm),
-                              const AppLogoWordmark(width: 220),
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  AppSpacing.md,
-                                  AppSpacing.md,
-                                  AppSpacing.md,
-                                  AppSpacing.sm,
-                                ),
-                                child: AppSurfaceCard(
-                                  color: Colors.white.withValues(alpha: 0.82),
-                                  padding: const EdgeInsets.all(AppSpacing.md),
-                                  child: Row(
-                                    textDirection: textDirection,
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: isArabic
-                                              ? CrossAxisAlignment.end
-                                              : CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              widget.adminSupportMode
-                                                  ? (isArabic
-                                                      ? 'دعم الإدارة'
-                                                      : 'Admin Support')
-                                                  : (isArabic
-                                                      ? 'مساعد Mental Smile'
-                                                      : 'Mental Smile Assistant'),
-                                              textAlign: isArabic
-                                                  ? TextAlign.right
-                                                  : TextAlign.left,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium,
-                                            ),
-                                            const SizedBox(
-                                                height: AppSpacing.xxs),
-                                            Text(
-                                              _pageSubtitle(isArabic),
-                                              textAlign: isArabic
-                                                  ? TextAlign.right
-                                                  : TextAlign.left,
-                                            ),
-                                            if (entryContextHelper != null) ...[
-                                              const SizedBox(
-                                                  height: AppSpacing.xxs),
-                                              Text(
-                                                entryContextHelper,
-                                                textAlign: isArabic
-                                                    ? TextAlign.right
-                                                    : TextAlign.left,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodySmall
-                                                    ?.copyWith(
-                                                      color: AppColors.obsidian
-                                                          .withValues(
-                                                        alpha: 0.72,
-                                                      ),
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                              ),
-                                            ],
-                                          ],
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  _backgroundAsset(constraints.maxWidth),
+                  fit: BoxFit.cover,
+                  alignment: constraints.maxWidth < 700
+                      ? Alignment.topCenter
+                      : Alignment.center,
+                ),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.62),
+                        Colors.black.withValues(alpha: 0.38),
+                        Colors.black.withValues(alpha: 0.74),
+                      ],
+                    ),
+                  ),
+                ),
+                SafeArea(
+                  child: _loading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFFE7C766),
+                          ),
+                        )
+                      : _error != null
+                          ? _buildErrorState(isArabic)
+                          : _thread == null
+                              ? Center(
+                                  child: Text(
+                                    isArabic
+                                        ? 'تعذر تحميل المحادثة'
+                                        : 'Unable to load conversation',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.copyWith(
+                                          color: const Color(0xFFFFF4D4),
                                         ),
-                                      ),
-                                      const SizedBox(width: AppSpacing.md),
-                                      CircleAvatar(
-                                        radius: 26,
-                                        backgroundColor: AppColors.deepTeal
-                                            .withValues(alpha: 0.10),
-                                        child: ClipOval(
-                                          child: Image.asset(
-                                            normalizeAssetPath(_avatarAsset),
-                                            width: 52,
-                                            height: 52,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Container(
-                                                width: 52,
-                                                height: 52,
-                                                color: AppColors.deepTeal
-                                                    .withValues(alpha: 0.10),
-                                                alignment: Alignment.center,
-                                                child: Icon(
-                                                  widget.adminSupportMode
-                                                      ? Icons
-                                                          .support_agent_rounded
-                                                      : Icons
-                                                          .person_outline_rounded,
-                                                  color: AppColors.deepTeal,
-                                                  size: 22,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                    ],
                                   ),
-                                ),
-                              ),
-                              _buildBoundaryBanner(isArabic, textDirection),
-                              Expanded(
-                                child: StreamBuilder<List<ChatMessageModel>>(
-                                  stream:
-                                      _controller.streamMessages(_thread!.id),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasError) {
-                                      return Center(
-                                        child: Text(
-                                          isArabic
-                                              ? 'حدث خطأ أثناء تحميل الرسائل'
-                                              : 'Failed to load messages',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge
-                                              ?.copyWith(
-                                                color: AppColors.obsidian,
-                                              ),
-                                        ),
-                                      );
-                                    }
-
-                                    if (!snapshot.hasData) {
-                                      return const Center(
-                                        child: CircularProgressIndicator(),
-                                      );
-                                    }
-
-                                    final messages = snapshot.data ?? [];
-                                    if (messages.isEmpty) {
-                                      return ListView(
-                                        controller: _scrollController,
+                                )
+                              : Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                        AppSpacing.md,
+                                        AppSpacing.md,
+                                        AppSpacing.md,
+                                        AppSpacing.sm,
+                                      ),
+                                      child: Container(
                                         padding:
                                             const EdgeInsets.all(AppSpacing.md),
-                                        children: [
-                                          _buildStructuredRequestMenu(
-                                            isArabic,
-                                            textDirection,
-                                          ),
-                                          _buildEmptyState(isArabic),
-                                        ],
-                                      );
-                                    }
-
-                                    return ListView.builder(
-                                      controller: _scrollController,
-                                      padding:
-                                          const EdgeInsets.all(AppSpacing.md),
-                                      itemCount: messages.length + 1,
-                                      itemBuilder: (context, index) {
-                                        if (index == 0) {
-                                          return _buildStructuredRequestMenu(
-                                            isArabic,
-                                            textDirection,
-                                          );
-                                        }
-                                        final msg = messages[index - 1];
-                                        if (!msg.visibleToUser) {
-                                          return const SizedBox.shrink();
-                                        }
-                                        return _bubble(msg, isArabic);
-                                      },
-                                    );
-                                  },
-                                ),
-                              ),
-                              if (!widget.adminSupportMode || isViewerAdmin)
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    AppSpacing.sm,
-                                    0,
-                                    AppSpacing.sm,
-                                    AppSpacing.sm,
-                                  ),
-                                  child: AppSectionPanel(
-                                    padding: const EdgeInsets.fromLTRB(
-                                      AppSpacing.sm,
-                                      AppSpacing.sm,
-                                      AppSpacing.sm,
-                                      AppSpacing.sm,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: isArabic
-                                          ? CrossAxisAlignment.end
-                                          : CrossAxisAlignment.start,
-                                      children: [
-                                        _buildRedirectHint(isArabic),
-                                        Row(
+                                        decoration: _glassDecoration(
+                                          alpha: 0.34,
+                                          radius: 24,
+                                        ),
+                                        child: Row(
                                           textDirection: textDirection,
                                           children: [
                                             Expanded(
-                                              child: TextField(
-                                                controller: _textController,
-                                                minLines: 1,
-                                                maxLines: 4,
-                                                textDirection: textDirection,
-                                                decoration: InputDecoration(
-                                                  hintText: isArabic
-                                                      ? 'اكتب رسالتك هنا...'
-                                                      : 'Type your message here...',
-                                                ),
-                                                onSubmitted: (_) => _send(),
+                                              child: Column(
+                                                crossAxisAlignment: isArabic
+                                                    ? CrossAxisAlignment.end
+                                                    : CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    widget.adminSupportMode
+                                                        ? (isArabic
+                                                            ? 'دعم الإدارة'
+                                                            : 'Admin Support')
+                                                        : (isArabic
+                                                            ? 'مساعد Mental Smile'
+                                                            : 'Mental Smile Assistant'),
+                                                    textAlign: isArabic
+                                                        ? TextAlign.right
+                                                        : TextAlign.left,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .titleMedium
+                                                        ?.copyWith(
+                                                          color: const Color(
+                                                              0xFFE7C766),
+                                                          fontWeight:
+                                                              FontWeight.w900,
+                                                        ),
+                                                  ),
+                                                  const SizedBox(
+                                                      height: AppSpacing.xxs),
+                                                  Text(
+                                                    _pageSubtitle(isArabic),
+                                                    textAlign: isArabic
+                                                        ? TextAlign.right
+                                                        : TextAlign.left,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          color: const Color(
+                                                            0xFFFFF4D4,
+                                                          ).withValues(
+                                                              alpha: 0.78),
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                  ),
+                                                  if (entryContextHelper !=
+                                                      null) ...[
+                                                    const SizedBox(
+                                                        height: AppSpacing.xxs),
+                                                    Text(
+                                                      entryContextHelper,
+                                                      textAlign: isArabic
+                                                          ? TextAlign.right
+                                                          : TextAlign.left,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodySmall
+                                                          ?.copyWith(
+                                                            color: const Color(
+                                                              0xFFFFF4D4,
+                                                            ).withValues(
+                                                              alpha: 0.72,
+                                                            ),
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                    ),
+                                                  ],
+                                                ],
                                               ),
                                             ),
-                                            const SizedBox(width: AppSpacing.sm),
-                                            SizedBox(
-                                              height: 50,
-                                              child: FilledButton(
-                                                onPressed:
-                                                    _sending ? null : _send,
-                                                child: _sending
-                                                    ? const SizedBox(
-                                                        width: 18,
-                                                        height: 18,
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                          strokeWidth: 2,
-                                                          color: Colors.white,
-                                                        ),
-                                                      )
-                                                    : Text(
-                                                        isArabic
-                                                            ? 'إرسال'
-                                                            : 'Send',
+                                            const SizedBox(
+                                                width: AppSpacing.md),
+                                            CircleAvatar(
+                                              radius: 26,
+                                              backgroundColor:
+                                                  const Color(0xFFE7C766)
+                                                      .withValues(alpha: 0.20),
+                                              child: ClipOval(
+                                                child: Image.asset(
+                                                  normalizeAssetPath(
+                                                      _avatarAsset),
+                                                  width: 52,
+                                                  height: 52,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
+                                                    return Container(
+                                                      width: 52,
+                                                      height: 52,
+                                                      color: Colors.black
+                                                          .withValues(
+                                                              alpha: 0.24),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Icon(
+                                                        widget.adminSupportMode
+                                                            ? Icons
+                                                                .support_agent_rounded
+                                                            : Icons
+                                                                .person_outline_rounded,
+                                                        color: const Color(
+                                                            0xFFE7C766),
+                                                        size: 22,
                                                       ),
+                                                    );
+                                                  },
+                                                ),
                                               ),
                                             ),
                                           ],
                                         ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
+                                    _buildBoundaryBanner(
+                                        isArabic, textDirection),
+                                    Expanded(
+                                      child:
+                                          StreamBuilder<List<ChatMessageModel>>(
+                                        stream: _controller
+                                            .streamMessages(_thread!.id),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasError) {
+                                            return Center(
+                                              child: Text(
+                                                isArabic
+                                                    ? 'حدث خطأ أثناء تحميل الرسائل'
+                                                    : 'Failed to load messages',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyLarge
+                                                    ?.copyWith(
+                                                      color: const Color(
+                                                          0xFFFFF4D4),
+                                                    ),
+                                              ),
+                                            );
+                                          }
+
+                                          if (!snapshot.hasData) {
+                                            return const Center(
+                                              child: CircularProgressIndicator(
+                                                color: Color(0xFFE7C766),
+                                              ),
+                                            );
+                                          }
+
+                                          final messages = snapshot.data ?? [];
+                                          if (messages.isEmpty) {
+                                            return ListView(
+                                              controller: _scrollController,
+                                              padding: const EdgeInsets.all(
+                                                  AppSpacing.md),
+                                              children: [
+                                                _buildStructuredRequestMenu(
+                                                  isArabic,
+                                                  textDirection,
+                                                ),
+                                                _buildEmptyState(isArabic),
+                                              ],
+                                            );
+                                          }
+
+                                          return ListView.builder(
+                                            controller: _scrollController,
+                                            padding: const EdgeInsets.all(
+                                                AppSpacing.md),
+                                            itemCount: messages.length + 1,
+                                            itemBuilder: (context, index) {
+                                              if (index == 0) {
+                                                return _buildStructuredRequestMenu(
+                                                  isArabic,
+                                                  textDirection,
+                                                );
+                                              }
+                                              final msg = messages[index - 1];
+                                              if (!msg.visibleToUser) {
+                                                return const SizedBox.shrink();
+                                              }
+                                              return _bubble(msg, isArabic);
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    if (!widget.adminSupportMode ||
+                                        isViewerAdmin)
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                          AppSpacing.sm,
+                                          0,
+                                          AppSpacing.sm,
+                                          AppSpacing.sm,
+                                        ),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(
+                                              AppSpacing.sm),
+                                          decoration: _glassDecoration(
+                                            alpha: 0.42,
+                                            radius: 22,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: isArabic
+                                                ? CrossAxisAlignment.end
+                                                : CrossAxisAlignment.start,
+                                            children: [
+                                              _buildRedirectHint(isArabic),
+                                              Row(
+                                                textDirection: textDirection,
+                                                children: [
+                                                  Expanded(
+                                                    child: TextField(
+                                                      controller:
+                                                          _textController,
+                                                      minLines: 1,
+                                                      maxLines: 4,
+                                                      textDirection:
+                                                          textDirection,
+                                                      style: const TextStyle(
+                                                        color:
+                                                            Color(0xFFFFF4D4),
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                      cursorColor: const Color(
+                                                          0xFFE7C766),
+                                                      decoration:
+                                                          InputDecoration(
+                                                        hintText: isArabic
+                                                            ? 'اكتب رسالتك هنا...'
+                                                            : 'Type your message here...',
+                                                        hintStyle: TextStyle(
+                                                          color: const Color(
+                                                            0xFFFFF4D4,
+                                                          ).withValues(
+                                                              alpha: 0.56),
+                                                        ),
+                                                        filled: true,
+                                                        fillColor: Colors.black
+                                                            .withValues(
+                                                                alpha: 0.34),
+                                                        enabledBorder:
+                                                            OutlineInputBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                            20,
+                                                          ),
+                                                          borderSide:
+                                                              BorderSide(
+                                                            color: const Color(
+                                                              0xFFE7C766,
+                                                            ).withValues(
+                                                                alpha: 0.28),
+                                                          ),
+                                                        ),
+                                                        focusedBorder:
+                                                            OutlineInputBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                            20,
+                                                          ),
+                                                          borderSide:
+                                                              const BorderSide(
+                                                            color: Color(
+                                                                0xFFE7C766),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      onSubmitted: (_) =>
+                                                          _send(),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                      width: AppSpacing.sm),
+                                                  SizedBox(
+                                                    height: 50,
+                                                    child: FilledButton(
+                                                      style: FilledButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            const Color(
+                                                                0xFF1C4E54),
+                                                        foregroundColor:
+                                                            const Color(
+                                                                0xFFFFF4D4),
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                            18,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      onPressed: _sending
+                                                          ? null
+                                                          : _send,
+                                                      child: _sending
+                                                          ? const SizedBox(
+                                                              width: 18,
+                                                              height: 18,
+                                                              child:
+                                                                  CircularProgressIndicator(
+                                                                strokeWidth: 2,
+                                                                color: Color(
+                                                                    0xFFFFF4D4),
+                                                              ),
+                                                            )
+                                                          : Text(
+                                                              isArabic
+                                                                  ? 'إرسال'
+                                                                  : 'Send',
+                                                            ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
-                            ],
-                          ),
-          ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

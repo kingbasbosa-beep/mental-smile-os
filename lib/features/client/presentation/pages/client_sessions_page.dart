@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
@@ -15,6 +15,33 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
 
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+
+  String _backgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/images/backgrounds/specialists_bg_mobile.png';
+    }
+    if (width < 1100) {
+      return 'assets/images/backgrounds/specialists_bg_tablet.png';
+    }
+    return 'assets/images/backgrounds/specialists_bg_desktop.png';
+  }
+
+  BoxDecoration _glassDecoration({double alpha = 0.34, double radius = 22}) {
+    return BoxDecoration(
+      color: Colors.black.withValues(alpha: alpha),
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(
+        color: const Color(0xFFE7C766).withValues(alpha: 0.34),
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.08),
+          blurRadius: 24,
+          offset: const Offset(0, 12),
+        ),
+      ],
+    );
+  }
 
   bool _isCenterRequestData(Map<String, dynamic> data) {
     final requestKind = (data['requestKind'] ?? '').toString().trim();
@@ -391,7 +418,12 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
+        backgroundColor: Colors.black,
         appBar: AppBar(
+          backgroundColor: Colors.black.withValues(alpha: 0.88),
+          elevation: 0,
+          foregroundColor: const Color(0xFFFFE8A6),
+          surfaceTintColor: Colors.transparent,
           title: Text(
             isArabic ? 'جلساتي وإقاماتي' : 'My Sessions & Residencies',
           ),
@@ -400,381 +432,447 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
             icon: const Icon(Icons.arrow_back),
           ),
         ),
-        body: uid.isEmpty
-            ? Center(
-                child: Text(
-                  isArabic ? 'يجب تسجيل الدخول أولًا' : 'Please sign in first',
-                ),
-              )
-            : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance
-                    .collection('booking_requests')
-                    .where('clientId', isEqualTo: uid)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Text(
-                        isArabic
-                            ? 'تعذر تحميل الجلسات والإقامات'
-                            : 'Unable to load sessions and residencies',
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return DefaultTextStyle.merge(
+              style: const TextStyle(color: Color(0xFFFFF4D4)),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    _backgroundAsset(constraints.maxWidth),
+                    fit: BoxFit.cover,
+                    alignment: constraints.maxWidth < 700
+                        ? Alignment.topCenter
+                        : Alignment.center,
+                  ),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.62),
+                          Colors.black.withValues(alpha: 0.38),
+                          Colors.black.withValues(alpha: 0.74),
+                        ],
                       ),
-                    );
-                  }
-
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  final docs = _normalizeDocs(
-                    snapshot.data!.docs,
-                    'booking_requests',
-                  ).where(_isSessionRelated).toList()
-                    ..sort((a, b) {
-                      final aTs = a['updatedAt'] ?? a['createdAt'];
-                      final bTs = b['updatedAt'] ?? b['createdAt'];
-                      DateTime ad = DateTime.fromMillisecondsSinceEpoch(0);
-                      DateTime bd = DateTime.fromMillisecondsSinceEpoch(0);
-                      if (aTs is Timestamp) ad = aTs.toDate();
-                      if (bTs is Timestamp) bd = bTs.toDate();
-                      return bd.compareTo(ad);
-                    });
-
-                  if (docs.isEmpty) {
-                    return Center(
-                      child: Text(
-                        isArabic
-                            ? 'لا توجد جلسات أو إقامات ظاهرة حاليًا'
-                            : 'No visible sessions or residencies yet',
-                      ),
-                    );
-                  }
-
-                  return ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: docs.map((data) {
-                      final requestId = (data['_id'] ?? '').toString();
-                      final status = (data['status'] ?? '').toString();
-                      final isCenterRequest = _isCenterRequestData(data);
-                      final clinicianName = (data['assignedClinicianName'] ??
-                              data['clinicianName'] ??
-                              '')
-                          .toString();
-                      final centerName = (data['centerName'] ?? '').toString();
-                      final titleText = isCenterRequest
-                          ? (centerName.trim().isEmpty
-                              ? (isArabic ? 'المركز' : 'Center')
-                              : centerName)
-                          : (clinicianName.trim().isEmpty
-                              ? (isArabic ? 'الأخصائي' : 'Clinician')
-                              : clinicianName);
-                      final sessionDate =
-                          (data['sessionDateText'] ?? '').toString();
-                      final sessionLink =
-                          (data['sessionLink'] ?? '').toString();
-                      final sessionCode =
-                          (data['sessionCode'] ?? '').toString();
-                      final adminNotes =
-                          (data['sessionAdminNotes'] ?? '').toString();
-                      final stayStartText = (data['stayStartDateText'] ??
-                              data['sessionDateText'] ??
-                              '')
-                          .toString()
-                          .trim();
-                      final stayEndText =
-                          (data['stayEndDateText'] ?? '').toString().trim();
-                      final stayDurationDays =
-                          (data['stayDurationDays'] ?? '').toString().trim();
-                      final stayDurationReason =
-                          (data['stayDurationReason'] ?? '').toString().trim();
-                      final stayDurationIsPreliminary =
-                          (data['stayDurationIsPreliminary'] ?? false) == true;
-                      final createdAt = _dateText(data['createdAt']);
-                      final centerArrivalConfirmed =
-                          (data['centerArrivalConfirmed'] ?? false) == true;
-                      final clientCheckInConfirmed =
-                          (data['clientCheckInConfirmed'] ?? false) == true;
-                      final clientReviewSubmitted =
-                          (data['clientReviewSubmitted'] ?? false) == true;
-                      final centerReviewSubmitted =
-                          ((data['centerReviewSubmitted'] ??
-                                      data['clinicianReviewSubmitted']) ??
-                                  false) ==
-                              true;
-                      final awaitingResidencyStart = _isAwaitingResidencyStart(
-                        status,
-                        isCenterRequest,
-                        centerArrivalConfirmed,
-                        clientCheckInConfirmed,
-                      );
-                      final hasPreliminaryResidencyDetails =
-                          _hasPreliminaryResidencyDetails(data);
-                      final busy = _busyIds.contains(requestId);
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 14),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: scheme.surface,
-                          borderRadius: BorderRadius.circular(22),
-                          border: Border.all(
-                            color: scheme.outline.withValues(alpha: 0.14),
+                    ),
+                  ),
+                  uid.isEmpty
+                      ? Center(
+                          child: Text(
+                            isArabic
+                                ? 'يجب تسجيل الدخول أولًا'
+                                : 'Please sign in first',
                           ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: isArabic
-                              ? CrossAxisAlignment.end
-                              : CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
+                        )
+                      : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                          stream: FirebaseFirestore.instance
+                              .collection('booking_requests')
+                              .where('clientId', isEqualTo: uid)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return Center(
+                                child: Text(
+                                  isArabic
+                                      ? 'تعذر تحميل الجلسات والإقامات'
+                                      : 'Unable to load sessions and residencies',
+                                ),
+                              );
+                            }
+
+                            if (!snapshot.hasData) {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: Color(0xFFE7C766),
+                                ),
+                              );
+                            }
+
+                            final docs = _normalizeDocs(
+                              snapshot.data!.docs,
+                              'booking_requests',
+                            ).where(_isSessionRelated).toList()
+                              ..sort((a, b) {
+                                final aTs = a['updatedAt'] ?? a['createdAt'];
+                                final bTs = b['updatedAt'] ?? b['createdAt'];
+                                DateTime ad =
+                                    DateTime.fromMillisecondsSinceEpoch(0);
+                                DateTime bd =
+                                    DateTime.fromMillisecondsSinceEpoch(0);
+                                if (aTs is Timestamp) ad = aTs.toDate();
+                                if (bTs is Timestamp) bd = bTs.toDate();
+                                return bd.compareTo(ad);
+                              });
+
+                            if (docs.isEmpty) {
+                              return Center(
+                                child: Text(
+                                  isArabic
+                                      ? 'لا توجد جلسات أو إقامات ظاهرة حاليًا'
+                                      : 'No visible sessions or residencies yet',
+                                ),
+                              );
+                            }
+
+                            return ListView(
+                              padding: const EdgeInsets.all(16),
+                              children: docs.map((data) {
+                                final requestId =
+                                    (data['_id'] ?? '').toString();
+                                final status =
+                                    (data['status'] ?? '').toString();
+                                final isCenterRequest =
+                                    _isCenterRequestData(data);
+                                final clinicianName =
+                                    (data['assignedClinicianName'] ??
+                                            data['clinicianName'] ??
+                                            '')
+                                        .toString();
+                                final centerName =
+                                    (data['centerName'] ?? '').toString();
+                                final titleText = isCenterRequest
+                                    ? (centerName.trim().isEmpty
+                                        ? (isArabic ? 'المركز' : 'Center')
+                                        : centerName)
+                                    : (clinicianName.trim().isEmpty
+                                        ? (isArabic ? 'الأخصائي' : 'Clinician')
+                                        : clinicianName);
+                                final sessionDate =
+                                    (data['sessionDateText'] ?? '').toString();
+                                final sessionLink =
+                                    (data['sessionLink'] ?? '').toString();
+                                final sessionCode =
+                                    (data['sessionCode'] ?? '').toString();
+                                final adminNotes =
+                                    (data['sessionAdminNotes'] ?? '')
+                                        .toString();
+                                final stayStartText =
+                                    (data['stayStartDateText'] ??
+                                            data['sessionDateText'] ??
+                                            '')
+                                        .toString()
+                                        .trim();
+                                final stayEndText =
+                                    (data['stayEndDateText'] ?? '')
+                                        .toString()
+                                        .trim();
+                                final stayDurationDays =
+                                    (data['stayDurationDays'] ?? '')
+                                        .toString()
+                                        .trim();
+                                final stayDurationReason =
+                                    (data['stayDurationReason'] ?? '')
+                                        .toString()
+                                        .trim();
+                                final stayDurationIsPreliminary =
+                                    (data['stayDurationIsPreliminary'] ??
+                                            false) ==
+                                        true;
+                                final createdAt = _dateText(data['createdAt']);
+                                final centerArrivalConfirmed =
+                                    (data['centerArrivalConfirmed'] ?? false) ==
+                                        true;
+                                final clientCheckInConfirmed =
+                                    (data['clientCheckInConfirmed'] ?? false) ==
+                                        true;
+                                final clientReviewSubmitted =
+                                    (data['clientReviewSubmitted'] ?? false) ==
+                                        true;
+                                final centerReviewSubmitted = ((data[
+                                                'centerReviewSubmitted'] ??
+                                            data['clinicianReviewSubmitted']) ??
+                                        false) ==
+                                    true;
+                                final awaitingResidencyStart =
+                                    _isAwaitingResidencyStart(
+                                  status,
+                                  isCenterRequest,
+                                  centerArrivalConfirmed,
+                                  clientCheckInConfirmed,
+                                );
+                                final hasPreliminaryResidencyDetails =
+                                    _hasPreliminaryResidencyDetails(data);
+                                final busy = _busyIds.contains(requestId);
+
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 14),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.34),
+                                    borderRadius: BorderRadius.circular(22),
+                                    border: Border.all(
+                                      color: const Color(0xFFE7C766)
+                                          .withValues(alpha: 0.34),
+                                    ),
+                                  ),
                                   child: Column(
                                     crossAxisAlignment: isArabic
                                         ? CrossAxisAlignment.end
                                         : CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        titleText,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w800,
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: isArabic
+                                                  ? CrossAxisAlignment.end
+                                                  : CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  titleText,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .titleLarge
+                                                      ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                        color: const Color(
+                                                            0xFFE7C766),
+                                                      ),
+                                                ),
+                                                const SizedBox(height: 6),
+                                                Text(
+                                                  isCenterRequest
+                                                      ? (isArabic
+                                                          ? 'طلب مركز'
+                                                          : 'Center request')
+                                                      : (isArabic
+                                                          ? 'طلب أخصائي'
+                                                          : 'Clinician request'),
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .labelMedium
+                                                      ?.copyWith(
+                                                        color: const Color(
+                                                            0xFFE7C766),
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                      ),
+                                                ),
+                                                if (createdAt.isNotEmpty) ...[
+                                                  const SizedBox(height: 6),
+                                                  Text(
+                                                    isArabic
+                                                        ? 'تاريخ الطلب: $createdAt'
+                                                        : 'Request date: $createdAt',
+                                                  ),
+                                                ],
+                                              ],
                                             ),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        isCenterRequest
-                                            ? (isArabic
-                                                ? 'طلب مركز'
-                                                : 'Center request')
-                                            : (isArabic
-                                                ? 'طلب أخصائي'
-                                                : 'Clinician request'),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelMedium
-                                            ?.copyWith(
-                                              color: scheme.primary,
-                                              fontWeight: FontWeight.w700,
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 6,
                                             ),
+                                            decoration: BoxDecoration(
+                                              color: _statusColor(status)
+                                                  .withValues(alpha: 0.12),
+                                              borderRadius:
+                                                  BorderRadius.circular(999),
+                                            ),
+                                            child: Text(
+                                              awaitingResidencyStart
+                                                  ? (isArabic
+                                                      ? 'بانتظار تأكيد البداية'
+                                                      : 'Awaiting start confirmations')
+                                                  : _statusLabel(
+                                                      status,
+                                                      isArabic,
+                                                      isCenterRequest,
+                                                    ),
+                                              style: TextStyle(
+                                                color: awaitingResidencyStart
+                                                    ? const Color(0xFFE39B2E)
+                                                    : _statusColor(status),
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      if (createdAt.isNotEmpty) ...[
+                                      const SizedBox(height: 14),
+                                      if (stayStartText.isNotEmpty)
+                                        Text(
+                                          isArabic
+                                              ? '${isCenterRequest ? 'موعد بداية الإقامة' : 'موعد الجلسة'}: $stayStartText'
+                                              : '${isCenterRequest ? 'Residency start' : 'Session date'}: $stayStartText',
+                                        ),
+                                      if (isCenterRequest &&
+                                          stayEndText.isNotEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          isArabic
+                                              ? 'نهاية الإقامة المبدئية: $stayEndText'
+                                              : 'Preliminary residency end: $stayEndText',
+                                        ),
+                                      ],
+                                      if (isCenterRequest &&
+                                          stayDurationDays.isNotEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          isArabic
+                                              ? 'مدة الإقامة المبدئية: $stayDurationDays يوم'
+                                              : 'Preliminary stay duration: $stayDurationDays day(s)',
+                                        ),
+                                      ],
+                                      if (isCenterRequest &&
+                                          stayDurationReason.isNotEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          isArabic
+                                              ? 'سبب تحديد المدة مبدئيًا: $stayDurationReason'
+                                              : 'Reason for preliminary duration: $stayDurationReason',
+                                        ),
+                                      ],
+                                      if (isCenterRequest &&
+                                          stayDurationIsPreliminary) ...[
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          isArabic
+                                              ? 'ملاحظة: هذه المدة مبدئية حتى يؤكدها أو يعدلها المركز بعد تقييم الاستقبال.'
+                                              : 'Note: This duration is preliminary until the center confirms or adjusts it after intake assessment.',
+                                        ),
+                                      ],
+                                      if (sessionLink.trim().isNotEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        SelectableText(
+                                          isArabic
+                                              ? '${isCenterRequest ? 'رابط المتابعة' : 'رابط الجلسة'}: $sessionLink'
+                                              : '${isCenterRequest ? 'Follow-up link' : 'Session link'}: $sessionLink',
+                                        ),
+                                      ],
+                                      if (sessionCode.trim().isNotEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        SelectableText(
+                                          isArabic
+                                              ? '${isCenterRequest ? 'كود الإقامة' : 'كود الجلسة'}: $sessionCode'
+                                              : '${isCenterRequest ? 'Residency code' : 'Session code'}: $sessionCode',
+                                        ),
+                                      ],
+                                      if (adminNotes.trim().isNotEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          isArabic
+                                              ? 'ملاحظات الإدارة: $adminNotes'
+                                              : 'Admin notes: $adminNotes',
+                                        ),
+                                      ],
+                                      if (stayStartText.isEmpty &&
+                                          sessionLink.trim().isEmpty &&
+                                          sessionCode.trim().isEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          isArabic
+                                              ? 'سيتم عرض بيانات الإقامة هنا بمجرد تجهيزها.'
+                                              : 'Residency details will appear here once prepared.',
+                                        ),
+                                      ],
+                                      if (isCenterRequest) ...[
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          isArabic
+                                              ? 'تأكيد المركز للوصول: ${centerArrivalConfirmed ? 'تم' : 'بانتظار التأكيد'}'
+                                              : 'Center arrival confirmation: ${centerArrivalConfirmed ? 'confirmed' : 'pending'}',
+                                        ),
                                         const SizedBox(height: 6),
                                         Text(
                                           isArabic
-                                              ? 'تاريخ الطلب: $createdAt'
-                                              : 'Request date: $createdAt',
+                                              ? 'تأكيد الأسرة لبداية الإقامة: ${clientCheckInConfirmed ? 'تم' : 'بانتظار التأكيد'}'
+                                              : 'Family check-in confirmation: ${clientCheckInConfirmed ? 'confirmed' : 'pending'}',
+                                        ),
+                                        if (status ==
+                                                'session_completed_pending_reviews' ||
+                                            status == 'payout_pending') ...[
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            isArabic
+                                                ? 'تقييم الأسرة: ${clientReviewSubmitted ? 'تم الإرسال' : 'بانتظار الإرسال'}'
+                                                : 'Family review: ${clientReviewSubmitted ? 'submitted' : 'pending'}',
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            isArabic
+                                                ? 'تقرير خروج المركز: ${centerReviewSubmitted ? 'تم الإرسال' : 'بانتظار الإرسال'}'
+                                                : 'Center discharge report: ${centerReviewSubmitted ? 'submitted' : 'pending'}',
+                                          ),
+                                        ],
+                                      ],
+                                      if (isCenterRequest &&
+                                          (status == 'session_setup_pending' ||
+                                              status == 'session_scheduled' ||
+                                              status == 'reschedule_pending') &&
+                                          !clientCheckInConfirmed &&
+                                          hasPreliminaryResidencyDetails) ...[
+                                        const SizedBox(height: 14),
+                                        FilledButton.icon(
+                                          onPressed: busy
+                                              ? null
+                                              : () => _confirmResidencyStart(
+                                                    context,
+                                                    requestId,
+                                                    data,
+                                                    isArabic,
+                                                  ),
+                                          icon: const Icon(
+                                              Icons.home_work_outlined),
+                                          label: Text(
+                                            isArabic
+                                                ? 'تأكيد بداية الإقامة'
+                                                : 'Confirm residency start',
+                                          ),
+                                        ),
+                                      ],
+                                      if (isCenterRequest &&
+                                          !hasPreliminaryResidencyDetails) ...[
+                                        const SizedBox(height: 14),
+                                        Text(
+                                          isArabic
+                                              ? 'سيظهر تأكيد بداية الإقامة بعد إرسال بيانات الإقامة المبدئية كاملة من الإدارة.'
+                                              : 'Residency start confirmation will appear after the admin sends the preliminary stay details.',
+                                        ),
+                                      ],
+                                      if (_canClientReview(data)) ...[
+                                        const SizedBox(height: 14),
+                                        FilledButton.icon(
+                                          onPressed: () {
+                                            Navigator.of(context).pushNamed(
+                                              Routes.sessionReview,
+                                              arguments: {
+                                                'requestId': requestId,
+                                                'reviewerType': 'client',
+                                              },
+                                            );
+                                          },
+                                          icon: const Icon(
+                                              Icons.rate_review_outlined),
+                                          label: Text(
+                                            isCenterRequest
+                                                ? (isArabic
+                                                    ? 'تقييم الإقامة'
+                                                    : 'Review residency')
+                                                : (isArabic
+                                                    ? 'تقييم الجلسة'
+                                                    : 'Review session'),
+                                          ),
                                         ),
                                       ],
                                     ],
                                   ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: _statusColor(status)
-                                        .withValues(alpha: 0.12),
-                                    borderRadius: BorderRadius.circular(999),
-                                  ),
-                                  child: Text(
-                                    awaitingResidencyStart
-                                        ? (isArabic
-                                            ? 'بانتظار تأكيد البداية'
-                                            : 'Awaiting start confirmations')
-                                        : _statusLabel(
-                                            status,
-                                            isArabic,
-                                            isCenterRequest,
-                                          ),
-                                    style: TextStyle(
-                                      color: awaitingResidencyStart
-                                          ? const Color(0xFFE39B2E)
-                                          : _statusColor(status),
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 14),
-                            if (stayStartText.isNotEmpty)
-                              Text(
-                                isArabic
-                                    ? '${isCenterRequest ? 'موعد بداية الإقامة' : 'موعد الجلسة'}: $stayStartText'
-                                    : '${isCenterRequest ? 'Residency start' : 'Session date'}: $stayStartText',
-                              ),
-                            if (isCenterRequest && stayEndText.isNotEmpty) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                isArabic
-                                    ? 'نهاية الإقامة المبدئية: $stayEndText'
-                                    : 'Preliminary residency end: $stayEndText',
-                              ),
-                            ],
-                            if (isCenterRequest &&
-                                stayDurationDays.isNotEmpty) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                isArabic
-                                    ? 'مدة الإقامة المبدئية: $stayDurationDays يوم'
-                                    : 'Preliminary stay duration: $stayDurationDays day(s)',
-                              ),
-                            ],
-                            if (isCenterRequest &&
-                                stayDurationReason.isNotEmpty) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                isArabic
-                                    ? 'سبب تحديد المدة مبدئيًا: $stayDurationReason'
-                                    : 'Reason for preliminary duration: $stayDurationReason',
-                              ),
-                            ],
-                            if (isCenterRequest &&
-                                stayDurationIsPreliminary) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                isArabic
-                                    ? 'ملاحظة: هذه المدة مبدئية حتى يؤكدها أو يعدلها المركز بعد تقييم الاستقبال.'
-                                    : 'Note: This duration is preliminary until the center confirms or adjusts it after intake assessment.',
-                              ),
-                            ],
-                            if (sessionLink.trim().isNotEmpty) ...[
-                              const SizedBox(height: 8),
-                              SelectableText(
-                                isArabic
-                                    ? '${isCenterRequest ? 'رابط المتابعة' : 'رابط الجلسة'}: $sessionLink'
-                                    : '${isCenterRequest ? 'Follow-up link' : 'Session link'}: $sessionLink',
-                              ),
-                            ],
-                            if (sessionCode.trim().isNotEmpty) ...[
-                              const SizedBox(height: 8),
-                              SelectableText(
-                                isArabic
-                                    ? '${isCenterRequest ? 'كود الإقامة' : 'كود الجلسة'}: $sessionCode'
-                                    : '${isCenterRequest ? 'Residency code' : 'Session code'}: $sessionCode',
-                              ),
-                            ],
-                            if (adminNotes.trim().isNotEmpty) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                isArabic
-                                    ? 'ملاحظات الإدارة: $adminNotes'
-                                    : 'Admin notes: $adminNotes',
-                              ),
-                            ],
-                            if (stayStartText.isEmpty &&
-                                sessionLink.trim().isEmpty &&
-                                sessionCode.trim().isEmpty) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                isArabic
-                                    ? 'سيتم عرض بيانات الإقامة هنا بمجرد تجهيزها.'
-                                    : 'Residency details will appear here once prepared.',
-                              ),
-                            ],
-                            if (isCenterRequest) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                isArabic
-                                    ? 'تأكيد المركز للوصول: ${centerArrivalConfirmed ? 'تم' : 'بانتظار التأكيد'}'
-                                    : 'Center arrival confirmation: ${centerArrivalConfirmed ? 'confirmed' : 'pending'}',
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                isArabic
-                                    ? 'تأكيد الأسرة لبداية الإقامة: ${clientCheckInConfirmed ? 'تم' : 'بانتظار التأكيد'}'
-                                    : 'Family check-in confirmation: ${clientCheckInConfirmed ? 'confirmed' : 'pending'}',
-                              ),
-                              if (status ==
-                                      'session_completed_pending_reviews' ||
-                                  status == 'payout_pending') ...[
-                                const SizedBox(height: 6),
-                                Text(
-                                  isArabic
-                                      ? 'تقييم الأسرة: ${clientReviewSubmitted ? 'تم الإرسال' : 'بانتظار الإرسال'}'
-                                      : 'Family review: ${clientReviewSubmitted ? 'submitted' : 'pending'}',
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  isArabic
-                                      ? 'تقرير خروج المركز: ${centerReviewSubmitted ? 'تم الإرسال' : 'بانتظار الإرسال'}'
-                                      : 'Center discharge report: ${centerReviewSubmitted ? 'submitted' : 'pending'}',
-                                ),
-                              ],
-                            ],
-                            if (isCenterRequest &&
-                                (status == 'session_setup_pending' ||
-                                    status == 'session_scheduled' ||
-                                    status == 'reschedule_pending') &&
-                                !clientCheckInConfirmed &&
-                                hasPreliminaryResidencyDetails) ...[
-                              const SizedBox(height: 14),
-                              FilledButton.icon(
-                                onPressed: busy
-                                    ? null
-                                    : () => _confirmResidencyStart(
-                                          context,
-                                          requestId,
-                                          data,
-                                          isArabic,
-                                        ),
-                                icon: const Icon(Icons.home_work_outlined),
-                                label: Text(
-                                  isArabic
-                                      ? 'تأكيد بداية الإقامة'
-                                      : 'Confirm residency start',
-                                ),
-                              ),
-                            ],
-                            if (isCenterRequest &&
-                                !hasPreliminaryResidencyDetails) ...[
-                              const SizedBox(height: 14),
-                              Text(
-                                isArabic
-                                    ? 'سيظهر تأكيد بداية الإقامة بعد إرسال بيانات الإقامة المبدئية كاملة من الإدارة.'
-                                    : 'Residency start confirmation will appear after the admin sends the preliminary stay details.',
-                              ),
-                            ],
-                            if (_canClientReview(data)) ...[
-                              const SizedBox(height: 14),
-                              FilledButton.icon(
-                                onPressed: () {
-                                  Navigator.of(context).pushNamed(
-                                    Routes.sessionReview,
-                                    arguments: {
-                                      'requestId': requestId,
-                                      'reviewerType': 'client',
-                                    },
-                                  );
-                                },
-                                icon: const Icon(Icons.rate_review_outlined),
-                                label: Text(
-                                  isCenterRequest
-                                      ? (isArabic
-                                          ? 'تقييم الإقامة'
-                                          : 'Review residency')
-                                      : (isArabic
-                                          ? 'تقييم الجلسة'
-                                          : 'Review session'),
-                                ),
-                              ),
-                            ],
-                          ],
+                                );
+                              }).toList(),
+                            );
+                          },
                         ),
-                      );
-                    }).toList(),
-                  );
-                },
+                ],
               ),
+            );
+          },
+        ),
       ),
     );
   }
 }
-
-
-

@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
@@ -20,6 +20,57 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
 
   bool get _isArabic =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+
+  String _backgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/images/backgrounds/specialists_bg_mobile.png';
+    }
+    if (width < 1100) {
+      return 'assets/images/backgrounds/specialists_bg_tablet.png';
+    }
+    return 'assets/images/backgrounds/specialists_bg_desktop.png';
+  }
+
+  BoxDecoration _glassDecoration({double alpha = 0.34, double radius = 22}) {
+    return BoxDecoration(
+      color: Colors.black.withValues(alpha: alpha),
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(
+        color: const Color(0xFFE7C766).withValues(alpha: 0.34),
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.08),
+          blurRadius: 24,
+          offset: const Offset(0, 12),
+        ),
+      ],
+    );
+  }
+
+  InputDecoration _darkInputDecoration({
+    required String label,
+    IconData? icon,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: Color(0xFFFFE8A6)),
+      prefixIcon:
+          icon == null ? null : Icon(icon, color: const Color(0xFFE7C766)),
+      filled: true,
+      fillColor: Colors.black.withValues(alpha: 0.30),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.28),
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(color: Color(0xFFE7C766)),
+      ),
+    );
+  }
 
   DateTime _asDateTime(dynamic value) {
     if (value is Timestamp) return value.toDate();
@@ -305,348 +356,427 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
     return Directionality(
       textDirection: _isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
+        backgroundColor: Colors.black,
         appBar: AppShellActions.buildAppBar(
           context,
           title: _isArabic ? 'رفع إثبات التحويل' : 'Upload payment proof',
         ),
-        body: uid.isEmpty
-            ? Center(
-                child: Text(
-                  _isArabic ? 'يجب تسجيل الدخول أولًا' : 'Please sign in first',
-                ),
-              )
-            : StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
-                stream: _awaitingPaymentRequests(uid),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Text(
-                        _isArabic
-                            ? 'تعذر تحميل الطلبات'
-                            : 'Unable to load requests',
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return DefaultTextStyle.merge(
+              style: const TextStyle(color: Color(0xFFFFF4D4)),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    _backgroundAsset(constraints.maxWidth),
+                    fit: BoxFit.cover,
+                    alignment: constraints.maxWidth < 700
+                        ? Alignment.topCenter
+                        : Alignment.center,
+                  ),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.62),
+                          Colors.black.withValues(alpha: 0.38),
+                          Colors.black.withValues(alpha: 0.74),
+                        ],
                       ),
-                    );
-                  }
-
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  final docs = snapshot.data ?? const [];
-                  if (docs.isEmpty) {
-                    _selectedRequestId = null;
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Text(
-                          _isArabic
-                              ? 'لا يوجد طلب بانتظار التحويل المالي حاليًا'
-                              : 'No request currently awaiting payment',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    );
-                  }
-
-                  final hasSelection = docs.any(
-                    (doc) => doc.id == _selectedRequestId,
-                  );
-                  final selectedDoc = hasSelection
-                      ? docs.firstWhere((doc) => doc.id == _selectedRequestId)
-                      : docs.first;
-                  _selectedRequestId = selectedDoc.id;
-                  final selectedData = selectedDoc.data();
-                  final selectedClinicianName =
-                      (selectedData['assignedClinicianName'] ??
-                              selectedData['clinicianName'] ??
-                              '')
-                          .toString();
-                  final selectedCenterName =
-                      (selectedData['centerName'] ?? '').toString();
-                  final selectedNote = (selectedData['note'] ?? '').toString();
-                  final isCenterRequest =
-                      (selectedData['requestKind'] ?? '').toString() ==
-                              'center' ||
-                          selectedCenterName.trim().isNotEmpty;
-                  final stayStart = (selectedData['stayStartDateText'] ??
-                          selectedData['sessionDateText'] ??
-                          '')
-                      .toString();
-                  final stayEnd =
-                      (selectedData['stayEndDateText'] ?? '').toString();
-                  final stayDurationDays =
-                      (selectedData['stayDurationDays'] ?? '').toString();
-                  final stayTotalAmount =
-                      (selectedData['stayTotalAmount'] ?? '').toString();
-                  final paymentBreakdownText =
-                      (selectedData['paymentBreakdownText'] ?? '').toString();
-
-                  return ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(22),
-                          border: Border.all(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .outline
-                                .withValues(alpha: 0.14),
+                    ),
+                  ),
+                  uid.isEmpty
+                      ? Center(
+                          child: Text(
+                            _isArabic
+                                ? 'يجب تسجيل الدخول أولًا'
+                                : 'Please sign in first',
+                            style: const TextStyle(color: Color(0xFFFFF4D4)),
                           ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _isArabic
-                                  ? 'اختر الطلب المطلوب رفع إثباته'
-                                  : 'Choose the request to upload proof for',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.w800),
-                            ),
-                            const SizedBox(height: 12),
-                            for (final doc in docs) ...[
-                              Builder(
-                                builder: (context) {
-                                  final data = doc.data();
-                                  final clinicianName =
-                                      (data['assignedClinicianName'] ??
-                                              data['clinicianName'] ??
-                                              '')
-                                          .toString();
-                                  final centerName =
-                                      (data['centerName'] ?? '').toString();
-                                  final isCenterRequest =
-                                      (data['requestKind'] ?? '').toString() ==
-                                              'center' ||
-                                          centerName.trim().isNotEmpty;
-                                  final note =
-                                      (data['note'] ?? '').toString().trim();
-                                  final isSelected =
-                                      doc.id == _selectedRequestId;
+                        )
+                      : StreamBuilder<
+                          List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
+                          stream: _awaitingPaymentRequests(uid),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return Center(
+                                child: Text(
+                                  _isArabic
+                                      ? 'تعذر تحميل الطلبات'
+                                      : 'Unable to load requests',
+                                ),
+                              );
+                            }
 
-                                  return Container(
-                                    margin: const EdgeInsets.only(bottom: 10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(18),
-                                      border: Border.all(
-                                        color: isSelected
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .primary
-                                            : Theme.of(context)
-                                                .colorScheme
-                                                .outline
-                                                .withValues(alpha: 0.14),
-                                        width: isSelected ? 1.6 : 1,
-                                      ),
+                            if (!snapshot.hasData) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            }
+
+                            final docs = snapshot.data ?? const [];
+                            if (docs.isEmpty) {
+                              _selectedRequestId = null;
+                              return Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(24),
+                                  child: Text(
+                                    _isArabic
+                                        ? 'لا يوجد طلب بانتظار التحويل المالي حاليًا'
+                                        : 'No request currently awaiting payment',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Color(0xFFFFF4D4),
+                                      fontWeight: FontWeight.w700,
                                     ),
-                                    child: ListTile(
-                                      onTap: _loading
-                                          ? null
-                                          : () {
-                                              setState(() {
-                                                _selectedRequestId = doc.id;
-                                              });
-                                            },
-                                      leading: Icon(
-                                        isSelected
-                                            ? Icons.radio_button_checked
-                                            : Icons.radio_button_off,
+                                  ),
+                                ),
+                              );
+                            }
+
+                            final hasSelection = docs.any(
+                              (doc) => doc.id == _selectedRequestId,
+                            );
+                            final selectedDoc = hasSelection
+                                ? docs.firstWhere(
+                                    (doc) => doc.id == _selectedRequestId)
+                                : docs.first;
+                            _selectedRequestId = selectedDoc.id;
+                            final selectedData = selectedDoc.data();
+                            final selectedClinicianName =
+                                (selectedData['assignedClinicianName'] ??
+                                        selectedData['clinicianName'] ??
+                                        '')
+                                    .toString();
+                            final selectedCenterName =
+                                (selectedData['centerName'] ?? '').toString();
+                            final selectedNote =
+                                (selectedData['note'] ?? '').toString();
+                            final isCenterRequest =
+                                (selectedData['requestKind'] ?? '')
+                                            .toString() ==
+                                        'center' ||
+                                    selectedCenterName.trim().isNotEmpty;
+                            final stayStart =
+                                (selectedData['stayStartDateText'] ??
+                                        selectedData['sessionDateText'] ??
+                                        '')
+                                    .toString();
+                            final stayEnd =
+                                (selectedData['stayEndDateText'] ?? '')
+                                    .toString();
+                            final stayDurationDays =
+                                (selectedData['stayDurationDays'] ?? '')
+                                    .toString();
+                            final stayTotalAmount =
+                                (selectedData['stayTotalAmount'] ?? '')
+                                    .toString();
+                            final paymentBreakdownText =
+                                (selectedData['paymentBreakdownText'] ?? '')
+                                    .toString();
+
+                            return ListView(
+                              padding: const EdgeInsets.all(16),
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.only(bottom: 16),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: _glassDecoration(alpha: 0.34),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        _isArabic
+                                            ? 'اختر الطلب المطلوب رفع إثباته'
+                                            : 'Choose the request to upload proof for',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                              color: const Color(0xFFE7C766),
+                                              fontWeight: FontWeight.w900,
+                                            ),
                                       ),
-                                      title: Text(
-                                        isCenterRequest
-                                            ? (centerName.trim().isNotEmpty
-                                                ? centerName
-                                                : (_isArabic
-                                                    ? 'طلب مركز'
-                                                    : 'Center request'))
-                                            : (clinicianName.trim().isNotEmpty
-                                                ? clinicianName
-                                                : (_isArabic
-                                                    ? 'طلب بدون اسم أخصائي'
-                                                    : 'Request without clinician name')),
-                                      ),
-                                      subtitle: note.isNotEmpty
-                                          ? Text(
-                                              _isArabic
-                                                  ? 'ملاحظتك: $note'
-                                                  : 'Your note: $note',
-                                            )
-                                          : null,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(22),
-                          border: Border.all(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .outline
-                                .withValues(alpha: 0.14),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _isArabic ? 'تفاصيل الطلب' : 'Request details',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(fontWeight: FontWeight.w800),
-                            ),
-                            const SizedBox(height: 10),
-                            if (selectedClinicianName.trim().isNotEmpty)
-                              Text(
-                                _isArabic
-                                    ? 'الأخصائي: $selectedClinicianName'
-                                    : 'Clinician: $selectedClinicianName',
-                              ),
-                            if (isCenterRequest &&
-                                selectedCenterName.trim().isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  _isArabic
-                                      ? 'المركز: $selectedCenterName'
-                                      : 'Center: $selectedCenterName',
-                                ),
-                              ),
-                            if (selectedNote.trim().isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  _isArabic
-                                      ? 'ملاحظتك: $selectedNote'
-                                      : 'Your note: $selectedNote',
-                                ),
-                              ),
-                            if (isCenterRequest && stayStart.trim().isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  _isArabic
-                                      ? 'بداية الإقامة: $stayStart'
-                                      : 'Residency start: $stayStart',
-                                ),
-                              ),
-                            if (isCenterRequest && stayEnd.trim().isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  _isArabic
-                                      ? 'نهاية الإقامة المبدئية: $stayEnd'
-                                      : 'Preliminary residency end: $stayEnd',
-                                ),
-                              ),
-                            if (isCenterRequest &&
-                                stayDurationDays.trim().isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  _isArabic
-                                      ? 'عدد الأيام: $stayDurationDays'
-                                      : 'Duration days: $stayDurationDays',
-                                ),
-                              ),
-                            if (isCenterRequest &&
-                                paymentBreakdownText.trim().isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  _isArabic
-                                      ? 'بيان الدفع: $paymentBreakdownText'
-                                      : 'Payment quote: $paymentBreakdownText',
-                                ),
-                              ),
-                            if (isCenterRequest &&
-                                stayTotalAmount.trim().isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  _isArabic
-                                      ? 'الإجمالي المستحق: $stayTotalAmount'
-                                      : 'Total due: $stayTotalAmount',
-                                ),
-                              ),
-                            const SizedBox(height: 18),
-                            TextField(
-                              controller: _receiptFileNameController,
-                              decoration: InputDecoration(
-                                labelText: _isArabic
-                                    ? 'اسم أو مرجع ملف إثبات التحويل'
-                                    : 'Payment proof file name/reference',
-                                border: const OutlineInputBorder(),
-                                prefixIcon: const Icon(
-                                  Icons.description_outlined,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            TextField(
-                              controller: _noteController,
-                              maxLines: 4,
-                              decoration: InputDecoration(
-                                labelText: _isArabic
-                                    ? 'ملاحظة إضافية للإدارة'
-                                    : 'Additional note to admin',
-                                border: const OutlineInputBorder(),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            SizedBox(
-                              width: double.infinity,
-                              height: 52,
-                              child: FilledButton.icon(
-                                onPressed: _loading
-                                    ? null
-                                    : () => _submit(selectedDoc.id),
-                                icon: _loading
-                                    ? const SizedBox(
-                                        width: 18,
-                                        height: 18,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
+                                      const SizedBox(height: 12),
+                                      for (final doc in docs) ...[
+                                        Builder(
+                                          builder: (context) {
+                                            final data = doc.data();
+                                            final clinicianName =
+                                                (data['assignedClinicianName'] ??
+                                                        data['clinicianName'] ??
+                                                        '')
+                                                    .toString();
+                                            final centerName =
+                                                (data['centerName'] ?? '')
+                                                    .toString();
+                                            final isCenterRequest =
+                                                (data['requestKind'] ?? '')
+                                                            .toString() ==
+                                                        'center' ||
+                                                    centerName
+                                                        .trim()
+                                                        .isNotEmpty;
+                                            final note = (data['note'] ?? '')
+                                                .toString()
+                                                .trim();
+                                            final isSelected =
+                                                doc.id == _selectedRequestId;
+
+                                            return Container(
+                                              margin: const EdgeInsets.only(
+                                                  bottom: 10),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(18),
+                                                border: Border.all(
+                                                  color: isSelected
+                                                      ? Theme.of(context)
+                                                          .colorScheme
+                                                          .primary
+                                                      : Theme.of(context)
+                                                          .colorScheme
+                                                          .outline
+                                                          .withValues(
+                                                              alpha: 0.14),
+                                                  width: isSelected ? 1.6 : 1,
+                                                ),
+                                              ),
+                                              child: ListTile(
+                                                onTap: _loading
+                                                    ? null
+                                                    : () {
+                                                        setState(() {
+                                                          _selectedRequestId =
+                                                              doc.id;
+                                                        });
+                                                      },
+                                                leading: Icon(
+                                                  isSelected
+                                                      ? Icons
+                                                          .radio_button_checked
+                                                      : Icons.radio_button_off,
+                                                  color:
+                                                      const Color(0xFFE7C766),
+                                                ),
+                                                title: Text(
+                                                  isCenterRequest
+                                                      ? (centerName
+                                                              .trim()
+                                                              .isNotEmpty
+                                                          ? centerName
+                                                          : (_isArabic
+                                                              ? 'طلب مركز'
+                                                              : 'Center request'))
+                                                      : (clinicianName
+                                                              .trim()
+                                                              .isNotEmpty
+                                                          ? clinicianName
+                                                          : (_isArabic
+                                                              ? 'طلب بدون اسم أخصائي'
+                                                              : 'Request without clinician name')),
+                                                ),
+                                                subtitle: note.isNotEmpty
+                                                    ? Text(
+                                                        _isArabic
+                                                            ? 'ملاحظتك: $note'
+                                                            : 'Your note: $note',
+                                                        style: const TextStyle(
+                                                          color:
+                                                              Color(0xFFFFF4D4),
+                                                        ),
+                                                      )
+                                                    : null,
+                                                textColor:
+                                                    const Color(0xFFFFF4D4),
+                                              ),
+                                            );
+                                          },
                                         ),
-                                      )
-                                    : const Icon(Icons.send_outlined),
-                                label: Text(
-                                  _loading
-                                      ? (_isArabic
-                                          ? 'جارٍ الإرسال...'
-                                          : 'Submitting...')
-                                      : (_isArabic
-                                          ? 'إرسال إثبات التحويل'
-                                          : 'Submit payment proof'),
+                                      ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
+                                Container(
+                                  margin: const EdgeInsets.only(bottom: 16),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: _glassDecoration(alpha: 0.34),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        _isArabic
+                                            ? 'تفاصيل الطلب'
+                                            : 'Request details',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                              color: const Color(0xFFE7C766),
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      if (selectedClinicianName
+                                          .trim()
+                                          .isNotEmpty)
+                                        Text(
+                                          _isArabic
+                                              ? 'الأخصائي: $selectedClinicianName'
+                                              : 'Clinician: $selectedClinicianName',
+                                        ),
+                                      if (isCenterRequest &&
+                                          selectedCenterName.trim().isNotEmpty)
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 6),
+                                          child: Text(
+                                            _isArabic
+                                                ? 'المركز: $selectedCenterName'
+                                                : 'Center: $selectedCenterName',
+                                          ),
+                                        ),
+                                      if (selectedNote.trim().isNotEmpty)
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 6),
+                                          child: Text(
+                                            _isArabic
+                                                ? 'ملاحظتك: $selectedNote'
+                                                : 'Your note: $selectedNote',
+                                          ),
+                                        ),
+                                      if (isCenterRequest &&
+                                          stayStart.trim().isNotEmpty)
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 6),
+                                          child: Text(
+                                            _isArabic
+                                                ? 'بداية الإقامة: $stayStart'
+                                                : 'Residency start: $stayStart',
+                                          ),
+                                        ),
+                                      if (isCenterRequest &&
+                                          stayEnd.trim().isNotEmpty)
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 6),
+                                          child: Text(
+                                            _isArabic
+                                                ? 'نهاية الإقامة المبدئية: $stayEnd'
+                                                : 'Preliminary residency end: $stayEnd',
+                                          ),
+                                        ),
+                                      if (isCenterRequest &&
+                                          stayDurationDays.trim().isNotEmpty)
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 6),
+                                          child: Text(
+                                            _isArabic
+                                                ? 'عدد الأيام: $stayDurationDays'
+                                                : 'Duration days: $stayDurationDays',
+                                          ),
+                                        ),
+                                      if (isCenterRequest &&
+                                          paymentBreakdownText
+                                              .trim()
+                                              .isNotEmpty)
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 6),
+                                          child: Text(
+                                            _isArabic
+                                                ? 'بيان الدفع: $paymentBreakdownText'
+                                                : 'Payment quote: $paymentBreakdownText',
+                                          ),
+                                        ),
+                                      if (isCenterRequest &&
+                                          stayTotalAmount.trim().isNotEmpty)
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 6),
+                                          child: Text(
+                                            _isArabic
+                                                ? 'الإجمالي المستحق: $stayTotalAmount'
+                                                : 'Total due: $stayTotalAmount',
+                                          ),
+                                        ),
+                                      const SizedBox(height: 18),
+                                      TextField(
+                                        controller: _receiptFileNameController,
+                                        style: const TextStyle(
+                                          color: Color(0xFFFFF4D4),
+                                        ),
+                                        cursorColor: const Color(0xFFE7C766),
+                                        decoration: _darkInputDecoration(
+                                          label: _isArabic
+                                              ? 'اسم أو مرجع ملف إثبات التحويل'
+                                              : 'Payment proof file name/reference',
+                                          icon: Icons.description_outlined,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      TextField(
+                                        controller: _noteController,
+                                        maxLines: 4,
+                                        style: const TextStyle(
+                                          color: Color(0xFFFFF4D4),
+                                        ),
+                                        cursorColor: const Color(0xFFE7C766),
+                                        decoration: _darkInputDecoration(
+                                          label: _isArabic
+                                              ? 'ملاحظة إضافية للإدارة'
+                                              : 'Additional note to admin',
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      SizedBox(
+                                        width: double.infinity,
+                                        height: 52,
+                                        child: FilledButton.icon(
+                                          onPressed: _loading
+                                              ? null
+                                              : () => _submit(selectedDoc.id),
+                                          icon: _loading
+                                              ? const SizedBox(
+                                                  width: 18,
+                                                  height: 18,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                  ),
+                                                )
+                                              : const Icon(Icons.send_outlined),
+                                          label: Text(
+                                            _loading
+                                                ? (_isArabic
+                                                    ? 'جارٍ الإرسال...'
+                                                    : 'Submitting...')
+                                                : (_isArabic
+                                                    ? 'إرسال إثبات التحويل'
+                                                    : 'Submit payment proof'),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
-                      ),
-                    ],
-                  );
-                },
+                ],
               ),
+            );
+          },
+        ),
       ),
     );
   }
 }
-
-
-

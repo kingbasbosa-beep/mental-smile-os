@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
@@ -27,6 +27,33 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
   bool get _isClientSupport => widget.supportType == 'client_support';
   bool get _isCenterSupport => widget.supportType == 'center_support';
   bool get _isClinicianSupport => widget.supportType == 'clinician_support';
+
+  String _backgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/images/backgrounds/specialists_bg_mobile.png';
+    }
+    if (width < 1100) {
+      return 'assets/images/backgrounds/specialists_bg_tablet.png';
+    }
+    return 'assets/images/backgrounds/specialists_bg_desktop.png';
+  }
+
+  BoxDecoration _glassDecoration({double alpha = 0.36, double radius = 24}) {
+    return BoxDecoration(
+      color: Colors.black.withValues(alpha: alpha),
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(
+        color: const Color(0xFFE7C766).withValues(alpha: 0.34),
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.08),
+          blurRadius: 24,
+          offset: const Offset(0, 12),
+        ),
+      ],
+    );
+  }
 
   List<_SupportIssueOption> _options(bool isArabic) {
     if (_isClientSupport) {
@@ -128,8 +155,7 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
       return [
         _SupportIssueOption(
           key: 'need_specialist',
-          label:
-              isArabic ? 'محتاج أخصائي مناسب' : 'Need a suitable specialist',
+          label: isArabic ? 'محتاج أخصائي مناسب' : 'Need a suitable specialist',
         ),
         _SupportIssueOption(
           key: 'need_center',
@@ -257,79 +283,126 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
+        backgroundColor: Colors.black,
         appBar: AppShellActions.buildAppBar(context, title: title),
-        body: AppPageBackground(
-          child: ListView(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            children: [
-              AppSurfaceCard(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: isArabic
-                      ? CrossAxisAlignment.end
-                      : CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
-                      textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      isArabic
-                          ? 'اختر المشكلة الأقرب لاحتياجك الحالي ليتم استلامها كطلب منظم.'
-                          : 'Choose the issue that best matches your current need so it can be received as a structured request.',
-                      textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                    ),
-                  ],
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  _backgroundAsset(constraints.maxWidth),
+                  fit: BoxFit.cover,
+                  alignment: constraints.maxWidth < 700
+                      ? Alignment.topCenter
+                      : Alignment.center,
                 ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              ...options.map(
-                (option) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(AppRadii.lg),
-                    onTap: _submittingIssueKey == null
-                        ? () => _submitIssue(option)
-                        : null,
-                    child: AppSurfaceCard(
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.62),
+                        Colors.black.withValues(alpha: 0.38),
+                        Colors.black.withValues(alpha: 0.74),
+                      ],
+                    ),
+                  ),
+                ),
+                ListView(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  children: [
+                    Container(
                       padding: const EdgeInsets.all(AppSpacing.lg),
-                      child: Row(
-                        textDirection:
-                            isArabic ? TextDirection.rtl : TextDirection.ltr,
+                      decoration: _glassDecoration(alpha: 0.34),
+                      child: Column(
+                        crossAxisAlignment: isArabic
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
                         children: [
-                          _submittingIssueKey == option.key
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.radio_button_unchecked_rounded),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: Text(
-                              option.label,
-                              textAlign:
-                                  isArabic ? TextAlign.right : TextAlign.left,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.w700),
-                            ),
+                          Text(
+                            title,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
+                                  color: const Color(0xFFE7C766),
+                                  fontWeight: FontWeight.w900,
+                                ),
+                            textAlign:
+                                isArabic ? TextAlign.right : TextAlign.left,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            isArabic
+                                ? 'اختر المشكلة الأقرب لاحتياجك الحالي ليتم استلامها كطلب منظم.'
+                                : 'Choose the issue that best matches your current need so it can be received as a structured request.',
+                            textAlign:
+                                isArabic ? TextAlign.right : TextAlign.left,
+                            style: const TextStyle(color: Color(0xFFFFF4D4)),
                           ),
                         ],
                       ),
                     ),
-                  ),
+                    const SizedBox(height: AppSpacing.md),
+                    ...options.map(
+                      (option) => Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(AppRadii.lg),
+                          onTap: _submittingIssueKey == null
+                              ? () => _submitIssue(option)
+                              : null,
+                          child: Container(
+                            padding: const EdgeInsets.all(AppSpacing.lg),
+                            decoration:
+                                _glassDecoration(alpha: 0.30, radius: 22),
+                            child: Row(
+                              textDirection: isArabic
+                                  ? TextDirection.rtl
+                                  : TextDirection.ltr,
+                              children: [
+                                _submittingIssueKey == option.key
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Color(0xFFE7C766),
+                                        ),
+                                      )
+                                    : const Icon(
+                                        Icons.radio_button_unchecked_rounded,
+                                        color: Color(0xFFE7C766),
+                                      ),
+                                const SizedBox(width: AppSpacing.sm),
+                                Expanded(
+                                  child: Text(
+                                    option.label,
+                                    textAlign: isArabic
+                                        ? TextAlign.right
+                                        : TextAlign.left,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          color: const Color(0xFFFFF4D4),
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -345,6 +418,3 @@ class _SupportIssueOption {
   final String key;
   final String label;
 }
-
-
-
