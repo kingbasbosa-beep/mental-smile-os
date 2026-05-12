@@ -380,6 +380,15 @@ class MenuPage extends StatelessWidget {
                               )
                             : _MenuWrapLayout(cards: cards),
                       ),
+                      Positioned(
+                        top: isMobile ? 128 : 74,
+                        left: isMobile ? 18 : null,
+                        right: isMobile ? 18 : null,
+                        child: _MenuLibraryTeaserHearts(
+                          compact: isMobile,
+                          isArabic: isArabic,
+                        ),
+                      ),
                     ],
                   );
                 },
@@ -546,6 +555,142 @@ class _FloatingMenuSpinner extends StatelessWidget {
           width: 18,
           height: 18,
           child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+    );
+  }
+}
+
+class _MenuLibraryTeaserHearts extends StatelessWidget {
+  const _MenuLibraryTeaserHearts({
+    required this.compact,
+    required this.isArabic,
+  });
+
+  final bool compact;
+  final bool isArabic;
+
+  @override
+  Widget build(BuildContext context) {
+    final entries = [
+      (
+        keyName: 'family_awareness',
+        title: isArabic ? 'دعم الأسرة' : 'Family support',
+      ),
+      (
+        keyName: 'prevention_awareness',
+        title: isArabic ? 'الوعي والوقاية' : 'Prevention awareness',
+      ),
+    ];
+
+    return IgnorePointer(
+      ignoring: false,
+      child: Center(
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: compact ? 10 : 14,
+          runSpacing: compact ? 8 : 10,
+          children: [
+            for (final entry in entries)
+              _MenuComingSoonHeart(
+                compact: compact,
+                title: entry.title,
+                onTap: () {
+                  AppAnalytics.logPathSelected('menu', entry.keyName);
+                  Navigator.of(context).pushNamed(
+                    Routes.library,
+                    arguments: {'categoryKey': entry.keyName},
+                  );
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MenuComingSoonHeart extends StatefulWidget {
+  const _MenuComingSoonHeart({
+    required this.compact,
+    required this.title,
+    required this.onTap,
+  });
+
+  final bool compact;
+  final String title;
+  final VoidCallback onTap;
+
+  @override
+  State<_MenuComingSoonHeart> createState() => _MenuComingSoonHeartState();
+}
+
+class _MenuComingSoonHeartState extends State<_MenuComingSoonHeart> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final heartSize = widget.compact ? 58.0 : 70.0;
+
+    return Tooltip(
+      message: widget.title,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: AnimatedScale(
+          scale: _hovered ? 1.06 : 1.0,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOut,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(999),
+            onTap: widget.onTap,
+            child: SizedBox(
+              width: widget.compact ? 58 : 70,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: heartSize,
+                    height: heartSize,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Icon(
+                          Icons.favorite_rounded,
+                          color: const Color(0xFFD9A640),
+                          size: heartSize,
+                          shadows: [
+                            Shadow(
+                              color: const Color(0xFFFFD98A).withValues(
+                                alpha: _hovered ? 0.42 : 0.22,
+                              ),
+                              blurRadius: _hovered ? 18 : 12,
+                            ),
+                            const Shadow(
+                              color: Colors.black,
+                              blurRadius: 12,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          'قريبًا',
+                          textAlign: TextAlign.center,
+                          style:
+                              Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: const Color(0xFF1A1007),
+                                    fontSize: widget.compact ? 10 : 11,
+                                    fontWeight: FontWeight.w900,
+                                    height: 1,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

@@ -262,6 +262,17 @@ class AppRouter {
     );
   }
 
+  static String? _libraryCategoryKey(RouteSettings settings) {
+    final args = settings.arguments;
+    if (args is Map) {
+      final value = args['categoryKey'];
+      if (value is String && value.trim().isNotEmpty) {
+        return value.trim();
+      }
+    }
+    return null;
+  }
+
   static Route<dynamic> _protectedRoute({
     required Widget child,
     required RouteSettings settings,
@@ -749,7 +760,9 @@ class AppRouter {
 
       case Routes.webLibrary:
         return MaterialPageRoute(
-          builder: (_) => const LibraryPage(),
+          builder: (_) => LibraryPage(
+            initialCategoryKey: _libraryCategoryKey(settings),
+          ),
           settings: settings,
         );
 
@@ -904,9 +917,8 @@ class AppRouter {
 
       case Routes.clinicianInbox:
         final authUid = FirebaseAuth.instance.currentUser?.uid;
-        String clinicianId = (authUid != null && authUid.isNotEmpty)
-            ? authUid
-            : '';
+        String clinicianId =
+            (authUid != null && authUid.isNotEmpty) ? authUid : '';
         String clinicianName = 'DEV Clinician';
 
         final a = settings.arguments;
@@ -1232,7 +1244,9 @@ class AppRouter {
 
       case Routes.library:
         return MaterialPageRoute(
-          builder: (_) => const LibraryPage(),
+          builder: (_) => LibraryPage(
+            initialCategoryKey: _libraryCategoryKey(settings),
+          ),
           settings: settings,
         );
 
@@ -1401,9 +1415,7 @@ class _RouteAccessGate extends StatelessWidget {
             ? 'Account approval was rejected. Please contact support.'
             : 'Account is pending admin approval or inactive.',
         isAdmin: isAdmin,
-        redirectTarget: isRejected
-            ? 'approval_rejected'
-            : 'approval_required',
+        redirectTarget: isRejected ? 'approval_rejected' : 'approval_required',
       );
     }
 
