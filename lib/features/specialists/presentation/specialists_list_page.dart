@@ -4,7 +4,6 @@ import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/specialists/data/clinician_specialty_catalog.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
-import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class SpecialistsListPage extends StatelessWidget {
   const SpecialistsListPage({
@@ -97,296 +96,439 @@ class SpecialistsListPage extends StatelessWidget {
     return u;
   }
 
+  String _backgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/images/backgrounds/specialists_bg_mobile.png';
+    }
+    if (width < 1100) {
+      return 'assets/images/backgrounds/specialists_bg_tablet.png';
+    }
+    return 'assets/images/backgrounds/specialists_bg_desktop.png';
+  }
+
   @override
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
-    final scheme = Theme.of(context).colorScheme;
 
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
-        appBar: AppShellActions.buildAppBar(
-          context,
-          title: _title(context),
-        ),
-        body: Stack(
-          children: [
-            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: FirebaseFirestore.instance
-                  .collection('clinicians')
-                  .where('isActive', isEqualTo: true)
-                  .where('approvalStatus', isEqualTo: 'approved')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      isArabic
-                          ? 'تعذر تحميل الأخصائيين'
-                          : 'Unable to load specialists',
+        backgroundColor: Colors.black,
+        body: LayoutBuilder(
+          builder: (context, pageConstraints) {
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  _backgroundAsset(pageConstraints.maxWidth),
+                  fit: BoxFit.cover,
+                  alignment: pageConstraints.maxWidth < 700
+                      ? Alignment.topCenter
+                      : Alignment.center,
+                ),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.50),
+                        Colors.black.withValues(alpha: 0.30),
+                        Colors.black.withValues(alpha: 0.66),
+                      ],
                     ),
-                  );
-                }
-
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                final docs = snapshot.data!.docs.where((doc) {
-                  final data = doc.data();
-                  final role = (data['role'] ?? '').toString().trim();
-                  if (role != 'clinician') return false;
-                  return _matchesCategory(data);
-                }).toList();
-
-                if (docs.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text(
-                        isArabic
-                            ? 'لا يوجد أخصائيون ظاهرون في هذا القسم حاليًا'
-                            : 'No active specialists in this category right now',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  );
-                }
-
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    int crossAxisCount = 2;
-                    double childAspectRatio = 1.15;
-
-                    if (constraints.maxWidth < 760) {
-                      crossAxisCount = 1;
-                      childAspectRatio = 1.02;
-                    } else if (constraints.maxWidth > 1450) {
-                      crossAxisCount = 3;
-                      childAspectRatio = 1.18;
+                  ),
+                ),
+                StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection('clinicians')
+                      .where('isActive', isEqualTo: true)
+                      .where('approvalStatus', isEqualTo: 'approved')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text(
+                          isArabic
+                              ? 'تعذر تحميل الأخصائيين'
+                              : 'Unable to load specialists',
+                        ),
+                      );
                     }
 
-                    return GridView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: docs.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: crossAxisCount,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: childAspectRatio,
-                      ),
-                      itemBuilder: (context, index) {
-                        final doc = docs[index];
-                        final data = doc.data();
+                    if (!snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-                        final name = _displayName(data, isArabic);
-                        final specialty = _specialty(data, isArabic);
-                        final bio = _bio(data, isArabic);
-                        final price = _price(data, isArabic);
-                        final duration = _duration(data, isArabic);
-                        final photoAsset =
-                            (data['photoAsset'] ?? '').toString().trim();
-                        final photoUrl = _safePhotoUrl(
-                          (data['photoUrl'] ?? '').toString(),
-                        );
-                        final imageProvider = photoUrl.isNotEmpty
-                            ? NetworkImage(photoUrl) as ImageProvider
-                            : (photoAsset.startsWith('assets/')
-                                ? safeAssetImageProvider(photoAsset)
-                                : null);
-                        final offersGroups =
-                            (data['offersGroupSessions'] ?? false) == true;
+                    final docs = snapshot.data!.docs.where((doc) {
+                      final data = doc.data();
+                      final role = (data['role'] ?? '').toString().trim();
+                      if (role != 'clinician') return false;
+                      return _matchesCategory(data);
+                    }).toList();
 
-                        return InkWell(
-                          borderRadius: BorderRadius.circular(24),
-                          onTap: () {
-                            AppAnalytics.logPathSelected(
-                              'specialists',
-                              'view_profile',
+                    if (docs.isEmpty) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Text(
+                            isArabic
+                                ? 'لا يوجد أخصائيون ظاهرون في هذا القسم حاليًا'
+                                : 'No active specialists in this category right now',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      );
+                    }
+
+                    return LayoutBuilder(
+                      builder: (context, constraints) {
+                        const crossAxisCount = 1;
+                        final childAspectRatio =
+                            constraints.maxWidth < 760 ? 1.02 : 2.35;
+
+                        return GridView.builder(
+                          padding: EdgeInsets.fromLTRB(
+                            16,
+                            pageConstraints.maxWidth < 700 ? 76 : 92,
+                            16,
+                            16,
+                          ),
+                          itemCount: docs.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: childAspectRatio,
+                          ),
+                          itemBuilder: (context, index) {
+                            final doc = docs[index];
+                            final data = doc.data();
+
+                            final name = _displayName(data, isArabic);
+                            final specialty = _specialty(data, isArabic);
+                            final bio = _bio(data, isArabic);
+                            final price = _price(data, isArabic);
+                            final duration = _duration(data, isArabic);
+                            final photoAsset =
+                                (data['photoAsset'] ?? '').toString().trim();
+                            final photoUrl = _safePhotoUrl(
+                              (data['photoUrl'] ?? '').toString(),
                             );
-                            Navigator.of(context).pushNamed(
-                              Routes.specialistDetails,
-                              arguments: {
-                                'uid': doc.id,
-                                ...data,
-                              },
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(18),
-                            decoration: BoxDecoration(
-                              color: scheme.surface,
+                            final imageProvider = photoUrl.isNotEmpty
+                                ? NetworkImage(photoUrl) as ImageProvider
+                                : (photoAsset.startsWith('assets/')
+                                    ? safeAssetImageProvider(photoAsset)
+                                    : null);
+                            final offersGroups =
+                                (data['offersGroupSessions'] ?? false) == true;
+
+                            return InkWell(
                               borderRadius: BorderRadius.circular(24),
-                              border: Border.all(
-                                color: scheme.outline.withValues(alpha: 0.12),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  blurRadius: 16,
-                                  offset: const Offset(0, 8),
-                                  color: Colors.black.withValues(alpha: 0.04),
+                              onTap: () {
+                                AppAnalytics.logPathSelected(
+                                  'specialists',
+                                  'view_profile',
+                                );
+                                Navigator.of(context).pushNamed(
+                                  Routes.specialistDetails,
+                                  arguments: {
+                                    'uid': doc.id,
+                                    ...data,
+                                  },
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(18),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.34),
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color: const Color(0xFFE7C766)
+                                        .withValues(alpha: 0.34),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 26,
+                                      offset: const Offset(0, 12),
+                                      color: const Color(0xFFE7C766)
+                                          .withValues(alpha: 0.10),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: isArabic
-                                  ? CrossAxisAlignment.end
-                                  : CrossAxisAlignment.start,
-                              children: [
-                                Row(
+                                child: Column(
+                                  crossAxisAlignment: isArabic
+                                      ? CrossAxisAlignment.end
+                                      : CrossAxisAlignment.start,
                                   children: [
-                                    CircleAvatar(
-                                      radius: 30,
-                                      backgroundColor:
-                                          scheme.primary.withValues(alpha: 0.10),
-                                      backgroundImage: imageProvider,
-                                      child: imageProvider == null
-                                          ? Text(
-                                              _initials(name),
-                                              style: TextStyle(
-                                                color: scheme.primary,
-                                                fontWeight: FontWeight.w800,
+                                    Row(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 30,
+                                          backgroundColor:
+                                              const Color(0xFFE7C766)
+                                                  .withValues(alpha: 0.18),
+                                          backgroundImage: imageProvider,
+                                          child: imageProvider == null
+                                              ? Text(
+                                                  _initials(name),
+                                                  style: const TextStyle(
+                                                    color: Color(0xFFFFE7B2),
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
+                                                )
+                                              : null,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: isArabic
+                                                ? CrossAxisAlignment.end
+                                                : CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                name,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                textAlign: isArabic
+                                                    ? TextAlign.right
+                                                    : TextAlign.left,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleMedium
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w800,
+                                                      color: const Color(
+                                                          0xFFFFE7B2),
+                                                    ),
                                               ),
-                                            )
-                                          : null,
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: isArabic
-                                            ? CrossAxisAlignment.end
-                                            : CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            name,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: isArabic
-                                                ? TextAlign.right
-                                                : TextAlign.left,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.w800,
-                                                ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                specialty,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                textAlign: isArabic
+                                                    ? TextAlign.right
+                                                    : TextAlign.left,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.copyWith(
+                                                      color: const Color(
+                                                              0xFFFFF4D4)
+                                                          .withValues(
+                                                              alpha: 0.78),
+                                                    ),
+                                              ),
+                                            ],
                                           ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            specialty,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: isArabic
-                                                ? TextAlign.right
-                                                : TextAlign.left,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium,
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      bio,
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: isArabic
+                                          ? TextAlign.right
+                                          : TextAlign.left,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            height: 1.4,
+                                            color: const Color(0xFFFFF4D4)
+                                                .withValues(alpha: 0.84),
                                           ),
-                                        ],
-                                      ),
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  bio,
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign:
-                                      isArabic ? TextAlign.right : TextAlign.left,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
-                                      ?.copyWith(
-                                        height: 1.4,
-                                      ),
-                                ),
-                                const SizedBox(height: 14),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _MiniInfoBox(
-                                        title: isArabic ? 'السعر' : 'Price',
-                                        value: price,
-                                      ),
+                                    const SizedBox(height: 14),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: _MiniInfoBox(
+                                            title: isArabic ? 'السعر' : 'Price',
+                                            value: price,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: _MiniInfoBox(
+                                            title:
+                                                isArabic ? 'المدة' : 'Duration',
+                                            value: duration,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: _MiniInfoBox(
-                                        title: isArabic ? 'المدة' : 'Duration',
-                                        value: duration,
+                                    if (offersGroups) ...[
+                                      const SizedBox(height: 10),
+                                      Align(
+                                        alignment: isArabic
+                                            ? Alignment.centerRight
+                                            : Alignment.centerLeft,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 7,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFE7C766)
+                                                .withValues(alpha: 0.16),
+                                            borderRadius:
+                                                BorderRadius.circular(999),
+                                            border: Border.all(
+                                              color: const Color(0xFFE7C766)
+                                                  .withValues(alpha: 0.30),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            isArabic
+                                                ? 'يقدم جروبات جماعية'
+                                                : 'Offers group sessions',
+                                            style: const TextStyle(
+                                              color: Color(0xFFFFE7B2),
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                if (offersGroups) ...[
-                                  const SizedBox(height: 10),
-                                  Align(
-                                    alignment: isArabic
-                                        ? Alignment.centerRight
-                                        : Alignment.centerLeft,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 7,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFF3ECFF),
-                                        borderRadius:
-                                            BorderRadius.circular(999),
-                                      ),
-                                      child: Text(
-                                        isArabic
-                                            ? 'يقدم جروبات جماعية'
-                                            : 'Offers group sessions',
-                                        style: const TextStyle(
-                                          color: Color(0xFF6C55B3),
-                                          fontWeight: FontWeight.w700,
+                                    ],
+                                    const Spacer(),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height: 48,
+                                      child: FilledButton.icon(
+                                        style: FilledButton.styleFrom(
+                                          backgroundColor:
+                                              const Color(0xFFE7C766)
+                                                  .withValues(alpha: 0.16),
+                                          foregroundColor:
+                                              const Color(0xFFFFE7B2),
+                                          side: BorderSide(
+                                            color: const Color(0xFFE7C766)
+                                                .withValues(alpha: 0.38),
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(18),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          AppAnalytics.logPathSelected(
+                                            'specialists',
+                                            'view_profile',
+                                          );
+                                          Navigator.of(context).pushNamed(
+                                            Routes.specialistDetails,
+                                            arguments: {
+                                              'uid': doc.id,
+                                              ...data,
+                                            },
+                                          );
+                                        },
+                                        icon: const Icon(
+                                            Icons.visibility_outlined),
+                                        label: Text(
+                                          isArabic
+                                              ? 'عرض المزيد'
+                                              : 'View details',
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                                const Spacer(),
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 48,
-                                  child: FilledButton.icon(
-                                    onPressed: () {
-                                      AppAnalytics.logPathSelected(
-                                        'specialists',
-                                        'view_profile',
-                                      );
-                                      Navigator.of(context).pushNamed(
-                                        Routes.specialistDetails,
-                                        arguments: {
-                                          'uid': doc.id,
-                                          ...data,
-                                        },
-                                      );
-                                    },
-                                    icon: const Icon(Icons.visibility_outlined),
-                                    label: Text(
-                                      isArabic ? 'عرض المزيد' : 'View details',
-                                    ),
-                                  ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
+                              ),
+                            );
+                          },
                         );
                       },
                     );
                   },
-                );
-              },
+                ),
+                const _PathSelectionLogger(
+                  module: 'specialists',
+                  path: 'browse',
+                ),
+                SafeArea(
+                  child: Align(
+                    alignment: AlignmentDirectional.topStart,
+                    child: Padding(
+                      padding: EdgeInsetsDirectional.only(
+                        start: pageConstraints.maxWidth < 700 ? 14 : 22,
+                        top: pageConstraints.maxWidth < 700 ? 12 : 18,
+                      ),
+                      child: _BackToMenuButton(
+                        compact: pageConstraints.maxWidth < 700,
+                      ),
+                    ),
+                  ),
+                ),
+                SafeArea(
+                  child: Align(
+                    alignment: AlignmentDirectional.topEnd,
+                    child: Padding(
+                      padding: EdgeInsetsDirectional.only(
+                        end: pageConstraints.maxWidth < 700 ? 16 : 28,
+                        top: pageConstraints.maxWidth < 700 ? 18 : 24,
+                      ),
+                      child: Text(
+                        _title(context),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              color: const Color(0xFFFFE7B2),
+                              fontWeight: FontWeight.w900,
+                            ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _BackToMenuButton extends StatelessWidget {
+  const _BackToMenuButton({required this.compact});
+
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = compact ? 44.0 : 52.0;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: () => Navigator.of(context).pushNamed(Routes.menu),
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0xFF1B1007).withValues(alpha: 0.50),
+            border: Border.all(
+              color: const Color(0xFFFFD98A).withValues(alpha: 0.56),
             ),
-            const _PathSelectionLogger(
-              module: 'specialists',
-              path: 'browse',
-            ),
-          ],
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFE7A94C).withValues(alpha: 0.18),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Icon(
+            Icons.arrow_back_rounded,
+            color: const Color(0xFFFFE7B2),
+            size: compact ? 22 : 26,
+          ),
         ),
       ),
     );
@@ -428,15 +570,13 @@ class _MiniInfoBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F5FB),
+        color: Colors.black.withValues(alpha: 0.24),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: scheme.outline.withValues(alpha: 0.10),
+          color: const Color(0xFFE7C766).withValues(alpha: 0.22),
         ),
       ),
       child: Column(
@@ -446,7 +586,7 @@ class _MiniInfoBox extends StatelessWidget {
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: scheme.onSurface.withValues(alpha: 0.70),
+                  color: const Color(0xFFFFF4D4).withValues(alpha: 0.72),
                 ),
           ),
           const SizedBox(height: 6),
@@ -455,6 +595,7 @@ class _MiniInfoBox extends StatelessWidget {
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w800,
+                  color: const Color(0xFFFFE7B2),
                 ),
           ),
         ],

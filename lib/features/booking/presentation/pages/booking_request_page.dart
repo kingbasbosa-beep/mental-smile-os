@@ -126,7 +126,8 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
 
       await requestRef.set(requestData);
 
-      final threadId = await _bookingChatAdapter.createOrUpdateAdminThreadForBooking(
+      final threadId =
+          await _bookingChatAdapter.createOrUpdateAdminThreadForBooking(
         clientId: uid,
         clientName: clientName,
         clientEmail: clientEmail,
@@ -195,6 +196,46 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
     return v;
   }
 
+  String _backgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/images/backgrounds/specialists_bg_mobile.png';
+    }
+    if (width < 1100) {
+      return 'assets/images/backgrounds/specialists_bg_tablet.png';
+    }
+    return 'assets/images/backgrounds/specialists_bg_desktop.png';
+  }
+
+  Widget _glassCard({
+    required Widget child,
+    EdgeInsetsGeometry padding = const EdgeInsets.all(16),
+  }) {
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.34),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.32),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE7C766).withValues(alpha: 0.08),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: DefaultTextStyle.merge(
+        style: const TextStyle(color: Color(0xFFFFF4D4), height: 1.35),
+        child: IconTheme(
+          data: const IconThemeData(color: Color(0xFFE7C766)),
+          child: child,
+        ),
+      ),
+    );
+  }
+
   Widget _buildClinicianAvatar(
     BuildContext context, {
     required String clinicianName,
@@ -207,6 +248,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
     if (network.isNotEmpty) {
       return CircleAvatar(
         radius: 28,
+        backgroundColor: const Color(0xFFE7C766).withValues(alpha: 0.18),
         backgroundImage: NetworkImage(network),
       );
     }
@@ -214,7 +256,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
     if (asset.isNotEmpty) {
       return CircleAvatar(
         radius: 28,
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+        backgroundColor: const Color(0xFFE7C766).withValues(alpha: 0.18),
         child: ClipOval(
           child: Image.asset(
             normalizeAssetPath(asset),
@@ -225,7 +267,10 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
               return Center(
                 child: Text(
                   _initials(clinicianName),
-                  style: const TextStyle(fontWeight: FontWeight.w800),
+                  style: const TextStyle(
+                    color: Color(0xFFFFE7B2),
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               );
             },
@@ -236,181 +281,283 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
 
     return CircleAvatar(
       radius: 28,
+      backgroundColor: const Color(0xFFE7C766).withValues(alpha: 0.18),
+      foregroundColor: const Color(0xFFFFE7B2),
       child: Text(
         _initials(clinicianName),
-        style: const TextStyle(fontWeight: FontWeight.w800),
+        style: const TextStyle(
+          color: Color(0xFFFFE7B2),
+          fontWeight: FontWeight.w800,
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
     return Directionality(
       textDirection: _isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
+        backgroundColor: Colors.black,
         appBar: AppBar(
+          backgroundColor: Colors.black.withValues(alpha: 0.30),
+          foregroundColor: const Color(0xFFFFE7B2),
+          elevation: 0,
           title: Text(_isArabic ? 'طلب حجز' : 'Booking request'),
         ),
-        body: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 820),
-            child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-              stream: FirebaseFirestore.instance
-                  .collection('clinicians')
-                  .doc(widget.args.clinicianId)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                final data = snapshot.data?.data() ?? <String, dynamic>{};
-                final displayName =
-                    (data['displayName'] ?? widget.args.clinicianName)
-                        .toString();
-                final photoAsset = (data['photoAsset'] ?? '').toString();
-                final photoUrl =
-                    (data['photoUrl'] ?? data['photo_url'] ?? '').toString();
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(_backgroundAsset(constraints.maxWidth)),
+                  fit: BoxFit.cover,
+                  alignment: constraints.maxWidth < 700
+                      ? Alignment.topCenter
+                      : Alignment.center,
+                ),
+              ),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.52),
+                      Colors.black.withValues(alpha: 0.30),
+                      Colors.black.withValues(alpha: 0.68),
+                    ],
+                  ),
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 820),
+                    child:
+                        StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                      stream: FirebaseFirestore.instance
+                          .collection('clinicians')
+                          .doc(widget.args.clinicianId)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        final data =
+                            snapshot.data?.data() ?? <String, dynamic>{};
+                        final displayName =
+                            (data['displayName'] ?? widget.args.clinicianName)
+                                .toString();
+                        final photoAsset =
+                            (data['photoAsset'] ?? '').toString();
+                        final photoUrl =
+                            (data['photoUrl'] ?? data['photo_url'] ?? '')
+                                .toString();
 
-                return ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: scheme.surface,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: scheme.outline.withValues(alpha: 0.14),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          _buildClinicianAvatar(
-                            context,
-                            clinicianName: displayName,
-                            photoAsset: photoAsset,
-                            photoUrl: photoUrl,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: _isArabic
-                                  ? CrossAxisAlignment.end
-                                  : CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  displayName,
+                        return ListView(
+                          padding: const EdgeInsets.all(16),
+                          children: [
+                            _glassCard(
+                              child: Row(
+                                children: [
+                                  _buildClinicianAvatar(
+                                    context,
+                                    clinicianName: displayName,
+                                    photoAsset: photoAsset,
+                                    photoUrl: photoUrl,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: _isArabic
+                                          ? CrossAxisAlignment.end
+                                          : CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          displayName,
+                                          textAlign: _isArabic
+                                              ? TextAlign.right
+                                              : TextAlign.left,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.copyWith(
+                                                color: const Color(0xFFFFE7B2),
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          _isArabic
+                                              ? 'سيتم إرسال طلبك أولًا إلى الإدارة ثم تحويله إلى الأخصائي المناسب.'
+                                              : 'Your request will be sent to admin first, then assigned to the suitable specialist.',
+                                          textAlign: _isArabic
+                                              ? TextAlign.right
+                                              : TextAlign.left,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(
+                                                color: const Color(0xFFFFF4D4)
+                                                    .withValues(alpha: 0.82),
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _glassCard(
+                              child: Column(
+                                crossAxisAlignment: _isArabic
+                                    ? CrossAxisAlignment.end
+                                    : CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _isArabic
+                                        ? 'ملاحظات إضافية'
+                                        : 'Additional notes',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(
+                                          color: const Color(0xFFFFE7B2),
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    _isArabic
+                                        ? 'اكتب أي تفاصيل تريد أن تصل إلى الإدارة أو الأخصائي.'
+                                        : 'Write any details you want admin or the specialist to receive.',
+                                    textAlign: _isArabic
+                                        ? TextAlign.right
+                                        : TextAlign.left,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: const Color(0xFFFFF4D4)
+                                              .withValues(alpha: 0.82),
+                                        ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  TextField(
+                                    controller: _noteCtrl,
+                                    style: const TextStyle(
+                                      color: Color(0xFFFFF4D4),
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                    textDirection: _isArabic
+                                        ? TextDirection.rtl
+                                        : TextDirection.ltr,
+                                    decoration: InputDecoration(
+                                      hintText: _isArabic
+                                          ? 'اكتب ملاحظتك هنا...'
+                                          : 'Write your note here...',
+                                      hintStyle: TextStyle(
+                                        color: const Color(0xFFFFF4D4)
+                                            .withValues(alpha: 0.62),
+                                      ),
+                                      filled: true,
+                                      fillColor:
+                                          Colors.black.withValues(alpha: 0.26),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(18),
+                                        borderSide: BorderSide(
+                                          color: const Color(0xFFE7C766)
+                                              .withValues(alpha: 0.26),
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(18),
+                                        borderSide: BorderSide(
+                                          color: const Color(0xFFE7C766)
+                                              .withValues(alpha: 0.56),
+                                        ),
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(18),
+                                      ),
+                                    ),
+                                    maxLines: 5,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              height: 54,
+                              child: FilledButton.icon(
+                                onPressed: _submitting ? null : _submit,
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: const Color(0xFFE7C766)
+                                      .withValues(alpha: 0.16),
+                                  foregroundColor: const Color(0xFFFFE7B2),
+                                  disabledBackgroundColor:
+                                      Colors.black.withValues(alpha: 0.22),
+                                  disabledForegroundColor:
+                                      const Color(0xFFFFF4D4)
+                                          .withValues(alpha: 0.45),
+                                  side: BorderSide(
+                                    color: const Color(0xFFE7C766)
+                                        .withValues(alpha: 0.44),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
+                                ),
+                                icon: _submitting
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 2),
+                                      )
+                                    : const Icon(Icons.send_outlined),
+                                label: Text(
+                                  _submitting
+                                      ? (_isArabic
+                                          ? 'جارٍ الإرسال...'
+                                          : 'Sending...')
+                                      : (_isArabic
+                                          ? 'إرسال الطلب'
+                                          : 'Send request'),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            if (_result != null)
+                              Container(
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.34),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                    color: const Color(0xFFE7C766)
+                                        .withValues(alpha: 0.26),
+                                  ),
+                                ),
+                                child: Text(
+                                  _result!,
                                   textAlign: _isArabic
                                       ? TextAlign.right
                                       : TextAlign.left,
                                   style: Theme.of(context)
                                       .textTheme
-                                      .titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.w800),
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: const Color(0xFFFFF4D4),
+                                      ),
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  _isArabic
-                                      ? 'سيتم إرسال طلبك أولًا إلى الإدارة ثم تحويله إلى الأخصائي المناسب.'
-                                      : 'Your request will be sent to admin first, then assigned to the suitable specialist.',
-                                  textAlign: _isArabic
-                                      ? TextAlign.right
-                                      : TextAlign.left,
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: scheme.surface,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: scheme.outline.withValues(alpha: 0.14),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: _isArabic
-                            ? CrossAxisAlignment.end
-                            : CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _isArabic ? 'ملاحظات إضافية' : 'Additional notes',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall
-                                ?.copyWith(fontWeight: FontWeight.w800),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            _isArabic
-                                ? 'اكتب أي تفاصيل تريد أن تصل إلى الإدارة أو الأخصائي.'
-                                : 'Write any details you want admin or the specialist to receive.',
-                            textAlign:
-                                _isArabic ? TextAlign.right : TextAlign.left,
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                          const SizedBox(height: 12),
-                          TextField(
-                            controller: _noteCtrl,
-                            textDirection: _isArabic
-                                ? TextDirection.rtl
-                                : TextDirection.ltr,
-                            decoration: InputDecoration(
-                              hintText: _isArabic
-                                  ? 'اكتب ملاحظتك هنا...'
-                                  : 'Write your note here...',
-                              border: const OutlineInputBorder(),
-                            ),
-                            maxLines: 5,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      height: 54,
-                      child: FilledButton.icon(
-                        onPressed: _submitting ? null : _submit,
-                        icon: _submitting
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Icon(Icons.send_outlined),
-                        label: Text(
-                          _submitting
-                              ? (_isArabic ? 'جارٍ الإرسال...' : 'Sending...')
-                              : (_isArabic ? 'إرسال الطلب' : 'Send request'),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    if (_result != null)
-                      Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: scheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Text(
-                          _result!,
-                          textAlign:
-                              _isArabic ? TextAlign.right : TextAlign.left,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ),
-                  ],
-                );
-              },
-            ),
-          ),
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
