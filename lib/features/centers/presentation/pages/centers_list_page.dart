@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/centers/data/services/centers_firestore_service.dart';
+
+const String _centerLogoMarkAsset = 'assets/c7_branding/logo/logo_mark.png';
 
 class CentersListPage extends StatelessWidget {
   final String category;
@@ -77,337 +78,342 @@ class CentersListPage extends StatelessWidget {
 
   String _fallbackAsset(CenterModel c) {
     if (c.coverImageAsset.trim().isNotEmpty) {
-      return c.coverImageAsset.trim().replaceFirst('assets/assets/', 'assets/');
+      final normalized =
+          c.coverImageAsset.trim().replaceFirst('assets/assets/', 'assets/');
+      final lower = normalized.toLowerCase();
+      if (lower.contains('enter') || lower.contains('c7_branding/home/')) {
+        return _centerLogoMarkAsset;
+      }
+      return normalized;
     }
-    if (c.category == 'detox') return 'assets/c7_branding/home/home_bg.png';
-    if (c.category == 'special_needs') {
-      return 'assets/c7_branding/logo/logo_mark.png';
+    return _centerLogoMarkAsset;
+  }
+
+  String _backgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/images/backgrounds/specialists_bg_mobile.png';
     }
-    return 'assets/c7_branding/home/hero_art.png';
+    if (width < 1100) {
+      return 'assets/images/backgrounds/specialists_bg_tablet.png';
+    }
+    return 'assets/images/backgrounds/specialists_bg_desktop.png';
   }
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final service = CentersFirestoreService();
 
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(_categoryTitleAr(category)),
-          leading: IconButton(
-            onPressed: () => Navigator.of(context).maybePop(),
-            icon: const Icon(Icons.arrow_back),
-          ),
-        ),
-        body: Stack(
-          children: [
-            StreamBuilder<List<CenterModel>>(
-              stream: service.streamActiveCentersByCategory(category),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return const Center(
-                    child: Text('حدث خطأ أثناء تحميل المراكز'),
-                  );
-                }
+        backgroundColor: Colors.black,
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  _backgroundAsset(constraints.maxWidth),
+                  fit: BoxFit.cover,
+                  alignment: constraints.maxWidth < 700
+                      ? Alignment.topCenter
+                      : Alignment.center,
+                ),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.50),
+                        Colors.black.withValues(alpha: 0.30),
+                        Colors.black.withValues(alpha: 0.66),
+                      ],
+                    ),
+                  ),
+                ),
+                StreamBuilder<List<CenterModel>>(
+                  stream: service.streamActiveCentersByCategory(category),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return const Center(
+                        child: Text('حدث خطأ أثناء تحميل المراكز'),
+                      );
+                    }
 
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+                    if (!snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-                final items = snapshot.data ?? const <CenterModel>[];
-                if (items.isEmpty) {
-                  return const Center(
-                    child: Text('لا توجد مراكز متاحة في هذه الفئة حاليًا'),
-                  );
-                }
+                    final items = snapshot.data ?? const <CenterModel>[];
+                    if (items.isEmpty) {
+                      return const Center(
+                        child: Text('لا توجد مراكز متاحة في هذه الفئة حاليًا'),
+                      );
+                    }
 
-                return ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final c = items[index];
-                    final loc = _locationLine(c);
-                    final desc = _shortDescription(c.description);
-                    final hasPhone = c.phone.trim().isNotEmpty;
-                    final chips =
-                        c.services.where((e) => e.trim().isNotEmpty).toList();
+                    return ListView.separated(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: items.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final c = items[index];
+                        final loc = _locationLine(c);
+                        final desc = _shortDescription(c.description);
+                        final chips = c.services
+                            .where((e) => e.trim().isNotEmpty)
+                            .toList();
 
-                    return Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(22),
-                        onTap: () {
-                          AppAnalytics.logPathSelected(
-                            'centers',
-                            'view_center',
-                          );
-                          Navigator.of(context).pushNamed(
-                            Routes.centerDetails,
-                            arguments: {
-                              'center': c,
-                            },
-                          );
-                        },
-                        child: Container(
-                          clipBehavior: Clip.antiAlias,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.88),
+                        return Material(
+                          color: Colors.transparent,
+                          child: InkWell(
                             borderRadius: BorderRadius.circular(22),
-                            border: Border.all(
-                              color: scheme.outline.withValues(alpha: 0.12),
-                            ),
-                            boxShadow: AppShadows.card,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              SizedBox(
-                                height: 180,
-                                child: Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    _CenterCover(
-                                      imageUrl: c.coverImageUrl,
-                                      assetPath: _fallbackAsset(c),
-                                    ),
-                                    DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            Colors.black.withValues(alpha: 0.10),
-                                            Colors.black.withValues(alpha: 0.52),
-                                          ],
+                            onTap: () {
+                              AppAnalytics.logPathSelected(
+                                'centers',
+                                'view_center',
+                              );
+                              Navigator.of(context).pushNamed(
+                                Routes.centerDetails,
+                                arguments: {
+                                  'center': c,
+                                },
+                              );
+                            },
+                            child: Container(
+                              clipBehavior: Clip.antiAlias,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.34),
+                                borderRadius: BorderRadius.circular(22),
+                                border: Border.all(
+                                  color: const Color(0xFFE7C766)
+                                      .withValues(alpha: 0.34),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFE7C766)
+                                        .withValues(alpha: 0.12),
+                                    blurRadius: 26,
+                                    offset: const Offset(0, 12),
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.34),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  SizedBox(
+                                    height: 250,
+                                    child: Stack(
+                                      fit: StackFit.expand,
+                                      children: [
+                                        _CenterCover(
+                                          imageUrl: c.coverImageUrl,
+                                          assetPath: _fallbackAsset(c),
                                         ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(16),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Row(
+                                        DecoratedBox(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                              colors: [
+                                                Colors.black
+                                                    .withValues(alpha: 0.10),
+                                                Colors.black
+                                                    .withValues(alpha: 0.52),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(16),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
                                             children: [
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 8,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white
-                                                      .withValues(alpha: 0.18),
-                                                  borderRadius:
-                                                      BorderRadius.circular(999),
-                                                ),
-                                                child: Text(
-                                                  _categoryBadge(category),
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.w700,
+                                              Row(
+                                                children: [
+                                                  const Spacer(),
+                                                  _CenterLogoBubble(
+                                                    imageUrl: c.imageUrl,
+                                                    assetPath:
+                                                        _fallbackAsset(c),
                                                   ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 8,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white
-                                                      .withValues(alpha: 0.18),
-                                                  borderRadius:
-                                                      BorderRadius.circular(999),
-                                                ),
-                                                child: Text(
-                                                  _centerTypeBadge(c),
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
+                                                ],
                                               ),
                                               const Spacer(),
-                                              _CenterLogoBubble(
-                                                imageUrl: c.imageUrl,
-                                                assetPath: _fallbackAsset(c),
+                                              Text(
+                                                c.name.trim().isEmpty
+                                                    ? 'مركز'
+                                                    : c.name.trim(),
+                                                textAlign: TextAlign.right,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headlineSmall
+                                                    ?.copyWith(
+                                                  color:
+                                                      const Color(0xFFFFE7B2),
+                                                  fontWeight: FontWeight.w900,
+                                                  shadows: const [
+                                                    Shadow(
+                                                      color: Colors.black,
+                                                      blurRadius: 12,
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
+                                              if (loc.isNotEmpty) ...[
+                                                const SizedBox(height: 6),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    Text(
+                                                      loc,
+                                                      style: const TextStyle(
+                                                        color:
+                                                            Color(0xFFFFF4D4),
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    const Icon(
+                                                      Icons
+                                                          .location_on_outlined,
+                                                      color: Colors.white,
+                                                      size: 18,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
                                             ],
                                           ),
-                                          const Spacer(),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        if (desc.isNotEmpty) ...[
+                                          const SizedBox(height: 2),
                                           Text(
-                                            c.name.trim().isEmpty
-                                                ? 'مركز'
-                                                : c.name.trim(),
+                                            desc,
                                             textAlign: TextAlign.right,
                                             style: Theme.of(context)
                                                 .textTheme
-                                                .headlineSmall
+                                                .bodyMedium
                                                 ?.copyWith(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w900,
+                                                  color: const Color(0xFFFFF4D4)
+                                                      .withValues(alpha: 0.86),
+                                                  height: 1.35,
                                                 ),
                                           ),
-                                          if (loc.isNotEmpty) ...[
-                                            const SizedBox(height: 6),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: [
-                                                Text(
-                                                  loc,
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.w600,
+                                        ],
+                                        if (chips.isNotEmpty) ...[
+                                          const SizedBox(height: 12),
+                                          Wrap(
+                                            spacing: 8,
+                                            runSpacing: 8,
+                                            alignment: WrapAlignment.end,
+                                            children: [
+                                              for (final s in chips.take(10))
+                                                Chip(
+                                                  label: Text(
+                                                    s,
+                                                    textAlign: TextAlign.right,
+                                                  ),
+                                                  visualDensity:
+                                                      VisualDensity.compact,
+                                                  backgroundColor: Colors.black
+                                                      .withValues(alpha: 0.24),
+                                                  side: BorderSide(
+                                                    color:
+                                                        const Color(0xFFE7C766)
+                                                            .withValues(
+                                                                alpha: 0.24),
+                                                  ),
+                                                  labelStyle: const TextStyle(
+                                                    color: Color(0xFFFFE7B2),
+                                                    fontWeight: FontWeight.w700,
                                                   ),
                                                 ),
-                                                const SizedBox(width: 8),
-                                                const Icon(
-                                                  Icons.location_on_outlined,
-                                                  color: Colors.white,
-                                                  size: 18,
+                                            ],
+                                          ),
+                                        ],
+                                        const SizedBox(height: 12),
+                                        Wrap(
+                                          spacing: 8,
+                                          runSpacing: 8,
+                                          alignment: WrapAlignment.end,
+                                          children: [
+                                            _InfoChip(
+                                              icon: Icons.account_tree_outlined,
+                                              label: _centerTypeBadge(c),
+                                            ),
+                                            if (c.hasDetoxUnit &&
+                                                c.centerType != 'detox')
+                                              const _InfoChip(
+                                                icon: Icons
+                                                    .local_hospital_outlined,
+                                                label: 'يوجد قسم أعراض انسحاب',
+                                              ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: FilledButton.icon(
+                                                onPressed: () {
+                                                  AppAnalytics.logPathSelected(
+                                                    'centers',
+                                                    'view_center',
+                                                  );
+                                                  Navigator.of(context)
+                                                      .pushNamed(
+                                                    Routes.centerDetails,
+                                                    arguments: {
+                                                      'center': c,
+                                                    },
+                                                  );
+                                                },
+                                                icon: const Icon(
+                                                  Icons.arrow_outward_rounded,
                                                 ),
-                                              ],
+                                                label:
+                                                    const Text('اضغط للمزيد'),
+                                              ),
                                             ),
                                           ],
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    if (desc.isNotEmpty) ...[
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        desc,
-                                        textAlign: TextAlign.right,
-                                        style:
-                                            Theme.of(context).textTheme.bodyMedium,
-                                      ),
-                                    ],
-                                    if (hasPhone) ...[
-                                      const SizedBox(height: 12),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Text(
-                                                c.phone.trim(),
-                                                textAlign: TextAlign.left,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                    ),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          const Icon(
-                                            Icons.phone_outlined,
-                                            size: 18,
-                                          ),
-                                          const SizedBox(width: 6),
-                                          const Text('هاتف'),
-                                        ],
-                                      ),
-                                    ],
-                                    if (chips.isNotEmpty) ...[
-                                      const SizedBox(height: 12),
-                                      Wrap(
-                                        spacing: 8,
-                                        runSpacing: 8,
-                                        alignment: WrapAlignment.end,
-                                        children: [
-                                          for (final s in chips.take(10))
-                                            Chip(
-                                              label: Text(
-                                                s,
-                                                textAlign: TextAlign.right,
-                                              ),
-                                              visualDensity:
-                                                  VisualDensity.compact,
-                                            ),
-                                        ],
-                                      ),
-                                    ],
-                                    const SizedBox(height: 12),
-                                    Wrap(
-                                      spacing: 8,
-                                      runSpacing: 8,
-                                      alignment: WrapAlignment.end,
-                                      children: [
-                                        _InfoChip(
-                                          icon: Icons.account_tree_outlined,
-                                          label: _centerTypeBadge(c),
-                                        ),
-                                        if (c.hasDetoxUnit &&
-                                            c.centerType != 'detox')
-                                          const _InfoChip(
-                                            icon:
-                                                Icons.local_hospital_outlined,
-                                            label: 'يوجد قسم أعراض انسحاب',
-                                          ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: FilledButton.icon(
-                                            onPressed: () {
-                                              AppAnalytics.logPathSelected(
-                                                'centers',
-                                                'view_center',
-                                              );
-                                              Navigator.of(context).pushNamed(
-                                                Routes.centerDetails,
-                                                arguments: {
-                                                  'center': c,
-                                                },
-                                              );
-                                            },
-                                            icon: const Icon(
-                                              Icons.arrow_outward_rounded,
-                                            ),
-                                            label:
-                                                const Text('اضغط للمزيد'),
-                                          ),
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     );
                   },
-                );
-              },
-            ),
-            const _PathSelectionLogger(
-              module: 'centers',
-              path: 'browse',
-            ),
-          ],
+                ),
+                const _PathSelectionLogger(
+                  module: 'centers',
+                  path: 'browse',
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -450,25 +456,93 @@ class _CenterCover extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final trimmedUrl = imageUrl.trim();
+    final normalizedAsset = normalizeAssetPath(assetPath);
+    final lowerAsset = normalizedAsset.toLowerCase();
+    final useFallbackAsset = normalizedAsset.isNotEmpty &&
+        !lowerAsset.contains('enter') &&
+        !lowerAsset.contains('c7_branding/home/') &&
+        !lowerAsset.contains('logo_mark');
+
     if (trimmedUrl.isNotEmpty) {
       return Image.network(
         trimmedUrl,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
+          if (!useFallbackAsset) return const _CenterCoverFallback();
           return Image.asset(
-            normalizeAssetPath(assetPath),
+            normalizedAsset,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) =>
-                const AppMissingAssetPlaceholder(),
+                const _CenterCoverFallback(),
           );
         },
       );
     }
+    if (!useFallbackAsset) return const _CenterCoverFallback();
     return Image.asset(
-      normalizeAssetPath(assetPath),
+      normalizedAsset,
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) =>
-          const AppMissingAssetPlaceholder(),
+          const _CenterCoverFallback(),
+    );
+  }
+}
+
+class _CenterCoverFallback extends StatelessWidget {
+  const _CenterCoverFallback();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            const Color(0xFF061413).withValues(alpha: 0.94),
+            const Color(0xFF120D05).withValues(alpha: 0.90),
+            Colors.black.withValues(alpha: 0.96),
+          ],
+        ),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final panelWidth =
+              constraints.maxWidth < 520 ? constraints.maxWidth * 0.72 : 420.0;
+          return Center(
+            child: Container(
+              width: panelWidth,
+              height: 168,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.24),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: const Color(0xFFE7C766).withValues(alpha: 0.42),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.image_outlined,
+                    size: 34,
+                    color: const Color(0xFFE7C766).withValues(alpha: 0.78),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'واجهة المركز',
+                    style: TextStyle(
+                      color: const Color(0xFFFFE7B2).withValues(alpha: 0.88),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -485,26 +559,35 @@ class _CenterLogoBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final trimmedUrl = imageUrl.trim();
+    final normalizedAsset = normalizeAssetPath(assetPath);
+    final lowerAsset = normalizedAsset.toLowerCase();
+    final useFallbackAsset = normalizedAsset.isNotEmpty &&
+        !lowerAsset.contains('enter') &&
+        !lowerAsset.contains('c7_branding/home/') &&
+        !lowerAsset.contains('logo_mark');
     Widget child;
     if (trimmedUrl.isNotEmpty) {
       child = Image.network(
         trimmedUrl,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
+          if (!useFallbackAsset) return const _CenterLogoFallback();
           return Image.asset(
-            normalizeAssetPath(assetPath),
+            normalizedAsset,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) =>
-                const AppMissingAssetPlaceholder(),
+                const _CenterLogoFallback(),
           );
         },
       );
+    } else if (!useFallbackAsset) {
+      child = const _CenterLogoFallback();
     } else {
       child = Image.asset(
-        normalizeAssetPath(assetPath),
+        normalizedAsset,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) =>
-            const AppMissingAssetPlaceholder(),
+            const _CenterLogoFallback(),
       );
     }
 
@@ -512,15 +595,37 @@ class _CenterLogoBubble extends StatelessWidget {
       width: 62,
       height: 62,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.92),
+        color: Colors.black.withValues(alpha: 0.32),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.mutedGold.withValues(alpha: 0.34),
+          color: AppColors.mutedGold.withValues(alpha: 0.62),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.mutedGold.withValues(alpha: 0.18),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
         child: child,
+      ),
+    );
+  }
+}
+
+class _CenterLogoFallback extends StatelessWidget {
+  const _CenterLogoFallback();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Icon(
+        Icons.business_rounded,
+        size: 30,
+        color: AppColors.mutedGold.withValues(alpha: 0.80),
       ),
     );
   }
@@ -537,25 +642,25 @@ class _InfoChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: scheme.primary.withValues(alpha: 0.06),
+        color: Colors.black.withValues(alpha: 0.22),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(
-          color: scheme.outline.withValues(alpha: 0.10),
+          color: const Color(0xFFE7C766).withValues(alpha: 0.30),
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: scheme.primary),
+          Icon(icon, size: 16, color: const Color(0xFFE7C766)),
           const SizedBox(width: 6),
           Text(
             label,
             textAlign: TextAlign.right,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: const Color(0xFFFFE7B2),
                   fontWeight: FontWeight.w700,
                 ),
           ),
