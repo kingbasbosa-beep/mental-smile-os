@@ -407,6 +407,20 @@ class CentersListPage extends StatelessWidget {
                     );
                   },
                 ),
+                SafeArea(
+                  child: Align(
+                    alignment: AlignmentDirectional.topStart,
+                    child: Padding(
+                      padding: EdgeInsetsDirectional.only(
+                        start: constraints.maxWidth < 700 ? 14 : 22,
+                        top: constraints.maxWidth < 700 ? 12 : 18,
+                      ),
+                      child: _BackToMenuButton(
+                        compact: constraints.maxWidth < 700,
+                      ),
+                    ),
+                  ),
+                ),
                 const _PathSelectionLogger(
                   module: 'centers',
                   path: 'browse',
@@ -414,6 +428,48 @@ class CentersListPage extends StatelessWidget {
               ],
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+class _BackToMenuButton extends StatelessWidget {
+  const _BackToMenuButton({required this.compact});
+
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = compact ? 44.0 : 52.0;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: () => Navigator.of(context).pushNamed(Routes.menu),
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0xFF1B1007).withValues(alpha: 0.50),
+            border: Border.all(
+              color: const Color(0xFFFFD98A).withValues(alpha: 0.56),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFE7A94C).withValues(alpha: 0.18),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Icon(
+            Icons.arrow_back_rounded,
+            color: const Color(0xFFFFE7B2),
+            size: compact ? 22 : 26,
+          ),
         ),
       ),
     );
