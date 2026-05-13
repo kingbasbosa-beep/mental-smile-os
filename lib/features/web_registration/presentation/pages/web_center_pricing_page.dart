@@ -5,6 +5,7 @@ import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 
 class WebCenterPricingPage extends StatefulWidget {
   const WebCenterPricingPage({super.key});
@@ -107,6 +108,8 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: webRegistrationCompactFormTheme(
@@ -152,8 +155,8 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text(
-                                'Center Registration - Pricing & Capabilities',
+                              Text(
+                                l10n.webCenterPricingCapabilitiesTitle,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 22,
@@ -168,7 +171,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                                 ),
                                 icon: const Icon(Icons.menu_book_outlined,
                                     size: 16),
-                                label: const Text('مكتبة الإرشاد'),
+                                label: Text(l10n.webCenterGuidanceLibrary),
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: webRegistrationTextTurquoise,
                                   side: BorderSide(
@@ -228,9 +231,13 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                                 },
                               ),
                               const SizedBox(height: 12),
-                              ..._accommodationCosts.map(_accommodationTile),
+                              ..._accommodationCosts.map(
+                                (item) => _accommodationTile(context, item),
+                              ),
                               const SizedBox(height: 8),
-                              ..._autismCareCosts.map(_autismTile),
+                              ..._autismCareCosts.map(
+                                (item) => _autismTile(context, item),
+                              ),
                               if (_error != null) ...[
                                 const SizedBox(height: 10),
                                 Text(
@@ -249,7 +256,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                                   onPressed: _isSaving ? null : _save,
                                   child: _isSaving
                                       ? const CircularProgressIndicator()
-                                      : const Text('Next: Documents'),
+                                      : Text(l10n.webCenterNextDocuments),
                                 ),
                               ),
                             ],
@@ -280,7 +287,9 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
     );
   }
 
-  Widget _accommodationTile(AccommodationCostItem item) {
+  Widget _accommodationTile(BuildContext context, AccommodationCostItem item) {
+    final l10n = AppLocalizations.of(context)!;
+
     return ExpansionTile(
       title: Text(item.labelEn),
       childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -298,14 +307,17 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                         .toList();
                   });
                 },
-          title: const Text('Enabled'),
+          title: Text(l10n.webCenterEnabled),
           controlAffinity: ListTileControlAffinity.leading,
         ),
-        _priceField(_accommodationPriceControllers[item.key], 'Price'),
+        _priceField(
+          _accommodationPriceControllers[item.key],
+          l10n.webCenterPrice,
+        ),
         const SizedBox(height: 12),
         _dropdown(
           value: item.pricingUnit.isEmpty ? null : item.pricingUnit,
-          label: 'Pricing unit',
+          label: l10n.webCenterPricingUnit,
           items: const ['day', 'week', 'month'],
           onChanged: (value) {
             setState(() {
@@ -320,7 +332,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
         const SizedBox(height: 12),
         _dropdown(
           value: item.acMode.isEmpty ? null : item.acMode,
-          label: 'AC mode',
+          label: l10n.webCenterAcMode,
           items: const ['included', 'extra', 'not_available'],
           onChanged: (value) {
             setState(() {
@@ -377,7 +389,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
             ),
             _accommodationChip(
               item,
-              'Tax included',
+              l10n.webCenterTaxIncluded,
               item.taxIncluded,
               (value) => item.copyWith(taxIncluded: value),
             ),
@@ -387,7 +399,9 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
     );
   }
 
-  Widget _autismTile(AutismCareCostItem item) {
+  Widget _autismTile(BuildContext context, AutismCareCostItem item) {
+    final l10n = AppLocalizations.of(context)!;
+
     return ExpansionTile(
       title: Text(item.labelEn),
       childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -405,14 +419,17 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                         .toList();
                   });
                 },
-          title: const Text('Enabled'),
+          title: Text(l10n.webCenterEnabled),
           controlAffinity: ListTileControlAffinity.leading,
         ),
-        _priceField(_autismPriceControllers[item.key], 'Price'),
+        _priceField(
+          _autismPriceControllers[item.key],
+          l10n.webCenterPrice,
+        ),
         const SizedBox(height: 12),
         _dropdown(
           value: item.pricingUnit.isEmpty ? null : item.pricingUnit,
-          label: 'Pricing unit',
+          label: l10n.webCenterPricingUnit,
           items: const ['session', 'day', 'month'],
           onChanged: (value) {
             setState(() {
@@ -425,7 +442,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
           },
         ),
         FilterChip(
-          label: const Text('Tax included'),
+          label: Text(l10n.webCenterTaxIncluded),
           selected: item.taxIncluded,
           onSelected: _isSaving
               ? null

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 
 class WebCenterMediaPage extends StatefulWidget {
   const WebCenterMediaPage({super.key});
@@ -107,6 +108,8 @@ class _WebCenterMediaPageState extends State<WebCenterMediaPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: webRegistrationCompactFormTheme(
@@ -152,8 +155,8 @@ class _WebCenterMediaPageState extends State<WebCenterMediaPage> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text(
-                                'Center Registration - Media & Gallery',
+                              Text(
+                                l10n.webCenterMediaGalleryTitle,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 22,
@@ -168,7 +171,7 @@ class _WebCenterMediaPageState extends State<WebCenterMediaPage> {
                                 ),
                                 icon: const Icon(Icons.menu_book_outlined,
                                     size: 16),
-                                label: const Text('مكتبة الإرشاد'),
+                                label: Text(l10n.webCenterGuidanceLibrary),
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: webRegistrationTextTurquoise,
                                   side: BorderSide(
@@ -193,15 +196,21 @@ class _WebCenterMediaPageState extends State<WebCenterMediaPage> {
                               ),
                               const SizedBox(height: 16),
                               _textField(
-                                  _frontImageController, 'Front image URL'),
+                                _frontImageController,
+                                l10n.webCenterFrontImageUrl,
+                              ),
                               _textField(
                                 _receptionImageController,
-                                'Reception image URL',
+                                l10n.webCenterReceptionImageUrl,
                               ),
-                              _textField(_inside1ImageController,
-                                  'Inside image 1 URL'),
-                              _textField(_inside2ImageController,
-                                  'Inside image 2 URL'),
+                              _textField(
+                                _inside1ImageController,
+                                l10n.webCenterInsideImage1Url,
+                              ),
+                              _textField(
+                                _inside2ImageController,
+                                l10n.webCenterInsideImage2Url,
+                              ),
                               if (_error != null) ...[
                                 const SizedBox(height: 10),
                                 Text(
@@ -220,8 +229,9 @@ class _WebCenterMediaPageState extends State<WebCenterMediaPage> {
                                   onPressed: _isSaving ? null : _save,
                                   child: _isSaving
                                       ? const CircularProgressIndicator()
-                                      : const Text(
-                                          'Next: Pricing & Capabilities'),
+                                      : Text(
+                                          l10n.webCenterNextPricingCapabilities,
+                                        ),
                                 ),
                               ),
                             ],

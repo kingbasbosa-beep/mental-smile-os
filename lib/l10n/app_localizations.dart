@@ -656,6 +656,84 @@ abstract class AppLocalizations {
   /// **'التالي: الصور والمعرض'**
   String get webCenterNextMediaGallery;
 
+  /// No description provided for @webCenterMediaGalleryTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل المركز - الصور والمعرض'**
+  String get webCenterMediaGalleryTitle;
+
+  /// No description provided for @webCenterFrontImageUrl.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابط صورة الواجهة'**
+  String get webCenterFrontImageUrl;
+
+  /// No description provided for @webCenterReceptionImageUrl.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابط صورة الاستقبال'**
+  String get webCenterReceptionImageUrl;
+
+  /// No description provided for @webCenterInsideImage1Url.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابط صورة داخلية 1'**
+  String get webCenterInsideImage1Url;
+
+  /// No description provided for @webCenterInsideImage2Url.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابط صورة داخلية 2'**
+  String get webCenterInsideImage2Url;
+
+  /// No description provided for @webCenterNextPricingCapabilities.
+  ///
+  /// In ar, this message translates to:
+  /// **'التالي: التسعير والقدرات'**
+  String get webCenterNextPricingCapabilities;
+
+  /// No description provided for @webCenterPricingCapabilitiesTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل المركز - التسعير والقدرات'**
+  String get webCenterPricingCapabilitiesTitle;
+
+  /// No description provided for @webCenterEnabled.
+  ///
+  /// In ar, this message translates to:
+  /// **'مفعل'**
+  String get webCenterEnabled;
+
+  /// No description provided for @webCenterPrice.
+  ///
+  /// In ar, this message translates to:
+  /// **'السعر'**
+  String get webCenterPrice;
+
+  /// No description provided for @webCenterPricingUnit.
+  ///
+  /// In ar, this message translates to:
+  /// **'وحدة التسعير'**
+  String get webCenterPricingUnit;
+
+  /// No description provided for @webCenterAcMode.
+  ///
+  /// In ar, this message translates to:
+  /// **'نظام التكييف'**
+  String get webCenterAcMode;
+
+  /// No description provided for @webCenterTaxIncluded.
+  ///
+  /// In ar, this message translates to:
+  /// **'يشمل الضريبة'**
+  String get webCenterTaxIncluded;
+
+  /// No description provided for @webCenterNextDocuments.
+  ///
+  /// In ar, this message translates to:
+  /// **'التالي: المستندات'**
+  String get webCenterNextDocuments;
+
   /// No description provided for @bookingRequestTitle.
   ///
   /// In ar, this message translates to:

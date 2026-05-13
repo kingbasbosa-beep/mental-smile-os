@@ -292,6 +292,46 @@ class AppLocalizationsAr extends AppLocalizations {
   String get webCenterNextMediaGallery => 'التالي: الصور والمعرض';
 
   @override
+  String get webCenterMediaGalleryTitle => 'تسجيل المركز - الصور والمعرض';
+
+  @override
+  String get webCenterFrontImageUrl => 'رابط صورة الواجهة';
+
+  @override
+  String get webCenterReceptionImageUrl => 'رابط صورة الاستقبال';
+
+  @override
+  String get webCenterInsideImage1Url => 'رابط صورة داخلية 1';
+
+  @override
+  String get webCenterInsideImage2Url => 'رابط صورة داخلية 2';
+
+  @override
+  String get webCenterNextPricingCapabilities => 'التالي: التسعير والقدرات';
+
+  @override
+  String get webCenterPricingCapabilitiesTitle =>
+      'تسجيل المركز - التسعير والقدرات';
+
+  @override
+  String get webCenterEnabled => 'مفعل';
+
+  @override
+  String get webCenterPrice => 'السعر';
+
+  @override
+  String get webCenterPricingUnit => 'وحدة التسعير';
+
+  @override
+  String get webCenterAcMode => 'نظام التكييف';
+
+  @override
+  String get webCenterTaxIncluded => 'يشمل الضريبة';
+
+  @override
+  String get webCenterNextDocuments => 'التالي: المستندات';
+
+  @override
   String get bookingRequestTitle => 'طلب حجز';
 
   @override

@@ -294,6 +294,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webCenterNextMediaGallery => 'Next: Media & Gallery';
 
   @override
+  String get webCenterMediaGalleryTitle =>
+      'Center Registration - Media & Gallery';
+
+  @override
+  String get webCenterFrontImageUrl => 'Front image URL';
+
+  @override
+  String get webCenterReceptionImageUrl => 'Reception image URL';
+
+  @override
+  String get webCenterInsideImage1Url => 'Inside image 1 URL';
+
+  @override
+  String get webCenterInsideImage2Url => 'Inside image 2 URL';
+
+  @override
+  String get webCenterNextPricingCapabilities => 'Next: Pricing & Capabilities';
+
+  @override
+  String get webCenterPricingCapabilitiesTitle =>
+      'Center Registration - Pricing & Capabilities';
+
+  @override
+  String get webCenterEnabled => 'Enabled';
+
+  @override
+  String get webCenterPrice => 'Price';
+
+  @override
+  String get webCenterPricingUnit => 'Pricing unit';
+
+  @override
+  String get webCenterAcMode => 'AC mode';
+
+  @override
+  String get webCenterTaxIncluded => 'Tax included';
+
+  @override
+  String get webCenterNextDocuments => 'Next: Documents';
+
+  @override
   String get bookingRequestTitle => 'Booking request';
 
   @override
