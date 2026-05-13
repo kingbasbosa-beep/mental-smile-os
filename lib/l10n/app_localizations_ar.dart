@@ -377,6 +377,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get webCenterSubmitDocumentsFailed => 'تعذر إرسال المستندات';
 
   @override
+  String get webClinicianRegistrationAccountTitle => 'تسجيل الأخصائي - الحساب';
+
+  @override
+  String get webClinicianRegistrationProfileTitle =>
+      'تسجيل الأخصائي - الملف الشخصي';
+
+  @override
+  String get webClinicianName => 'الاسم';
+
+  @override
+  String get webClinicianProfessionalTitle => 'اللقب المهني';
+
+  @override
+  String get webClinicianSpecialty => 'التخصص';
+
+  @override
+  String get webClinicianNextProfile => 'التالي: الملف الشخصي';
+
+  @override
+  String get webClinicianPhotoUrl => 'رابط الصورة';
+
+  @override
+  String get webClinicianBio => 'النبذة';
+
+  @override
+  String get webClinicianNextSessions => 'التالي: الجلسات';
+
+  @override
   String get bookingRequestTitle => 'طلب حجز';
 
   @override

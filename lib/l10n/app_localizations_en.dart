@@ -380,6 +380,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webCenterSubmitDocumentsFailed => 'Could not submit documents';
 
   @override
+  String get webClinicianRegistrationAccountTitle =>
+      'Clinician Registration - Account';
+
+  @override
+  String get webClinicianRegistrationProfileTitle =>
+      'Clinician Registration - Profile';
+
+  @override
+  String get webClinicianName => 'Name';
+
+  @override
+  String get webClinicianProfessionalTitle => 'Professional title';
+
+  @override
+  String get webClinicianSpecialty => 'Specialty';
+
+  @override
+  String get webClinicianNextProfile => 'Next: Profile';
+
+  @override
+  String get webClinicianPhotoUrl => 'Photo URL';
+
+  @override
+  String get webClinicianBio => 'Bio';
+
+  @override
+  String get webClinicianNextSessions => 'Next: Sessions';
+
+  @override
   String get bookingRequestTitle => 'Booking request';
 
   @override

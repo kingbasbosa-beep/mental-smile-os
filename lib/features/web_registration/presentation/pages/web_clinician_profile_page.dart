@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 
 class WebClinicianProfilePage extends StatefulWidget {
   const WebClinicianProfilePage({super.key});
@@ -95,6 +96,8 @@ class _WebClinicianProfilePageState extends State<WebClinicianProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: webRegistrationCompactFormTheme(
@@ -141,8 +144,8 @@ class _WebClinicianProfilePageState extends State<WebClinicianProfilePage> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text(
-                                'Clinician Registration - Profile',
+                              Text(
+                                l10n.webClinicianRegistrationProfileTitle,
                                 style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w700,
@@ -158,7 +161,7 @@ class _WebClinicianProfilePageState extends State<WebClinicianProfilePage> {
                                   Icons.menu_book_outlined,
                                   size: 16,
                                 ),
-                                label: const Text('مكتبة الإرشاد'),
+                                label: Text(l10n.webCenterGuidanceLibrary),
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: webRegistrationTextTurquoise,
                                   side: BorderSide(
@@ -180,9 +183,16 @@ class _WebClinicianProfilePageState extends State<WebClinicianProfilePage> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              _textField(_photoUrlController, 'Photo URL'),
+                              _textField(
+                                _photoUrlController,
+                                l10n.webClinicianPhotoUrl,
+                              ),
                               const SizedBox(height: 10),
-                              _textField(_bioController, 'Bio', maxLines: 4),
+                              _textField(
+                                _bioController,
+                                l10n.webClinicianBio,
+                                maxLines: 4,
+                              ),
                               if (_error != null) ...[
                                 const SizedBox(height: 10),
                                 Text(
@@ -202,7 +212,7 @@ class _WebClinicianProfilePageState extends State<WebClinicianProfilePage> {
                                       _isSaving || _uid == null ? null : _save,
                                   child: _isSaving
                                       ? const CircularProgressIndicator()
-                                      : const Text('Next: Sessions'),
+                                      : Text(l10n.webClinicianNextSessions),
                                 ),
                               ),
                             ],

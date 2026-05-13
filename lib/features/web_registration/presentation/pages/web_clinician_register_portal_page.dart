@@ -5,6 +5,7 @@ import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/specialists/data/clinician_specialty_catalog.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 
 class WebClinicianRegisterPortalPage extends StatefulWidget {
   const WebClinicianRegisterPortalPage({super.key});
@@ -162,6 +163,8 @@ class _WebClinicianRegisterPortalPageState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: webRegistrationCompactFormTheme(
@@ -226,8 +229,8 @@ class _WebClinicianRegisterPortalPageState
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text(
-                                'Clinician Registration - Account',
+                              Text(
+                                l10n.webClinicianRegistrationAccountTitle,
                                 style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w700,
@@ -241,7 +244,7 @@ class _WebClinicianRegisterPortalPageState
                                 ),
                                 icon: const Icon(Icons.menu_book_outlined,
                                     size: 16),
-                                label: const Text('مكتبة الإرشاد'),
+                                label: Text(l10n.webCenterGuidanceLibrary),
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: webRegistrationTextTurquoise,
                                   side: BorderSide(
@@ -265,7 +268,7 @@ class _WebClinicianRegisterPortalPageState
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              _textField(_nameController, 'Name',
+                              _textField(_nameController, l10n.webClinicianName,
                                   validator: _required),
                               const SizedBox(height: 10),
                               DropdownButtonFormField<String>(
@@ -276,8 +279,9 @@ class _WebClinicianRegisterPortalPageState
                                   color: _fieldGold,
                                   fontWeight: FontWeight.w700,
                                 ),
-                                decoration:
-                                    _fieldDecoration('Professional title'),
+                                decoration: _fieldDecoration(
+                                  l10n.webClinicianProfessionalTitle,
+                                ),
                                 items: _professionalTitles
                                     .map((title) => DropdownMenuItem(
                                           value: title['key'],
@@ -302,7 +306,8 @@ class _WebClinicianRegisterPortalPageState
                                   color: _fieldGold,
                                   fontWeight: FontWeight.w700,
                                 ),
-                                decoration: _fieldDecoration('Specialty'),
+                                decoration:
+                                    _fieldDecoration(l10n.webClinicianSpecialty),
                                 items: _specialties
                                     .map((specialty) => DropdownMenuItem(
                                           value: specialty['key'],
@@ -320,7 +325,7 @@ class _WebClinicianRegisterPortalPageState
                               const SizedBox(height: 10),
                               _textField(
                                 _emailController,
-                                'Email',
+                                l10n.authEmail,
                                 keyboardType: TextInputType.emailAddress,
                                 validator: (value) {
                                   final email = value?.trim() ?? '';
@@ -333,7 +338,7 @@ class _WebClinicianRegisterPortalPageState
                               const SizedBox(height: 10),
                               _textField(
                                 _passwordController,
-                                'Password',
+                                l10n.authPassword,
                                 obscureText: true,
                                 validator: (value) {
                                   if (value == null || value.length < 6) {
@@ -345,7 +350,7 @@ class _WebClinicianRegisterPortalPageState
                               const SizedBox(height: 10),
                               _textField(
                                 _confirmPasswordController,
-                                'Confirm password',
+                                l10n.authConfirmPassword,
                                 obscureText: true,
                                 validator: (value) {
                                   if (value != _passwordController.text) {
@@ -378,7 +383,7 @@ class _WebClinicianRegisterPortalPageState
                                           child: CircularProgressIndicator(
                                               strokeWidth: 2),
                                         )
-                                      : const Text('Next: Profile'),
+                                      : Text(l10n.webClinicianNextProfile),
                                 ),
                               ),
                             ],

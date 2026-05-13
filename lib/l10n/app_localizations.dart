@@ -818,6 +818,60 @@ abstract class AppLocalizations {
   /// **'تعذر إرسال المستندات'**
   String get webCenterSubmitDocumentsFailed;
 
+  /// No description provided for @webClinicianRegistrationAccountTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الأخصائي - الحساب'**
+  String get webClinicianRegistrationAccountTitle;
+
+  /// No description provided for @webClinicianRegistrationProfileTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الأخصائي - الملف الشخصي'**
+  String get webClinicianRegistrationProfileTitle;
+
+  /// No description provided for @webClinicianName.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم'**
+  String get webClinicianName;
+
+  /// No description provided for @webClinicianProfessionalTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللقب المهني'**
+  String get webClinicianProfessionalTitle;
+
+  /// No description provided for @webClinicianSpecialty.
+  ///
+  /// In ar, this message translates to:
+  /// **'التخصص'**
+  String get webClinicianSpecialty;
+
+  /// No description provided for @webClinicianNextProfile.
+  ///
+  /// In ar, this message translates to:
+  /// **'التالي: الملف الشخصي'**
+  String get webClinicianNextProfile;
+
+  /// No description provided for @webClinicianPhotoUrl.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابط الصورة'**
+  String get webClinicianPhotoUrl;
+
+  /// No description provided for @webClinicianBio.
+  ///
+  /// In ar, this message translates to:
+  /// **'النبذة'**
+  String get webClinicianBio;
+
+  /// No description provided for @webClinicianNextSessions.
+  ///
+  /// In ar, this message translates to:
+  /// **'التالي: الجلسات'**
+  String get webClinicianNextSessions;
+
   /// No description provided for @bookingRequestTitle.
   ///
   /// In ar, this message translates to:
