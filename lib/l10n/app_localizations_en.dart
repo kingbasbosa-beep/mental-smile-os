@@ -340,6 +340,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookingCenterRequestFallback => 'Center request';
 
   @override
+  String clientDashboardWelcome(String name) {
+    return 'Welcome, $name';
+  }
+
+  @override
+  String get clientDashboardSubtitle => 'Your next steps are all here.';
+
+  @override
+  String get clientBookings => 'Bookings';
+
+  @override
+  String get clientBookingRequests => 'Booking requests';
+
+  @override
+  String get clientSupport => 'Support';
+
+  @override
+  String get clientSupportRequests => 'Support requests';
+
+  @override
+  String get clientPaymentProof => 'Payment proof';
+
+  @override
+  String get clientUploadPaymentProof => 'Upload transfer proof';
+
+  @override
+  String get clientMySessions => 'My sessions';
+
+  @override
+  String get clientLinksAndCodes => 'Links and codes';
+
+  @override
+  String get clientFollowUp => 'Follow-up';
+
+  @override
+  String get clientMessagePreferences => 'Message preferences';
+
+  @override
+  String get clientRatingsCount => 'Ratings count';
+
+  @override
+  String get clientAverageStars => 'Average stars';
+
+  @override
+  String get clientOverallAverage => 'Overall average';
+
+  @override
   String comingSoon(String title) {
     return '$title — Coming soon';
   }

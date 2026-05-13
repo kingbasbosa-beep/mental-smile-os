@@ -746,6 +746,96 @@ abstract class AppLocalizations {
   /// **'طلب مركز'**
   String get bookingCenterRequestFallback;
 
+  /// No description provided for @clientDashboardWelcome.
+  ///
+  /// In ar, this message translates to:
+  /// **'مرحبًا {name}'**
+  String clientDashboardWelcome(String name);
+
+  /// No description provided for @clientDashboardSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل خطواتك موجودة هنا بهدوء.'**
+  String get clientDashboardSubtitle;
+
+  /// No description provided for @clientBookings.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلبات الحجز'**
+  String get clientBookings;
+
+  /// No description provided for @clientBookingRequests.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلبات الحجز'**
+  String get clientBookingRequests;
+
+  /// No description provided for @clientSupport.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدعم'**
+  String get clientSupport;
+
+  /// No description provided for @clientSupportRequests.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلبات الدعم'**
+  String get clientSupportRequests;
+
+  /// No description provided for @clientPaymentProof.
+  ///
+  /// In ar, this message translates to:
+  /// **'إثبات التحويل النقدي'**
+  String get clientPaymentProof;
+
+  /// No description provided for @clientUploadPaymentProof.
+  ///
+  /// In ar, this message translates to:
+  /// **'رفع إثبات التحويل'**
+  String get clientUploadPaymentProof;
+
+  /// No description provided for @clientMySessions.
+  ///
+  /// In ar, this message translates to:
+  /// **'جلساتي'**
+  String get clientMySessions;
+
+  /// No description provided for @clientLinksAndCodes.
+  ///
+  /// In ar, this message translates to:
+  /// **'الروابط والأكواد'**
+  String get clientLinksAndCodes;
+
+  /// No description provided for @clientFollowUp.
+  ///
+  /// In ar, this message translates to:
+  /// **'المتابعة'**
+  String get clientFollowUp;
+
+  /// No description provided for @clientMessagePreferences.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفضيلات الرسائل'**
+  String get clientMessagePreferences;
+
+  /// No description provided for @clientRatingsCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'عدد التقييمات'**
+  String get clientRatingsCount;
+
+  /// No description provided for @clientAverageStars.
+  ///
+  /// In ar, this message translates to:
+  /// **'متوسط النجوم'**
+  String get clientAverageStars;
+
+  /// No description provided for @clientOverallAverage.
+  ///
+  /// In ar, this message translates to:
+  /// **'المتوسط العام'**
+  String get clientOverallAverage;
+
   /// No description provided for @comingSoon.
   ///
   /// In ar, this message translates to:

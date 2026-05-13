@@ -118,6 +118,28 @@
   "bookingEmptyClosed": "No closed requests",
   "bookingSpecialistFallback": "Specialist",
   "bookingCenterRequestFallback": "Center request",
+  "clientDashboardWelcome": "Welcome, {name}",
+  "@clientDashboardWelcome": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "clientDashboardSubtitle": "Your next steps are all here.",
+  "clientBookings": "Bookings",
+  "clientBookingRequests": "Booking requests",
+  "clientSupport": "Support",
+  "clientSupportRequests": "Support requests",
+  "clientPaymentProof": "Payment proof",
+  "clientUploadPaymentProof": "Upload transfer proof",
+  "clientMySessions": "My sessions",
+  "clientLinksAndCodes": "Links and codes",
+  "clientFollowUp": "Follow-up",
+  "clientMessagePreferences": "Message preferences",
+  "clientRatingsCount": "Ratings count",
+  "clientAverageStars": "Average stars",
+  "clientOverallAverage": "Overall average",
   "comingSoon": "{title} — Coming soon",
   "@comingSoon": {
     "placeholders": {

@@ -338,6 +338,53 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bookingCenterRequestFallback => 'طلب مركز';
 
   @override
+  String clientDashboardWelcome(String name) {
+    return 'مرحبًا $name';
+  }
+
+  @override
+  String get clientDashboardSubtitle => 'كل خطواتك موجودة هنا بهدوء.';
+
+  @override
+  String get clientBookings => 'طلبات الحجز';
+
+  @override
+  String get clientBookingRequests => 'طلبات الحجز';
+
+  @override
+  String get clientSupport => 'الدعم';
+
+  @override
+  String get clientSupportRequests => 'طلبات الدعم';
+
+  @override
+  String get clientPaymentProof => 'إثبات التحويل النقدي';
+
+  @override
+  String get clientUploadPaymentProof => 'رفع إثبات التحويل';
+
+  @override
+  String get clientMySessions => 'جلساتي';
+
+  @override
+  String get clientLinksAndCodes => 'الروابط والأكواد';
+
+  @override
+  String get clientFollowUp => 'المتابعة';
+
+  @override
+  String get clientMessagePreferences => 'تفضيلات الرسائل';
+
+  @override
+  String get clientRatingsCount => 'عدد التقييمات';
+
+  @override
+  String get clientAverageStars => 'متوسط النجوم';
+
+  @override
+  String get clientOverallAverage => 'المتوسط العام';
+
+  @override
   String comingSoon(String title) {
     return '$title — قريبًا';
   }

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/contracts/role_names.dart';
 import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
@@ -266,6 +267,7 @@ class ClientDashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isArabic =
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
@@ -315,10 +317,9 @@ class ClientDashboardPage extends StatelessWidget {
                             builder: (context, snap) {
                               final count = snap.data ?? 0;
                               return _ActionButton(
-                                title: isArabic ? 'طلبات الحجز' : 'Bookings',
-                                subtitle: isArabic
-                                    ? 'طلبات الحجز: $count'
-                                    : 'Booking requests: $count',
+                                title: l10n.clientBookings,
+                                subtitle:
+                                    '${l10n.clientBookingRequests}: $count',
                                 asset:
                                     'assets/images/client_dashboard/actions/client_bookings.png',
                                 icon: Icons.list_alt_outlined,
@@ -332,10 +333,9 @@ class ClientDashboardPage extends StatelessWidget {
                             builder: (context, snap) {
                               final count = snap.data ?? 0;
                               return _ActionButton(
-                                title: isArabic ? 'الدعم' : 'Support',
-                                subtitle: isArabic
-                                    ? 'طلبات الدعم: $count'
-                                    : 'Support requests: $count',
+                                title: l10n.clientSupport,
+                                subtitle:
+                                    '${l10n.clientSupportRequests}: $count',
                                 asset:
                                     'assets/images/client_dashboard/actions/client_support.png',
                                 icon: Icons.chat_bubble_outline_rounded,
@@ -349,12 +349,8 @@ class ClientDashboardPage extends StatelessWidget {
                             },
                           ),
                           _ActionButton(
-                            title: isArabic
-                                ? 'إثبات التحويل النقدي'
-                                : 'Payment Proof',
-                            subtitle: isArabic
-                                ? 'رفع إثبات التحويل'
-                                : 'Upload transfer proof',
+                            title: l10n.clientPaymentProof,
+                            subtitle: l10n.clientUploadPaymentProof,
                             asset:
                                 'assets/images/client_dashboard/actions/client_payment_proof.png',
                             icon: Icons.receipt_long_outlined,
@@ -362,10 +358,8 @@ class ClientDashboardPage extends StatelessWidget {
                                 .pushNamed(Routes.clientPaymentProof),
                           ),
                           _ActionButton(
-                            title: isArabic ? 'جلساتي' : 'My Sessions',
-                            subtitle: isArabic
-                                ? 'الروابط والأكواد'
-                                : 'Links and codes',
+                            title: l10n.clientMySessions,
+                            subtitle: l10n.clientLinksAndCodes,
                             asset:
                                 'assets/images/client_dashboard/actions/client_sessions.png',
                             icon: Icons.video_camera_front_outlined,
@@ -373,10 +367,8 @@ class ClientDashboardPage extends StatelessWidget {
                                 .pushNamed(Routes.clientSessions),
                           ),
                           _ActionButton(
-                            title: isArabic ? 'المتابعة' : 'Follow-up',
-                            subtitle: isArabic
-                                ? 'تفضيلات الرسائل'
-                                : 'Message preferences',
+                            title: l10n.clientFollowUp,
+                            subtitle: l10n.clientMessagePreferences,
                             asset:
                                 'assets/images/client_dashboard/actions/client_follow_up.png',
                             icon: Icons.mark_email_read_outlined,
@@ -409,7 +401,7 @@ class ClientDashboardPage extends StatelessWidget {
                                 };
 
                             return _RatingsPanel(
-                              isArabic: isArabic,
+                              l10n: l10n,
                               count: (ratingsData['count'] ?? 0).toInt(),
                               avgStars:
                                   (ratingsData['avgStars'] ?? 0).toDouble(),
@@ -478,7 +470,7 @@ class ClientDashboardPage extends StatelessWidget {
                                             CrossAxisAlignment.end,
                                         children: [
                                           _GreetingText(
-                                            isArabic: isArabic,
+                                            l10n: l10n,
                                             name: name,
                                             textTheme:
                                                 Theme.of(context).textTheme,
@@ -528,6 +520,7 @@ class _DashboardTopActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       textDirection: TextDirection.ltr,
       mainAxisAlignment: MainAxisAlignment.end,
@@ -535,7 +528,7 @@ class _DashboardTopActions extends StatelessWidget {
         _TopIconButton(
           icon: Icons.arrow_back_rounded,
           asset: 'assets/branding/navigation/back/back_right_gold.png',
-          tooltip: isArabic ? 'رجوع' : 'Back',
+          tooltip: l10n.commonBack,
           onTap: () {
             if (Navigator.of(context).canPop()) {
               Navigator.of(context).maybePop();
@@ -551,7 +544,7 @@ class _DashboardTopActions extends StatelessWidget {
         _TopIconButton(
           icon: Icons.logout_rounded,
           asset: 'assets/branding/navigation/logout/logout_gold.png',
-          tooltip: isArabic ? 'تسجيل الخروج' : 'Logout',
+          tooltip: l10n.commonLogout,
           onTap: () async {
             await FirebaseAuth.instance.signOut();
             if (!context.mounted) return;
@@ -690,7 +683,7 @@ class _ProfileBanner extends StatelessWidget {
           if (showGreeting)
             Expanded(
               child: _GreetingText(
-                isArabic: isArabic,
+                l10n: AppLocalizations.of(context)!,
                 name: name,
                 textTheme: textTheme,
               ),
@@ -704,12 +697,12 @@ class _ProfileBanner extends StatelessWidget {
 }
 
 class _GreetingText extends StatelessWidget {
-  final bool isArabic;
+  final AppLocalizations l10n;
   final String name;
   final TextTheme textTheme;
 
   const _GreetingText({
-    required this.isArabic,
+    required this.l10n,
     required this.name,
     required this.textTheme,
   });
@@ -721,7 +714,7 @@ class _GreetingText extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
-          isArabic ? 'مرحباً $name' : 'Welcome, $name',
+          l10n.clientDashboardWelcome(name),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: textTheme.titleLarge?.copyWith(
@@ -740,9 +733,7 @@ class _GreetingText extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          isArabic
-              ? 'كل خطواتك موجودة هنا بهدوء.'
-              : 'Your next steps are all here.',
+          l10n.clientDashboardSubtitle,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: textTheme.bodySmall?.copyWith(
@@ -1071,14 +1062,14 @@ class _HoverScaleState extends State<_HoverScale> {
 }
 
 class _RatingsPanel extends StatelessWidget {
-  final bool isArabic;
+  final AppLocalizations l10n;
   final int count;
   final double avgStars;
   final double avgPercentage;
   final bool horizontal;
 
   const _RatingsPanel({
-    required this.isArabic,
+    required this.l10n,
     required this.count,
     required this.avgStars,
     required this.avgPercentage,
@@ -1090,15 +1081,15 @@ class _RatingsPanel extends StatelessWidget {
     final metrics = [
       _PlainMetric(
         value: '$count',
-        label: isArabic ? 'عدد التقييمات' : 'Ratings count',
+        label: l10n.clientRatingsCount,
       ),
       _PlainMetric(
         value: avgStars.toStringAsFixed(1),
-        label: isArabic ? 'متوسط النجوم' : 'Average stars',
+        label: l10n.clientAverageStars,
       ),
       _PlainMetric(
         value: '${avgPercentage.toStringAsFixed(1)}%',
-        label: isArabic ? 'المتوسط العام' : 'Overall average',
+        label: l10n.clientOverallAverage,
       ),
     ];
 

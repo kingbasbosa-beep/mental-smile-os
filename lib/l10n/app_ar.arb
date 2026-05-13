@@ -118,6 +118,28 @@
   "bookingEmptyClosed": "لا توجد طلبات مغلقة",
   "bookingSpecialistFallback": "الأخصائي",
   "bookingCenterRequestFallback": "طلب مركز",
+  "clientDashboardWelcome": "مرحبًا {name}",
+  "@clientDashboardWelcome": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "clientDashboardSubtitle": "كل خطواتك موجودة هنا بهدوء.",
+  "clientBookings": "طلبات الحجز",
+  "clientBookingRequests": "طلبات الحجز",
+  "clientSupport": "الدعم",
+  "clientSupportRequests": "طلبات الدعم",
+  "clientPaymentProof": "إثبات التحويل النقدي",
+  "clientUploadPaymentProof": "رفع إثبات التحويل",
+  "clientMySessions": "جلساتي",
+  "clientLinksAndCodes": "الروابط والأكواد",
+  "clientFollowUp": "المتابعة",
+  "clientMessagePreferences": "تفضيلات الرسائل",
+  "clientRatingsCount": "عدد التقييمات",
+  "clientAverageStars": "متوسط النجوم",
+  "clientOverallAverage": "المتوسط العام",
   "comingSoon": "{title} — قريبًا",
   "@comingSoon": {
     "placeholders": {
