@@ -286,7 +286,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            textDirection: TextDirection.rtl,
+            textDirection: Directionality.of(context),
             children: [
               Expanded(
                 child: Text(
@@ -394,7 +394,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         body: AppPageBackground(
           child: SafeArea(
@@ -661,7 +661,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           Align(
-                            alignment: Alignment.centerRight,
+                            alignment: AlignmentDirectional.centerStart,
                             child: TextButton(
                               onPressed: () => Navigator.of(context).pop(),
                               child:

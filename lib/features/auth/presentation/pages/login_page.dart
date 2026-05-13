@@ -339,8 +339,10 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
             ),
-            const Icon(
-              Icons.arrow_back_ios_new_rounded,
+            Icon(
+              Directionality.of(context) == TextDirection.rtl
+                  ? Icons.arrow_back_ios_new_rounded
+                  : Icons.arrow_forward_ios_rounded,
               color: _cyberTurquoise,
               size: 16,
             ),
@@ -353,9 +355,14 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context);
+    final textDirection =
+        locale.languageCode.toLowerCase() == 'ar'
+            ? TextDirection.rtl
+            : TextDirection.ltr;
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: textDirection,
       child: Scaffold(
         body: Stack(
           children: [

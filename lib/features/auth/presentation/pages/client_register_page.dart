@@ -217,9 +217,14 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context);
+    final textDirection =
+        locale.languageCode.toLowerCase() == 'ar'
+            ? TextDirection.rtl
+            : TextDirection.ltr;
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: textDirection,
       child: Scaffold(
         backgroundColor: Colors.black,
         body: Stack(
