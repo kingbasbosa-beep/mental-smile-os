@@ -87,6 +87,7 @@ class _WebCenterRegisterPortalPageState
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
 
     setState(() {
       _isSubmitting = true;
@@ -134,11 +135,11 @@ class _WebCenterRegisterPortalPageState
       );
     } on FirebaseAuthException catch (e) {
       setState(() {
-        _errorMessage = e.message ?? 'Registration failed. Please try again.';
+        _errorMessage = e.message ?? l10n.webCenterRegistrationFailed;
       });
     } catch (_) {
       setState(() {
-        _errorMessage = 'Registration failed. Please try again.';
+        _errorMessage = l10n.webCenterRegistrationFailed;
       });
     } finally {
       if (mounted) {
@@ -268,7 +269,7 @@ class _WebCenterRegisterPortalPageState
                                     _fieldDecoration(l10n.webCenterCenterName),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return 'Center name is required';
+                                    return l10n.webCenterCenterNameRequired;
                                   }
                                   return null;
                                 },
@@ -294,7 +295,7 @@ class _WebCenterRegisterPortalPageState
                                     .toList(),
                                 validator: (value) =>
                                     value == null || value.isEmpty
-                                        ? 'Required'
+                                        ? l10n.authRequiredField
                                         : null,
                                 onChanged: _isSubmitting
                                     ? null
@@ -334,7 +335,7 @@ class _WebCenterRegisterPortalPageState
                                     .toList(),
                                 validator: (value) =>
                                     value == null || value.isEmpty
-                                        ? 'Required'
+                                        ? l10n.authRequiredField
                                         : null,
                                 onChanged: _isSubmitting
                                     ? null
@@ -352,9 +353,11 @@ class _WebCenterRegisterPortalPageState
                                 keyboardType: TextInputType.emailAddress,
                                 validator: (value) {
                                   final email = value?.trim() ?? '';
-                                  if (email.isEmpty) return 'Email is required';
+                                  if (email.isEmpty) {
+                                    return l10n.authEmailRequired;
+                                  }
                                   if (!email.contains('@')) {
-                                    return 'Enter a valid email';
+                                    return l10n.authInvalidEmail;
                                   }
                                   return null;
                                 },
@@ -371,7 +374,7 @@ class _WebCenterRegisterPortalPageState
                                 obscureText: true,
                                 validator: (value) {
                                   if (value == null || value.length < 6) {
-                                    return 'Password must be at least 6 characters';
+                                    return l10n.authWeakPassword;
                                   }
                                   return null;
                                 },
@@ -390,7 +393,7 @@ class _WebCenterRegisterPortalPageState
                                 obscureText: true,
                                 validator: (value) {
                                   if (value != _passwordController.text) {
-                                    return 'Passwords do not match';
+                                    return l10n.authPasswordsDoNotMatch;
                                   }
                                   return null;
                                 },

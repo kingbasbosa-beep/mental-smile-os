@@ -354,6 +354,32 @@ class AppLocalizationsEn extends AppLocalizations {
       'Browse the guidance library while your account is reviewed';
 
   @override
+  String get webCenterCenterNameRequired => 'Enter the center name';
+
+  @override
+  String get webCenterRegistrationFailed =>
+      'Registration failed. Please try again.';
+
+  @override
+  String get webCenterPleaseRegisterBeforeSaving =>
+      'Please register or sign in before saving.';
+
+  @override
+  String get webCenterMissingSession => 'Missing center session';
+
+  @override
+  String get webCenterSaveProfileFailed => 'Could not save profile';
+
+  @override
+  String get webCenterSaveMediaFailed => 'Could not save media';
+
+  @override
+  String get webCenterSavePricingFailed => 'Could not save pricing';
+
+  @override
+  String get webCenterSubmitDocumentsFailed => 'Could not submit documents';
+
+  @override
   String get bookingRequestTitle => 'Booking request';
 
   @override

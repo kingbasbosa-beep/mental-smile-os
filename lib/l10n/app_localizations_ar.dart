@@ -351,6 +351,32 @@ class AppLocalizationsAr extends AppLocalizations {
       'تصفح مكتبة الإرشاد أثناء مراجعة حسابك';
 
   @override
+  String get webCenterCenterNameRequired => 'اكتب اسم المركز';
+
+  @override
+  String get webCenterRegistrationFailed =>
+      'تعذر إكمال التسجيل، حاول مرة أخرى.';
+
+  @override
+  String get webCenterPleaseRegisterBeforeSaving =>
+      'يرجى التسجيل أو تسجيل الدخول قبل الحفظ.';
+
+  @override
+  String get webCenterMissingSession => 'جلسة المركز غير متاحة';
+
+  @override
+  String get webCenterSaveProfileFailed => 'تعذر حفظ بيانات المركز';
+
+  @override
+  String get webCenterSaveMediaFailed => 'تعذر حفظ الصور';
+
+  @override
+  String get webCenterSavePricingFailed => 'تعذر حفظ التسعير';
+
+  @override
+  String get webCenterSubmitDocumentsFailed => 'تعذر إرسال المستندات';
+
+  @override
   String get bookingRequestTitle => 'طلب حجز';
 
   @override

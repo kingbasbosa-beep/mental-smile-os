@@ -41,11 +41,12 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
 
     final user = FirebaseAuth.instance.currentUser;
     final uid = user?.uid ?? WebRegistrationDraftStore.centerUid;
     if (uid == null) {
-      setState(() => _error = 'Please register or sign in before saving.');
+      setState(() => _error = l10n.webCenterPleaseRegisterBeforeSaving);
       return;
     }
 
@@ -75,14 +76,16 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
       if (!mounted) return;
       Navigator.of(context).pushReplacementNamed(Routes.webCenterMedia);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Failed to save profile');
+      if (mounted) setState(() => _error = l10n.webCenterSaveProfileFailed);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
   }
 
   String? _required(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Required';
+    if (value == null || value.trim().isEmpty) {
+      return AppLocalizations.of(context)!.authRequiredField;
+    }
     return null;
   }
 

@@ -74,10 +74,11 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
     final uid = FirebaseAuth.instance.currentUser?.uid ??
         WebRegistrationDraftStore.centerUid;
     if (uid == null) {
-      setState(() => _error = 'Please register or sign in before saving.');
+      setState(() => _error = l10n.webCenterPleaseRegisterBeforeSaving);
       return;
     }
 
@@ -100,7 +101,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
       if (!mounted) return;
       Navigator.of(context).pushReplacementNamed(Routes.webCenterDocuments);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Failed to save pricing.');
+      if (mounted) setState(() => _error = l10n.webCenterSavePricingFailed);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }

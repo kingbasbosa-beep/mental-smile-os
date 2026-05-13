@@ -79,6 +79,7 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
 
     setState(() {
       _isSaving = true;
@@ -90,7 +91,7 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
       final uid = user?.uid ?? WebRegistrationDraftStore.centerUid;
 
       if (uid == null) {
-        setState(() => _error = 'Missing user session');
+        setState(() => _error = l10n.webCenterMissingSession);
         return;
       }
 
@@ -112,14 +113,18 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
         arguments: const {'source': 'center'},
       );
     } catch (_) {
-      if (mounted) setState(() => _error = 'Failed to submit documents');
+      if (mounted) {
+        setState(() => _error = l10n.webCenterSubmitDocumentsFailed);
+      }
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
   }
 
   String? _required(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Required';
+    if (value == null || value.trim().isEmpty) {
+      return AppLocalizations.of(context)!.authRequiredField;
+    }
     return null;
   }
 

@@ -770,6 +770,54 @@ abstract class AppLocalizations {
   /// **'تصفح مكتبة الإرشاد أثناء مراجعة حسابك'**
   String get webRegistrationBrowseLibraryDuringReview;
 
+  /// No description provided for @webCenterCenterNameRequired.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب اسم المركز'**
+  String get webCenterCenterNameRequired;
+
+  /// No description provided for @webCenterRegistrationFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر إكمال التسجيل، حاول مرة أخرى.'**
+  String get webCenterRegistrationFailed;
+
+  /// No description provided for @webCenterPleaseRegisterBeforeSaving.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى التسجيل أو تسجيل الدخول قبل الحفظ.'**
+  String get webCenterPleaseRegisterBeforeSaving;
+
+  /// No description provided for @webCenterMissingSession.
+  ///
+  /// In ar, this message translates to:
+  /// **'جلسة المركز غير متاحة'**
+  String get webCenterMissingSession;
+
+  /// No description provided for @webCenterSaveProfileFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر حفظ بيانات المركز'**
+  String get webCenterSaveProfileFailed;
+
+  /// No description provided for @webCenterSaveMediaFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر حفظ الصور'**
+  String get webCenterSaveMediaFailed;
+
+  /// No description provided for @webCenterSavePricingFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر حفظ التسعير'**
+  String get webCenterSavePricingFailed;
+
+  /// No description provided for @webCenterSubmitDocumentsFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر إرسال المستندات'**
+  String get webCenterSubmitDocumentsFailed;
+
   /// No description provided for @bookingRequestTitle.
   ///
   /// In ar, this message translates to:

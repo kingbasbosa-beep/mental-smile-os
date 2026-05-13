@@ -69,10 +69,11 @@ class _WebCenterMediaPageState extends State<WebCenterMediaPage> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
     final uid = FirebaseAuth.instance.currentUser?.uid ??
         WebRegistrationDraftStore.centerUid;
     if (uid == null) {
-      setState(() => _error = 'Missing center session');
+      setState(() => _error = l10n.webCenterMissingSession);
       return;
     }
 
@@ -100,7 +101,7 @@ class _WebCenterMediaPageState extends State<WebCenterMediaPage> {
       if (!mounted) return;
       Navigator.of(context).pushReplacementNamed(Routes.webCenterPricing);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Failed to save media');
+      if (mounted) setState(() => _error = l10n.webCenterSaveMediaFailed);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
