@@ -84,6 +84,54 @@ class CenterDetailsPage extends StatelessWidget {
     }
   }
 
+  Uri? _whatsappUri(String value) {
+    final raw = value.trim();
+    if (raw.isEmpty) return null;
+
+    final parsed = Uri.tryParse(raw);
+    if (parsed != null && (parsed.scheme == 'http' || parsed.scheme == 'https')) {
+      return parsed;
+    }
+
+    var normalized = raw
+        .replaceAll(' ', '')
+        .replaceAll('-', '')
+        .replaceAll('(', '')
+        .replaceAll(')', '');
+    if (normalized.startsWith('+')) {
+      normalized = normalized.substring(1);
+    }
+    if (normalized.startsWith('00')) {
+      normalized = normalized.substring(2);
+    }
+
+    final digits = _digitsOnly(normalized);
+    if (digits.isEmpty) return null;
+    return Uri.https('wa.me', '/$digits');
+  }
+
+  Uri? _mapsSearchUri({
+    required String address,
+    required String area,
+    required String city,
+  }) {
+    final query = [
+      address.trim(),
+      area.trim(),
+      city.trim(),
+    ].where((part) => part.isNotEmpty).join(', ');
+
+    if (query.isEmpty) return null;
+    return Uri.https(
+      'www.google.com',
+      '/maps/search/',
+      {
+        'api': '1',
+        'query': query,
+      },
+    );
+  }
+
   Widget _sectionCard({
     required BuildContext context,
     required Widget child,
@@ -604,12 +652,26 @@ class CenterDetailsPage extends StatelessWidget {
   Widget _contactChipsSection(
     BuildContext context,
     String address,
+    String area,
+    String city,
     String phone,
     String whatsapp,
   ) {
     final l10n = AppLocalizations.of(context)!;
+    final mapsUri = _mapsSearchUri(address: address, area: area, city: city);
+    final whatsappUri = _whatsappUri(whatsapp);
+    final locationValue = [
+      address.trim(),
+      area.trim(),
+      city.trim(),
+    ].where((part) => part.isNotEmpty).join(' / ');
     final items = [
-      _ContactItem(Icons.location_on_outlined, l10n.centerAddress, address, null),
+      _ContactItem(
+        Icons.location_on_outlined,
+        l10n.centerAddress,
+        locationValue,
+        mapsUri == null ? null : () => _tryLaunch(context, mapsUri),
+      ),
       _ContactItem(
         Icons.phone_outlined,
         l10n.centerPhone,
@@ -618,7 +680,12 @@ class CenterDetailsPage extends StatelessWidget {
             ? null
             : () => _tryLaunch(context, Uri(scheme: 'tel', path: phone)),
       ),
-      _ContactItem(Icons.chat_outlined, l10n.centerWhatsapp, whatsapp, null),
+      _ContactItem(
+        Icons.chat_outlined,
+        l10n.centerWhatsapp,
+        whatsapp,
+        whatsappUri == null ? null : () => _tryLaunch(context, whatsappUri),
+      ),
     ].where((item) => item.value.trim().isNotEmpty).toList();
 
     if (items.isEmpty) return const SizedBox.shrink();
@@ -795,6 +862,8 @@ class CenterDetailsPage extends StatelessWidget {
     final loc = _locationLine(c);
     final desc = c.description.trim();
     final address = c.address.trim();
+    final area = c.area.trim();
+    final city = c.city.trim();
     final phone = c.phone.trim();
     final whatsapp = c.whatsapp.trim();
     final services = c.services.where((e) => e.trim().isNotEmpty).toList();
@@ -889,7 +958,7 @@ class CenterDetailsPage extends StatelessWidget {
           ),
         ),
         _gallerySection(context, galleryValues),
-        _contactChipsSection(context, address, phone, whatsapp),
+        _contactChipsSection(context, address, area, city, phone, whatsapp),
         if (false)
           _sectionCard(
             context: context,
