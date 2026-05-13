@@ -140,6 +140,45 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authCreatingAccount => 'جارٍ إنشاء الحساب...';
 
   @override
+  String get authEmailRequired => 'اكتب البريد الإلكتروني';
+
+  @override
+  String get authPasswordRequired => 'اكتب كلمة المرور';
+
+  @override
+  String get authNameRequired => 'اكتب الاسم';
+
+  @override
+  String get authPasswordsDoNotMatch => 'تأكيد كلمة المرور غير مطابق';
+
+  @override
+  String get authInvalidEmail => 'البريد الإلكتروني غير صالح';
+
+  @override
+  String get authWeakPassword => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+
+  @override
+  String get authLoginFailed => 'فشل تسجيل الدخول';
+
+  @override
+  String get authRegistrationFailed => 'فشل إنشاء الحساب';
+
+  @override
+  String get authUnexpectedError => 'حدث خطأ غير متوقع';
+
+  @override
+  String get authPleaseWait => 'من فضلك انتظر';
+
+  @override
+  String get authInvalidCredentialsMessage => 'بيانات الدخول غير صحيحة';
+
+  @override
+  String get authAccountCreated => 'تم إنشاء الحساب';
+
+  @override
+  String get authTryAgain => 'تعذر إكمال العملية، حاول مرة أخرى';
+
+  @override
   String comingSoon(String title) {
     return '$title — قريبًا';
   }

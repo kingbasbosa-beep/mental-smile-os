@@ -36,20 +36,20 @@ class _LoginPageState extends State<LoginPage> {
     return 'assets/branding/login/login_web_v1.png';
   }
 
-  String _err(FirebaseAuthException e) {
+  String _err(FirebaseAuthException e, AppLocalizations l10n) {
     switch (e.code) {
       case 'invalid-email':
-        return 'البريد الإلكتروني غير صالح';
+        return l10n.authInvalidEmail;
       case 'user-disabled':
-        return 'هذا الحساب موقوف';
+        return l10n.authLoginFailed;
       case 'user-not-found':
-        return 'الحساب غير موجود';
+        return l10n.authInvalidCredentialsMessage;
       case 'wrong-password':
-        return 'كلمة المرور غير صحيحة';
+        return l10n.authInvalidCredentialsMessage;
       case 'network-request-failed':
-        return 'مشكلة في الاتصال';
+        return l10n.authTryAgain;
       default:
-        return 'فشل تسجيل الدخول';
+        return l10n.authLoginFailed;
     }
   }
 
@@ -110,9 +110,11 @@ class _LoginPageState extends State<LoginPage> {
 
       Navigator.of(context).pushNamedAndRemoveUntil(r, (route) => false);
     } on FirebaseAuthException catch (e) {
-      setState(() => _error = _err(e));
+      final l10n = AppLocalizations.of(context)!;
+      setState(() => _error = _err(e, l10n));
     } catch (_) {
-      setState(() => _error = 'خطأ غير متوقع');
+      final l10n = AppLocalizations.of(context)!;
+      setState(() => _error = l10n.authUnexpectedError);
     } finally {
       if (mounted) setState(() => _loading = false);
     }

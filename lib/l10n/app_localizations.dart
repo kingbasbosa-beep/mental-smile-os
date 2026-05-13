@@ -356,6 +356,84 @@ abstract class AppLocalizations {
   /// **'جارٍ إنشاء الحساب...'**
   String get authCreatingAccount;
 
+  /// No description provided for @authEmailRequired.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب البريد الإلكتروني'**
+  String get authEmailRequired;
+
+  /// No description provided for @authPasswordRequired.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب كلمة المرور'**
+  String get authPasswordRequired;
+
+  /// No description provided for @authNameRequired.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب الاسم'**
+  String get authNameRequired;
+
+  /// No description provided for @authPasswordsDoNotMatch.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد كلمة المرور غير مطابق'**
+  String get authPasswordsDoNotMatch;
+
+  /// No description provided for @authInvalidEmail.
+  ///
+  /// In ar, this message translates to:
+  /// **'البريد الإلكتروني غير صالح'**
+  String get authInvalidEmail;
+
+  /// No description provided for @authWeakPassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور يجب أن تكون 6 أحرف على الأقل'**
+  String get authWeakPassword;
+
+  /// No description provided for @authLoginFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'فشل تسجيل الدخول'**
+  String get authLoginFailed;
+
+  /// No description provided for @authRegistrationFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'فشل إنشاء الحساب'**
+  String get authRegistrationFailed;
+
+  /// No description provided for @authUnexpectedError.
+  ///
+  /// In ar, this message translates to:
+  /// **'حدث خطأ غير متوقع'**
+  String get authUnexpectedError;
+
+  /// No description provided for @authPleaseWait.
+  ///
+  /// In ar, this message translates to:
+  /// **'من فضلك انتظر'**
+  String get authPleaseWait;
+
+  /// No description provided for @authInvalidCredentialsMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'بيانات الدخول غير صحيحة'**
+  String get authInvalidCredentialsMessage;
+
+  /// No description provided for @authAccountCreated.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إنشاء الحساب'**
+  String get authAccountCreated;
+
+  /// No description provided for @authTryAgain.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر إكمال العملية، حاول مرة أخرى'**
+  String get authTryAgain;
+
   /// No description provided for @comingSoon.
   ///
   /// In ar, this message translates to:

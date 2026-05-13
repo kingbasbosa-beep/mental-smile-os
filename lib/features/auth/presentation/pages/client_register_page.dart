@@ -113,33 +113,34 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
   }
 
   Future<void> _register() async {
+    final l10n = AppLocalizations.of(context)!;
     final name = _nameController.text.trim();
     final email = _normalizeEmail(_emailController.text);
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
     if (name.isEmpty) {
-      setState(() => _error = 'اكتب الاسم');
+      setState(() => _error = l10n.authNameRequired);
       return;
     }
 
     if (email.isEmpty) {
-      setState(() => _error = 'اكتب البريد الإلكتروني');
+      setState(() => _error = l10n.authEmailRequired);
       return;
     }
 
     if (!email.contains('@')) {
-      setState(() => _error = 'البريد الإلكتروني غير صالح');
+      setState(() => _error = l10n.authInvalidEmail);
       return;
     }
 
     if (password.length < 6) {
-      setState(() => _error = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      setState(() => _error = l10n.authWeakPassword);
       return;
     }
 
     if (password != confirmPassword) {
-      setState(() => _error = 'تأكيد كلمة المرور غير مطابق');
+      setState(() => _error = l10n.authPasswordsDoNotMatch);
       return;
     }
 
@@ -182,11 +183,11 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
       );
     } on FirebaseAuthException catch (e) {
       setState(() {
-        _error = e.message ?? 'فشل إنشاء حساب العميل';
+        _error = e.message ?? l10n.authRegistrationFailed;
       });
     } catch (e) {
       setState(() {
-        _error = 'فشل إنشاء حساب العميل: ';
+        _error = l10n.authRegistrationFailed;
       });
     } finally {
       if (mounted) {

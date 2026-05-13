@@ -140,6 +140,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authCreatingAccount => 'Creating account...';
 
   @override
+  String get authEmailRequired => 'Enter your email';
+
+  @override
+  String get authPasswordRequired => 'Enter your password';
+
+  @override
+  String get authNameRequired => 'Enter your name';
+
+  @override
+  String get authPasswordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get authInvalidEmail => 'Invalid email address';
+
+  @override
+  String get authWeakPassword => 'Password must be at least 6 characters';
+
+  @override
+  String get authLoginFailed => 'Login failed';
+
+  @override
+  String get authRegistrationFailed => 'Could not create account';
+
+  @override
+  String get authUnexpectedError => 'Something went wrong';
+
+  @override
+  String get authPleaseWait => 'Please wait';
+
+  @override
+  String get authInvalidCredentialsMessage => 'Invalid login details';
+
+  @override
+  String get authAccountCreated => 'Account created';
+
+  @override
+  String get authTryAgain => 'Could not complete this. Please try again';
+
+  @override
   String comingSoon(String title) {
     return '$title — Coming soon';
   }
