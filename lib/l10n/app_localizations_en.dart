@@ -179,6 +179,77 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authTryAgain => 'Could not complete this. Please try again';
 
   @override
+  String get commonNext => 'Next';
+
+  @override
+  String get centersLoadError => 'Something went wrong while loading centers';
+
+  @override
+  String get centersEmpty =>
+      'No centers are available in this category right now';
+
+  @override
+  String get centersReadMore => 'Read more';
+
+  @override
+  String get centerDefaultName => 'Center';
+
+  @override
+  String get centerDetoxUnitAvailable => 'Includes a withdrawal unit';
+
+  @override
+  String get centerDetailsTitle => 'Center details';
+
+  @override
+  String get centerDataNotFound => 'Could not find this center\'s details';
+
+  @override
+  String get centerDataLoadError =>
+      'Something went wrong while loading center details';
+
+  @override
+  String get centerAvailable => 'Available';
+
+  @override
+  String get centerUnavailable => 'Unavailable';
+
+  @override
+  String get centerGallery => 'Center photos';
+
+  @override
+  String get centerPricing => 'Cost of stay';
+
+  @override
+  String get centerTypeAndService => 'Center type and service';
+
+  @override
+  String get centerCapabilities => 'Center capabilities';
+
+  @override
+  String get centerContactLocation => 'Contact and location';
+
+  @override
+  String get centerAddress => 'Address';
+
+  @override
+  String get centerCity => 'City';
+
+  @override
+  String get centerPhone => 'Phone';
+
+  @override
+  String get centerWhatsapp => 'WhatsApp';
+
+  @override
+  String get centerServices => 'Services';
+
+  @override
+  String get centerAbout => 'About the center';
+
+  @override
+  String get centerRequestViaAdmin => 'Request this center through admin';
+
+  @override
   String comingSoon(String title) {
     return '$title — Coming soon';
   }

@@ -7,6 +7,7 @@ import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -1121,6 +1122,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Directionality(
       textDirection: _isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
@@ -1428,7 +1430,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 controller: _phoneController,
                                 decoration: appInputDecoration(
                                   context: context,
-                                  label: _isArabic ? 'رقم الهاتف' : 'Phone',
+                                  label: l10n.centerPhone,
                                   icon: Icons.phone_outlined,
                                 ),
                               ),
@@ -1437,7 +1439,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 controller: _cityController,
                                 decoration: appInputDecoration(
                                   context: context,
-                                  label: _isArabic ? 'المدينة' : 'City',
+                                  label: l10n.centerCity,
                                   icon: Icons.location_city_outlined,
                                 ),
                               ),
@@ -1493,7 +1495,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 controller: _addressController,
                                 decoration: appInputDecoration(
                                   context: context,
-                                  label: _isArabic ? 'العنوان' : 'Address',
+                                  label: l10n.centerAddress,
                                   icon: Icons.location_on_outlined,
                                 ),
                               ),
@@ -1551,8 +1553,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                                 });
                                               },
                                         icon: const BackButtonIcon(),
-                                        label:
-                                            Text(_isArabic ? 'رجوع' : 'Back'),
+                                        label: Text(l10n.commonBack),
                                       ),
                                     ),
                                   ),
@@ -1596,9 +1597,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                                 ? 'جارٍ الإنشاء...'
                                                 : 'Creating...')
                                             : (_currentStep == 0
-                                                ? (_isArabic
-                                                    ? 'التالي'
-                                                    : 'Next')
+                                                ? l10n.commonNext
                                                 : (_isArabic
                                                     ? 'إنشاء حساب المركز'
                                                     : 'Create center account')),

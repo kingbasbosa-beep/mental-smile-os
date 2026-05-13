@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
@@ -104,6 +105,7 @@ class CentersListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final service = CentersFirestoreService();
+    final l10n = AppLocalizations.of(context)!;
     final isArabic =
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
@@ -140,8 +142,8 @@ class CentersListPage extends StatelessWidget {
                   stream: service.streamActiveCentersByCategory(category),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
-                      return const Center(
-                        child: Text('حدث خطأ أثناء تحميل المراكز'),
+                      return Center(
+                        child: Text(l10n.centersLoadError),
                       );
                     }
 
@@ -151,8 +153,8 @@ class CentersListPage extends StatelessWidget {
 
                     final items = snapshot.data ?? const <CenterModel>[];
                     if (items.isEmpty) {
-                      return const Center(
-                        child: Text('لا توجد مراكز متاحة في هذه الفئة حاليًا'),
+                      return Center(
+                        child: Text(l10n.centersEmpty),
                       );
                     }
 
@@ -252,7 +254,7 @@ class CentersListPage extends StatelessWidget {
                                               const Spacer(),
                                               Text(
                                                 c.name.trim().isEmpty
-                                                    ? 'مركز'
+                                                    ? l10n.centerDefaultName
                                                     : c.name.trim(),
                                                 textAlign: TextAlign.start,
                                                 style: Theme.of(context)
@@ -365,10 +367,11 @@ class CentersListPage extends StatelessWidget {
                                             ),
                                             if (c.hasDetoxUnit &&
                                                 c.centerType != 'detox')
-                                              const _InfoChip(
+                                              _InfoChip(
                                                 icon: Icons
                                                     .local_hospital_outlined,
-                                                label: 'يوجد قسم أعراض انسحاب',
+                                                label: l10n
+                                                    .centerDetoxUnitAvailable,
                                               ),
                                           ],
                                         ),
@@ -393,8 +396,9 @@ class CentersListPage extends StatelessWidget {
                                                 icon: const Icon(
                                                   Icons.arrow_outward_rounded,
                                                 ),
-                                                label:
-                                                    const Text('اضغط للمزيد'),
+                                                label: Text(
+                                                  l10n.centersReadMore,
+                                                ),
                                               ),
                                             ),
                                           ],

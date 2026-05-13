@@ -434,6 +434,144 @@ abstract class AppLocalizations {
   /// **'تعذر إكمال العملية، حاول مرة أخرى'**
   String get authTryAgain;
 
+  /// No description provided for @commonNext.
+  ///
+  /// In ar, this message translates to:
+  /// **'التالي'**
+  String get commonNext;
+
+  /// No description provided for @centersLoadError.
+  ///
+  /// In ar, this message translates to:
+  /// **'حدث خطأ أثناء تحميل المراكز'**
+  String get centersLoadError;
+
+  /// No description provided for @centersEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد مراكز متاحة في هذه الفئة حاليًا'**
+  String get centersEmpty;
+
+  /// No description provided for @centersReadMore.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط للمزيد'**
+  String get centersReadMore;
+
+  /// No description provided for @centerDefaultName.
+  ///
+  /// In ar, this message translates to:
+  /// **'مركز'**
+  String get centerDefaultName;
+
+  /// No description provided for @centerDetoxUnitAvailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'يوجد قسم أعراض انسحاب'**
+  String get centerDetoxUnitAvailable;
+
+  /// No description provided for @centerDetailsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفاصيل المركز'**
+  String get centerDetailsTitle;
+
+  /// No description provided for @centerDataNotFound.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر العثور على بيانات المركز'**
+  String get centerDataNotFound;
+
+  /// No description provided for @centerDataLoadError.
+  ///
+  /// In ar, this message translates to:
+  /// **'حدث خطأ أثناء تحميل بيانات المركز'**
+  String get centerDataLoadError;
+
+  /// No description provided for @centerAvailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'متاح'**
+  String get centerAvailable;
+
+  /// No description provided for @centerUnavailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير متاح'**
+  String get centerUnavailable;
+
+  /// No description provided for @centerGallery.
+  ///
+  /// In ar, this message translates to:
+  /// **'صور المركز'**
+  String get centerGallery;
+
+  /// No description provided for @centerPricing.
+  ///
+  /// In ar, this message translates to:
+  /// **'تكلفة الإقامة'**
+  String get centerPricing;
+
+  /// No description provided for @centerTypeAndService.
+  ///
+  /// In ar, this message translates to:
+  /// **'نوع المركز وخدمته'**
+  String get centerTypeAndService;
+
+  /// No description provided for @centerCapabilities.
+  ///
+  /// In ar, this message translates to:
+  /// **'قدرات المركز'**
+  String get centerCapabilities;
+
+  /// No description provided for @centerContactLocation.
+  ///
+  /// In ar, this message translates to:
+  /// **'التواصل والموقع'**
+  String get centerContactLocation;
+
+  /// No description provided for @centerAddress.
+  ///
+  /// In ar, this message translates to:
+  /// **'العنوان'**
+  String get centerAddress;
+
+  /// No description provided for @centerCity.
+  ///
+  /// In ar, this message translates to:
+  /// **'المدينة'**
+  String get centerCity;
+
+  /// No description provided for @centerPhone.
+  ///
+  /// In ar, this message translates to:
+  /// **'الهاتف'**
+  String get centerPhone;
+
+  /// No description provided for @centerWhatsapp.
+  ///
+  /// In ar, this message translates to:
+  /// **'واتساب'**
+  String get centerWhatsapp;
+
+  /// No description provided for @centerServices.
+  ///
+  /// In ar, this message translates to:
+  /// **'الخدمات'**
+  String get centerServices;
+
+  /// No description provided for @centerAbout.
+  ///
+  /// In ar, this message translates to:
+  /// **'نبذة عن المركز'**
+  String get centerAbout;
+
+  /// No description provided for @centerRequestViaAdmin.
+  ///
+  /// In ar, this message translates to:
+  /// **'اطلب المركز عبر الإدارة'**
+  String get centerRequestViaAdmin;
+
   /// No description provided for @comingSoon.
   ///
   /// In ar, this message translates to:

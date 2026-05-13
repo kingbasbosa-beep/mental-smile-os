@@ -179,6 +179,75 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authTryAgain => 'تعذر إكمال العملية، حاول مرة أخرى';
 
   @override
+  String get commonNext => 'التالي';
+
+  @override
+  String get centersLoadError => 'حدث خطأ أثناء تحميل المراكز';
+
+  @override
+  String get centersEmpty => 'لا توجد مراكز متاحة في هذه الفئة حاليًا';
+
+  @override
+  String get centersReadMore => 'اضغط للمزيد';
+
+  @override
+  String get centerDefaultName => 'مركز';
+
+  @override
+  String get centerDetoxUnitAvailable => 'يوجد قسم أعراض انسحاب';
+
+  @override
+  String get centerDetailsTitle => 'تفاصيل المركز';
+
+  @override
+  String get centerDataNotFound => 'تعذّر العثور على بيانات المركز';
+
+  @override
+  String get centerDataLoadError => 'حدث خطأ أثناء تحميل بيانات المركز';
+
+  @override
+  String get centerAvailable => 'متاح';
+
+  @override
+  String get centerUnavailable => 'غير متاح';
+
+  @override
+  String get centerGallery => 'صور المركز';
+
+  @override
+  String get centerPricing => 'تكلفة الإقامة';
+
+  @override
+  String get centerTypeAndService => 'نوع المركز وخدمته';
+
+  @override
+  String get centerCapabilities => 'قدرات المركز';
+
+  @override
+  String get centerContactLocation => 'التواصل والموقع';
+
+  @override
+  String get centerAddress => 'العنوان';
+
+  @override
+  String get centerCity => 'المدينة';
+
+  @override
+  String get centerPhone => 'الهاتف';
+
+  @override
+  String get centerWhatsapp => 'واتساب';
+
+  @override
+  String get centerServices => 'الخدمات';
+
+  @override
+  String get centerAbout => 'نبذة عن المركز';
+
+  @override
+  String get centerRequestViaAdmin => 'اطلب المركز عبر الإدارة';
+
+  @override
   String comingSoon(String title) {
     return '$title — قريبًا';
   }

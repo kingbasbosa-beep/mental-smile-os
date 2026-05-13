@@ -4,6 +4,7 @@ import 'package:flutterprojects/features/booking/presentation/pages/center_booki
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
 import 'package:flutterprojects/features/centers/data/services/centers_firestore_service.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -76,8 +77,9 @@ class CenterDetailsPage extends StatelessWidget {
   Future<void> _tryLaunch(BuildContext context, Uri uri) async {
     final ok = await launchUrl(uri, mode: LaunchMode.platformDefault);
     if (!ok && context.mounted) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تعذّر فتح الرابط')),
+        SnackBar(content: Text(l10n.authTryAgain)),
       );
     }
   }
@@ -212,6 +214,7 @@ class CenterDetailsPage extends StatelessWidget {
   }
 
   Widget _gallerySection(BuildContext context, List<String> values) {
+    final l10n = AppLocalizations.of(context)!;
     const frameLabels = [
       'الواجهة',
       'الاستقبال',
@@ -233,7 +236,7 @@ class CenterDetailsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              _sectionTitle(context, 'صور المركز'),
+              _sectionTitle(context, l10n.centerGallery),
               const SizedBox(height: 12),
               _CenterGalleryCarousel(
                 values: padded,
@@ -274,7 +277,7 @@ class CenterDetailsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              _sectionTitle(context, 'تكلفة الإقامة'),
+              _sectionTitle(context, l10n.centerPricing),
               const SizedBox(height: 10),
               if (isAutism)
                 for (final item in autismItems) ...[
@@ -343,7 +346,7 @@ class CenterDetailsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              _sectionTitle(context, 'نوع المركز وخدمته'),
+              _sectionTitle(context, l10n.centerTypeAndService),
               const SizedBox(height: 10),
               Text(
                 'النوع التشغيلي: ${_centerTypeLabelAr(c)}',
@@ -385,7 +388,7 @@ class CenterDetailsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              _sectionTitle(context, 'قدرات المركز'),
+              _sectionTitle(context, l10n.centerCapabilities),
               const SizedBox(height: 10),
               for (final item in items)
                 Padding(
@@ -451,6 +454,7 @@ class CenterDetailsPage extends StatelessWidget {
   }
 
   Widget _descriptionSection(BuildContext context, String desc) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         const SizedBox(height: 12),
@@ -464,7 +468,7 @@ class CenterDetailsPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    'نبذة عن المركز',
+                    l10n.centerAbout,
                     textAlign: TextAlign.start,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: const Color(0xFFFFE7B2),
@@ -527,6 +531,7 @@ class CenterDetailsPage extends StatelessWidget {
   }
 
   Widget _heroMedia(BuildContext context, CenterModel c) {
+    final l10n = AppLocalizations.of(context)!;
     final cover = _coverValue(c);
     final logo = _logoValue(c);
 
@@ -588,7 +593,7 @@ class CenterDetailsPage extends StatelessWidget {
               icon: c.isActive
                   ? Icons.verified_outlined
                   : Icons.hourglass_empty_rounded,
-              label: c.isActive ? 'متاح' : 'غير متاح',
+              label: c.isActive ? l10n.centerAvailable : l10n.centerUnavailable,
             ),
           ),
         ],
@@ -602,17 +607,18 @@ class CenterDetailsPage extends StatelessWidget {
     String phone,
     String whatsapp,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     final items = [
-      _ContactItem(Icons.location_on_outlined, 'العنوان', address, null),
+      _ContactItem(Icons.location_on_outlined, l10n.centerAddress, address, null),
       _ContactItem(
         Icons.phone_outlined,
-        'الهاتف',
+        l10n.centerPhone,
         phone,
         phone.trim().isEmpty
             ? null
             : () => _tryLaunch(context, Uri(scheme: 'tel', path: phone)),
       ),
-      _ContactItem(Icons.chat_outlined, 'واتساب', whatsapp, null),
+      _ContactItem(Icons.chat_outlined, l10n.centerWhatsapp, whatsapp, null),
     ].where((item) => item.value.trim().isNotEmpty).toList();
 
     if (items.isEmpty) return const SizedBox.shrink();
@@ -624,7 +630,7 @@ class CenterDetailsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              _sectionTitle(context, 'التواصل والموقع'),
+              _sectionTitle(context, l10n.centerContactLocation),
               const SizedBox(height: 10),
               LayoutBuilder(
                 builder: (context, constraints) {
@@ -722,10 +728,11 @@ class CenterDetailsPage extends StatelessWidget {
     CenterModel c,
     List<String> services,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     final cards = <Widget>[
       _GridInfoCard(
         icon: Icons.account_tree_outlined,
-        title: 'نوع المركز وخدمته',
+        title: l10n.centerTypeAndService,
         lines: [
           _centerTypeLabelAr(c),
           c.hasDetoxUnit
@@ -735,13 +742,13 @@ class CenterDetailsPage extends StatelessWidget {
       ),
       _GridInfoCard(
         icon: Icons.payments_outlined,
-        title: 'تكلفة الإقامة',
+        title: l10n.centerPricing,
         lines:
             _pricingLines(c).isEmpty ? const ['غير محددة'] : _pricingLines(c),
       ),
       _GridInfoCard(
         icon: Icons.verified_user_outlined,
-        title: 'قدرات المركز',
+        title: l10n.centerCapabilities,
         lines: _capabilityLines(c).isEmpty
             ? const ['غير محددة']
             : _capabilityLines(c),
@@ -749,7 +756,7 @@ class CenterDetailsPage extends StatelessWidget {
       if (services.isNotEmpty)
         _GridInfoCard(
           icon: Icons.medical_services_outlined,
-          title: 'الخدمات',
+          title: l10n.centerServices,
           lines: services,
         ),
     ];
@@ -781,7 +788,9 @@ class CenterDetailsPage extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context, CenterModel c) {
-    final name = c.name.trim().isEmpty ? 'مركز' : c.name.trim();
+    final l10n = AppLocalizations.of(context)!;
+    final name =
+        c.name.trim().isEmpty ? l10n.centerDefaultName : c.name.trim();
     final categoryLabel = _categoryLabelAr(c);
     final loc = _locationLine(c);
     final desc = c.description.trim();
@@ -873,7 +882,7 @@ class CenterDetailsPage extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.send_outlined),
-                    label: const Text('اطلب المركز عبر الإدارة'),
+                    label: Text(l10n.centerRequestViaAdmin),
                   ),
                 ),
             ],
@@ -888,7 +897,7 @@ class CenterDetailsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  'التواصل والموقع',
+                  l10n.centerContactLocation,
                   textAlign: TextAlign.start,
                   style: Theme.of(context)
                       .textTheme
@@ -899,13 +908,13 @@ class CenterDetailsPage extends StatelessWidget {
                 _infoRow(
                   context: context,
                   icon: Icons.location_on_outlined,
-                  label: 'العنوان',
+                  label: l10n.centerAddress,
                   value: address,
                 ),
                 _infoRow(
                   context: context,
                   icon: Icons.phone_outlined,
-                  label: 'هاتف',
+                  label: l10n.centerPhone,
                   value: phone,
                   onTap: phone.isEmpty
                       ? null
@@ -915,7 +924,7 @@ class CenterDetailsPage extends StatelessWidget {
                 _infoRow(
                   context: context,
                   icon: Icons.chat_outlined,
-                  label: 'واتساب',
+                  label: l10n.centerWhatsapp,
                   value: whatsapp,
                   onTap: null,
                 ),
@@ -931,7 +940,7 @@ class CenterDetailsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  'الخدمات',
+                  l10n.centerServices,
                   textAlign: TextAlign.start,
                   style: Theme.of(context)
                       .textTheme
@@ -999,7 +1008,7 @@ class CenterDetailsPage extends StatelessWidget {
               );
             },
             icon: const Icon(Icons.send_outlined),
-            label: const Text('اطلب المركز عبر الإدارة'),
+            label: Text(l10n.centerRequestViaAdmin),
           ),
         ),
         const SizedBox(height: 24),
@@ -1011,6 +1020,7 @@ class CenterDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final initial = center;
     final id = centerId?.trim();
+    final l10n = AppLocalizations.of(context)!;
     final isArabic =
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
@@ -1022,7 +1032,7 @@ class CenterDetailsPage extends StatelessWidget {
           backgroundColor: Colors.black.withValues(alpha: 0.30),
           foregroundColor: const Color(0xFFFFE7B2),
           elevation: 0,
-          title: const Text('تفاصيل المركز'),
+          title: Text(l10n.centerDetailsTitle),
           leading: IconButton(
             onPressed: () => Navigator.of(context).maybePop(),
             icon: _GoldBackIcon(compact: true),
@@ -1059,8 +1069,8 @@ class CenterDetailsPage extends StatelessWidget {
                 }
 
                 if (id == null || id.isEmpty) {
-                  return const Center(
-                    child: Text('تعذّر العثور على بيانات المركز'),
+                  return Center(
+                    child: Text(l10n.centerDataNotFound),
                   );
                 }
 
@@ -1069,8 +1079,8 @@ class CenterDetailsPage extends StatelessWidget {
                   stream: service.streamCenterById(id),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
-                      return const Center(
-                        child: Text('حدث خطأ أثناء تحميل بيانات المركز'),
+                      return Center(
+                        child: Text(l10n.centerDataLoadError),
                       );
                     }
 
@@ -1080,8 +1090,8 @@ class CenterDetailsPage extends StatelessWidget {
 
                     final c = snapshot.data;
                     if (c == null) {
-                      return const Center(
-                        child: Text('تعذّر العثور على بيانات المركز'),
+                      return Center(
+                        child: Text(l10n.centerDataNotFound),
                       );
                     }
 
