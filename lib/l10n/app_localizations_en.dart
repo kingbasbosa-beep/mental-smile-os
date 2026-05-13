@@ -47,6 +47,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moduleFamilyStress => 'Family Stress';
 
   @override
+  String get commonBack => 'Back';
+
+  @override
+  String get commonClose => 'Close';
+
+  @override
+  String get commonRetry => 'Retry';
+
+  @override
+  String get commonLoading => 'Loading';
+
+  @override
+  String get commonLogout => 'Log out';
+
+  @override
+  String get menuSpecialists => 'Specialists';
+
+  @override
+  String get menuCenters => 'Centers';
+
+  @override
+  String get menuLibrary => 'Library';
+
+  @override
+  String get menuAddictionSupport => 'Recovery Support';
+
+  @override
+  String get menuSpecialNeedsFamilies => 'Special Needs Families';
+
+  @override
+  String get menuChatSupport => 'Chat Support';
+
+  @override
+  String get homeStartJourney => 'Start your healing journey';
+
+  @override
+  String get homeLogin => 'Login';
+
+  @override
+  String get homeBack => 'Back';
+
+  @override
   String comingSoon(String title) {
     return '$title — Coming soon';
   }

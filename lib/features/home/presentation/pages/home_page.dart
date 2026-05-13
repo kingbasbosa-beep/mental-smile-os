@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
@@ -35,12 +36,11 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
+    final l10n = AppLocalizations.of(context)!;
     final textDirection = isArabic ? TextDirection.rtl : TextDirection.ltr;
     final hasUser = FirebaseAuth.instance.currentUser != null;
 
-    final description = isArabic
-        ? 'ابدأ رحلتك نحو التعافي'
-        : 'Start your healing journey';
+    final description = l10n.homeStartJourney;
 
     return Directionality(
       textDirection: textDirection,
@@ -105,11 +105,7 @@ class HomePage extends StatelessWidget {
                                             Icons.login_rounded,
                                             size: 18,
                                           ),
-                                          label: Text(
-                                            isArabic
-                                                ? 'تسجيل الدخول'
-                                                : 'Login',
-                                          ),
+                                          label: Text(l10n.homeLogin),
                                         ),
                                       OutlinedButton.icon(
                                         onPressed: () => _goBack(context),
@@ -129,8 +125,7 @@ class HomePage extends StatelessWidget {
                                             );
                                           },
                                         ),
-                                        label: Text(
-                                            isArabic ? 'رجوع' : 'Back'),
+                                        label: Text(l10n.homeBack),
                                       ),
                                     ],
                                   ),

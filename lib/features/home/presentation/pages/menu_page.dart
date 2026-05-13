@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
@@ -135,11 +136,12 @@ class MenuPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final locale = Localizations.localeOf(context);
     final isArabic = locale.languageCode.toLowerCase() == 'ar';
+    final l10n = AppLocalizations.of(context)!;
     final textDirection = isArabic ? TextDirection.rtl : TextDirection.ltr;
 
     final cards = <_MenuCardData>[
       _MenuCardData(
-        title: isArabic ? 'الأخصائيون' : 'Specialists',
+        title: l10n.menuSpecialists,
         subtitle: isArabic
             ? 'استعرض التخصصات وابدأ طلب الحجز'
             : 'Browse specialists and request a booking',
@@ -148,7 +150,7 @@ class MenuPage extends StatelessWidget {
         accent: AppColors.accentLavender,
       ),
       _MenuCardData(
-        title: isArabic ? 'المراكز' : 'Centers',
+        title: l10n.menuCenters,
         subtitle: isArabic
             ? 'استعرض المراكز والخدمات المتاحة'
             : 'Browse centers and available services',
@@ -157,7 +159,7 @@ class MenuPage extends StatelessWidget {
         accent: AppColors.mutedGold,
       ),
       _MenuCardData(
-        title: isArabic ? 'المكتبة' : 'Library',
+        title: l10n.menuLibrary,
         subtitle: isArabic
             ? 'مواد ومحتوى داعم وإرشادي'
             : 'Supportive and educational content',
@@ -166,7 +168,7 @@ class MenuPage extends StatelessWidget {
         accent: AppColors.softTerracotta,
       ),
       _MenuCardData(
-        title: isArabic ? 'دعم المتعافي' : 'Recovered Support',
+        title: l10n.menuAddictionSupport,
         subtitle: isArabic
             ? 'دعم هادئ للتعافي مع المختصين والمراكز وطلب دعم منظم'
             : 'A calm recovery path across specialists, centers, and structured support',
@@ -175,9 +177,7 @@ class MenuPage extends StatelessWidget {
         accent: AppColors.success,
       ),
       _MenuCardData(
-        title: isArabic
-            ? 'رعاية أسر ذوي الاحتياجات الخاصة'
-            : 'Special Needs Families',
+        title: l10n.menuSpecialNeedsFamilies,
         subtitle: isArabic
             ? 'مسار أسري داعم وخطوات واضحة للوصول للمساندة المناسبة'
             : 'A family-aware support path with clear next steps',

@@ -170,6 +170,90 @@ abstract class AppLocalizations {
   /// **'ضغط الأسرة'**
   String get moduleFamilyStress;
 
+  /// No description provided for @commonBack.
+  ///
+  /// In ar, this message translates to:
+  /// **'رجوع'**
+  String get commonBack;
+
+  /// No description provided for @commonClose.
+  ///
+  /// In ar, this message translates to:
+  /// **'إغلاق'**
+  String get commonClose;
+
+  /// No description provided for @commonRetry.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة المحاولة'**
+  String get commonRetry;
+
+  /// No description provided for @commonLoading.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ التحميل'**
+  String get commonLoading;
+
+  /// No description provided for @commonLogout.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الخروج'**
+  String get commonLogout;
+
+  /// No description provided for @menuSpecialists.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأخصائيون'**
+  String get menuSpecialists;
+
+  /// No description provided for @menuCenters.
+  ///
+  /// In ar, this message translates to:
+  /// **'المراكز'**
+  String get menuCenters;
+
+  /// No description provided for @menuLibrary.
+  ///
+  /// In ar, this message translates to:
+  /// **'المكتبة'**
+  String get menuLibrary;
+
+  /// No description provided for @menuAddictionSupport.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعم المتعافي'**
+  String get menuAddictionSupport;
+
+  /// No description provided for @menuSpecialNeedsFamilies.
+  ///
+  /// In ar, this message translates to:
+  /// **'رعاية أسر ذوي الاحتياجات الخاصة'**
+  String get menuSpecialNeedsFamilies;
+
+  /// No description provided for @menuChatSupport.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعم المحادثة'**
+  String get menuChatSupport;
+
+  /// No description provided for @homeStartJourney.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ رحلتك نحو التعافي'**
+  String get homeStartJourney;
+
+  /// No description provided for @homeLogin.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الدخول'**
+  String get homeLogin;
+
+  /// No description provided for @homeBack.
+  ///
+  /// In ar, this message translates to:
+  /// **'رجوع'**
+  String get homeBack;
+
   /// No description provided for @comingSoon.
   ///
   /// In ar, this message translates to:

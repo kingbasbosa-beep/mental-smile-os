@@ -47,6 +47,48 @@ class AppLocalizationsAr extends AppLocalizations {
   String get moduleFamilyStress => 'ضغط الأسرة';
 
   @override
+  String get commonBack => 'رجوع';
+
+  @override
+  String get commonClose => 'إغلاق';
+
+  @override
+  String get commonRetry => 'إعادة المحاولة';
+
+  @override
+  String get commonLoading => 'جارٍ التحميل';
+
+  @override
+  String get commonLogout => 'تسجيل الخروج';
+
+  @override
+  String get menuSpecialists => 'الأخصائيون';
+
+  @override
+  String get menuCenters => 'المراكز';
+
+  @override
+  String get menuLibrary => 'المكتبة';
+
+  @override
+  String get menuAddictionSupport => 'دعم المتعافي';
+
+  @override
+  String get menuSpecialNeedsFamilies => 'رعاية أسر ذوي الاحتياجات الخاصة';
+
+  @override
+  String get menuChatSupport => 'دعم المحادثة';
+
+  @override
+  String get homeStartJourney => 'ابدأ رحلتك نحو التعافي';
+
+  @override
+  String get homeLogin => 'تسجيل الدخول';
+
+  @override
+  String get homeBack => 'رجوع';
+
+  @override
   String comingSoon(String title) {
     return '$title — قريبًا';
   }
