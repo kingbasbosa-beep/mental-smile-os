@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
@@ -412,10 +413,11 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     required BuildContext context,
     required bool isArabic,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     return _OperationActionsCarousel(
       children: [
             _OperationActionButton(
-              label: isArabic ? 'فتح الحالات' : 'Open cases',
+              label: l10n.clinicianOpenCases,
               icon: Icons.forum_outlined,
               imageAsset:
                   'assets/images/clinicians_dashboard/actions/clinician_open_cases.png',
@@ -429,7 +431,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                   : null,
             ),
             _OperationActionButton(
-              label: isArabic ? 'إرسال طلب دعم' : 'Send support request',
+              label: l10n.clinicianSendSupportRequest,
               icon: Icons.chat_bubble_outline_rounded,
               imageAsset:
                   'assets/images/clinicians_dashboard/actions/clinician_support_request.png',
@@ -443,7 +445,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                   : null,
             ),
             _OperationActionButton(
-              label: isArabic ? 'تعديل بياناتي' : 'Edit my profile',
+              label: l10n.clinicianEditProfile,
               icon: Icons.edit_outlined,
               imageAsset:
                   'assets/images/clinicians_dashboard/actions/clinician_edit_profile.png',
@@ -452,7 +454,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
               ),
             ),
             _OperationActionButton(
-              label: isArabic ? 'جلساتي' : 'My sessions',
+              label: l10n.clinicianMySessions,
               icon: Icons.video_call_outlined,
               imageAsset:
                   'assets/images/clinicians_dashboard/actions/clinician_sessions.png',
@@ -702,17 +704,16 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     required BuildContext context,
     required bool isArabic,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     return StreamBuilder<int>(
       stream: _messagesCountStream(),
       builder: (context, msgSnapshot) {
         final count = msgSnapshot.data ?? 0;
         return _SectionCard(
-          title: isArabic ? 'طلب دعم' : 'Support Request',
-          subtitle: isArabic
-              ? 'عدد طلبات الدعم الحالية: $count'
-              : 'Current support requests count: $count',
+          title: l10n.clinicianSupportRequest,
+          subtitle: '${l10n.clinicianCurrentSupportRequests}: $count',
           icon: Icons.chat_bubble_outline_rounded,
-          actionLabel: isArabic ? 'إرسال طلب دعم' : 'Send support request',
+          actionLabel: l10n.clinicianSendSupportRequest,
           onTap: _clinicianHomeActionsEnabled
               ? () {
                   Navigator.of(context).pushNamed(
@@ -730,17 +731,18 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     required BuildContext context,
     required bool isArabic,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     return StreamBuilder<int>(
       stream: _chatCasesCountStream(),
       builder: (context, snapshot) {
         final count = snapshot.data ?? 0;
         return _SectionCard(
-          title: isArabic ? 'حالات الشات المحالة' : 'Referred chat cases',
+          title: l10n.clinicianReferredChatCases,
           subtitle: isArabic
               ? 'حالات شات مصعّدة أو مُحالة تتطلب تدخل الأخصائي: $count'
               : 'Escalated or referred chat cases that need clinician involvement: $count',
           icon: Icons.forum_outlined,
-          actionLabel: isArabic ? 'فتح الحالات' : 'Open cases',
+          actionLabel: l10n.clinicianOpenCases,
           onTap: _clinicianHomeActionsEnabled
               ? () {
                   Navigator.of(context).pushNamed(Routes.clinicianChatInbox);
@@ -756,6 +758,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     required bool isArabic,
     required Map<String, dynamic> clinicianData,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -772,9 +775,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
             isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
-            isArabic
-                ? 'طلب تعديل الصورة أو النبذة'
-                : 'Request photo or bio update',
+            l10n.clinicianProfileChangeTitle,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -789,7 +790,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           TextField(
             controller: _requestedPhotoUrlController,
             decoration: InputDecoration(
-              labelText: isArabic ? 'رابط الصورة الجديدة' : 'New photo URL',
+              labelText: l10n.clinicianNewPhotoUrl,
               border: const OutlineInputBorder(),
             ),
           ),
@@ -798,7 +799,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
             controller: _requestedBioController,
             maxLines: 4,
             decoration: InputDecoration(
-              labelText: isArabic ? 'النبذة الجديدة' : 'New bio',
+              labelText: l10n.clinicianNewBio,
               border: const OutlineInputBorder(),
             ),
           ),
@@ -822,8 +823,8 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                   : const Icon(Icons.fact_check_outlined),
               label: Text(
                 _submittingChangeRequest
-                    ? (isArabic ? 'جارٍ إرسال الطلب...' : 'Sending request...')
-                    : (isArabic ? 'إرسال طلب التعديل' : 'Send change request'),
+                    ? l10n.clinicianSendingRequest
+                    : l10n.clinicianSendChangeRequest,
               ),
             ),
           ),
@@ -1007,6 +1008,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     required BuildContext context,
     required bool isArabic,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Wrap(
         spacing: 12,
@@ -1015,22 +1017,22 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
         children: [
           _FilterPill(
             selected: _tab == 'assigned_clinician',
-            label: isArabic ? 'طلبات جديدة' : 'New',
+            label: l10n.clinicianNewRequests,
             onTap: () => setState(() => _tab = 'assigned_clinician'),
           ),
           _FilterPill(
             selected: _tab == 'in_progress',
-            label: isArabic ? 'طلبات نشطة' : 'In progress',
+            label: l10n.clinicianActiveRequests,
             onTap: () => setState(() => _tab = 'in_progress'),
           ),
           _FilterPill(
             selected: _tab == 'completed',
-            label: isArabic ? 'مكتملة' : 'Completed',
+            label: l10n.clinicianCompleted,
             onTap: () => setState(() => _tab = 'completed'),
           ),
           _FilterPill(
             selected: _tab == 'closed',
-            label: isArabic ? 'مرفوضة/مغلقة' : 'Closed',
+            label: l10n.clinicianClosed,
             onTap: () => setState(() => _tab = 'closed'),
           ),
         ],
@@ -1044,6 +1046,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     required String requestId,
     required Map<String, dynamic> data,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final busy = _busyIds.contains(requestId);
 
@@ -1097,9 +1100,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                       textAlign: isArabic ? TextAlign.right : TextAlign.left,
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      isArabic ? 'طلب مخصص لك' : 'Request assigned to you',
-                    ),
+                    Text(l10n.clinicianAssignedRequest),
                   ],
                 ),
               ),
@@ -1164,19 +1165,19 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                 FilledButton.icon(
                   onPressed: busy ? null : () => _acceptRequest(requestId),
                   icon: const Icon(Icons.check_circle_outline),
-                  label: Text(isArabic ? 'قبول الطلب' : 'Accept request'),
+                  label: Text(l10n.clinicianAcceptRequest),
                 ),
               if (status == 'assigned_clinician' && !clinicianAccepted)
                 OutlinedButton.icon(
                   onPressed: busy ? null : () => _rejectRequest(requestId),
                   icon: const Icon(Icons.cancel_outlined),
-                  label: Text(isArabic ? 'رفض الطلب' : 'Reject request'),
+                  label: Text(l10n.clinicianRejectRequest),
                 ),
               if (canMarkCompleted)
                 FilledButton.tonalIcon(
                   onPressed: busy ? null : () => _markCompleted(requestId),
                   icon: const Icon(Icons.task_alt_outlined),
-                  label: Text(isArabic ? 'إنهاء الجلسة' : 'End session'),
+                  label: Text(l10n.clinicianEndSession),
                 ),
               if (canReviewSession)
                 FilledButton.icon(
@@ -1192,7 +1193,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                           );
                         },
                   icon: const Icon(Icons.rate_review_outlined),
-                  label: Text(isArabic ? 'تقييم الجلسة' : 'Review session'),
+                  label: Text(l10n.clinicianReviewSession),
                 ),
             ],
           ),
@@ -1213,6 +1214,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return _buildRatingsCompactCounters(
+            l10n: AppLocalizations.of(context)!,
             isArabic: isArabic,
             count: '--',
             avgStars: '--',
@@ -1252,6 +1254,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
             compactCount == 0 ? 0.0 : compactTotalPercentage / compactCount;
 
         return _buildRatingsCompactCounters(
+          l10n: AppLocalizations.of(context)!,
           isArabic: isArabic,
           count: '$compactCount',
           avgStars: compactAvgStars.toStringAsFixed(1),
@@ -1262,6 +1265,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
   }
 
   Widget _buildRatingsCompactCounters({
+    required AppLocalizations l10n,
     required bool isArabic,
     required String count,
     required String avgStars,
@@ -1277,15 +1281,15 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           runSpacing: 7,
           children: [
             _RatingMetricChip(
-              title: isArabic ? 'عدد التقييمات' : 'Ratings',
+              title: l10n.clinicianRatings,
               value: count,
             ),
             _RatingMetricChip(
-              title: isArabic ? 'متوسط النجوم' : 'Stars',
+              title: l10n.clinicianStars,
               value: avgStars,
             ),
             _RatingMetricChip(
-              title: isArabic ? 'المتوسط العام' : 'Overall',
+              title: l10n.clinicianOverall,
               value: avgPercentage,
             ),
           ],
@@ -1381,6 +1385,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
   @override
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
+    final l10n = AppLocalizations.of(context)!;
 
     if (_uid.isEmpty) {
       return Directionality(
@@ -1389,7 +1394,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           body: _buildDashboardBackground(
             child: Center(
               child: Text(
-                isArabic ? 'يجب تسجيل الدخول أولًا' : 'Please sign in first',
+                l10n.clinicianPleaseSignIn,
               ),
             ),
           ),
@@ -1552,14 +1557,15 @@ class _ClinicianLogoutButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Tooltip(
-      message: isArabic ? 'تسجيل الخروج' : 'Sign out',
+      message: l10n.commonLogout,
       child: SizedBox(
         height: 30,
         child: OutlinedButton.icon(
           onPressed: onPressed,
           icon: const Icon(Icons.logout_rounded, size: 15),
-          label: Text(isArabic ? 'خروج' : 'Logout'),
+          label: Text(l10n.clinicianLogout),
           style: OutlinedButton.styleFrom(
             foregroundColor: const Color(0xFFFFE7B2),
             side: BorderSide(
@@ -2490,13 +2496,14 @@ class _ClinicianProfileEditRequestPageState
   @override
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         appBar: AppShellActions.buildAppBar(
           context,
-          title: isArabic ? 'تعديل بياناتي' : 'Edit my profile',
+          title: l10n.clinicianEditProfile,
         ),
         body: AppPageBackground(
           child: StreamBuilder<Map<String, dynamic>?>(

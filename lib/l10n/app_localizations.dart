@@ -836,6 +836,180 @@ abstract class AppLocalizations {
   /// **'المتوسط العام'**
   String get clientOverallAverage;
 
+  /// No description provided for @clinicianOperations.
+  ///
+  /// In ar, this message translates to:
+  /// **'العمليات'**
+  String get clinicianOperations;
+
+  /// No description provided for @clinicianDashboard.
+  ///
+  /// In ar, this message translates to:
+  /// **'لوحة الأخصائي'**
+  String get clinicianDashboard;
+
+  /// No description provided for @clinicianOpenCases.
+  ///
+  /// In ar, this message translates to:
+  /// **'فتح الحالات'**
+  String get clinicianOpenCases;
+
+  /// No description provided for @clinicianSendSupportRequest.
+  ///
+  /// In ar, this message translates to:
+  /// **'إرسال طلب دعم'**
+  String get clinicianSendSupportRequest;
+
+  /// No description provided for @clinicianEditProfile.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل بياناتي'**
+  String get clinicianEditProfile;
+
+  /// No description provided for @clinicianMySessions.
+  ///
+  /// In ar, this message translates to:
+  /// **'جلساتي'**
+  String get clinicianMySessions;
+
+  /// No description provided for @clinicianSupportRequest.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلب دعم'**
+  String get clinicianSupportRequest;
+
+  /// No description provided for @clinicianCurrentSupportRequests.
+  ///
+  /// In ar, this message translates to:
+  /// **'عدد طلبات الدعم الحالية'**
+  String get clinicianCurrentSupportRequests;
+
+  /// No description provided for @clinicianReferredChatCases.
+  ///
+  /// In ar, this message translates to:
+  /// **'حالات الشات المحالة'**
+  String get clinicianReferredChatCases;
+
+  /// No description provided for @clinicianReferredChatCasesCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'حالات الشات المحالة'**
+  String get clinicianReferredChatCasesCount;
+
+  /// No description provided for @clinicianNewRequests.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلبات جديدة'**
+  String get clinicianNewRequests;
+
+  /// No description provided for @clinicianActiveRequests.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلبات نشطة'**
+  String get clinicianActiveRequests;
+
+  /// No description provided for @clinicianCompleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكتملة'**
+  String get clinicianCompleted;
+
+  /// No description provided for @clinicianClosed.
+  ///
+  /// In ar, this message translates to:
+  /// **'مرفوضة/مغلقة'**
+  String get clinicianClosed;
+
+  /// No description provided for @clinicianAcceptRequest.
+  ///
+  /// In ar, this message translates to:
+  /// **'قبول الطلب'**
+  String get clinicianAcceptRequest;
+
+  /// No description provided for @clinicianRejectRequest.
+  ///
+  /// In ar, this message translates to:
+  /// **'رفض الطلب'**
+  String get clinicianRejectRequest;
+
+  /// No description provided for @clinicianEndSession.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنهاء الجلسة'**
+  String get clinicianEndSession;
+
+  /// No description provided for @clinicianReviewSession.
+  ///
+  /// In ar, this message translates to:
+  /// **'تقييم الجلسة'**
+  String get clinicianReviewSession;
+
+  /// No description provided for @clinicianAssignedRequest.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلب مخصص لك'**
+  String get clinicianAssignedRequest;
+
+  /// No description provided for @clinicianProfileChangeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلب تعديل الصورة أو النبذة'**
+  String get clinicianProfileChangeTitle;
+
+  /// No description provided for @clinicianNewPhotoUrl.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابط الصورة الجديدة'**
+  String get clinicianNewPhotoUrl;
+
+  /// No description provided for @clinicianNewBio.
+  ///
+  /// In ar, this message translates to:
+  /// **'النبذة الجديدة'**
+  String get clinicianNewBio;
+
+  /// No description provided for @clinicianSendingRequest.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ إرسال الطلب...'**
+  String get clinicianSendingRequest;
+
+  /// No description provided for @clinicianSendChangeRequest.
+  ///
+  /// In ar, this message translates to:
+  /// **'إرسال طلب التعديل'**
+  String get clinicianSendChangeRequest;
+
+  /// No description provided for @clinicianRatings.
+  ///
+  /// In ar, this message translates to:
+  /// **'عدد التقييمات'**
+  String get clinicianRatings;
+
+  /// No description provided for @clinicianStars.
+  ///
+  /// In ar, this message translates to:
+  /// **'متوسط النجوم'**
+  String get clinicianStars;
+
+  /// No description provided for @clinicianOverall.
+  ///
+  /// In ar, this message translates to:
+  /// **'المتوسط العام'**
+  String get clinicianOverall;
+
+  /// No description provided for @clinicianLogout.
+  ///
+  /// In ar, this message translates to:
+  /// **'خروج'**
+  String get clinicianLogout;
+
+  /// No description provided for @clinicianPleaseSignIn.
+  ///
+  /// In ar, this message translates to:
+  /// **'يجب تسجيل الدخول أولًا'**
+  String get clinicianPleaseSignIn;
+
   /// No description provided for @comingSoon.
   ///
   /// In ar, this message translates to:

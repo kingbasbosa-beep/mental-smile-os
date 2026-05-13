@@ -387,6 +387,93 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clientOverallAverage => 'Overall average';
 
   @override
+  String get clinicianOperations => 'Operations';
+
+  @override
+  String get clinicianDashboard => 'Clinician dashboard';
+
+  @override
+  String get clinicianOpenCases => 'Open cases';
+
+  @override
+  String get clinicianSendSupportRequest => 'Send support request';
+
+  @override
+  String get clinicianEditProfile => 'Edit my profile';
+
+  @override
+  String get clinicianMySessions => 'My sessions';
+
+  @override
+  String get clinicianSupportRequest => 'Support request';
+
+  @override
+  String get clinicianCurrentSupportRequests => 'Current support requests';
+
+  @override
+  String get clinicianReferredChatCases => 'Referred chat cases';
+
+  @override
+  String get clinicianReferredChatCasesCount => 'Referred chat cases';
+
+  @override
+  String get clinicianNewRequests => 'New';
+
+  @override
+  String get clinicianActiveRequests => 'In progress';
+
+  @override
+  String get clinicianCompleted => 'Completed';
+
+  @override
+  String get clinicianClosed => 'Closed';
+
+  @override
+  String get clinicianAcceptRequest => 'Accept request';
+
+  @override
+  String get clinicianRejectRequest => 'Reject request';
+
+  @override
+  String get clinicianEndSession => 'End session';
+
+  @override
+  String get clinicianReviewSession => 'Review session';
+
+  @override
+  String get clinicianAssignedRequest => 'Request assigned to you';
+
+  @override
+  String get clinicianProfileChangeTitle => 'Request photo or bio update';
+
+  @override
+  String get clinicianNewPhotoUrl => 'New photo URL';
+
+  @override
+  String get clinicianNewBio => 'New bio';
+
+  @override
+  String get clinicianSendingRequest => 'Sending request...';
+
+  @override
+  String get clinicianSendChangeRequest => 'Send change request';
+
+  @override
+  String get clinicianRatings => 'Ratings';
+
+  @override
+  String get clinicianStars => 'Stars';
+
+  @override
+  String get clinicianOverall => 'Overall';
+
+  @override
+  String get clinicianLogout => 'Logout';
+
+  @override
+  String get clinicianPleaseSignIn => 'Please sign in first';
+
+  @override
   String comingSoon(String title) {
     return '$title — Coming soon';
   }

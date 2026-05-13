@@ -385,6 +385,93 @@ class AppLocalizationsAr extends AppLocalizations {
   String get clientOverallAverage => 'المتوسط العام';
 
   @override
+  String get clinicianOperations => 'العمليات';
+
+  @override
+  String get clinicianDashboard => 'لوحة الأخصائي';
+
+  @override
+  String get clinicianOpenCases => 'فتح الحالات';
+
+  @override
+  String get clinicianSendSupportRequest => 'إرسال طلب دعم';
+
+  @override
+  String get clinicianEditProfile => 'تعديل بياناتي';
+
+  @override
+  String get clinicianMySessions => 'جلساتي';
+
+  @override
+  String get clinicianSupportRequest => 'طلب دعم';
+
+  @override
+  String get clinicianCurrentSupportRequests => 'عدد طلبات الدعم الحالية';
+
+  @override
+  String get clinicianReferredChatCases => 'حالات الشات المحالة';
+
+  @override
+  String get clinicianReferredChatCasesCount => 'حالات الشات المحالة';
+
+  @override
+  String get clinicianNewRequests => 'طلبات جديدة';
+
+  @override
+  String get clinicianActiveRequests => 'طلبات نشطة';
+
+  @override
+  String get clinicianCompleted => 'مكتملة';
+
+  @override
+  String get clinicianClosed => 'مرفوضة/مغلقة';
+
+  @override
+  String get clinicianAcceptRequest => 'قبول الطلب';
+
+  @override
+  String get clinicianRejectRequest => 'رفض الطلب';
+
+  @override
+  String get clinicianEndSession => 'إنهاء الجلسة';
+
+  @override
+  String get clinicianReviewSession => 'تقييم الجلسة';
+
+  @override
+  String get clinicianAssignedRequest => 'طلب مخصص لك';
+
+  @override
+  String get clinicianProfileChangeTitle => 'طلب تعديل الصورة أو النبذة';
+
+  @override
+  String get clinicianNewPhotoUrl => 'رابط الصورة الجديدة';
+
+  @override
+  String get clinicianNewBio => 'النبذة الجديدة';
+
+  @override
+  String get clinicianSendingRequest => 'جارٍ إرسال الطلب...';
+
+  @override
+  String get clinicianSendChangeRequest => 'إرسال طلب التعديل';
+
+  @override
+  String get clinicianRatings => 'عدد التقييمات';
+
+  @override
+  String get clinicianStars => 'متوسط النجوم';
+
+  @override
+  String get clinicianOverall => 'المتوسط العام';
+
+  @override
+  String get clinicianLogout => 'خروج';
+
+  @override
+  String get clinicianPleaseSignIn => 'يجب تسجيل الدخول أولًا';
+
+  @override
   String comingSoon(String title) {
     return '$title — قريبًا';
   }
