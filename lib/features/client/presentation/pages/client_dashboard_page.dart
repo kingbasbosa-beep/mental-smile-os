@@ -441,7 +441,7 @@ class ClientDashboardPage extends StatelessWidget {
                                     ),
                                     const SizedBox(height: AppSpacing.sm),
                                     Align(
-                                      alignment: Alignment.centerLeft,
+                                      alignment: AlignmentDirectional.centerEnd,
                                       child: ratingsPanel,
                                     ),
                                     const SizedBox(height: AppSpacing.md),
@@ -736,7 +736,7 @@ class _GreetingText extends StatelessWidget {
               ),
             ],
           ),
-          textAlign: TextAlign.right,
+          textAlign: TextAlign.start,
         ),
         const SizedBox(height: 4),
         Text(
@@ -757,7 +757,7 @@ class _GreetingText extends StatelessWidget {
               ),
             ],
           ),
-          textAlign: TextAlign.right,
+          textAlign: TextAlign.start,
         ),
       ],
     );
@@ -1157,7 +1157,7 @@ class _PlainMetric extends StatelessWidget {
               ),
             ],
           ),
-          textAlign: TextAlign.left,
+          textAlign: TextAlign.start,
         ),
         const SizedBox(height: 2),
         Text(
@@ -1176,7 +1176,7 @@ class _PlainMetric extends StatelessWidget {
               ),
             ],
           ),
-          textAlign: TextAlign.left,
+          textAlign: TextAlign.start,
         ),
       ],
     );
