@@ -734,6 +734,42 @@ abstract class AppLocalizations {
   /// **'التالي: المستندات'**
   String get webCenterNextDocuments;
 
+  /// No description provided for @webCenterDocumentsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل المركز - المستندات'**
+  String get webCenterDocumentsTitle;
+
+  /// No description provided for @webCenterFileName.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم الملف'**
+  String get webCenterFileName;
+
+  /// No description provided for @webCenterFileUrlOptional.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابط الملف (اختياري)'**
+  String get webCenterFileUrlOptional;
+
+  /// No description provided for @webCenterReviewNoteOptional.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملاحظة المراجعة (اختياري)'**
+  String get webCenterReviewNoteOptional;
+
+  /// No description provided for @webCenterSubmitForReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'إرسال للمراجعة'**
+  String get webCenterSubmitForReview;
+
+  /// No description provided for @webRegistrationBrowseLibraryDuringReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'تصفح مكتبة الإرشاد أثناء مراجعة حسابك'**
+  String get webRegistrationBrowseLibraryDuringReview;
+
   /// No description provided for @bookingRequestTitle.
   ///
   /// In ar, this message translates to:

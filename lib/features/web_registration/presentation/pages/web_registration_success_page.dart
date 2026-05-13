@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 
 class WebRegistrationSuccessPage extends StatelessWidget {
   const WebRegistrationSuccessPage({super.key});
@@ -19,6 +20,7 @@ class WebRegistrationSuccessPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final source = _source(context);
     final isClinician = source == 'clinician';
 
@@ -46,9 +48,7 @@ class WebRegistrationSuccessPage extends StatelessWidget {
                   onPressed: () =>
                       Navigator.of(context).pushNamed(Routes.webLibrary),
                   icon: const Icon(Icons.menu_book_outlined, size: 18),
-                  label: const Text(
-                    'تصفح مكتبة الإرشاد أثناء مراجعة حسابك',
-                  ),
+                  label: Text(l10n.webRegistrationBrowseLibraryDuringReview),
                   style: TextButton.styleFrom(
                     foregroundColor: webRegistrationTextTurquoise,
                     padding: const EdgeInsets.symmetric(

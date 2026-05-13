@@ -332,6 +332,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get webCenterNextDocuments => 'التالي: المستندات';
 
   @override
+  String get webCenterDocumentsTitle => 'تسجيل المركز - المستندات';
+
+  @override
+  String get webCenterFileName => 'اسم الملف';
+
+  @override
+  String get webCenterFileUrlOptional => 'رابط الملف (اختياري)';
+
+  @override
+  String get webCenterReviewNoteOptional => 'ملاحظة المراجعة (اختياري)';
+
+  @override
+  String get webCenterSubmitForReview => 'إرسال للمراجعة';
+
+  @override
+  String get webRegistrationBrowseLibraryDuringReview =>
+      'تصفح مكتبة الإرشاد أثناء مراجعة حسابك';
+
+  @override
   String get bookingRequestTitle => 'طلب حجز';
 
   @override

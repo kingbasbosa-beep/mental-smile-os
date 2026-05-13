@@ -5,6 +5,7 @@ import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/centers/presentation/center_document_requirements.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 
 class WebCenterDocumentsPage extends StatefulWidget {
   const WebCenterDocumentsPage({super.key});
@@ -124,6 +125,8 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: webRegistrationCompactFormTheme(
@@ -169,8 +172,8 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text(
-                                'Center Registration - Documents',
+                              Text(
+                                l10n.webCenterDocumentsTitle,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 22,
@@ -185,7 +188,7 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
                                 ),
                                 icon: const Icon(Icons.menu_book_outlined,
                                     size: 16),
-                                label: const Text('مكتبة الإرشاد'),
+                                label: Text(l10n.webCenterGuidanceLibrary),
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: webRegistrationTextTurquoise,
                                   side: BorderSide(
@@ -210,7 +213,7 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
                               ),
                               const SizedBox(height: 16),
                               ...kRequiredCenterDocumentTypes
-                                  .map(_documentSection),
+                                  .map((item) => _documentSection(context, item)),
                               if (_error != null) ...[
                                 const SizedBox(height: 10),
                                 Text(
@@ -229,7 +232,7 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
                                   onPressed: _isSaving ? null : _submit,
                                   child: _isSaving
                                       ? const CircularProgressIndicator()
-                                      : const Text('Submit for review'),
+                                      : Text(l10n.webCenterSubmitForReview),
                                 ),
                               ),
                             ],
@@ -247,7 +250,8 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
     );
   }
 
-  Widget _documentSection(Map<String, String> item) {
+  Widget _documentSection(BuildContext context, Map<String, String> item) {
+    final l10n = AppLocalizations.of(context)!;
     final type = item['key'] ?? '';
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -259,26 +263,26 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
           TextFormField(
             controller: _fileNameControllers[type],
             validator: _required,
-            decoration: const InputDecoration(
-              labelText: 'File name',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: l10n.webCenterFileName,
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _fileUrlControllers[type],
-            decoration: const InputDecoration(
-              labelText: 'File URL (optional)',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: l10n.webCenterFileUrlOptional,
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _reviewNoteControllers[type],
             maxLines: 2,
-            decoration: const InputDecoration(
-              labelText: 'Review note (optional)',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: l10n.webCenterReviewNoteOptional,
+              border: const OutlineInputBorder(),
             ),
           ),
         ],

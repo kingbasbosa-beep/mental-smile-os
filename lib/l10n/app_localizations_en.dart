@@ -335,6 +335,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webCenterNextDocuments => 'Next: Documents';
 
   @override
+  String get webCenterDocumentsTitle => 'Center Registration - Documents';
+
+  @override
+  String get webCenterFileName => 'File name';
+
+  @override
+  String get webCenterFileUrlOptional => 'File URL (optional)';
+
+  @override
+  String get webCenterReviewNoteOptional => 'Review note (optional)';
+
+  @override
+  String get webCenterSubmitForReview => 'Submit for review';
+
+  @override
+  String get webRegistrationBrowseLibraryDuringReview =>
+      'Browse the guidance library while your account is reviewed';
+
+  @override
   String get bookingRequestTitle => 'Booking request';
 
   @override
