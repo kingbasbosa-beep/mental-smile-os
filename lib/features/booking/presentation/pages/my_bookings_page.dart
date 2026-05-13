@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/center_booking_request_page.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 
 class MyBookingsPage extends StatefulWidget {
   const MyBookingsPage({super.key});
@@ -16,11 +17,25 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
   String _viewFilter = 'current';
 
   static const List<Map<String, String>> _tabs = [
-    {'key': 'current', 'label': 'الجارية'},
-    {'key': 'action_needed', 'label': 'تحتاج منك إجراء'},
-    {'key': 'completed', 'label': 'المكتملة'},
-    {'key': 'closed', 'label': 'المغلقة'},
+    {'key': 'current'},
+    {'key': 'action_needed'},
+    {'key': 'completed'},
+    {'key': 'closed'},
   ];
+
+  String _tabLabel(AppLocalizations l10n, String key) {
+    switch (key) {
+      case 'action_needed':
+        return l10n.bookingActionNeeded;
+      case 'completed':
+        return l10n.bookingCompleted;
+      case 'closed':
+        return l10n.bookingClosed;
+      case 'current':
+      default:
+        return l10n.bookingCurrent;
+    }
+  }
 
   String _backgroundAsset(double width) {
     if (width < 700) {
@@ -64,6 +79,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
   }
 
   Widget _statusTabs(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
       child: Wrap(
@@ -72,7 +88,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
         children: [
           for (final it in _tabs)
             ChoiceChip(
-              label: Text(it['label']!),
+              label: Text(_tabLabel(l10n, it['key']!)),
               selected: _viewFilter == it['key'],
               backgroundColor: Colors.black.withValues(alpha: 0.30),
               selectedColor: const Color(0xFFE7C766).withValues(alpha: 0.22),
@@ -150,6 +166,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     String oldRequestId,
     Map<String, dynamic> source,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final user = FirebaseAuth.instance.currentUser;
     final uid = user?.uid ?? '';
     if (uid.isEmpty) return;
@@ -157,18 +174,18 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('إنشاء طلب جديد من هذا الطلب'),
+        title: Text(l10n.bookingCreateNewFromRequest),
         content: const Text(
           'سيتم إنشاء طلب جديد بنفس بيانات المركز والإقامة، ولن يتم تعديل الطلب الحالي.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('إلغاء'),
+            child: Text(l10n.authCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('إنشاء طلب جديد'),
+            child: Text(l10n.bookingCreateNewRequest),
           ),
         ],
       ),
@@ -275,7 +292,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
 
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('تم إنشاء طلب مركز جديد')),
+      SnackBar(content: Text(l10n.bookingNewCenterRequestCreated)),
     );
   }
 
@@ -911,21 +928,22 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     }
   }
 
-  Widget _emptyState() {
+  Widget _emptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     String text;
     switch (_viewFilter) {
       case 'action_needed':
-        text = 'لا توجد طلبات تحتاج منك إجراء الآن';
+        text = l10n.bookingEmptyActionNeeded;
         break;
       case 'completed':
-        text = 'لا توجد طلبات مكتملة بعد';
+        text = l10n.bookingEmptyCompleted;
         break;
       case 'closed':
-        text = 'لا توجد طلبات مغلقة';
+        text = l10n.bookingEmptyClosed;
         break;
       case 'current':
       default:
-        text = 'لا توجد طلبات جارية الآن';
+        text = l10n.bookingEmptyCurrent;
         break;
     }
 
@@ -947,6 +965,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
   @override
   Widget build(BuildContext context) {
     final u = FirebaseAuth.instance.currentUser;
+    final l10n = AppLocalizations.of(context)!;
     final isArabic =
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
@@ -956,7 +975,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
         backgroundColor: Colors.black,
         appBar: AppShellActions.buildAppBar(
           context,
-          title: 'طلباتي',
+          title: l10n.bookingMyRequestsTitle,
         ),
         body: LayoutBuilder(
           builder: (context, constraints) {
@@ -1022,7 +1041,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
 
                                   final docs = snap.data ?? const [];
                                   if (docs.isEmpty) {
-                                    return _emptyState();
+                                    return _emptyState(context);
                                   }
 
                                   final deduped = <String,
@@ -1064,7 +1083,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                     ..sort(_compareCreatedAt);
 
                                   if (visibleDocs.isEmpty) {
-                                    return _emptyState();
+                                    return _emptyState(context);
                                   }
 
                                   return ListView.separated(
@@ -1232,8 +1251,10 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                                     },
                                                     icon: const Icon(
                                                         Icons.edit_outlined),
-                                                    label: const Text(
-                                                        'تعديل نوع الإقامة'),
+                                                    label: Text(
+                                                      l10n
+                                                          .bookingEditAccommodation,
+                                                    ),
                                                   ),
                                                 ),
                                               ],
@@ -1255,8 +1276,9 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                                     icon: const Icon(
                                                       Icons.assignment_outlined,
                                                     ),
-                                                    label: const Text(
-                                                      'استكمال بيانات التقييم الأولي',
+                                                    label: Text(
+                                                      l10n
+                                                          .bookingCompleteInitialIntake,
                                                     ),
                                                   ),
                                                 ),
@@ -1278,8 +1300,10 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                                     },
                                                     icon: const Icon(Icons
                                                         .upload_file_outlined),
-                                                    label: const Text(
-                                                        'رفع إثبات التحويل'),
+                                                    label: Text(
+                                                      l10n
+                                                          .bookingUploadPaymentProof,
+                                                    ),
                                                   ),
                                                 ),
                                               ],
@@ -1362,8 +1386,9 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                                             Icons
                                                                 .copy_all_outlined,
                                                           ),
-                                                          label: const Text(
-                                                            'إنشاء طلب جديد من هذا الطلب',
+                                                          label: Text(
+                                                            l10n
+                                                                .bookingCreateNewFromRequest,
                                                           ),
                                                         )
                                                       : OutlinedButton.icon(
@@ -1386,8 +1411,9 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                                             Icons
                                                                 .copy_all_outlined,
                                                           ),
-                                                          label: const Text(
-                                                            'إنشاء طلب جديد من هذا الطلب',
+                                                          label: Text(
+                                                            l10n
+                                                                .bookingCreateNewFromRequest,
                                                           ),
                                                         ),
                                                 ),

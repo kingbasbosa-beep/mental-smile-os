@@ -248,6 +248,96 @@ class AppLocalizationsAr extends AppLocalizations {
   String get centerRequestViaAdmin => 'اطلب المركز عبر الإدارة';
 
   @override
+  String get bookingRequestTitle => 'طلب حجز';
+
+  @override
+  String get bookingCenterRequestTitle => 'طلب حجز مركز';
+
+  @override
+  String get bookingMyRequestsTitle => 'طلباتي';
+
+  @override
+  String get bookingAdditionalNotes => 'ملاحظات إضافية';
+
+  @override
+  String get bookingWriteNoteHint => 'اكتب ملاحظتك هنا...';
+
+  @override
+  String get bookingSendRequest => 'إرسال الطلب';
+
+  @override
+  String get bookingSendRequestToAdmin => 'إرسال الطلب إلى الإدارة';
+
+  @override
+  String get bookingSending => 'جارٍ الإرسال...';
+
+  @override
+  String get bookingRequestSent => 'تم إرسال الطلب بنجاح';
+
+  @override
+  String get bookingRequestFailed => 'تعذّر إرسال الطلب';
+
+  @override
+  String get bookingRequestSentAdminChat =>
+      'تم إرسال الطلب وفتح محادثة المتابعة مع الإدارة';
+
+  @override
+  String get bookingCenterRequestSent =>
+      'تم إرسال طلب المركز إلى الإدارة بنجاح';
+
+  @override
+  String get bookingCenterRequestSentToAdmin =>
+      'تم إرسال طلب المركز إلى الإدارة';
+
+  @override
+  String get bookingUploadPaymentProof => 'رفع إثبات التحويل';
+
+  @override
+  String get bookingEditAccommodation => 'تعديل نوع الإقامة';
+
+  @override
+  String get bookingCompleteInitialIntake => 'استكمال بيانات التقييم الأولي';
+
+  @override
+  String get bookingCreateNewRequest => 'إنشاء طلب جديد';
+
+  @override
+  String get bookingCreateNewFromRequest => 'إنشاء طلب جديد من هذا الطلب';
+
+  @override
+  String get bookingNewCenterRequestCreated => 'تم إنشاء طلب مركز جديد';
+
+  @override
+  String get bookingCurrent => 'الجارية';
+
+  @override
+  String get bookingActionNeeded => 'تحتاج منك إجراء';
+
+  @override
+  String get bookingCompleted => 'المكتملة';
+
+  @override
+  String get bookingClosed => 'المغلقة';
+
+  @override
+  String get bookingEmptyCurrent => 'لا توجد طلبات جارية الآن';
+
+  @override
+  String get bookingEmptyActionNeeded => 'لا توجد طلبات تحتاج منك إجراء الآن';
+
+  @override
+  String get bookingEmptyCompleted => 'لا توجد طلبات مكتملة بعد';
+
+  @override
+  String get bookingEmptyClosed => 'لا توجد طلبات مغلقة';
+
+  @override
+  String get bookingSpecialistFallback => 'الأخصائي';
+
+  @override
+  String get bookingCenterRequestFallback => 'طلب مركز';
+
+  @override
   String comingSoon(String title) {
     return '$title — قريبًا';
   }

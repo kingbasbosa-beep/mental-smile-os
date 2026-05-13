@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/features/booking/data/services/booking_legacy_chat_adapter.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 const String kDevClinicianUid =
@@ -113,6 +114,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context)!;
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       setState(() => _result =
@@ -190,22 +192,18 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
 
       if (!mounted) return;
 
-      setState(() => _result =
-          _isArabic ? 'تم إرسال الطلب بنجاح' : 'Request sent successfully');
+      setState(() => _result = l10n.bookingRequestSent);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            _isArabic
-                ? 'تم إرسال الطلب وفتح محادثة المتابعة مع الإدارة'
-                : 'Request sent and admin follow-up chat opened',
+            l10n.bookingRequestSentAdminChat,
           ),
         ),
       );
     } catch (e) {
       if (!mounted) return;
-      setState(() =>
-          _result = _isArabic ? 'تعذر إرسال الطلب' : 'Failed to send request');
+      setState(() => _result = l10n.bookingRequestFailed);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(_isArabic ? 'فشل الإرسال: $e' : 'Send failed: $e'),
@@ -340,6 +338,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Directionality(
       textDirection: _isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
@@ -352,7 +351,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
             onPressed: () => Navigator.of(context).maybePop(),
             icon: const _GoldBackIcon(compact: true),
           ),
-          title: Text(_isArabic ? 'طلب حجز' : 'Booking request'),
+          title: Text(l10n.bookingRequestTitle),
         ),
         body: LayoutBuilder(
           builder: (context, constraints) {
@@ -457,9 +456,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
                                     : CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    _isArabic
-                                        ? 'ملاحظات إضافية'
-                                        : 'Additional notes',
+                                    l10n.bookingAdditionalNotes,
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleSmall
@@ -494,8 +491,8 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
                                         : TextDirection.ltr,
                                     decoration: InputDecoration(
                                       hintText: _isArabic
-                                          ? 'اكتب ملاحظتك هنا...'
-                                          : 'Write your note here...',
+                                          ? l10n.bookingWriteNoteHint
+                                          : l10n.bookingWriteNoteHint,
                                       hintStyle: TextStyle(
                                         color: const Color(0xFFFFF4D4)
                                             .withValues(alpha: 0.62),
@@ -558,12 +555,8 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
                                     : const Icon(Icons.send_outlined),
                                 label: Text(
                                   _submitting
-                                      ? (_isArabic
-                                          ? 'جارٍ الإرسال...'
-                                          : 'Sending...')
-                                      : (_isArabic
-                                          ? 'إرسال الطلب'
-                                          : 'Send request'),
+                                      ? l10n.bookingSending
+                                      : l10n.bookingSendRequest,
                                 ),
                               ),
                             ),

@@ -572,6 +572,180 @@ abstract class AppLocalizations {
   /// **'اطلب المركز عبر الإدارة'**
   String get centerRequestViaAdmin;
 
+  /// No description provided for @bookingRequestTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلب حجز'**
+  String get bookingRequestTitle;
+
+  /// No description provided for @bookingCenterRequestTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلب حجز مركز'**
+  String get bookingCenterRequestTitle;
+
+  /// No description provided for @bookingMyRequestsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلباتي'**
+  String get bookingMyRequestsTitle;
+
+  /// No description provided for @bookingAdditionalNotes.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملاحظات إضافية'**
+  String get bookingAdditionalNotes;
+
+  /// No description provided for @bookingWriteNoteHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب ملاحظتك هنا...'**
+  String get bookingWriteNoteHint;
+
+  /// No description provided for @bookingSendRequest.
+  ///
+  /// In ar, this message translates to:
+  /// **'إرسال الطلب'**
+  String get bookingSendRequest;
+
+  /// No description provided for @bookingSendRequestToAdmin.
+  ///
+  /// In ar, this message translates to:
+  /// **'إرسال الطلب إلى الإدارة'**
+  String get bookingSendRequestToAdmin;
+
+  /// No description provided for @bookingSending.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ الإرسال...'**
+  String get bookingSending;
+
+  /// No description provided for @bookingRequestSent.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إرسال الطلب بنجاح'**
+  String get bookingRequestSent;
+
+  /// No description provided for @bookingRequestFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر إرسال الطلب'**
+  String get bookingRequestFailed;
+
+  /// No description provided for @bookingRequestSentAdminChat.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إرسال الطلب وفتح محادثة المتابعة مع الإدارة'**
+  String get bookingRequestSentAdminChat;
+
+  /// No description provided for @bookingCenterRequestSent.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إرسال طلب المركز إلى الإدارة بنجاح'**
+  String get bookingCenterRequestSent;
+
+  /// No description provided for @bookingCenterRequestSentToAdmin.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إرسال طلب المركز إلى الإدارة'**
+  String get bookingCenterRequestSentToAdmin;
+
+  /// No description provided for @bookingUploadPaymentProof.
+  ///
+  /// In ar, this message translates to:
+  /// **'رفع إثبات التحويل'**
+  String get bookingUploadPaymentProof;
+
+  /// No description provided for @bookingEditAccommodation.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل نوع الإقامة'**
+  String get bookingEditAccommodation;
+
+  /// No description provided for @bookingCompleteInitialIntake.
+  ///
+  /// In ar, this message translates to:
+  /// **'استكمال بيانات التقييم الأولي'**
+  String get bookingCompleteInitialIntake;
+
+  /// No description provided for @bookingCreateNewRequest.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء طلب جديد'**
+  String get bookingCreateNewRequest;
+
+  /// No description provided for @bookingCreateNewFromRequest.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء طلب جديد من هذا الطلب'**
+  String get bookingCreateNewFromRequest;
+
+  /// No description provided for @bookingNewCenterRequestCreated.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إنشاء طلب مركز جديد'**
+  String get bookingNewCenterRequestCreated;
+
+  /// No description provided for @bookingCurrent.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجارية'**
+  String get bookingCurrent;
+
+  /// No description provided for @bookingActionNeeded.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحتاج منك إجراء'**
+  String get bookingActionNeeded;
+
+  /// No description provided for @bookingCompleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'المكتملة'**
+  String get bookingCompleted;
+
+  /// No description provided for @bookingClosed.
+  ///
+  /// In ar, this message translates to:
+  /// **'المغلقة'**
+  String get bookingClosed;
+
+  /// No description provided for @bookingEmptyCurrent.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد طلبات جارية الآن'**
+  String get bookingEmptyCurrent;
+
+  /// No description provided for @bookingEmptyActionNeeded.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد طلبات تحتاج منك إجراء الآن'**
+  String get bookingEmptyActionNeeded;
+
+  /// No description provided for @bookingEmptyCompleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد طلبات مكتملة بعد'**
+  String get bookingEmptyCompleted;
+
+  /// No description provided for @bookingEmptyClosed.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد طلبات مغلقة'**
+  String get bookingEmptyClosed;
+
+  /// No description provided for @bookingSpecialistFallback.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأخصائي'**
+  String get bookingSpecialistFallback;
+
+  /// No description provided for @bookingCenterRequestFallback.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلب مركز'**
+  String get bookingCenterRequestFallback;
+
   /// No description provided for @comingSoon.
   ///
   /// In ar, this message translates to:

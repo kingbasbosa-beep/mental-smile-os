@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 
 class CenterBookingRequestArgs {
   final String centerId;
@@ -231,6 +232,7 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context)!;
     print('CENTER_DIAG entered_submit_v2');
     if (_submitting) {
       debugPrint('CENTER_CREATE early_return reason=already_submitting');
@@ -559,13 +561,13 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
       }
 
       final routedNames = sentToNames.toSet().join(' / ');
-      setState(() => _result = 'تم إرسال طلب المركز إلى الإدارة بنجاح');
+      setState(() => _result = l10n.bookingCenterRequestSent);
 
       messenger.showSnackBar(
         SnackBar(
           content: Text(
             routedNames.isEmpty
-                ? 'تم إرسال طلب المركز إلى الإدارة'
+                ? l10n.bookingCenterRequestSentToAdmin
                 : 'تم إرسال طلب المركز إلى: $routedNames',
           ),
         ),
@@ -573,7 +575,7 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
     } catch (e) {
       debugPrint('CENTER_CREATE submit_error error=$e');
       if (!mounted) return;
-      setState(() => _result = 'تعذر إرسال الطلب');
+      setState(() => _result = l10n.bookingRequestFailed);
       messenger.showSnackBar(
         SnackBar(content: Text('فشل الإرسال: $e')),
       );
@@ -658,6 +660,7 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isArabic =
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
@@ -673,7 +676,7 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
             onPressed: () => Navigator.of(context).maybePop(),
             icon: const _GoldBackIcon(compact: true),
           ),
-          title: const Text('طلب حجز مركز'),
+          title: Text(l10n.bookingCenterRequestTitle),
         ),
         body: Container(
           decoration: BoxDecoration(
@@ -763,7 +766,7 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'ملاحظات إضافية',
+                            l10n.bookingAdditionalNotes,
                             style: Theme.of(context)
                                 .textTheme
                                 .titleSmall
@@ -908,7 +911,7 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
                               fontWeight: FontWeight.w700,
                             ),
                             decoration: const InputDecoration(
-                              hintText: 'اكتب ملاحظتك هنا...',
+                              hintText: l10n.bookingWriteNoteHint,
                               enabledBorder: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(18)),
@@ -965,8 +968,8 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
                             : const Icon(Icons.send_outlined),
                         label: Text(
                           _submitting
-                              ? 'جارٍ الإرسال...'
-                              : 'إرسال الطلب إلى الإدارة',
+                              ? l10n.bookingSending
+                              : l10n.bookingSendRequestToAdmin,
                         ),
                       ),
                     ),

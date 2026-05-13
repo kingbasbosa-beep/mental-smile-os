@@ -250,6 +250,96 @@ class AppLocalizationsEn extends AppLocalizations {
   String get centerRequestViaAdmin => 'Request this center through admin';
 
   @override
+  String get bookingRequestTitle => 'Booking request';
+
+  @override
+  String get bookingCenterRequestTitle => 'Center booking request';
+
+  @override
+  String get bookingMyRequestsTitle => 'My requests';
+
+  @override
+  String get bookingAdditionalNotes => 'Additional notes';
+
+  @override
+  String get bookingWriteNoteHint => 'Write your note here...';
+
+  @override
+  String get bookingSendRequest => 'Send request';
+
+  @override
+  String get bookingSendRequestToAdmin => 'Send request to admin';
+
+  @override
+  String get bookingSending => 'Sending...';
+
+  @override
+  String get bookingRequestSent => 'Request sent successfully';
+
+  @override
+  String get bookingRequestFailed => 'Could not send request';
+
+  @override
+  String get bookingRequestSentAdminChat =>
+      'Request sent and admin follow-up chat opened';
+
+  @override
+  String get bookingCenterRequestSent =>
+      'Center request sent to admin successfully';
+
+  @override
+  String get bookingCenterRequestSentToAdmin => 'Center request sent to admin';
+
+  @override
+  String get bookingUploadPaymentProof => 'Upload payment proof';
+
+  @override
+  String get bookingEditAccommodation => 'Edit accommodation type';
+
+  @override
+  String get bookingCompleteInitialIntake => 'Complete initial intake details';
+
+  @override
+  String get bookingCreateNewRequest => 'Create new request';
+
+  @override
+  String get bookingCreateNewFromRequest =>
+      'Create new request from this request';
+
+  @override
+  String get bookingNewCenterRequestCreated => 'New center request created';
+
+  @override
+  String get bookingCurrent => 'Current';
+
+  @override
+  String get bookingActionNeeded => 'Action needed';
+
+  @override
+  String get bookingCompleted => 'Completed';
+
+  @override
+  String get bookingClosed => 'Closed';
+
+  @override
+  String get bookingEmptyCurrent => 'No current requests right now';
+
+  @override
+  String get bookingEmptyActionNeeded => 'No requests need action right now';
+
+  @override
+  String get bookingEmptyCompleted => 'No completed requests yet';
+
+  @override
+  String get bookingEmptyClosed => 'No closed requests';
+
+  @override
+  String get bookingSpecialistFallback => 'Specialist';
+
+  @override
+  String get bookingCenterRequestFallback => 'Center request';
+
+  @override
   String comingSoon(String title) {
     return '$title — Coming soon';
   }
