@@ -435,6 +435,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get webClinicianExtraFileNameOptional => 'اسم ملف إضافي (اختياري)';
 
   @override
+  String get webClinicianRegistrationFailed => 'تعذر إنشاء حساب الأخصائي';
+
+  @override
+  String get webClinicianStartFromAccountStep =>
+      'يرجى بدء التسجيل من خطوة الحساب';
+
+  @override
+  String get webClinicianAuthenticationSessionMissing =>
+      'جلسة تسجيل الدخول غير متاحة';
+
+  @override
+  String get webClinicianSaveProfileFailed => 'تعذر حفظ الملف الشخصي';
+
+  @override
+  String get webClinicianSelectSessionMode => 'اختر طريقة جلسة واحدة على الأقل';
+
+  @override
+  String get webClinicianSaveSessionsFailed => 'تعذر حفظ بيانات الجلسات';
+
+  @override
+  String get webClinicianSubmitDocumentsFailed => 'تعذر إرسال المستندات';
+
+  @override
   String get bookingRequestTitle => 'طلب حجز';
 
   @override

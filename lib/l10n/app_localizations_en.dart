@@ -439,6 +439,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webClinicianExtraFileNameOptional => 'Extra file name (optional)';
 
   @override
+  String get webClinicianRegistrationFailed =>
+      'Could not create clinician account';
+
+  @override
+  String get webClinicianStartFromAccountStep =>
+      'Please start registration from the account step';
+
+  @override
+  String get webClinicianAuthenticationSessionMissing =>
+      'Authentication session missing';
+
+  @override
+  String get webClinicianSaveProfileFailed => 'Could not save profile';
+
+  @override
+  String get webClinicianSelectSessionMode =>
+      'Choose at least one session method';
+
+  @override
+  String get webClinicianSaveSessionsFailed => 'Could not save sessions';
+
+  @override
+  String get webClinicianSubmitDocumentsFailed => 'Could not submit documents';
+
+  @override
   String get bookingRequestTitle => 'Booking request';
 
   @override

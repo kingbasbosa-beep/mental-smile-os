@@ -932,6 +932,48 @@ abstract class AppLocalizations {
   /// **'اسم ملف إضافي (اختياري)'**
   String get webClinicianExtraFileNameOptional;
 
+  /// No description provided for @webClinicianRegistrationFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر إنشاء حساب الأخصائي'**
+  String get webClinicianRegistrationFailed;
+
+  /// No description provided for @webClinicianStartFromAccountStep.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى بدء التسجيل من خطوة الحساب'**
+  String get webClinicianStartFromAccountStep;
+
+  /// No description provided for @webClinicianAuthenticationSessionMissing.
+  ///
+  /// In ar, this message translates to:
+  /// **'جلسة تسجيل الدخول غير متاحة'**
+  String get webClinicianAuthenticationSessionMissing;
+
+  /// No description provided for @webClinicianSaveProfileFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر حفظ الملف الشخصي'**
+  String get webClinicianSaveProfileFailed;
+
+  /// No description provided for @webClinicianSelectSessionMode.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر طريقة جلسة واحدة على الأقل'**
+  String get webClinicianSelectSessionMode;
+
+  /// No description provided for @webClinicianSaveSessionsFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر حفظ بيانات الجلسات'**
+  String get webClinicianSaveSessionsFailed;
+
+  /// No description provided for @webClinicianSubmitDocumentsFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر إرسال المستندات'**
+  String get webClinicianSubmitDocumentsFailed;
+
   /// No description provided for @bookingRequestTitle.
   ///
   /// In ar, this message translates to:

@@ -44,9 +44,10 @@ class _WebClinicianDocumentsPageState extends State<WebClinicianDocumentsPage> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
     final uid = _uid;
     if (uid == null) {
-      setState(() => _error = 'Please start registration from account step');
+      setState(() => _error = l10n.webClinicianStartFromAccountStep);
       return;
     }
 
@@ -80,14 +81,21 @@ class _WebClinicianDocumentsPageState extends State<WebClinicianDocumentsPage> {
         arguments: const {'source': 'clinician'},
       );
     } catch (_) {
-      if (mounted) setState(() => _error = 'Failed to submit documents');
+      if (mounted) {
+        setState(() => _error = l10n.webClinicianSubmitDocumentsFailed);
+      }
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
   }
 
   String? _required(String? value) {
-    if (value == null || value.trim().isEmpty) return 'مطلوب';
+    if (value == null || value.trim().isEmpty) {
+      return AppLocalizations.of(context)!.authRequiredField;
+    }
+    if (value == null || value.trim().isEmpty) {
+      return AppLocalizations.of(context)!.authRequiredField;
+    }
     return null;
   }
 

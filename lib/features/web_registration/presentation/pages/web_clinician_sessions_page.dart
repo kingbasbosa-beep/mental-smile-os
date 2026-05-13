@@ -52,14 +52,15 @@ class _WebClinicianSessionsPageState extends State<WebClinicianSessionsPage> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
     if (!_offersOnline && !_offersInPerson) {
-      setState(() => _error = 'اختر طريقة جلسة واحدة على الأقل');
+      setState(() => _error = l10n.webClinicianSelectSessionMode);
       return;
     }
 
     final uid = _uid;
     if (uid == null) {
-      setState(() => _error = 'Please start registration from account step');
+      setState(() => _error = l10n.webClinicianStartFromAccountStep);
       return;
     }
 
@@ -83,7 +84,7 @@ class _WebClinicianSessionsPageState extends State<WebClinicianSessionsPage> {
       if (!mounted) return;
       Navigator.of(context).pushReplacementNamed(Routes.webClinicianDocuments);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Failed to save sessions');
+      if (mounted) setState(() => _error = l10n.webClinicianSaveSessionsFailed);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }

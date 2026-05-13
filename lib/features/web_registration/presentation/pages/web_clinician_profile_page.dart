@@ -61,15 +61,16 @@ class _WebClinicianProfilePageState extends State<WebClinicianProfilePage> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
     final authUser = FirebaseAuth.instance.currentUser;
     if (authUser == null) {
-      setState(() => _error = 'Authentication session missing');
+      setState(() => _error = l10n.webClinicianAuthenticationSessionMissing);
       return;
     }
 
     final uid = _uid;
     if (uid == null) {
-      setState(() => _error = 'Please start registration from account step');
+      setState(() => _error = l10n.webClinicianStartFromAccountStep);
       return;
     }
 
@@ -85,10 +86,10 @@ class _WebClinicianProfilePageState extends State<WebClinicianProfilePage> {
       Navigator.of(context).pushReplacementNamed(Routes.webClinicianSessions);
     } on FirebaseException {
       if (mounted) {
-        setState(() => _error = 'Unable to save profile');
+        setState(() => _error = l10n.webClinicianSaveProfileFailed);
       }
     } catch (_) {
-      if (mounted) setState(() => _error = 'Unable to save profile');
+      if (mounted) setState(() => _error = l10n.webClinicianSaveProfileFailed);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }

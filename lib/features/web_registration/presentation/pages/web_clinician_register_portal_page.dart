@@ -78,6 +78,7 @@ class _WebClinicianRegisterPortalPageState
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
 
     setState(() {
       _isSubmitting = true;
@@ -148,8 +149,12 @@ class _WebClinicianRegisterPortalPageState
       if (!mounted) return;
       Navigator.of(context).pushReplacementNamed(Routes.webClinicianProfile);
     } on FirebaseAuthException catch (e) {
+      setState(() => _error = e.message ?? l10n.webClinicianRegistrationFailed);
+      return;
       setState(() => _error = e.message ?? 'فشل إنشاء حساب الأخصائي');
     } catch (_) {
+      setState(() => _error = l10n.webClinicianRegistrationFailed);
+      return;
       setState(() => _error = 'فشل إنشاء حساب الأخصائي');
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -157,7 +162,12 @@ class _WebClinicianRegisterPortalPageState
   }
 
   String? _required(String? value) {
-    if (value == null || value.trim().isEmpty) return 'مطلوب';
+    if (value == null || value.trim().isEmpty) {
+      return AppLocalizations.of(context)!.authRequiredField;
+    }
+    if (value == null || value.trim().isEmpty) {
+      return AppLocalizations.of(context)!.authRequiredField;
+    }
     return null;
   }
 
@@ -290,7 +300,7 @@ class _WebClinicianRegisterPortalPageState
                                     .toList(),
                                 validator: (value) =>
                                     value == null || value.isEmpty
-                                        ? 'مطلوب'
+                                        ? l10n.authRequiredField
                                         : null,
                                 onChanged: (value) {
                                   setState(() =>
@@ -316,7 +326,7 @@ class _WebClinicianRegisterPortalPageState
                                     .toList(),
                                 validator: (value) =>
                                     value == null || value.isEmpty
-                                        ? 'مطلوب'
+                                        ? l10n.authRequiredField
                                         : null,
                                 onChanged: (value) {
                                   setState(() => _selectedSpecialtyKey = value);
@@ -329,9 +339,15 @@ class _WebClinicianRegisterPortalPageState
                                 keyboardType: TextInputType.emailAddress,
                                 validator: (value) {
                                   final email = value?.trim() ?? '';
-                                  if (email.isEmpty) return 'مطلوب';
+                                  if (email.isEmpty) {
+                                    return l10n.authEmailRequired;
+                                  }
+                                  if (!email.contains('@')) {
+                                    return l10n.authInvalidEmail;
+                                  }
+                                  if (email.isEmpty) return l10n.authEmailRequired;
                                   if (!email.contains('@'))
-                                    return 'Email invalid';
+                                    return l10n.authInvalidEmail;
                                   return null;
                                 },
                               ),
@@ -342,7 +358,10 @@ class _WebClinicianRegisterPortalPageState
                                 obscureText: true,
                                 validator: (value) {
                                   if (value == null || value.length < 6) {
-                                    return 'Password must be at least 6 characters';
+                                    return l10n.authWeakPassword;
+                                  }
+                                  if (value == null || value.length < 6) {
+                                    return l10n.authWeakPassword;
                                   }
                                   return null;
                                 },
@@ -354,7 +373,10 @@ class _WebClinicianRegisterPortalPageState
                                 obscureText: true,
                                 validator: (value) {
                                   if (value != _passwordController.text) {
-                                    return 'Passwords do not match';
+                                    return l10n.authPasswordsDoNotMatch;
+                                  }
+                                  if (value != _passwordController.text) {
+                                    return l10n.authPasswordsDoNotMatch;
                                   }
                                   return null;
                                 },
