@@ -182,7 +182,7 @@ class CenterDetailsPage extends StatelessWidget {
   Widget _sectionTitle(BuildContext context, String title) {
     return Text(
       title,
-      textAlign: TextAlign.right,
+      textAlign: TextAlign.start,
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
             color: const Color(0xFFFFE7B2),
             fontWeight: FontWeight.w800,
@@ -280,7 +280,7 @@ class CenterDetailsPage extends StatelessWidget {
                 for (final item in autismItems) ...[
                   Text(
                     item.labelAr,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w800,
                         ),
@@ -293,7 +293,7 @@ class CenterDetailsPage extends StatelessWidget {
                         'الوحدة: ${unitLabel(item.pricingUnit)}',
                       item.taxIncluded ? 'الضريبة شاملة' : 'الضريبة غير شاملة',
                     ].join(' • '),
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                   ),
                   const SizedBox(height: 10),
                 ]
@@ -301,7 +301,7 @@ class CenterDetailsPage extends StatelessWidget {
                 for (final item in accommodationItems) ...[
                   Text(
                     item.labelAr,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w800,
                         ),
@@ -322,7 +322,7 @@ class CenterDetailsPage extends StatelessWidget {
                       if (item.includesTourismOrExternalOutings) 'جولات خارجية',
                       item.taxIncluded ? 'الضريبة شاملة' : 'الضريبة غير شاملة',
                     ].join(' • '),
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                   ),
                   const SizedBox(height: 10),
                 ],
@@ -347,14 +347,14 @@ class CenterDetailsPage extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 'النوع التشغيلي: ${_centerTypeLabelAr(c)}',
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
               ),
               const SizedBox(height: 6),
               Text(
                 c.hasDetoxUnit
                     ? 'يوجد قسم داخلي لأعراض الانسحاب.'
                     : 'لا يوجد قسم داخلي مستقل لأعراض الانسحاب.',
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
               ),
             ],
           ),
@@ -390,7 +390,7 @@ class CenterDetailsPage extends StatelessWidget {
               for (final item in items)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 6),
-                  child: Text(item, textAlign: TextAlign.right),
+                  child: Text(item, textAlign: TextAlign.start),
                 ),
             ],
           ),
@@ -416,7 +416,7 @@ class CenterDetailsPage extends StatelessWidget {
         Expanded(
           child: Text(
             v,
-            textAlign: TextAlign.left,
+            textAlign: TextAlign.start,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: onTap == null ? FontWeight.w600 : FontWeight.w800,
                   color: onTap == null
@@ -465,7 +465,7 @@ class CenterDetailsPage extends StatelessWidget {
                 children: [
                   Text(
                     'نبذة عن المركز',
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: const Color(0xFFFFE7B2),
                           fontWeight: FontWeight.w900,
@@ -483,7 +483,7 @@ class CenterDetailsPage extends StatelessWidget {
               if (false)
                 Text(
                   'نبذة',
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: Theme.of(context)
                       .textTheme
                       .titleMedium
@@ -492,7 +492,7 @@ class CenterDetailsPage extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 desc,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
@@ -807,7 +807,7 @@ class CenterDetailsPage extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 name,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color: const Color(0xFFFFE7B2),
                       fontWeight: FontWeight.w900,
@@ -822,7 +822,7 @@ class CenterDetailsPage extends StatelessWidget {
                   Chip(
                     label: Text(
                       categoryLabel,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                     ),
                     visualDensity: VisualDensity.compact,
                     backgroundColor: Colors.black.withValues(alpha: 0.24),
@@ -838,7 +838,7 @@ class CenterDetailsPage extends StatelessWidget {
                     Chip(
                       label: Text(
                         loc,
-                        textAlign: TextAlign.right,
+                        textAlign: TextAlign.start,
                       ),
                       visualDensity: VisualDensity.compact,
                       backgroundColor: Colors.black.withValues(alpha: 0.24),
@@ -889,7 +889,7 @@ class CenterDetailsPage extends StatelessWidget {
               children: [
                 Text(
                   'التواصل والموقع',
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: Theme.of(context)
                       .textTheme
                       .titleMedium
@@ -932,7 +932,7 @@ class CenterDetailsPage extends StatelessWidget {
               children: [
                 Text(
                   'الخدمات',
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: Theme.of(context)
                       .textTheme
                       .titleMedium
@@ -948,7 +948,7 @@ class CenterDetailsPage extends StatelessWidget {
                       Chip(
                         label: Text(
                           s.trim(),
-                          textAlign: TextAlign.right,
+                          textAlign: TextAlign.start,
                         ),
                         visualDensity: VisualDensity.compact,
                         backgroundColor: Colors.black.withValues(alpha: 0.24),
@@ -1011,9 +1011,11 @@ class CenterDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final initial = center;
     final id = centerId?.trim();
+    final isArabic =
+        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
@@ -1130,10 +1132,12 @@ class _GoldBackIcon extends StatelessWidget {
         height: iconSize,
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
-          return Icon(
-            Icons.arrow_back_rounded,
-            color: const Color(0xFFFFE7B2),
-            size: iconSize,
+          return IconTheme(
+            data: IconThemeData(
+              color: const Color(0xFFFFE7B2),
+              size: iconSize,
+            ),
+            child: const BackButtonIcon(),
           );
         },
       ),
@@ -1215,7 +1219,7 @@ class _MiniContactCard extends StatelessWidget {
               children: [
                 Text(
                   item.label,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: const Color(0xFFFFE7B2),
                         fontWeight: FontWeight.w800,
@@ -1224,7 +1228,7 @@ class _MiniContactCard extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   item.value,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -1281,7 +1285,7 @@ class _GridInfoCard extends StatelessWidget {
               Flexible(
                 child: Text(
                   title,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -1304,7 +1308,7 @@ class _GridInfoCard extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 5),
                   child: Text(
                     line,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(

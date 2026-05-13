@@ -462,7 +462,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
       onChanged: _loading ? null : onChanged,
       title: Text(
         title,
-        textAlign: _isArabic ? TextAlign.right : TextAlign.left,
+        textAlign: TextAlign.start,
       ),
       contentPadding: EdgeInsets.zero,
     );
@@ -478,7 +478,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
         children: [
           Text(
             _isArabic ? 'قدرات المركز' : 'Center capabilities',
-            textAlign: _isArabic ? TextAlign.right : TextAlign.left,
+            textAlign: TextAlign.start,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -842,7 +842,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
         children: [
           Text(
             isArabic ? 'تكلفة الإقامة' : 'Cost of stay',
-            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            textAlign: TextAlign.start,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -856,7 +856,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                 : (isArabic
                     ? 'أدخل الفئات المتاحة فقط، واترك غير المتاح بدون تفعيل.'
                     : 'Fill only the available accommodation categories and leave the unavailable ones disabled.'),
-            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            textAlign: TextAlign.start,
           ),
           const SizedBox(height: AppSpacing.md),
           ...(_usesAutismPricing
@@ -983,7 +983,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
             _isArabic
                 ? 'يمكنك ربط صورة غلاف أو لوجو يظهر في كارت المركز وصفحة التفاصيل. استخدم رابط صورة أو مسار أصل محلي داخل المشروع.'
                 : 'Link a cover image or logo that appears on the center card and details page. Use an image URL or a local asset path.',
-            textAlign: _isArabic ? TextAlign.right : TextAlign.left,
+            textAlign: TextAlign.start,
           ),
           const SizedBox(height: AppSpacing.md),
           ClipRRect(
@@ -1084,7 +1084,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
       children: [
         Text(
           _isArabic ? 'بيانات المركز' : 'Center information',
-          textAlign: _isArabic ? TextAlign.right : TextAlign.left,
+          textAlign: TextAlign.start,
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: AppSpacing.xs),
@@ -1092,7 +1092,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
           _isArabic
               ? 'أدخل بيانات المركز الأساسية لإعداد الصفحة الشخصية ولوحة التشغيل لاحقًا.'
               : 'Enter the core center information to prepare the profile and dashboard.',
-          textAlign: _isArabic ? TextAlign.right : TextAlign.left,
+          textAlign: TextAlign.start,
         ),
       ],
     );
@@ -1105,7 +1105,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
       children: [
         Text(
           _isArabic ? 'هوية المركز وتسعيره' : 'Center identity and pricing',
-          textAlign: _isArabic ? TextAlign.right : TextAlign.left,
+          textAlign: TextAlign.start,
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: AppSpacing.xs),
@@ -1113,7 +1113,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
           _isArabic
               ? 'هذه الخطوة تضبط صورة الكارت، قدرات المركز، وفئات التسعير التي ستظهر لاحقًا.'
               : 'This step prepares the card image, capabilities, and pricing bands that will appear later.',
-          textAlign: _isArabic ? TextAlign.right : TextAlign.left,
+          textAlign: TextAlign.start,
         ),
       ],
     );
@@ -1202,9 +1202,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                           _isArabic
                                               ? (item['labelAr'] ?? '')
                                               : (item['labelEn'] ?? ''),
-                                          textAlign: _isArabic
-                                              ? TextAlign.right
-                                              : TextAlign.left,
+                                          textAlign: TextAlign.start,
                                         ),
                                       ),
                                     )
@@ -1251,9 +1249,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                           _isArabic
                                               ? (item['labelAr'] ?? '')
                                               : (item['labelEn'] ?? ''),
-                                          textAlign: _isArabic
-                                              ? TextAlign.right
-                                              : TextAlign.left,
+                                          textAlign: TextAlign.start,
                                         ),
                                       ),
                                     )
@@ -1294,9 +1290,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                   _isArabic
                                       ? 'يوجد قسم داخلي لأعراض الانسحاب'
                                       : 'Includes an internal withdrawal unit',
-                                  textAlign: _isArabic
-                                      ? TextAlign.right
-                                      : TextAlign.left,
+                                  textAlign: TextAlign.start,
                                 ),
                                 subtitle: Text(
                                   _selectedCenterTypeKey == 'detox'
@@ -1306,9 +1300,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                       : (_isArabic
                                           ? 'فعّل هذا الخيار إذا كان المركز يحتوي على وحدة ديتوكس داخلية بجانب خدمته الأساسية.'
                                           : 'Enable this if the center includes an internal detox/withdrawal unit alongside its main service.'),
-                                  textAlign: _isArabic
-                                      ? TextAlign.right
-                                      : TextAlign.left,
+                                  textAlign: TextAlign.start,
                                 ),
                               ),
                               const SizedBox(height: AppSpacing.md),
@@ -1451,9 +1443,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                               ),
                               const SizedBox(height: AppSpacing.sm),
                               Align(
-                                alignment: _isArabic
-                                    ? Alignment.centerRight
-                                    : Alignment.centerLeft,
+                                alignment: AlignmentDirectional.centerStart,
                                 child: OutlinedButton.icon(
                                   onPressed: _resolvingLocation
                                       ? null
@@ -1560,8 +1550,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                                   _currentStep = 0;
                                                 });
                                               },
-                                        icon: const Icon(
-                                            Icons.arrow_back_rounded),
+                                        icon: const BackButtonIcon(),
                                         label:
                                             Text(_isArabic ? 'رجوع' : 'Back'),
                                       ),
@@ -1596,7 +1585,9 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                             )
                                           : Icon(
                                               _currentStep == 0
-                                                  ? Icons.arrow_forward_rounded
+                                                  ? (_isArabic
+                                                      ? Icons.arrow_back_rounded
+                                                      : Icons.arrow_forward_rounded)
                                                   : Icons.app_registration,
                                             ),
                                       label: Text(
@@ -1619,7 +1610,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                             ),
                             const SizedBox(height: AppSpacing.sm),
                             Align(
-                              alignment: Alignment.centerRight,
+                              alignment: AlignmentDirectional.centerStart,
                               child: TextButton(
                                 onPressed: () => Navigator.of(context).pop(),
                                 child: Text(

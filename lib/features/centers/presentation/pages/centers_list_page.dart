@@ -104,9 +104,11 @@ class CentersListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final service = CentersFirestoreService();
+    final isArabic =
+        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: Colors.black,
         body: LayoutBuilder(
@@ -252,7 +254,7 @@ class CentersListPage extends StatelessWidget {
                                                 c.name.trim().isEmpty
                                                     ? 'مركز'
                                                     : c.name.trim(),
-                                                textAlign: TextAlign.right,
+                                                textAlign: TextAlign.start,
                                                 style: Theme.of(context)
                                                     .textTheme
                                                     .headlineSmall
@@ -309,7 +311,7 @@ class CentersListPage extends StatelessWidget {
                                           const SizedBox(height: 2),
                                           Text(
                                             desc,
-                                            textAlign: TextAlign.right,
+                                            textAlign: TextAlign.start,
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodyMedium
@@ -331,7 +333,7 @@ class CentersListPage extends StatelessWidget {
                                                 Chip(
                                                   label: Text(
                                                     s,
-                                                    textAlign: TextAlign.right,
+                                                    textAlign: TextAlign.start,
                                                   ),
                                                   visualDensity:
                                                       VisualDensity.compact,
@@ -483,10 +485,12 @@ class _BackToMenuButton extends StatelessWidget {
             height: compact ? 22 : 26,
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) {
-              return Icon(
-                Icons.arrow_back_rounded,
-                color: const Color(0xFFFFE7B2),
-                size: compact ? 22 : 26,
+              return IconTheme(
+                data: IconThemeData(
+                  color: const Color(0xFFFFE7B2),
+                  size: compact ? 22 : 26,
+                ),
+                child: const BackButtonIcon(),
               );
             },
           ),
@@ -734,7 +738,7 @@ class _InfoChip extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             label,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.start,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   color: const Color(0xFFFFE7B2),
                   fontWeight: FontWeight.w700,
