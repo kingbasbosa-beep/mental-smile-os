@@ -2,6 +2,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
@@ -214,6 +215,8 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -291,7 +294,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
                                     fontSize: 14,
                                   ),
                                   decoration: _clientInputDecoration(
-                                    label: 'الاسم',
+                                    label: l10n.authName,
                                     icon: Icons.person_outline,
                                   ),
                                 ),
@@ -304,7 +307,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
                                     fontSize: 14,
                                   ),
                                   decoration: _clientInputDecoration(
-                                    label: 'البريد الإلكتروني',
+                                    label: l10n.authEmail,
                                     icon: Icons.alternate_email,
                                   ),
                                 ),
@@ -317,7 +320,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
                                     fontSize: 14,
                                   ),
                                   decoration: _clientInputDecoration(
-                                    label: 'كلمة المرور',
+                                    label: l10n.authPassword,
                                     icon: Icons.lock_outline,
                                   ),
                                 ),
@@ -330,7 +333,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
                                     fontSize: 14,
                                   ),
                                   decoration: _clientInputDecoration(
-                                    label: 'تأكيد كلمة المرور',
+                                    label: l10n.authConfirmPassword,
                                     icon: Icons.verified_user_outlined,
                                   ),
                                 ),
@@ -384,8 +387,8 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
                                           : const Icon(Icons.person_add_alt_1),
                                       label: Text(
                                         _loading
-                                            ? 'جارٍ إنشاء الحساب...'
-                                            : 'إنشاء حساب عميل',
+                                            ? l10n.authCreatingAccount
+                                            : l10n.authClientRegister,
                                       ),
                                     ),
                                   ),

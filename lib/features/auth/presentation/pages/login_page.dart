@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/contracts/role_names.dart';
 
 class LoginPage extends StatefulWidget {
@@ -174,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _loginButton() {
+  Widget _loginButton(AppLocalizations l10n) {
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
@@ -236,13 +237,13 @@ class _LoginPageState extends State<LoginPage> {
                     color: Color(0xFF111111),
                   ),
                 )
-              : const Text('دخول | Login'),
+              : Text(l10n.authLoginButton),
         ),
       ),
     );
   }
 
-  Widget _registerLink() {
+  Widget _registerLink(AppLocalizations l10n) {
     return TextButton(
       style: TextButton.styleFrom(
         foregroundColor: _cyberGold,
@@ -255,7 +256,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.of(context).pushNamed(Routes.language);
       },
       child: Text(
-        'للتسجيل اضغط هنا',
+        l10n.authCreateAccount,
         style: TextStyle(
           color: _cyberGold,
           fontSize: 13,
@@ -349,6 +350,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -378,8 +381,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: Column(
                       children: [
-                        const Text(
-                          'تسجيل الدخول',
+                        Text(
+                          l10n.authLoginTitle,
                           style: TextStyle(
                             color: Color(0xFFFFE8A3),
                             fontSize: 28,
@@ -389,7 +392,7 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 20),
                         _field(
                           c: _emailController,
-                          label: 'البريد الإلكتروني',
+                          label: l10n.authEmail,
                           icon: Icons.alternate_email,
                           clientStyle: true,
                           keyboardType: TextInputType.emailAddress,
@@ -397,7 +400,7 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 12),
                         _field(
                           c: _passwordController,
-                          label: 'كلمة المرور',
+                          label: l10n.authPassword,
                           icon: Icons.lock_outline,
                           obscure: _obscurePassword,
                           clientStyle: true,
@@ -420,9 +423,9 @@ class _LoginPageState extends State<LoginPage> {
                               style: const TextStyle(color: Colors.red)),
                         ],
                         const SizedBox(height: 20),
-                        _loginButton(),
+                        _loginButton(l10n),
                         const SizedBox(height: 10),
-                        _registerLink(),
+                        _registerLink(l10n),
                       ],
                     ),
                   ),

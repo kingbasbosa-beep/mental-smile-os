@@ -89,6 +89,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeBack => 'Back';
 
   @override
+  String get authLoginTitle => 'Log in';
+
+  @override
+  String get authEmail => 'Email';
+
+  @override
+  String get authPassword => 'Password';
+
+  @override
+  String get authLoginButton => 'Log in';
+
+  @override
+  String get authLoggingIn => 'Logging in';
+
+  @override
+  String get authInvalidCredentials => 'Invalid login details';
+
+  @override
+  String get authRequiredField => 'This field is required';
+
+  @override
+  String get authForgotPassword => 'Forgot password?';
+
+  @override
+  String get authCreateAccount => 'Tap here to register';
+
+  @override
+  String get authClientRegister => 'Create client account';
+
+  @override
+  String get authBackToHome => 'Back to home';
+
+  @override
+  String get authLogoutConfirm => 'Confirm log out';
+
+  @override
+  String get authLogoutQuestion => 'Do you want to log out?';
+
+  @override
+  String get authCancel => 'Cancel';
+
+  @override
+  String get authName => 'Name';
+
+  @override
+  String get authConfirmPassword => 'Confirm password';
+
+  @override
+  String get authCreatingAccount => 'Creating account...';
+
+  @override
   String comingSoon(String title) {
     return '$title — Coming soon';
   }

@@ -89,6 +89,57 @@ class AppLocalizationsAr extends AppLocalizations {
   String get homeBack => 'رجوع';
 
   @override
+  String get authLoginTitle => 'تسجيل الدخول';
+
+  @override
+  String get authEmail => 'البريد الإلكتروني';
+
+  @override
+  String get authPassword => 'كلمة المرور';
+
+  @override
+  String get authLoginButton => 'دخول';
+
+  @override
+  String get authLoggingIn => 'جارٍ تسجيل الدخول';
+
+  @override
+  String get authInvalidCredentials => 'بيانات الدخول غير صحيحة';
+
+  @override
+  String get authRequiredField => 'هذا الحقل مطلوب';
+
+  @override
+  String get authForgotPassword => 'نسيت كلمة المرور؟';
+
+  @override
+  String get authCreateAccount => 'للتسجيل اضغط هنا';
+
+  @override
+  String get authClientRegister => 'إنشاء حساب عميل';
+
+  @override
+  String get authBackToHome => 'العودة للرئيسية';
+
+  @override
+  String get authLogoutConfirm => 'تأكيد تسجيل الخروج';
+
+  @override
+  String get authLogoutQuestion => 'هل تريد تسجيل الخروج؟';
+
+  @override
+  String get authCancel => 'إلغاء';
+
+  @override
+  String get authName => 'الاسم';
+
+  @override
+  String get authConfirmPassword => 'تأكيد كلمة المرور';
+
+  @override
+  String get authCreatingAccount => 'جارٍ إنشاء الحساب...';
+
+  @override
   String comingSoon(String title) {
     return '$title — قريبًا';
   }

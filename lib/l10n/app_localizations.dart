@@ -254,6 +254,108 @@ abstract class AppLocalizations {
   /// **'رجوع'**
   String get homeBack;
 
+  /// No description provided for @authLoginTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الدخول'**
+  String get authLoginTitle;
+
+  /// No description provided for @authEmail.
+  ///
+  /// In ar, this message translates to:
+  /// **'البريد الإلكتروني'**
+  String get authEmail;
+
+  /// No description provided for @authPassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور'**
+  String get authPassword;
+
+  /// No description provided for @authLoginButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'دخول'**
+  String get authLoginButton;
+
+  /// No description provided for @authLoggingIn.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ تسجيل الدخول'**
+  String get authLoggingIn;
+
+  /// No description provided for @authInvalidCredentials.
+  ///
+  /// In ar, this message translates to:
+  /// **'بيانات الدخول غير صحيحة'**
+  String get authInvalidCredentials;
+
+  /// No description provided for @authRequiredField.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذا الحقل مطلوب'**
+  String get authRequiredField;
+
+  /// No description provided for @authForgotPassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسيت كلمة المرور؟'**
+  String get authForgotPassword;
+
+  /// No description provided for @authCreateAccount.
+  ///
+  /// In ar, this message translates to:
+  /// **'للتسجيل اضغط هنا'**
+  String get authCreateAccount;
+
+  /// No description provided for @authClientRegister.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء حساب عميل'**
+  String get authClientRegister;
+
+  /// No description provided for @authBackToHome.
+  ///
+  /// In ar, this message translates to:
+  /// **'العودة للرئيسية'**
+  String get authBackToHome;
+
+  /// No description provided for @authLogoutConfirm.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد تسجيل الخروج'**
+  String get authLogoutConfirm;
+
+  /// No description provided for @authLogoutQuestion.
+  ///
+  /// In ar, this message translates to:
+  /// **'هل تريد تسجيل الخروج؟'**
+  String get authLogoutQuestion;
+
+  /// No description provided for @authCancel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء'**
+  String get authCancel;
+
+  /// No description provided for @authName.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم'**
+  String get authName;
+
+  /// No description provided for @authConfirmPassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد كلمة المرور'**
+  String get authConfirmPassword;
+
+  /// No description provided for @authCreatingAccount.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ إنشاء الحساب...'**
+  String get authCreatingAccount;
+
   /// No description provided for @comingSoon.
   ///
   /// In ar, this message translates to:
