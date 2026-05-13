@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 
 class WebCenterRegisterPortalPage extends StatefulWidget {
   const WebCenterRegisterPortalPage({super.key});
@@ -148,6 +149,8 @@ class _WebCenterRegisterPortalPageState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: webRegistrationCompactFormTheme(
@@ -211,16 +214,16 @@ class _WebCenterRegisterPortalPageState
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text(
-                                'Center Registration Portal',
+                              Text(
+                                l10n.webCenterRegistrationPortalTitle,
                                 style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              const Text(
-                                'Create your center account for admin review.',
+                              Text(
+                                l10n.webCenterRegistrationPortalSubtitle,
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 6),
@@ -231,7 +234,7 @@ class _WebCenterRegisterPortalPageState
                                 ),
                                 icon: const Icon(Icons.menu_book_outlined,
                                     size: 16),
-                                label: const Text('مكتبة الإرشاد'),
+                                label: Text(l10n.webCenterGuidanceLibrary),
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: webRegistrationTextTurquoise,
                                   side: BorderSide(
@@ -261,7 +264,8 @@ class _WebCenterRegisterPortalPageState
                                   color: _fieldGold,
                                   fontWeight: FontWeight.w700,
                                 ),
-                                decoration: _fieldDecoration('Center name'),
+                                decoration:
+                                    _fieldDecoration(l10n.webCenterCenterName),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return 'Center name is required';
@@ -278,7 +282,8 @@ class _WebCenterRegisterPortalPageState
                                   color: _fieldGold,
                                   fontWeight: FontWeight.w700,
                                 ),
-                                decoration: _fieldDecoration('Category'),
+                                decoration:
+                                    _fieldDecoration(l10n.webCenterCategory),
                                 items: _categories
                                     .map(
                                       (item) => DropdownMenuItem<String>(
@@ -317,7 +322,8 @@ class _WebCenterRegisterPortalPageState
                                   color: _fieldGold,
                                   fontWeight: FontWeight.w700,
                                 ),
-                                decoration: _fieldDecoration('Center type'),
+                                decoration:
+                                    _fieldDecoration(l10n.webCenterType),
                                 items: _centerTypes
                                     .map(
                                       (item) => DropdownMenuItem<String>(
@@ -342,7 +348,7 @@ class _WebCenterRegisterPortalPageState
                                   color: _fieldGold,
                                   fontWeight: FontWeight.w700,
                                 ),
-                                decoration: _fieldDecoration('Email'),
+                                decoration: _fieldDecoration(l10n.authEmail),
                                 keyboardType: TextInputType.emailAddress,
                                 validator: (value) {
                                   final email = value?.trim() ?? '';
@@ -360,7 +366,8 @@ class _WebCenterRegisterPortalPageState
                                   color: _fieldGold,
                                   fontWeight: FontWeight.w700,
                                 ),
-                                decoration: _fieldDecoration('Password'),
+                                decoration:
+                                    _fieldDecoration(l10n.authPassword),
                                 obscureText: true,
                                 validator: (value) {
                                   if (value == null || value.length < 6) {
@@ -377,7 +384,9 @@ class _WebCenterRegisterPortalPageState
                                   fontWeight: FontWeight.w700,
                                 ),
                                 decoration:
-                                    _fieldDecoration('Confirm password'),
+                                    _fieldDecoration(
+                                  l10n.webCenterConfirmPassword,
+                                ),
                                 obscureText: true,
                                 validator: (value) {
                                   if (value != _passwordController.text) {
@@ -411,7 +420,7 @@ class _WebCenterRegisterPortalPageState
                                             strokeWidth: 2,
                                           ),
                                         )
-                                      : const Text('Next: Basic Info'),
+                                      : Text(l10n.webCenterNextBasicInfo),
                                 ),
                               ),
                             ],

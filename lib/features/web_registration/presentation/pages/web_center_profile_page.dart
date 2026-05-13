@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 
 class WebCenterProfilePage extends StatefulWidget {
   const WebCenterProfilePage({super.key});
@@ -87,6 +88,8 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: webRegistrationCompactFormTheme(
@@ -132,8 +135,8 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text(
-                                'Center Registration - Basic Info',
+                              Text(
+                                l10n.webCenterRegistrationBasicInfoTitle,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 22,
@@ -148,7 +151,7 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
                                 ),
                                 icon: const Icon(Icons.menu_book_outlined,
                                     size: 16),
-                                label: const Text('مكتبة الإرشاد'),
+                                label: Text(l10n.webCenterGuidanceLibrary),
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: webRegistrationTextTurquoise,
                                   side: BorderSide(
@@ -173,27 +176,32 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
                               ),
                               const SizedBox(height: 16),
                               _textField(
-                                  _managerNameController, 'Manager name'),
+                                _managerNameController,
+                                l10n.webCenterManagerName,
+                              ),
                               _textField(
                                 _phoneController,
-                                'Phone',
+                                l10n.centerPhone,
                                 keyboardType: TextInputType.phone,
                               ),
                               _textField(
                                 _whatsappController,
-                                'WhatsApp',
+                                l10n.centerWhatsapp,
                                 keyboardType: TextInputType.phone,
                               ),
-                              _textField(_cityController, 'City'),
+                              _textField(_cityController, l10n.centerCity),
                               _textField(
                                 _areaController,
-                                'Area',
+                                l10n.webCenterArea,
                                 required: false,
                               ),
-                              _textField(_addressController, 'Address'),
+                              _textField(
+                                _addressController,
+                                l10n.centerAddress,
+                              ),
                               _textField(
                                 _descriptionController,
-                                'Description',
+                                l10n.webCenterDescription,
                                 maxLines: 3,
                               ),
                               CheckboxListTile(
@@ -204,7 +212,7 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
                                         setState(() =>
                                             _hasDetoxUnit = value ?? false);
                                       },
-                                title: const Text('Has detox unit'),
+                                title: Text(l10n.webCenterHasDetoxUnit),
                               ),
                               if (_error != null) ...[
                                 const SizedBox(height: 10),
@@ -224,7 +232,7 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
                                   onPressed: _isSaving ? null : _save,
                                   child: _isSaving
                                       ? const CircularProgressIndicator()
-                                      : const Text('Next: Media & Gallery'),
+                                      : Text(l10n.webCenterNextMediaGallery),
                                 ),
                               ),
                             ],

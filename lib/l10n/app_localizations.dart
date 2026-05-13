@@ -572,6 +572,90 @@ abstract class AppLocalizations {
   /// **'اطلب المركز عبر الإدارة'**
   String get centerRequestViaAdmin;
 
+  /// No description provided for @webCenterRegistrationPortalTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'بوابة تسجيل المراكز'**
+  String get webCenterRegistrationPortalTitle;
+
+  /// No description provided for @webCenterRegistrationPortalSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنشئ حساب المركز ليتم مراجعته من الإدارة.'**
+  String get webCenterRegistrationPortalSubtitle;
+
+  /// No description provided for @webCenterRegistrationBasicInfoTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل المركز - البيانات الأساسية'**
+  String get webCenterRegistrationBasicInfoTitle;
+
+  /// No description provided for @webCenterGuidanceLibrary.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكتبة الإرشاد'**
+  String get webCenterGuidanceLibrary;
+
+  /// No description provided for @webCenterCenterName.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم المركز'**
+  String get webCenterCenterName;
+
+  /// No description provided for @webCenterCategory.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفئة'**
+  String get webCenterCategory;
+
+  /// No description provided for @webCenterType.
+  ///
+  /// In ar, this message translates to:
+  /// **'نوع المركز'**
+  String get webCenterType;
+
+  /// No description provided for @webCenterConfirmPassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد كلمة المرور'**
+  String get webCenterConfirmPassword;
+
+  /// No description provided for @webCenterNextBasicInfo.
+  ///
+  /// In ar, this message translates to:
+  /// **'التالي: البيانات الأساسية'**
+  String get webCenterNextBasicInfo;
+
+  /// No description provided for @webCenterManagerName.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم المسؤول'**
+  String get webCenterManagerName;
+
+  /// No description provided for @webCenterArea.
+  ///
+  /// In ar, this message translates to:
+  /// **'المنطقة'**
+  String get webCenterArea;
+
+  /// No description provided for @webCenterDescription.
+  ///
+  /// In ar, this message translates to:
+  /// **'الوصف'**
+  String get webCenterDescription;
+
+  /// No description provided for @webCenterHasDetoxUnit.
+  ///
+  /// In ar, this message translates to:
+  /// **'يوجد قسم سحب سموم'**
+  String get webCenterHasDetoxUnit;
+
+  /// No description provided for @webCenterNextMediaGallery.
+  ///
+  /// In ar, this message translates to:
+  /// **'التالي: الصور والمعرض'**
+  String get webCenterNextMediaGallery;
+
   /// No description provided for @bookingRequestTitle.
   ///
   /// In ar, this message translates to:

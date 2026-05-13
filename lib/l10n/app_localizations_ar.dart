@@ -248,6 +248,50 @@ class AppLocalizationsAr extends AppLocalizations {
   String get centerRequestViaAdmin => 'اطلب المركز عبر الإدارة';
 
   @override
+  String get webCenterRegistrationPortalTitle => 'بوابة تسجيل المراكز';
+
+  @override
+  String get webCenterRegistrationPortalSubtitle =>
+      'أنشئ حساب المركز ليتم مراجعته من الإدارة.';
+
+  @override
+  String get webCenterRegistrationBasicInfoTitle =>
+      'تسجيل المركز - البيانات الأساسية';
+
+  @override
+  String get webCenterGuidanceLibrary => 'مكتبة الإرشاد';
+
+  @override
+  String get webCenterCenterName => 'اسم المركز';
+
+  @override
+  String get webCenterCategory => 'الفئة';
+
+  @override
+  String get webCenterType => 'نوع المركز';
+
+  @override
+  String get webCenterConfirmPassword => 'تأكيد كلمة المرور';
+
+  @override
+  String get webCenterNextBasicInfo => 'التالي: البيانات الأساسية';
+
+  @override
+  String get webCenterManagerName => 'اسم المسؤول';
+
+  @override
+  String get webCenterArea => 'المنطقة';
+
+  @override
+  String get webCenterDescription => 'الوصف';
+
+  @override
+  String get webCenterHasDetoxUnit => 'يوجد قسم سحب سموم';
+
+  @override
+  String get webCenterNextMediaGallery => 'التالي: الصور والمعرض';
+
+  @override
   String get bookingRequestTitle => 'طلب حجز';
 
   @override

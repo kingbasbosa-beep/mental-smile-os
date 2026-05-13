@@ -250,6 +250,50 @@ class AppLocalizationsEn extends AppLocalizations {
   String get centerRequestViaAdmin => 'Request this center through admin';
 
   @override
+  String get webCenterRegistrationPortalTitle => 'Center Registration Portal';
+
+  @override
+  String get webCenterRegistrationPortalSubtitle =>
+      'Create your center account for admin review.';
+
+  @override
+  String get webCenterRegistrationBasicInfoTitle =>
+      'Center Registration - Basic Info';
+
+  @override
+  String get webCenterGuidanceLibrary => 'Guidance library';
+
+  @override
+  String get webCenterCenterName => 'Center name';
+
+  @override
+  String get webCenterCategory => 'Category';
+
+  @override
+  String get webCenterType => 'Center type';
+
+  @override
+  String get webCenterConfirmPassword => 'Confirm password';
+
+  @override
+  String get webCenterNextBasicInfo => 'Next: Basic Info';
+
+  @override
+  String get webCenterManagerName => 'Manager name';
+
+  @override
+  String get webCenterArea => 'Area';
+
+  @override
+  String get webCenterDescription => 'Description';
+
+  @override
+  String get webCenterHasDetoxUnit => 'Has detox unit';
+
+  @override
+  String get webCenterNextMediaGallery => 'Next: Media & Gallery';
+
+  @override
   String get bookingRequestTitle => 'Booking request';
 
   @override
