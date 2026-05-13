@@ -992,6 +992,30 @@ abstract class AppLocalizations {
   /// **'طلباتي'**
   String get bookingMyRequestsTitle;
 
+  /// No description provided for @bookingBookSpecialistTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حجز مع أخصائي'**
+  String get bookingBookSpecialistTitle;
+
+  /// No description provided for @bookingNoSpecialistsYet.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يوجد أخصائيون بعد.'**
+  String get bookingNoSpecialistsYet;
+
+  /// No description provided for @bookingTrustedSpecialistHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر أخصائيًا موثوقًا وأرسل طلبك للإدارة.'**
+  String get bookingTrustedSpecialistHint;
+
+  /// No description provided for @bookingDevUiEnabled.
+  ///
+  /// In ar, this message translates to:
+  /// **'واجهة التطوير مفعلة'**
+  String get bookingDevUiEnabled;
+
   /// No description provided for @bookingAdditionalNotes.
   ///
   /// In ar, this message translates to:

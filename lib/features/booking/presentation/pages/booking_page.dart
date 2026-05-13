@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/booking_request_page.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 const bool kDevUi = bool.fromEnvironment('MK_DEV_UI', defaultValue: false);
@@ -152,6 +153,7 @@ class BookingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final lang = Localizations.localeOf(context).languageCode.toLowerCase();
     final isArabic = lang == 'ar';
 
@@ -165,10 +167,10 @@ class BookingPage extends StatelessWidget {
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(isArabic ? 'حجز مع مختص' : 'Book a specialist'),
+          title: Text(l10n.bookingBookSpecialistTitle),
           actions: [
             IconButton(
-              tooltip: isArabic ? 'طلباتي' : 'My requests',
+              tooltip: l10n.bookingMyRequestsTitle,
               icon: const Icon(Icons.list_alt),
               onPressed: () =>
                   Navigator.of(context).pushNamed(Routes.myBookings),
@@ -179,7 +181,7 @@ class BookingPage extends StatelessWidget {
                 icon: const Icon(Icons.developer_mode),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('MK_DEV_UI=true')),
+                    SnackBar(content: Text(l10n.bookingDevUiEnabled)),
                   );
                 },
               ),
@@ -189,7 +191,7 @@ class BookingPage extends StatelessWidget {
           stream: q.snapshots(),
           builder: (context, snap) {
             if (snap.hasError) {
-              return Center(child: Text(isArabic ? 'حدث خطأ' : 'Error'));
+              return Center(child: Text(l10n.authUnexpectedError));
             }
             if (!snap.hasData) {
               return const Center(child: CircularProgressIndicator());
@@ -198,7 +200,7 @@ class BookingPage extends StatelessWidget {
             if (docs.isEmpty) {
               return Center(
                 child: Text(
-                  isArabic ? 'لا يوجد مختصون بعد' : 'No specialists yet.',
+                  l10n.bookingNoSpecialistsYet,
                 ),
               );
             }
@@ -237,26 +239,20 @@ class BookingPage extends StatelessWidget {
                             children: [
                               Text(
                                 name,
-                                textAlign:
-                                    isArabic ? TextAlign.right : TextAlign.left,
+                                textAlign: TextAlign.start,
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               if (spec.isNotEmpty) ...[
                                 const SizedBox(height: 4),
                                 Text(
                                   spec,
-                                  textAlign: isArabic
-                                      ? TextAlign.right
-                                      : TextAlign.left,
+                                  textAlign: TextAlign.start,
                                 ),
                               ],
                               const SizedBox(height: 8),
                               Text(
-                                isArabic
-                                    ? 'اختر مختصًا موثوقًا وأرسل طلبك للإدارة.'
-                                    : 'Choose a trusted specialist and send your request to admin.',
-                                textAlign:
-                                    isArabic ? TextAlign.right : TextAlign.left,
+                                l10n.bookingTrustedSpecialistHint,
+                                textAlign: TextAlign.start,
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ],
@@ -273,7 +269,7 @@ class BookingPage extends StatelessWidget {
                               ),
                             );
                           },
-                          child: Text(isArabic ? 'اطلب موعد' : 'Request'),
+                          child: Text(l10n.bookingSendRequest),
                         ),
                       ],
                     ),

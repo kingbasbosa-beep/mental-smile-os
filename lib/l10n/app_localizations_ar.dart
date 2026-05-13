@@ -467,6 +467,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bookingMyRequestsTitle => 'طلباتي';
 
   @override
+  String get bookingBookSpecialistTitle => 'حجز مع أخصائي';
+
+  @override
+  String get bookingNoSpecialistsYet => 'لا يوجد أخصائيون بعد.';
+
+  @override
+  String get bookingTrustedSpecialistHint =>
+      'اختر أخصائيًا موثوقًا وأرسل طلبك للإدارة.';
+
+  @override
+  String get bookingDevUiEnabled => 'واجهة التطوير مفعلة';
+
+  @override
   String get bookingAdditionalNotes => 'ملاحظات إضافية';
 
   @override

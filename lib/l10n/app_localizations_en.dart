@@ -473,6 +473,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookingMyRequestsTitle => 'My requests';
 
   @override
+  String get bookingBookSpecialistTitle => 'Book a specialist';
+
+  @override
+  String get bookingNoSpecialistsYet => 'No specialists yet.';
+
+  @override
+  String get bookingTrustedSpecialistHint =>
+      'Choose a trusted specialist and send your request to admin.';
+
+  @override
+  String get bookingDevUiEnabled => 'Developer UI is enabled';
+
+  @override
   String get bookingAdditionalNotes => 'Additional notes';
 
   @override
