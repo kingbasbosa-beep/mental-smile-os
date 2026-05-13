@@ -98,88 +98,88 @@ abstract class AppLocalizations {
     Locale('en')
   ];
 
-  /// Application title
+  /// عنوان التطبيق
   ///
-  /// In en, this message translates to:
-  /// **'Mental Key'**
+  /// In ar, this message translates to:
+  /// **'مينتال كي'**
   String get appTitle;
 
   /// No description provided for @homeTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Home'**
+  /// In ar, this message translates to:
+  /// **'الرئيسية'**
   String get homeTitle;
 
   /// No description provided for @changeLanguage.
   ///
-  /// In en, this message translates to:
-  /// **'Change language'**
+  /// In ar, this message translates to:
+  /// **'تغيير اللغة'**
   String get changeLanguage;
 
   /// No description provided for @localeLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Locale: {code} (tap or 🌐)'**
+  /// In ar, this message translates to:
+  /// **'اللغة: {code} (اضغط أو 🌐)'**
   String localeLabel(String code);
 
   /// No description provided for @splashTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Splash'**
+  /// In ar, this message translates to:
+  /// **'شاشة البداية'**
   String get splashTitle;
 
   /// No description provided for @routeNotFound.
   ///
-  /// In en, this message translates to:
-  /// **'Route not found'**
+  /// In ar, this message translates to:
+  /// **'المسار غير موجود'**
   String get routeNotFound;
 
   /// No description provided for @moduleSpecialists.
   ///
-  /// In en, this message translates to:
-  /// **'Specialists'**
+  /// In ar, this message translates to:
+  /// **'المختصون'**
   String get moduleSpecialists;
 
   /// No description provided for @moduleLearningLibrary.
   ///
-  /// In en, this message translates to:
-  /// **'Learning Library'**
+  /// In ar, this message translates to:
+  /// **'مكتبة المعرفة'**
   String get moduleLearningLibrary;
 
   /// No description provided for @moduleAddictionSupport.
   ///
-  /// In en, this message translates to:
-  /// **'Addiction Support'**
+  /// In ar, this message translates to:
+  /// **'دعم الإدمان'**
   String get moduleAddictionSupport;
 
   /// No description provided for @moduleCenters.
   ///
-  /// In en, this message translates to:
-  /// **'Centers'**
+  /// In ar, this message translates to:
+  /// **'المراكز'**
   String get moduleCenters;
 
   /// No description provided for @moduleSpecialNeedsFamilies.
   ///
-  /// In en, this message translates to:
-  /// **'Special Needs Families'**
+  /// In ar, this message translates to:
+  /// **'أسر ذوي الاحتياجات الخاصة'**
   String get moduleSpecialNeedsFamilies;
 
   /// No description provided for @moduleFamilyStress.
   ///
-  /// In en, this message translates to:
-  /// **'Family Stress'**
+  /// In ar, this message translates to:
+  /// **'ضغط الأسرة'**
   String get moduleFamilyStress;
 
   /// No description provided for @comingSoon.
   ///
-  /// In en, this message translates to:
-  /// **'{title} — Coming soon'**
+  /// In ar, this message translates to:
+  /// **'{title} — قريبًا'**
   String comingSoon(String title);
 
   /// No description provided for @modulePlaceholderBody.
   ///
-  /// In en, this message translates to:
-  /// **'Content coming soon.'**
+  /// In ar, this message translates to:
+  /// **'المحتوى قريبًا.'**
   String get modulePlaceholderBody;
 }
 

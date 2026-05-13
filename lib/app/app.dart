@@ -11,15 +11,12 @@ class MentalKeyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final Locale effectiveLocale =
-        ref.watch(localeProvider) ?? const Locale('ar');
+    final selectedLocale = ref.watch(localeProvider);
+    final effectiveLocale = selectedLocale ?? const Locale('ar');
 
     return MaterialApp(
       locale: effectiveLocale,
-      supportedLocales: const [
-        Locale('en'),
-        Locale('ar'),
-      ],
+      supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

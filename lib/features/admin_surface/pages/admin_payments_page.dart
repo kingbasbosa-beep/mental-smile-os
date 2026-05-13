@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/core/ui/value_label_mapper.dart';
@@ -66,8 +66,8 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
           content: Text(
             _isArabic(context)
                 ? (result.isCenterRequest
-                    ? 'ØªÙ… Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ø³Ø¯Ø§Ø¯ ÙˆØªØ­ÙˆÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨ Ø¥Ù„Ù‰ Ø¥Ù‚Ø§Ù…Ø© Ù…Ø¨Ø¯Ø¦ÙŠØ© Ù…Ø¬Ø¯ÙˆÙ„Ø©'
-                    : 'ØªÙ… Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ø³Ø¯Ø§Ø¯ ÙˆØªØ­ÙˆÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨ Ø¥Ù„Ù‰ Ù‚Ø³Ù… Ø§Ù„Ø¬Ù„Ø³Ø§Øª')
+                    ? 'تم اعتماد السداد وتحويل الطلب إلى إقامة مبدئية مجدولة'
+                    : 'تم اعتماد السداد وتحويل الطلب إلى قسم الجلسات')
                 : (result.isCenterRequest
                     ? 'Payment signal confirmed; next step updated to preliminary residency scheduled'
                     : 'Payment signal confirmed; next step updated to sessions setup'),
@@ -89,7 +89,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'ØªÙ… Ø±ÙØ¶ Ø¥Ø«Ø¨Ø§Øª Ø§Ù„Ø³Ø¯Ø§Ø¯ ÙˆØ¥Ø±Ø¬Ø§Ø¹ Ø§Ù„Ø·Ù„Ø¨ Ù„Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø¯ÙØ¹'
+                ? 'تم رفض إثبات السداد وإرجاع الطلب لانتظار الدفع'
                 : 'Payment issue flagged and returned to awaiting payment',
           ),
         ),
@@ -109,7 +109,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'ØªÙ… ØªØ³Ø¬ÙŠÙ„ ØªØ­ÙˆÙŠÙ„ Ù…Ø³ØªØ­Ù‚ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ ÙˆØ¥ØºÙ„Ø§Ù‚ Ø§Ù„Ø¹Ù…Ù„ÙŠØ© Ø¨Ù†Ø¬Ø§Ø­'
+                ? 'تم تسجيل تحويل مستحق الأخصائي وإغلاق العملية بنجاح'
                 : 'Clinician payout confirmed and flow completed successfully',
           ),
         ),
@@ -151,7 +151,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
         textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
         child: AlertDialog(
           title: Text(
-            isArabic ? 'Ù…Ø±Ø§Ø¬Ø¹Ø© Ù…Ø­Ø§Ø³Ø¨ÙŠØ©' : 'Accounting review',
+            isArabic ? 'مراجعة محاسبية' : 'Accounting review',
           ),
           content: SizedBox(
             width: 420,
@@ -164,7 +164,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                       const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
                     labelText: isArabic
-                        ? 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø¯ÙÙˆØ¹ Ù…Ù† Ø§Ù„Ø¹Ù…ÙŠÙ„'
+                        ? 'إجمالي المدفوع من العميل'
                         : 'Gross client-paid amount',
                     border: const OutlineInputBorder(),
                   ),
@@ -175,7 +175,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
-                    labelText: isArabic ? 'Ù†Ø³Ø¨Ø© Ø§Ù„Ø¹Ù…ÙˆÙ„Ø©' : 'Commission percent',
+                    labelText: isArabic ? 'نسبة العمولة' : 'Commission percent',
                     border: const OutlineInputBorder(),
                   ),
                 ),
@@ -185,7 +185,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                   maxLines: 3,
                   decoration: InputDecoration(
                     labelText:
-                        isArabic ? 'Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ù…Ø­Ø§Ø³Ø¨ÙŠØ©' : 'Accounting notes',
+                        isArabic ? 'ملاحظات محاسبية' : 'Accounting notes',
                     border: const OutlineInputBorder(),
                   ),
                 ),
@@ -195,11 +195,11 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(isArabic ? 'Ø¥Ù„ØºØ§Ø¡' : 'Cancel'),
+              child: Text(isArabic ? 'إلغاء' : 'Cancel'),
             ),
             FilledButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: Text(isArabic ? 'Ø§Ø¹ØªÙ…Ø§Ø¯' : 'Confirm'),
+              child: Text(isArabic ? 'اعتماد' : 'Confirm'),
             ),
           ],
         ),
@@ -257,7 +257,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨ Ø¥Ù„Ù‰ Ø£Ø±Ø´ÙŠÙ Ø§Ù„Ø¬Ù„Ø³Ø§Øª'
+                ? 'تم إرسال الطلب إلى أرشيف الجلسات'
                 : 'Request sent to sessions archive',
           ),
         ),
@@ -277,7 +277,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨ Ø¥Ù„Ù‰ Ø£Ø±Ø´ÙŠÙ Ø§Ù„Ù…Ø¯ÙÙˆØ¹Ø§Øª'
+                ? 'تم إرسال الطلب إلى أرشيف المدفوعات'
                 : 'Request sent to payments archive',
           ),
         ),

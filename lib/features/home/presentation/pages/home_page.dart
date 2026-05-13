@@ -39,7 +39,7 @@ class HomePage extends StatelessWidget {
     final hasUser = FirebaseAuth.instance.currentUser != null;
 
     final description = isArabic
-        ? 'Ø§Ø¨Ø¯Ø£ Ø±Ø­Ù„ØªÙƒ Ù†Ø­Ùˆ Ø§Ù„ØªØ¹Ø§ÙÙŠ'
+        ? 'ابدأ رحلتك نحو التعافي'
         : 'Start your healing journey';
 
     return Directionality(
@@ -107,7 +107,7 @@ class HomePage extends StatelessWidget {
                                           ),
                                           label: Text(
                                             isArabic
-                                                ? 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„'
+                                                ? 'تسجيل الدخول'
                                                 : 'Login',
                                           ),
                                         ),
@@ -130,7 +130,7 @@ class HomePage extends StatelessWidget {
                                           },
                                         ),
                                         label: Text(
-                                            isArabic ? 'Ø±Ø¬ÙˆØ¹' : 'Back'),
+                                            isArabic ? 'رجوع' : 'Back'),
                                       ),
                                     ],
                                   ),
@@ -173,7 +173,7 @@ class HomePage extends StatelessWidget {
                                     const SizedBox(height: AppSpacing.sm),
                                     Text(
                                       isArabic
-                                          ? 'ÙˆØ§Ø¬Ù‡Ø© Ù‡Ø§Ø¯Ø¦Ø© ÙˆÙˆØ§Ø¶Ø­Ø© ØªØ³Ø§Ø¹Ø¯Ùƒ Ø¹Ù„Ù‰ Ø§Ù„ÙˆØµÙˆÙ„ Ø§Ù„Ø³Ø±ÙŠØ¹ Ù„Ù„Ø¯Ø¹Ù… ÙˆØ§Ù„Ù…Ø³Ø§Ø±Ø§Øª Ø§Ù„Ù…Ù†Ø§Ø³Ø¨Ø©.'
+                                          ? 'واجهة هادئة وواضحة تساعدك على الوصول السريع للدعم والمسارات المناسبة.'
                                           : 'A calm, clear entry point to support, guidance, and the right care path.',
                                       textAlign: TextAlign.center,
                                       style: Theme.of(context)
@@ -200,7 +200,7 @@ class HomePage extends StatelessWidget {
                                           icon: const Icon(Icons.apps_rounded),
                                           label: Text(
                                             isArabic
-                                                ? 'Ø§Ø¨Ø¯Ø£ Ø§Ù„Ø¢Ù†'
+                                                ? 'ابدأ الآن'
                                                 : 'Start now',
                                           ),
                                         ),
