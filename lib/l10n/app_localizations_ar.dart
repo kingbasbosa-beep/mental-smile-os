@@ -405,6 +405,36 @@ class AppLocalizationsAr extends AppLocalizations {
   String get webClinicianNextSessions => 'التالي: الجلسات';
 
   @override
+  String get webClinicianSessionsTitle => 'تسجيل الأخصائي - الجلسات';
+
+  @override
+  String get webClinicianSessionPrice => 'سعر الجلسة';
+
+  @override
+  String get webClinicianSessionDuration => 'مدة الجلسة';
+
+  @override
+  String get webClinicianOnlineSessions => 'جلسات أونلاين';
+
+  @override
+  String get webClinicianInPersonSessions => 'جلسات حضورية';
+
+  @override
+  String get webClinicianGroupSessions => 'يقدم جلسات جماعية';
+
+  @override
+  String get webClinicianDocumentsTitle => 'تسجيل الأخصائي - المستندات';
+
+  @override
+  String get webClinicianIdentityFileName => 'اسم ملف الهوية';
+
+  @override
+  String get webClinicianCertificateFileName => 'اسم ملف الشهادة';
+
+  @override
+  String get webClinicianExtraFileNameOptional => 'اسم ملف إضافي (اختياري)';
+
+  @override
   String get bookingRequestTitle => 'طلب حجز';
 
   @override

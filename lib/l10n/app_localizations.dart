@@ -872,6 +872,66 @@ abstract class AppLocalizations {
   /// **'التالي: الجلسات'**
   String get webClinicianNextSessions;
 
+  /// No description provided for @webClinicianSessionsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الأخصائي - الجلسات'**
+  String get webClinicianSessionsTitle;
+
+  /// No description provided for @webClinicianSessionPrice.
+  ///
+  /// In ar, this message translates to:
+  /// **'سعر الجلسة'**
+  String get webClinicianSessionPrice;
+
+  /// No description provided for @webClinicianSessionDuration.
+  ///
+  /// In ar, this message translates to:
+  /// **'مدة الجلسة'**
+  String get webClinicianSessionDuration;
+
+  /// No description provided for @webClinicianOnlineSessions.
+  ///
+  /// In ar, this message translates to:
+  /// **'جلسات أونلاين'**
+  String get webClinicianOnlineSessions;
+
+  /// No description provided for @webClinicianInPersonSessions.
+  ///
+  /// In ar, this message translates to:
+  /// **'جلسات حضورية'**
+  String get webClinicianInPersonSessions;
+
+  /// No description provided for @webClinicianGroupSessions.
+  ///
+  /// In ar, this message translates to:
+  /// **'يقدم جلسات جماعية'**
+  String get webClinicianGroupSessions;
+
+  /// No description provided for @webClinicianDocumentsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الأخصائي - المستندات'**
+  String get webClinicianDocumentsTitle;
+
+  /// No description provided for @webClinicianIdentityFileName.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم ملف الهوية'**
+  String get webClinicianIdentityFileName;
+
+  /// No description provided for @webClinicianCertificateFileName.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم ملف الشهادة'**
+  String get webClinicianCertificateFileName;
+
+  /// No description provided for @webClinicianExtraFileNameOptional.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم ملف إضافي (اختياري)'**
+  String get webClinicianExtraFileNameOptional;
+
   /// No description provided for @bookingRequestTitle.
   ///
   /// In ar, this message translates to:

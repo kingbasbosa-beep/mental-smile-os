@@ -409,6 +409,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webClinicianNextSessions => 'Next: Sessions';
 
   @override
+  String get webClinicianSessionsTitle => 'Clinician Registration - Sessions';
+
+  @override
+  String get webClinicianSessionPrice => 'Session price';
+
+  @override
+  String get webClinicianSessionDuration => 'Session duration';
+
+  @override
+  String get webClinicianOnlineSessions => 'Online sessions';
+
+  @override
+  String get webClinicianInPersonSessions => 'In-person sessions';
+
+  @override
+  String get webClinicianGroupSessions => 'Offers group sessions';
+
+  @override
+  String get webClinicianDocumentsTitle => 'Clinician Registration - Documents';
+
+  @override
+  String get webClinicianIdentityFileName => 'Identity file name';
+
+  @override
+  String get webClinicianCertificateFileName => 'Certificate file name';
+
+  @override
+  String get webClinicianExtraFileNameOptional => 'Extra file name (optional)';
+
+  @override
   String get bookingRequestTitle => 'Booking request';
 
   @override

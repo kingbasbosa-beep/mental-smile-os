@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 
 class WebClinicianSessionsPage extends StatefulWidget {
   const WebClinicianSessionsPage({super.key});
@@ -90,6 +91,8 @@ class _WebClinicianSessionsPageState extends State<WebClinicianSessionsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: webRegistrationCompactFormTheme(
@@ -136,8 +139,8 @@ class _WebClinicianSessionsPageState extends State<WebClinicianSessionsPage> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text(
-                                'Clinician Registration - Sessions',
+                              Text(
+                                l10n.webClinicianSessionsTitle,
                                 style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w700,
@@ -151,7 +154,7 @@ class _WebClinicianSessionsPageState extends State<WebClinicianSessionsPage> {
                                 ),
                                 icon: const Icon(Icons.menu_book_outlined,
                                     size: 16),
-                                label: const Text('مكتبة الإرشاد'),
+                                label: Text(l10n.webCenterGuidanceLibrary),
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: webRegistrationTextTurquoise,
                                   side: BorderSide(
@@ -176,11 +179,13 @@ class _WebClinicianSessionsPageState extends State<WebClinicianSessionsPage> {
                               ),
                               const SizedBox(height: 16),
                               _textField(
-                                  _sessionPriceController, 'Session price'),
+                                _sessionPriceController,
+                                l10n.webClinicianSessionPrice,
+                              ),
                               const SizedBox(height: 10),
                               _textField(
                                 _sessionDurationController,
-                                'Session duration',
+                                l10n.webClinicianSessionDuration,
                               ),
                               const SizedBox(height: 10),
                               CheckboxListTile(
@@ -191,7 +196,7 @@ class _WebClinicianSessionsPageState extends State<WebClinicianSessionsPage> {
                                         setState(() =>
                                             _offersOnline = value ?? false);
                                       },
-                                title: const Text('Online sessions'),
+                                title: Text(l10n.webClinicianOnlineSessions),
                                 controlAffinity:
                                     ListTileControlAffinity.leading,
                               ),
@@ -205,7 +210,7 @@ class _WebClinicianSessionsPageState extends State<WebClinicianSessionsPage> {
                                               _offersInPerson = value ?? false,
                                         );
                                       },
-                                title: const Text('In-person sessions'),
+                                title: Text(l10n.webClinicianInPersonSessions),
                                 controlAffinity:
                                     ListTileControlAffinity.leading,
                               ),
@@ -219,7 +224,7 @@ class _WebClinicianSessionsPageState extends State<WebClinicianSessionsPage> {
                                               value ?? false,
                                         );
                                       },
-                                title: const Text('Offers group sessions'),
+                                title: Text(l10n.webClinicianGroupSessions),
                                 controlAffinity:
                                     ListTileControlAffinity.leading,
                               ),
@@ -242,7 +247,7 @@ class _WebClinicianSessionsPageState extends State<WebClinicianSessionsPage> {
                                       _isSaving || _uid == null ? null : _save,
                                   child: _isSaving
                                       ? const CircularProgressIndicator()
-                                      : const Text('Next: Documents'),
+                                      : Text(l10n.webCenterNextDocuments),
                                 ),
                               ),
                             ],
