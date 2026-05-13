@@ -7,9 +7,14 @@ import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 /// C6 Library UI.
 class LibraryPage extends StatefulWidget {
-  const LibraryPage({super.key, this.initialCategoryKey});
+  const LibraryPage({
+    super.key,
+    this.initialCategoryKey,
+    this.returnRoute = Routes.menu,
+  });
 
   final String? initialCategoryKey;
+  final String returnRoute;
 
   @override
   State<LibraryPage> createState() => _LibraryPageState();
@@ -238,6 +243,7 @@ class _LibraryPageState extends State<LibraryPage> {
                           child: _LibraryBackButton(
                             compact: isMobile,
                             returnToLibraryHome: showingCategory,
+                            returnRoute: widget.returnRoute,
                           ),
                         ),
                       ),
@@ -301,10 +307,12 @@ class _LibraryBackButton extends StatefulWidget {
   const _LibraryBackButton({
     required this.compact,
     required this.returnToLibraryHome,
+    required this.returnRoute,
   });
 
   final bool compact;
   final bool returnToLibraryHome;
+  final String returnRoute;
 
   @override
   State<_LibraryBackButton> createState() => _LibraryBackButtonState();
@@ -327,9 +335,14 @@ class _LibraryBackButtonState extends State<_LibraryBackButton> {
         child: InkWell(
           customBorder: const CircleBorder(),
           onTap: () {
-            Navigator.of(context).pushNamed(
-              widget.returnToLibraryHome ? Routes.library : Routes.menu,
-            );
+            if (widget.returnToLibraryHome) {
+              Navigator.of(context).pushReplacementNamed(
+                Routes.library,
+                arguments: {'returnRoute': widget.returnRoute},
+              );
+            } else {
+              Navigator.of(context).pushNamed(widget.returnRoute);
+            }
           },
           child: Container(
             width: size,
@@ -350,10 +363,20 @@ class _LibraryBackButtonState extends State<_LibraryBackButton> {
                 ),
               ],
             ),
-            child: Icon(
-              Icons.arrow_back_rounded,
-              color: const Color(0xFFFFE7B2),
-              size: widget.compact ? 22 : 26,
+            child: Image.asset(
+              Directionality.of(context) == TextDirection.rtl
+                  ? 'assets/branding/navigation/back/back_right_gold.png'
+                  : 'assets/branding/navigation/back/back_left_gold.png',
+              width: widget.compact ? 22 : 26,
+              height: widget.compact ? 22 : 26,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(
+                  Icons.arrow_back_rounded,
+                  color: const Color(0xFFFFE7B2),
+                  size: widget.compact ? 22 : 26,
+                );
+              },
             ),
           ),
         ),

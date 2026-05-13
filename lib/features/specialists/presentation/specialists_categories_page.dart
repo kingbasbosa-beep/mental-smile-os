@@ -6,7 +6,12 @@ import 'package:flutterprojects/features/specialists/data/clinician_specialty_ca
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 
 class SpecialistsCategoriesPage extends StatefulWidget {
-  const SpecialistsCategoriesPage({super.key});
+  const SpecialistsCategoriesPage({
+    super.key,
+    this.returnRoute = Routes.menu,
+  });
+
+  final String returnRoute;
 
   @override
   State<SpecialistsCategoriesPage> createState() =>
@@ -91,6 +96,8 @@ class _SpecialistsCategoriesPageState extends State<SpecialistsCategoriesPage> {
         arguments: {
           'category': category.key,
           'title': category.label(isArabic),
+          'returnRoute': Routes.specialists,
+          'parentReturnRoute': widget.returnRoute,
         },
       );
     }).toList();
@@ -181,7 +188,10 @@ class _SpecialistsCategoriesPageState extends State<SpecialistsCategoriesPage> {
                         start: isMobile ? 14 : 22,
                         top: isMobile ? 12 : 18,
                       ),
-                      child: _BackToMenuButton(compact: isMobile),
+                      child: _BackToMenuButton(
+                        compact: isMobile,
+                        returnRoute: widget.returnRoute,
+                      ),
                     ),
                   ),
                 ),
@@ -257,9 +267,13 @@ class _SpecialistsCategoriesPageState extends State<SpecialistsCategoriesPage> {
 }
 
 class _BackToMenuButton extends StatefulWidget {
-  const _BackToMenuButton({required this.compact});
+  const _BackToMenuButton({
+    required this.compact,
+    required this.returnRoute,
+  });
 
   final bool compact;
+  final String returnRoute;
 
   @override
   State<_BackToMenuButton> createState() => _BackToMenuButtonState();
@@ -281,7 +295,7 @@ class _BackToMenuButtonState extends State<_BackToMenuButton> {
         curve: Curves.easeOutCubic,
         child: InkWell(
           customBorder: const CircleBorder(),
-          onTap: () => Navigator.of(context).pushNamed(Routes.menu),
+          onTap: () => Navigator.of(context).pushNamed(widget.returnRoute),
           child: Container(
             width: size,
             height: size,
@@ -301,10 +315,20 @@ class _BackToMenuButtonState extends State<_BackToMenuButton> {
                 ),
               ],
             ),
-            child: Icon(
-              Icons.arrow_back_rounded,
-              color: const Color(0xFFFFE7B2),
-              size: widget.compact ? 22 : 26,
+            child: Image.asset(
+              Directionality.of(context) == TextDirection.rtl
+                  ? 'assets/branding/navigation/back/back_right_gold.png'
+                  : 'assets/branding/navigation/back/back_left_gold.png',
+              width: widget.compact ? 22 : 26,
+              height: widget.compact ? 22 : 26,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(
+                  Icons.arrow_back_rounded,
+                  color: const Color(0xFFFFE7B2),
+                  size: widget.compact ? 22 : 26,
+                );
+              },
             ),
           ),
         ),

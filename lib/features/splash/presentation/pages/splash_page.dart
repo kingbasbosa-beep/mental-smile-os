@@ -1,7 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterprojects/app/locale_provider.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/core/storage/locale_storage.dart';
 
-class SplashPage extends StatelessWidget {
+class SplashPage extends ConsumerWidget {
   const SplashPage({super.key});
 
   String _backgroundAsset(BuildContext context) {
@@ -18,9 +21,16 @@ class SplashPage extends StatelessWidget {
     return 'assets/branding/splash/splash_web_v1.jpg';
   }
 
+  Future<void> _setEnglish(WidgetRef ref) async {
+    await LocaleStorage().write('en');
+    ref.read(localeProvider.notifier).state = const Locale('en');
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final bg = _backgroundAsset(context);
+    final languageIconSize =
+        MediaQuery.sizeOf(context).width < 700 ? 46.0 : 60.0;
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -38,53 +48,44 @@ class SplashPage extends StatelessWidget {
                 color: Colors.black.withValues(alpha: 0.25),
               ),
             ),
-
             Positioned(
               top: 20,
-              left: 20,
+              right: 96,
               child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pushNamed(Routes.language);
-                },
+                onTap: () => _setEnglish(ref),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFE8A3).withValues(alpha: 0.88),
-                    borderRadius: BorderRadius.circular(30),
+                    color: Colors.black.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(999),
                     border: Border.all(
-                      color: const Color(0xFFFFF4C2),
-                      width: 1.2,
+                      color: const Color(0xFFFFE8A3).withValues(alpha: 0.22),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFD4AF37).withValues(alpha: 0.35),
-                        blurRadius: 14,
-                        spreadRadius: 1,
+                        color: Colors.black.withValues(alpha: 0.22),
+                        blurRadius: 12,
                       ),
                     ],
                   ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'اللغة',
+                  child: Image.asset(
+                    'assets/branding/language/en_gold.png',
+                    width: languageIconSize,
+                    height: languageIconSize,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Text(
+                        'EN',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF5B3A0E),
+                          color: Color(0xFFFFE8A3),
                         ),
-                      ),
-                      SizedBox(width: 6),
-                      Icon(
-                        Icons.language,
-                        size: 18,
-                        color: Color(0xFF5B3A0E),
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
               ),
             ),
-
             Align(
               alignment: Alignment.centerRight,
               child: Padding(
@@ -94,7 +95,8 @@ class SplashPage extends StatelessWidget {
                     Navigator.of(context).pushReplacementNamed(Routes.login);
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 22, vertical: 14),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(999),
                       gradient: const LinearGradient(
@@ -112,16 +114,17 @@ class SplashPage extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFD4AF37).withValues(alpha: 0.65),
+                          color:
+                              const Color(0xFFD4AF37).withValues(alpha: 0.65),
                           blurRadius: 24,
                           spreadRadius: 3,
                         ),
                       ],
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
+                        const Text(
                           'ابدأ الرحلة',
                           style: TextStyle(
                             fontSize: 18,
@@ -137,18 +140,11 @@ class SplashPage extends StatelessWidget {
                             ],
                           ),
                         ),
-                        SizedBox(width: 10),
-                        Icon(
+                        const SizedBox(width: 10),
+                        const Icon(
                           Icons.arrow_back_rounded,
                           color: Color(0xFFFFF4C2),
                           size: 28,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black54,
-                              blurRadius: 6,
-                              offset: Offset(0, 1),
-                            ),
-                          ],
                         ),
                       ],
                     ),

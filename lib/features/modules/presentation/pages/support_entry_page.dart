@@ -29,6 +29,7 @@ class SupportEntryPage extends StatelessWidget {
             analyticsPath: 'specialist',
             arguments: {
               'category': 'addiction',
+              'returnRoute': Routes.addiction,
               'title': 'علاج السلوكيات الإدمانية',
             },
           ),
@@ -42,6 +43,7 @@ class SupportEntryPage extends StatelessWidget {
             icon: Icons.apartment_outlined,
             route: Routes.centers,
             analyticsPath: 'center',
+            arguments: {'returnRoute': Routes.addiction},
           ),
           _SupportPathCard(
             titleAr: 'مواد مفيدة',
@@ -52,6 +54,7 @@ class SupportEntryPage extends StatelessWidget {
             icon: Icons.auto_stories_outlined,
             route: Routes.library,
             analyticsPath: 'library',
+            arguments: {'returnRoute': Routes.addiction},
           ),
           _SupportPathCard(
             titleAr: 'تحدث مع الدعم عند الحاجة',
@@ -86,6 +89,7 @@ class SupportEntryPage extends StatelessWidget {
             icon: Icons.psychology_alt_outlined,
             route: Routes.specialists,
             analyticsPath: 'specialist',
+            arguments: {'returnRoute': Routes.specialNeeds},
           ),
           _SupportPathCard(
             titleAr: 'استكشف المراكز',
@@ -97,6 +101,7 @@ class SupportEntryPage extends StatelessWidget {
             icon: Icons.local_hospital_outlined,
             route: Routes.centers,
             analyticsPath: 'center',
+            arguments: {'returnRoute': Routes.specialNeeds},
           ),
           _SupportPathCard(
             titleAr: 'مواد مفيدة',
@@ -107,6 +112,7 @@ class SupportEntryPage extends StatelessWidget {
             icon: Icons.menu_book_outlined,
             route: Routes.library,
             analyticsPath: 'library',
+            arguments: {'returnRoute': Routes.specialNeeds},
           ),
           _SupportPathCard(
             titleAr: 'تحدث مع الدعم عند الحاجة',
@@ -552,10 +558,20 @@ class _BackToMenuButtonState extends State<_BackToMenuButton> {
                 ),
               ],
             ),
-            child: Icon(
-              Icons.arrow_back_rounded,
-              color: const Color(0xFFFFE7B2),
-              size: widget.compact ? 22 : 26,
+            child: Image.asset(
+              Directionality.of(context) == TextDirection.rtl
+                  ? 'assets/branding/navigation/back/back_right_gold.png'
+                  : 'assets/branding/navigation/back/back_left_gold.png',
+              width: widget.compact ? 22 : 26,
+              height: widget.compact ? 22 : 26,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(
+                  Icons.arrow_back_rounded,
+                  color: const Color(0xFFFFE7B2),
+                  size: widget.compact ? 22 : 26,
+                );
+              },
             ),
           ),
         ),

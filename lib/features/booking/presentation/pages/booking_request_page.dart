@@ -26,6 +26,52 @@ class BookingRequestPage extends StatefulWidget {
   State<BookingRequestPage> createState() => _BookingRequestPageState();
 }
 
+class _GoldBackIcon extends StatelessWidget {
+  const _GoldBackIcon({required this.compact});
+
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = compact ? 44.0 : 52.0;
+    final iconSize = compact ? 22.0 : 26.0;
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: const Color(0xFF1B1007).withValues(alpha: 0.50),
+        border: Border.all(
+          color: const Color(0xFFFFD98A).withValues(alpha: 0.56),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE7A94C).withValues(alpha: 0.16),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Image.asset(
+        Directionality.of(context) == TextDirection.rtl
+            ? 'assets/branding/navigation/back/back_right_gold.png'
+            : 'assets/branding/navigation/back/back_left_gold.png',
+        width: iconSize,
+        height: iconSize,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return Icon(
+            Icons.arrow_back_rounded,
+            color: const Color(0xFFFFE7B2),
+            size: iconSize,
+          );
+        },
+      ),
+    );
+  }
+}
+
 class _BookingRequestPageState extends State<BookingRequestPage> {
   final BookingLegacyChatAdapter _bookingChatAdapter =
       BookingLegacyChatAdapter();
@@ -303,6 +349,10 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
           backgroundColor: Colors.black.withValues(alpha: 0.30),
           foregroundColor: const Color(0xFFFFE7B2),
           elevation: 0,
+          leading: IconButton(
+            onPressed: () => Navigator.of(context).maybePop(),
+            icon: const _GoldBackIcon(compact: true),
+          ),
           title: Text(_isArabic ? 'طلب حجز' : 'Booking request'),
         ),
         body: LayoutBuilder(

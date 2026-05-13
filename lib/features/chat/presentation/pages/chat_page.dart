@@ -2,12 +2,59 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/gateways/role_access_gateway.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 import 'package:flutterprojects/features/chat/controller/chat_controller.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_message_model.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
+
+class _GoldBackIcon extends StatelessWidget {
+  const _GoldBackIcon({required this.compact});
+
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = compact ? 44.0 : 52.0;
+    final iconSize = compact ? 22.0 : 26.0;
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: const Color(0xFF1B1007).withValues(alpha: 0.50),
+        border: Border.all(
+          color: const Color(0xFFFFD98A).withValues(alpha: 0.56),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE7A94C).withValues(alpha: 0.16),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Image.asset(
+        Directionality.of(context) == TextDirection.rtl
+            ? 'assets/branding/navigation/back/back_right_gold.png'
+            : 'assets/branding/navigation/back/back_left_gold.png',
+        width: iconSize,
+        height: iconSize,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return Icon(
+            Icons.arrow_back_rounded,
+            color: const Color(0xFFFFE7B2),
+            size: iconSize,
+          );
+        },
+      ),
+    );
+  }
+}
 
 class ChatPage extends StatefulWidget {
   const ChatPage({
@@ -825,6 +872,16 @@ class _ChatPageState extends State<ChatPage> {
           elevation: 0,
           foregroundColor: const Color(0xFFFFE8A6),
           surfaceTintColor: Colors.transparent,
+          leading: IconButton(
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).maybePop();
+              } else {
+                Navigator.of(context).pushNamed(Routes.menu);
+              }
+            },
+            icon: const _GoldBackIcon(compact: true),
+          ),
           title: Text(isArabic ? 'شات Mental Smile' : 'Mental Smile Chat'),
           actions: [
             if (!widget.adminSupportMode)

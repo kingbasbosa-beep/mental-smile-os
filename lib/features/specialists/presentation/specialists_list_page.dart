@@ -21,6 +21,17 @@ class SpecialistsListPage extends StatelessWidget {
     return (args['category'] ?? '').toString().trim();
   }
 
+  String _returnRoute() {
+    final route = (args['returnRoute'] ?? '').toString().trim();
+    return route.isEmpty ? Routes.specialists : route;
+  }
+
+  Map<String, dynamic>? _returnArguments() {
+    final parentReturnRoute = (args['parentReturnRoute'] ?? '').toString().trim();
+    if (parentReturnRoute.isEmpty) return null;
+    return {'returnRoute': parentReturnRoute};
+  }
+
   String _title(BuildContext context) {
     final isArabic = _isArabic(context);
     final fromArgs = (args['title'] ?? '').toString().trim();
@@ -462,6 +473,8 @@ class SpecialistsListPage extends StatelessWidget {
                       ),
                       child: _BackToMenuButton(
                         compact: pageConstraints.maxWidth < 700,
+                        returnRoute: _returnRoute(),
+                        returnArguments: _returnArguments(),
                       ),
                     ),
                   ),
@@ -494,9 +507,15 @@ class SpecialistsListPage extends StatelessWidget {
 }
 
 class _BackToMenuButton extends StatelessWidget {
-  const _BackToMenuButton({required this.compact});
+  const _BackToMenuButton({
+    required this.compact,
+    required this.returnRoute,
+    required this.returnArguments,
+  });
 
   final bool compact;
+  final String returnRoute;
+  final Map<String, dynamic>? returnArguments;
 
   @override
   Widget build(BuildContext context) {
@@ -506,7 +525,10 @@ class _BackToMenuButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         customBorder: const CircleBorder(),
-        onTap: () => Navigator.of(context).pushNamed(Routes.menu),
+        onTap: () => Navigator.of(context).pushNamed(
+          returnRoute,
+          arguments: returnArguments,
+        ),
         child: Container(
           width: size,
           height: size,
@@ -524,10 +546,20 @@ class _BackToMenuButton extends StatelessWidget {
               ),
             ],
           ),
-          child: Icon(
-            Icons.arrow_back_rounded,
-            color: const Color(0xFFFFE7B2),
-            size: compact ? 22 : 26,
+          child: Image.asset(
+            Directionality.of(context) == TextDirection.rtl
+                ? 'assets/branding/navigation/back/back_right_gold.png'
+                : 'assets/branding/navigation/back/back_left_gold.png',
+            width: compact ? 22 : 26,
+            height: compact ? 22 : 26,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return Icon(
+                Icons.arrow_back_rounded,
+                color: const Color(0xFFFFE7B2),
+                size: compact ? 22 : 26,
+              );
+            },
           ),
         ),
       ),

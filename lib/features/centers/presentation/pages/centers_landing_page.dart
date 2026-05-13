@@ -5,7 +5,12 @@ import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 
 class CentersLandingPage extends StatefulWidget {
-  const CentersLandingPage({super.key});
+  const CentersLandingPage({
+    super.key,
+    this.returnRoute = Routes.menu,
+  });
+
+  final String returnRoute;
 
   @override
   State<CentersLandingPage> createState() => _CentersLandingPageState();
@@ -87,7 +92,7 @@ class _CentersLandingPageState extends State<CentersLandingPage> {
         color: const Color(0xFFD7A85C),
         imageAsset: 'assets/images/centers/center_rehabilitation.png',
         route: Routes.centersList,
-        arguments: const {'category': 'recovery'},
+        arguments: {'category': 'recovery', 'returnRoute': widget.returnRoute},
       ),
       _CenterCategoryItem(
         title: isArabic ? 'مراكز الديتوكس' : 'Detox Centers',
@@ -98,7 +103,7 @@ class _CentersLandingPageState extends State<CentersLandingPage> {
         color: const Color(0xFFC47D47),
         imageAsset: 'assets/images/centers/center_detox.png',
         route: Routes.centersList,
-        arguments: const {'category': 'detox'},
+        arguments: {'category': 'detox', 'returnRoute': widget.returnRoute},
       ),
       _CenterCategoryItem(
         title: isArabic ? 'المستشفيات' : 'Hospitals',
@@ -109,7 +114,7 @@ class _CentersLandingPageState extends State<CentersLandingPage> {
         color: const Color(0xFFCF9F61),
         imageAsset: 'assets/images/centers/center_hospital.png',
         route: Routes.centersList,
-        arguments: const {'category': 'hospital'},
+        arguments: {'category': 'hospital', 'returnRoute': widget.returnRoute},
       ),
       _CenterCategoryItem(
         title: isArabic ? 'مراكز الاحتياجات الخاصة' : 'Special Needs Centers',
@@ -120,7 +125,10 @@ class _CentersLandingPageState extends State<CentersLandingPage> {
         color: const Color(0xFFB98E52),
         imageAsset: 'assets/images/centers/center_special_needs.png',
         route: Routes.centersList,
-        arguments: const {'category': 'special_needs'},
+        arguments: {
+          'category': 'special_needs',
+          'returnRoute': widget.returnRoute,
+        },
       ),
     ];
 
@@ -209,7 +217,10 @@ class _CentersLandingPageState extends State<CentersLandingPage> {
                         start: isMobile ? 14 : 22,
                         top: isMobile ? 12 : 18,
                       ),
-                      child: _BackToMenuButton(compact: isMobile),
+                      child: _BackToMenuButton(
+                        compact: isMobile,
+                        returnRoute: widget.returnRoute,
+                      ),
                     ),
                   ),
                 ),
@@ -234,9 +245,13 @@ class _CentersLandingPageState extends State<CentersLandingPage> {
 }
 
 class _BackToMenuButton extends StatefulWidget {
-  const _BackToMenuButton({required this.compact});
+  const _BackToMenuButton({
+    required this.compact,
+    required this.returnRoute,
+  });
 
   final bool compact;
+  final String returnRoute;
 
   @override
   State<_BackToMenuButton> createState() => _BackToMenuButtonState();
@@ -258,7 +273,7 @@ class _BackToMenuButtonState extends State<_BackToMenuButton> {
         curve: Curves.easeOutCubic,
         child: InkWell(
           customBorder: const CircleBorder(),
-          onTap: () => Navigator.of(context).pushNamed(Routes.menu),
+          onTap: () => Navigator.of(context).pushNamed(widget.returnRoute),
           child: Container(
             width: size,
             height: size,
@@ -278,10 +293,20 @@ class _BackToMenuButtonState extends State<_BackToMenuButton> {
                 ),
               ],
             ),
-            child: Icon(
-              Icons.arrow_back_rounded,
-              color: const Color(0xFFFFE7B2),
-              size: widget.compact ? 22 : 26,
+            child: Image.asset(
+              Directionality.of(context) == TextDirection.rtl
+                  ? 'assets/branding/navigation/back/back_right_gold.png'
+                  : 'assets/branding/navigation/back/back_left_gold.png',
+              width: widget.compact ? 22 : 26,
+              height: widget.compact ? 22 : 26,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(
+                  Icons.arrow_back_rounded,
+                  color: const Color(0xFFFFE7B2),
+                  size: widget.compact ? 22 : 26,
+                );
+              },
             ),
           ),
         ),

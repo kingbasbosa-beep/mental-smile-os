@@ -39,6 +39,14 @@ flutter:
 
   assets:
     - assets/branding/
+    - assets/branding/library/hodn_amen/
+    - assets/branding/library/bedaya_amena/
+    - assets/branding/library/backgrounds/desktop/
+    - assets/branding/library/backgrounds/tablet/
+    - assets/branding/library/backgrounds/mobile/
+    - assets/branding/navigation/logout/
+    - assets/branding/navigation/back/
+    - assets/branding/language/
     - assets/branding/client_dashboard/
     - assets/branding/client_dashboard/desktop/
     - assets/branding/client_dashboard/tablet/

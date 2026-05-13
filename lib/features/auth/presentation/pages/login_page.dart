@@ -16,6 +16,8 @@ class _LoginPageState extends State<LoginPage> {
   static const _cyberTurquoise = Color(0xFF00E5FF);
   static const _cyberText = Color(0xFF7DF9FF);
   static const _cyberGold = Color(0xFFE0C174);
+  static const _clientMutedText = Color(0xFFB8B8B8);
+  static const _clientInputText = Color(0xFFFFE7B0);
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -121,57 +123,154 @@ class _LoginPageState extends State<LoginPage> {
     required IconData icon,
     bool obscure = false,
     Widget? suffix,
+    bool clientStyle = false,
+    TextInputType? keyboardType,
   }) {
     return TextField(
       controller: c,
+      keyboardType: keyboardType,
       obscureText: obscure,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Color(0xFFFFE8A3)),
-        prefixIcon: Icon(icon, color: const Color(0xFFFFE8A3)),
-        suffixIcon: suffix,
-        filled: true,
-        fillColor: Colors.black.withValues(alpha: 0.4),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+      style: clientStyle
+          ? const TextStyle(
+              color: _clientInputText,
+              fontSize: 14,
+            )
+          : const TextStyle(color: Colors.white),
+      decoration: clientStyle
+          ? InputDecoration(
+              labelText: label,
+              labelStyle: const TextStyle(
+                color: _clientMutedText,
+                fontWeight: FontWeight.w700,
+              ),
+              prefixIcon: Icon(icon, color: _cyberGold),
+              prefixIconConstraints: const BoxConstraints(
+                minWidth: 36,
+                minHeight: 36,
+              ),
+              suffixIcon: suffix,
+              filled: true,
+              fillColor: Colors.transparent,
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(vertical: 6),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: _cyberGold, width: 1.2),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: _cyberGold, width: 2),
+              ),
+            )
+          : InputDecoration(
+              labelText: label,
+              labelStyle: const TextStyle(color: Color(0xFFFFE8A3)),
+              prefixIcon: Icon(icon, color: const Color(0xFFFFE8A3)),
+              suffixIcon: suffix,
+              filled: true,
+              fillColor: Colors.black.withValues(alpha: 0.4),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+    );
+  }
+
+  Widget _loginButton() {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: _loading
+              ? [
+                  const Color(0xFFD8D8D8).withValues(alpha: 0.45),
+                  const Color(0xFFF8F8F8).withValues(alpha: 0.5),
+                  const Color(0xFFBEBEBE).withValues(alpha: 0.45),
+                ]
+              : const [
+                  Color(0xFFE8E8E8),
+                  Color(0xFFFFFFFF),
+                  Color(0xFFBDBDBD),
+                ],
+        ),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.78)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.white.withValues(alpha: _loading ? 0.18 : 0.42),
+            blurRadius: 18,
+            spreadRadius: 1,
+          ),
+          BoxShadow(
+            color: _cyberGold.withValues(alpha: _loading ? 0.12 : 0.24),
+            blurRadius: 22,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        height: 48,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            foregroundColor: const Color(0xFF111111),
+            disabledBackgroundColor: Colors.transparent,
+            disabledForegroundColor:
+                const Color(0xFF111111).withValues(alpha: 0.55),
+            shadowColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            textStyle: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+            ),
+            elevation: 0,
+          ),
+          onPressed: _loading ? null : _login,
+          child: _loading
+              ? const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.4,
+                    color: Color(0xFF111111),
+                  ),
+                )
+              : const Text('دخول | Login'),
         ),
       ),
     );
   }
 
-  Widget _loginButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 50,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _cyberNavy,
-          foregroundColor: _cyberText,
-          disabledBackgroundColor: _cyberNavy.withValues(alpha: 0.55),
-          disabledForegroundColor: _cyberText.withValues(alpha: 0.55),
-          side:
-              BorderSide(color: _cyberGold.withValues(alpha: 0.9), width: 1.2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-          ),
-          elevation: 0,
+  Widget _registerLink() {
+    return TextButton(
+      style: TextButton.styleFrom(
+        foregroundColor: _cyberGold,
+        overlayColor: Colors.transparent,
+        padding: EdgeInsets.zero,
+        minimumSize: const Size(0, 28),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      onPressed: () {
+        Navigator.of(context).pushNamed(Routes.language);
+      },
+      child: Text(
+        'للتسجيل اضغط هنا',
+        style: TextStyle(
+          color: _cyberGold,
+          fontSize: 13,
+          fontWeight: FontWeight.w800,
+          shadows: [
+            Shadow(
+              color: _cyberGold.withValues(alpha: 0.72),
+              blurRadius: 10,
+            ),
+            Shadow(
+              color: Colors.white.withValues(alpha: 0.34),
+              blurRadius: 14,
+            ),
+          ],
         ),
-        onPressed: _loading ? null : _login,
-        child: _loading
-            ? const SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.4,
-                  color: _cyberText,
-                ),
-              )
-            : const Text('دخول | Login'),
       ),
     );
   }
@@ -261,16 +360,21 @@ class _LoginPageState extends State<LoginPage> {
             Positioned.fill(
               child: Container(color: Colors.black.withValues(alpha: 0.5)),
             ),
-            Center(
+            Align(
+              alignment: const Alignment(0, 0.78),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 450),
+                  constraints: const BoxConstraints(maxWidth: 390),
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(25),
+                      color: Colors.white.withValues(alpha: 0.03),
+                      borderRadius: BorderRadius.circular(18),
                     ),
                     child: Column(
                       children: [
@@ -286,14 +390,17 @@ class _LoginPageState extends State<LoginPage> {
                         _field(
                           c: _emailController,
                           label: 'البريد الإلكتروني',
-                          icon: Icons.email,
+                          icon: Icons.alternate_email,
+                          clientStyle: true,
+                          keyboardType: TextInputType.emailAddress,
                         ),
                         const SizedBox(height: 12),
                         _field(
                           c: _passwordController,
                           label: 'كلمة المرور',
-                          icon: Icons.lock,
+                          icon: Icons.lock_outline,
                           obscure: _obscurePassword,
+                          clientStyle: true,
                           suffix: IconButton(
                             onPressed: () {
                               setState(
@@ -314,27 +421,8 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                         const SizedBox(height: 20),
                         _loginButton(),
-                        const SizedBox(height: 20),
-                        _registrationEntry(
-                          icon: Icons.person_add_alt_1_outlined,
-                          label: 'تسجيل عميل',
-                          subtitle: 'Client registration',
-                          route: Routes.clientRegister,
-                        ),
                         const SizedBox(height: 10),
-                        _registrationEntry(
-                          icon: Icons.medical_services_outlined,
-                          label: 'تسجيل أخصائي عبر الويب',
-                          subtitle: 'Clinician web registration',
-                          route: Routes.webClinicianRegister,
-                        ),
-                        const SizedBox(height: 10),
-                        _registrationEntry(
-                          icon: Icons.apartment_outlined,
-                          label: 'تسجيل مركز عبر الويب',
-                          subtitle: 'Center web registration',
-                          route: Routes.webCenterRegister,
-                        ),
+                        _registerLink(),
                       ],
                     ),
                   ),

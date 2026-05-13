@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutterprojects/app/router/routes.dart';
@@ -510,14 +511,24 @@ class _AdminHubPageState extends State<AdminHubPage> {
           title: const SizedBox.shrink(),
           leading: IconButton(
             onPressed: () async {
-              final didPop = await Navigator.of(context).maybePop();
-              if (!didPop && context.mounted) {
-                Navigator.of(context).pushNamed(Routes.menu);
-              }
+              await FirebaseAuth.instance.signOut();
+              if (!context.mounted) return;
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                Routes.login,
+                (_) => false,
+              );
             },
-            icon: const Icon(
-              Icons.logout,
-              color: Color(0xFFE8D7A5),
+            icon: Image.asset(
+              'assets/branding/navigation/logout/logout_gold.png',
+              width: 28,
+              height: 28,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(
+                  Icons.logout,
+                  color: Color(0xFFE8D7A5),
+                );
+              },
             ),
           ),
         ),

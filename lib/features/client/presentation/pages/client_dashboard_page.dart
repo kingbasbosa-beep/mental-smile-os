@@ -437,7 +437,7 @@ class ClientDashboardPage extends StatelessWidget {
                                       isActive: isActive,
                                       initials: _initials(name),
                                       showGreeting: true,
-                                      avatarSize: 72,
+                                      avatarSize: 82,
                                     ),
                                     const SizedBox(height: AppSpacing.sm),
                                     Align(
@@ -466,7 +466,7 @@ class ClientDashboardPage extends StatelessWidget {
                                       left: 54,
                                       top: 16,
                                       child: const _DashboardLogoBadge(
-                                        size: 104,
+                                        size: 88,
                                       ),
                                     ),
                                     Positioned(
@@ -483,19 +483,19 @@ class ClientDashboardPage extends StatelessWidget {
                                             textTheme:
                                                 Theme.of(context).textTheme,
                                           ),
-                                          const SizedBox(height: 14),
+                                          const SizedBox(height: 10),
                                           _ClientAvatarBadge(
                                             avatarAsset: avatarAsset,
                                             isActive: isActive,
                                             initials: _initials(name),
-                                            size: 82,
+                                            size: 88,
                                           ),
                                         ],
                                       ),
                                     ),
                                     Positioned(
                                       left: -22,
-                                      top: 72,
+                                      top: 64,
                                       width: 520,
                                       child: ratingsPanel,
                                     ),
@@ -534,6 +534,7 @@ class _DashboardTopActions extends StatelessWidget {
       children: [
         _TopIconButton(
           icon: Icons.arrow_back_rounded,
+          asset: 'assets/branding/navigation/back/back_right_gold.png',
           tooltip: isArabic ? 'رجوع' : 'Back',
           onTap: () {
             if (Navigator.of(context).canPop()) {
@@ -549,6 +550,7 @@ class _DashboardTopActions extends StatelessWidget {
         const SizedBox(width: 12),
         _TopIconButton(
           icon: Icons.logout_rounded,
+          asset: 'assets/branding/navigation/logout/logout_gold.png',
           tooltip: isArabic ? 'تسجيل الخروج' : 'Logout',
           onTap: () async {
             await FirebaseAuth.instance.signOut();
@@ -566,11 +568,13 @@ class _DashboardTopActions extends StatelessWidget {
 
 class _TopIconButton extends StatelessWidget {
   final IconData icon;
+  final String asset;
   final String tooltip;
   final VoidCallback onTap;
 
   const _TopIconButton({
     required this.icon,
+    required this.asset,
     required this.tooltip,
     required this.onTap,
   });
@@ -586,19 +590,27 @@ class _TopIconButton extends StatelessWidget {
           onTap: onTap,
           customBorder: const CircleBorder(),
           child: SizedBox(
-            width: 34,
-            height: 34,
-            child: Icon(
-              icon,
-              color: AppColors.mutedGold,
-              size: 20,
-              shadows: const [
-                Shadow(
-                  color: Colors.black,
-                  blurRadius: 7,
-                  offset: Offset(0, 1),
-                ),
-              ],
+            width: 38,
+            height: 38,
+            child: Image.asset(
+              asset,
+              width: 26,
+              height: 26,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(
+                  icon,
+                  color: AppColors.mutedGold,
+                  size: 22,
+                  shadows: const [
+                    Shadow(
+                      color: Colors.black,
+                      blurRadius: 7,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),
@@ -660,10 +672,10 @@ class _ProfileBanner extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return SizedBox(
-      height: avatarSize + 26,
+      height: avatarSize + 18,
       child: Row(
         textDirection: TextDirection.ltr,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 19),
@@ -705,7 +717,7 @@ class _GreetingText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
@@ -714,6 +726,7 @@ class _GreetingText extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: textTheme.titleLarge?.copyWith(
             color: const Color(0xFFE7C766),
+            fontSize: 24,
             fontWeight: FontWeight.w900,
             shadows: const [
               Shadow(
@@ -734,6 +747,7 @@ class _GreetingText extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: textTheme.bodySmall?.copyWith(
             color: AppColors.mutedGold.withValues(alpha: 0.84),
+            fontSize: 13,
             fontWeight: FontWeight.w700,
             shadows: const [
               Shadow(
@@ -848,27 +862,15 @@ class _DashboardLogoBadge extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.mutedGold.withValues(alpha: 0.14),
-              blurRadius: 18,
-              spreadRadius: 1,
-            ),
-          ],
-        ),
-        child: Image.asset(
-          'assets/branding/logo_primary_dark.png',
+      child: Image.asset(
+        'assets/branding/logo_primary_dark.png',
+        width: imageSize,
+        height: imageSize,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) =>
+            AppMissingAssetPlaceholder(
           width: imageSize,
           height: imageSize,
-          fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) =>
-              AppMissingAssetPlaceholder(
-            width: imageSize,
-            height: imageSize,
-          ),
         ),
       ),
     );
@@ -1145,6 +1147,7 @@ class _PlainMetric extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
             color: const Color(0xFFE7C766),
+            fontSize: 28,
             fontWeight: FontWeight.w900,
             shadows: const [
               Shadow(
@@ -1163,6 +1166,7 @@ class _PlainMetric extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
             color: AppColors.mutedGold.withValues(alpha: 0.82),
+            fontSize: 13,
             fontWeight: FontWeight.w700,
             shadows: const [
               Shadow(

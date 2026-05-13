@@ -1121,8 +1121,15 @@ class AppRouter {
         );
 
       case Routes.specialists:
+        final args = settings.arguments;
+        final returnRoute =
+            args is Map ? args['returnRoute']?.toString() : null;
         return MaterialPageRoute(
-          builder: (_) => const SpecialistsCategoriesPage(),
+          builder: (_) => SpecialistsCategoriesPage(
+            returnRoute: (returnRoute == null || returnRoute.isEmpty)
+                ? Routes.menu
+                : returnRoute,
+          ),
           settings: settings,
         );
 
@@ -1161,14 +1168,23 @@ class AppRouter {
         );
 
       case Routes.centers:
+        final args = settings.arguments;
+        final returnRoute =
+            args is Map ? args['returnRoute']?.toString() : null;
         return MaterialPageRoute(
-          builder: (_) => const CentersLandingPage(),
+          builder: (_) => CentersLandingPage(
+            returnRoute: (returnRoute == null || returnRoute.isEmpty)
+                ? Routes.menu
+                : returnRoute,
+          ),
           settings: settings,
         );
 
       case Routes.centersList:
         final args = settings.arguments;
         final category = args is Map ? args['category']?.toString() : null;
+        final returnRoute =
+            args is Map ? args['returnRoute']?.toString() : null;
         if (category == null || category.isEmpty) {
           return MaterialPageRoute(
             builder: (ctx) => Scaffold(
@@ -1180,7 +1196,12 @@ class AppRouter {
           );
         }
         return MaterialPageRoute(
-          builder: (_) => CentersListPage(category: category),
+          builder: (_) => CentersListPage(
+            category: category,
+            returnRoute: (returnRoute == null || returnRoute.isEmpty)
+                ? Routes.menu
+                : returnRoute,
+          ),
           settings: settings,
         );
 
@@ -1243,9 +1264,15 @@ class AppRouter {
         );
 
       case Routes.library:
+        final args = settings.arguments;
+        final returnRoute =
+            args is Map ? args['returnRoute']?.toString() : null;
         return MaterialPageRoute(
           builder: (_) => LibraryPage(
             initialCategoryKey: _libraryCategoryKey(settings),
+            returnRoute: (returnRoute == null || returnRoute.isEmpty)
+                ? Routes.menu
+                : returnRoute,
           ),
           settings: settings,
         );

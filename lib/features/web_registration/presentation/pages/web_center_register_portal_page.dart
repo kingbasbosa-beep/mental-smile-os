@@ -27,6 +27,9 @@ class _WebCenterRegisterPortalPageState
   bool _isSubmitting = false;
   String? _errorMessage;
 
+  static const Color _fieldGold = Color(0xFFE8C878);
+  static const Color _fieldSilver = Color(0xFFEDEDED);
+
   static const _categories = [
     {
       'key': 'recovery',
@@ -60,6 +63,15 @@ class _WebCenterRegisterPortalPageState
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _signOut() async {
+    await FirebaseAuth.instance.signOut();
+    if (!mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      Routes.login,
+      (_) => false,
+    );
   }
 
   Map<String, String> _labels(
@@ -151,6 +163,24 @@ class _WebCenterRegisterPortalPageState
               ),
               fit: BoxFit.contain,
             ),
+            Positioned(
+              top: 16,
+              right: 16,
+              child: SafeArea(
+                child: IconButton(
+                  onPressed: _signOut,
+                  icon: Image.asset(
+                    'assets/branding/navigation/logout/logout_gold.png',
+                    width: 30,
+                    height: 30,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(Icons.logout_rounded);
+                    },
+                  ),
+                ),
+              ),
+            ),
             Align(
               alignment: Alignment.bottomCenter,
               child: SafeArea(
@@ -227,10 +257,11 @@ class _WebCenterRegisterPortalPageState
                               const SizedBox(height: 24),
                               TextFormField(
                                 controller: _centerNameController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Center name',
-                                  border: OutlineInputBorder(),
+                                style: const TextStyle(
+                                  color: _fieldGold,
+                                  fontWeight: FontWeight.w700,
                                 ),
+                                decoration: _fieldDecoration('Center name'),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return 'Center name is required';
@@ -241,10 +272,13 @@ class _WebCenterRegisterPortalPageState
                               const SizedBox(height: 10),
                               DropdownButtonFormField<String>(
                                 initialValue: _category,
-                                decoration: const InputDecoration(
-                                  labelText: 'Category',
-                                  border: OutlineInputBorder(),
+                                dropdownColor: Colors.black,
+                                iconEnabledColor: _fieldGold,
+                                style: const TextStyle(
+                                  color: _fieldGold,
+                                  fontWeight: FontWeight.w700,
                                 ),
+                                decoration: _fieldDecoration('Category'),
                                 items: _categories
                                     .map(
                                       (item) => DropdownMenuItem<String>(
@@ -277,10 +311,13 @@ class _WebCenterRegisterPortalPageState
                               const SizedBox(height: 10),
                               DropdownButtonFormField<String>(
                                 initialValue: _centerType,
-                                decoration: const InputDecoration(
-                                  labelText: 'Center type',
-                                  border: OutlineInputBorder(),
+                                dropdownColor: Colors.black,
+                                iconEnabledColor: _fieldGold,
+                                style: const TextStyle(
+                                  color: _fieldGold,
+                                  fontWeight: FontWeight.w700,
                                 ),
+                                decoration: _fieldDecoration('Center type'),
                                 items: _centerTypes
                                     .map(
                                       (item) => DropdownMenuItem<String>(
@@ -301,10 +338,11 @@ class _WebCenterRegisterPortalPageState
                               const SizedBox(height: 10),
                               TextFormField(
                                 controller: _emailController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Email',
-                                  border: OutlineInputBorder(),
+                                style: const TextStyle(
+                                  color: _fieldGold,
+                                  fontWeight: FontWeight.w700,
                                 ),
+                                decoration: _fieldDecoration('Email'),
                                 keyboardType: TextInputType.emailAddress,
                                 validator: (value) {
                                   final email = value?.trim() ?? '';
@@ -318,10 +356,11 @@ class _WebCenterRegisterPortalPageState
                               const SizedBox(height: 10),
                               TextFormField(
                                 controller: _passwordController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Password',
-                                  border: OutlineInputBorder(),
+                                style: const TextStyle(
+                                  color: _fieldGold,
+                                  fontWeight: FontWeight.w700,
                                 ),
+                                decoration: _fieldDecoration('Password'),
                                 obscureText: true,
                                 validator: (value) {
                                   if (value == null || value.length < 6) {
@@ -333,10 +372,12 @@ class _WebCenterRegisterPortalPageState
                               const SizedBox(height: 10),
                               TextFormField(
                                 controller: _confirmPasswordController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Confirm password',
-                                  border: OutlineInputBorder(),
+                                style: const TextStyle(
+                                  color: _fieldGold,
+                                  fontWeight: FontWeight.w700,
                                 ),
+                                decoration:
+                                    _fieldDecoration('Confirm password'),
                                 obscureText: true,
                                 validator: (value) {
                                   if (value != _passwordController.text) {
@@ -383,6 +424,46 @@ class _WebCenterRegisterPortalPageState
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  InputDecoration _fieldDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(
+        color: _fieldGold,
+        fontWeight: FontWeight.w700,
+      ),
+      hintStyle: TextStyle(
+        color: _fieldGold.withValues(alpha: 0.72),
+        fontWeight: FontWeight.w600,
+      ),
+      filled: true,
+      fillColor: Colors.white.withValues(alpha: 0.02),
+      enabledBorder: UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: _fieldSilver.withValues(alpha: 0.75),
+          width: 1.2,
+        ),
+      ),
+      focusedBorder: const UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: _fieldSilver,
+          width: 1.8,
+        ),
+      ),
+      errorBorder: UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: Colors.redAccent.withValues(alpha: 0.85),
+          width: 1.2,
+        ),
+      ),
+      focusedErrorBorder: const UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: Colors.redAccent,
+          width: 1.8,
         ),
       ),
     );

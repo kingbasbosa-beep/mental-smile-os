@@ -203,6 +203,15 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
     super.dispose();
   }
 
+  Future<void> _signOut() async {
+    await FirebaseAuth.instance.signOut();
+    if (!mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      Routes.login,
+      (_) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -231,6 +240,13 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
 
                   return Stack(
                     children: [
+                      Positioned(
+                        top: AppSpacing.md,
+                        right: AppSpacing.md,
+                        child: SafeArea(
+                          child: _RegisterLogoutButton(onPressed: _signOut),
+                        ),
+                      ),
                       Positioned(
                         top: avatarTop,
                         left: sideSpacing,
@@ -387,6 +403,31 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _RegisterLogoutButton extends StatelessWidget {
+  const _RegisterLogoutButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: onPressed,
+      icon: Image.asset(
+        'assets/branding/navigation/logout/logout_gold.png',
+        width: 30,
+        height: 30,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return const Icon(
+            Icons.logout_rounded,
+            color: _ClientRegisterPageState._clientGold,
+          );
+        },
       ),
     );
   }

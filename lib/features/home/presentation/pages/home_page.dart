@@ -38,8 +38,9 @@ class HomePage extends StatelessWidget {
     final textDirection = isArabic ? TextDirection.rtl : TextDirection.ltr;
     final hasUser = FirebaseAuth.instance.currentUser != null;
 
-    final description =
-        isArabic ? 'ابدأ رحلتك نحو التعافي' : 'Start your healing journey';
+    final description = isArabic
+        ? 'Ø§Ø¨Ø¯Ø£ Ø±Ø­Ù„ØªÙƒ Ù†Ø­Ùˆ Ø§Ù„ØªØ¹Ø§ÙÙŠ'
+        : 'Start your healing journey';
 
     return Directionality(
       textDirection: textDirection,
@@ -94,48 +95,42 @@ class HomePage extends StatelessWidget {
                                     spacing: AppSpacing.sm,
                                     runSpacing: AppSpacing.sm,
                                     children: [
-                                      OutlinedButton.icon(
-                                        onPressed: () {
-                                          Navigator.of(context)
-                                              .pushNamed(Routes.language);
-                                        },
-                                        icon: const Icon(
-                                          Icons.language_rounded,
-                                          size: 16,
+                                      if (!hasUser)
+                                        OutlinedButton.icon(
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pushNamed(Routes.login);
+                                          },
+                                          icon: const Icon(
+                                            Icons.login_rounded,
+                                            size: 18,
+                                          ),
+                                          label: Text(
+                                            isArabic
+                                                ? 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„'
+                                                : 'Login',
+                                          ),
                                         ),
-                                        label: Text(
-                                            isArabic ? 'اللغة' : 'Language'),
-                                      ),
-                                      OutlinedButton.icon(
-                                        onPressed: hasUser
-                                            ? () => _logout(context)
-                                            : () {
-                                                Navigator.of(context)
-                                                    .pushNamed(Routes.login);
-                                              },
-                                        icon: Icon(
-                                          hasUser
-                                              ? Icons.logout_rounded
-                                              : Icons.login_rounded,
-                                          size: 18,
-                                        ),
-                                        label: Text(
-                                          hasUser
-                                              ? (isArabic
-                                                  ? 'تسجيل الخروج'
-                                                  : 'Logout')
-                                              : (isArabic
-                                                  ? 'تسجيل الدخول'
-                                                  : 'Login'),
-                                        ),
-                                      ),
                                       OutlinedButton.icon(
                                         onPressed: () => _goBack(context),
-                                        icon: const Icon(
-                                          Icons.arrow_back_rounded,
-                                          size: 18,
+                                        icon: Image.asset(
+                                          Directionality.of(context) ==
+                                                  TextDirection.rtl
+                                              ? 'assets/branding/navigation/back/back_right_gold.png'
+                                              : 'assets/branding/navigation/back/back_left_gold.png',
+                                          width: 18,
+                                          height: 18,
+                                          fit: BoxFit.contain,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return const Icon(
+                                              Icons.arrow_back_rounded,
+                                              size: 18,
+                                            );
+                                          },
                                         ),
-                                        label: Text(isArabic ? 'رجوع' : 'Back'),
+                                        label: Text(
+                                            isArabic ? 'Ø±Ø¬ÙˆØ¹' : 'Back'),
                                       ),
                                     ],
                                   ),
@@ -178,7 +173,7 @@ class HomePage extends StatelessWidget {
                                     const SizedBox(height: AppSpacing.sm),
                                     Text(
                                       isArabic
-                                          ? 'واجهة هادئة وواضحة تساعدك على الوصول السريع للدعم والمسارات المناسبة.'
+                                          ? 'ÙˆØ§Ø¬Ù‡Ø© Ù‡Ø§Ø¯Ø¦Ø© ÙˆÙˆØ§Ø¶Ø­Ø© ØªØ³Ø§Ø¹Ø¯Ùƒ Ø¹Ù„Ù‰ Ø§Ù„ÙˆØµÙˆÙ„ Ø§Ù„Ø³Ø±ÙŠØ¹ Ù„Ù„Ø¯Ø¹Ù… ÙˆØ§Ù„Ù…Ø³Ø§Ø±Ø§Øª Ø§Ù„Ù…Ù†Ø§Ø³Ø¨Ø©.'
                                           : 'A calm, clear entry point to support, guidance, and the right care path.',
                                       textAlign: TextAlign.center,
                                       style: Theme.of(context)
@@ -205,7 +200,7 @@ class HomePage extends StatelessWidget {
                                           icon: const Icon(Icons.apps_rounded),
                                           label: Text(
                                             isArabic
-                                                ? 'ابدأ الآن'
+                                                ? 'Ø§Ø¨Ø¯Ø£ Ø§Ù„Ø¢Ù†'
                                                 : 'Start now',
                                           ),
                                         ),

@@ -10,10 +10,12 @@ const String _centerLogoMarkAsset = 'assets/c7_branding/logo/logo_mark.png';
 
 class CentersListPage extends StatelessWidget {
   final String category;
+  final String returnRoute;
 
   const CentersListPage({
     super.key,
     required this.category,
+    this.returnRoute = Routes.menu,
   });
 
   String _categoryTitleAr(String key) {
@@ -417,6 +419,7 @@ class CentersListPage extends StatelessWidget {
                       ),
                       child: _BackToMenuButton(
                         compact: constraints.maxWidth < 700,
+                        returnRoute: returnRoute,
                       ),
                     ),
                   ),
@@ -435,9 +438,13 @@ class CentersListPage extends StatelessWidget {
 }
 
 class _BackToMenuButton extends StatelessWidget {
-  const _BackToMenuButton({required this.compact});
+  const _BackToMenuButton({
+    required this.compact,
+    required this.returnRoute,
+  });
 
   final bool compact;
+  final String returnRoute;
 
   @override
   Widget build(BuildContext context) {
@@ -447,7 +454,10 @@ class _BackToMenuButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         customBorder: const CircleBorder(),
-        onTap: () => Navigator.of(context).pushNamed(Routes.menu),
+        onTap: () => Navigator.of(context).pushNamed(
+          Routes.centers,
+          arguments: {'returnRoute': returnRoute},
+        ),
         child: Container(
           width: size,
           height: size,
@@ -465,10 +475,20 @@ class _BackToMenuButton extends StatelessWidget {
               ),
             ],
           ),
-          child: Icon(
-            Icons.arrow_back_rounded,
-            color: const Color(0xFFFFE7B2),
-            size: compact ? 22 : 26,
+          child: Image.asset(
+            Directionality.of(context) == TextDirection.rtl
+                ? 'assets/branding/navigation/back/back_right_gold.png'
+                : 'assets/branding/navigation/back/back_left_gold.png',
+            width: compact ? 22 : 26,
+            height: compact ? 22 : 26,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return Icon(
+                Icons.arrow_back_rounded,
+                color: const Color(0xFFFFE7B2),
+                size: compact ? 22 : 26,
+              );
+            },
           ),
         ),
       ),

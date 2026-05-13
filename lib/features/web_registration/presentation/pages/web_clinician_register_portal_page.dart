@@ -27,6 +27,9 @@ class _WebClinicianRegisterPortalPageState
   String? _selectedProfessionalTitleKey;
   String? _selectedSpecialtyKey;
 
+  static const Color _fieldGold = Color(0xFFE8C878);
+  static const Color _fieldSilver = Color(0xFFEDEDED);
+
   static const List<Map<String, String>> _professionalTitles = [
     {'key': 'doctor', 'labelAr': 'د.', 'labelEn': 'Dr.'},
     {'key': 'specialist', 'labelAr': 'أ.', 'labelEn': 'Spec.'},
@@ -47,6 +50,15 @@ class _WebClinicianRegisterPortalPageState
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _signOut() async {
+    await FirebaseAuth.instance.signOut();
+    if (!mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      Routes.login,
+      (_) => false,
+    );
   }
 
   Map<String, String>? _selectedTitle() {
@@ -166,6 +178,24 @@ class _WebClinicianRegisterPortalPageState
               fit: BoxFit.contain,
             ),
             Container(color: Colors.black.withValues(alpha: 0.10)),
+            Positioned(
+              top: 16,
+              right: 16,
+              child: SafeArea(
+                child: IconButton(
+                  onPressed: _signOut,
+                  icon: Image.asset(
+                    'assets/branding/navigation/logout/logout_gold.png',
+                    width: 30,
+                    height: 30,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(Icons.logout_rounded);
+                    },
+                  ),
+                ),
+              ),
+            ),
             Align(
               alignment: Alignment.bottomCenter,
               child: SafeArea(
@@ -240,10 +270,14 @@ class _WebClinicianRegisterPortalPageState
                               const SizedBox(height: 10),
                               DropdownButtonFormField<String>(
                                 initialValue: _selectedProfessionalTitleKey,
-                                decoration: const InputDecoration(
-                                  labelText: 'Professional title',
-                                  border: OutlineInputBorder(),
+                                dropdownColor: Colors.black,
+                                iconEnabledColor: _fieldGold,
+                                style: const TextStyle(
+                                  color: _fieldGold,
+                                  fontWeight: FontWeight.w700,
                                 ),
+                                decoration:
+                                    _fieldDecoration('Professional title'),
                                 items: _professionalTitles
                                     .map((title) => DropdownMenuItem(
                                           value: title['key'],
@@ -262,10 +296,13 @@ class _WebClinicianRegisterPortalPageState
                               const SizedBox(height: 10),
                               DropdownButtonFormField<String>(
                                 initialValue: _selectedSpecialtyKey,
-                                decoration: const InputDecoration(
-                                  labelText: 'Specialty',
-                                  border: OutlineInputBorder(),
+                                dropdownColor: Colors.black,
+                                iconEnabledColor: _fieldGold,
+                                style: const TextStyle(
+                                  color: _fieldGold,
+                                  fontWeight: FontWeight.w700,
                                 ),
+                                decoration: _fieldDecoration('Specialty'),
                                 items: _specialties
                                     .map((specialty) => DropdownMenuItem(
                                           value: specialty['key'],
@@ -371,9 +408,50 @@ class _WebClinicianRegisterPortalPageState
       obscureText: obscureText,
       keyboardType: keyboardType,
       validator: validator,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
+      style: const TextStyle(
+        color: _fieldGold,
+        fontWeight: FontWeight.w700,
+      ),
+      decoration: _fieldDecoration(label),
+    );
+  }
+
+  InputDecoration _fieldDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(
+        color: _fieldGold,
+        fontWeight: FontWeight.w700,
+      ),
+      hintStyle: TextStyle(
+        color: _fieldGold.withValues(alpha: 0.72),
+        fontWeight: FontWeight.w600,
+      ),
+      filled: true,
+      fillColor: Colors.white.withValues(alpha: 0.02),
+      enabledBorder: UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: _fieldSilver.withValues(alpha: 0.75),
+          width: 1.2,
+        ),
+      ),
+      focusedBorder: const UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: _fieldSilver,
+          width: 1.8,
+        ),
+      ),
+      errorBorder: UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: Colors.redAccent.withValues(alpha: 0.85),
+          width: 1.2,
+        ),
+      ),
+      focusedErrorBorder: const UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: Colors.redAccent,
+          width: 1.8,
+        ),
       ),
     );
   }

@@ -131,26 +131,6 @@ class MenuPage extends StatelessWidget {
     return email.isNotEmpty;
   }
 
-  Future<void> _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-    if (!context.mounted) return;
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      Routes.login,
-      (route) => false,
-    );
-  }
-
-  void _goBack(BuildContext context) {
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).maybePop();
-    } else {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        Routes.menu,
-        (route) => false,
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final locale = Localizations.localeOf(context);
@@ -235,25 +215,6 @@ class MenuPage extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _FloatingMenuIcon(
-                      tooltip: isArabic ? 'رجوع' : 'Back',
-                      icon: Icons.arrow_back_rounded,
-                      onPressed: () => _goBack(context),
-                    ),
-                    const SizedBox(width: 8),
-                    _FloatingMenuIcon(
-                      tooltip: isArabic ? 'تسجيل الخروج' : 'Logout',
-                      icon: Icons.logout_rounded,
-                      onPressed: () => _logout(context),
-                    ),
-                    const SizedBox(width: 8),
-                    _FloatingMenuIcon(
-                      tooltip: isArabic ? 'اللغة' : 'Language',
-                      icon: Icons.language_outlined,
-                      onPressed: () {
-                        Navigator.of(context).pushNamed(Routes.language);
-                      },
-                    ),
                     const Spacer(),
                     FutureBuilder<
                         ({String label, IconData icon, String route})?>(
@@ -434,54 +395,6 @@ Alignment _menuBackgroundAlignment(BuildContext context) {
   return Alignment.center;
 }
 
-class _FloatingMenuIcon extends StatelessWidget {
-  const _FloatingMenuIcon({
-    required this.tooltip,
-    required this.icon,
-    required this.onPressed,
-  });
-
-  final String tooltip;
-  final IconData icon;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: AppColors.obsidian.withValues(alpha: 0.48),
-        shape: const CircleBorder(),
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: onPressed,
-          child: Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: AppColors.mutedGold.withValues(alpha: 0.58),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.deepTeal.withValues(alpha: 0.18),
-                  blurRadius: 14,
-                ),
-              ],
-            ),
-            child: Icon(
-              icon,
-              color: AppColors.mutedGold,
-              size: 22,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _FloatingProfileButton extends StatelessWidget {
   const _FloatingProfileButton({
     required this.label,
@@ -575,11 +488,11 @@ class _MenuLibraryTeaserHearts extends StatelessWidget {
     final entries = [
       (
         keyName: 'family_awareness',
-        title: isArabic ? 'دعم الأسرة' : 'Family support',
+        title: isArabic ? 'حضن آمن' : 'Safe embrace',
       ),
       (
         keyName: 'prevention_awareness',
-        title: isArabic ? 'الوعي والوقاية' : 'Prevention awareness',
+        title: isArabic ? 'بداية آمنة' : 'Safe start',
       ),
     ];
 

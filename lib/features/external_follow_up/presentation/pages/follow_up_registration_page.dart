@@ -236,6 +236,15 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
     });
   }
 
+  Future<void> _signOut() async {
+    await FirebaseAuth.instance.signOut();
+    if (!mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      Routes.login,
+      (_) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -269,6 +278,24 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                 ),
                 Positioned(
                   top: AppSpacing.md,
+                  left: AppSpacing.md,
+                  child: SafeArea(
+                    child: IconButton(
+                      onPressed: _signOut,
+                      icon: Image.asset(
+                        'assets/branding/navigation/logout/logout_gold.png',
+                        width: 30,
+                        height: 30,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.logout_rounded);
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: AppSpacing.md,
                   right: AppSpacing.md,
                   child: SafeArea(
                     child: TextButton.icon(
@@ -278,7 +305,17 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                           (route) => false,
                         );
                       },
-                      icon: const Icon(Icons.arrow_back_rounded),
+                      icon: Image.asset(
+                        Directionality.of(context) == TextDirection.rtl
+                            ? 'assets/branding/navigation/back/back_right_gold.png'
+                            : 'assets/branding/navigation/back/back_left_gold.png',
+                        width: 22,
+                        height: 22,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.arrow_back_rounded);
+                        },
+                      ),
                       label: const Text('رجوع للصفحة الشخصية'),
                       style: TextButton.styleFrom(
                         foregroundColor: const Color(0xFFFFE8A6),

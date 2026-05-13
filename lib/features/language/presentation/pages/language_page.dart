@@ -1,26 +1,105 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterprojects/app/locale_provider.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/storage/locale_storage.dart';
 
 class MkLanguagePage extends ConsumerWidget {
   const MkLanguagePage({super.key});
 
-  Future<void> _set(BuildContext context, WidgetRef ref, String code) async {
-    await LocaleStorage().write(code);
-    ref.read(localeProvider.notifier).state = Locale(code);
-    if (context.mounted) {
-      Navigator.of(context).pushReplacementNamed(Routes.login);
-    }
+  static const _gold = Color(0xFFE0C174);
+  static const _silver = Color(0xFFE8E8E8);
+
+  Widget _backButton(BuildContext context) {
+    return IconButton(
+      onPressed: () => Navigator.of(context).maybePop(),
+      icon: Container(
+        width: 46,
+        height: 46,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: const Color(0xFF1B1007).withValues(alpha: 0.50),
+          border: Border.all(
+            color: _gold.withValues(alpha: 0.56),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: _gold.withValues(alpha: 0.16),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Image.asset(
+          Directionality.of(context) == TextDirection.rtl
+              ? 'assets/branding/navigation/back/back_right_gold.png'
+              : 'assets/branding/navigation/back/back_left_gold.png',
+          width: 24,
+          height: 24,
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
+  }
+
+  Widget _registrationItem({
+    required BuildContext context,
+    required String label,
+    required String route,
+  }) {
+    return InkWell(
+      onTap: () => Navigator.of(context).pushNamed(route),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 13),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: _silver.withValues(alpha: 0.72),
+              width: 1.2,
+            ),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: _silver.withValues(alpha: 0.12),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: _gold,
+            fontSize: 17,
+            fontWeight: FontWeight.w800,
+            shadows: [
+              Shadow(
+                color: _gold.withValues(alpha: 0.5),
+                blurRadius: 10,
+              ),
+              Shadow(
+                color: _silver.withValues(alpha: 0.22),
+                blurRadius: 12,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Directionality(
-      textDirection: TextDirection.ltr,
+      textDirection: TextDirection.rtl,
       child: Scaffold(
-        appBar: AppBar(title: const Text('Choose language')),
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          foregroundColor: _gold,
+          elevation: 0,
+          leading: _backButton(context),
+        ),
         body: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 360),
@@ -29,48 +108,34 @@ class MkLanguagePage extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: FilledButton(
-                      onPressed: () => _set(context, ref, 'en'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF2F6FED),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                      ),
-                      child: const Text(
-                        'English',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
+                  ColorFiltered(
+                    colorFilter: const ColorFilter.mode(
+                      _gold,
+                      BlendMode.modulate,
+                    ),
+                    child: Image.asset(
+                      'assets/branding/logo_icon_light.png',
+                      width: 190,
+                      fit: BoxFit.contain,
                     ),
                   ),
+                  const SizedBox(height: 20),
+                  _registrationItem(
+                    context: context,
+                    label: 'تسجيل عميل',
+                    route: Routes.clientRegister,
+                  ),
                   const SizedBox(height: 14),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: FilledButton(
-                      onPressed: () => _set(context, ref, 'ar'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFF2F6FED),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                      ),
-                      child: const Text(
-                        'العربية',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
+                  _registrationItem(
+                    context: context,
+                    label: 'تسجيل أخصائي',
+                    route: Routes.webClinicianRegister,
+                  ),
+                  const SizedBox(height: 14),
+                  _registrationItem(
+                    context: context,
+                    label: 'تسجيل مركز',
+                    route: Routes.webCenterRegister,
                   ),
                 ],
               ),
