@@ -65,8 +65,7 @@ class _GoldBackIcon extends StatelessWidget {
         height: iconSize,
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
-          return Icon(
-            Icons.arrow_back_rounded,
+          return BackButtonIcon(
             color: const Color(0xFFFFE7B2),
             size: iconSize,
           );
@@ -659,8 +658,11 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isArabic =
+        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(

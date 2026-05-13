@@ -61,8 +61,7 @@ class _GoldBackIcon extends StatelessWidget {
         height: iconSize,
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
-          return Icon(
-            Icons.arrow_back_rounded,
+          return BackButtonIcon(
             color: const Color(0xFFFFE7B2),
             size: iconSize,
           );
@@ -421,9 +420,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
                                       children: [
                                         Text(
                                           displayName,
-                                          textAlign: _isArabic
-                                              ? TextAlign.right
-                                              : TextAlign.left,
+                                          textAlign: TextAlign.start,
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleMedium
@@ -437,9 +434,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
                                           _isArabic
                                               ? 'سيتم إرسال طلبك أولًا إلى الإدارة ثم تحويله إلى الأخصائي المناسب.'
                                               : 'Your request will be sent to admin first, then assigned to the suitable specialist.',
-                                          textAlign: _isArabic
-                                              ? TextAlign.right
-                                              : TextAlign.left,
+                                          textAlign: TextAlign.start,
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyMedium
@@ -478,9 +473,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
                                     _isArabic
                                         ? 'اكتب أي تفاصيل تريد أن تصل إلى الإدارة أو الأخصائي.'
                                         : 'Write any details you want admin or the specialist to receive.',
-                                    textAlign: _isArabic
-                                        ? TextAlign.right
-                                        : TextAlign.left,
+                                    textAlign: TextAlign.start,
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodyMedium
@@ -588,9 +581,7 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
                                 ),
                                 child: Text(
                                   _result!,
-                                  textAlign: _isArabic
-                                      ? TextAlign.right
-                                      : TextAlign.left,
+                                  textAlign: TextAlign.start,
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyMedium

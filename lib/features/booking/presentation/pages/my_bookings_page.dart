@@ -947,9 +947,11 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
   @override
   Widget build(BuildContext context) {
     final u = FirebaseAuth.instance.currentUser;
+    final isArabic =
+        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: Colors.black,
         appBar: AppShellActions.buildAppBar(
@@ -1199,7 +1201,8 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                                 const SizedBox(height: 12),
                                                 Align(
                                                   alignment:
-                                                      Alignment.centerRight,
+                                                      AlignmentDirectional
+                                                          .centerStart,
                                                   child: FilledButton.icon(
                                                     onPressed: () {
                                                       Navigator.of(context)
@@ -1240,7 +1243,8 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                                 const SizedBox(height: 12),
                                                 Align(
                                                   alignment:
-                                                      Alignment.centerRight,
+                                                      AlignmentDirectional
+                                                          .centerStart,
                                                   child: FilledButton.icon(
                                                     onPressed: () =>
                                                         _submitInitialIntake(
@@ -1262,7 +1266,8 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                                 const SizedBox(height: 12),
                                                 Align(
                                                   alignment:
-                                                      Alignment.centerRight,
+                                                      AlignmentDirectional
+                                                          .centerStart,
                                                   child: FilledButton.icon(
                                                     onPressed: () {
                                                       Navigator.of(context)
@@ -1334,7 +1339,8 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                                 const SizedBox(height: 12),
                                                 Align(
                                                   alignment:
-                                                      Alignment.centerRight,
+                                                      AlignmentDirectional
+                                                          .centerStart,
                                                   child: centerUnavailable
                                                       ? FilledButton.icon(
                                                           onPressed: centerId
