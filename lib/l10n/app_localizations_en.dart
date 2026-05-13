@@ -474,6 +474,119 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clinicianPleaseSignIn => 'Please sign in first';
 
   @override
+  String get statusPendingReview => 'Pending review';
+
+  @override
+  String get statusRequestUnderReview => 'Your request is under review';
+
+  @override
+  String get statusCenterFollowUp => 'The center is checking availability';
+
+  @override
+  String get statusClientUpdateRequired =>
+      'The center requested an accommodation update';
+
+  @override
+  String get statusCenterIntakePending => 'Waiting for initial intake details';
+
+  @override
+  String get statusCenterRecommendationPending =>
+      'Waiting for the center recommendation';
+
+  @override
+  String get statusApproved => 'Approved';
+
+  @override
+  String get statusRequestApproved => 'Your request was approved';
+
+  @override
+  String get statusAwaitingPayment => 'Awaiting payment';
+
+  @override
+  String get statusUploadPaymentProof => 'Please upload payment proof';
+
+  @override
+  String get statusPaymentReview => 'Payment proof under review';
+
+  @override
+  String get statusSessionSetupPending => 'Session setup pending';
+
+  @override
+  String get statusResidencySetupPending => 'Residency setup pending';
+
+  @override
+  String get statusSessionScheduled => 'Session scheduled';
+
+  @override
+  String get statusResidencyScheduled => 'Residency scheduled';
+
+  @override
+  String get statusSessionInProgress => 'Session in progress';
+
+  @override
+  String get statusResidencyInProgress => 'Residency in progress';
+
+  @override
+  String get statusPendingReviews => 'Pending reviews';
+
+  @override
+  String get statusPendingDischargeReviews => 'Pending discharge reviews';
+
+  @override
+  String get statusPayoutPending => 'Financial closing pending';
+
+  @override
+  String get statusCenterAccountingReview => 'Pending center accounting review';
+
+  @override
+  String get statusCompleted => 'Completed';
+
+  @override
+  String get statusCompletedSuccessfully => 'Completed successfully';
+
+  @override
+  String get statusRequestCompleted => 'Request completed';
+
+  @override
+  String get statusReschedulePending => 'Reschedule pending';
+
+  @override
+  String get statusAwaitingStartConfirmations => 'Awaiting start confirmations';
+
+  @override
+  String get statusRejected => 'Request could not be accepted';
+
+  @override
+  String get statusClinicianRejected => 'Clinician could not confirm';
+
+  @override
+  String get statusCancelled => 'Cancelled';
+
+  @override
+  String get statusCancellationPending => 'Cancellation request under review';
+
+  @override
+  String get statusDisputeReceived => 'Complaint received';
+
+  @override
+  String get statusRequestCoordination => 'Request is being coordinated';
+
+  @override
+  String get statusRequestUpdateInProgress => 'Request status is being updated';
+
+  @override
+  String get statusNewRequest => 'New request';
+
+  @override
+  String get statusCenterAvailableResponse => 'Center response: available';
+
+  @override
+  String get statusCenterUnavailableResponse => 'Center response: unavailable';
+
+  @override
+  String get statusCenterNoResponse => 'Center response: no reply yet';
+
+  @override
   String comingSoon(String title) {
     return '$title — Coming soon';
   }

@@ -1010,6 +1010,228 @@ abstract class AppLocalizations {
   /// **'يجب تسجيل الدخول أولًا'**
   String get clinicianPleaseSignIn;
 
+  /// No description provided for @statusPendingReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'قيد المراجعة'**
+  String get statusPendingReview;
+
+  /// No description provided for @statusRequestUnderReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلبك قيد المراجعة'**
+  String get statusRequestUnderReview;
+
+  /// No description provided for @statusCenterFollowUp.
+  ///
+  /// In ar, this message translates to:
+  /// **'الطلب لدى المركز للتحقق من التوفر'**
+  String get statusCenterFollowUp;
+
+  /// No description provided for @statusClientUpdateRequired.
+  ///
+  /// In ar, this message translates to:
+  /// **'المركز طلب تعديل نوع الإقامة'**
+  String get statusClientUpdateRequired;
+
+  /// No description provided for @statusCenterIntakePending.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار استكمال بيانات التقييم الأولي'**
+  String get statusCenterIntakePending;
+
+  /// No description provided for @statusCenterRecommendationPending.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار توصية المركز بعد مراجعة الحالة'**
+  String get statusCenterRecommendationPending;
+
+  /// No description provided for @statusApproved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمت الموافقة'**
+  String get statusApproved;
+
+  /// No description provided for @statusRequestApproved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمت الموافقة على طلبك'**
+  String get statusRequestApproved;
+
+  /// No description provided for @statusAwaitingPayment.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار الدفع'**
+  String get statusAwaitingPayment;
+
+  /// No description provided for @statusUploadPaymentProof.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى رفع إثبات التحويل'**
+  String get statusUploadPaymentProof;
+
+  /// No description provided for @statusPaymentReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'إثبات الدفع قيد المراجعة'**
+  String get statusPaymentReview;
+
+  /// No description provided for @statusSessionSetupPending.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار تجهيز الجلسة'**
+  String get statusSessionSetupPending;
+
+  /// No description provided for @statusResidencySetupPending.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار تجهيز الإقامة'**
+  String get statusResidencySetupPending;
+
+  /// No description provided for @statusSessionScheduled.
+  ///
+  /// In ar, this message translates to:
+  /// **'جلسة مجدولة'**
+  String get statusSessionScheduled;
+
+  /// No description provided for @statusResidencyScheduled.
+  ///
+  /// In ar, this message translates to:
+  /// **'إقامة مجدولة'**
+  String get statusResidencyScheduled;
+
+  /// No description provided for @statusSessionInProgress.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجلسة جارية'**
+  String get statusSessionInProgress;
+
+  /// No description provided for @statusResidencyInProgress.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإقامة جارية'**
+  String get statusResidencyInProgress;
+
+  /// No description provided for @statusPendingReviews.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار التقييمات'**
+  String get statusPendingReviews;
+
+  /// No description provided for @statusPendingDischargeReviews.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار تقارير الخروج'**
+  String get statusPendingDischargeReviews;
+
+  /// No description provided for @statusPayoutPending.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار الإغلاق المالي'**
+  String get statusPayoutPending;
+
+  /// No description provided for @statusCenterAccountingReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار المراجعة المحاسبية للمركز'**
+  String get statusCenterAccountingReview;
+
+  /// No description provided for @statusCompleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكتمل'**
+  String get statusCompleted;
+
+  /// No description provided for @statusCompletedSuccessfully.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكتمل بنجاح'**
+  String get statusCompletedSuccessfully;
+
+  /// No description provided for @statusRequestCompleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتمل الطلب'**
+  String get statusRequestCompleted;
+
+  /// No description provided for @statusReschedulePending.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار إعادة الجدولة'**
+  String get statusReschedulePending;
+
+  /// No description provided for @statusAwaitingStartConfirmations.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار تأكيد البداية'**
+  String get statusAwaitingStartConfirmations;
+
+  /// No description provided for @statusRejected.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر قبول الطلب'**
+  String get statusRejected;
+
+  /// No description provided for @statusClinicianRejected.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تأكيد الأخصائي'**
+  String get statusClinicianRejected;
+
+  /// No description provided for @statusCancelled.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملغي'**
+  String get statusCancelled;
+
+  /// No description provided for @statusCancellationPending.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلب الإلغاء قيد المراجعة'**
+  String get statusCancellationPending;
+
+  /// No description provided for @statusDisputeReceived.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم استلام الشكوى'**
+  String get statusDisputeReceived;
+
+  /// No description provided for @statusRequestCoordination.
+  ///
+  /// In ar, this message translates to:
+  /// **'يجري تنسيق الطلب'**
+  String get statusRequestCoordination;
+
+  /// No description provided for @statusRequestUpdateInProgress.
+  ///
+  /// In ar, this message translates to:
+  /// **'يتم تحديث حالة الطلب'**
+  String get statusRequestUpdateInProgress;
+
+  /// No description provided for @statusNewRequest.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلب جديد'**
+  String get statusNewRequest;
+
+  /// No description provided for @statusCenterAvailableResponse.
+  ///
+  /// In ar, this message translates to:
+  /// **'رد المركز: متاح'**
+  String get statusCenterAvailableResponse;
+
+  /// No description provided for @statusCenterUnavailableResponse.
+  ///
+  /// In ar, this message translates to:
+  /// **'رد المركز: غير متاح'**
+  String get statusCenterUnavailableResponse;
+
+  /// No description provided for @statusCenterNoResponse.
+  ///
+  /// In ar, this message translates to:
+  /// **'رد المركز: لم يرد بعد'**
+  String get statusCenterNoResponse;
+
   /// No description provided for @comingSoon.
   ///
   /// In ar, this message translates to:

@@ -229,31 +229,29 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     return false;
   }
 
-  String _statusLabel(String status, bool isArabic) {
+  String _statusLabel(String status, AppLocalizations l10n) {
     switch (status) {
       case 'session_setup_pending':
-        return isArabic ? 'بانتظار تجهيز الجلسة' : 'Session setup pending';
+        return l10n.statusSessionSetupPending;
       case 'reschedule_pending':
-        return isArabic ? 'إعادة جدولة' : 'Reschedule';
+        return l10n.statusReschedulePending;
       case 'session_scheduled':
-        return isArabic ? 'جلسة مجدولة' : 'Scheduled';
+        return l10n.statusSessionScheduled;
       case 'session_in_progress':
-        return isArabic ? 'جلسة جارية' : 'In progress';
+        return l10n.statusSessionInProgress;
       case 'session_completed_pending_reviews':
-        return isArabic ? 'بانتظار التقييمات' : 'Pending reviews';
+        return l10n.statusPendingReviews;
       case 'completed':
       case 'completed_success':
-        return isArabic ? 'مكتمل' : 'Completed';
+        return l10n.statusCompleted;
       case 'clinician_rejected':
-        return isArabic ? 'مرفوض من الأخصائي' : 'Rejected by clinician';
+        return l10n.statusClinicianRejected;
       case 'rejected_admin':
-        return isArabic
-            ? 'مرفوض خارج مسار الأخصائي'
-            : 'Rejected outside clinician flow';
+        return l10n.statusRejected;
       case 'cancelled':
-        return isArabic ? 'ملغي' : 'Cancelled';
+        return l10n.statusCancelled;
       default:
-        return isArabic ? 'طلب جديد' : 'New request';
+        return l10n.statusNewRequest;
     }
   }
 
@@ -1114,7 +1112,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  _statusLabel(status, isArabic),
+                  _statusLabel(status, l10n),
                   style: TextStyle(
                     color: _statusColor(status),
                     fontWeight: FontWeight.w800,

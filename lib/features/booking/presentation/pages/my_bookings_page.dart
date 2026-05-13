@@ -605,80 +605,84 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     );
   }
 
-  String _statusLabel(String requestKind, String status) {
+  String _statusLabel(
+    String requestKind,
+    String status,
+    AppLocalizations l10n,
+  ) {
     final isCenter = requestKind == 'center';
 
     if (isCenter) {
       switch (status) {
         case 'pending_admin':
-          return 'طلبك قيد المراجعة';
+          return l10n.statusRequestUnderReview;
         case 'center_follow_up':
-          return 'الطلب لدى المركز للتحقق من التوفر';
+          return l10n.statusCenterFollowUp;
         case 'client_update_required':
-          return 'المركز طلب تعديل نوع الإقامة';
+          return l10n.statusClientUpdateRequired;
         case 'center_intake_pending':
-          return 'بانتظار استكمال بيانات التقييم الأولي';
+          return l10n.statusCenterIntakePending;
         case 'center_recommendation_pending':
-          return 'بانتظار توصية المركز بعد مراجعة الحالة';
+          return l10n.statusCenterRecommendationPending;
         case 'approved':
-          return 'تمت الموافقة على طلبك';
+          return l10n.statusRequestApproved;
         case 'awaiting_payment':
-          return 'بانتظار التحويل المالي من العميل';
+          return l10n.statusAwaitingPayment;
         case 'payment_review':
-          return 'إثبات الدفع قيد المراجعة';
+          return l10n.statusPaymentReview;
         case 'session_setup_pending':
-          return 'الإدارة تجهز الإقامة بعد توصية المركز';
+          return l10n.statusResidencySetupPending;
         case 'session_scheduled':
-          return 'تم تأكيد الحجز والإقامة';
+          return l10n.statusResidencyScheduled;
         case 'session_in_progress':
-          return 'الإقامة أو البرنامج جارٍ';
+          return l10n.statusResidencyInProgress;
         case 'session_completed_pending_reviews':
-          return 'بانتظار التقييمات';
+          return l10n.statusPendingReviews;
         case 'payout_pending':
-          return 'بانتظار الإغلاق المالي';
+          return l10n.statusPayoutPending;
         case 'rejected':
         case 'rejected_admin':
-          return 'تعذر قبول الطلب';
+          return l10n.statusRejected;
         case 'completed_success':
-          return 'اكتملت العملية';
+          return l10n.statusCompletedSuccessfully;
         default:
-          return 'يتم تحديث حالة الطلب';
+          return l10n.statusRequestUpdateInProgress;
       }
     }
 
     switch (status) {
       case 'pending_admin':
-        return 'طلبك قيد المراجعة';
+        return l10n.statusRequestUnderReview;
       case 'assigned_clinician':
-        return 'يجري تنسيق الطلب';
+        return l10n.statusRequestCoordination;
       case 'awaiting_payment':
-        return 'يرجى رفع إثبات التحويل';
+        return l10n.statusUploadPaymentProof;
       case 'payment_review':
-        return 'إثبات الدفع قيد المراجعة';
+        return l10n.statusPaymentReview;
       case 'session_setup_pending':
-        return 'جارٍ تجهيز الجلسة';
+        return l10n.statusSessionSetupPending;
       case 'session_scheduled':
-        return 'تم تحديد الجلسة';
+        return l10n.statusSessionScheduled;
       case 'session_in_progress':
-        return 'الجلسة جارية';
+        return l10n.statusSessionInProgress;
       case 'session_completed_pending_reviews':
-        return 'بانتظار إغلاق الجلسة';
+        return l10n.statusPendingReviews;
       case 'payout_pending':
-        return 'اكتملت الجلسة وبانتظار الإغلاق';
+        return l10n.statusPayoutPending;
       case 'completed_success':
-        return 'اكتمل الطلب';
+        return l10n.statusRequestCompleted;
       case 'rejected_admin':
-        return 'تعذر قبول الطلب';
+        return l10n.statusRejected;
       case 'clinician_rejected':
-        return 'تعذر تأكيد الأخصائي';
+        return l10n.statusClinicianRejected;
       case 'reschedule_pending':
-        return 'يجري ترتيب موعد جديد';
+        return l10n.statusReschedulePending;
       case 'cancellation_pending':
-        return 'طلب الإلغاء قيد المراجعة';
+        return l10n.statusCancellationPending;
       case 'dispute_pending':
-        return 'تم استلام الشكوى';
+        return l10n.statusDisputeReceived;
       default:
-        return 'يتم تحديث حالة الطلب';
+        return l10n.statusRequestUpdateInProgress;
     }
   }
 
@@ -719,21 +723,28 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     return db.compareTo(da);
   }
 
-  String _badgeLabel(String requestKind, String status) {
-    return _statusLabel(requestKind, status);
+  String _badgeLabel(
+    String requestKind,
+    String status,
+    AppLocalizations l10n,
+  ) {
+    return _statusLabel(requestKind, status, l10n);
   }
 
-  String _centerAvailabilityOutcomeLabel(String value) {
+  String _centerAvailabilityOutcomeLabel(
+    String value,
+    AppLocalizations l10n,
+  ) {
     switch (value.trim()) {
       case 'available':
-        return 'رد المركز: متاح';
+        return l10n.statusCenterAvailableResponse;
       case 'unavailable':
-        return 'رد المركز: غير متاح';
+        return l10n.statusCenterUnavailableResponse;
       case 'pending':
       case '':
-        return 'رد المركز: لم يرد بعد';
+        return l10n.statusCenterNoResponse;
       default:
-        return 'رد المركز: لم يرد بعد';
+        return l10n.statusCenterNoResponse;
     }
   }
 
@@ -756,7 +767,10 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     return isCenter ? 'طلب مركز' : 'طلب أخصائي';
   }
 
-  List<String> _clientDetails(Map<String, dynamic> data) {
+  List<String> _clientDetails(
+    Map<String, dynamic> data,
+    AppLocalizations l10n,
+  ) {
     final requestKind = (data['requestKind'] ?? 'clinician').toString();
     final isCenter = requestKind == 'center';
     final status = (data['status'] ?? '').toString();
@@ -833,7 +847,8 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
       if (approvedSlot.isNotEmpty) 'الموعد المعتمد: $approvedSlot',
       if (selectedAccommodationLabelAr.isNotEmpty)
         'نوع الإقامة: $selectedAccommodationLabelAr',
-      if (isCenter) _centerAvailabilityOutcomeLabel(centerAvailabilityStatus),
+      if (isCenter)
+        _centerAvailabilityOutcomeLabel(centerAvailabilityStatus, l10n),
       if (isCenter && contractStatus.isNotEmpty) 'مسودة العقد: $contractStatus',
       if (isCenter && contractRoomLabel.isNotEmpty)
         'غرفة العقد: $contractRoomLabel',
@@ -1128,7 +1143,8 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                               ? 'الأخصائي'
                                               : clinicianName);
 
-                                      final subtitleParts = _clientDetails(d);
+                                      final subtitleParts =
+                                          _clientDetails(d, l10n);
 
                                       return Container(
                                         decoration:
@@ -1202,7 +1218,10 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                                     ),
                                                     child: Text(
                                                       _badgeLabel(
-                                                          requestKind, status),
+                                                        requestKind,
+                                                        status,
+                                                        l10n,
+                                                      ),
                                                       style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.w700,

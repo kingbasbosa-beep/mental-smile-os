@@ -472,6 +472,120 @@ class AppLocalizationsAr extends AppLocalizations {
   String get clinicianPleaseSignIn => 'يجب تسجيل الدخول أولًا';
 
   @override
+  String get statusPendingReview => 'قيد المراجعة';
+
+  @override
+  String get statusRequestUnderReview => 'طلبك قيد المراجعة';
+
+  @override
+  String get statusCenterFollowUp => 'الطلب لدى المركز للتحقق من التوفر';
+
+  @override
+  String get statusClientUpdateRequired => 'المركز طلب تعديل نوع الإقامة';
+
+  @override
+  String get statusCenterIntakePending =>
+      'بانتظار استكمال بيانات التقييم الأولي';
+
+  @override
+  String get statusCenterRecommendationPending =>
+      'بانتظار توصية المركز بعد مراجعة الحالة';
+
+  @override
+  String get statusApproved => 'تمت الموافقة';
+
+  @override
+  String get statusRequestApproved => 'تمت الموافقة على طلبك';
+
+  @override
+  String get statusAwaitingPayment => 'بانتظار الدفع';
+
+  @override
+  String get statusUploadPaymentProof => 'يرجى رفع إثبات التحويل';
+
+  @override
+  String get statusPaymentReview => 'إثبات الدفع قيد المراجعة';
+
+  @override
+  String get statusSessionSetupPending => 'بانتظار تجهيز الجلسة';
+
+  @override
+  String get statusResidencySetupPending => 'بانتظار تجهيز الإقامة';
+
+  @override
+  String get statusSessionScheduled => 'جلسة مجدولة';
+
+  @override
+  String get statusResidencyScheduled => 'إقامة مجدولة';
+
+  @override
+  String get statusSessionInProgress => 'الجلسة جارية';
+
+  @override
+  String get statusResidencyInProgress => 'الإقامة جارية';
+
+  @override
+  String get statusPendingReviews => 'بانتظار التقييمات';
+
+  @override
+  String get statusPendingDischargeReviews => 'بانتظار تقارير الخروج';
+
+  @override
+  String get statusPayoutPending => 'بانتظار الإغلاق المالي';
+
+  @override
+  String get statusCenterAccountingReview =>
+      'بانتظار المراجعة المحاسبية للمركز';
+
+  @override
+  String get statusCompleted => 'مكتمل';
+
+  @override
+  String get statusCompletedSuccessfully => 'مكتمل بنجاح';
+
+  @override
+  String get statusRequestCompleted => 'اكتمل الطلب';
+
+  @override
+  String get statusReschedulePending => 'بانتظار إعادة الجدولة';
+
+  @override
+  String get statusAwaitingStartConfirmations => 'بانتظار تأكيد البداية';
+
+  @override
+  String get statusRejected => 'تعذّر قبول الطلب';
+
+  @override
+  String get statusClinicianRejected => 'تعذّر تأكيد الأخصائي';
+
+  @override
+  String get statusCancelled => 'ملغي';
+
+  @override
+  String get statusCancellationPending => 'طلب الإلغاء قيد المراجعة';
+
+  @override
+  String get statusDisputeReceived => 'تم استلام الشكوى';
+
+  @override
+  String get statusRequestCoordination => 'يجري تنسيق الطلب';
+
+  @override
+  String get statusRequestUpdateInProgress => 'يتم تحديث حالة الطلب';
+
+  @override
+  String get statusNewRequest => 'طلب جديد';
+
+  @override
+  String get statusCenterAvailableResponse => 'رد المركز: متاح';
+
+  @override
+  String get statusCenterUnavailableResponse => 'رد المركز: غير متاح';
+
+  @override
+  String get statusCenterNoResponse => 'رد المركز: لم يرد بعد';
+
+  @override
   String comingSoon(String title) {
     return '$title — قريبًا';
   }

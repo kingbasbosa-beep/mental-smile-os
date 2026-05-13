@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 
 class ClientSessionsPage extends StatefulWidget {
@@ -109,34 +110,36 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
         status == 'payout_pending';
   }
 
-  String _statusLabel(String status, bool isArabic, bool isCenterRequest) {
+  String _statusLabel(
+    String status,
+    AppLocalizations l10n,
+    bool isCenterRequest,
+  ) {
     switch (status) {
       case 'session_setup_pending':
         return isCenterRequest
-            ? (isArabic ? 'بانتظار تجهيز الإقامة' : 'Residency setup pending')
-            : (isArabic ? 'بانتظار تجهيز الجلسة' : 'Session setup pending');
+            ? l10n.statusResidencySetupPending
+            : l10n.statusSessionSetupPending;
       case 'session_scheduled':
         return isCenterRequest
-            ? (isArabic ? 'إقامة مجدولة' : 'Residency scheduled')
-            : (isArabic ? 'جلسة مجدولة' : 'Session scheduled');
+            ? l10n.statusResidencyScheduled
+            : l10n.statusSessionScheduled;
       case 'session_in_progress':
         return isCenterRequest
-            ? (isArabic ? 'الإقامة جارية' : 'Residency in progress')
-            : (isArabic ? 'الجلسة جارية' : 'Session in progress');
+            ? l10n.statusResidencyInProgress
+            : l10n.statusSessionInProgress;
       case 'session_completed_pending_reviews':
         return isCenterRequest
-            ? (isArabic ? 'بانتظار تقارير الخروج' : 'Pending discharge reviews')
-            : (isArabic ? 'بانتظار التقييمات' : 'Pending reviews');
+            ? l10n.statusPendingDischargeReviews
+            : l10n.statusPendingReviews;
       case 'payout_pending':
         return isCenterRequest
-            ? (isArabic
-                ? 'بانتظار المراجعة المحاسبية للمركز'
-                : 'Pending center accounting review')
-            : (isArabic ? 'بانتظار التحويل للأخصائي' : 'Payout pending');
+            ? l10n.statusCenterAccountingReview
+            : l10n.statusPayoutPending;
       case 'completed_success':
-        return isArabic ? 'منتهية بنجاح' : 'Completed successfully';
+        return l10n.statusCompletedSuccessfully;
       case 'reschedule_pending':
-        return isArabic ? 'بانتظار إعادة الجدولة' : 'Reschedule pending';
+        return l10n.statusReschedulePending;
       default:
         return status;
     }
@@ -458,6 +461,7 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
   @override
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
 
@@ -722,12 +726,11 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                                             ),
                                             child: Text(
                                               awaitingResidencyStart
-                                                  ? (isArabic
-                                                      ? 'بانتظار تأكيد البداية'
-                                                      : 'Awaiting start confirmations')
+                                                  ? l10n
+                                                      .statusAwaitingStartConfirmations
                                                   : _statusLabel(
                                                       status,
-                                                      isArabic,
+                                                      l10n,
                                                       isCenterRequest,
                                                     ),
                                               style: TextStyle(
