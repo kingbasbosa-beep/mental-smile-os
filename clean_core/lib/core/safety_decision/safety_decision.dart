@@ -1,6 +1,9 @@
 import 'safety_decision_audit_link.dart';
+import 'safety_decision_confidence.dart';
+import 'safety_decision_reason.dart';
 import 'safety_decision_result.dart';
 import 'safety_decision_state.dart';
+import 'safety_decision_verdict.dart';
 
 class SafetyDecision {
   const SafetyDecision({

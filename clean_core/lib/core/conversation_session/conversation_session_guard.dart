@@ -1,5 +1,6 @@
 import 'conversation_fallback_state.dart';
 import 'conversation_session.dart';
+import 'conversation_session_mode.dart';
 import 'conversation_session_policy.dart';
 import 'conversation_session_state.dart';
 
