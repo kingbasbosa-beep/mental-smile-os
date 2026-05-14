@@ -10,6 +10,8 @@ import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_details_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/centers_landing_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/centers_list_page.dart';
+import 'package:flutterprojects/features/client/presentation/pages/client_dashboard_page.dart';
+import 'package:flutterprojects/features/client/presentation/pages/client_sessions_page.dart';
 import 'package:flutterprojects/features/home/presentation/pages/home_page.dart';
 import 'package:flutterprojects/features/home/presentation/pages/menu_page.dart';
 import 'package:flutterprojects/features/library/presentation/pages/library_page.dart';
@@ -53,6 +55,11 @@ class AppRouter {
 
   static const Set<String> _clientOnlyRoutes = {
     Routes.clientDashboard,
+    Routes.clientSessions,
+    Routes.clientPaymentProof,
+    Routes.followUpRegistration,
+    Routes.supportIssueSelector,
+    Routes.sessionReview,
     Routes.myBookings,
     Routes.bookingRequest,
     Routes.centerBookingRequest,
@@ -129,6 +136,10 @@ class AppRouter {
         return const WebRegistrationSuccessPage();
       case Routes.booking:
         return const BookingPage();
+      case Routes.clientDashboard:
+        return const ClientDashboardPage();
+      case Routes.clientSessions:
+        return const ClientSessionsPage();
       case Routes.bookingRequest:
         final args = settings.arguments;
         BookingRequestArgs? requestArgs;

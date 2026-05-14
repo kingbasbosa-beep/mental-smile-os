@@ -41,6 +41,9 @@ flutter:
     - assets/branding/menu/desktop/
     - assets/branding/menu/tablet/
     - assets/branding/menu/mobile/
+    - assets/branding/client_dashboard/desktop/
+    - assets/branding/client_dashboard/tablet/
+    - assets/branding/client_dashboard/mobile/
     - assets/branding/web_registration/centers/
     - assets/branding/web_registration/clinicians/
     - assets/c6_library/brand/logo_wordmark.png
@@ -55,4 +58,5 @@ flutter:
     - assets/images/avatar_clinician_male.png
     - assets/images/backgrounds/
     - assets/images/centers/
+    - assets/images/client_dashboard/actions/
     - assets/images/specialists/

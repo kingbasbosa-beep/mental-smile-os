@@ -7,6 +7,11 @@ class Routes {
   static const menu = '/menu';
 
   static const clientDashboard = '/client/dashboard';
+  static const clientSessions = '/client/sessions';
+  static const clientPaymentProof = '/client/payment-proof';
+  static const followUpRegistration = '/client/follow-up-registration';
+  static const supportIssueSelector = '/support/issues';
+  static const sessionReview = '/session/review';
   static const centerDashboard = '/center/dashboard';
   static const centerOperations = '/center/operations';
   static const centerInbox = '/center/inbox';
