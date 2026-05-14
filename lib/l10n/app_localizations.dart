@@ -572,6 +572,30 @@ abstract class AppLocalizations {
   /// **'اطلب المركز عبر الإدارة'**
   String get centerRequestViaAdmin;
 
+  /// No description provided for @centerInboxTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'وارد المركز'**
+  String get centerInboxTitle;
+
+  /// No description provided for @commonAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكل'**
+  String get commonAll;
+
+  /// No description provided for @statusPending.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار الرد'**
+  String get statusPending;
+
+  /// No description provided for @centerSaveResponse.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ الرد'**
+  String get centerSaveResponse;
+
   /// No description provided for @webCenterRegistrationPortalTitle.
   ///
   /// In ar, this message translates to:

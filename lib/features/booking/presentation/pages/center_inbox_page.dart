@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/booking/data/services/center_request_inbox_service.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 
 class CenterInboxPage extends StatefulWidget {
   const CenterInboxPage({super.key});
@@ -90,6 +91,7 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
     required String availabilityStatus,
   }) async {
     final isArabic = _isArabic(context);
+    final l10n = AppLocalizations.of(context)!;
     final shouldSubmit = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
@@ -109,11 +111,11 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(false),
-                child: Text(isArabic ? 'إلغاء' : 'Cancel'),
+                child: Text(l10n.authCancel),
               ),
               FilledButton(
                 onPressed: () => Navigator.of(dialogContext).pop(true),
-                child: Text(isArabic ? 'حفظ الرد' : 'Save response'),
+                child: Text(l10n.centerSaveResponse),
               ),
             ],
           ),
@@ -161,12 +163,13 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
   @override
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(isArabic ? 'وارد المركز' : 'Center inbox'),
+          title: Text(l10n.centerInboxTitle),
         ),
         body: Builder(
           builder: (context) {
@@ -189,23 +192,23 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                     runSpacing: 10,
                     children: [
                       ChoiceChip(
-                        label: Text(isArabic ? 'الكل' : 'All'),
+                        label: Text(l10n.commonAll),
                         selected: _filter == 'all',
                         onSelected: (_) => setState(() => _filter = 'all'),
                       ),
                       ChoiceChip(
-                        label: Text(isArabic ? 'بانتظار الرد' : 'Pending'),
+                        label: Text(l10n.statusPending),
                         selected: _filter == 'pending',
                         onSelected: (_) => setState(() => _filter = 'pending'),
                       ),
                       ChoiceChip(
-                        label: Text(isArabic ? 'متاح' : 'Available'),
+                        label: Text(l10n.centerAvailable),
                         selected: _filter == 'available',
                         onSelected: (_) =>
                             setState(() => _filter = 'available'),
                       ),
                       ChoiceChip(
-                        label: Text(isArabic ? 'غير متاح' : 'Unavailable'),
+                        label: Text(l10n.centerUnavailable),
                         selected: _filter == 'unavailable',
                         onSelected: (_) =>
                             setState(() => _filter = 'unavailable'),
@@ -422,9 +425,7 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                           icon: const Icon(
                                             Icons.check_circle_outline,
                                           ),
-                                          label: Text(
-                                            isArabic ? 'متاح' : 'Available',
-                                          ),
+                                          label: Text(l10n.centerAvailable),
                                         ),
                                         OutlinedButton.icon(
                                           onPressed: () => _respond(
@@ -433,11 +434,7 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                           ),
                                           icon: const Icon(
                                               Icons.event_busy_outlined),
-                                          label: Text(
-                                            isArabic
-                                                ? 'غير متاح'
-                                                : 'Unavailable',
-                                          ),
+                                          label: Text(l10n.centerUnavailable),
                                         ),
                                       ],
                                     ),

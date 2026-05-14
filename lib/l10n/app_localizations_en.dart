@@ -250,6 +250,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get centerRequestViaAdmin => 'Request this center through admin';
 
   @override
+  String get centerInboxTitle => 'Center inbox';
+
+  @override
+  String get commonAll => 'All';
+
+  @override
+  String get statusPending => 'Pending';
+
+  @override
+  String get centerSaveResponse => 'Save response';
+
+  @override
   String get webCenterRegistrationPortalTitle => 'Center Registration Portal';
 
   @override

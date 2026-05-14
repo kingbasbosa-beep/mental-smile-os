@@ -248,6 +248,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get centerRequestViaAdmin => 'اطلب المركز عبر الإدارة';
 
   @override
+  String get centerInboxTitle => 'وارد المركز';
+
+  @override
+  String get commonAll => 'الكل';
+
+  @override
+  String get statusPending => 'بانتظار الرد';
+
+  @override
+  String get centerSaveResponse => 'حفظ الرد';
+
+  @override
   String get webCenterRegistrationPortalTitle => 'بوابة تسجيل المراكز';
 
   @override
