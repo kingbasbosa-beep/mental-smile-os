@@ -1460,6 +1460,78 @@ abstract class AppLocalizations {
   /// **'يجب تسجيل الدخول أولًا'**
   String get clinicianPleaseSignIn;
 
+  /// No description provided for @clinicianInboxTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'وارد الأخصائي'**
+  String get clinicianInboxTitle;
+
+  /// No description provided for @clinicianAwaitingPayment.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار التحويل'**
+  String get clinicianAwaitingPayment;
+
+  /// No description provided for @clinicianReject.
+  ///
+  /// In ar, this message translates to:
+  /// **'رفض'**
+  String get clinicianReject;
+
+  /// No description provided for @clinicianAccept.
+  ///
+  /// In ar, this message translates to:
+  /// **'قبول'**
+  String get clinicianAccept;
+
+  /// No description provided for @clinicianRejectRequestTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'رفض الطلب'**
+  String get clinicianRejectRequestTitle;
+
+  /// No description provided for @clinicianRejectReason.
+  ///
+  /// In ar, this message translates to:
+  /// **'سبب الرفض'**
+  String get clinicianRejectReason;
+
+  /// No description provided for @clinicianRejectReasonHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب سبب الرفض هنا...'**
+  String get clinicianRejectReasonHint;
+
+  /// No description provided for @clinicianConfirmReject.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد الرفض'**
+  String get clinicianConfirmReject;
+
+  /// No description provided for @clinicianApprovalSent.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمت موافقة الأخصائي وتحويل الطلب لانتظار الدفع'**
+  String get clinicianApprovalSent;
+
+  /// No description provided for @clinicianRejectFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'فشل الرفض'**
+  String get clinicianRejectFailed;
+
+  /// No description provided for @clinicianAcceptFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'فشل القبول'**
+  String get clinicianAcceptFailed;
+
+  /// No description provided for @clinicianRequestRejected.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم رفض الطلب'**
+  String get clinicianRequestRejected;
+
   /// No description provided for @statusPendingReview.
   ///
   /// In ar, this message translates to:

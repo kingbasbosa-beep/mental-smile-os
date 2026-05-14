@@ -713,6 +713,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clinicianPleaseSignIn => 'Please sign in first';
 
   @override
+  String get clinicianInboxTitle => 'Clinician inbox';
+
+  @override
+  String get clinicianAwaitingPayment => 'Awaiting payment';
+
+  @override
+  String get clinicianReject => 'Reject';
+
+  @override
+  String get clinicianAccept => 'Accept';
+
+  @override
+  String get clinicianRejectRequestTitle => 'Reject request';
+
+  @override
+  String get clinicianRejectReason => 'Rejection reason';
+
+  @override
+  String get clinicianRejectReasonHint => 'Write the rejection reason here...';
+
+  @override
+  String get clinicianConfirmReject => 'Confirm rejection';
+
+  @override
+  String get clinicianApprovalSent =>
+      'Clinician approval sent and request moved to awaiting payment';
+
+  @override
+  String get clinicianRejectFailed => 'Reject failed';
+
+  @override
+  String get clinicianAcceptFailed => 'Accept failed';
+
+  @override
+  String get clinicianRequestRejected => 'Request rejected';
+
+  @override
   String get statusPendingReview => 'Pending review';
 
   @override

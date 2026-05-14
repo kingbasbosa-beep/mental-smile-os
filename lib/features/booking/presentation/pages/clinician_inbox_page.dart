@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/l10n/app_localizations.dart';
 
 const String kDevClinicianId =
     String.fromEnvironment('MK_DEV_CLINICIAN_ID', defaultValue: '');
@@ -49,6 +50,9 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
     if (currentUid.isNotEmpty) return currentUid;
     return kDevClinicianId.isNotEmpty ? kDevClinicianId : widget.clinicianId;
   }
+
+  bool _isArabic(BuildContext context) =>
+      Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
   Query<Map<String, dynamic>> _query(String status) {
     final uid = _effectiveClinicianUid();
@@ -113,24 +117,24 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
     return '$y-$m-$d $hh:$mm';
   }
 
-  String _statusLabel(String status) {
+  String _statusLabel(String status, AppLocalizations l10n) {
     switch (status) {
       case 'assigned_clinician':
-        return 'طلبات جديدة';
+        return l10n.clinicianNewRequests;
       case 'awaiting_payment':
-        return 'بانتظار التحويل';
+        return l10n.clinicianAwaitingPayment;
       case 'clinician_rejected':
-        return 'مرفوضة';
+        return l10n.clinicianClosed;
       default:
         return status;
     }
   }
-
   Widget _statusTabs(BuildContext context) {
-    const items = <Map<String, String>>[
-      {'key': 'assigned_clinician', 'label': 'طلبات جديدة'},
-      {'key': 'awaiting_payment', 'label': 'بانتظار التحويل'},
-      {'key': 'clinician_rejected', 'label': 'مرفوضة'},
+    final l10n = AppLocalizations.of(context)!;
+    final items = <Map<String, String>>[
+      {'key': 'assigned_clinician', 'label': l10n.clinicianNewRequests},
+      {'key': 'awaiting_payment', 'label': l10n.clinicianAwaitingPayment},
+      {'key': 'clinician_rejected', 'label': l10n.clinicianClosed},
     ];
 
     return Padding(
@@ -148,7 +152,6 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
       ),
     );
   }
-
   Widget _buildLegacyInboxIntro(BuildContext context) {
     final isArabic =
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
@@ -173,7 +176,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
-            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            textAlign: TextAlign.start,
           ),
           const SizedBox(height: 6),
           Text(
@@ -181,7 +184,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
                 ? 'هذه الصفحة ما زالت متاحة للتوافق والمتابعة، لكن المساحة الأساسية لطلبات الأخصائي داخل Specialist Workspace أصبحت غرفة عمليات الأخصائي.'
                 : 'This page remains available for compatibility and follow-up, but the primary specialist workspace for assignments is now Clinician Operations.',
             style: Theme.of(context).textTheme.bodyMedium,
-            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            textAlign: TextAlign.start,
           ),
         ],
       ),
@@ -190,6 +193,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
 
   Future<void> _onApprovePressed(BuildContext context, String docId) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final slot = _slotCtrl.text.trim();
     final clinicianUid =
         FirebaseAuth.instance.currentUser?.uid ?? _effectiveClinicianUid();
@@ -209,43 +213,45 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
         'payoutStatus': 'blocked',
       });
       messenger.showSnackBar(
-        const SnackBar(
-            content: Text('تمت موافقة الأخصائي وتحويل الطلب لانتظار الدفع ✅')),
+        SnackBar(content: Text(l10n.clinicianApprovalSent)),
       );
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('فشل القبول: $e')));
+      messenger.showSnackBar(
+        SnackBar(content: Text('${l10n.clinicianAcceptFailed}: $e')),
+      );
     }
   }
-
   Future<void> _onRejectPressed(BuildContext context, String docId) async {
     _rejectCtrl.text = '';
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final isArabic = _isArabic(context);
     final clinicianUid =
         FirebaseAuth.instance.currentUser?.uid ?? _effectiveClinicianUid();
 
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => Directionality(
-        textDirection: TextDirection.rtl,
+        textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
         child: AlertDialog(
-          title: const Text('رفض الطلب'),
+          title: Text(l10n.clinicianRejectRequestTitle),
           content: TextField(
             controller: _rejectCtrl,
-            decoration: const InputDecoration(
-              labelText: 'سبب الرفض',
-              hintText: 'اكتب سبب الرفض هنا...',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: l10n.clinicianRejectReason,
+              hintText: l10n.clinicianRejectReasonHint,
+              border: const OutlineInputBorder(),
             ),
             maxLines: 3,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('إلغاء'),
+              child: Text(l10n.authCancel),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('تأكيد الرفض'),
+              child: Text(l10n.clinicianConfirmReject),
             ),
           ],
         ),
@@ -267,20 +273,26 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
         'paymentStatus': 'blocked',
         'sessionStatus': 'cancelled',
       });
-      messenger.showSnackBar(const SnackBar(content: Text('تم رفض الطلب ⛔')));
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.clinicianRequestRejected)),
+      );
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('فشل الرفض: $e')));
+      messenger.showSnackBar(
+        SnackBar(content: Text('${l10n.clinicianRejectFailed}: $e')),
+      );
     }
   }
-
   @override
   Widget build(BuildContext context) {
+    final isArabic = _isArabic(context);
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_legacyClinicianInboxEnabled) {
       return Directionality(
-        textDirection: TextDirection.rtl,
+        textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
         child: Scaffold(
           appBar: AppBar(
-            title: Text('وارد الأخصائي'),
+            title: Text(l10n.clinicianInboxTitle),
           ),
           body: Center(
             child: Padding(
@@ -298,10 +310,10 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
     final q = _query(_statusFilter);
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('وارد الأخصائي'),
+          title: Text(l10n.clinicianInboxTitle),
         ),
         body: Column(
           children: [
@@ -392,8 +404,8 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
                                     const SizedBox(height: 6),
                                     Text(
                                       createdAt.isEmpty
-                                          ? _statusLabel(status)
-                                          : '${_statusLabel(status)} • $createdAt',
+                                          ? _statusLabel(status, l10n)
+                                          : '${_statusLabel(status, l10n)} • $createdAt',
                                       style:
                                           Theme.of(context).textTheme.bodySmall,
                                     ),
@@ -430,13 +442,13 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
                                 OutlinedButton(
                                   onPressed: () =>
                                       _onRejectPressed(context, d.id),
-                                  child: const Text('رفض'),
+                                  child: Text(l10n.clinicianReject),
                                 ),
                                 const SizedBox(width: 8),
                                 ElevatedButton(
                                   onPressed: () =>
                                       _onApprovePressed(context, d.id),
-                                  child: const Text('قبول'),
+                                  child: Text(l10n.clinicianAccept),
                                 ),
                               ],
                             ],

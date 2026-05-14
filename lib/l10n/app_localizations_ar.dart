@@ -707,6 +707,43 @@ class AppLocalizationsAr extends AppLocalizations {
   String get clinicianPleaseSignIn => 'يجب تسجيل الدخول أولًا';
 
   @override
+  String get clinicianInboxTitle => 'وارد الأخصائي';
+
+  @override
+  String get clinicianAwaitingPayment => 'بانتظار التحويل';
+
+  @override
+  String get clinicianReject => 'رفض';
+
+  @override
+  String get clinicianAccept => 'قبول';
+
+  @override
+  String get clinicianRejectRequestTitle => 'رفض الطلب';
+
+  @override
+  String get clinicianRejectReason => 'سبب الرفض';
+
+  @override
+  String get clinicianRejectReasonHint => 'اكتب سبب الرفض هنا...';
+
+  @override
+  String get clinicianConfirmReject => 'تأكيد الرفض';
+
+  @override
+  String get clinicianApprovalSent =>
+      'تمت موافقة الأخصائي وتحويل الطلب لانتظار الدفع';
+
+  @override
+  String get clinicianRejectFailed => 'فشل الرفض';
+
+  @override
+  String get clinicianAcceptFailed => 'فشل القبول';
+
+  @override
+  String get clinicianRequestRejected => 'تم رفض الطلب';
+
+  @override
   String get statusPendingReview => 'قيد المراجعة';
 
   @override
