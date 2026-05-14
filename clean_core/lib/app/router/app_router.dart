@@ -2,6 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/core/auth/presentation/pages/account_blocked_page.dart';
+import 'package:flutterprojects/features/booking/presentation/pages/booking_page.dart';
+import 'package:flutterprojects/features/booking/presentation/pages/booking_request_page.dart';
+import 'package:flutterprojects/features/booking/presentation/pages/center_booking_request_page.dart';
+import 'package:flutterprojects/features/booking/presentation/pages/my_bookings_page.dart';
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_details_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/centers_landing_page.dart';
@@ -123,6 +127,50 @@ class AppRouter {
         return const WebClinicianDocumentsPage();
       case Routes.webRegistrationSuccess:
         return const WebRegistrationSuccessPage();
+      case Routes.booking:
+        return const BookingPage();
+      case Routes.bookingRequest:
+        final args = settings.arguments;
+        BookingRequestArgs? requestArgs;
+        if (args is BookingRequestArgs) {
+          requestArgs = args;
+        } else if (args is Map) {
+          final clinicianId = args['clinicianId']?.toString() ?? '';
+          final clinicianName = args['clinicianName']?.toString() ?? '';
+          if (clinicianId.isNotEmpty && clinicianName.isNotEmpty) {
+            requestArgs = BookingRequestArgs(
+              clinicianId: clinicianId,
+              clinicianName: clinicianName,
+            );
+          }
+        }
+        if (requestArgs == null) {
+          return const _FoundationPlaceholderPage(title: 'Route not found');
+        }
+        return BookingRequestPage(args: requestArgs);
+      case Routes.centerBookingRequest:
+        final args = settings.arguments;
+        CenterBookingRequestArgs? requestArgs;
+        if (args is CenterBookingRequestArgs) {
+          requestArgs = args;
+        } else if (args is Map) {
+          final centerId = args['centerId']?.toString() ?? '';
+          final centerName = args['centerName']?.toString() ?? '';
+          if (centerId.isNotEmpty && centerName.isNotEmpty) {
+            requestArgs = CenterBookingRequestArgs(
+              centerId: centerId,
+              centerName: centerName,
+              centerType: args['centerType']?.toString() ?? '',
+              hasDetoxUnit: args['hasDetoxUnit'] == true,
+            );
+          }
+        }
+        if (requestArgs == null) {
+          return const _FoundationPlaceholderPage(title: 'Route not found');
+        }
+        return CenterBookingRequestPage(args: requestArgs);
+      case Routes.myBookings:
+        return const MyBookingsPage();
       case Routes.centers:
         final args = settings.arguments;
         final returnRoute =
