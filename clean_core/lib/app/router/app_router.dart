@@ -15,6 +15,8 @@ import 'package:flutterprojects/features/centers/presentation/pages/centers_land
 import 'package:flutterprojects/features/centers/presentation/pages/centers_list_page.dart';
 import 'package:flutterprojects/features/client/presentation/pages/client_dashboard_page.dart';
 import 'package:flutterprojects/features/client/presentation/pages/client_sessions_page.dart';
+import 'package:flutterprojects/features/clinician/presentation/pages/clinician_operations_page.dart';
+import 'package:flutterprojects/features/clinician/presentation/pages/clinician_sessions_page.dart';
 import 'package:flutterprojects/features/home/presentation/pages/home_page.dart';
 import 'package:flutterprojects/features/home/presentation/pages/menu_page.dart';
 import 'package:flutterprojects/features/library/presentation/pages/library_page.dart';
@@ -47,6 +49,8 @@ class AppRouter {
   static const Set<String> _clinicianOnlyRoutes = {
     Routes.clinicianOperations,
     Routes.clinicianSessions,
+    Routes.clinicianChatInbox,
+    Routes.clinicianProfileEditRequest,
   };
 
   static const Set<String> _centerOnlyRoutes = {
@@ -71,7 +75,7 @@ class AppRouter {
     if (_adminOnlyRoutes.contains(routeName)) return {_roleAdmin};
     if (routeName == Routes.supportIssueSelector ||
         routeName == Routes.sessionReview) {
-      return {_roleClient, _roleCenter};
+      return {_roleClient, _roleCenter, _roleClinician};
     }
     if (_clinicianOnlyRoutes.contains(routeName)) return {_roleClinician};
     if (_centerOnlyRoutes.contains(routeName)) return {_roleCenter};
@@ -151,6 +155,10 @@ class AppRouter {
         return const CenterInboxPage();
       case Routes.centerResidencies:
         return const CenterResidenciesPage();
+      case Routes.clinicianOperations:
+        return const ClinicianOperationsPage();
+      case Routes.clinicianSessions:
+        return const ClinicianSessionsPage();
       case Routes.bookingRequest:
         final args = settings.arguments;
         BookingRequestArgs? requestArgs;

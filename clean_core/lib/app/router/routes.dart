@@ -18,6 +18,8 @@ class Routes {
   static const centerResidencies = '/center/residencies';
   static const clinicianOperations = '/clinician/operations';
   static const clinicianSessions = '/clinician/sessions';
+  static const clinicianChatInbox = '/clinician/chat-inbox';
+  static const clinicianProfileEditRequest = '/clinician/profile-edit-request';
   static const adminHub = '/admin';
 
   static const webCenterRegister = '/web/center/register';
