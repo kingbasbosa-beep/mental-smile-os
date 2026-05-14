@@ -13,6 +13,7 @@ class Routes {
   static const centerResidencies = '/center/residencies';
   static const clinicianOperations = '/clinician/operations';
   static const clinicianSessions = '/clinician/sessions';
+  static const adminHub = '/admin';
 
   static const webCenterRegister = '/web/center/register';
   static const webCenterProfile = '/web/center/profile';
@@ -32,6 +33,10 @@ class Routes {
   static const specialistsList = '/module/specialists/list';
   static const specialistDetails = '/module/specialists/details';
   static const library = '/module/library';
+  static const webLibrary = '/web/library';
+  static const addiction = '/module/addiction';
+  static const specialNeeds = '/module/special-needs';
+  static const chat = '/chat';
   static const booking = '/booking';
   static const bookingRequest = '/booking/request';
   static const centerBookingRequest = '/booking/center-request';

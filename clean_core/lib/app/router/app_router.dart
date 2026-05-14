@@ -2,6 +2,26 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/core/auth/presentation/pages/account_blocked_page.dart';
+import 'package:flutterprojects/features/centers/data/models/center_model.dart';
+import 'package:flutterprojects/features/centers/presentation/pages/center_details_page.dart';
+import 'package:flutterprojects/features/centers/presentation/pages/centers_landing_page.dart';
+import 'package:flutterprojects/features/centers/presentation/pages/centers_list_page.dart';
+import 'package:flutterprojects/features/home/presentation/pages/home_page.dart';
+import 'package:flutterprojects/features/home/presentation/pages/menu_page.dart';
+import 'package:flutterprojects/features/library/presentation/pages/library_page.dart';
+import 'package:flutterprojects/features/specialists/presentation/specialist_details_page.dart';
+import 'package:flutterprojects/features/specialists/presentation/specialists_categories_page.dart';
+import 'package:flutterprojects/features/specialists/presentation/specialists_list_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_documents_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_media_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_pricing_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_profile_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_register_portal_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_documents_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_profile_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_register_portal_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_sessions_page.dart';
+import 'package:flutterprojects/features/web_registration/presentation/pages/web_registration_success_page.dart';
 
 import 'routes.dart';
 
@@ -11,6 +31,10 @@ const String _roleCenter = 'center';
 const String _roleClient = 'client';
 
 class AppRouter {
+  static const Set<String> _adminOnlyRoutes = {
+    Routes.adminHub,
+  };
+
   static const Set<String> _clinicianOnlyRoutes = {
     Routes.clinicianOperations,
     Routes.clinicianSessions,
@@ -32,6 +56,7 @@ class AppRouter {
 
   static Set<String>? _requiredRoles(String? routeName) {
     if (routeName == null) return null;
+    if (_adminOnlyRoutes.contains(routeName)) return {_roleAdmin};
     if (_clinicianOnlyRoutes.contains(routeName)) return {_roleClinician};
     if (_centerOnlyRoutes.contains(routeName)) return {_roleCenter};
     if (_clientOnlyRoutes.contains(routeName)) return {_roleClient};
@@ -59,9 +84,101 @@ class AppRouter {
         return const AccountBlockedPage();
       case Routes.splash:
       case Routes.language:
+        return const HomePage();
       case Routes.home:
+        return const MenuPage();
       case Routes.menu:
-        return const _FoundationPlaceholderPage(title: 'Mental Smile');
+        return const MenuPage();
+      case Routes.library:
+      case Routes.webLibrary:
+        final args = settings.arguments;
+        final categoryKey =
+            args is Map ? args['categoryKey']?.toString() : null;
+        final returnRoute =
+            args is Map ? args['returnRoute']?.toString() : null;
+        return LibraryPage(
+          initialCategoryKey:
+              categoryKey == null || categoryKey.isEmpty ? null : categoryKey,
+          returnRoute: (returnRoute == null || returnRoute.isEmpty)
+              ? Routes.menu
+              : returnRoute,
+        );
+      case Routes.webCenterRegister:
+        return const WebCenterRegisterPortalPage();
+      case Routes.webCenterProfile:
+        return const WebCenterProfilePage();
+      case Routes.webCenterMedia:
+        return const WebCenterMediaPage();
+      case Routes.webCenterPricing:
+        return const WebCenterPricingPage();
+      case Routes.webCenterDocuments:
+        return const WebCenterDocumentsPage();
+      case Routes.webClinicianRegister:
+        return const WebClinicianRegisterPortalPage();
+      case Routes.webClinicianProfile:
+        return const WebClinicianProfilePage();
+      case Routes.webClinicianSessions:
+        return const WebClinicianSessionsPage();
+      case Routes.webClinicianDocuments:
+        return const WebClinicianDocumentsPage();
+      case Routes.webRegistrationSuccess:
+        return const WebRegistrationSuccessPage();
+      case Routes.centers:
+        final args = settings.arguments;
+        final returnRoute =
+            args is Map ? args['returnRoute']?.toString() : null;
+        return CentersLandingPage(
+          returnRoute: (returnRoute == null || returnRoute.isEmpty)
+              ? Routes.menu
+              : returnRoute,
+        );
+      case Routes.centersList:
+        final args = settings.arguments;
+        final category = args is Map ? args['category']?.toString() : null;
+        final returnRoute =
+            args is Map ? args['returnRoute']?.toString() : null;
+        if (category == null || category.isEmpty) {
+          return const _FoundationPlaceholderPage(title: 'Route not found');
+        }
+        return CentersListPage(
+          category: category,
+          returnRoute: (returnRoute == null || returnRoute.isEmpty)
+              ? Routes.menu
+              : returnRoute,
+        );
+      case Routes.centerDetails:
+        final args = settings.arguments;
+        CenterModel? center;
+        String? centerId;
+        if (args is Map) {
+          final rawCenter = args['center'];
+          if (rawCenter is CenterModel) center = rawCenter;
+          centerId = args['centerId']?.toString();
+        } else if (args is CenterModel) {
+          center = args;
+        }
+        return CenterDetailsPage(center: center, centerId: centerId);
+      case Routes.specialists:
+        final args = settings.arguments;
+        final returnRoute =
+            args is Map ? args['returnRoute']?.toString() : null;
+        return SpecialistsCategoriesPage(
+          returnRoute: (returnRoute == null || returnRoute.isEmpty)
+              ? Routes.menu
+              : returnRoute,
+        );
+      case Routes.specialistsList:
+        final args = settings.arguments;
+        if (args is! Map<String, dynamic>) {
+          return const _FoundationPlaceholderPage(title: 'Route not found');
+        }
+        return SpecialistsListPage(args: args);
+      case Routes.specialistDetails:
+        final args = settings.arguments;
+        if (args is! Map<String, dynamic>) {
+          return const _FoundationPlaceholderPage(title: 'Route not found');
+        }
+        return SpecialistDetailsPage(args: args);
       default:
         return _FoundationPlaceholderPage(
           title: settings.name ?? 'Route not found',

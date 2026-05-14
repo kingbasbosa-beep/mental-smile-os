@@ -1,0 +1,1308 @@
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/shared/analytics/app_analytics.dart';
+import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
+
+/// C6 Library UI.
+class LibraryPage extends StatefulWidget {
+  const LibraryPage({
+    super.key,
+    this.initialCategoryKey,
+    this.returnRoute = Routes.menu,
+  });
+
+  final String? initialCategoryKey;
+  final String returnRoute;
+
+  @override
+  State<LibraryPage> createState() => _LibraryPageState();
+}
+
+class _LibraryPageState extends State<LibraryPage> {
+  PageController? _pageController;
+  double _viewportFraction = 0.82;
+  double _page = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _syncPageController(_viewportFraction);
+  }
+
+  @override
+  void dispose() {
+    _pageController?.removeListener(_handlePageChange);
+    _pageController?.dispose();
+    super.dispose();
+  }
+
+  void _handlePageChange() {
+    if (!mounted) return;
+    setState(() => _page = _pageController?.page ?? 0);
+  }
+
+  void _syncPageController(double viewportFraction) {
+    if (_pageController != null && _viewportFraction == viewportFraction) {
+      return;
+    }
+
+    final oldPage = _pageController?.hasClients == true
+        ? (_pageController?.page ?? _page)
+        : _page;
+
+    _pageController?.removeListener(_handlePageChange);
+    _pageController?.dispose();
+    _viewportFraction = viewportFraction;
+    _pageController = PageController(
+      initialPage: oldPage.round().clamp(0, 5).toInt(),
+      viewportFraction: viewportFraction,
+    )..addListener(_handlePageChange);
+    _page = oldPage;
+  }
+
+  void _goToPage(int targetIndex, int itemCount) {
+    final clamped = targetIndex.clamp(0, itemCount - 1).toInt();
+    _pageController?.animateToPage(
+      clamped,
+      duration: const Duration(milliseconds: 360),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  void _nextPage(int itemCount) {
+    _goToPage((_pageController?.page ?? _page).round() + 1, itemCount);
+  }
+
+  void _previousPage(int itemCount) {
+    _goToPage((_pageController?.page ?? _page).round() - 1, itemCount);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = Localizations.localeOf(context).languageCode.toLowerCase();
+    final isAr = lang == 'ar';
+    final selectedFeatured = _featuredLibraryEntry(widget.initialCategoryKey);
+
+    final categories = <_LibCat>[
+      const _LibCat(
+        keyName: 'articles',
+        titleAr: 'مقالات',
+        titleEn: 'Articles',
+        asset: 'c6_library/categories/cat_articles.png',
+      ),
+      const _LibCat(
+        keyName: 'exercises',
+        titleAr: 'تمارين',
+        titleEn: 'Exercises',
+        asset: 'c6_library/categories/cat_exercises.png',
+      ),
+      const _LibCat(
+        keyName: 'audio',
+        titleAr: 'صوتيات',
+        titleEn: 'Audio',
+        asset: 'c6_library/categories/cat_audio.png',
+      ),
+      const _LibCat(
+        keyName: 'videos',
+        titleAr: 'فيديو',
+        titleEn: 'Videos',
+        asset: 'c6_library/categories/cat_videos.png',
+      ),
+      const _LibCat(
+        keyName: 'tools',
+        titleAr: 'أدوات',
+        titleEn: 'Tools',
+        asset: 'c6_library/categories/cat_tools.png',
+      ),
+      const _LibCat(
+        keyName: 'saved',
+        titleAr: 'المحفوظات',
+        titleEn: 'Saved',
+        asset: 'c6_library/categories/cat_saved.png',
+      ),
+    ];
+    final selectedCategory = _standardLibraryCategory(
+      widget.initialCategoryKey,
+      categories,
+    );
+    final showingCategory =
+        selectedFeatured != null || selectedCategory != null;
+
+    return Directionality(
+      textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                final height = constraints.maxHeight;
+                final isMobile = width < 700;
+                final isTablet = width >= 700 && width < 1100;
+                final viewportFraction = isMobile
+                    ? 0.82
+                    : isTablet
+                        ? 0.56
+                        : 0.31;
+                _syncPageController(viewportFraction);
+                final pageController = _pageController!;
+
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      _libraryBackgroundAsset(width),
+                      fit: BoxFit.cover,
+                      alignment: _libraryBackgroundAlignment(width),
+                      errorBuilder: (context, error, stackTrace) =>
+                          const ColoredBox(color: Color(0xFF03080D)),
+                    ),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.26),
+                            Colors.black.withValues(alpha: 0.18),
+                            Colors.black.withValues(alpha: 0.48),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SafeArea(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (!showingCategory)
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(
+                                isMobile ? 18 : 34,
+                                isMobile ? 18 : 28,
+                                isMobile ? 18 : 34,
+                                isMobile ? 10 : 18,
+                              ),
+                              child: _LibraryHeader(isAr: isAr),
+                            ),
+                          if (!showingCategory)
+                            _LibraryFeaturedEntries(
+                              compact: isMobile,
+                              isAr: isAr,
+                            ),
+                          Expanded(
+                            child: selectedFeatured != null
+                                ? _LibraryFeaturedDetail(
+                                    entry: selectedFeatured,
+                                    isAr: isAr,
+                                    compact: isMobile,
+                                  )
+                                : selectedCategory != null
+                                    ? _LibraryStandardCategoryDetail(
+                                        category: selectedCategory,
+                                        isAr: isAr,
+                                        compact: isMobile,
+                                      )
+                                    : isMobile || isTablet
+                                        ? _LibraryCarousel(
+                                            controller: pageController,
+                                            page: _page,
+                                            categories: categories,
+                                            isAr: isAr,
+                                            height: height,
+                                          )
+                                        : _LibraryDesktopStage(
+                                            controller: pageController,
+                                            page: _page,
+                                            categories: categories,
+                                            isAr: isAr,
+                                          ),
+                          ),
+                          if (!showingCategory)
+                            _LibraryCarouselControls(
+                              compact: isMobile,
+                              onPrevious: () =>
+                                  _previousPage(categories.length),
+                              onNext: () => _nextPage(categories.length),
+                            ),
+                          SizedBox(height: isMobile ? 16 : 28),
+                        ],
+                      ),
+                    ),
+                    SafeArea(
+                      child: Align(
+                        alignment: AlignmentDirectional.topStart,
+                        child: Padding(
+                          padding: EdgeInsetsDirectional.only(
+                            start: isMobile ? 14 : 22,
+                            top: isMobile ? 12 : 18,
+                          ),
+                          child: _LibraryBackButton(
+                            compact: isMobile,
+                            returnToLibraryHome: showingCategory,
+                            returnRoute: widget.returnRoute,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            const _ModuleEntryLogger(module: 'library'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _libraryBackgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/branding/library/backgrounds/mobile/library_mobile_bg.png';
+    }
+    if (width < 1100) {
+      return 'assets/branding/library/backgrounds/tablet/library_tablet_bg.png';
+    }
+    return 'assets/branding/library/backgrounds/desktop/library_desktop_bg.png';
+  }
+
+  Alignment _libraryBackgroundAlignment(double width) {
+    if (width < 700) return Alignment.topCenter;
+    if (width < 1100) return Alignment.center;
+    return Alignment.center;
+  }
+}
+
+class _LibraryHeader extends StatelessWidget {
+  const _LibraryHeader({required this.isAr});
+
+  final bool isAr;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      isAr ? 'المكتبة' : 'Library',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        color: const Color(0xFFFFD47A),
+        fontSize: MediaQuery.sizeOf(context).width < 700 ? 38 : 56,
+        fontWeight: FontWeight.w900,
+        height: 1,
+        shadows: const [
+          Shadow(
+            color: Colors.black,
+            blurRadius: 16,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LibraryBackButton extends StatefulWidget {
+  const _LibraryBackButton({
+    required this.compact,
+    required this.returnToLibraryHome,
+    required this.returnRoute,
+  });
+
+  final bool compact;
+  final bool returnToLibraryHome;
+  final String returnRoute;
+
+  @override
+  State<_LibraryBackButton> createState() => _LibraryBackButtonState();
+}
+
+class _LibraryBackButtonState extends State<_LibraryBackButton> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = widget.compact ? 44.0 : 52.0;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedScale(
+        scale: _hovered ? 1.04 : 1.0,
+        duration: const Duration(milliseconds: 160),
+        curve: Curves.easeOutCubic,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: () {
+            if (widget.returnToLibraryHome) {
+              Navigator.of(context).pushReplacementNamed(
+                Routes.library,
+                arguments: {'returnRoute': widget.returnRoute},
+              );
+            } else {
+              Navigator.of(context).pushNamed(widget.returnRoute);
+            }
+          },
+          child: Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFF1B1007).withValues(alpha: 0.50),
+              border: Border.all(
+                color: const Color(0xFFFFD98A).withValues(alpha: 0.56),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFE7A94C).withValues(
+                    alpha: _hovered ? 0.28 : 0.16,
+                  ),
+                  blurRadius: _hovered ? 18 : 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Image.asset(
+              Directionality.of(context) == TextDirection.rtl
+                  ? 'assets/branding/navigation/back/back_right_gold.png'
+                  : 'assets/branding/navigation/back/back_left_gold.png',
+              width: widget.compact ? 22 : 26,
+              height: widget.compact ? 22 : 26,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(
+                  Icons.arrow_back_rounded,
+                  color: const Color(0xFFFFE7B2),
+                  size: widget.compact ? 22 : 26,
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryFeaturedEntries extends StatelessWidget {
+  const _LibraryFeaturedEntries({
+    required this.compact,
+    required this.isAr,
+  });
+
+  final bool compact;
+  final bool isAr;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        compact ? 14 : 24,
+        compact ? 2 : 4,
+        compact ? 14 : 24,
+        compact ? 6 : 12,
+      ),
+      child: Center(
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: compact ? 10 : 16,
+          runSpacing: compact ? 8 : 10,
+          children: [
+            for (final entry in _featuredLibraryEntries)
+              _LibraryFeaturedHeartCard(
+                entry: entry,
+                compact: compact,
+                isAr: isAr,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryFeaturedHeartCard extends StatefulWidget {
+  const _LibraryFeaturedHeartCard({
+    required this.entry,
+    required this.compact,
+    required this.isAr,
+  });
+
+  final _FeaturedLibraryEntry entry;
+  final bool compact;
+  final bool isAr;
+
+  @override
+  State<_LibraryFeaturedHeartCard> createState() =>
+      _LibraryFeaturedHeartCardState();
+}
+
+class _LibraryFeaturedHeartCardState extends State<_LibraryFeaturedHeartCard> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final routeName = ModalRoute.of(context)?.settings.name == Routes.webLibrary
+        ? Routes.webLibrary
+        : Routes.library;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedScale(
+        scale: _hovered ? 1.035 : 1.0,
+        duration: const Duration(milliseconds: 160),
+        curve: Curves.easeOutCubic,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: () {
+            AppAnalytics.logPathSelected('library', widget.entry.keyName);
+            Navigator.of(context).pushNamed(
+              routeName,
+              arguments: {'categoryKey': widget.entry.keyName},
+            );
+          },
+          child: Container(
+            width: widget.compact ? 152 : 214,
+            padding: EdgeInsets.symmetric(
+              horizontal: widget.compact ? 12 : 16,
+              vertical: widget.compact ? 10 : 14,
+            ),
+            decoration: BoxDecoration(
+              color: const Color(0xFF120B05).withValues(alpha: 0.58),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: const Color(0xFFFFD98A).withValues(
+                  alpha: _hovered ? 0.72 : 0.42,
+                ),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFE7A94C).withValues(
+                    alpha: _hovered ? 0.20 : 0.10,
+                  ),
+                  blurRadius: _hovered ? 22 : 14,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Icon(
+                      Icons.favorite_rounded,
+                      color: const Color(0xFFD8A13F),
+                      size: widget.compact ? 46 : 54,
+                    ),
+                    Text(
+                      'قريبًا',
+                      style: TextStyle(
+                        color: const Color(0xFF1A1007),
+                        fontSize: widget.compact ? 9 : 10,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    widget.isAr ? widget.entry.titleAr : widget.entry.titleEn,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: const Color(0xFFFFE7B2),
+                      fontSize: widget.compact ? 15 : 18,
+                      fontWeight: FontWeight.w900,
+                      height: 1.1,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryFeaturedDetail extends StatelessWidget {
+  const _LibraryFeaturedDetail({
+    required this.entry,
+    required this.isAr,
+    required this.compact,
+  });
+
+  final _FeaturedLibraryEntry entry;
+  final bool isAr;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          compact ? 16 : 28,
+          compact ? 8 : 14,
+          compact ? 16 : 28,
+          compact ? 18 : 24,
+        ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 920),
+          child: Container(
+            padding: EdgeInsets.all(compact ? 18 : 28),
+            decoration: BoxDecoration(
+              color: const Color(0xFF080704).withValues(alpha: 0.68),
+              borderRadius: BorderRadius.circular(compact ? 28 : 34),
+              border: Border.all(
+                color: const Color(0xFFFFD98A).withValues(alpha: 0.46),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFE7A94C).withValues(alpha: 0.14),
+                  blurRadius: 28,
+                  offset: const Offset(0, 12),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _LibraryFutureBackgroundSlot(
+                  entry: entry,
+                  compact: compact,
+                ),
+                SizedBox(height: compact ? 18 : 24),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD8A13F).withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                      color: const Color(0xFFFFD98A).withValues(alpha: 0.42),
+                    ),
+                  ),
+                  child: const Text(
+                    'قريبًا',
+                    style: TextStyle(
+                      color: Color(0xFFFFE7B2),
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                SizedBox(height: compact ? 14 : 18),
+                Text(
+                  isAr ? entry.titleAr : entry.titleEn,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color(0xFFFFD47A),
+                    fontSize: compact ? 30 : 44,
+                    fontWeight: FontWeight.w900,
+                    height: 1.05,
+                  ),
+                ),
+                SizedBox(height: compact ? 14 : 18),
+                Text(
+                  isAr
+                      ? 'هذا المحتوى للتوعية ولا يغني عن استشارة مختص عند الحاجة.'
+                      : 'This content is educational and does not replace consulting a specialist when needed.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color(0xFFFFE7B2).withValues(alpha: 0.82),
+                    fontSize: compact ? 13 : 15,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryFutureBackgroundSlot extends StatelessWidget {
+  const _LibraryFutureBackgroundSlot({
+    required this.entry,
+    required this.compact,
+  });
+
+  final _FeaturedLibraryEntry entry;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: compact ? 150 : 230,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(compact ? 24 : 30),
+        border: Border.all(
+          color: const Color(0xFFFFD98A).withValues(alpha: 0.34),
+        ),
+        gradient: RadialGradient(
+          colors: [
+            const Color(0xFFD8A13F).withValues(alpha: 0.18),
+            const Color(0xFF080704).withValues(alpha: 0.72),
+          ],
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Image.asset(
+        entry.cardAsset,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Center(
+            child: Icon(
+              Icons.favorite_rounded,
+              color: const Color(0xFFFFD47A).withValues(alpha: 0.72),
+              size: compact ? 54 : 76,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _LibraryStandardCategoryDetail extends StatelessWidget {
+  const _LibraryStandardCategoryDetail({
+    required this.category,
+    required this.isAr,
+    required this.compact,
+  });
+
+  final _LibCat category;
+  final bool isAr;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          compact ? 16 : 28,
+          compact ? 8 : 14,
+          compact ? 16 : 28,
+          compact ? 18 : 24,
+        ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 920),
+          child: Container(
+            padding: EdgeInsets.all(compact ? 18 : 28),
+            decoration: BoxDecoration(
+              color: const Color(0xFF080704).withValues(alpha: 0.68),
+              borderRadius: BorderRadius.circular(compact ? 28 : 34),
+              border: Border.all(
+                color: const Color(0xFFFFD98A).withValues(alpha: 0.46),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFE7A94C).withValues(alpha: 0.14),
+                  blurRadius: 28,
+                  offset: const Offset(0, 12),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _LibraryStandardCategoryImageSlot(
+                  category: category,
+                  compact: compact,
+                ),
+                SizedBox(height: compact ? 18 : 24),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD8A13F).withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                      color: const Color(0xFFFFD98A).withValues(alpha: 0.42),
+                    ),
+                  ),
+                  child: const Text(
+                    'قريبًا',
+                    style: TextStyle(
+                      color: Color(0xFFFFE7B2),
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                SizedBox(height: compact ? 14 : 18),
+                Text(
+                  isAr ? category.titleAr : category.titleEn,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color(0xFFFFD47A),
+                    fontSize: compact ? 30 : 44,
+                    fontWeight: FontWeight.w900,
+                    height: 1.05,
+                  ),
+                ),
+                SizedBox(height: compact ? 14 : 18),
+                Text(
+                  isAr
+                      ? 'هذا المحتوى للتوعية ولا يغني عن استشارة مختص عند الحاجة.'
+                      : 'This content is educational and does not replace consulting a specialist when needed.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color(0xFFFFE7B2).withValues(alpha: 0.82),
+                    fontSize: compact ? 13 : 15,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryStandardCategoryImageSlot extends StatelessWidget {
+  const _LibraryStandardCategoryImageSlot({
+    required this.category,
+    required this.compact,
+  });
+
+  final _LibCat category;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: compact ? 150 : 230,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(compact ? 24 : 30),
+        border: Border.all(
+          color: const Color(0xFFFFD98A).withValues(alpha: 0.34),
+        ),
+        gradient: RadialGradient(
+          colors: [
+            const Color(0xFFD8A13F).withValues(alpha: 0.18),
+            const Color(0xFF080704).withValues(alpha: 0.72),
+          ],
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Center(
+        child: Image.asset(
+          normalizeAssetPath(category.asset),
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return Icon(
+              Icons.auto_stories_outlined,
+              color: const Color(0xFFFFD47A).withValues(alpha: 0.72),
+              size: compact ? 54 : 76,
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryCarousel extends StatelessWidget {
+  const _LibraryCarousel({
+    required this.controller,
+    required this.page,
+    required this.categories,
+    required this.isAr,
+    required this.height,
+  });
+
+  final PageController controller;
+  final double page;
+  final List<_LibCat> categories;
+  final bool isAr;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final cardHeight = math.min(height * 0.66, 580.0);
+
+    return Center(
+      child: SizedBox(
+        height: cardHeight,
+        child: PageView.builder(
+          controller: controller,
+          itemCount: categories.length,
+          padEnds: true,
+          itemBuilder: (context, index) {
+            final distance = (page - index).abs().clamp(0.0, 1.0);
+            final scale = 1.0 - (distance * 0.075);
+            return AnimatedScale(
+              scale: scale,
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: _LibraryCarouselCard(
+                  category: categories[index],
+                  isAr: isAr,
+                  compact: MediaQuery.sizeOf(context).width < 700,
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryDesktopStage extends StatelessWidget {
+  const _LibraryDesktopStage({
+    required this.controller,
+    required this.page,
+    required this.categories,
+    required this.isAr,
+  });
+
+  final PageController controller;
+  final double page;
+  final List<_LibCat> categories;
+  final bool isAr;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1360),
+        child: SizedBox(
+          height: 560,
+          child: PageView.builder(
+            controller: controller,
+            itemCount: categories.length,
+            padEnds: true,
+            itemBuilder: (context, index) {
+              final distance = (page - index).abs().clamp(0.0, 1.0);
+              final scale = 1.0 - (distance * 0.055);
+              return AnimatedScale(
+                scale: scale,
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  child: _LibraryCarouselCard(
+                    category: categories[index],
+                    isAr: isAr,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryCarouselCard extends StatefulWidget {
+  const _LibraryCarouselCard({
+    required this.category,
+    required this.isAr,
+    this.compact = false,
+  });
+
+  final _LibCat category;
+  final bool isAr;
+  final bool compact;
+
+  @override
+  State<_LibraryCarouselCard> createState() => _LibraryCarouselCardState();
+}
+
+class _LibraryCarouselCardState extends State<_LibraryCarouselCard> {
+  bool _hovered = false;
+
+  Color get _accent {
+    switch (widget.category.keyName) {
+      case 'audio':
+        return const Color(0xFF67B7C8);
+      case 'exercises':
+        return const Color(0xFFD8A75F);
+      case 'articles':
+        return const Color(0xFFE0B86E);
+      case 'saved':
+        return const Color(0xFFBBA2FF);
+      case 'tools':
+        return const Color(0xFF7DF9FF);
+      case 'videos':
+        return const Color(0xFFE58667);
+      default:
+        return const Color(0xFFD8A75F);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = widget.compact ? 30.0 : 36.0;
+    final title =
+        widget.isAr ? widget.category.titleAr : widget.category.titleEn;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedScale(
+        scale: _hovered ? 1.025 : 1.0,
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(radius),
+          onTap: () {
+            AppAnalytics.logPathSelected(
+              'library',
+              widget.category.keyName,
+            );
+            Navigator.of(context).pushNamed(
+              Routes.library,
+              arguments: {'categoryKey': widget.category.keyName},
+            );
+          },
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOutCubic,
+                  width: widget.compact ? 230 : 300,
+                  height: widget.compact ? 230 : 300,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: _accent.withValues(
+                          alpha: _hovered ? 0.26 : 0.16,
+                        ),
+                        blurRadius: _hovered ? 34 : 24,
+                        spreadRadius: _hovered ? 1 : 0,
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(widget.compact ? 12 : 16),
+                    child: Image.asset(
+                      normalizeAssetPath(widget.category.asset),
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.auto_stories_outlined,
+                        color: const Color(0xFFFFE7B2),
+                        size: widget.compact ? 72 : 92,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: widget.compact ? 14 : 20,
+                right: widget.compact ? 14 : 20,
+                bottom: widget.compact ? 18 : 26,
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: const Color(0xFFFFE7B2),
+                    fontSize: widget.compact ? 27 : 34,
+                    fontWeight: FontWeight.w900,
+                    height: 1.02,
+                    shadows: const [
+                      Shadow(
+                        color: Colors.black,
+                        blurRadius: 16,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryCarouselControls extends StatelessWidget {
+  const _LibraryCarouselControls({
+    required this.compact,
+    required this.onPrevious,
+    required this.onNext,
+  });
+
+  final bool compact;
+  final VoidCallback onPrevious;
+  final VoidCallback onNext;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: compact ? 14 : 22,
+        right: compact ? 14 : 22,
+        top: compact ? 4 : 8,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        textDirection: TextDirection.ltr,
+        children: [
+          _LibraryLogoNavControl(
+            icon: Icons.arrow_forward_ios_rounded,
+            compact: compact,
+            arrowOnLeft: false,
+            onTap: onNext,
+          ),
+          SizedBox(width: compact ? 18 : 26),
+          _LibraryLogoNavControl(
+            icon: Icons.arrow_back_ios_new_rounded,
+            compact: compact,
+            arrowOnLeft: true,
+            onTap: onPrevious,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LibraryLogoNavControl extends StatefulWidget {
+  const _LibraryLogoNavControl({
+    required this.icon,
+    required this.compact,
+    required this.arrowOnLeft,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final bool compact;
+  final bool arrowOnLeft;
+  final VoidCallback onTap;
+
+  @override
+  State<_LibraryLogoNavControl> createState() => _LibraryLogoNavControlState();
+}
+
+class _LibraryLogoNavControlState extends State<_LibraryLogoNavControl> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final logoSize = widget.compact ? 50.0 : 60.0;
+    final arrowSize = widget.compact ? 30.0 : 36.0;
+    final arrow = _LibraryArrowCircle(
+      icon: widget.icon,
+      size: arrowSize,
+      compact: widget.compact,
+    );
+    final logo = _LibraryLogoCircle(
+      size: logoSize,
+      compact: widget.compact,
+      hovered: _hovered,
+    );
+    final gap = SizedBox(width: widget.compact ? 6 : 8);
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedScale(
+        scale: _hovered ? 1.06 : 1.0,
+        duration: const Duration(milliseconds: 170),
+        curve: Curves.easeOutCubic,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(999),
+          onTap: widget.onTap,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children:
+                widget.arrowOnLeft ? [arrow, gap, logo] : [logo, gap, arrow],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryArrowCircle extends StatelessWidget {
+  const _LibraryArrowCircle({
+    required this.icon,
+    required this.size,
+    required this.compact,
+  });
+
+  final IconData icon;
+  final double size;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: const Color(0xFF1B1007).withValues(alpha: 0.42),
+        border: Border.all(
+          color: const Color(0xFFFFD98A).withValues(alpha: 0.38),
+        ),
+      ),
+      child: Icon(
+        icon,
+        color: const Color(0xFFFFE7B2),
+        size: compact ? 15 : 17,
+        shadows: const [
+          Shadow(
+            color: Colors.black,
+            blurRadius: 8,
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LibraryLogoCircle extends StatelessWidget {
+  const _LibraryLogoCircle({
+    required this.size,
+    required this.compact,
+    required this.hovered,
+  });
+
+  final double size;
+  final bool compact;
+  final bool hovered;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: const Color(0xFF1B1007).withValues(alpha: 0.48),
+        border: Border.all(
+          color: const Color(0xFFFFD98A).withValues(
+            alpha: hovered ? 0.68 : 0.46,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE7A94C).withValues(
+              alpha: hovered ? 0.20 : 0.10,
+            ),
+            blurRadius: hovered ? 14 : 9,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(compact ? 6 : 7),
+        child: Image.asset(
+          'assets/branding/logo_primary_dark.png',
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
+  }
+}
+
+class _ModuleEntryLogger extends StatefulWidget {
+  const _ModuleEntryLogger({required this.module});
+
+  final String module;
+
+  @override
+  State<_ModuleEntryLogger> createState() => _ModuleEntryLoggerState();
+}
+
+class _ModuleEntryLoggerState extends State<_ModuleEntryLogger> {
+  @override
+  void initState() {
+    super.initState();
+    AppAnalytics.logModuleEntry(widget.module);
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
+
+_FeaturedLibraryEntry? _featuredLibraryEntry(String? keyName) {
+  if (keyName == null || keyName.trim().isEmpty) return null;
+  for (final entry in _featuredLibraryEntries) {
+    if (entry.keyName == keyName.trim()) return entry;
+  }
+  return null;
+}
+
+_LibCat? _standardLibraryCategory(String? keyName, List<_LibCat> categories) {
+  if (keyName == null || keyName.trim().isEmpty) return null;
+  for (final category in categories) {
+    if (category.keyName == keyName.trim()) return category;
+  }
+  return null;
+}
+
+const _featuredLibraryEntries = <_FeaturedLibraryEntry>[
+  _FeaturedLibraryEntry(
+    keyName: 'family_awareness',
+    titleAr: 'حضن آمن',
+    titleEn: 'Safe embrace',
+    icon: Icons.family_restroom_rounded,
+    cardAsset: 'assets/branding/library/hodn_amen/hodn_amen_card.png',
+  ),
+  _FeaturedLibraryEntry(
+    keyName: 'prevention_awareness',
+    titleAr: 'بداية آمنة',
+    titleEn: 'Safe start',
+    icon: Icons.psychology_alt_rounded,
+    cardAsset: 'assets/branding/library/bedaya_amena/bedaya_amena_card.png',
+  ),
+];
+
+class _FeaturedLibraryEntry {
+  const _FeaturedLibraryEntry({
+    required this.keyName,
+    required this.titleAr,
+    required this.titleEn,
+    required this.icon,
+    required this.cardAsset,
+  });
+
+  final String keyName;
+  final String titleAr;
+  final String titleEn;
+  final IconData icon;
+  final String cardAsset;
+}
+
+class _LibCat {
+  const _LibCat({
+    required this.keyName,
+    required this.titleAr,
+    required this.titleEn,
+    required this.asset,
+  });
+
+  final String keyName;
+  final String titleAr;
+  final String titleEn;
+  final String asset;
+}

@@ -18,6 +18,7 @@ dependencies:
   cloud_firestore: ^5.6.12
   firebase_auth: ^5.7.0
   shared_preferences: ^2.3.2
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
@@ -27,3 +28,31 @@ dev_dependencies:
 flutter:
   generate: true
   uses-material-design: true
+
+  assets:
+    - assets/branding/navigation/back/
+    - assets/branding/navigation/logout/
+    - assets/branding/library/hodn_amen/
+    - assets/branding/library/bedaya_amena/
+    - assets/branding/library/backgrounds/desktop/
+    - assets/branding/library/backgrounds/tablet/
+    - assets/branding/library/backgrounds/mobile/
+    - assets/branding/logo_primary_dark.png
+    - assets/branding/menu/desktop/
+    - assets/branding/menu/tablet/
+    - assets/branding/menu/mobile/
+    - assets/branding/web_registration/centers/
+    - assets/branding/web_registration/clinicians/
+    - assets/c6_library/brand/logo_wordmark.png
+    - assets/c6_library/categories/cat_articles.png
+    - assets/c6_library/categories/cat_exercises.png
+    - assets/c6_library/categories/cat_audio.png
+    - assets/c6_library/categories/cat_videos.png
+    - assets/c6_library/categories/cat_tools.png
+    - assets/c6_library/categories/cat_saved.png
+    - assets/c7_branding/home/
+    - assets/c7_branding/logo/
+    - assets/images/avatar_clinician_male.png
+    - assets/images/backgrounds/
+    - assets/images/centers/
+    - assets/images/specialists/
