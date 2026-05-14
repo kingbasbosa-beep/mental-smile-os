@@ -1,0 +1,337 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function uid() {
+      return request.auth.uid;
+    }
+
+    function isOwner(ownerUid) {
+      return signedIn() && ownerUid == uid();
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && (
+          request.auth.token.role == 'admin'
+          || (
+            exists(/databases/$(database)/documents/admins/$(uid()))
+            && get(/databases/$(database)/documents/admins/$(uid())).data.active == true
+          )
+        );
+    }
+
+    function isClient(userId) {
+      return signedIn()
+        && userId == uid()
+        && (
+          request.auth.token.role == 'client'
+          || exists(/databases/$(database)/documents/clients/$(userId))
+        );
+    }
+
+    function isCenter(userId) {
+      return signedIn()
+        && userId == uid()
+        && (
+          request.auth.token.role == 'center'
+          || exists(/databases/$(database)/documents/centers/$(userId))
+        );
+    }
+
+    function isClinician(userId) {
+      return signedIn()
+        && userId == uid()
+        && (
+          request.auth.token.role == 'clinician'
+          || exists(/databases/$(database)/documents/clinicians/$(userId))
+        );
+    }
+
+    function isApprovedActiveCenter(userId) {
+      return isCenter(userId)
+        && get(/databases/$(database)/documents/centers/$(userId)).data.approvalStatus == 'approved'
+        && get(/databases/$(database)/documents/centers/$(userId)).data.isActive == true
+        && get(/databases/$(database)/documents/centers/$(userId)).data.isBlocked != true;
+    }
+
+    function isApprovedActiveClinician(userId) {
+      return isClinician(userId)
+        && get(/databases/$(database)/documents/clinicians/$(userId)).data.approvalStatus == 'approved'
+        && get(/databases/$(database)/documents/clinicians/$(userId)).data.isActive == true
+        && get(/databases/$(database)/documents/clinicians/$(userId)).data.isBlocked != true;
+    }
+
+    function isPublicApprovedCenter() {
+      return resource.data.approvalStatus == 'approved'
+        && resource.data.isActive == true
+        && resource.data.isBlocked != true;
+    }
+
+    function isPublicApprovedClinician() {
+      return resource.data.approvalStatus == 'approved'
+        && resource.data.isActive == true
+        && resource.data.isBlocked != true;
+    }
+
+    function protectedAccountFields() {
+      return [
+        'role',
+        'isAdmin',
+        'approvalStatus',
+        'isActive',
+        'active',
+        'isBlocked',
+        'blockedAt',
+        'blockedBy',
+        'blockReason',
+        'verified',
+        'verifiedAt',
+        'verifiedBy'
+      ];
+    }
+
+    function providerApprovalFields() {
+      return [
+        'approvalStatus',
+        'isActive',
+        'active',
+        'isBlocked',
+        'blockReason',
+        'blockedAt',
+        'blockedBy',
+        'verified',
+        'verifiedAt',
+        'verifiedBy',
+        'approvedAt',
+        'approvedBy',
+        'rejectedAt',
+        'rejectedBy',
+        'rejectionReason',
+        'adminNotes'
+      ];
+    }
+
+    function bookingParticipantFields() {
+      return [
+        'clientId',
+        'clientUid',
+        'centerId',
+        'clinicianId',
+        'clinicianUid',
+        'assignedClinicianId',
+        'assignedClinicianUid',
+        'requestGroupId'
+      ];
+    }
+
+    function bookingAdminOnlyFields() {
+      return [
+        'status',
+        'reviewStatus',
+        'sessionStatus',
+        'assignedAdminUid',
+        'adminNotes',
+        'adminDecision',
+        'handoffState',
+        'lifecycleState',
+        'disputeStatus',
+        'accountingStatus'
+      ];
+    }
+
+    function bookingPaymentFields() {
+      return [
+        'paymentStatus',
+        'payment_confirmed',
+        'paymentReceiptFileName',
+        'paymentReceiptUrl',
+        'paymentSubmittedAt',
+        'paymentVerifiedAt',
+        'paymentVerifiedBy',
+        'paymentProofApproved',
+        'paymentClientNote'
+      ];
+    }
+
+    function bookingSessionLinkFields() {
+      return [
+        'sessionLink',
+        'meetingUrl',
+        'zoomUrl',
+        'meetUrl',
+        'sessionAccessCode',
+        'sessionPrivateNotes'
+      ];
+    }
+
+    function chatSafetyFields() {
+      return [
+        'riskScore',
+        'riskLevel',
+        'safetyState',
+        'strategyMode',
+        'safetyTriggered',
+        'containsEscalationSignal',
+        'escalationLevel',
+        'lastEmotionalStates',
+        'lastDetectedRole',
+        'aiModelVersion',
+        'systemVersion'
+      ];
+    }
+
+    function aiGovernanceFields() {
+      return [
+        'policyVersion',
+        'policySnapshotId',
+        'runtimeConfigId',
+        'riskScore',
+        'riskLevel',
+        'severity',
+        'reviewStatus',
+        'reviewedBy',
+        'reviewedAt',
+        'assignedToUid',
+        'assignedToType',
+        'adminNotes',
+        'governanceState',
+        'exportState'
+      ];
+    }
+
+    function documentReviewFields() {
+      return [
+        'documentsReady',
+        'documentsSubmitted',
+        'documentsReviewStatus',
+        'documentsReviewedAt',
+        'documentsReviewedBy',
+        'identityDocumentApproved',
+        'licenseDocumentApproved',
+        'certificateDocumentApproved',
+        'commercialDocumentApproved',
+        'taxDocumentApproved',
+        'documentRejectionReason',
+        'documentAdminNotes'
+      ];
+    }
+
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    function hasChangedAny(fields) {
+      return changedKeys().hasAny(fields);
+    }
+
+    function hasOnlyAllowedChangedFields(fields) {
+      return changedKeys().hasOnly(fields);
+    }
+
+    function hasNoProtectedAccountFieldChanges() {
+      return !hasChangedAny(protectedAccountFields());
+    }
+
+    function isPendingProviderCreate(roleName, pendingStatus) {
+      return signedIn()
+        && request.resource.data.role == roleName
+        && request.resource.data.approvalStatus == pendingStatus
+        && request.resource.data.isActive == false
+        && request.resource.data.isBlocked != true
+        && request.resource.data.isAdmin != true;
+    }
+
+    match /clients/{clientId} {
+      allow read, write: if false;
+    }
+
+    match /centers/{centerId} {
+      allow read, write: if false;
+    }
+
+    match /clinicians/{clinicianId} {
+      allow read, write: if false;
+    }
+
+    match /admins/{adminId} {
+      allow read, write: if false;
+    }
+
+    match /booking_requests/{requestId} {
+      allow read, write: if false;
+    }
+
+    match /bookingRequests/{requestId} {
+      allow read, write: if false;
+    }
+
+    match /chat_threads/{threadId} {
+      allow read, write: if false;
+
+      match /messages/{messageId} {
+        allow read, write: if false;
+      }
+    }
+
+    match /support_requests/{requestId} {
+      allow read, write: if false;
+    }
+
+    match /sessionRatings/{ratingId} {
+      allow read, write: if false;
+    }
+
+    match /clinician_profile_change_requests/{requestId} {
+      allow read, write: if false;
+    }
+
+    match /center_profile_change_requests/{requestId} {
+      allow read, write: if false;
+    }
+
+    match /chat_escalations/{escalationId} {
+      allow read, write: if false;
+    }
+
+    match /aiSafetyEvents/{eventId} {
+      allow read, write: if false;
+    }
+
+    match /aiEscalationCases/{caseId} {
+      allow read, write: if false;
+    }
+
+    match /aiSafetyTraces/{traceId} {
+      allow read, write: if false;
+    }
+
+    match /aiSafetyIncidents/{incidentId} {
+      allow read, write: if false;
+    }
+
+    match /aiSafetySystemAlerts/{alertId} {
+      allow read, write: if false;
+    }
+
+    match /aiSafetyPolicyRuntimeConfig/{configId} {
+      allow read, write: if false;
+    }
+
+    match /aiSafetyPolicySnapshots/{snapshotId} {
+      allow read, write: if false;
+    }
+
+    match /legalConsents/{consentId} {
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
