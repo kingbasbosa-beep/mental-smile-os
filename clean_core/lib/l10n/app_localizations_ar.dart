@@ -1,0 +1,867 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Arabic (`ar`).
+class AppLocalizationsAr extends AppLocalizations {
+  AppLocalizationsAr([String locale = 'ar']) : super(locale);
+
+  @override
+  String get appTitle => 'مينتال كي';
+
+  @override
+  String get homeTitle => 'الرئيسية';
+
+  @override
+  String get changeLanguage => 'تغيير اللغة';
+
+  @override
+  String localeLabel(String code) {
+    return 'اللغة: $code (اضغط أو 🌐)';
+  }
+
+  @override
+  String get splashTitle => 'شاشة البداية';
+
+  @override
+  String get routeNotFound => 'المسار غير موجود';
+
+  @override
+  String get moduleSpecialists => 'المختصون';
+
+  @override
+  String get moduleLearningLibrary => 'مكتبة المعرفة';
+
+  @override
+  String get moduleAddictionSupport => 'دعم الإدمان';
+
+  @override
+  String get moduleCenters => 'المراكز';
+
+  @override
+  String get moduleSpecialNeedsFamilies => 'أسر ذوي الاحتياجات الخاصة';
+
+  @override
+  String get moduleFamilyStress => 'ضغط الأسرة';
+
+  @override
+  String get commonBack => 'رجوع';
+
+  @override
+  String get commonClose => 'إغلاق';
+
+  @override
+  String get commonRetry => 'إعادة المحاولة';
+
+  @override
+  String get commonLoading => 'جارٍ التحميل';
+
+  @override
+  String get commonLogout => 'تسجيل الخروج';
+
+  @override
+  String get menuSpecialists => 'الأخصائيون';
+
+  @override
+  String get menuCenters => 'المراكز';
+
+  @override
+  String get menuLibrary => 'المكتبة';
+
+  @override
+  String get menuAddictionSupport => 'دعم المتعافي';
+
+  @override
+  String get menuSpecialNeedsFamilies => 'رعاية أسر ذوي الاحتياجات الخاصة';
+
+  @override
+  String get menuChatSupport => 'دعم المحادثة';
+
+  @override
+  String get homeStartJourney => 'ابدأ رحلتك نحو التعافي';
+
+  @override
+  String get homeLogin => 'تسجيل الدخول';
+
+  @override
+  String get homeBack => 'رجوع';
+
+  @override
+  String get authLoginTitle => 'تسجيل الدخول';
+
+  @override
+  String get authEmail => 'البريد الإلكتروني';
+
+  @override
+  String get authPassword => 'كلمة المرور';
+
+  @override
+  String get authLoginButton => 'دخول';
+
+  @override
+  String get authLoggingIn => 'جارٍ تسجيل الدخول';
+
+  @override
+  String get authInvalidCredentials => 'بيانات الدخول غير صحيحة';
+
+  @override
+  String get authRequiredField => 'هذا الحقل مطلوب';
+
+  @override
+  String get authForgotPassword => 'نسيت كلمة المرور؟';
+
+  @override
+  String get authCreateAccount => 'للتسجيل اضغط هنا';
+
+  @override
+  String get authClientRegister => 'إنشاء حساب عميل';
+
+  @override
+  String get authBackToHome => 'العودة للرئيسية';
+
+  @override
+  String get authLogoutConfirm => 'تأكيد تسجيل الخروج';
+
+  @override
+  String get authLogoutQuestion => 'هل تريد تسجيل الخروج؟';
+
+  @override
+  String get authCancel => 'إلغاء';
+
+  @override
+  String get authName => 'الاسم';
+
+  @override
+  String get authConfirmPassword => 'تأكيد كلمة المرور';
+
+  @override
+  String get authCreatingAccount => 'جارٍ إنشاء الحساب...';
+
+  @override
+  String get authEmailRequired => 'اكتب البريد الإلكتروني';
+
+  @override
+  String get authPasswordRequired => 'اكتب كلمة المرور';
+
+  @override
+  String get authNameRequired => 'اكتب الاسم';
+
+  @override
+  String get authPasswordsDoNotMatch => 'تأكيد كلمة المرور غير مطابق';
+
+  @override
+  String get authInvalidEmail => 'البريد الإلكتروني غير صالح';
+
+  @override
+  String get authWeakPassword => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+
+  @override
+  String get authLoginFailed => 'فشل تسجيل الدخول';
+
+  @override
+  String get authRegistrationFailed => 'فشل إنشاء الحساب';
+
+  @override
+  String get authUnexpectedError => 'حدث خطأ غير متوقع';
+
+  @override
+  String get authPleaseWait => 'من فضلك انتظر';
+
+  @override
+  String get authInvalidCredentialsMessage => 'بيانات الدخول غير صحيحة';
+
+  @override
+  String get authAccountCreated => 'تم إنشاء الحساب';
+
+  @override
+  String get authTryAgain => 'تعذر إكمال العملية، حاول مرة أخرى';
+
+  @override
+  String get commonNext => 'التالي';
+
+  @override
+  String get centersLoadError => 'حدث خطأ أثناء تحميل المراكز';
+
+  @override
+  String get centersEmpty => 'لا توجد مراكز متاحة في هذه الفئة حاليًا';
+
+  @override
+  String get centersReadMore => 'اضغط للمزيد';
+
+  @override
+  String get centerDefaultName => 'مركز';
+
+  @override
+  String get centerDetoxUnitAvailable => 'يوجد قسم أعراض انسحاب';
+
+  @override
+  String get centerDetailsTitle => 'تفاصيل المركز';
+
+  @override
+  String get centerDataNotFound => 'تعذّر العثور على بيانات المركز';
+
+  @override
+  String get centerDataLoadError => 'حدث خطأ أثناء تحميل بيانات المركز';
+
+  @override
+  String get centerAvailable => 'متاح';
+
+  @override
+  String get centerUnavailable => 'غير متاح';
+
+  @override
+  String get centerGallery => 'صور المركز';
+
+  @override
+  String get centerPricing => 'تكلفة الإقامة';
+
+  @override
+  String get centerTypeAndService => 'نوع المركز وخدمته';
+
+  @override
+  String get centerCapabilities => 'قدرات المركز';
+
+  @override
+  String get centerContactLocation => 'التواصل والموقع';
+
+  @override
+  String get centerAddress => 'العنوان';
+
+  @override
+  String get centerCity => 'المدينة';
+
+  @override
+  String get centerPhone => 'الهاتف';
+
+  @override
+  String get centerWhatsapp => 'واتساب';
+
+  @override
+  String get centerServices => 'الخدمات';
+
+  @override
+  String get centerAbout => 'نبذة عن المركز';
+
+  @override
+  String get centerRequestViaAdmin => 'اطلب المركز عبر الإدارة';
+
+  @override
+  String get centerInboxTitle => 'وارد المركز';
+
+  @override
+  String get commonAll => 'الكل';
+
+  @override
+  String get statusPending => 'بانتظار الرد';
+
+  @override
+  String get centerSaveResponse => 'حفظ الرد';
+
+  @override
+  String get webCenterRegistrationPortalTitle => 'بوابة تسجيل المراكز';
+
+  @override
+  String get webCenterRegistrationPortalSubtitle =>
+      'أنشئ حساب المركز ليتم مراجعته من الإدارة.';
+
+  @override
+  String get webCenterRegistrationBasicInfoTitle =>
+      'تسجيل المركز - البيانات الأساسية';
+
+  @override
+  String get webCenterGuidanceLibrary => 'مكتبة الإرشاد';
+
+  @override
+  String get webCenterCenterName => 'اسم المركز';
+
+  @override
+  String get webCenterCategory => 'الفئة';
+
+  @override
+  String get webCenterType => 'نوع المركز';
+
+  @override
+  String get webCenterConfirmPassword => 'تأكيد كلمة المرور';
+
+  @override
+  String get webCenterNextBasicInfo => 'التالي: البيانات الأساسية';
+
+  @override
+  String get webCenterManagerName => 'اسم المسؤول';
+
+  @override
+  String get webCenterArea => 'المنطقة';
+
+  @override
+  String get webCenterDescription => 'الوصف';
+
+  @override
+  String get webCenterHasDetoxUnit => 'يوجد قسم سحب سموم';
+
+  @override
+  String get webCenterNextMediaGallery => 'التالي: الصور والمعرض';
+
+  @override
+  String get webCenterMediaGalleryTitle => 'تسجيل المركز - الصور والمعرض';
+
+  @override
+  String get webCenterFrontImageUrl => 'رابط صورة الواجهة';
+
+  @override
+  String get webCenterReceptionImageUrl => 'رابط صورة الاستقبال';
+
+  @override
+  String get webCenterInsideImage1Url => 'رابط صورة داخلية 1';
+
+  @override
+  String get webCenterInsideImage2Url => 'رابط صورة داخلية 2';
+
+  @override
+  String get webCenterNextPricingCapabilities => 'التالي: التسعير والقدرات';
+
+  @override
+  String get webCenterPricingCapabilitiesTitle =>
+      'تسجيل المركز - التسعير والقدرات';
+
+  @override
+  String get webCenterEnabled => 'مفعل';
+
+  @override
+  String get webCenterPrice => 'السعر';
+
+  @override
+  String get webCenterPricingUnit => 'وحدة التسعير';
+
+  @override
+  String get webCenterAcMode => 'نظام التكييف';
+
+  @override
+  String get webCenterTaxIncluded => 'يشمل الضريبة';
+
+  @override
+  String get webCenterNextDocuments => 'التالي: المستندات';
+
+  @override
+  String get webCenterDocumentsTitle => 'تسجيل المركز - المستندات';
+
+  @override
+  String get webCenterFileName => 'اسم الملف';
+
+  @override
+  String get webCenterFileUrlOptional => 'رابط الملف (اختياري)';
+
+  @override
+  String get webCenterReviewNoteOptional => 'ملاحظة المراجعة (اختياري)';
+
+  @override
+  String get webCenterSubmitForReview => 'إرسال للمراجعة';
+
+  @override
+  String get webRegistrationBrowseLibraryDuringReview =>
+      'تصفح مكتبة الإرشاد أثناء مراجعة حسابك';
+
+  @override
+  String get webCenterCenterNameRequired => 'اكتب اسم المركز';
+
+  @override
+  String get webCenterRegistrationFailed =>
+      'تعذر إكمال التسجيل، حاول مرة أخرى.';
+
+  @override
+  String get webCenterPleaseRegisterBeforeSaving =>
+      'يرجى التسجيل أو تسجيل الدخول قبل الحفظ.';
+
+  @override
+  String get webCenterMissingSession => 'جلسة المركز غير متاحة';
+
+  @override
+  String get webCenterSaveProfileFailed => 'تعذر حفظ بيانات المركز';
+
+  @override
+  String get webCenterSaveMediaFailed => 'تعذر حفظ الصور';
+
+  @override
+  String get webCenterSavePricingFailed => 'تعذر حفظ التسعير';
+
+  @override
+  String get webCenterSubmitDocumentsFailed => 'تعذر إرسال المستندات';
+
+  @override
+  String get webClinicianRegistrationAccountTitle => 'تسجيل الأخصائي - الحساب';
+
+  @override
+  String get webClinicianRegistrationProfileTitle =>
+      'تسجيل الأخصائي - الملف الشخصي';
+
+  @override
+  String get webClinicianName => 'الاسم';
+
+  @override
+  String get webClinicianProfessionalTitle => 'اللقب المهني';
+
+  @override
+  String get webClinicianSpecialty => 'التخصص';
+
+  @override
+  String get webClinicianNextProfile => 'التالي: الملف الشخصي';
+
+  @override
+  String get webClinicianPhotoUrl => 'رابط الصورة';
+
+  @override
+  String get webClinicianBio => 'النبذة';
+
+  @override
+  String get webClinicianNextSessions => 'التالي: الجلسات';
+
+  @override
+  String get webClinicianSessionsTitle => 'تسجيل الأخصائي - الجلسات';
+
+  @override
+  String get webClinicianSessionPrice => 'سعر الجلسة';
+
+  @override
+  String get webClinicianSessionDuration => 'مدة الجلسة';
+
+  @override
+  String get webClinicianOnlineSessions => 'جلسات أونلاين';
+
+  @override
+  String get webClinicianInPersonSessions => 'جلسات حضورية';
+
+  @override
+  String get webClinicianGroupSessions => 'يقدم جلسات جماعية';
+
+  @override
+  String get webClinicianDocumentsTitle => 'تسجيل الأخصائي - المستندات';
+
+  @override
+  String get webClinicianIdentityFileName => 'اسم ملف الهوية';
+
+  @override
+  String get webClinicianCertificateFileName => 'اسم ملف الشهادة';
+
+  @override
+  String get webClinicianExtraFileNameOptional => 'اسم ملف إضافي (اختياري)';
+
+  @override
+  String get webClinicianRegistrationFailed => 'تعذر إنشاء حساب الأخصائي';
+
+  @override
+  String get webClinicianStartFromAccountStep =>
+      'يرجى بدء التسجيل من خطوة الحساب';
+
+  @override
+  String get webClinicianAuthenticationSessionMissing =>
+      'جلسة تسجيل الدخول غير متاحة';
+
+  @override
+  String get webClinicianSaveProfileFailed => 'تعذر حفظ الملف الشخصي';
+
+  @override
+  String get webClinicianSelectSessionMode => 'اختر طريقة جلسة واحدة على الأقل';
+
+  @override
+  String get webClinicianSaveSessionsFailed => 'تعذر حفظ بيانات الجلسات';
+
+  @override
+  String get webClinicianSubmitDocumentsFailed => 'تعذر إرسال المستندات';
+
+  @override
+  String get bookingRequestTitle => 'طلب حجز';
+
+  @override
+  String get bookingCenterRequestTitle => 'طلب حجز مركز';
+
+  @override
+  String get bookingMyRequestsTitle => 'طلباتي';
+
+  @override
+  String get bookingBookSpecialistTitle => 'حجز مع أخصائي';
+
+  @override
+  String get bookingNoSpecialistsYet => 'لا يوجد أخصائيون بعد.';
+
+  @override
+  String get bookingTrustedSpecialistHint =>
+      'اختر أخصائيًا موثوقًا وأرسل طلبك للإدارة.';
+
+  @override
+  String get bookingDevUiEnabled => 'واجهة التطوير مفعلة';
+
+  @override
+  String get bookingAdditionalNotes => 'ملاحظات إضافية';
+
+  @override
+  String get bookingWriteNoteHint => 'اكتب ملاحظتك هنا...';
+
+  @override
+  String get bookingSendRequest => 'إرسال الطلب';
+
+  @override
+  String get bookingSendRequestToAdmin => 'إرسال الطلب إلى الإدارة';
+
+  @override
+  String get bookingSending => 'جارٍ الإرسال...';
+
+  @override
+  String get bookingRequestSent => 'تم إرسال الطلب بنجاح';
+
+  @override
+  String get bookingRequestFailed => 'تعذّر إرسال الطلب';
+
+  @override
+  String get bookingRequestSentAdminChat =>
+      'تم إرسال الطلب وفتح محادثة المتابعة مع الإدارة';
+
+  @override
+  String get bookingCenterRequestSent =>
+      'تم إرسال طلب المركز إلى الإدارة بنجاح';
+
+  @override
+  String get bookingCenterRequestSentToAdmin =>
+      'تم إرسال طلب المركز إلى الإدارة';
+
+  @override
+  String get bookingUploadPaymentProof => 'رفع إثبات التحويل';
+
+  @override
+  String get bookingEditAccommodation => 'تعديل نوع الإقامة';
+
+  @override
+  String get bookingCompleteInitialIntake => 'استكمال بيانات التقييم الأولي';
+
+  @override
+  String get bookingCreateNewRequest => 'إنشاء طلب جديد';
+
+  @override
+  String get bookingCreateNewFromRequest => 'إنشاء طلب جديد من هذا الطلب';
+
+  @override
+  String get bookingNewCenterRequestCreated => 'تم إنشاء طلب مركز جديد';
+
+  @override
+  String get bookingCurrent => 'الجارية';
+
+  @override
+  String get bookingActionNeeded => 'تحتاج منك إجراء';
+
+  @override
+  String get bookingCompleted => 'المكتملة';
+
+  @override
+  String get bookingClosed => 'المغلقة';
+
+  @override
+  String get bookingEmptyCurrent => 'لا توجد طلبات جارية الآن';
+
+  @override
+  String get bookingEmptyActionNeeded => 'لا توجد طلبات تحتاج منك إجراء الآن';
+
+  @override
+  String get bookingEmptyCompleted => 'لا توجد طلبات مكتملة بعد';
+
+  @override
+  String get bookingEmptyClosed => 'لا توجد طلبات مغلقة';
+
+  @override
+  String get bookingSpecialistFallback => 'الأخصائي';
+
+  @override
+  String get bookingCenterRequestFallback => 'طلب مركز';
+
+  @override
+  String clientDashboardWelcome(String name) {
+    return 'مرحبًا $name';
+  }
+
+  @override
+  String get clientDashboardSubtitle => 'كل خطواتك موجودة هنا بهدوء.';
+
+  @override
+  String get clientBookings => 'طلبات الحجز';
+
+  @override
+  String get clientBookingRequests => 'طلبات الحجز';
+
+  @override
+  String get clientSupport => 'الدعم';
+
+  @override
+  String get clientSupportRequests => 'طلبات الدعم';
+
+  @override
+  String get clientPaymentProof => 'إثبات التحويل النقدي';
+
+  @override
+  String get clientUploadPaymentProof => 'رفع إثبات التحويل';
+
+  @override
+  String get clientMySessions => 'جلساتي';
+
+  @override
+  String get clientLinksAndCodes => 'الروابط والأكواد';
+
+  @override
+  String get clientFollowUp => 'المتابعة';
+
+  @override
+  String get clientMessagePreferences => 'تفضيلات الرسائل';
+
+  @override
+  String get clientRatingsCount => 'عدد التقييمات';
+
+  @override
+  String get clientAverageStars => 'متوسط النجوم';
+
+  @override
+  String get clientOverallAverage => 'المتوسط العام';
+
+  @override
+  String get clinicianOperations => 'العمليات';
+
+  @override
+  String get clinicianDashboard => 'لوحة الأخصائي';
+
+  @override
+  String get clinicianOpenCases => 'فتح الحالات';
+
+  @override
+  String get clinicianSendSupportRequest => 'إرسال طلب دعم';
+
+  @override
+  String get clinicianEditProfile => 'تعديل بياناتي';
+
+  @override
+  String get clinicianMySessions => 'جلساتي';
+
+  @override
+  String get clinicianSupportRequest => 'طلب دعم';
+
+  @override
+  String get clinicianCurrentSupportRequests => 'عدد طلبات الدعم الحالية';
+
+  @override
+  String get clinicianReferredChatCases => 'حالات الشات المحالة';
+
+  @override
+  String get clinicianReferredChatCasesCount => 'حالات الشات المحالة';
+
+  @override
+  String get clinicianNewRequests => 'طلبات جديدة';
+
+  @override
+  String get clinicianActiveRequests => 'طلبات نشطة';
+
+  @override
+  String get clinicianCompleted => 'مكتملة';
+
+  @override
+  String get clinicianClosed => 'مرفوضة/مغلقة';
+
+  @override
+  String get clinicianAcceptRequest => 'قبول الطلب';
+
+  @override
+  String get clinicianRejectRequest => 'رفض الطلب';
+
+  @override
+  String get clinicianEndSession => 'إنهاء الجلسة';
+
+  @override
+  String get clinicianReviewSession => 'تقييم الجلسة';
+
+  @override
+  String get clinicianAssignedRequest => 'طلب مخصص لك';
+
+  @override
+  String get clinicianProfileChangeTitle => 'طلب تعديل الصورة أو النبذة';
+
+  @override
+  String get clinicianNewPhotoUrl => 'رابط الصورة الجديدة';
+
+  @override
+  String get clinicianNewBio => 'النبذة الجديدة';
+
+  @override
+  String get clinicianSendingRequest => 'جارٍ إرسال الطلب...';
+
+  @override
+  String get clinicianSendChangeRequest => 'إرسال طلب التعديل';
+
+  @override
+  String get clinicianRatings => 'عدد التقييمات';
+
+  @override
+  String get clinicianStars => 'متوسط النجوم';
+
+  @override
+  String get clinicianOverall => 'المتوسط العام';
+
+  @override
+  String get clinicianLogout => 'خروج';
+
+  @override
+  String get clinicianPleaseSignIn => 'يجب تسجيل الدخول أولًا';
+
+  @override
+  String get clinicianInboxTitle => 'وارد الأخصائي';
+
+  @override
+  String get clinicianAwaitingPayment => 'بانتظار التحويل';
+
+  @override
+  String get clinicianReject => 'رفض';
+
+  @override
+  String get clinicianAccept => 'قبول';
+
+  @override
+  String get clinicianRejectRequestTitle => 'رفض الطلب';
+
+  @override
+  String get clinicianRejectReason => 'سبب الرفض';
+
+  @override
+  String get clinicianRejectReasonHint => 'اكتب سبب الرفض هنا...';
+
+  @override
+  String get clinicianConfirmReject => 'تأكيد الرفض';
+
+  @override
+  String get clinicianApprovalSent =>
+      'تمت موافقة الأخصائي وتحويل الطلب لانتظار الدفع';
+
+  @override
+  String get clinicianRejectFailed => 'فشل الرفض';
+
+  @override
+  String get clinicianAcceptFailed => 'فشل القبول';
+
+  @override
+  String get clinicianRequestRejected => 'تم رفض الطلب';
+
+  @override
+  String get statusPendingReview => 'قيد المراجعة';
+
+  @override
+  String get statusRequestUnderReview => 'طلبك قيد المراجعة';
+
+  @override
+  String get statusCenterFollowUp => 'الطلب لدى المركز للتحقق من التوفر';
+
+  @override
+  String get statusClientUpdateRequired => 'المركز طلب تعديل نوع الإقامة';
+
+  @override
+  String get statusCenterIntakePending =>
+      'بانتظار استكمال بيانات التقييم الأولي';
+
+  @override
+  String get statusCenterRecommendationPending =>
+      'بانتظار توصية المركز بعد مراجعة الحالة';
+
+  @override
+  String get statusApproved => 'تمت الموافقة';
+
+  @override
+  String get statusRequestApproved => 'تمت الموافقة على طلبك';
+
+  @override
+  String get statusAwaitingPayment => 'بانتظار الدفع';
+
+  @override
+  String get statusUploadPaymentProof => 'يرجى رفع إثبات التحويل';
+
+  @override
+  String get statusPaymentReview => 'إثبات الدفع قيد المراجعة';
+
+  @override
+  String get statusSessionSetupPending => 'بانتظار تجهيز الجلسة';
+
+  @override
+  String get statusResidencySetupPending => 'بانتظار تجهيز الإقامة';
+
+  @override
+  String get statusSessionScheduled => 'جلسة مجدولة';
+
+  @override
+  String get statusResidencyScheduled => 'إقامة مجدولة';
+
+  @override
+  String get statusSessionInProgress => 'الجلسة جارية';
+
+  @override
+  String get statusResidencyInProgress => 'الإقامة جارية';
+
+  @override
+  String get statusPendingReviews => 'بانتظار التقييمات';
+
+  @override
+  String get statusPendingDischargeReviews => 'بانتظار تقارير الخروج';
+
+  @override
+  String get statusPayoutPending => 'بانتظار الإغلاق المالي';
+
+  @override
+  String get statusCenterAccountingReview =>
+      'بانتظار المراجعة المحاسبية للمركز';
+
+  @override
+  String get statusCompleted => 'مكتمل';
+
+  @override
+  String get statusCompletedSuccessfully => 'مكتمل بنجاح';
+
+  @override
+  String get statusRequestCompleted => 'اكتمل الطلب';
+
+  @override
+  String get statusReschedulePending => 'بانتظار إعادة الجدولة';
+
+  @override
+  String get statusAwaitingStartConfirmations => 'بانتظار تأكيد البداية';
+
+  @override
+  String get statusRejected => 'تعذّر قبول الطلب';
+
+  @override
+  String get statusClinicianRejected => 'تعذّر تأكيد الأخصائي';
+
+  @override
+  String get statusCancelled => 'ملغي';
+
+  @override
+  String get statusCancellationPending => 'طلب الإلغاء قيد المراجعة';
+
+  @override
+  String get statusDisputeReceived => 'تم استلام الشكوى';
+
+  @override
+  String get statusRequestCoordination => 'يجري تنسيق الطلب';
+
+  @override
+  String get statusRequestUpdateInProgress => 'يتم تحديث حالة الطلب';
+
+  @override
+  String get statusNewRequest => 'طلب جديد';
+
+  @override
+  String get statusCenterAvailableResponse => 'رد المركز: متاح';
+
+  @override
+  String get statusCenterUnavailableResponse => 'رد المركز: غير متاح';
+
+  @override
+  String get statusCenterNoResponse => 'رد المركز: لم يرد بعد';
+
+  @override
+  String comingSoon(String title) {
+    return '$title — قريبًا';
+  }
+
+  @override
+  String get modulePlaceholderBody => 'المحتوى قريبًا.';
+}
