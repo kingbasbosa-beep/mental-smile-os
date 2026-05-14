@@ -4,10 +4,13 @@ import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/core/auth/presentation/pages/account_blocked_page.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/booking_page.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/booking_request_page.dart';
+import 'package:flutterprojects/features/booking/presentation/pages/center_inbox_page.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/center_booking_request_page.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/my_bookings_page.dart';
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
+import 'package:flutterprojects/features/centers/presentation/pages/center_dashboard_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_details_page.dart';
+import 'package:flutterprojects/features/centers/presentation/pages/center_residencies_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/centers_landing_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/centers_list_page.dart';
 import 'package:flutterprojects/features/client/presentation/pages/client_dashboard_page.dart';
@@ -58,8 +61,6 @@ class AppRouter {
     Routes.clientSessions,
     Routes.clientPaymentProof,
     Routes.followUpRegistration,
-    Routes.supportIssueSelector,
-    Routes.sessionReview,
     Routes.myBookings,
     Routes.bookingRequest,
     Routes.centerBookingRequest,
@@ -68,6 +69,10 @@ class AppRouter {
   static Set<String>? _requiredRoles(String? routeName) {
     if (routeName == null) return null;
     if (_adminOnlyRoutes.contains(routeName)) return {_roleAdmin};
+    if (routeName == Routes.supportIssueSelector ||
+        routeName == Routes.sessionReview) {
+      return {_roleClient, _roleCenter};
+    }
     if (_clinicianOnlyRoutes.contains(routeName)) return {_roleClinician};
     if (_centerOnlyRoutes.contains(routeName)) return {_roleCenter};
     if (_clientOnlyRoutes.contains(routeName)) return {_roleClient};
@@ -140,6 +145,12 @@ class AppRouter {
         return const ClientDashboardPage();
       case Routes.clientSessions:
         return const ClientSessionsPage();
+      case Routes.centerDashboard:
+        return const CenterDashboardPage();
+      case Routes.centerInbox:
+        return const CenterInboxPage();
+      case Routes.centerResidencies:
+        return const CenterResidenciesPage();
       case Routes.bookingRequest:
         final args = settings.arguments;
         BookingRequestArgs? requestArgs;

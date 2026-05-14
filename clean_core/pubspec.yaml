@@ -38,6 +38,7 @@ flutter:
     - assets/branding/library/backgrounds/tablet/
     - assets/branding/library/backgrounds/mobile/
     - assets/branding/logo_primary_dark.png
+    - assets/branding/logo_icon.png
     - assets/branding/menu/desktop/
     - assets/branding/menu/tablet/
     - assets/branding/menu/mobile/
@@ -59,4 +60,5 @@ flutter:
     - assets/images/backgrounds/
     - assets/images/centers/
     - assets/images/client_dashboard/actions/
+    - assets/images/center_dashboard/actions/
     - assets/images/specialists/
