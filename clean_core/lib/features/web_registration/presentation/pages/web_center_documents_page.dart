@@ -101,8 +101,6 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
       await FirebaseFirestore.instance.collection('centers').doc(uid).update({
         'documentItems': docs,
         'documentsReady': documentsReady,
-        'approvalStatus': 'pending_admin',
-        'isActive': false,
         'updatedAt': FieldValue.serverTimestamp(),
       });
 

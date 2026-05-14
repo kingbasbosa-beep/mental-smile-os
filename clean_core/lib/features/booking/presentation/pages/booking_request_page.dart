@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/features/booking/data/services/booking_legacy_chat_adapter.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
@@ -76,8 +75,6 @@ class _GoldBackIcon extends StatelessWidget {
 }
 
 class _BookingRequestPageState extends State<BookingRequestPage> {
-  final BookingLegacyChatAdapter _bookingChatAdapter =
-      BookingLegacyChatAdapter();
   final TextEditingController _noteCtrl = TextEditingController();
   bool _submitting = false;
   String? _result;
@@ -164,34 +161,16 @@ class _BookingRequestPageState extends State<BookingRequestPage> {
         // Legacy compatibility field.
         'clinicianUid': widget.args.clinicianId,
         'status': 'assigned_clinician',
-        'workflowStage': 'assigned_clinician',
         'createdAt': now,
         'updatedAt': now,
         'note': note,
-        'adminForwarded': false,
-        'adminAssignedBy': '',
-        'adminAssignedAt': null,
         'source': 'client_dashboard',
       };
 
       await requestRef.set(requestData);
-
-      final threadId =
-          await _bookingChatAdapter.createOrUpdateAdminThreadForBooking(
-        clientId: uid,
-        clientName: clientName,
-        clientEmail: clientEmail,
-        requestId: requestRef.id,
-        clinicianId: widget.args.clinicianId,
-        clinicianName: widget.args.clinicianName,
-        note: note,
-        isArabic: _isArabic,
-      );
-
-      await requestRef.update({
-        'threadId': threadId,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      // TODO: Create booking chat threads/messages from a trusted Cloud Function.
+      // Current Firestore rules deny client chat writes, so booking creation must
+      // remain valid without a threadId.
 
       if (!mounted) return;
 

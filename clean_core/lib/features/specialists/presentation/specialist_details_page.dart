@@ -322,12 +322,16 @@ class SpecialistDetailsPage extends StatelessWidget {
       'ratingPercentage',
     ]).toDouble();
 
+    return _ratingsCountersCard(
+      context,
+      isArabic: isArabic,
+      count: fallbackCount,
+      avgStars: fallbackStars,
+      avgPercentage: fallbackPercentage,
+    );
+    /*
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance
-          .collection('sessionRatings')
-          .where('clinicianId', isEqualTo: clinicianId)
-          .where('reviewerType', isEqualTo: 'client')
-          .snapshots(),
+      stream: null,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return _ratingsCountersCard(
@@ -432,6 +436,7 @@ class SpecialistDetailsPage extends StatelessWidget {
         );
       },
     );
+    */
   }
 
   Widget _buildContent(

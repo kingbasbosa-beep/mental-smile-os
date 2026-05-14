@@ -1266,8 +1266,6 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
         'currentPhotoUrl': (data['photoUrl'] ?? '').toString(),
         'requestedPhotoUrl': requestedPhotoUrl,
         'status': 'pending',
-        'adminDecision': '',
-        'adminNote': '',
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
@@ -2161,8 +2159,6 @@ class _ClinicianProfileEditRequestPageState
         'currentPhotoUrl': currentPhotoUrl,
         'requestedPhotoUrl': requestedPhotoUrl,
         'status': 'pending',
-        'adminDecision': '',
-        'adminNote': '',
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });

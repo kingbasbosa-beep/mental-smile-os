@@ -69,8 +69,6 @@ class _WebClinicianDocumentsPageState extends State<WebClinicianDocumentsPage> {
         'identityDocumentUrl': '',
         'certificateDocumentUrl': '',
         'extraDocumentUrl': '',
-        'approvalStatus': 'pending_review',
-        'isActive': false,
         'updatedAt': FieldValue.serverTimestamp(),
       });
 

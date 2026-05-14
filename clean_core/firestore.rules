@@ -169,6 +169,351 @@ service cloud.firestore {
       ];
     }
 
+    function bookingForbiddenOnCreateFields() {
+      return [
+        'paymentStatus',
+        'payment_confirmed',
+        'paymentConfirmed',
+        'paymentVerifiedAt',
+        'paymentVerifiedBy',
+        'paymentProofApproved',
+        'paymentReceiptFileName',
+        'paymentReceiptUrl',
+        'paymentSubmittedAt',
+        'assignedAdminUid',
+        'assignedAdminId',
+        'adminNotes',
+        'adminApproved',
+        'adminRejected',
+        'adminForwarded',
+        'adminDecisionType',
+        'adminDecisionBy',
+        'adminDecisionAt',
+        'adminAssignedBy',
+        'adminAssignedAt',
+        'targetAdminIds',
+        'targetAdminNames',
+        'sessionLink',
+        'meetingUrl',
+        'zoomUrl',
+        'meetUrl',
+        'riskScore',
+        'riskLevel',
+        'safetyState',
+        'strategyMode',
+        'handoffState',
+        'lifecycleState'
+      ];
+    }
+
+    function bookingCreateAllowedFields() {
+      return [
+        'requestId',
+        'requestKind',
+        'requestGroupId',
+        'clientId',
+        'clientName',
+        'clientEmail',
+        'centerId',
+        'centerName',
+        'selectedCenterType',
+        'centerHasDetoxUnit',
+        'clinicianId',
+        'clinicianUid',
+        'clinicianName',
+        'assignedClinicianId',
+        'assignedClinicianName',
+        'status',
+        'workflowStage',
+        'createdAt',
+        'updatedAt',
+        'note',
+        'source',
+        'centerAvailabilityStatus',
+        'centerAvailabilityNote',
+        'centerAvailabilityRespondedAt',
+        'centerAvailabilityRespondedBy',
+        'centerSuggestedAlternativeKey',
+        'centerSuggestedAlternativeLabelAr',
+        'selectedAccommodationKey',
+        'selectedAccommodationLabelAr',
+        'selectedAccommodationPricingSnapshot',
+        'selectedAccommodationPrice',
+        'selectedAccommodationPricingUnit',
+        'contract',
+        'lastCenterAvailabilityStatus',
+        'lastCenterAvailabilityNote',
+        'lastCenterSuggestedAlternativeKey',
+        'lastCenterSuggestedAlternativeLabelAr',
+        'clientRevisionNumber',
+        'lastCenterFeedbackRevisionNumber',
+        'clientUpdatedAfterCenterFeedback',
+        'adminCanApproveWithoutCenterRecheck'
+      ];
+    }
+
+    function bookingClientAllowedUpdateFields() {
+      return [
+        'threadId',
+        'note',
+        'clientCheckInConfirmed',
+        'clientCheckInConfirmedAt',
+        'clientCheckInNotes',
+        'clientArrivalPlaceMatched',
+        'clientArrivalRightsExplained',
+        'clientArrivalSpecialistMet',
+        'clientArrivalReceptionRating',
+        'clientReviewSubmitted',
+        'clientReviewSubmittedAt',
+        'clientReviewTotalScore',
+        'clientReviewPercentage',
+        'clientReviewDerivedStars',
+        'updatedAt'
+      ];
+    }
+
+    function bookingCenterAllowedUpdateFields() {
+      return [
+        'centerAvailabilityStatus',
+        'centerAvailabilityNote',
+        'centerAvailabilityRespondedAt',
+        'centerAvailabilityRespondedBy',
+        'centerSuggestedAlternativeKey',
+        'centerSuggestedAlternativeLabelAr',
+        'centerArrivalConfirmed',
+        'centerArrivalConfirmedAt',
+        'centerArrivalConfirmedBy',
+        'centerArrivalNotes',
+        'centerRoomDeliveredAsBooked',
+        'centerInitialRecommendation',
+        'centerRecommendedCareLevel',
+        'centerRecommendedStayDays',
+        'centerNeedsInternalAssessment',
+        'centerRecommendationNotes',
+        'centerRecommendationSubmittedAt',
+        'centerRecommendationSubmittedBy',
+        'centerReviewSubmitted',
+        'centerReviewSubmittedAt',
+        'centerReviewTotalScore',
+        'centerReviewPercentage',
+        'centerReviewDerivedStars',
+        'updatedAt'
+      ];
+    }
+
+    function bookingClinicianAllowedUpdateFields() {
+      return [
+        'clinicianAccepted',
+        'clinicianRejected',
+        'clinicianCompleted',
+        'clinicianResponseStatus',
+        'clinicianRespondedAt',
+        'clinicianRespondedBy',
+        'completedAt',
+        'clinicianSessionNotes',
+        'clinicianReviewSubmitted',
+        'clinicianReviewSubmittedAt',
+        'clinicianReviewTotalScore',
+        'clinicianReviewPercentage',
+        'clinicianReviewDerivedStars',
+        'updatedAt'
+      ];
+    }
+
+    function clinicianProfileChangeCreateAllowedFields() {
+      return [
+        'clinicianId',
+        'clinicianName',
+        'clinicianEmail',
+        'requestType',
+        'currentBio',
+        'requestedBio',
+        'currentPhotoUrl',
+        'requestedPhotoUrl',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ];
+    }
+
+    function centerProfileChangeCreateAllowedFields() {
+      return [
+        'centerId',
+        'centerName',
+        'centerEmail',
+        'requestType',
+        'currentData',
+        'requestedData',
+        'requestedName',
+        'requestedDescription',
+        'requestedPhone',
+        'requestedWhatsapp',
+        'requestedAddress',
+        'requestedCity',
+        'requestedArea',
+        'requestedGalleryItems',
+        'requestedPricing',
+        'status',
+        'createdAt',
+        'updatedAt'
+      ];
+    }
+
+    function profileChangeProtectedFields() {
+      return [
+        'reviewedBy',
+        'reviewedAt',
+        'reviewerUid',
+        'adminNotes',
+        'adminNote',
+        'adminDecision',
+        'approvedAt',
+        'approvedBy',
+        'rejectedAt',
+        'rejectedBy',
+        'rejectionReason',
+        'appliedAt',
+        'appliedBy',
+        'moderationStatus',
+        'paymentStatus',
+        'riskScore',
+        'riskLevel',
+        'safetyState',
+        'escalationLevel'
+      ];
+    }
+
+    function supportRequestCreateAllowedFields() {
+      return [
+        'createdByUid',
+        'createdByRole',
+        'createdByName',
+        'createdByEmail',
+        'supportType',
+        'source',
+        'status',
+        'subject',
+        'message',
+        'note',
+        'category',
+        'priority',
+        'attachmentItems',
+        'attachmentFileNames',
+        'attachmentUrls',
+        'createdAt',
+        'updatedAt'
+      ];
+    }
+
+    function supportRequestOwnerAllowedUpdateFields() {
+      return [
+        'followUpNote',
+        'ownerFollowUpNote',
+        'lastOwnerMessage',
+        'attachmentItems',
+        'attachmentFileNames',
+        'attachmentUrls',
+        'updatedAt'
+      ];
+    }
+
+    function supportRequestProtectedFields() {
+      return [
+        'status',
+        'assignedToUid',
+        'assignedToType',
+        'assignedAt',
+        'assignedBy',
+        'escalationStatus',
+        'escalationLevel',
+        'reviewedBy',
+        'reviewedAt',
+        'adminNotes',
+        'internalNotes',
+        'resolution',
+        'resolvedAt',
+        'resolvedBy',
+        'paymentStatus',
+        'riskScore',
+        'riskLevel',
+        'safetyState',
+        'strategyMode',
+        'lifecycleState'
+      ];
+    }
+
+    function supportRequestForbiddenOnCreateFields() {
+      return [
+        'assignedToUid',
+        'assignedToType',
+        'assignedAt',
+        'assignedBy',
+        'escalationStatus',
+        'escalationLevel',
+        'reviewedBy',
+        'reviewedAt',
+        'adminNotes',
+        'internalNotes',
+        'resolution',
+        'resolvedAt',
+        'resolvedBy',
+        'paymentStatus',
+        'riskScore',
+        'riskLevel',
+        'safetyState',
+        'strategyMode',
+        'lifecycleState'
+      ];
+    }
+
+    function sessionRatingCreateAllowedFields() {
+      return [
+        'bookingRequestId',
+        'requestId',
+        'clientId',
+        'reviewerId',
+        'reviewerUid',
+        'uid',
+        'reviewerType',
+        'clinicianId',
+        'centerId',
+        'rating',
+        'score',
+        'stars',
+        'derivedStars',
+        'percentageScore',
+        'totalScore',
+        'comment',
+        'createdAt',
+        'updatedAt'
+      ];
+    }
+
+    function sessionRatingProtectedFields() {
+      return [
+        'aggregateTotal',
+        'aggregateCount',
+        'averageRating',
+        'avgRating',
+        'averageStars',
+        'ratingAverage',
+        'ratingCount',
+        'ratingsCount',
+        'publicRatingsCount',
+        'publicAvgStars',
+        'publicAvgPercentage',
+        'publicApproved',
+        'approved',
+        'moderationStatus',
+        'reviewedBy',
+        'reviewedAt',
+        'adminNotes',
+        'adminNote',
+        'paymentStatus',
+        'sessionLink'
+      ];
+    }
+
     function chatSafetyFields() {
       return [
         'riskScore',
@@ -242,8 +587,433 @@ service cloud.firestore {
         && request.resource.data.role == roleName
         && request.resource.data.approvalStatus == pendingStatus
         && request.resource.data.isActive == false
+        && (
+          !request.resource.data.keys().hasAny(['active'])
+          || request.resource.data.active == false
+        )
         && request.resource.data.isBlocked != true
-        && request.resource.data.isAdmin != true;
+        && request.resource.data.isAdmin != true
+        && request.resource.data.verified != true;
+    }
+
+    function centerRegistrationCreateFields() {
+      return [
+        'role',
+        'name',
+        'centerName',
+        'displayName',
+        'email',
+        'category',
+        'categoryLabelAr',
+        'categoryLabelEn',
+        'centerType',
+        'centerTypeLabelAr',
+        'centerTypeLabelEn',
+        'sortOrder',
+        'approvalStatus',
+        'active',
+        'isActive',
+        'isAdmin',
+        'isBlocked',
+        'verified',
+        'imagesReady',
+        'documentsReady',
+        'createdAt',
+        'updatedAt'
+      ];
+    }
+
+    function centerRegistrationUpdateFields() {
+      return [
+        'managerName',
+        'phone',
+        'phoneNumber',
+        'whatsapp',
+        'whatsappNumber',
+        'countryCode',
+        'city',
+        'area',
+        'address',
+        'description',
+        'hasDetoxUnit',
+        'galleryItems',
+        'galleryImages',
+        'imageUrl',
+        'coverImageUrl',
+        'imagesReady',
+        'accommodationCosts',
+        'autismCareCosts',
+        'centerCapabilities',
+        'services',
+        'pricingReady',
+        'documentItems',
+        'documentsReady',
+        'documentsUploadMode',
+        'identityDocumentUrl',
+        'licenseDocumentUrl',
+        'commercialDocumentUrl',
+        'taxDocumentUrl',
+        'identityFileName',
+        'licenseFileName',
+        'commercialFileName',
+        'taxFileName',
+        'updatedAt'
+      ];
+    }
+
+    function clinicianRegistrationCreateFields() {
+      return [
+        'displayName',
+        'fullName',
+        'fullDisplayNameAr',
+        'fullDisplayNameEn',
+        'email',
+        'professionalTitle',
+        'professionalTitleKey',
+        'professionalTitleLabelAr',
+        'professionalTitleLabelEn',
+        'specialty',
+        'specialtyKey',
+        'specialtyLabel',
+        'offersGroupSessions',
+        'bio',
+        'sessionPriceText',
+        'sessionDurationText',
+        'sessionModes',
+        'role',
+        'isActive',
+        'active',
+        'isAdmin',
+        'isBlocked',
+        'verified',
+        'photoUrl',
+        'photoAsset',
+        'createdAt',
+        'updatedAt',
+        'documentsSubmitted',
+        'documentsUploadMode',
+        'approvalStatus',
+        'identityFileName',
+        'certificateFileName',
+        'extraFileName',
+        'identityDocumentUrl',
+        'certificateDocumentUrl',
+        'extraDocumentUrl'
+      ];
+    }
+
+    function clinicianRegistrationUpdateFields() {
+      return [
+        'photoUrl',
+        'photoAsset',
+        'bio',
+        'sessionPriceText',
+        'sessionDurationText',
+        'sessionModes',
+        'offersGroupSessions',
+        'documentsSubmitted',
+        'documentsUploadMode',
+        'identityFileName',
+        'certificateFileName',
+        'extraFileName',
+        'identityDocumentUrl',
+        'certificateDocumentUrl',
+        'extraDocumentUrl',
+        'updatedAt'
+      ];
+    }
+
+    function hasNoProviderProtectedChanges() {
+      return !hasChangedAny(protectedAccountFields())
+        && !hasChangedAny(providerApprovalFields())
+        && !hasChangedAny(bookingPaymentFields())
+        && !hasChangedAny(bookingSessionLinkFields())
+        && !hasChangedAny(chatSafetyFields())
+        && !hasChangedAny(aiGovernanceFields());
+    }
+
+    function centerCreateValid(centerId) {
+      return isOwner(centerId)
+        && isPendingProviderCreate('center', 'pending_admin')
+        && request.resource.data.keys().hasOnly(centerRegistrationCreateFields());
+    }
+
+    function clinicianCreateValid(clinicianId) {
+      return isOwner(clinicianId)
+        && isPendingProviderCreate('clinician', 'pending_review')
+        && request.resource.data.keys().hasOnly(clinicianRegistrationCreateFields());
+    }
+
+    function isBookingParticipant() {
+      return signedIn()
+        && resource != null
+        && (
+          resource.data.clientId == uid()
+          || resource.data.centerId == uid()
+          || resource.data.clinicianId == uid()
+          || resource.data.clinicianUid == uid()
+          || resource.data.assignedClinicianId == uid()
+          || resource.data.assignedClinicianUid == uid()
+        );
+    }
+
+    function isBookingClientOwner() {
+      return signedIn()
+        && resource != null
+        && resource.data.clientId == uid();
+    }
+
+    function isBookingCenterOwner() {
+      return signedIn()
+        && resource != null
+        && resource.data.centerId == uid();
+    }
+
+    function isBookingClinicianOwner() {
+      return signedIn()
+        && resource != null
+        && (
+          resource.data.clinicianId == uid()
+          || resource.data.clinicianUid == uid()
+          || resource.data.assignedClinicianId == uid()
+          || resource.data.assignedClinicianUid == uid()
+        );
+    }
+
+    function bookingCreateValid() {
+      return signedIn()
+        && request.resource.data.clientId == uid()
+        && request.resource.data.status in ['assigned_clinician', 'pending_admin']
+        && request.resource.data.requestKind in ['clinician', 'center']
+        && request.resource.data.keys().hasOnly(bookingCreateAllowedFields())
+        && !request.resource.data.keys().hasAny(bookingForbiddenOnCreateFields());
+    }
+
+    function hasNoBookingParticipantChanges() {
+      return !hasChangedAny(bookingParticipantFields());
+    }
+
+    function hasNoBookingSensitiveChanges() {
+      return !hasChangedAny(bookingPaymentFields())
+        && !hasChangedAny(bookingSessionLinkFields())
+        && !hasChangedAny(chatSafetyFields())
+        && !hasChangedAny(aiGovernanceFields());
+    }
+
+    function clientBookingUpdateValid() {
+      return isBookingClientOwner()
+        && hasOnlyAllowedChangedFields(bookingClientAllowedUpdateFields())
+        && hasNoBookingParticipantChanges()
+        && hasNoBookingSensitiveChanges()
+        && !hasChangedAny(bookingAdminOnlyFields());
+    }
+
+    function centerBookingUpdateValid() {
+      return isBookingCenterOwner()
+        && hasOnlyAllowedChangedFields(bookingCenterAllowedUpdateFields())
+        && hasNoBookingParticipantChanges()
+        && hasNoBookingSensitiveChanges()
+        && !hasChangedAny(bookingAdminOnlyFields());
+    }
+
+    function clinicianBookingUpdateValid() {
+      return isBookingClinicianOwner()
+        && hasOnlyAllowedChangedFields(bookingClinicianAllowedUpdateFields())
+        && hasNoBookingParticipantChanges()
+        && hasNoBookingSensitiveChanges()
+        && !hasChangedAny(bookingAdminOnlyFields());
+    }
+
+    function clinicianProfileChangeCreateValid() {
+      return signedIn()
+        && request.resource.data.clinicianId == uid()
+        && request.resource.data.status == 'pending'
+        && request.resource.data.keys().hasOnly(clinicianProfileChangeCreateAllowedFields())
+        && !request.resource.data.keys().hasAny(profileChangeProtectedFields());
+    }
+
+    function centerProfileChangeCreateValid() {
+      return signedIn()
+        && request.resource.data.centerId == uid()
+        && request.resource.data.status == 'pending'
+        && request.resource.data.keys().hasOnly(centerProfileChangeCreateAllowedFields())
+        && !request.resource.data.keys().hasAny(profileChangeProtectedFields());
+    }
+
+    function ownsClinicianProfileChangeRequest() {
+      return signedIn()
+        && resource != null
+        && resource.data.clinicianId == uid();
+    }
+
+    function ownsCenterProfileChangeRequest() {
+      return signedIn()
+        && resource != null
+        && resource.data.centerId == uid();
+    }
+
+    function supportRequestCreateValid() {
+      return signedIn()
+        && request.resource.data.createdByUid == uid()
+        && request.resource.data.status == 'new'
+        && request.resource.data.keys().hasOnly(supportRequestCreateAllowedFields())
+        && !request.resource.data.keys().hasAny(supportRequestForbiddenOnCreateFields())
+        && !request.resource.data.keys().hasAny(chatSafetyFields())
+        && !request.resource.data.keys().hasAny(aiGovernanceFields());
+    }
+
+    function ownsSupportRequest() {
+      return signedIn()
+        && resource != null
+        && resource.data.createdByUid == uid();
+    }
+
+    function supportRequestOwnerUpdateValid() {
+      return ownsSupportRequest()
+        && hasOnlyAllowedChangedFields(supportRequestOwnerAllowedUpdateFields())
+        && !hasChangedAny(supportRequestProtectedFields())
+        && !hasChangedAny(chatSafetyFields())
+        && !hasChangedAny(aiGovernanceFields());
+    }
+
+    function ownsSessionRatingAsReviewer() {
+      return signedIn()
+        && resource != null
+        && (
+          resource.data.reviewerUid == uid()
+          || resource.data.reviewerId == uid()
+          || resource.data.uid == uid()
+          || resource.data.clientId == uid()
+        );
+    }
+
+    function isSessionRatingReviewedProvider() {
+      return signedIn()
+        && resource != null
+        && (
+          resource.data.clinicianId == uid()
+          || resource.data.centerId == uid()
+        );
+    }
+
+    function canReadSessionRating() {
+      return isAdmin()
+        || ownsSessionRatingAsReviewer()
+        || isSessionRatingReviewedProvider();
+    }
+
+    function sessionRatingCreatorMatchesAuth() {
+      return request.resource.data.reviewerUid == uid()
+        || request.resource.data.reviewerId == uid()
+        || request.resource.data.uid == uid()
+        || request.resource.data.clientId == uid();
+    }
+
+    function hasLinkedBookingRequestId() {
+      return request.resource.data.bookingRequestId is string
+        || request.resource.data.requestId is string;
+    }
+
+    function hasSafeRatingValue() {
+      return (
+          request.resource.data.rating is number
+          && request.resource.data.rating >= 1
+          && request.resource.data.rating <= 5
+        )
+        || (
+          request.resource.data.stars is number
+          && request.resource.data.stars >= 1
+          && request.resource.data.stars <= 5
+        )
+        || (
+          request.resource.data.derivedStars is number
+          && request.resource.data.derivedStars >= 1
+          && request.resource.data.derivedStars <= 5
+        )
+        || (
+          request.resource.data.score is number
+          && request.resource.data.score >= 0
+          && request.resource.data.score <= 100
+        )
+        || (
+          request.resource.data.percentageScore is number
+          && request.resource.data.percentageScore >= 0
+          && request.resource.data.percentageScore <= 100
+        )
+        || (
+          request.resource.data.totalScore is number
+          && request.resource.data.totalScore >= 0
+          && request.resource.data.totalScore <= 100
+        );
+    }
+
+    function sessionRatingCreateValid() {
+      return signedIn()
+        && sessionRatingCreatorMatchesAuth()
+        && hasLinkedBookingRequestId()
+        && hasSafeRatingValue()
+        && request.resource.data.keys().hasOnly(sessionRatingCreateAllowedFields())
+        && !request.resource.data.keys().hasAny(sessionRatingProtectedFields())
+        && !request.resource.data.keys().hasAny(bookingPaymentFields())
+        && !request.resource.data.keys().hasAny(chatSafetyFields())
+        && !request.resource.data.keys().hasAny(aiGovernanceFields());
+    }
+
+    function isChatThreadParticipant() {
+      return signedIn()
+        && resource != null
+        && (
+          resource.data.ownerUid == uid()
+          || resource.data.officialClientUid == uid()
+          || resource.data.clientId == uid()
+          || resource.data.clinicianId == uid()
+          || resource.data.assignedClinicianUid == uid()
+          || resource.data.centerId == uid()
+          || (
+            resource.data.assignedAdminUid == uid()
+            && isAdmin()
+          )
+        );
+    }
+
+    function canReadChatThread() {
+      return isAdmin() || isChatThreadParticipant();
+    }
+
+    function canReadChatThreadById(threadId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/chat_threads/$(threadId))
+        && (
+          isAdmin()
+          || get(/databases/$(database)/documents/chat_threads/$(threadId)).data.ownerUid == uid()
+          || get(/databases/$(database)/documents/chat_threads/$(threadId)).data.officialClientUid == uid()
+          || get(/databases/$(database)/documents/chat_threads/$(threadId)).data.clientId == uid()
+          || get(/databases/$(database)/documents/chat_threads/$(threadId)).data.clinicianId == uid()
+          || get(/databases/$(database)/documents/chat_threads/$(threadId)).data.assignedClinicianUid == uid()
+          || get(/databases/$(database)/documents/chat_threads/$(threadId)).data.centerId == uid()
+          || (
+            get(/databases/$(database)/documents/chat_threads/$(threadId)).data.assignedAdminUid == uid()
+            && isAdmin()
+          )
+        );
+    }
+
+    function centerPendingOwnerUpdateValid(centerId) {
+      return isOwner(centerId)
+        && resource.data.approvalStatus == 'pending_admin'
+        && resource.data.isActive == false
+        && resource.data.isBlocked != true
+        && hasOnlyAllowedChangedFields(centerRegistrationUpdateFields())
+        && hasNoProviderProtectedChanges();
+    }
+
+    function clinicianPendingOwnerUpdateValid(clinicianId) {
+      return isOwner(clinicianId)
+        && resource.data.approvalStatus == 'pending_review'
+        && resource.data.isActive == false
+        && resource.data.isBlocked != true
+        && hasOnlyAllowedChangedFields(clinicianRegistrationUpdateFields())
+        && hasNoProviderProtectedChanges();
     }
 
     match /clients/{clientId} {
@@ -251,11 +1021,42 @@ service cloud.firestore {
     }
 
     match /centers/{centerId} {
-      allow read, write: if false;
+      // Batch 2: public provider reads.
+      // TODO(public-profile-split): Firestore rules cannot redact fields from a
+      // document. Before production, prefer sanitized publicCenters documents or
+      // ensure approved center docs never contain private document URLs,
+      // internal review notes, blocked reasons, safety fields, payment fields,
+      // or admin-only verification metadata.
+      allow get: if isOwner(centerId) || isPublicApprovedCenter();
+      allow list: if isPublicApprovedCenter();
+
+      allow create: if centerCreateValid(centerId);
+      allow update: if centerPendingOwnerUpdateValid(centerId);
+
+      // Future owner writes after approval must use profile change requests.
+      // Future admin moderation: keep denied until admin/rules batch.
+      // Future profile publication split: publicCenters should be considered.
+      allow delete: if false;
     }
 
     match /clinicians/{clinicianId} {
-      allow read, write: if false;
+      // Batch 2: public provider reads.
+      // TODO(public-profile-split): Firestore rules cannot redact fields from a
+      // document. Before production, prefer sanitized publicClinicians documents
+      // or ensure approved clinician docs never contain identity/certificate
+      // URLs, private contact data, internal review notes, blocked reasons,
+      // safety fields, payment fields, session links, or admin-only verification
+      // metadata.
+      allow get: if isOwner(clinicianId) || isPublicApprovedClinician();
+      allow list: if isPublicApprovedClinician();
+
+      allow create: if clinicianCreateValid(clinicianId);
+      allow update: if clinicianPendingOwnerUpdateValid(clinicianId);
+
+      // Future owner writes after approval must use profile change requests.
+      // Future admin moderation: keep denied until admin/rules batch.
+      // Future profile publication split: publicClinicians should be considered.
+      allow delete: if false;
     }
 
     match /admins/{adminId} {
@@ -263,7 +1064,16 @@ service cloud.firestore {
     }
 
     match /booking_requests/{requestId} {
-      allow read, write: if false;
+      allow read: if isAdmin() || isBookingParticipant();
+      allow create: if bookingCreateValid();
+      allow update: if clientBookingUpdateValid()
+        || centerBookingUpdateValid()
+        || clinicianBookingUpdateValid();
+
+      // TODO(server-lifecycle): lifecycle, payment, assignment, session links,
+      // admin notes, and safety fields should be controlled by admin/server or
+      // Cloud Functions in a later batch.
+      allow delete: if false;
     }
 
     match /bookingRequests/{requestId} {
@@ -271,27 +1081,63 @@ service cloud.firestore {
     }
 
     match /chat_threads/{threadId} {
-      allow read, write: if false;
+      // Batch 5C: participant/admin reads only. Client-side chat writes remain
+      // denied because current adapter payloads include governance/safety/admin
+      // fields such as handoffState, safetyState, riskScore, riskLevel,
+      // strategyMode, assignedAdminUid, messageCount, lastMessagePreview, and
+      // lifecycleState.
+      //
+      // TODO(chat-cloud-functions): create/update threads, append system/admin
+      // messages, update counters/previews, and mutate safety/escalation fields
+      // through Cloud Functions or a reviewed admin pipeline.
+      // TODO(ai-safety-os): crisis escalation, safety traces, and raw sensitive
+      // chat governance must wait for the AI Safety OS phase.
+      allow read: if canReadChatThread();
+      allow create, update, delete: if false;
 
       match /messages/{messageId} {
-        allow read, write: if false;
+        allow read: if canReadChatThreadById(threadId);
+        allow create, update, delete: if false;
       }
     }
 
     match /support_requests/{requestId} {
-      allow read, write: if false;
+      allow read: if isAdmin() || ownsSupportRequest();
+      allow create: if supportRequestCreateValid();
+      allow update: if supportRequestOwnerUpdateValid();
+
+      // TODO(support-moderation): assignment, escalation, resolution,
+      // notifications, audit logging, and AI safety integration should be
+      // admin/server or Cloud Function controlled in a future batch.
+      allow delete: if false;
     }
 
     match /sessionRatings/{ratingId} {
-      allow read, write: if false;
+      // Batch 5B: raw session ratings are participant-only, never public.
+      // TODO(rating-aggregates): publish public-safe aggregate counts/averages
+      // through a Cloud Function/admin pipeline or sanitized public provider
+      // documents instead of reading raw sessionRatings from public pages.
+      allow read: if canReadSessionRating();
+      allow create: if sessionRatingCreateValid();
+      allow update, delete: if false;
     }
 
     match /clinician_profile_change_requests/{requestId} {
-      allow read, write: if false;
+      allow read: if isAdmin() || ownsClinicianProfileChangeRequest();
+      allow create: if clinicianProfileChangeCreateValid();
+
+      // TODO(profile-moderation): review, approval, rejection, application,
+      // audit logging, and notification dispatch are future admin/server work.
+      allow update, delete: if false;
     }
 
     match /center_profile_change_requests/{requestId} {
-      allow read, write: if false;
+      allow read: if isAdmin() || ownsCenterProfileChangeRequest();
+      allow create: if centerProfileChangeCreateValid();
+
+      // TODO(profile-moderation): review, approval, rejection, application,
+      // audit logging, and notification dispatch are future admin/server work.
+      allow update, delete: if false;
     }
 
     match /chat_escalations/{escalationId} {

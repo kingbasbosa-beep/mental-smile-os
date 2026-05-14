@@ -304,13 +304,7 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
       final createdAt = Timestamp.now();
       final requestGroupId = firestore.collection('booking_requests').doc().id;
 
-      final sentToNames = admins
-          .map((adminDoc) => (adminDoc.data()['displayName'] ??
-                  adminDoc.data()['email'] ??
-                  'Admin')
-              .toString())
-          .toList();
-      final sentToIds = admins.map((adminDoc) => adminDoc.id).toList();
+      final adminCount = admins.length;
 
       final selectedLabelAr = (selection?['labelAr'] ?? '').toString();
       final selectedPricingUnit =
@@ -349,22 +343,9 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
         'selectedCenterType': _centerType,
         'centerHasDetoxUnit': _centerHasDetoxUnit,
         'status': 'pending_admin',
-        'workflowStage': 'pending_admin',
         'createdAt': createdAt,
         'updatedAt': createdAt,
         'note': note,
-        'adminApproved': false,
-        'adminRejected': false,
-        'adminForwarded': false,
-        'adminDecisionType': '',
-        'adminDecisionBy': '',
-        'adminDecisionAt': null,
-        'adminAssignedBy': '',
-        'adminAssignedAt': null,
-        'paymentStatus': 'not_started',
-        'sessionStatus': 'not_created',
-        'reviewStatus': 'not_started',
-        'payoutStatus': 'blocked',
         // Canonical ownership field.
         'assignedClinicianId': '',
         'assignedClinicianName': '',
@@ -400,14 +381,12 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
         'lastCenterFeedbackRevisionNumber': 0,
         'clientUpdatedAfterCenterFeedback': false,
         'adminCanApproveWithoutCenterRecheck': false,
-        'targetAdminIds': sentToIds,
-        'targetAdminNames': sentToNames,
       };
       debugPrint(
         'CENTER_TRACE after_prepare_payload '
         'requestGroupId=$requestGroupId '
         'selectedAccommodationKey=$_selectedAccommodationKey '
-        'targetAdmins=${sentToIds.length}',
+        'resolvedAdmins=$adminCount',
       );
 
       final existingId = widget.args.existingRequestId;
@@ -460,8 +439,6 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
           }
         }
         final updatePayload = <String, dynamic>{
-          'status': 'pending_admin',
-          'workflowStage': 'pending_admin',
           'updatedAt': FieldValue.serverTimestamp(),
           'note': note,
           'centerAvailabilityStatus': 'pending',
@@ -536,7 +513,7 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
         debugPrint(
             'CENTER_CREATE selectedAccommodationKey=$_selectedAccommodationKey');
         debugPrint('CENTER_CREATE noteLength=${note.length}');
-        debugPrint('CENTER_CREATE targetAdminIds=$sentToIds');
+        debugPrint('CENTER_CREATE resolvedAdmins=$adminCount');
         final requestRef = firestore.collection('booking_requests').doc();
         debugPrint(
           'CENTER_CREATE create_request '
@@ -563,15 +540,14 @@ class _CenterBookingRequestPageState extends State<CenterBookingRequestPage> {
         return;
       }
 
-      final routedNames = sentToNames.toSet().join(' / ');
       setState(() => _result = l10n.bookingCenterRequestSent);
 
       messenger.showSnackBar(
         SnackBar(
           content: Text(
-            routedNames.isEmpty
-                ? l10n.bookingCenterRequestSentToAdmin
+            l10n.bookingCenterRequestSentToAdmin /*
                 : 'تم إرسال طلب المركز إلى: $routedNames',
+            */
           ),
         ),
       );
