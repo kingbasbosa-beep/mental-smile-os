@@ -1,4 +1,4 @@
-import 'package:flutterprojects/core/backend_boundaries/trusted_operation_type.dart';
+import '../../../mental_smile_clean_core/lib/mental_smile_clean_core.dart';
 
 class MockTrustedOperation {
   const MockTrustedOperation({

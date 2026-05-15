@@ -1,9 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutterprojects/core/backend_boundaries/backend_governed_action.dart';
-import 'package:flutterprojects/core/backend_boundaries/cloud_function_boundary.dart';
-import 'package:flutterprojects/core/backend_boundaries/protected_governance_fields.dart';
-import 'package:flutterprojects/core/backend_boundaries/trusted_operation_type.dart';
 
+import '../../../mental_smile_clean_core/lib/mental_smile_clean_core.dart';
 import '../emulator/protected_field_fixture.dart';
 
 void main() {
