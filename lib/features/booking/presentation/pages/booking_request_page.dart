@@ -62,9 +62,12 @@ class _GoldBackIcon extends StatelessWidget {
         height: iconSize,
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
-          return BackButtonIcon(
-            color: const Color(0xFFFFE7B2),
-            size: iconSize,
+          return IconTheme(
+            data: IconThemeData(
+              color: const Color(0xFFFFE7B2),
+              size: iconSize,
+            ),
+            child: const BackButtonIcon(),
           );
         },
       ),

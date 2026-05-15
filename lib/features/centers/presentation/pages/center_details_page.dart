@@ -299,6 +299,7 @@ class CenterDetailsPage extends StatelessWidget {
   }
 
   Widget _pricingSection(BuildContext context, CenterModel c) {
+    final l10n = AppLocalizations.of(context)!;
     final isAutism = usesAutismCarePricing(c.category);
     final accommodationItems = c.accommodationCosts
         .where((item) => item.enabled && item.price > 0)
@@ -386,6 +387,7 @@ class CenterDetailsPage extends StatelessWidget {
   }
 
   Widget _serviceTypeSection(BuildContext context, CenterModel c) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -416,6 +418,7 @@ class CenterDetailsPage extends StatelessWidget {
   }
 
   Widget _capabilitiesSection(BuildContext context, CenterModel c) {
+    final l10n = AppLocalizations.of(context)!;
     final items = <String>[];
     if (c.capabilities.supportsAddictionCasesWithHiv) {
       items.add('يدعم حالات الإدمان المصاحبة لفيروس HIV');
