@@ -1,71 +1,62 @@
 # Clean Core Extraction Rollback Strategy
 
-Draft rollback strategy for future extraction. No extraction was performed.
+Draft rollback strategy for future extraction transition.
 
-## Rollback Principle
+## Rollback Principles
 
-Every extraction phase should have a clear rollback checkpoint before files are moved, imports are rewritten, or the host app reconnects to an extracted package.
+- Rollback must preserve fail-closed behavior.
+- Rollback must not activate runtime implicitly.
+- Rollback must preserve backend authority expectations.
+- Rollback must preserve provider-blocked defaults.
+- Rollback must keep app-owned implementations intact.
 
-## Checkpoints
+## Staged Rollback
 
-### Checkpoint 0: Before Package Creation
+Each stage should have a rollback checkpoint:
 
-- Import graph verified.
-- Export candidates reviewed.
-- App-owned exclusions documented.
-- Host app unchanged.
+- Stage 1 rollback: restore pure contract references to original path.
+- Stage 2 rollback: disable signed/review/legal contract package references.
+- Stage 3 rollback: disconnect adapter contract package references.
+- Stage 4 rollback: keep runtime-deferred placeholders internal and inactive.
 
-Rollback: abandon package creation plan; docs remain useful.
+## Partial Reconnect Rollback
 
-### Checkpoint 1: After Pure Contract Extraction
+If reconnect fails:
 
-- Pure contract package builds independently.
-- Host app can still use original source path or temporary local link.
-- No app-owned runtime moved.
+- Stop replacing imports.
+- Restore host app reference to prior implementation path.
+- Keep extracted package dependency disabled or unused.
+- Reclassify failing area as app-owned or adapter-required.
 
-Rollback: point host app back to original clean_core source and remove package link.
+## Adapter Disconnect Fallback
 
-### Checkpoint 2: After Governance Contract Extraction
+If an adapter is unavailable:
 
-- Runtime/provider governance remains inert.
-- No runtime execution activated.
-- Host app still owns Firebase, UI, routing, generated files.
+- Fail closed.
+- Preserve review-required state.
+- Avoid direct Firebase/provider/backend calls from clean_core.
+- Use host-owned legacy path until adapter is reviewed.
 
-Rollback: revert dependency link and keep governance contracts in app source until reviewed.
+## Freeze Reactivation
 
-### Checkpoint 3: After Adapter Contract Extraction
+Rollback should reactivate freeze rules:
 
-- Adapter interfaces exist.
-- Implementations remain host-app owned.
-- No network/provider/Firebase runtime moved into package.
+- No new app-owned imports in export candidates.
+- No provider SDKs.
+- No generated file exports.
+- No runtime activation.
 
-Rollback: keep adapter contracts in host app and disable extracted package dependency.
+## Rollback Audit Expectations
 
-### Checkpoint 4: After Host Reconnect
+Future rollback should record:
 
-- Host app reconnects through adapters.
-- Tests/manual checks confirm behavior.
-- Runtime systems remain disabled.
-
-Rollback: revert adapter wiring and dependency link; keep legacy app-owned implementation path.
-
-## Temporary Dual-Link Strategy
-
-During extraction, maintain a short-lived compatibility path:
-
-- Host app may reference local package dependency.
-- Original app-owned implementation remains until reconnect is verified.
-- Avoid deleting legacy modules during initial extraction.
-
-## Partial Extraction Recovery
-
-If a phase fails:
-
-- Stop before the next phase.
-- Reclassify failed files as app-owned or adapter-required.
-- Keep pure contracts extracted only if stable.
-- Do not activate runtime systems as a workaround.
+- Stage.
+- Trigger.
+- Affected contract group.
+- Restored path.
+- Remaining risk.
+- Required follow-up review.
 
 ## Explicit Non-Action
 
-No rollback action was performed because no extraction was performed.
+No rollback was performed.
