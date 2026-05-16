@@ -27,6 +27,8 @@ dependencies:
   geolocator: ^14.0.2
   geocoding: ^4.0.0
   firebase_analytics: ^11.6.0
+  mental_smile_clean_core:
+    path: mental_smile_clean_core
 
 dev_dependencies:
   flutter_test:
