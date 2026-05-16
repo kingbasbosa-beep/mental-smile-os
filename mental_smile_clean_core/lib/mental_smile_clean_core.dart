@@ -1,3 +1,6 @@
+export 'src/audit/audit_hash_placeholder.dart';
+export 'src/audit/audit_redaction.dart';
+export 'src/audit/audit_retention_policy.dart';
 export 'src/backend_boundaries/ai_governance_boundary.dart';
 export 'src/backend_boundaries/backend_governed_action.dart';
 export 'src/backend_boundaries/booking_lifecycle_boundary.dart';
