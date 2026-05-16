@@ -1,4 +1,5 @@
 export 'src/audit/audit_hash_placeholder.dart';
+export 'src/audit/audit_processing_context.dart';
 export 'src/audit/audit_redaction.dart';
 export 'src/audit/audit_retention_policy.dart';
 export 'src/audit/audit_snapshot.dart';
