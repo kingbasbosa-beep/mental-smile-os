@@ -1,0 +1,7 @@
+name: mental_smile_clean_core
+description: Pure Dart governance and boundary contracts for Mental Smile.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
