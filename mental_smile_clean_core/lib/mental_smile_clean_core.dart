@@ -75,6 +75,7 @@ export 'src/human_review/escalation_audit_link.dart';
 export 'src/human_review/escalation_level.dart';
 export 'src/human_review/escalation_policy_reference.dart';
 export 'src/human_review/escalation_reason.dart';
+export 'src/human_review/escalation_resolution.dart';
 export 'src/human_review/escalation_review.dart';
 export 'src/human_review/escalation_state.dart';
 export 'src/human_review/review_priority.dart';
