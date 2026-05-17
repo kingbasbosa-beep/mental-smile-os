@@ -79,6 +79,7 @@ export 'src/human_review/escalation_request.dart';
 export 'src/human_review/escalation_resolution.dart';
 export 'src/human_review/escalation_review.dart';
 export 'src/human_review/escalation_state.dart';
+export 'src/human_review/passive_review_signal.dart';
 export 'src/human_review/review_priority.dart';
 export 'src/human_review/review_visibility_scope.dart';
 export 'src/policy_runtime/runtime_policy_audit_link.dart';
