@@ -1,4 +1,5 @@
 export 'src/audit/audit_actor_type.dart';
+export 'src/audit/audit_event.dart';
 export 'src/audit/audit_event_type.dart';
 export 'src/audit/audit_hash_placeholder.dart';
 export 'src/audit/audit_processing_context.dart';
