@@ -8,6 +8,7 @@ export 'src/audit/audit_redaction.dart';
 export 'src/audit/audit_retention_policy.dart';
 export 'src/audit/audit_severity.dart';
 export 'src/audit/audit_snapshot.dart';
+export 'src/audit/audit_trace.dart';
 export 'src/audit/audit_visibility_scope.dart';
 export 'src/backend_boundaries/ai_governance_boundary.dart';
 export 'src/backend_boundaries/backend_governed_action.dart';
