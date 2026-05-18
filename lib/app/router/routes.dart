@@ -13,13 +13,16 @@ class Routes {
   static const webRegistrationSuccess = '/web/register/success';
   static const splash = '/';
   static const language = '/language';
+  // Alias: /home intentionally opens the same menu surface as /menu.
   static const home = '/home';
   static const login = '/login';
   static const blockedAccount = '/account-blocked';
   static const menu = '/menu';
 
   static const clientRegister = '/register/client';
+  // Alias: legacy app registration entry; same destination as webClinicianRegister.
   static const clinicianRegister = '/register/clinician';
+  // Alias: legacy app registration entry; same destination as webCenterRegister.
   static const centerRegister = '/register/center';
   static const followUpRegistration = '/follow-up/register';
   static const followUpTemplates = '/workspace/external-follow-up/templates';
@@ -32,6 +35,7 @@ class Routes {
   static const clinicianSessions = '/clinician/sessions';
   static const clinicianInbox = '/clinician/inbox';
   static const clinicianChatInbox = '/clinician/chat-inbox';
+  // Alias retained for old deep links into the clinician chat inbox.
   static const clinicianChatInboxLegacy = '/chat/clinician/inbox';
 
   static const clientDashboard = '/client/dashboard';
@@ -51,6 +55,7 @@ class Routes {
   static const addiction = '/module/addiction';
   static const specialNeeds = '/module/special_needs';
   static const supportIssueSelector = '/module/support-issue-selector';
+  // Preview placeholder: route exists but is not operationally production-ready.
   static const familyStress = '/module/family_stress';
   static const specialists = '/module/specialists';
   static const specialistsList = '/module/specialists/list';
@@ -61,6 +66,7 @@ class Routes {
   static const centerDetails = '/module/centers/details';
   static const centerBookingRequest = '/booking/center-request';
 
+  // Alias: webLibrary opens the same LibraryPage as this in-app library route.
   static const library = '/module/library';
   static const booking = '/booking';
   static const bookingRequest = '/booking/request';
@@ -68,6 +74,7 @@ class Routes {
 
   static const adminHub = '/admin/hub';
   static const adminOperations = '/admin/operations';
+  static const adminBookingQueue = '/admin/booking-queue';
   static const adminCommunications = '/admin/communications';
   static const adminClients = '/admin/clients';
   static const adminRegistrationMaintenance = '/admin/registration-maintenance';
@@ -76,6 +83,7 @@ class Routes {
   static const adminClinicianProfileRequests =
       '/admin/clinician-profile-requests';
   static const adminSupportChats = '/admin/support-chats';
+  static const adminAlertsReview = '/admin/alerts-review';
   static const adminAiPolicies = '/admin/ai-policies';
   static const adminDomainStatus = '/admin/system-domains';
   static const adminContentCarePrograms = '/admin/content-care-programs';
@@ -84,9 +92,11 @@ class Routes {
       '/admin/support-messaging-governance';
   static const adminFollowupCareGovernance = '/admin/followup-care-governance';
   static const adminAiFollowupBoundaries = '/admin/ai-followup-boundaries';
+  // Preview/ops shell: visible for governance, not a live operational engine.
   static const adminGrowthLayer = '/admin/growth-layer';
   static const adminEmployeeSystem = '/admin/employee-system';
   static const adminMaintenanceSystem = '/admin/maintenance';
+  // Preview/ops shell: UI actions remain supervised and are not automation.
   static const adminAiDevOpsCenter = '/admin/ai-devops';
   static const adminDomainAvailability = '/admin/domain-availability';
   static const adminFunctionalWorkspaces = '/admin/functional-workspaces';
@@ -94,8 +104,10 @@ class Routes {
   static const customerFollowUpWorkspace = '/workspace/customer-follow-up';
   static const technicalSupportWorkspace = '/workspace/technical-support';
   static const marketingWorkspace = '/workspace/marketing';
+  // Preview/content shell: external tools are launcher-style, not integrated.
   static const adminWorkspaceCommandCenter = '/admin/workspace-command-center';
   static const contentWorkspace = '/workspace/content';
+  // Preview placeholders: Control Room shells, not operational execution surfaces.
   static const adminGuidedWorkflows = '/admin/control-room/guided-workflows';
   static const adminReferences = '/admin/control-room/references';
   static const adminDetailedMonitoring =
@@ -106,6 +118,7 @@ class Routes {
   static const adminExposureRules = '/admin/exposure-rules';
   static const adminActivationReadiness = '/admin/activation-readiness';
   static const adminSystemActivationPack = '/admin/system-activation-pack';
+  // Preview gateway routes: governance/visibility shells, not live integrations.
   static const adminGatewayLayer = '/admin/gateways';
   static const adminCommunicationGateway = '/admin/gateways/communication';
   static const adminEngineeringGateway = '/admin/gateways/engineering';

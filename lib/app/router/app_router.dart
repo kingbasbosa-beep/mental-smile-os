@@ -114,8 +114,6 @@ import 'package:flutterprojects/features/centers/presentation/pages/center_opera
 import 'package:flutterprojects/features/centers/presentation/pages/center_residencies_page.dart';
 import 'package:flutterprojects/features/client/presentation/pages/client_sessions_page.dart';
 
-const String _adminBookingQueueRoute = '/admin/booking-queue';
-const String _adminAlertsReviewRoute = '/admin/alerts-review';
 const String _roleAdmin = 'admin';
 const String _roleClinician = 'clinician';
 const String _roleCenter = 'center';
@@ -125,6 +123,7 @@ class AppRouter {
   static const Set<String> _adminOnlyRoutes = {
     Routes.adminHub,
     Routes.adminOperations,
+    Routes.adminBookingQueue,
     Routes.adminCommunications,
     Routes.adminClinicianRequests,
     Routes.adminClinicianWorkspace,
@@ -134,6 +133,7 @@ class AppRouter {
     Routes.adminPayments,
     Routes.adminSessions,
     Routes.adminSupportChats,
+    Routes.adminAlertsReview,
     Routes.adminAiPolicies,
     Routes.adminDomainStatus,
     Routes.adminDomainAvailability,
@@ -167,8 +167,6 @@ class AppRouter {
     Routes.adminCommunicationGateway,
     Routes.adminEngineeringGateway,
     Routes.adminDeviceStorageGateway,
-    _adminBookingQueueRoute,
-    _adminAlertsReviewRoute,
     Routes.adminArchive,
     Routes.adminArchiveSessions,
     Routes.adminArchivePayments,
@@ -180,6 +178,7 @@ class AppRouter {
     Routes.adminAccountingWorkspace,
     Routes.adminSessionReport,
     Routes.adminCenters,
+    Routes.adminCenterDetails,
     Routes.chatEscalations,
     Routes.chatEscalationReport,
   };
@@ -578,7 +577,7 @@ class AppRouter {
           settings: settings,
         );
 
-      case _adminAlertsReviewRoute:
+      case Routes.adminAlertsReview:
         return _adminProtectedRoute(
           child: const AdminAlertsReviewPage(),
           settings: settings,
@@ -692,7 +691,7 @@ class AppRouter {
           settings: settings,
         );
 
-      case _adminBookingQueueRoute:
+      case Routes.adminBookingQueue:
         return _adminProtectedRoute(
           child: const AdminBookingQueuePage(),
           settings: settings,
@@ -835,6 +834,9 @@ class AppRouter {
         );
 
       case Routes.chat:
+        // Current doctrine: /chat remains a public/support entry route. Admin
+        // support mode is argument-driven; role hardening needs a separate
+        // MASTER CORE decision.
         final args = settings.arguments;
         String? threadId;
         String? entryContext;
@@ -978,9 +980,25 @@ class AppRouter {
         );
 
       case Routes.centerBookingRequest:
-        final args = settings.arguments as CenterBookingRequestArgs;
+        final rawArgs = settings.arguments;
+        if (rawArgs is! CenterBookingRequestArgs) {
+          return MaterialPageRoute(
+            builder: (ctx) => Scaffold(
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    AppLocalizations.of(ctx)!.routeNotFound,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ),
+            settings: settings,
+          );
+        }
         return _protectedRoute(
-          child: CenterBookingRequestPage(args: args),
+          child: CenterBookingRequestPage(args: rawArgs),
           settings: settings,
         );
 

@@ -6,8 +6,6 @@ import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 class AdminOperationsPage extends StatelessWidget {
   const AdminOperationsPage({super.key});
 
-  static const String _adminBookingQueueRoute = '/admin/booking-queue';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +23,7 @@ class AdminOperationsPage extends StatelessWidget {
             _OperationsEntryCard(
               title: 'Requests Queue',
               summary: 'Review and route active booking workflow items.',
-              route: _adminBookingQueueRoute,
+              route: Routes.adminBookingQueue,
             ),
             SizedBox(height: AppSpacing.md),
             _OperationsEntryCard(
