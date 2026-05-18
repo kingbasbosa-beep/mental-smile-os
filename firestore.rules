@@ -1,4 +1,12 @@
 rules_version = '2';
+
+// MASTER CORE role doctrine:
+// Firestore authorization depends on custom claims, not UI role documents.
+// AccountAccessService and role documents are app-side UI/UX gates only.
+// Opening a screen in the app does not guarantee Firestore read/write access.
+// Admin SDK tooling is a privileged ops layer.
+// QA bot writes are privileged ops behavior, not client/app behavior.
+// Do not broaden rules to hide a custom-claims mismatch.
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() {
@@ -464,6 +472,14 @@ service cloud.firestore {
     }
 
     match /system_health/{docId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // Ops-owned alert snapshots.
+    // Written only by trusted Admin SDK tooling.
+    // Client/app writes remain denied.
+    match /system_alerts/{docId} {
       allow read: if isAdmin();
       allow write: if false;
     }
