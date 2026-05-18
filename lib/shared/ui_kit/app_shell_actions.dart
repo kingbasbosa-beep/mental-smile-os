@@ -8,20 +8,23 @@ class AppShellActions {
   static PreferredSizeWidget buildAppBar(
     BuildContext context, {
     required String title,
-    bool canLogout = true,
+    bool canLogout = false,
     bool showAccountBadge = true,
+    bool showTitle = true,
   }) {
     final isArabic =
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
     return AppBar(
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: Color(0xFFC9A75B),
-          fontWeight: FontWeight.w800,
-        ),
-      ),
+      title: showTitle
+          ? Text(
+              title,
+              style: const TextStyle(
+                color: Color(0xFFC9A75B),
+                fontWeight: FontWeight.w800,
+              ),
+            )
+          : const SizedBox.shrink(),
       backgroundColor: const Color(0xFF0F1316).withValues(alpha: 0.96),
       foregroundColor: const Color(0xFFC9A75B),
       elevation: 0,
@@ -85,9 +88,16 @@ class _GoldBackIcon extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE7A94C).withValues(alpha: 0.16),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: const Color(0xFFFFD98A).withValues(alpha: 0.34),
+            blurRadius: 16,
+            spreadRadius: 1,
+            offset: const Offset(0, 5),
+          ),
+          BoxShadow(
+            color: const Color(0xFFE7A94C).withValues(alpha: 0.24),
+            blurRadius: 26,
+            spreadRadius: 2,
+            offset: const Offset(0, 12),
           ),
         ],
       ),

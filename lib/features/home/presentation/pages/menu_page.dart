@@ -508,6 +508,7 @@ class _MenuLibraryTeaserHearts extends StatelessWidget {
               _MenuComingSoonHeart(
                 compact: compact,
                 title: entry.title,
+                badgeLabel: isArabic ? 'قريبًا' : 'Soon',
                 onTap: () {
                   AppAnalytics.logPathSelected('menu', entry.keyName);
                   Navigator.of(context).pushNamed(
@@ -527,11 +528,13 @@ class _MenuComingSoonHeart extends StatefulWidget {
   const _MenuComingSoonHeart({
     required this.compact,
     required this.title,
+    required this.badgeLabel,
     required this.onTap,
   });
 
   final bool compact;
   final String title;
+  final String badgeLabel;
   final VoidCallback onTap;
 
   @override
@@ -587,7 +590,7 @@ class _MenuComingSoonHeartState extends State<_MenuComingSoonHeart> {
                           ],
                         ),
                         Text(
-                          'قريبًا',
+                          widget.badgeLabel,
                           textAlign: TextAlign.center,
                           style:
                               Theme.of(context).textTheme.labelSmall?.copyWith(

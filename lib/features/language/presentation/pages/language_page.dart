@@ -90,8 +90,11 @@ class MkLanguagePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isArabic =
+        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
@@ -122,19 +125,20 @@ class MkLanguagePage extends ConsumerWidget {
                   const SizedBox(height: 20),
                   _registrationItem(
                     context: context,
-                    label: 'تسجيل عميل',
+                    label: isArabic ? 'تسجيل عميل' : 'Register as client',
                     route: Routes.clientRegister,
                   ),
                   const SizedBox(height: 14),
                   _registrationItem(
                     context: context,
-                    label: 'تسجيل أخصائي',
+                    label:
+                        isArabic ? 'تسجيل أخصائي' : 'Register as clinician',
                     route: Routes.webClinicianRegister,
                   ),
                   const SizedBox(height: 14),
                   _registrationItem(
                     context: context,
-                    label: 'تسجيل مركز',
+                    label: isArabic ? 'تسجيل مركز' : 'Register as center',
                     route: Routes.webCenterRegister,
                   ),
                 ],

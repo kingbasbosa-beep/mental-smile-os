@@ -284,7 +284,11 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: Colors.black,
-        appBar: AppShellActions.buildAppBar(context, title: title),
+        appBar: AppShellActions.buildAppBar(
+          context,
+          title: title,
+          showTitle: false,
+        ),
         body: LayoutBuilder(
           builder: (context, constraints) {
             return Stack(

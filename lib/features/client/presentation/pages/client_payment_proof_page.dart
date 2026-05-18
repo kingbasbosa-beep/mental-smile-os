@@ -360,6 +360,7 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
         appBar: AppShellActions.buildAppBar(
           context,
           title: _isArabic ? 'رفع إثبات التحويل' : 'Upload payment proof',
+          showTitle: false,
         ),
         body: LayoutBuilder(
           builder: (context, constraints) {

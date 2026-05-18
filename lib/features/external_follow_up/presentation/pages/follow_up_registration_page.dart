@@ -236,15 +236,6 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
     });
   }
 
-  Future<void> _signOut() async {
-    await FirebaseAuth.instance.signOut();
-    if (!mounted) return;
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      Routes.login,
-      (_) => false,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -281,56 +272,52 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                   left: AppSpacing.md,
                   child: SafeArea(
                     child: IconButton(
-                      onPressed: _signOut,
-                      icon: Image.asset(
-                        'assets/branding/navigation/logout/logout_gold.png',
-                        width: 30,
-                        height: 30,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Icon(Icons.logout_rounded);
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: AppSpacing.md,
-                  right: AppSpacing.md,
-                  child: SafeArea(
-                    child: TextButton.icon(
                       onPressed: () {
                         Navigator.of(context).pushNamedAndRemoveUntil(
                           Routes.clientDashboard,
                           (route) => false,
                         );
                       },
-                      icon: Image.asset(
-                        Directionality.of(context) == TextDirection.rtl
-                            ? 'assets/branding/navigation/back/back_right_gold.png'
-                            : 'assets/branding/navigation/back/back_left_gold.png',
-                        width: 22,
-                        height: 22,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Icon(Icons.arrow_back_rounded);
-                        },
-                      ),
-                      label: const Text('رجوع للصفحة الشخصية'),
-                      style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFFFFE8A6),
-                        backgroundColor:
-                            Colors.black.withValues(alpha: 0.36),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.md,
-                          vertical: AppSpacing.sm,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(999),
-                          side: BorderSide(
-                            color: const Color(0xFFE7C766)
-                                .withValues(alpha: 0.40),
+                      tooltip: 'Back',
+                      icon: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color(0xFF1B1007)
+                              .withValues(alpha: 0.50),
+                          border: Border.all(
+                            color: const Color(0xFFFFD98A)
+                                .withValues(alpha: 0.56),
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFFFD98A)
+                                  .withValues(alpha: 0.34),
+                              blurRadius: 16,
+                              spreadRadius: 1,
+                              offset: const Offset(0, 5),
+                            ),
+                            BoxShadow(
+                              color: const Color(0xFFE7A94C)
+                                  .withValues(alpha: 0.24),
+                              blurRadius: 26,
+                              spreadRadius: 2,
+                              offset: const Offset(0, 12),
+                            ),
+                          ],
+                        ),
+                        child: Image.asset(
+                          'assets/branding/navigation/back/back_left_gold.png',
+                          width: 22,
+                          height: 22,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(
+                              Icons.arrow_back_rounded,
+                              color: Color(0xFFFFE7B2),
+                            );
+                          },
                         ),
                       ),
                     ),

@@ -180,7 +180,23 @@ class _AdminHubPageState extends State<AdminHubPage> {
   }
 
   bool _isArabic(BuildContext context) {
-    return Directionality.of(context) == TextDirection.rtl;
+    return Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+  }
+
+  void _backToMenu(BuildContext context) {
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      Routes.menu,
+      (route) => false,
+    );
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    if (!context.mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      Routes.login,
+      (route) => false,
+    );
   }
 
   @override
@@ -505,32 +521,24 @@ class _AdminHubPageState extends State<AdminHubPage> {
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
           elevation: 0,
-          toolbarHeight: 42,
+          toolbarHeight: 52,
           automaticallyImplyLeading: false,
-          titleSpacing: 0,
+          titleSpacing: AppSpacing.sm,
           title: const SizedBox.shrink(),
-          leading: IconButton(
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              if (!context.mounted) return;
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                Routes.login,
-                (_) => false,
-              );
-            },
-            icon: Image.asset(
-              'assets/branding/navigation/logout/logout_gold.png',
-              width: 28,
-              height: 28,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) {
-                return const Icon(
-                  Icons.logout,
-                  color: Color(0xFFE8D7A5),
-                );
-              },
+          actions: [
+            _AdminHubTopButton(
+              label: isArabic ? 'القائمة' : 'Back to Menu',
+              icon: Icons.grid_view_rounded,
+              onPressed: () => _backToMenu(context),
             ),
-          ),
+            const SizedBox(width: 8),
+            _AdminHubTopButton(
+              label: isArabic ? 'تسجيل الخروج' : 'Logout',
+              icon: Icons.logout_rounded,
+              onPressed: () => _logout(context),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+          ],
         ),
         body: Container(
           color: const Color(0xFF0D1114),
@@ -548,6 +556,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
               LayoutBuilder(
                 builder: (context, constraints) {
                   final width = constraints.maxWidth;
+                  final sideInset = width >= 960 ? 40.0 : 0.0;
 
                   return ListView(
                     physics: const ClampingScrollPhysics(),
@@ -559,11 +568,14 @@ class _AdminHubPageState extends State<AdminHubPage> {
                     ),
                     children: [
                       Row(
+                        textDirection: TextDirection.rtl,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
                             flex: 7,
-                            child: width >= 960
+                            child: Padding(
+                              padding: EdgeInsets.only(right: sideInset),
+                              child: width >= 960
                                 ? Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
@@ -603,26 +615,30 @@ class _AdminHubPageState extends State<AdminHubPage> {
                                     governanceActions: governanceActions,
                                     entryActions: mainSectionCards,
                                   ),
+                            ),
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Expanded(
                             flex: 5,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _AdminHomeCountersSection(
-                                  isArabic: isArabic,
-                                  cards: compactCounters,
-                                ),
-                                const SizedBox(height: 10),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 18),
-                                  child: _AdminFixedDetailPanel(
+                            child: Padding(
+                              padding: EdgeInsets.only(left: sideInset),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _AdminHomeCountersSection(
                                     isArabic: isArabic,
-                                    sections: detailSections,
+                                    cards: compactCounters,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: 10),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 18),
+                                    child: _AdminFixedDetailPanel(
+                                      isArabic: isArabic,
+                                      sections: detailSections,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -677,6 +693,46 @@ class _AdminDetailPanelSection {
   final String? missingRouteTodo;
 }
 
+class _AdminHubTopButton extends StatelessWidget {
+  const _AdminHubTopButton({
+    required this.label,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 17),
+      label: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      style: TextButton.styleFrom(
+        foregroundColor: const Color(0xFFE8D7A5),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        textStyle: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(999),
+          side: BorderSide(
+            color: const Color(0xFFE0C174).withValues(alpha: 0.42),
+          ),
+        ),
+        backgroundColor: const Color(0xFF11191E).withValues(alpha: 0.72),
+      ),
+    );
+  }
+}
+
 class _AdminFixedDetailPanel extends StatelessWidget {
   const _AdminFixedDetailPanel({
     required this.isArabic,
@@ -700,10 +756,11 @@ class _AdminFixedDetailPanel extends StatelessWidget {
         children: [
           for (int index = 0; index < rows.length; index++) ...[
             Transform.translate(
-              offset: index == 1 ? const Offset(-112, 0) : Offset.zero,
+              offset: index == 1 ? const Offset(-56, 0) : Offset.zero,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                textDirection: TextDirection.rtl,
+                textDirection:
+                    index == 1 ? TextDirection.ltr : TextDirection.rtl,
                 children: [
                   for (int itemIndex = 0;
                       itemIndex < rows[index].length;
@@ -750,7 +807,7 @@ class _AdminDetailNavigationPill extends StatelessWidget {
         },
         child: SizedBox(
           width: 112,
-          height: 88,
+          height: 92,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -794,16 +851,19 @@ class _AdminDetailNavigationPill extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2),
-              Text(
-                section.title,
-                textAlign: isRtl ? TextAlign.right : TextAlign.left,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Color(0xFFF8EDD3),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  height: 1.12,
+              SizedBox(
+                width: 104,
+                child: Text(
+                  section.title,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFFF8EDD3),
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w700,
+                    height: 1.08,
+                  ),
                 ),
               ),
             ],
@@ -879,11 +939,9 @@ class _AdminHeaderShortcutBar extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             for (int rowIndex = 0; rowIndex < rows.length; rowIndex++) ...[
-              Transform.translate(
-                offset: rowIndex == 2 ? const Offset(122, 0) : Offset.zero,
-                child: Row(
+              Row(
                   mainAxisSize: MainAxisSize.min,
-                  textDirection: Directionality.of(context),
+                  textDirection: TextDirection.rtl,
                   children: [
                     for (int index = 0;
                         index < rows[rowIndex].length;
@@ -894,7 +952,6 @@ class _AdminHeaderShortcutBar extends StatelessWidget {
                     ],
                   ],
                 ),
-              ),
               if (rowIndex != rows.length - 1) const SizedBox(height: 9),
             ],
           ],
@@ -1201,13 +1258,13 @@ class _AdminSectionLaunchCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadii.xl),
         onTap: () => Navigator.of(context).pushNamed(item.route),
         child: SizedBox(
-          height: 76,
+          height: 80,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 52,
-                height: 52,
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: const Color(0xFF182126),
@@ -1226,8 +1283,8 @@ class _AdminSectionLaunchCard extends StatelessWidget {
                 ),
                 child: Center(
                   child: Container(
-                    width: 40,
-                    height: 40,
+                    width: 38,
+                    height: 38,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: const Color(0xFF11191E),
@@ -1259,17 +1316,20 @@ class _AdminSectionLaunchCard extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 1),
-              Text(
-                item.title,
-                maxLines: 2,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: const Color(0xFFE0C174),
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w800,
-                  height: 1.15,
+              const SizedBox(height: 2),
+              SizedBox(
+                width: double.infinity,
+                child: Text(
+                  item.title,
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFFE0C174),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    height: 1.08,
+                  ),
                 ),
               ),
             ],

@@ -455,13 +455,6 @@ class ClientDashboardPage extends StatelessWidget {
                                       ],
                                     ),
                                     Positioned(
-                                      left: 54,
-                                      top: 16,
-                                      child: const _DashboardLogoBadge(
-                                        size: 88,
-                                      ),
-                                    ),
-                                    Positioned(
                                       right: 40,
                                       top: 0,
                                       width: 230,
@@ -486,10 +479,34 @@ class ClientDashboardPage extends StatelessWidget {
                                       ),
                                     ),
                                     Positioned(
-                                      left: -22,
-                                      top: 64,
-                                      width: 520,
-                                      child: ratingsPanel,
+                                      left: 24,
+                                      top: 0,
+                                      child: Directionality(
+                                        textDirection: TextDirection.ltr,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Transform.translate(
+                                              offset: const Offset(0, -114),
+                                              child: const _DashboardLogoBadge(
+                                                size: 472,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 70),
+                                            Directionality(
+                                              textDirection: isArabic
+                                                  ? TextDirection.rtl
+                                                  : TextDirection.ltr,
+                                              child: Transform.translate(
+                                                offset: const Offset(0, -84),
+                                                child: ratingsPanel,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),

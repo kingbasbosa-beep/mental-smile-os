@@ -32,9 +32,16 @@ class _GoldBackIcon extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE7A94C).withValues(alpha: 0.16),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: const Color(0xFFFFD98A).withValues(alpha: 0.34),
+            blurRadius: 16,
+            spreadRadius: 1,
+            offset: const Offset(0, 5),
+          ),
+          BoxShadow(
+            color: const Color(0xFFE7A94C).withValues(alpha: 0.24),
+            blurRadius: 26,
+            spreadRadius: 2,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -474,9 +481,7 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
           elevation: 0,
           foregroundColor: const Color(0xFFFFE8A6),
           surfaceTintColor: Colors.transparent,
-          title: Text(
-            isArabic ? 'جلساتي وإقاماتي' : 'My Sessions & Residencies',
-          ),
+          title: const SizedBox.shrink(),
           leading: IconButton(
             onPressed: () => Navigator.of(context).maybePop(),
             icon: _GoldBackIcon(compact: true),

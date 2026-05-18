@@ -991,6 +991,7 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
         appBar: AppShellActions.buildAppBar(
           context,
           title: l10n.bookingMyRequestsTitle,
+          showTitle: false,
         ),
         body: LayoutBuilder(
           builder: (context, constraints) {
