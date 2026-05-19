@@ -437,6 +437,50 @@ class AppStatusBadge extends StatelessWidget {
   }
 }
 
+class GoldPageTitle extends StatelessWidget {
+  const GoldPageTitle({
+    super.key,
+    required this.title,
+    this.padding = const EdgeInsetsDirectional.fromSTEB(
+      AppSpacing.lg,
+      AppSpacing.sm,
+      AppSpacing.lg,
+      AppSpacing.md,
+    ),
+  });
+
+  final String title;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Padding(
+        padding: padding,
+        child: Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: Text(
+            title,
+            textAlign: TextAlign.right,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: AppColors.mutedGold,
+                  fontWeight: FontWeight.w900,
+                  height: 1.2,
+                  shadows: [
+                    Shadow(
+                      color: AppColors.mutedGold.withValues(alpha: 0.24),
+                      blurRadius: 12,
+                    ),
+                  ],
+                ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class AppMessageBanner extends StatelessWidget {
   const AppMessageBanner({
     super.key,
@@ -468,6 +512,94 @@ class AppMessageBanner extends StatelessWidget {
               color: const Color(0xFF8A4330),
               fontWeight: FontWeight.w700,
             ),
+      ),
+    );
+  }
+}
+
+class PremiumEmptyState extends StatelessWidget {
+  const PremiumEmptyState({
+    super.key,
+    required this.title,
+    this.message,
+    this.icon,
+    this.padding = const EdgeInsets.all(AppSpacing.xl),
+  });
+
+  final String title;
+  final String? message;
+  final IconData? icon;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Center(
+      child: Padding(
+        padding: padding,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xl,
+                vertical: AppSpacing.xxl,
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F1316).withValues(alpha: 0.84),
+                borderRadius: BorderRadius.circular(AppRadii.lg),
+                border: Border.all(
+                  color: AppColors.mutedGold.withValues(alpha: 0.24),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.mutedGold.withValues(alpha: 0.12),
+                    blurRadius: 22,
+                    offset: const Offset(0, 10),
+                  ),
+                  ...AppShadows.card,
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (icon != null) ...[
+                    Icon(
+                      icon,
+                      size: 34,
+                      color: AppColors.mutedGold.withValues(alpha: 0.88),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                  ],
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: textTheme.titleMedium?.copyWith(
+                      color: const Color(0xFFFFF4DA),
+                      fontWeight: FontWeight.w900,
+                      height: 1.35,
+                    ),
+                  ),
+                  if (message != null && message!.trim().isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      message!,
+                      textAlign: TextAlign.center,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.76),
+                        fontWeight: FontWeight.w600,
+                        height: 1.6,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

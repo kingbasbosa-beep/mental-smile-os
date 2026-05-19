@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
+import 'package:flutterprojects/shared/ui_kit/app_widgets.dart';
 
 class ClientSessionsPage extends StatefulWidget {
   const ClientSessionsPage({super.key});
@@ -476,17 +478,6 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: Colors.black,
-        appBar: AppBar(
-          backgroundColor: Colors.black.withValues(alpha: 0.88),
-          elevation: 0,
-          foregroundColor: const Color(0xFFFFE8A6),
-          surfaceTintColor: Colors.transparent,
-          title: const SizedBox.shrink(),
-          leading: IconButton(
-            onPressed: () => Navigator.of(context).maybePop(),
-            icon: _GoldBackIcon(compact: true),
-          ),
-        ),
         body: LayoutBuilder(
           builder: (context, constraints) {
             return DefaultTextStyle.merge(
@@ -513,6 +504,22 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                         ],
                       ),
                     ),
+                  ),
+                  const Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: SafeArea(
+                      bottom: false,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 56),
+                        child: GoldPageTitle(title: 'جلساتي'),
+                      ),
+                    ),
+                  ),
+                  AppShellActions.buildOverlayActions(
+                    onBack: () => Navigator.of(context).maybePop(),
+                    showLogout: false,
                   ),
                   uid.isEmpty
                       ? Center(
@@ -563,17 +570,17 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                               });
 
                             if (docs.isEmpty) {
-                              return Center(
-                                child: Text(
-                                  isArabic
-                                      ? 'لا توجد جلسات أو إقامات ظاهرة حاليًا'
-                                      : 'No visible sessions or residencies yet',
-                                ),
+                              return PremiumEmptyState(
+                                title: isArabic
+                                    ? 'لا توجد جلسات أو إقامات ظاهرة حاليًا'
+                                    : 'No visible sessions or residencies yet',
+                                icon: Icons.event_available_outlined,
                               );
                             }
 
                             return ListView(
-                              padding: const EdgeInsets.all(16),
+                              padding:
+                                  const EdgeInsets.fromLTRB(16, 144, 16, 16),
                               children: docs.map((data) {
                                 final requestId =
                                     (data['_id'] ?? '').toString();

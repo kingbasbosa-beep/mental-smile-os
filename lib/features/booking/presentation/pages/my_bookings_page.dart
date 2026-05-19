@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
+import 'package:flutterprojects/shared/ui_kit/app_widgets.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/center_booking_request_page.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
 
@@ -962,18 +963,9 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
         break;
     }
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Color(0xFFFFF4D4),
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
+    return PremiumEmptyState(
+      title: text,
+      icon: Icons.assignment_outlined,
     );
   }
 
@@ -988,11 +980,6 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: Colors.black,
-        appBar: AppShellActions.buildAppBar(
-          context,
-          title: l10n.bookingMyRequestsTitle,
-          showTitle: false,
-        ),
         body: LayoutBuilder(
           builder: (context, constraints) {
             return DefaultTextStyle.merge(
@@ -1020,10 +1007,14 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                       ),
                     ),
                   ),
-                  Column(
-                    children: [
-                      _statusTabs(context),
-                      Expanded(
+                  SafeArea(
+                    bottom: false,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 56),
+                        const GoldPageTitle(title: 'طلبات الحجز'),
+                        _statusTabs(context),
+                        Expanded(
                         child: (u == null)
                             ? const Center(
                                 child: Text(
@@ -1446,8 +1437,22 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                   );
                                 },
                               ),
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  AppShellActions.buildOverlayActions(
+                    onBack: () {
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).maybePop();
+                      } else {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          Routes.menu,
+                          (route) => false,
+                        );
+                      }
+                    },
+                    showLogout: false,
                   ),
                 ],
               ),

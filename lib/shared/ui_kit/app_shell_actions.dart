@@ -5,6 +5,53 @@ import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 
 class AppShellActions {
+  static Widget buildOverlayActions({
+    Key? key,
+    VoidCallback? onBack,
+    VoidCallback? onLogout,
+    bool showBack = true,
+    bool showLogout = false,
+    bool showLogoutLabel = true,
+    EdgeInsetsGeometry padding = const EdgeInsetsDirectional.fromSTEB(
+      AppSpacing.md,
+      AppSpacing.xs,
+      AppSpacing.md,
+      0,
+    ),
+  }) {
+    return Align(
+      key: key,
+      alignment: Alignment.topCenter,
+      child: SafeArea(
+        bottom: false,
+        child: Transform.translate(
+          offset: const Offset(0, -6),
+          child: Padding(
+            padding: padding,
+            child: Row(
+              children: [
+                if (showBack)
+                  _GoldShellActionButton(
+                    tooltip: 'رجوع',
+                    onPressed: onBack,
+                    child: const _GoldBackIcon(compact: true),
+                  )
+                else
+                  const SizedBox(width: 48, height: 48),
+                const Spacer(),
+                if (showLogout)
+                  _GoldLogoutAction(
+                    onPressed: onLogout,
+                    showLabel: showLogoutLabel,
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   static PreferredSizeWidget buildAppBar(
     BuildContext context, {
     required String title,
@@ -63,6 +110,108 @@ class AppShellActions {
               child: const _AccountRoleBanner(),
             )
           : null,
+    );
+  }
+}
+
+class _GoldShellActionButton extends StatelessWidget {
+  const _GoldShellActionButton({
+    required this.child,
+    required this.tooltip,
+    this.onPressed,
+  });
+
+  final Widget child;
+  final String tooltip;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: tooltip,
+      child: Tooltip(
+        message: tooltip,
+        child: GestureDetector(
+          onTap: onPressed,
+          behavior: HitTestBehavior.opaque,
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+class _GoldLogoutAction extends StatelessWidget {
+  const _GoldLogoutAction({
+    required this.showLabel,
+    this.onPressed,
+  });
+
+  final bool showLabel;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'خروج',
+      child: Tooltip(
+        message: 'خروج',
+        child: GestureDetector(
+          onTap: onPressed,
+          behavior: HitTestBehavior.opaque,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF1B1007).withValues(alpha: 0.50),
+                  border: Border.all(
+                    color: const Color(0xFFFFD98A).withValues(alpha: 0.48),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFFD98A).withValues(alpha: 0.26),
+                      blurRadius: 14,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.logout_rounded,
+                  color: onPressed == null
+                      ? const Color(0xFFFFE7B2).withValues(alpha: 0.46)
+                      : const Color(0xFFFFE7B2),
+                  size: 21,
+                ),
+              ),
+              if (showLabel) ...[
+                const SizedBox(height: 3),
+                Text(
+                  'خروج',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: const Color(0xFFFFD98A),
+                        fontWeight: FontWeight.w800,
+                        shadows: [
+                          Shadow(
+                            color:
+                                const Color(0xFFE7A94C).withValues(alpha: 0.30),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

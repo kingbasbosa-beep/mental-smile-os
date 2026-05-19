@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
+import 'package:flutterprojects/shared/ui_kit/app_widgets.dart';
 
 class ClientPaymentProofPage extends StatefulWidget {
   const ClientPaymentProofPage({super.key});
@@ -357,11 +359,6 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
       textDirection: _isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: Colors.black,
-        appBar: AppShellActions.buildAppBar(
-          context,
-          title: _isArabic ? 'رفع إثبات التحويل' : 'Upload payment proof',
-          showTitle: false,
-        ),
         body: LayoutBuilder(
           builder: (context, constraints) {
             return DefaultTextStyle.merge(
@@ -420,19 +417,23 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
                             final docs = snapshot.data ?? const [];
                             if (docs.isEmpty) {
                               _selectedRequestId = null;
-                              return Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(24),
-                                  child: Text(
-                                    _isArabic
-                                        ? 'لا يوجد طلب بانتظار التحويل المالي حاليًا'
-                                        : 'No request currently awaiting payment',
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      color: Color(0xFFFFF4D4),
-                                      fontWeight: FontWeight.w700,
+                              return SafeArea(
+                                bottom: false,
+                                child: Column(
+                                  children: [
+                                    const SizedBox(height: 56),
+                                    const GoldPageTitle(
+                                      title: 'إثبات التحويل المالي',
                                     ),
-                                  ),
+                                    Expanded(
+                                      child: PremiumEmptyState(
+                                        title: _isArabic
+                                            ? 'لا يوجد طلب بانتظار التحويل المالي حاليًا'
+                                            : 'No request currently awaiting payment',
+                                        icon: Icons.receipt_long_outlined,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               );
                             }
@@ -479,8 +480,15 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
                                     .toString();
 
                             return ListView(
-                              padding: const EdgeInsets.all(16),
+                              padding:
+                                  const EdgeInsets.fromLTRB(16, 104, 16, 16),
                               children: [
+                                const GoldPageTitle(
+                                  title: 'إثبات التحويل المالي',
+                                  padding: EdgeInsetsDirectional.only(
+                                    bottom: 16,
+                                  ),
+                                ),
                                 Container(
                                   margin: const EdgeInsets.only(bottom: 16),
                                   padding: const EdgeInsets.all(16),
@@ -772,6 +780,19 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
                             );
                           },
                         ),
+                  AppShellActions.buildOverlayActions(
+                    onBack: () {
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).maybePop();
+                      } else {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          Routes.menu,
+                          (route) => false,
+                        );
+                      }
+                    },
+                    showLogout: false,
+                  ),
                 ],
               ),
             );
