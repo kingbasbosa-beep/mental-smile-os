@@ -4,6 +4,7 @@ import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/external_follow_up/data/models/follow_up_registry_entry.dart';
 import 'package:flutterprojects/features/external_follow_up/data/services/follow_up_registry_service.dart';
 import 'package:flutterprojects/features/external_follow_up/domain/follow_up_registry_constants.dart';
+import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 
 class FollowUpRegistrationPage extends StatefulWidget {
@@ -21,10 +22,12 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
   final _displayNameController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _emailController = TextEditingController();
+  final _scrollController = ScrollController();
   final Set<String> _selectedFollowUpTypes = <String>{};
   final Set<String> _selectedEducationalTopics = <String>{};
 
   bool _consentAccepted = false;
+  bool _policyAcknowledged = false;
   bool _submitting = false;
 
   int? _birthDay;
@@ -45,6 +48,24 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
 
   bool get _isEducationSelected => _selectedFollowUpTypes
       .contains(FollowUpRegistryType.educationalAwareness);
+
+  bool get _isArabic =>
+      Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+
+  TextDirection get _pageDirection =>
+      _isArabic ? TextDirection.rtl : TextDirection.ltr;
+
+  TextAlign get _contentTextAlign =>
+      _isArabic ? TextAlign.right : TextAlign.left;
+
+  CrossAxisAlignment get _contentAlignment =>
+      _isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+
+  Alignment get _sectionTitleAlignment =>
+      _isArabic ? Alignment.center : Alignment.centerLeft;
+
+  String _copy({required String ar, required String en}) =>
+      _isArabic ? ar : en;
 
   String _backgroundAsset(double width) {
     if (width < 700) {
@@ -93,6 +114,7 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
     _displayNameController.dispose();
     _phoneNumberController.dispose();
     _emailController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -164,34 +186,62 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
 
   String? _validateSelections() {
     if (_selectedFollowUpTypes.isEmpty) {
-      return 'Select at least one follow-up type.';
+      return _copy(
+        ar: 'اختر نوع متابعة واحدًا على الأقل.',
+        en: 'Select at least one follow-up type.',
+      );
     }
 
     if (_preferredContactChannel == null) {
-      return 'Enter a WhatsApp number or an email address.';
+      return _copy(
+        ar: 'أدخل رقم واتساب أو بريدًا إلكترونيًا.',
+        en: 'Enter a WhatsApp number or an email address.',
+      );
     }
 
     if (!_consentAccepted) {
-      return 'Consent is required to continue.';
+      return _copy(
+        ar: 'الموافقة مطلوبة للمتابعة.',
+        en: 'Consent is required to continue.',
+      );
+    }
+
+    if (!_policyAcknowledged) {
+      return _copy(
+        ar: 'يلزم الإقرار بتوضيح سياسة المتابعة قبل إتمام التسجيل.',
+        en: 'Acknowledge the follow-up policy clarification before submitting.',
+      );
     }
 
     if (_isBirthdaySelected && (_birthDay == null || _birthMonth == null)) {
-      return 'Birthday day and month are required.';
+      return _copy(
+        ar: 'يلزم تحديد يوم وشهر الميلاد.',
+        en: 'Birthday day and month are required.',
+      );
     }
 
     if (_isRecoverySelected &&
         (_recoveryFrequency == null ||
             _recoveryStartMonth == null ||
             _recoveryStartYear == null)) {
-      return 'Recovery frequency, start month, and start year are required.';
+      return _copy(
+        ar: 'يلزم تحديد وتيرة المتابعة وشهر وسنة بداية التعافي.',
+        en: 'Recovery frequency, start month, and start year are required.',
+      );
     }
 
     if (_isGeneralSupportSelected && _supportFrequency == null) {
-      return 'Support frequency is required.';
+      return _copy(
+        ar: 'يلزم تحديد وتيرة رسائل الدعم.',
+        en: 'Support frequency is required.',
+      );
     }
 
     if (_isEducationSelected && _selectedEducationalTopics.isEmpty) {
-      return 'Select at least one educational topic.';
+      return _copy(
+        ar: 'اختر موضوعًا توعويًا واحدًا على الأقل.',
+        en: 'Select at least one educational topic.',
+      );
     }
 
     return null;
@@ -227,6 +277,7 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
       _selectedFollowUpTypes.clear();
       _selectedEducationalTopics.clear();
       _consentAccepted = false;
+      _policyAcknowledged = false;
       _birthDay = null;
       _birthMonth = null;
       _supportFrequency = null;
@@ -236,10 +287,69 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
     });
   }
 
+  String _recoveryFrequencyLabel(String value) {
+    switch (value) {
+      case 'weekly':
+        return _copy(ar: 'أسبوعيًا', en: 'Weekly');
+      case 'biweekly':
+        return _copy(ar: 'كل أسبوعين', en: 'Every two weeks');
+      case 'monthly':
+        return _copy(ar: 'شهريًا', en: 'Monthly');
+      default:
+        return value;
+    }
+  }
+
+  String _supportFrequencyLabel(String value) {
+    switch (value) {
+      case 'weekly':
+        return _copy(ar: 'أسبوعيًا', en: 'Weekly');
+      case 'biweekly':
+        return _copy(ar: 'كل أسبوعين', en: 'Every two weeks');
+      case 'monthly':
+        return _copy(ar: 'شهريًا', en: 'Monthly');
+      case 'occasional':
+        return _copy(ar: 'عند الحاجة', en: 'Occasional');
+      default:
+        return value;
+    }
+  }
+
+  String _educationTopicLabel(String value) {
+    switch (value) {
+      case 'relapse_prevention':
+        return _copy(ar: 'الوقاية من الانتكاس', en: 'Relapse prevention');
+      case 'family_support':
+        return _copy(ar: 'دعم الأسرة', en: 'Family support');
+      case 'coping_skills':
+        return _copy(ar: 'مهارات التعامل', en: 'Coping skills');
+      case 'healthy_routines':
+        return _copy(ar: 'العادات الصحية', en: 'Healthy routines');
+      default:
+        return value;
+    }
+  }
+
+  String _preferredContactChannelLabel() {
+    switch (_preferredContactChannel) {
+      case FollowUpRegistryContactChannel.whatsapp:
+        return _copy(ar: 'واتساب', en: 'WhatsApp');
+      case FollowUpRegistryContactChannel.email:
+        return _copy(ar: 'البريد الإلكتروني', en: 'Email');
+      case FollowUpRegistryContactChannel.both:
+        return _copy(ar: 'واتساب والبريد الإلكتروني', en: 'WhatsApp and email');
+      default:
+        return _copy(
+          ar: 'وسيلة التواصل المفضلة غير متاحة حاليًا',
+          en: 'Preferred contact channel is not available yet',
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: _pageDirection,
       child: Scaffold(
         backgroundColor: Colors.black,
         body: LayoutBuilder(
@@ -267,61 +377,14 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                     ),
                   ),
                 ),
-                Positioned(
-                  top: AppSpacing.md,
-                  left: AppSpacing.md,
-                  child: SafeArea(
-                    child: IconButton(
-                      onPressed: () {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          Routes.clientDashboard,
-                          (route) => false,
-                        );
-                      },
-                      tooltip: 'Back',
-                      icon: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: const Color(0xFF1B1007)
-                              .withValues(alpha: 0.50),
-                          border: Border.all(
-                            color: const Color(0xFFFFD98A)
-                                .withValues(alpha: 0.56),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFFFFD98A)
-                                  .withValues(alpha: 0.34),
-                              blurRadius: 16,
-                              spreadRadius: 1,
-                              offset: const Offset(0, 5),
-                            ),
-                            BoxShadow(
-                              color: const Color(0xFFE7A94C)
-                                  .withValues(alpha: 0.24),
-                              blurRadius: 26,
-                              spreadRadius: 2,
-                              offset: const Offset(0, 12),
-                            ),
-                          ],
-                        ),
-                        child: Image.asset(
-                          'assets/branding/navigation/back/back_left_gold.png',
-                          width: 22,
-                          height: 22,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
-                              Icons.arrow_back_rounded,
-                              color: Color(0xFFFFE7B2),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
+                AppShellActions.buildOverlayActions(
+                  onBack: () {
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      Routes.clientDashboard,
+                      (route) => false,
+                    );
+                  },
+                  showLogout: false,
                 ),
                 SafeArea(
                   child: Center(
@@ -329,52 +392,75 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                       constraints: const BoxConstraints(maxWidth: 760),
                       child: Form(
                         key: _formKey,
-                        child: ListView(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.xl,
-                            vertical: AppSpacing.xxl,
-                          ),
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(AppSpacing.lg),
-                              decoration:
-                                  _glassDecoration(alpha: 0.34, radius: 24),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Follow-up Registration',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall
-                                        ?.copyWith(
-                                          color: const Color(0xFFE7C766),
-                                          fontWeight: FontWeight.w900,
-                                        ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.sm),
-                                  Text(
-                                    'Register once to receive the follow-up categories you choose later. This form creates a registry entry only.',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          color: const Color(0xFFFFF4D4),
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                  ),
-                                ],
-                              ),
+                        child: RawScrollbar(
+                          controller: _scrollController,
+                          thumbVisibility: true,
+                          thickness: 4,
+                          radius: const Radius.circular(999),
+                          thumbColor:
+                              const Color(0xFFE7C766).withValues(alpha: 0.42),
+                          child: ListView(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.fromLTRB(
+                              AppSpacing.xl,
+                              88,
+                              AppSpacing.xl,
+                              AppSpacing.xxl,
                             ),
-                            const SizedBox(height: AppSpacing.lg),
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(AppSpacing.lg),
+                                decoration:
+                                    _glassDecoration(alpha: 0.34, radius: 24),
+                                child: Column(
+                                  crossAxisAlignment: _contentAlignment,
+                                  children: [
+                                    if (_isArabic)
+                                      const Center(
+                                        child: GoldPageTitle(
+                                          title: 'تسجيل المتابعة',
+                                          padding: EdgeInsets.zero,
+                                        ),
+                                      )
+                                    else
+                                      Text(
+                                        'Follow-up Registration',
+                                        textAlign: TextAlign.left,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headlineSmall
+                                            ?.copyWith(
+                                              color: const Color(0xFFE7C766),
+                                              fontWeight: FontWeight.w900,
+                                              shadows: [
+                                                Shadow(
+                                                  color: const Color(0xFFE7C766)
+                                                      .withValues(alpha: 0.24),
+                                                  blurRadius: 12,
+                                                ),
+                                              ],
+                                            ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.lg),
                             Container(
                               padding: const EdgeInsets.all(AppSpacing.lg),
                               decoration: _glassDecoration(alpha: 0.34),
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: _contentAlignment,
                                 children: [
-                                  Text(
-                                    'Follow-up types',
+                                  Align(
+                                    alignment: _sectionTitleAlignment,
+                                    child: Text(
+                                      _copy(
+                                        ar: 'أنواع المتابعة',
+                                        en: 'Follow-up Types',
+                                      ),
+                                      textAlign: _isArabic
+                                          ? TextAlign.center
+                                          : TextAlign.left,
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleLarge
@@ -382,10 +468,15 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                                           color: const Color(0xFFE7C766),
                                           fontWeight: FontWeight.w900,
                                         ),
+                                    ),
                                   ),
                                   const SizedBox(height: AppSpacing.sm),
                                   Text(
-                                    'Choose one or more categories.',
+                                    _copy(
+                                      ar: 'اختر نوعًا واحدًا أو أكثر من خدمات الدعم المناسبة لك.',
+                                      en: 'Choose one or more support categories.',
+                                    ),
+                                    textAlign: _contentTextAlign,
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodyMedium
@@ -394,19 +485,31 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                                   ),
                                   const SizedBox(height: AppSpacing.md),
                                   _buildTypeSelector(
-                                    title: 'Birthday greetings',
+                                    title: _copy(
+                                      ar: 'تهنئة أعياد الميلاد',
+                                      en: 'Birthday greetings',
+                                    ),
                                     value: FollowUpRegistryType.birthday,
                                   ),
                                   _buildTypeSelector(
-                                    title: 'Recovery follow-up',
+                                    title: _copy(
+                                      ar: 'متابعة التعافي',
+                                      en: 'Recovery follow-up',
+                                    ),
                                     value: FollowUpRegistryType.recoverySupport,
                                   ),
                                   _buildTypeSelector(
-                                    title: 'General support messages',
+                                    title: _copy(
+                                      ar: 'رسائل الدعم العامة',
+                                      en: 'General support messages',
+                                    ),
                                     value: FollowUpRegistryType.generalSupport,
                                   ),
                                   _buildTypeSelector(
-                                    title: 'Educational / awareness content',
+                                    title: _copy(
+                                      ar: 'محتوى توعوي وتثقيفي',
+                                      en: 'Educational / awareness content',
+                                    ),
                                     value: FollowUpRegistryType
                                         .educationalAwareness,
                                   ),
@@ -418,10 +521,18 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                               padding: const EdgeInsets.all(AppSpacing.lg),
                               decoration: _glassDecoration(alpha: 0.34),
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: _contentAlignment,
                                 children: [
-                                  Text(
-                                    'Contact details',
+                                  Align(
+                                    alignment: _sectionTitleAlignment,
+                                    child: Text(
+                                      _copy(
+                                        ar: 'توضيح سياسة المتابعة',
+                                        en: 'Follow-up Policy Clarification',
+                                      ),
+                                      textAlign: _isArabic
+                                          ? TextAlign.center
+                                          : TextAlign.left,
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleLarge
@@ -429,13 +540,89 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                                           color: const Color(0xFFE7C766),
                                           fontWeight: FontWeight.w900,
                                         ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.sm),
+                                  Text(
+                                    _copy(
+                                      ar: 'المتابعة مقدمة من الإدارة كخدمة دعم مجانية وليست خدمة علاجية.\n'
+                                          'المتابعة بعد الجلسات أو الإقامة فقط، وليست أثناء تقديم الخدمة.\n'
+                                          'المتابعة أثناء الجلسات أو الإقامة حق من حقوقك ويقدمها لك مقدم الخدمة مباشرة.',
+                                      en: 'Administrative follow-up is a free support service, not a therapeutic service.\n'
+                                          'Follow-up applies after sessions or residency, not during active service delivery.\n'
+                                          'During sessions or residency, therapeutic follow-up is your right and is provided directly by the service provider.',
+                                    ),
+                                    textAlign: _contentTextAlign,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: const Color(0xFFFFF4D4),
+                                          fontWeight: FontWeight.w600,
+                                          height: 1.7,
+                                        ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  CheckboxListTile(
+                                    value: _policyAcknowledged,
+                                    contentPadding: EdgeInsets.zero,
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
+                                    title: Text(
+                                      _copy(
+                                        ar: 'أقر بأن المتابعة المقدمة من الإدارة خدمة دعم مجانية وليست خدمة علاجية، وأن المتابعة العلاجية أثناء الجلسات أو الإقامة مسؤولية مقدم الخدمة ضمن الخدمة المدفوعة.',
+                                        en: "I acknowledge that administrative follow-up is a free support service, not a therapeutic service, and that therapeutic follow-up during sessions or residency is the provider's responsibility as part of the paid service.",
+                                      ),
+                                      textAlign: _contentTextAlign,
+                                      style: const TextStyle(
+                                        color: Color(0xFFFFF4D4),
+                                      ),
+                                    ),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _policyAcknowledged = value == true;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                            Container(
+                              padding: const EdgeInsets.all(AppSpacing.lg),
+                              decoration: _glassDecoration(alpha: 0.34),
+                              child: Column(
+                                crossAxisAlignment: _contentAlignment,
+                                children: [
+                                  Align(
+                                    alignment: _sectionTitleAlignment,
+                                    child: Text(
+                                      _copy(
+                                        ar: 'بيانات التواصل',
+                                        en: 'Contact Details',
+                                      ),
+                                      textAlign: _isArabic
+                                          ? TextAlign.center
+                                          : TextAlign.left,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                          color: const Color(0xFFE7C766),
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                    ),
                                   ),
                                   const SizedBox(height: AppSpacing.md),
                                   TextFormField(
                                     controller: _displayNameController,
+                                    textAlign: _contentTextAlign,
                                     decoration: appInputDecoration(
                                       context: context,
-                                      label: 'Name or nickname',
+                                      label: _copy(
+                                        ar: 'الاسم أو اللقب',
+                                        en: 'Name or nickname',
+                                      ),
                                       icon: Icons.person_outline,
                                     ),
                                   ),
@@ -443,10 +630,14 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                                   TextFormField(
                                     controller: _phoneNumberController,
                                     keyboardType: TextInputType.phone,
+                                    textAlign: _contentTextAlign,
                                     onChanged: (_) => setState(() {}),
                                     decoration: appInputDecoration(
                                       context: context,
-                                      label: 'WhatsApp number',
+                                      label: _copy(
+                                        ar: 'رقم واتساب',
+                                        en: 'WhatsApp number',
+                                      ),
                                       icon: Icons.phone_outlined,
                                     ),
                                   ),
@@ -454,10 +645,14 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                                   TextFormField(
                                     controller: _emailController,
                                     keyboardType: TextInputType.emailAddress,
+                                    textAlign: _contentTextAlign,
                                     onChanged: (_) => setState(() {}),
                                     decoration: appInputDecoration(
                                       context: context,
-                                      label: 'Email',
+                                      label: _copy(
+                                        ar: 'البريد الإلكتروني',
+                                        en: 'Email',
+                                      ),
                                       icon: Icons.email_outlined,
                                     ),
                                   ),
@@ -475,7 +670,8 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                                         const SizedBox(width: AppSpacing.sm),
                                         Expanded(
                                           child: Text(
-                                            'Preferred contact channel: ${_preferredContactChannel ?? 'Not available yet'}',
+                                            '${_copy(ar: 'وسيلة التواصل المفضلة', en: 'Preferred contact channel')}: ${_preferredContactChannelLabel()}',
+                                            textAlign: _contentTextAlign,
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodyMedium
@@ -512,10 +708,18 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                               padding: const EdgeInsets.all(AppSpacing.lg),
                               decoration: _glassDecoration(alpha: 0.34),
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: _contentAlignment,
                                 children: [
-                                  Text(
-                                    'Consent',
+                                  Align(
+                                    alignment: _sectionTitleAlignment,
+                                    child: Text(
+                                      _copy(
+                                        ar: 'الموافقة',
+                                        en: 'Consent',
+                                      ),
+                                      textAlign: _isArabic
+                                          ? TextAlign.center
+                                          : TextAlign.left,
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleLarge
@@ -523,6 +727,7 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                                           color: const Color(0xFFE7C766),
                                           fontWeight: FontWeight.w900,
                                         ),
+                                    ),
                                   ),
                                   const SizedBox(height: AppSpacing.md),
                                   CheckboxListTile(
@@ -530,10 +735,15 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                                     contentPadding: EdgeInsets.zero,
                                     controlAffinity:
                                         ListTileControlAffinity.leading,
-                                    title: const Text(
-                                      'I agree to receive follow-up, support, and awareness messages from the support team.',
-                                      style:
-                                          TextStyle(color: Color(0xFFFFF4D4)),
+                                    title: Text(
+                                      _copy(
+                                        ar: 'أوافق على استقبال رسائل المتابعة والدعم والتوعية من فريق الدعم.',
+                                        en: 'I agree to receive follow-up, support, and awareness messages from the support team.',
+                                      ),
+                                      textAlign: _contentTextAlign,
+                                      style: const TextStyle(
+                                        color: Color(0xFFFFF4D4),
+                                      ),
                                     ),
                                     onChanged: (value) {
                                       setState(() {
@@ -550,24 +760,47 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                               height: 56,
                               child: FilledButton.icon(
                                 onPressed: _submitting ? null : _submit,
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: const Color(0xFFE7C766),
+                                  foregroundColor: const Color(0xFF1B1007),
+                                  disabledBackgroundColor: const Color(
+                                    0xFFE7C766,
+                                  ).withValues(alpha: 0.44),
+                                  disabledForegroundColor: const Color(
+                                    0xFF1B1007,
+                                  ).withValues(alpha: 0.70),
+                                  textStyle: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                ),
                                 icon: _submitting
                                     ? const SizedBox(
                                         width: 18,
                                         height: 18,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          color: Colors.white,
+                                          color: Color(0xFF1B1007),
                                         ),
                                       )
                                     : const Icon(Icons.how_to_reg_outlined),
                                 label: Text(
                                   _submitting
-                                      ? 'Submitting...'
-                                      : 'Submit registration',
+                                      ? _copy(
+                                          ar: 'جارٍ الإرسال...',
+                                          en: 'Submitting...',
+                                        )
+                                      : _copy(
+                                          ar: 'إتمام التسجيل',
+                                          en: 'Submit registration',
+                                        ),
                                 ),
                               ),
                             ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -594,6 +827,7 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
         controlAffinity: ListTileControlAffinity.leading,
         title: Text(
           title,
+          textAlign: _contentTextAlign,
           style: const TextStyle(color: Color(0xFFFFF4D4)),
         ),
         onChanged: (checked) {
@@ -626,14 +860,18 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: _glassDecoration(alpha: 0.34),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: _contentAlignment,
         children: [
-          Text(
-            'Birthday details',
+          Align(
+            alignment: _sectionTitleAlignment,
+            child: Text(
+              _copy(ar: 'تاريخ الميلاد', en: 'Birthday Details'),
+              textAlign: _isArabic ? TextAlign.center : TextAlign.left,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: const Color(0xFFE7C766),
                   fontWeight: FontWeight.w900,
                 ),
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
           Row(
@@ -651,7 +889,7 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                       .toList(),
                   decoration: appInputDecoration(
                     context: context,
-                    label: 'Birth day',
+                    label: _copy(ar: 'اليوم', en: 'Birth day'),
                     icon: Icons.cake_outlined,
                   ),
                   onChanged: (value) => setState(() => _birthDay = value),
@@ -671,7 +909,7 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                       .toList(),
                   decoration: appInputDecoration(
                     context: context,
-                    label: 'Birth month',
+                    label: _copy(ar: 'الشهر', en: 'Birth month'),
                     icon: Icons.calendar_month_outlined,
                   ),
                   onChanged: (value) => setState(() => _birthMonth = value),
@@ -689,14 +927,18 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: _glassDecoration(alpha: 0.34),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: _contentAlignment,
         children: [
-          Text(
-            'Recovery follow-up',
+          Align(
+            alignment: _sectionTitleAlignment,
+            child: Text(
+              _copy(ar: 'متابعة التعافي', en: 'Recovery Follow-up'),
+              textAlign: _isArabic ? TextAlign.center : TextAlign.left,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: const Color(0xFFE7C766),
                   fontWeight: FontWeight.w900,
                 ),
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
           DropdownButtonFormField<String>(
@@ -705,13 +947,13 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                 .map(
                   (value) => DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value),
+                    child: Text(_recoveryFrequencyLabel(value)),
                   ),
                 )
                 .toList(),
             decoration: appInputDecoration(
               context: context,
-              label: 'Recovery frequency',
+              label: _copy(ar: 'وتيرة المتابعة', en: 'Recovery frequency'),
               icon: Icons.schedule_outlined,
             ),
             onChanged: (value) => setState(() => _recoveryFrequency = value),
@@ -732,7 +974,10 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                       .toList(),
                   decoration: appInputDecoration(
                     context: context,
-                    label: 'Recovery start month',
+                    label: _copy(
+                      ar: 'شهر بداية التعافي',
+                      en: 'Recovery start month',
+                    ),
                     icon: Icons.calendar_today_outlined,
                   ),
                   onChanged: (value) =>
@@ -753,7 +998,10 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                       .toList(),
                   decoration: appInputDecoration(
                     context: context,
-                    label: 'Recovery start year',
+                    label: _copy(
+                      ar: 'سنة بداية التعافي',
+                      en: 'Recovery start year',
+                    ),
                     icon: Icons.event_note_outlined,
                   ),
                   onChanged: (value) =>
@@ -772,14 +1020,21 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: _glassDecoration(alpha: 0.34),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: _contentAlignment,
         children: [
-          Text(
-            'General support messages',
+          Align(
+            alignment: _sectionTitleAlignment,
+            child: Text(
+              _copy(
+                ar: 'رسائل الدعم العامة',
+                en: 'General Support Messages',
+              ),
+              textAlign: _isArabic ? TextAlign.center : TextAlign.left,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: const Color(0xFFE7C766),
                   fontWeight: FontWeight.w900,
                 ),
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
           DropdownButtonFormField<String>(
@@ -788,13 +1043,16 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                 .map(
                   (value) => DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value),
+                    child: Text(_supportFrequencyLabel(value)),
                   ),
                 )
                 .toList(),
             decoration: appInputDecoration(
               context: context,
-              label: 'Support frequency',
+              label: _copy(
+                ar: 'وتيرة رسائل الدعم',
+                en: 'Support frequency',
+              ),
               icon: Icons.support_agent_outlined,
             ),
             onChanged: (value) => setState(() => _supportFrequency = value),
@@ -809,18 +1067,29 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: _glassDecoration(alpha: 0.34),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: _contentAlignment,
         children: [
-          Text(
-            'Educational topics',
+          Align(
+            alignment: _sectionTitleAlignment,
+            child: Text(
+              _copy(
+                ar: 'الموضوعات التوعوية المفضلة',
+                en: 'Preferred Educational Topics',
+              ),
+              textAlign: _isArabic ? TextAlign.center : TextAlign.left,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: const Color(0xFFE7C766),
                   fontWeight: FontWeight.w900,
                 ),
+            ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'Choose one or more topics.',
+            _copy(
+              ar: 'اختر موضوعًا واحدًا أو أكثر.',
+              en: 'Choose one or more topics.',
+            ),
+            textAlign: _contentTextAlign,
             style: Theme.of(context)
                 .textTheme
                 .bodyMedium
@@ -833,7 +1102,7 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
             children: FollowUpRegistryEducationalTopic.values.map((topic) {
               final selected = _selectedEducationalTopics.contains(topic);
               return FilterChip(
-                label: Text(topic),
+                label: Text(_educationTopicLabel(topic)),
                 selected: selected,
                 onSelected: (value) {
                   setState(() {

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import argparse
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -99,11 +100,36 @@ def save_local_report(snapshot: dict[str, object]) -> Path:
     return report_path
 
 
-def write_firestore_snapshot(db, snapshot: dict[str, object]) -> None:
+def write_firestore_snapshot(
+    db,
+    snapshot: dict[str, object],
+    *,
+    dry_run: bool,
+) -> None:
+    if dry_run:
+        print("DRY RUN: no Firestore writes performed")
+        print("Target: system_alerts/latest")
+        print(
+            "Payload summary: "
+            f"status={snapshot['status']}, "
+            f"alertsCount={snapshot['alertsCount']}, "
+            f"severity={snapshot['severity']}"
+        )
+        return
+
     db.collection("system_alerts").document("latest").set(snapshot)
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Audit center follow-up alerts.")
+    parser.add_argument(
+        "--write-firestore",
+        action="store_true",
+        help="Privileged ops mode: write system_alerts/latest to Firestore.",
+    )
+    args = parser.parse_args()
+    dry_run = not args.write_firestore
+
     cred_path, project_id = load_environment()
     db = init_firestore(cred_path, project_id)
 
@@ -118,8 +144,11 @@ def main() -> int:
     )
 
     save_local_report(snapshot)
-    write_firestore_snapshot(db, snapshot)
-    print("Center follow-up alerts snapshot updated.")
+    write_firestore_snapshot(db, snapshot, dry_run=dry_run)
+    if dry_run:
+        print("Center follow-up alerts snapshot prepared locally.")
+    else:
+        print("Center follow-up alerts snapshot updated.")
     return 0
 
 

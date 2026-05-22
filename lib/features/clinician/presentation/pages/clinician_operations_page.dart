@@ -110,6 +110,9 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     final refs = [
       db.collection('booking_requests').doc(requestId),
       if (_legacyBookingRequestsWriteEnabled)
+        // TODO(EX-137): Legacy bookingRequests fallback is transitional only.
+        // Canonical booking collection is booking_requests.
+        // Do not expand this fallback; remove only after manual legacy data verification.
         db.collection('bookingRequests').doc(requestId),
     ];
 

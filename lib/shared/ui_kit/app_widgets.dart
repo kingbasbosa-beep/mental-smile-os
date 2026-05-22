@@ -605,6 +605,123 @@ class PremiumEmptyState extends StatelessWidget {
   }
 }
 
+class GoldTabItem {
+  const GoldTabItem({
+    required this.key,
+    required this.label,
+  });
+
+  final String key;
+  final String label;
+}
+
+class GoldTabBar extends StatelessWidget {
+  const GoldTabBar({
+    super.key,
+    required this.items,
+    required this.selectedKey,
+    required this.onSelected,
+    this.padding = const EdgeInsets.fromLTRB(12, 12, 12, 8),
+  });
+
+  final List<GoldTabItem> items;
+  final String selectedKey;
+  final ValueChanged<String> onSelected;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: padding,
+      child: Wrap(
+        spacing: 13,
+        runSpacing: 8,
+        children: [
+          for (final item in items)
+            _GoldTabButton(
+              label: item.label,
+              selected: selectedKey == item.key,
+              onTap: () => onSelected(item.key),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GoldTabButton extends StatelessWidget {
+  const _GoldTabButton({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final gold = AppColors.mutedGold;
+
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: Duration.zero,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          decoration: BoxDecoration(
+            color: selected
+                ? const Color(0xFF1B1007).withValues(alpha: 0.62)
+                : Colors.black.withValues(alpha: 0.26),
+            borderRadius: BorderRadius.circular(AppRadii.pill),
+            border: Border.all(
+              color: selected
+                  ? gold.withValues(alpha: 0.72)
+                  : gold.withValues(alpha: 0.26),
+              width: selected ? 1.2 : 1,
+            ),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: gold.withValues(alpha: 0.16),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: selected
+                      ? const Color(0xFFFFE8A6)
+                      : const Color(0xFFFFF4D4).withValues(alpha: 0.82),
+                  fontWeight: FontWeight.w900,
+                  shadows: selected
+                      ? [
+                          Shadow(
+                            color: gold.withValues(alpha: 0.27),
+                            blurRadius: 8,
+                          ),
+                        ]
+                      : null,
+                ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class AppEmptyState extends StatelessWidget {
   const AppEmptyState({
     super.key,

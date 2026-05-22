@@ -81,32 +81,16 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
 
   Widget _statusTabs(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-      child: Wrap(
-        spacing: 10,
-        runSpacing: 8,
-        children: [
-          for (final it in _tabs)
-            ChoiceChip(
-              label: Text(_tabLabel(l10n, it['key']!)),
-              selected: _viewFilter == it['key'],
-              backgroundColor: Colors.black.withValues(alpha: 0.30),
-              selectedColor: const Color(0xFFE7C766).withValues(alpha: 0.22),
-              side: BorderSide(
-                color: const Color(0xFFE7C766).withValues(alpha: 0.34),
-              ),
-              labelStyle: TextStyle(
-                color: _viewFilter == it['key']
-                    ? const Color(0xFFFFE8A6)
-                    : const Color(0xFFFFF4D4),
-                fontWeight: FontWeight.w800,
-              ),
-              checkmarkColor: const Color(0xFFE7C766),
-              onSelected: (value) => setState(() => _viewFilter = it['key']!),
-            ),
-        ],
-      ),
+    return GoldTabBar(
+      items: [
+        for (final it in _tabs)
+          GoldTabItem(
+            key: it['key']!,
+            label: _tabLabel(l10n, it['key']!),
+          ),
+      ],
+      selectedKey: _viewFilter,
+      onSelected: (key) => setState(() => _viewFilter = key),
     );
   }
 

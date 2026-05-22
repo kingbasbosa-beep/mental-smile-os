@@ -4,6 +4,9 @@
 
 This tool is a lightweight Python-based audit utility for reviewing Firestore data integrity in the Mental Smile system.
 
+It defaults to dry-run mode. Firestore writes require an explicit privileged
+ops flag.
+
 It is designed to:
 
 * Detect inconsistent or invalid data
@@ -84,6 +87,21 @@ pip install -r requirements.txt
 python qa_audit.py
 ```
 
+Default runs do not write to Firestore:
+
+```text
+DRY RUN: no Firestore writes performed
+Target: system_health/latest
+Payload summary: ...
+```
+
+Privileged ops writes require an explicit flag:
+
+```powershell
+python qa_audit.py --write-firestore
+python audit_center_followup.py --write-firestore
+```
+
 ---
 
 ## Output
@@ -99,6 +117,7 @@ tools/qa_bot/reports/
 ## Safety Notes
 
 * This tool uses Firebase Admin SDK (full access).
+* Dry-run is the default; Firestore writes require `--write-firestore`.
 * Use **read-only logic only**.
 * Never run unverified scripts on production.
 * Always test on staging when possible.

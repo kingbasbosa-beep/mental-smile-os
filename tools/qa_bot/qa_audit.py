@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import socket
+import argparse
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -352,7 +353,7 @@ def save_latest_report_summary(result: AuditResult) -> Path:
     return latest_report_path
 
 
-def write_system_health_snapshot(db, result: AuditResult) -> None:
+def build_system_health_snapshot(result: AuditResult) -> dict[str, Any]:
     issues_count = len(result.issues)
     status = "ok" if issues_count == 0 else "warning"
     severity = "low" if issues_count == 0 else "medium"
@@ -362,17 +363,31 @@ def write_system_health_snapshot(db, result: AuditResult) -> None:
         else f"{issues_count} issues detected in audit"
     )
 
-    db.collection("system_health").document("latest").set(
-        {
-            "status": status,
-            "issuesCount": issues_count,
-            "checkedCollections": ["centers"],
-            "timestamp": datetime.now(UTC).isoformat(),
-            "source": "qa_audit.py",
-            "summary": summary,
-            "severity": severity,
-        }
-    )
+    return {
+        "status": status,
+        "issuesCount": issues_count,
+        "checkedCollections": ["centers"],
+        "timestamp": datetime.now(UTC).isoformat(),
+        "source": "qa_audit.py",
+        "summary": summary,
+        "severity": severity,
+    }
+
+
+def write_system_health_snapshot(db, result: AuditResult, *, dry_run: bool) -> None:
+    snapshot = build_system_health_snapshot(result)
+    if dry_run:
+        print_line("DRY RUN: no Firestore writes performed")
+        print_line("Target: system_health/latest")
+        print_line(
+            "Payload summary: "
+            f"status={snapshot['status']}, "
+            f"issuesCount={snapshot['issuesCount']}, "
+            f"severity={snapshot['severity']}"
+        )
+        return
+
+    db.collection("system_health").document("latest").set(snapshot)
 
 
 def print_summary(result: AuditResult, report_path: Path) -> None:
@@ -405,6 +420,15 @@ def print_summary(result: AuditResult, report_path: Path) -> None:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Mental Smile QA audit.")
+    parser.add_argument(
+        "--write-firestore",
+        action="store_true",
+        help="Privileged ops mode: write system_health/latest to Firestore.",
+    )
+    args = parser.parse_args()
+    dry_run = not args.write_firestore
+
     cred_path, project_id = load_environment()
     result = AuditResult(
         project_id=project_id,
@@ -436,7 +460,7 @@ def main() -> int:
     audit_legacy_collection(db, result)
     report_path = save_report(result)
     save_latest_report_summary(result)
-    write_system_health_snapshot(db, result)
+    write_system_health_snapshot(db, result, dry_run=dry_run)
     print_summary(result, report_path)
     return 0
 
