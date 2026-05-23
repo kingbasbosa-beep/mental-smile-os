@@ -38,6 +38,19 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
     }
   }
 
+  String _localizedBadgeLabel(
+    bool isArabic,
+    String requestKind,
+    String status,
+    AppLocalizations l10n,
+  ) {
+    final label = _badgeLabel(requestKind, status, l10n);
+    if (isArabic && label == 'Request is being coordinated') {
+      return 'جاري تنسيق الطلب';
+    }
+    return label;
+  }
+
   String _backgroundAsset(double width) {
     if (width < 700) {
       return 'assets/images/backgrounds/specialists_bg_mobile.png';
@@ -996,7 +1009,9 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                     child: Column(
                       children: [
                         const SizedBox(height: 56),
-                        const GoldPageTitle(title: 'طلبات الحجز'),
+                        GoldPageTitle(
+                          title: isArabic ? 'طلبات الحجز' : 'Booking requests',
+                        ),
                         _statusTabs(context),
                         Expanded(
                         child: (u == null)
@@ -1193,7 +1208,8 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                                                               999),
                                                     ),
                                                     child: Text(
-                                                      _badgeLabel(
+                                                      _localizedBadgeLabel(
+                                                        isArabic,
                                                         requestKind,
                                                         status,
                                                         l10n,

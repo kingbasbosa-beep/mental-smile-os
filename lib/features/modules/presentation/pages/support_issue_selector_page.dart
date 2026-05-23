@@ -277,7 +277,9 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
   @override
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
-    final title = isArabic ? 'اختر نوع المساعدة' : 'Choose support type';
+    final title = isArabic ? 'الدعم' : 'Support';
+    final selectorTitle =
+        isArabic ? 'اختر نوع المساعدة' : 'Choose support type';
     final options = _options(isArabic);
 
     return Directionality(
@@ -287,7 +289,7 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
         appBar: AppShellActions.buildAppBar(
           context,
           title: title,
-          showTitle: false,
+          showAccountBadge: false,
         ),
         body: LayoutBuilder(
           builder: (context, constraints) {
@@ -326,7 +328,7 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
                             : CrossAxisAlignment.start,
                         children: [
                           Text(
-                            title,
+                            selectorTitle,
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge

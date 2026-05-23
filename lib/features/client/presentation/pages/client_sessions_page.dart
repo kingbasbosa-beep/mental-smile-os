@@ -505,15 +505,17 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                       ),
                     ),
                   ),
-                  const Positioned(
+                  Positioned(
                     top: 0,
                     left: 0,
                     right: 0,
                     child: SafeArea(
                       bottom: false,
                       child: Padding(
-                        padding: EdgeInsets.only(top: 56),
-                        child: GoldPageTitle(title: 'جلساتي'),
+                        padding: const EdgeInsets.only(top: 56),
+                        child: GoldPageTitle(
+                          title: isArabic ? 'جلساتي' : 'My sessions',
+                        ),
                       ),
                     ),
                   ),

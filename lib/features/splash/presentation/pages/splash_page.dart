@@ -4,8 +4,15 @@ import 'package:flutterprojects/app/locale_provider.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/storage/locale_storage.dart';
 
-class SplashPage extends ConsumerWidget {
+class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
+
+  @override
+  ConsumerState<SplashPage> createState() => _SplashPageState();
+}
+
+class _SplashPageState extends ConsumerState<SplashPage> {
+  bool _languagePressed = false;
 
   String _backgroundAsset(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -21,19 +28,24 @@ class SplashPage extends ConsumerWidget {
     return 'assets/branding/splash/splash_web_v1.jpg';
   }
 
-  Future<void> _setEnglish(WidgetRef ref) async {
-    await LocaleStorage().write('en');
-    ref.read(localeProvider.notifier).state = const Locale('en');
+  Future<void> _toggleLocale(Locale locale) async {
+    final nextCode =
+        locale.languageCode.toLowerCase() == 'ar' ? 'en' : 'ar';
+    await LocaleStorage().write(nextCode);
+    ref.read(localeProvider.notifier).state = Locale(nextCode);
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final bg = _backgroundAsset(context);
     final languageIconSize =
         MediaQuery.sizeOf(context).width < 700 ? 46.0 : 60.0;
+    final locale = ref.watch(localeProvider);
+    final activeLocale = locale ?? Localizations.localeOf(context);
+    final isArabic = activeLocale.languageCode.toLowerCase() == 'ar';
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         body: Stack(
           children: [
@@ -51,37 +63,60 @@ class SplashPage extends ConsumerWidget {
             Positioned(
               top: 20,
               right: 96,
-              child: GestureDetector(
-                onTap: () => _setEnglish(ref),
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(999),
-                    border: Border.all(
-                      color: const Color(0xFFFFE8A3).withValues(alpha: 0.22),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.22),
-                        blurRadius: 12,
-                      ),
-                    ],
-                  ),
-                  child: Image.asset(
-                    'assets/branding/language/en_gold.png',
-                    width: languageIconSize,
-                    height: languageIconSize,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Text(
-                        'EN',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFFFFE8A3),
+              child: Tooltip(
+                message: isArabic ? 'English' : 'العربية',
+                child: GestureDetector(
+                  onTapDown: (_) => setState(() => _languagePressed = true),
+                  onTapCancel: () =>
+                      setState(() => _languagePressed = false),
+                  onTapUp: (_) => setState(() => _languagePressed = false),
+                  onTap: () => _toggleLocale(activeLocale),
+                  child: AnimatedScale(
+                    scale: _languagePressed ? 0.96 : 1,
+                    duration: const Duration(milliseconds: 120),
+                    curve: Curves.easeOutCubic,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 140),
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(
+                          alpha: _languagePressed ? 0.24 : 0.14,
                         ),
-                      );
-                    },
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                          color: const Color(0xFFFFE8A3).withValues(
+                            alpha: _languagePressed ? 0.56 : 0.34,
+                          ),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFD4AF37).withValues(
+                              alpha: _languagePressed ? 0.34 : 0.18,
+                            ),
+                            blurRadius: _languagePressed ? 20 : 12,
+                          ),
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.22),
+                            blurRadius: 12,
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(
+                        'assets/branding/language/en_gold.png',
+                        width: languageIconSize,
+                        height: languageIconSize,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Text(
+                            isArabic ? 'EN' : 'AR',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFFFE8A3),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -124,9 +159,9 @@ class SplashPage extends ConsumerWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text(
-                          'ابدأ الرحلة',
-                          style: TextStyle(
+                        Text(
+                          isArabic ? 'ابدأ الرحلة' : 'Start Journey',
+                          style: const TextStyle(
                             fontSize: 18,
                             color: Color(0xFFF4F1E8),
                             fontWeight: FontWeight.w900,
@@ -139,12 +174,6 @@ class SplashPage extends ConsumerWidget {
                               ),
                             ],
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        const Icon(
-                          Icons.arrow_back_rounded,
-                          color: Color(0xFFFFF4C2),
-                          size: 28,
                         ),
                       ],
                     ),

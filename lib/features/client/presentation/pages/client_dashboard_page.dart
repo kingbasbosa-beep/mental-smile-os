@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterprojects/app/locale_provider.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/core/storage/locale_storage.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/contracts/role_names.dart';
 import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
@@ -297,7 +300,10 @@ class ClientDashboardPage extends StatelessWidget {
                   top: 10,
                   left: 10,
                   right: 10,
-                  child: _DashboardTopActions(isArabic: isArabic),
+                  child: SafeArea(
+                    bottom: false,
+                    child: const _DashboardTopActions(),
+                  ),
                 ),
                 StreamBuilder<Map<String, dynamic>?>(
                   stream: _clientStream(),
@@ -317,7 +323,7 @@ class ClientDashboardPage extends StatelessWidget {
                             builder: (context, snap) {
                               final count = snap.data ?? 0;
                               return _ActionButton(
-                                title: l10n.clientBookings,
+                                title: isArabic ? 'طلبات الحجز' : 'Bookings',
                                 subtitle:
                                     '${l10n.clientBookingRequests}: $count',
                                 asset:
@@ -333,7 +339,7 @@ class ClientDashboardPage extends StatelessWidget {
                             builder: (context, snap) {
                               final count = snap.data ?? 0;
                               return _ActionButton(
-                                title: l10n.clientSupport,
+                                title: isArabic ? 'الدعم' : 'Support',
                                 subtitle:
                                     '${l10n.clientSupportRequests}: $count',
                                 asset:
@@ -349,7 +355,9 @@ class ClientDashboardPage extends StatelessWidget {
                             },
                           ),
                           _ActionButton(
-                            title: l10n.clientPaymentProof,
+                            title: isArabic
+                                ? 'إثبات التحويل النقدي'
+                                : 'Payment proof',
                             subtitle: l10n.clientUploadPaymentProof,
                             asset:
                                 'assets/images/client_dashboard/actions/client_payment_proof.png',
@@ -358,7 +366,7 @@ class ClientDashboardPage extends StatelessWidget {
                                 .pushNamed(Routes.clientPaymentProof),
                           ),
                           _ActionButton(
-                            title: l10n.clientMySessions,
+                            title: isArabic ? 'جلساتي' : 'My sessions',
                             subtitle: l10n.clientLinksAndCodes,
                             asset:
                                 'assets/images/client_dashboard/actions/client_sessions.png',
@@ -367,11 +375,12 @@ class ClientDashboardPage extends StatelessWidget {
                                 .pushNamed(Routes.clientSessions),
                           ),
                           _ActionButton(
-                            title: l10n.clientFollowUp,
+                            title: isArabic ? 'المتابعة' : 'Follow-up',
                             subtitle: l10n.clientMessagePreferences,
                             asset:
                                 'assets/images/client_dashboard/actions/client_follow_up.png',
                             icon: Icons.mark_email_read_outlined,
+                            assetScale: 1.22,
                             onTap: () => Navigator.of(context)
                                 .pushNamed(Routes.followUpRegistration),
                           ),
@@ -407,7 +416,7 @@ class ClientDashboardPage extends StatelessWidget {
                                   (ratingsData['avgStars'] ?? 0).toDouble(),
                               avgPercentage: (ratingsData['avgPercentage'] ?? 0)
                                   .toDouble(),
-                              horizontal: !isMobile,
+                              horizontal: false,
                             );
                           },
                         );
@@ -455,7 +464,7 @@ class ClientDashboardPage extends StatelessWidget {
                                       ],
                                     ),
                                     Positioned(
-                                      right: 40,
+                                      right: 56,
                                       top: 0,
                                       width: 230,
                                       child: Column(
@@ -474,6 +483,12 @@ class ClientDashboardPage extends StatelessWidget {
                                             isActive: isActive,
                                             initials: _initials(name),
                                             size: 88,
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Align(
+                                            alignment:
+                                                AlignmentDirectional.centerEnd,
+                                            child: ratingsPanel,
                                           ),
                                         ],
                                       ),
@@ -495,15 +510,6 @@ class ClientDashboardPage extends StatelessWidget {
                                               ),
                                             ),
                                             const SizedBox(width: 70),
-                                            Directionality(
-                                              textDirection: isArabic
-                                                  ? TextDirection.rtl
-                                                  : TextDirection.ltr,
-                                              child: Transform.translate(
-                                                offset: const Offset(0, -84),
-                                                child: ratingsPanel,
-                                              ),
-                                            ),
                                           ],
                                         ),
                                       ),
@@ -530,18 +536,44 @@ class ClientDashboardPage extends StatelessWidget {
   }
 }
 
-class _DashboardTopActions extends StatelessWidget {
-  final bool isArabic;
+class _DashboardTopActions extends ConsumerStatefulWidget {
+  const _DashboardTopActions();
 
-  const _DashboardTopActions({required this.isArabic});
+  @override
+  ConsumerState<_DashboardTopActions> createState() =>
+      _DashboardTopActionsState();
+}
+
+class _DashboardTopActionsState extends ConsumerState<_DashboardTopActions> {
+  bool _languagePressed = false;
+
+  Future<void> _toggleLocale(Locale locale) async {
+    final nextCode =
+        locale.languageCode.toLowerCase() == 'ar' ? 'en' : 'ar';
+    await LocaleStorage().write(nextCode);
+    ref.read(localeProvider.notifier).state = Locale(nextCode);
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final providerLocale = ref.watch(localeProvider);
+    final locale = providerLocale ?? Localizations.localeOf(context);
+    final isArabic = locale.languageCode.toLowerCase() == 'ar';
+
     return Row(
       textDirection: TextDirection.ltr,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
+        _DashboardLanguageButton(
+          label: isArabic ? 'EN' : 'AR',
+          pressed: _languagePressed,
+          onTapDown: () => setState(() => _languagePressed = true),
+          onTapCancel: () => setState(() => _languagePressed = false),
+          onTapUp: () => setState(() => _languagePressed = false),
+          onTap: () => _toggleLocale(locale),
+        ),
+        const SizedBox(width: 12),
         _TopIconButton(
           icon: Icons.arrow_back_rounded,
           asset: 'assets/branding/navigation/back/back_right_gold.png',
@@ -572,6 +604,73 @@ class _DashboardTopActions extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+}
+
+class _DashboardLanguageButton extends StatelessWidget {
+  final String label;
+  final bool pressed;
+  final VoidCallback onTapDown;
+  final VoidCallback onTapCancel;
+  final VoidCallback onTapUp;
+  final VoidCallback onTap;
+
+  const _DashboardLanguageButton({
+    required this.label,
+    required this.pressed,
+    required this.onTapDown,
+    required this.onTapCancel,
+    required this.onTapUp,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: label,
+      child: GestureDetector(
+        onTapDown: (_) => onTapDown(),
+        onTapCancel: onTapCancel,
+        onTapUp: (_) => onTapUp(),
+        onTap: onTap,
+        child: AnimatedScale(
+          scale: pressed ? 0.96 : 1,
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 140),
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: pressed ? 0.34 : 0.22),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColors.mutedGold.withValues(
+                  alpha: pressed ? 0.74 : 0.42,
+                ),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.mutedGold.withValues(
+                    alpha: pressed ? 0.28 : 0.14,
+                  ),
+                  blurRadius: pressed ? 16 : 10,
+                ),
+              ],
+            ),
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Color(0xFFFFE7B2),
+                fontSize: 12,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -890,6 +989,7 @@ class _ActionButton extends StatelessWidget {
   final String subtitle;
   final String asset;
   final IconData icon;
+  final double assetScale;
   final VoidCallback onTap;
 
   const _ActionButton({
@@ -897,6 +997,7 @@ class _ActionButton extends StatelessWidget {
     required this.subtitle,
     required this.asset,
     required this.icon,
+    this.assetScale = 1,
     required this.onTap,
   });
 
@@ -926,16 +1027,19 @@ class _ActionButton extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset(
-                    asset,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.black.withValues(alpha: 0.42),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        icon,
-                        color: AppColors.mutedGold,
-                        size: 34,
+                  Transform.scale(
+                    scale: assetScale,
+                    child: Image.asset(
+                      asset,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.black.withValues(alpha: 0.42),
+                        alignment: Alignment.center,
+                        child: Icon(
+                          icon,
+                          color: AppColors.mutedGold,
+                          size: 34,
+                        ),
                       ),
                     ),
                   ),

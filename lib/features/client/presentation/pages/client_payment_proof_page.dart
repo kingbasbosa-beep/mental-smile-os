@@ -422,8 +422,10 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
                                 child: Column(
                                   children: [
                                     const SizedBox(height: 56),
-                                    const GoldPageTitle(
-                                      title: 'إثبات التحويل المالي',
+                                    GoldPageTitle(
+                                      title: _isArabic
+                                          ? 'إثبات التحويل المالي'
+                                          : 'Payment proof',
                                     ),
                                     Expanded(
                                       child: PremiumEmptyState(
@@ -483,9 +485,11 @@ class _ClientPaymentProofPageState extends State<ClientPaymentProofPage> {
                               padding:
                                   const EdgeInsets.fromLTRB(16, 104, 16, 16),
                               children: [
-                                const GoldPageTitle(
-                                  title: 'إثبات التحويل المالي',
-                                  padding: EdgeInsetsDirectional.only(
+                                GoldPageTitle(
+                                  title: _isArabic
+                                      ? 'إثبات التحويل المالي'
+                                      : 'Payment proof',
+                                  padding: const EdgeInsetsDirectional.only(
                                     bottom: 16,
                                   ),
                                 ),
