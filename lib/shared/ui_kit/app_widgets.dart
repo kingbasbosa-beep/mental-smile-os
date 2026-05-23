@@ -102,8 +102,8 @@ class AppPageBackground extends StatelessWidget {
               child: IgnorePointer(
                 child: Opacity(
                   opacity: 0.045,
-                  child: CustomPaint(
-                    painter: const _PagePatternPainter(
+                  child: const CustomPaint(
+                    painter: _PagePatternPainter(
                       color: AppColors.deepTeal,
                     ),
                   ),
@@ -318,8 +318,8 @@ class AppSurfaceCard extends StatelessWidget {
             child: IgnorePointer(
               child: Opacity(
                 opacity: 0.025,
-                child: CustomPaint(
-                  painter: const _PagePatternPainter(color: AppColors.deepTeal),
+                child: const CustomPaint(
+                  painter: _PagePatternPainter(color: AppColors.deepTeal),
                 ),
               ),
             ),
@@ -662,7 +662,7 @@ class _GoldTabButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gold = AppColors.mutedGold;
+    const gold = AppColors.mutedGold;
 
     return Semantics(
       button: true,

@@ -32,7 +32,6 @@ import 'package:flutterprojects/features/language/presentation/pages/language_pa
 import 'package:flutterprojects/features/modules/presentation/pages/module_placeholder_page.dart';
 import 'package:flutterprojects/features/modules/presentation/pages/support_entry_page.dart';
 import 'package:flutterprojects/features/modules/presentation/pages/support_issue_selector_page.dart';
-import 'package:flutterprojects/features/home/presentation/pages/home_page.dart';
 import 'package:flutterprojects/features/home/presentation/pages/menu_page.dart';
 import 'package:flutterprojects/features/specialists/presentation/specialists_categories_page.dart';
 import 'package:flutterprojects/features/specialists/presentation/specialists_list_page.dart';

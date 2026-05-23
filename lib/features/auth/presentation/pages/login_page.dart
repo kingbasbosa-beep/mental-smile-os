@@ -278,79 +278,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _registrationEntry({
-    required IconData icon,
-    required String label,
-    required String subtitle,
-    required String route,
-  }) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton(
-        style: OutlinedButton.styleFrom(
-          backgroundColor: _cyberNavy.withValues(alpha: 0.72),
-          foregroundColor: _cyberText,
-          side: BorderSide(color: _cyberTurquoise.withValues(alpha: 0.75)),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        ),
-        onPressed: () => Navigator.pushNamed(context, route),
-        child: Row(
-          children: [
-            Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.black.withValues(alpha: 0.22),
-                border: Border.all(color: _cyberGold.withValues(alpha: 0.76)),
-              ),
-              child: Icon(icon, color: _cyberGold, size: 19),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: _cyberText,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: _cyberGold.withValues(alpha: 0.88),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Directionality.of(context) == TextDirection.rtl
-                  ? Icons.arrow_back_ios_new_rounded
-                  : Icons.arrow_forward_ios_rounded,
-              color: _cyberTurquoise,
-              size: 16,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -392,7 +319,7 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         Text(
                           l10n.authLoginTitle,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Color(0xFFFFE8A3),
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
