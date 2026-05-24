@@ -346,7 +346,8 @@ service cloud.firestore {
     }
 
     match /clients/{clientId} {
-      allow read: if isAdmin() || (signedIn() && clientId == uid());
+      allow get: if isAdmin() || ownDoc(clientId);
+      allow list: if isAdmin() || (signedIn() && resource.data.email == request.auth.token.email);
       allow create: if clientCreateValid(clientId) || isAdmin();
       allow update: if isAdmin() || clientUpdateValid(clientId);
       allow delete: if false;
@@ -371,7 +372,7 @@ service cloud.firestore {
     }
 
     match /booking_requests/{requestId} {
-      allow read: if isAdmin() || isOwnBooking();
+      allow get, list: if isAdmin() || isOwnBooking();
       allow create: if bookingCreateValid() || isAdmin();
       allow update: if isAdmin() || bookingUserUpdateValid();
       allow delete: if false;
@@ -382,7 +383,7 @@ service cloud.firestore {
     }
 
     match /sessionRatings/{ratingId} {
-      allow read: if canReadRating();
+      allow get, list: if canReadRating();
       allow create: if ratingWriteValid();
       allow update: if ratingWriteValid()
         && resource.data.reviewerUid == uid()
@@ -407,7 +408,7 @@ service cloud.firestore {
     }
 
     match /support_requests/{requestId} {
-      allow read: if isAdmin()
+      allow get, list: if isAdmin()
         || (signedIn() && resource.data.createdByUid == uid());
       allow create: if signedIn()
         && request.resource.data.createdByUid == uid()
