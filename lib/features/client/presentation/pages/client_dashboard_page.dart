@@ -296,15 +296,6 @@ class ClientDashboardPage extends StatelessWidget {
                   color: Colors.black
                       .withValues(alpha: _dashboardOverlayAlpha(width)),
                 ),
-                Positioned(
-                  top: 10,
-                  left: 10,
-                  right: 10,
-                  child: SafeArea(
-                    bottom: false,
-                    child: const _DashboardTopActions(),
-                  ),
-                ),
                 StreamBuilder<Map<String, dynamic>?>(
                   stream: _clientStream(),
                   builder: (context, snapshot) {
@@ -505,8 +496,10 @@ class ClientDashboardPage extends StatelessWidget {
                                           children: [
                                             Transform.translate(
                                               offset: const Offset(0, -114),
-                                              child: const _DashboardLogoBadge(
-                                                size: 472,
+                                              child: const IgnorePointer(
+                                                child: _DashboardLogoBadge(
+                                                  size: 472,
+                                                ),
                                               ),
                                             ),
                                             const SizedBox(width: 70),
@@ -526,6 +519,15 @@ class ClientDashboardPage extends StatelessWidget {
                       },
                     );
                   },
+                ),
+                Positioned(
+                  top: 10,
+                  left: 10,
+                  right: 10,
+                  child: SafeArea(
+                    bottom: false,
+                    child: const _DashboardTopActions(),
+                  ),
                 ),
               ],
             );
@@ -548,8 +550,7 @@ class _DashboardTopActionsState extends ConsumerState<_DashboardTopActions> {
   bool _languagePressed = false;
 
   Future<void> _toggleLocale(Locale locale) async {
-    final nextCode =
-        locale.languageCode.toLowerCase() == 'ar' ? 'en' : 'ar';
+    final nextCode = locale.languageCode.toLowerCase() == 'ar' ? 'en' : 'ar';
     await LocaleStorage().write(nextCode);
     ref.read(localeProvider.notifier).state = Locale(nextCode);
   }
