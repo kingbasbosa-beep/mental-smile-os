@@ -394,19 +394,30 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     required String clinicianName,
     required String clinicianPhotoUrl,
   }) {
-    return Row(
-      textDirection: TextDirection.ltr,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _ClinicianGoldLogo(isArabic: isArabic),
-        const Spacer(),
-        _ClinicianCompactProfile(
-          isArabic: isArabic,
-          clinicianName: clinicianName,
-          clinicianPhotoUrl: clinicianPhotoUrl,
-          onSignOut: _signOut,
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final gap = constraints.maxWidth < 420 ? 8.0 : 16.0;
+
+        return Row(
+          textDirection: TextDirection.ltr,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _ClinicianGoldLogo(isArabic: isArabic),
+            SizedBox(width: gap),
+            Expanded(
+              child: Align(
+                alignment: Alignment.topRight,
+                child: _ClinicianCompactProfile(
+                  isArabic: isArabic,
+                  clinicianName: clinicianName,
+                  clinicianPhotoUrl: clinicianPhotoUrl,
+                  onSignOut: _signOut,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -417,53 +428,53 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     final l10n = AppLocalizations.of(context)!;
     return _OperationActionsCarousel(
       children: [
-            _OperationActionButton(
-              label: l10n.clinicianOpenCases,
-              icon: Icons.forum_outlined,
-              imageAsset:
-                  'assets/images/clinicians_dashboard/actions/clinician_open_cases.png',
-              primary: true,
-              onTap: _clinicianHomeActionsEnabled
-                  ? () {
-                      Navigator.of(context).pushNamed(
-                        Routes.clinicianChatInbox,
-                      );
-                    }
-                  : null,
-            ),
-            _OperationActionButton(
-              label: l10n.clinicianSendSupportRequest,
-              icon: Icons.chat_bubble_outline_rounded,
-              imageAsset:
-                  'assets/images/clinicians_dashboard/actions/clinician_support_request.png',
-              onTap: _clinicianHomeActionsEnabled
-                  ? () {
-                      Navigator.of(context).pushNamed(
-                        Routes.supportIssueSelector,
-                        arguments: const {'supportType': 'clinician_support'},
-                      );
-                    }
-                  : null,
-            ),
-            _OperationActionButton(
-              label: l10n.clinicianEditProfile,
-              icon: Icons.edit_outlined,
-              imageAsset:
-                  'assets/images/clinicians_dashboard/actions/clinician_edit_profile.png',
-              onTap: () => Navigator.of(context).pushNamed(
-                Routes.clinicianProfileEditRequest,
-              ),
-            ),
-            _OperationActionButton(
-              label: l10n.clinicianMySessions,
-              icon: Icons.video_call_outlined,
-              imageAsset:
-                  'assets/images/clinicians_dashboard/actions/clinician_sessions.png',
-              primary: true,
-              onTap: () => Navigator.of(context).pushNamed(
-                Routes.clinicianSessions,
-              ),
-            ),
+        _OperationActionButton(
+          label: l10n.clinicianOpenCases,
+          icon: Icons.forum_outlined,
+          imageAsset:
+              'assets/images/clinicians_dashboard/actions/clinician_open_cases.png',
+          primary: true,
+          onTap: _clinicianHomeActionsEnabled
+              ? () {
+                  Navigator.of(context).pushNamed(
+                    Routes.clinicianChatInbox,
+                  );
+                }
+              : null,
+        ),
+        _OperationActionButton(
+          label: l10n.clinicianSendSupportRequest,
+          icon: Icons.chat_bubble_outline_rounded,
+          imageAsset:
+              'assets/images/clinicians_dashboard/actions/clinician_support_request.png',
+          onTap: _clinicianHomeActionsEnabled
+              ? () {
+                  Navigator.of(context).pushNamed(
+                    Routes.supportIssueSelector,
+                    arguments: const {'supportType': 'clinician_support'},
+                  );
+                }
+              : null,
+        ),
+        _OperationActionButton(
+          label: l10n.clinicianEditProfile,
+          icon: Icons.edit_outlined,
+          imageAsset:
+              'assets/images/clinicians_dashboard/actions/clinician_edit_profile.png',
+          onTap: () => Navigator.of(context).pushNamed(
+            Routes.clinicianProfileEditRequest,
+          ),
+        ),
+        _OperationActionButton(
+          label: l10n.clinicianMySessions,
+          icon: Icons.video_call_outlined,
+          imageAsset:
+              'assets/images/clinicians_dashboard/actions/clinician_sessions.png',
+          primary: true,
+          onTap: () => Navigator.of(context).pushNamed(
+            Routes.clinicianSessions,
+          ),
+        ),
       ],
     );
   }
@@ -1724,17 +1735,17 @@ class _ClinicianCompactProfile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 textAlign: isArabic ? TextAlign.right : TextAlign.left,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: const Color(0xFFFFE7B2),
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0,
-                      shadows: const [
-                        Shadow(
-                          color: Colors.black,
-                          blurRadius: 12,
-                          offset: Offset(0, 1),
-                        ),
-                      ],
+                  color: const Color(0xFFFFE7B2),
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
+                  shadows: const [
+                    Shadow(
+                      color: Colors.black,
+                      blurRadius: 12,
+                      offset: Offset(0, 1),
                     ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -1862,17 +1873,17 @@ class _OperationActionButton extends StatelessWidget {
                                 .textTheme
                                 .titleSmall
                                 ?.copyWith(
-                                  color: const Color(0xFFFFE7B2),
-                                  fontWeight: FontWeight.w900,
-                                  height: 1.08,
-                                  shadows: const [
-                                    Shadow(
-                                      color: Colors.black,
-                                      blurRadius: 12,
-                                      offset: Offset(0, 1),
-                                    ),
-                                  ],
+                              color: const Color(0xFFFFE7B2),
+                              fontWeight: FontWeight.w900,
+                              height: 1.08,
+                              shadows: const [
+                                Shadow(
+                                  color: Colors.black,
+                                  blurRadius: 12,
+                                  offset: Offset(0, 1),
                                 ),
+                              ],
+                            ),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 4),
@@ -1911,6 +1922,7 @@ class _OperationActionsCarouselState extends State<_OperationActionsCarousel> {
   PageController? _controller;
   double _viewportFraction = 0.82;
   double _page = 0;
+  bool _pageUpdateScheduled = false;
 
   @override
   void initState() {
@@ -1936,15 +1948,27 @@ class _OperationActionsCarouselState extends State<_OperationActionsCarousel> {
 
   void _handlePageChange() {
     if (!mounted) return;
-    setState(() => _page = _controller?.page ?? _page);
+    if (_pageUpdateScheduled) return;
+
+    _pageUpdateScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      _pageUpdateScheduled = false;
+      final nextPage = _controller?.hasClients == true
+          ? (_controller?.page ?? _page)
+          : _page;
+      if (nextPage == _page) return;
+
+      setState(() => _page = nextPage);
+    });
   }
 
   void _syncController(double viewportFraction) {
     if (_controller != null && _viewportFraction == viewportFraction) return;
 
-    final oldPage = _controller?.hasClients == true
-        ? (_controller?.page ?? _page)
-        : _page;
+    final oldPage =
+        _controller?.hasClients == true ? (_controller?.page ?? _page) : _page;
     final maxIndex = widget.children.isEmpty ? 0 : widget.children.length - 1;
 
     _controller?.removeListener(_handlePageChange);
@@ -2149,6 +2173,7 @@ class _OperationActionHoverState extends State<_OperationActionHover> {
     );
   }
 }
+
 class _FilterPill extends StatelessWidget {
   final bool selected;
   final String label;
@@ -2168,8 +2193,9 @@ class _FilterPill extends StatelessWidget {
     final border = selected
         ? const Color(0xFFE7C766).withValues(alpha: 0.46)
         : const Color(0xFFE7C766).withValues(alpha: 0.18);
-    final foreground =
-        selected ? const Color(0xFFFFE7B2) : Colors.white.withValues(alpha: 0.70);
+    final foreground = selected
+        ? const Color(0xFFFFE7B2)
+        : Colors.white.withValues(alpha: 0.70);
 
     return InkWell(
       onTap: onTap,
