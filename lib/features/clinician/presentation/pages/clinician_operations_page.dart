@@ -583,62 +583,78 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     required BuildContext context,
     required bool isArabic,
   }) {
-    final scheme = Theme.of(context).colorScheme;
-
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: scheme.surface,
+        color: Colors.black.withValues(alpha: 0.34),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: scheme.outline.withValues(alpha: 0.12),
+          color: const Color(0xFFE7C766).withValues(alpha: 0.34),
         ),
-      ),
-      child: Row(
-        textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
-        children: [
-          Container(
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(
-              color: scheme.primary.withValues(alpha: 0.10),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.manage_accounts_outlined, color: scheme.primary),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment:
-                  isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isArabic ? 'تعديل بياناتي' : 'Edit my profile',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.w800),
-                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  isArabic
-                      ? 'إرسال طلب تعديل الصورة أو النبذة'
-                      : 'Send a photo or bio change request',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pushNamed(
-              Routes.clinicianProfileEditRequest,
-            ),
-            child: Text(isArabic ? 'فتح' : 'Open'),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE7C766).withValues(alpha: 0.08),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
         ],
+      ),
+      child: DefaultTextStyle.merge(
+        style: const TextStyle(color: Color(0xFFFFF4D4)),
+        child: Row(
+          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+          children: [
+            Container(
+              width: 54,
+              height: 54,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE7C766).withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: const Color(0xFFE7C766).withValues(alpha: 0.28),
+                ),
+              ),
+              child: const Icon(
+                Icons.manage_accounts_outlined,
+                color: Color(0xFFE7C766),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment:
+                    isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isArabic ? 'تعديل بياناتي' : 'Edit my profile',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: const Color(0xFFFFF4D4),
+                          fontWeight: FontWeight.w800,
+                        ),
+                    textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    isArabic
+                        ? 'إرسال طلب تعديل الصورة أو النبذة'
+                        : 'Send a photo or bio change request',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: const Color(0xFFEBDDB7),
+                        ),
+                    textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pushNamed(
+                Routes.clinicianProfileEditRequest,
+              ),
+              child: Text(isArabic ? 'فتح' : 'Open'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -2253,6 +2269,116 @@ class ClinicianProfileEditRequestPage extends StatefulWidget {
 
 class _ClinicianProfileEditRequestPageState
     extends State<ClinicianProfileEditRequestPage> {
+  String _profileEditBackgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/images/backgrounds/specialists_bg_mobile.png';
+    }
+    if (width < 1100) {
+      return 'assets/images/backgrounds/specialists_bg_tablet.png';
+    }
+    return 'assets/images/backgrounds/specialists_bg_desktop.png';
+  }
+
+  BoxDecoration _profileEditGlassDecoration({
+    double alpha = 0.34,
+    double radius = 22,
+  }) {
+    return BoxDecoration(
+      color: Colors.black.withValues(alpha: alpha),
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(
+        color: const Color(0xFFE7C766).withValues(alpha: 0.34),
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.08),
+          blurRadius: 24,
+          offset: const Offset(0, 12),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProfileEditBackground({required Widget child}) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              _profileEditBackgroundAsset(constraints.maxWidth),
+              fit: BoxFit.cover,
+              alignment: constraints.maxWidth < 700
+                  ? Alignment.topCenter
+                  : Alignment.center,
+            ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.62),
+                    Colors.black.withValues(alpha: 0.38),
+                    Colors.black.withValues(alpha: 0.74),
+                  ],
+                ),
+              ),
+            ),
+            child,
+          ],
+        );
+      },
+    );
+  }
+
+  InputDecoration _profileEditInputDecoration(String label) {
+    const gold = Color(0xFFE7C766);
+    const lightText = Color(0xFFFFF4D4);
+
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(
+        color: lightText.withValues(alpha: 0.72),
+        fontWeight: FontWeight.w700,
+      ),
+      filled: true,
+      fillColor: Colors.black.withValues(alpha: 0.22),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide(
+          color: gold.withValues(alpha: 0.30),
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(
+          color: gold,
+          width: 1.25,
+        ),
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+    );
+  }
+
+  ButtonStyle _profileEditSubmitButtonStyle() {
+    return FilledButton.styleFrom(
+      backgroundColor: const Color(0xFF1B1007).withValues(alpha: 0.92),
+      foregroundColor: const Color(0xFFFFE7B2),
+      disabledBackgroundColor: Colors.black.withValues(alpha: 0.28),
+      disabledForegroundColor: const Color(0xFFFFE7B2).withValues(alpha: 0.50),
+      side: BorderSide(
+        color: const Color(0xFFE7C766).withValues(alpha: 0.52),
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+      elevation: 0,
+    );
+  }
+
   final _requestedPhotoUrlController = TextEditingController();
   final _requestedBioController = TextEditingController();
 
@@ -2370,17 +2496,21 @@ class _ClinicianProfileEditRequestPageState
     required bool isArabic,
     required Map<String, dynamic> clinicianData,
   }) {
-    return AppSurfaceCard(
+    return Container(
       padding: const EdgeInsets.all(18),
-      child: Column(
-        crossAxisAlignment:
-            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
+      decoration: _profileEditGlassDecoration(alpha: 0.34, radius: 22),
+      child: DefaultTextStyle.merge(
+        style: const TextStyle(color: Color(0xFFFFF4D4)),
+        child: Column(
+          crossAxisAlignment:
+              isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
           Text(
             isArabic
                 ? 'طلب تعديل الصورة أو النبذة'
                 : 'Request photo or bio update',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: const Color(0xFFE7C766),
                   fontWeight: FontWeight.w800,
                 ),
           ),
@@ -2389,22 +2519,33 @@ class _ClinicianProfileEditRequestPageState
             isArabic
                 ? 'أي تعديل على الصورة الشخصية أو النبذة يذهب للمراجعة أولًا. الاسم والوثائق غير قابلة للتعديل من هنا.'
                 : 'Any update to the profile photo or bio is sent for review first. Name and documents cannot be edited here.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: const Color(0xFFFFF4D4),
+                ),
           ),
           const SizedBox(height: 14),
           TextField(
             controller: _requestedPhotoUrlController,
-            decoration: InputDecoration(
-              labelText: isArabic ? 'رابط الصورة الجديدة' : 'New photo URL',
-              border: const OutlineInputBorder(),
+            style: const TextStyle(
+              color: Color(0xFFFFF4D4),
+              fontWeight: FontWeight.w600,
+            ),
+            cursorColor: const Color(0xFFE7C766),
+            decoration: _profileEditInputDecoration(
+              isArabic ? 'رابط الصورة الجديدة' : 'New photo URL',
             ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _requestedBioController,
             maxLines: 4,
-            decoration: InputDecoration(
-              labelText: isArabic ? 'النبذة الجديدة' : 'New bio',
-              border: const OutlineInputBorder(),
+            style: const TextStyle(
+              color: Color(0xFFFFF4D4),
+              fontWeight: FontWeight.w600,
+            ),
+            cursorColor: const Color(0xFFE7C766),
+            decoration: _profileEditInputDecoration(
+              isArabic ? 'النبذة الجديدة' : 'New bio',
             ),
           ),
           const SizedBox(height: 14),
@@ -2412,6 +2553,7 @@ class _ClinicianProfileEditRequestPageState
             width: double.infinity,
             height: 52,
             child: FilledButton.icon(
+              style: _profileEditSubmitButtonStyle(),
               onPressed: _submittingChangeRequest
                   ? null
                   : () => _submitProfileChangeRequest(clinicianData),
@@ -2429,7 +2571,8 @@ class _ClinicianProfileEditRequestPageState
               ),
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -2439,17 +2582,19 @@ class _ClinicianProfileEditRequestPageState
     required bool isArabic,
     required List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
   }) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return AppSurfaceCard(
+    return Container(
       padding: const EdgeInsets.all(18),
-      child: Column(
-        crossAxisAlignment:
-            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
+      decoration: _profileEditGlassDecoration(alpha: 0.34, radius: 22),
+      child: DefaultTextStyle.merge(
+        style: const TextStyle(color: Color(0xFFFFF4D4)),
+        child: Column(
+          crossAxisAlignment:
+              isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
           Text(
             isArabic ? 'طلبات التعديل السابقة' : 'Previous change requests',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: const Color(0xFFE7C766),
                   fontWeight: FontWeight.w800,
                 ),
           ),
@@ -2471,8 +2616,11 @@ class _ClinicianProfileEditRequestPageState
                 margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: scheme.primary.withValues(alpha: 0.05),
+                  color: const Color(0xFFE7C766).withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: const Color(0xFFE7C766).withValues(alpha: 0.22),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: isArabic
@@ -2481,8 +2629,8 @@ class _ClinicianProfileEditRequestPageState
                   children: [
                     Text(
                       _requestStatusLabel(status, isArabic),
-                      style: TextStyle(
-                        color: scheme.primary,
+                      style: const TextStyle(
+                        color: Color(0xFFE7C766),
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -2508,7 +2656,8 @@ class _ClinicianProfileEditRequestPageState
                 ),
               );
             }),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -2528,11 +2677,72 @@ class _ClinicianProfileEditRequestPageState
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
-        appBar: AppShellActions.buildAppBar(
-          context,
-          title: l10n.clinicianEditProfile,
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).maybePop();
+              } else {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  Routes.menu,
+                  (route) => false,
+                );
+              }
+            },
+            icon: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF1B1007).withValues(alpha: 0.50),
+                border: Border.all(
+                  color: const Color(0xFFFFD98A).withValues(alpha: 0.56),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFFFD98A).withValues(alpha: 0.34),
+                    blurRadius: 16,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 5),
+                  ),
+                  BoxShadow(
+                    color: const Color(0xFFE7A94C).withValues(alpha: 0.24),
+                    blurRadius: 26,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Image.asset(
+                isArabic
+                    ? 'assets/branding/navigation/back/back_right_gold.png'
+                    : 'assets/branding/navigation/back/back_left_gold.png',
+                width: 22,
+                height: 22,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(
+                    Icons.arrow_back_rounded,
+                    color: Color(0xFFFFE7B2),
+                    size: 22,
+                  );
+                },
+              ),
+            ),
+            tooltip: isArabic ? 'رجوع' : 'Back',
+          ),
+          title: Text(
+            l10n.clinicianEditProfile,
+            style: const TextStyle(
+              color: Color(0xFFC9A75B),
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          backgroundColor: const Color(0xFF0F1316).withValues(alpha: 0.96),
+          foregroundColor: const Color(0xFFC9A75B),
+          elevation: 0,
         ),
-        body: AppPageBackground(
+        body: _buildProfileEditBackground(
           child: StreamBuilder<Map<String, dynamic>?>(
             stream: _clinicianStream(),
             builder: (context, clinicianSnapshot) {
@@ -2551,12 +2761,22 @@ class _ClinicianProfileEditRequestPageState
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     children: [
                       if (hasPending)
-                        AppSurfaceCard(
+                        Container(
                           padding: const EdgeInsets.all(18),
+                          decoration: _profileEditGlassDecoration(
+                            alpha: 0.34,
+                            radius: 22,
+                          ),
                           child: Text(
                             isArabic
                                 ? 'يوجد طلب تعديل قيد المراجعة. يمكنك متابعة حالته هنا.'
                                 : 'A profile change request is pending. You can track it here.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: const Color(0xFFFFF4D4),
+                                ),
                             textAlign:
                                 isArabic ? TextAlign.right : TextAlign.left,
                           ),
