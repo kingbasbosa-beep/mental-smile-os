@@ -377,15 +377,6 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                     ),
                   ),
                 ),
-                AppShellActions.buildOverlayActions(
-                  onBack: () {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      Routes.clientDashboard,
-                      (route) => false,
-                    );
-                  },
-                  showLogout: false,
-                ),
                 SafeArea(
                   child: Center(
                     child: ConstrainedBox(
@@ -805,6 +796,15 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                       ),
                     ),
                   ),
+                ),
+                AppShellActions.buildOverlayActions(
+                  onBack: () {
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      Routes.clientDashboard,
+                      (route) => false,
+                    );
+                  },
+                  showLogout: false,
                 ),
               ],
             );
