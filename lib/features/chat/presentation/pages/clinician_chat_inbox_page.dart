@@ -24,6 +24,69 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
   final ChatFirestoreService _service = ChatFirestoreService();
   bool _resolvingCase = false;
 
+  bool get _isArabic =>
+      Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+
+  String _backgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/images/backgrounds/specialists_bg_mobile.png';
+    }
+    if (width < 1100) {
+      return 'assets/images/backgrounds/specialists_bg_tablet.png';
+    }
+    return 'assets/images/backgrounds/specialists_bg_desktop.png';
+  }
+
+  BoxDecoration _glassDecoration({double alpha = 0.34, double radius = 22}) {
+    return BoxDecoration(
+      color: Colors.black.withValues(alpha: alpha),
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(
+        color: const Color(0xFFE7C766).withValues(alpha: 0.34),
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.08),
+          blurRadius: 24,
+          offset: const Offset(0, 12),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDarkShell({required Widget child}) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              _backgroundAsset(constraints.maxWidth),
+              fit: BoxFit.cover,
+              alignment: constraints.maxWidth < 700
+                  ? Alignment.topCenter
+                  : Alignment.center,
+            ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.62),
+                    Colors.black.withValues(alpha: 0.38),
+                    Colors.black.withValues(alpha: 0.74),
+                  ],
+                ),
+              ),
+            ),
+            child,
+          ],
+        );
+      },
+    );
+  }
+
   String _statusLabel(String status) {
     switch (status) {
       case 'open':
@@ -173,19 +236,25 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
   }
 
   Widget _buildIntroCard() {
-    return AppSurfaceCard(
+    return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: _glassDecoration(alpha: 0.34, radius: 22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'حالات الشات للأخصائي',
-            style: Theme.of(context).textTheme.titleLarge,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: const Color(0xFFE7C766),
+                  fontWeight: FontWeight.w900,
+                ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             'هذه المساحة مخصصة للحالات المصعّدة أو المُحالة من الشات، وهي منفصلة عن الجلسات والطلبات التشغيلية.',
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: const Color(0xFFFFF4D4),
+                ),
           ),
         ],
       ),
@@ -196,10 +265,14 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: AppSurfaceCard(
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          decoration: _glassDecoration(alpha: 0.36, radius: 22),
           child: Text(
             'يجب تسجيل الدخول كأخصائي لرؤية هذه الصفحة.',
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: const Color(0xFFFFF4D4),
+                ),
             textAlign: TextAlign.center,
           ),
         ),
@@ -208,9 +281,27 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
   }
 
   Widget _buildEmptyState() {
-    return AppEmptyState(
-      message: 'لا توجد حالات شات مصعّدة أو مُحالة لك حالياً',
-      icon: Icons.inbox_outlined,
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.xl),
+      decoration: _glassDecoration(alpha: 0.34, radius: 22),
+      child: Column(
+        children: [
+          const Icon(
+            Icons.inbox_outlined,
+            color: Color(0xFFE7C766),
+            size: 34,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'لا توجد حالات شات مصعّدة أو مُحالة لك حالياً',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: const Color(0xFFFFF4D4),
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -223,17 +314,23 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
     final origin = _originLabel(thread);
     final canMarkHandled = escalation.status != 'resolved';
 
-    return AppSurfaceCard(
+    return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      decoration: _glassDecoration(alpha: 0.34, radius: 22),
+      child: DefaultTextStyle.merge(
+        style: const TextStyle(color: Color(0xFFFFF4D4)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           Row(
             children: [
               Expanded(
                 child: Text(
                   identity,
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: const Color(0xFFFFF4D4),
+                        fontWeight: FontWeight.w800,
+                      ),
                 ),
               ),
               AppStatusBadge(
@@ -269,7 +366,9 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
           const SizedBox(height: AppSpacing.md),
           Text(
             preview,
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: const Color(0xFFFFF4D4),
+                ),
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
           ),
@@ -309,20 +408,76 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
                 ),
             ],
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final textDirection = _isArabic ? TextDirection.rtl : TextDirection.ltr;
+
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: textDirection,
       child: Scaffold(
+        backgroundColor: Colors.black,
         appBar: AppBar(
-          title: const Text('حالات الشات للأخصائي'),
+          leading: IconButton(
+            onPressed: () => Navigator.of(context).maybePop(),
+            icon: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF1B1007).withValues(alpha: 0.50),
+                border: Border.all(
+                  color: const Color(0xFFFFD98A).withValues(alpha: 0.56),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFFFD98A).withValues(alpha: 0.34),
+                    blurRadius: 16,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 5),
+                  ),
+                  BoxShadow(
+                    color: const Color(0xFFE7A94C).withValues(alpha: 0.24),
+                    blurRadius: 26,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Image.asset(
+                textDirection == TextDirection.rtl
+                    ? 'assets/branding/navigation/back/back_right_gold.png'
+                    : 'assets/branding/navigation/back/back_left_gold.png',
+                width: 22,
+                height: 22,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(
+                    Icons.arrow_back_rounded,
+                    color: Color(0xFFFFE7B2),
+                    size: 22,
+                  );
+                },
+              ),
+            ),
+          ),
+          title: Text(
+            _isArabic ? 'حالات الشات للأخصائي' : 'Clinician Chat Cases',
+          ),
+          backgroundColor: const Color(0xFF0F1316).withValues(alpha: 0.96),
+          foregroundColor: const Color(0xFFC9A75B),
+          elevation: 0,
+          titleTextStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: const Color(0xFFC9A75B),
+                fontWeight: FontWeight.w800,
+              ),
         ),
-        body: AppPageBackground(
+        body: _buildDarkShell(
           child: _buildBody(),
         ),
       ),
@@ -342,10 +497,14 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
-              child: AppSurfaceCard(
+              child: Container(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                decoration: _glassDecoration(alpha: 0.36, radius: 22),
                 child: Text(
                   'فشل تحميل الحالات: ${snapshot.error}',
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: const Color(0xFFFFF4D4),
+                      ),
                   textAlign: TextAlign.center,
                 ),
               ),
