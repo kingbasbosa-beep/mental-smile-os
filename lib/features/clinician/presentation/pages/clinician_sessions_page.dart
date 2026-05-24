@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class ClinicianSessionsPage extends StatelessWidget {
   const ClinicianSessionsPage({super.key});
@@ -14,6 +15,66 @@ class ClinicianSessionsPage extends StatelessWidget {
 
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+
+  String _backgroundAsset(double width) {
+    if (width < 700) {
+      return 'assets/images/backgrounds/specialists_bg_mobile.png';
+    }
+    if (width < 1100) {
+      return 'assets/images/backgrounds/specialists_bg_tablet.png';
+    }
+    return 'assets/images/backgrounds/specialists_bg_desktop.png';
+  }
+
+  BoxDecoration _glassDecoration({double alpha = 0.34, double radius = 22}) {
+    return BoxDecoration(
+      color: Colors.black.withValues(alpha: alpha),
+      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(
+        color: const Color(0xFFE7C766).withValues(alpha: 0.34),
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFFE7C766).withValues(alpha: 0.08),
+          blurRadius: 24,
+          offset: const Offset(0, 12),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSessionsBackground({required Widget child}) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              _backgroundAsset(constraints.maxWidth),
+              fit: BoxFit.cover,
+              alignment: constraints.maxWidth < 700
+                  ? Alignment.topCenter
+                  : Alignment.center,
+            ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.62),
+                    Colors.black.withValues(alpha: 0.38),
+                    Colors.black.withValues(alpha: 0.74),
+                  ],
+                ),
+              ),
+            ),
+            child,
+          ],
+        );
+      },
+    );
+  }
 
   bool _isSessionRelated(Map<String, dynamic> data) {
     final status = (data['status'] ?? '').toString();
@@ -85,6 +146,7 @@ class ClinicianSessionsPage extends StatelessWidget {
           Text(
             isArabic ? 'الجلسات والمتابعة' : 'Sessions and follow-up',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: const Color(0xFFE7C766),
                   fontWeight: FontWeight.w800,
                 ),
           ),
@@ -93,7 +155,9 @@ class ClinicianSessionsPage extends StatelessWidget {
             isArabic
                 ? 'هذه الصفحة مخصصة لمتابعة حالة الجلسة وبياناتها، ومنها تنتقل إلى التقييم عندما تصبح الجلسة جاهزة للمراجعة.'
                 : 'This page is for tracking session status and details, and from here you move to review once the session is ready for evaluation.',
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: const Color(0xFFFFF4D4),
+                ),
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
           ),
         ],
@@ -210,272 +274,240 @@ class ClinicianSessionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
-    final scheme = Theme.of(context).colorScheme;
     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
 
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(isArabic ? 'جلسات الأخصائي' : 'Clinician Sessions'),
-          leading: IconButton(
-            onPressed: () => Navigator.of(context).maybePop(),
-            icon: _GoldBackIcon(compact: true),
-          ),
+        backgroundColor: Colors.black,
+        appBar: AppShellActions.buildAppBar(
+          context,
+          title: isArabic ? 'جلسات الأخصائي' : 'Clinician Sessions',
+          showAccountBadge: false,
         ),
-        body: uid.isEmpty
-            ? Center(
-                child: Text(
-                  isArabic ? 'يجب تسجيل الدخول أولًا' : 'Please sign in first',
-                ),
-              )
-            : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance
-                    .collection(_primaryBookingSource)
-                    .where('assignedClinicianId', isEqualTo: uid)
-                    .snapshots(),
-                builder: (context, snapA) {
-                  return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                    stream: _legacyBookingRequestsReadEnabled
-                        ? FirebaseFirestore.instance
-                            .collection(_legacyBookingSource)
-                            .where('assignedClinicianId', isEqualTo: uid)
-                            .snapshots()
-                        : null,
-                    builder: (context, snapB) {
-                      if (snapA.hasError &&
-                          (!_legacyBookingRequestsReadEnabled ||
-                              snapB.hasError)) {
-                        return Center(
-                          child: Text(
-                            isArabic
-                                ? 'تعذر تحميل الجلسات'
-                                : 'Unable to load sessions',
-                          ),
-                        );
-                      }
+        body: _buildSessionsBackground(
+          child: uid.isEmpty
+              ? Center(
+                  child: Text(
+                    isArabic
+                        ? 'يجب تسجيل الدخول أولًا'
+                        : 'Please sign in first',
+                    style: const TextStyle(color: Color(0xFFFFF4D4)),
+                  ),
+                )
+              : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection(_primaryBookingSource)
+                      .where('assignedClinicianId', isEqualTo: uid)
+                      .snapshots(),
+                  builder: (context, snapA) {
+                    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                      stream: _legacyBookingRequestsReadEnabled
+                          ? FirebaseFirestore.instance
+                              .collection(_legacyBookingSource)
+                              .where('assignedClinicianId', isEqualTo: uid)
+                              .snapshots()
+                          : null,
+                      builder: (context, snapB) {
+                        if (snapA.hasError &&
+                            (!_legacyBookingRequestsReadEnabled ||
+                                snapB.hasError)) {
+                          return Center(
+                            child: Text(
+                              isArabic
+                                  ? 'تعذر تحميل الجلسات'
+                                  : 'Unable to load sessions',
+                              style: const TextStyle(color: Color(0xFFFFF4D4)),
+                            ),
+                          );
+                        }
 
-                      if (!snapA.hasData &&
-                          (!_legacyBookingRequestsReadEnabled ||
-                              !snapB.hasData)) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
+                        if (!snapA.hasData &&
+                            (!_legacyBookingRequestsReadEnabled ||
+                                !snapB.hasData)) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
 
-                      final docs = _mergeBookingSources(
-                        primarySnapshot: snapA.data,
-                        legacySnapshot: _legacyBookingRequestsReadEnabled
-                            ? snapB.data
-                            : null,
-                      ).where(_isSessionRelated).toList()
-                        ..sort((a, b) {
-                          final aTs = a['updatedAt'] ?? a['createdAt'];
-                          final bTs = b['updatedAt'] ?? b['createdAt'];
-                          DateTime ad = DateTime.fromMillisecondsSinceEpoch(0);
-                          DateTime bd = DateTime.fromMillisecondsSinceEpoch(0);
-                          if (aTs is Timestamp) ad = aTs.toDate();
-                          if (bTs is Timestamp) bd = bTs.toDate();
-                          return bd.compareTo(ad);
-                        });
+                        final docs = _mergeBookingSources(
+                          primarySnapshot: snapA.data,
+                          legacySnapshot: _legacyBookingRequestsReadEnabled
+                              ? snapB.data
+                              : null,
+                        ).where(_isSessionRelated).toList()
+                          ..sort((a, b) {
+                            final aTs = a['updatedAt'] ?? a['createdAt'];
+                            final bTs = b['updatedAt'] ?? b['createdAt'];
+                            DateTime ad =
+                                DateTime.fromMillisecondsSinceEpoch(0);
+                            DateTime bd =
+                                DateTime.fromMillisecondsSinceEpoch(0);
+                            if (aTs is Timestamp) ad = aTs.toDate();
+                            if (bTs is Timestamp) bd = bTs.toDate();
+                            return bd.compareTo(ad);
+                          });
 
-                      if (docs.isEmpty) {
-                        return Center(
-                          child: Text(
-                            isArabic
-                                ? 'لا توجد جلسات ظاهرة حاليًا'
-                                : 'No visible sessions yet',
-                          ),
-                        );
-                      }
+                        if (docs.isEmpty) {
+                          return Center(
+                            child: Text(
+                              isArabic
+                                  ? 'لا توجد جلسات ظاهرة حاليًا'
+                                  : 'No visible sessions yet',
+                              style: const TextStyle(color: Color(0xFFFFF4D4)),
+                            ),
+                          );
+                        }
 
-                      return ListView(
-                        padding: const EdgeInsets.all(16),
-                        children: [
-                          _buildSessionsIntro(context, isArabic),
-                          const SizedBox(height: 16),
-                          ...docs.map((data) {
-                            final requestId = (data['_id'] ?? '').toString();
-                            final status = (data['status'] ?? '').toString();
-                            final clientName =
-                                (data['clientName'] ?? 'Client').toString();
-                            final sessionDate =
-                                (data['sessionDateText'] ?? '').toString();
-                            final sessionLink =
-                                (data['sessionLink'] ?? '').toString();
-                            final sessionCode =
-                                (data['sessionCode'] ?? '').toString();
-                            final sessionNotes =
-                                (data['sessionAdminNotes'] ?? '').toString();
-                            final createdAt = _dateText(data['createdAt']);
+                        return ListView(
+                          padding: const EdgeInsets.all(16),
+                          children: [
+                            _buildSessionsIntro(context, isArabic),
+                            const SizedBox(height: 16),
+                            ...docs.map((data) {
+                              final requestId = (data['_id'] ?? '').toString();
+                              final status = (data['status'] ?? '').toString();
+                              final clientName =
+                                  (data['clientName'] ?? 'Client').toString();
+                              final sessionDate =
+                                  (data['sessionDateText'] ?? '').toString();
+                              final sessionLink =
+                                  (data['sessionLink'] ?? '').toString();
+                              final sessionCode =
+                                  (data['sessionCode'] ?? '').toString();
+                              final sessionNotes =
+                                  (data['sessionAdminNotes'] ?? '').toString();
+                              final createdAt = _dateText(data['createdAt']);
 
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 14),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: scheme.surface,
-                                borderRadius: BorderRadius.circular(22),
-                                border: Border.all(
-                                  color: scheme.outline.withValues(alpha: 0.14),
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: isArabic
-                                    ? CrossAxisAlignment.end
-                                    : CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 14),
+                                padding: const EdgeInsets.all(16),
+                                decoration:
+                                    _glassDecoration(alpha: 0.34, radius: 22),
+                                child: DefaultTextStyle.merge(
+                                  style: const TextStyle(
+                                    color: Color(0xFFFFF4D4),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: isArabic
+                                        ? CrossAxisAlignment.end
+                                        : CrossAxisAlignment.start,
                                     children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: isArabic
-                                              ? CrossAxisAlignment.end
-                                              : CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              clientName,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleLarge
-                                                  ?.copyWith(
-                                                    fontWeight: FontWeight.w800,
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: isArabic
+                                                  ? CrossAxisAlignment.end
+                                                  : CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  clientName,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .titleLarge
+                                                      ?.copyWith(
+                                                        color: const Color(
+                                                            0xFFFFF4D4),
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                      ),
+                                                ),
+                                                if (createdAt.isNotEmpty) ...[
+                                                  const SizedBox(height: 6),
+                                                  Text(
+                                                    isArabic
+                                                        ? 'تاريخ الطلب: $createdAt'
+                                                        : 'Request date: $createdAt',
+                                                    style: const TextStyle(
+                                                      color: Color(0xFFEBDDB7),
+                                                    ),
                                                   ),
+                                                ],
+                                              ],
                                             ),
-                                            if (createdAt.isNotEmpty) ...[
-                                              const SizedBox(height: 6),
-                                              Text(
-                                                isArabic
-                                                    ? 'تاريخ الطلب: $createdAt'
-                                                    : 'Request date: $createdAt',
-                                              ),
-                                            ],
-                                          ],
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 6,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: _statusColor(status)
-                                              .withValues(alpha: 0.12),
-                                          borderRadius:
-                                              BorderRadius.circular(999),
-                                        ),
-                                        child: Text(
-                                          _statusLabel(status, isArabic),
-                                          style: TextStyle(
-                                            color: _statusColor(status),
-                                            fontWeight: FontWeight.w800,
                                           ),
-                                        ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 6,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: _statusColor(status)
+                                                  .withValues(alpha: 0.12),
+                                              borderRadius:
+                                                  BorderRadius.circular(999),
+                                            ),
+                                            child: Text(
+                                              _statusLabel(status, isArabic),
+                                              style: TextStyle(
+                                                color: _statusColor(status),
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
+                                      const SizedBox(height: 14),
+                                      if (sessionDate.trim().isNotEmpty)
+                                        Text(
+                                          isArabic
+                                              ? 'موعد الجلسة: $sessionDate'
+                                              : 'Session date: $sessionDate',
+                                        ),
+                                      if (sessionLink.trim().isNotEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        SelectableText(
+                                          isArabic
+                                              ? 'رابط الجلسة: $sessionLink'
+                                              : 'Session link: $sessionLink',
+                                        ),
+                                      ],
+                                      if (sessionCode.trim().isNotEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        SelectableText(
+                                          isArabic
+                                              ? 'كود الجلسة: $sessionCode'
+                                              : 'Session code: $sessionCode',
+                                        ),
+                                      ],
+                                      if (sessionNotes.trim().isNotEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          isArabic
+                                              ? 'ملاحظات الجلسة: $sessionNotes'
+                                              : 'Session notes: $sessionNotes',
+                                        ),
+                                      ],
+                                      if (sessionDate.trim().isEmpty &&
+                                          sessionLink.trim().isEmpty &&
+                                          sessionCode.trim().isEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          isArabic
+                                              ? 'لم يتم تجهيز بيانات الجلسة بعد.'
+                                              : 'Session details are not prepared yet.',
+                                        ),
+                                      ],
+                                      if (_canClinicianReview(data)) ...[
+                                        const SizedBox(height: 14),
+                                        _buildReviewHandoffAction(
+                                          context,
+                                          isArabic: isArabic,
+                                          requestId: requestId,
+                                        ),
+                                      ],
                                     ],
                                   ),
-                                  const SizedBox(height: 14),
-                                  if (sessionDate.trim().isNotEmpty)
-                                    Text(
-                                      isArabic
-                                          ? 'موعد الجلسة: $sessionDate'
-                                          : 'Session date: $sessionDate',
-                                    ),
-                                  if (sessionLink.trim().isNotEmpty) ...[
-                                    const SizedBox(height: 8),
-                                    SelectableText(
-                                      isArabic
-                                          ? 'رابط الجلسة: $sessionLink'
-                                          : 'Session link: $sessionLink',
-                                    ),
-                                  ],
-                                  if (sessionCode.trim().isNotEmpty) ...[
-                                    const SizedBox(height: 8),
-                                    SelectableText(
-                                      isArabic
-                                          ? 'كود الجلسة: $sessionCode'
-                                          : 'Session code: $sessionCode',
-                                    ),
-                                  ],
-                                  if (sessionNotes.trim().isNotEmpty) ...[
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      isArabic
-                                          ? 'ملاحظات الجلسة: $sessionNotes'
-                                          : 'Session notes: $sessionNotes',
-                                    ),
-                                  ],
-                                  if (sessionDate.trim().isEmpty &&
-                                      sessionLink.trim().isEmpty &&
-                                      sessionCode.trim().isEmpty) ...[
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      isArabic
-                                          ? 'لم يتم تجهيز بيانات الجلسة بعد.'
-                                          : 'Session details are not prepared yet.',
-                                    ),
-                                  ],
-                                  if (_canClinicianReview(data)) ...[
-                                    const SizedBox(height: 14),
-                                    _buildReviewHandoffAction(
-                                      context,
-                                      isArabic: isArabic,
-                                      requestId: requestId,
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            );
-                          }),
-                        ],
-                      );
-                    },
-                  );
-                },
-              ),
-      ),
-    );
-  }
-}
-
-class _GoldBackIcon extends StatelessWidget {
-  const _GoldBackIcon({required this.compact});
-
-  final bool compact;
-
-  @override
-  Widget build(BuildContext context) {
-    final size = compact ? 44.0 : 52.0;
-    final iconSize = compact ? 22.0 : 26.0;
-
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: const Color(0xFF1B1007).withValues(alpha: 0.50),
-        border: Border.all(
-          color: const Color(0xFFFFD98A).withValues(alpha: 0.56),
+                                ),
+                              );
+                            }),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFE7A94C).withValues(alpha: 0.16),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Image.asset(
-        Directionality.of(context) == TextDirection.rtl
-            ? 'assets/branding/navigation/back/back_right_gold.png'
-            : 'assets/branding/navigation/back/back_left_gold.png',
-        width: iconSize,
-        height: iconSize,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) {
-          return Icon(
-            Icons.arrow_back_rounded,
-            color: const Color(0xFFFFE7B2),
-            size: iconSize,
-          );
-        },
       ),
     );
   }
