@@ -1588,28 +1588,35 @@ class _ClinicianLogoutButton extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Tooltip(
       message: l10n.commonLogout,
-      child: SizedBox(
-        height: 30,
-        child: OutlinedButton.icon(
-          onPressed: onPressed,
-          icon: const Icon(Icons.logout_rounded, size: 15),
-          label: Text(l10n.clinicianLogout),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: const Color(0xFFFFE7B2),
-            side: BorderSide(
-              color: const Color(0xFFE7C766).withValues(alpha: 0.62),
+      child: Material(
+        color: Colors.transparent,
+        shape: const CircleBorder(),
+        child: InkWell(
+          onTap: onPressed,
+          customBorder: const CircleBorder(),
+          child: SizedBox(
+            width: 38,
+            height: 38,
+            child: Image.asset(
+              'assets/branding/navigation/logout/logout_gold.png',
+              width: 26,
+              height: 26,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(
+                  Icons.logout_rounded,
+                  color: AppColors.mutedGold,
+                  size: 22,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black,
+                      blurRadius: 7,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                );
+              },
             ),
-            backgroundColor: Colors.black.withValues(alpha: 0.24),
-            minimumSize: const Size(0, 30),
-            padding: const EdgeInsets.symmetric(horizontal: 9),
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            textStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0,
-                ),
           ),
         ),
       ),
@@ -1626,34 +1633,18 @@ class _ClinicianGoldLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFFE7C766).withValues(alpha: 0.24),
-              blurRadius: 28,
-              spreadRadius: 2,
-            ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.28),
-              blurRadius: 18,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Image.asset(
-          'assets/branding/logo_icon.png',
-          width: 82,
-          height: 82,
-          fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) {
-            return const Icon(
-              Icons.auto_awesome_rounded,
-              color: Color(0xFFE7C766),
-              size: 78,
-            );
-          },
-        ),
+      child: Image.asset(
+        'assets/branding/logo_icon.png',
+        width: 90,
+        height: 90,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return const Icon(
+            Icons.auto_awesome_rounded,
+            color: Color(0xFFE7C766),
+            size: 84,
+          );
+        },
       ),
     );
   }
@@ -1682,87 +1673,79 @@ class _ClinicianCompactProfile extends StatelessWidget {
         : clinicianName;
 
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 320),
+      constraints: const BoxConstraints(maxWidth: 300),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-        child: Row(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
-          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            SizedBox(
-              width: 92,
-              height: 128,
-              child: Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color:
-                              const Color(0xFFE7C766).withValues(alpha: 0.22),
-                          blurRadius: 24,
-                          spreadRadius: 1,
-                        ),
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.30),
-                          blurRadius: 18,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: CircleAvatar(
-                      radius: 46,
-                      backgroundColor:
-                          const Color(0xFFE7C766).withValues(alpha: 0.18),
-                      backgroundImage: hasValidPhotoUrl
-                          ? NetworkImage(clinicianPhotoUrl.trim())
-                          : null,
-                      child: hasValidPhotoUrl
-                          ? null
-                          : Icon(
-                              Icons.person_rounded,
-                              color: const Color(0xFFE7C766),
-                              size: 50,
-                            ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: _ClinicianLogoutButton(
-                        isArabic: isArabic,
-                        onPressed: onSignOut,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            _ClinicianLogoutButton(
+              isArabic: isArabic,
+              onPressed: onSignOut,
             ),
-            const SizedBox(width: 14),
-            Flexible(
-              child: Text(
-                displayName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: isArabic ? TextAlign.right : TextAlign.left,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: const Color(0xFFFFE7B2),
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0,
-                  shadows: const [
-                    Shadow(
-                      color: Colors.black,
-                      blurRadius: 12,
-                      offset: Offset(0, 1),
-                    ),
-                  ],
+            const SizedBox(height: 4),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              textDirection: TextDirection.rtl,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color:
+                            const Color(0xFFE7C766).withValues(alpha: 0.22),
+                        blurRadius: 24,
+                        spreadRadius: 1,
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.30),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: CircleAvatar(
+                    radius: 46,
+                    backgroundColor:
+                        const Color(0xFFE7C766).withValues(alpha: 0.18),
+                    backgroundImage: hasValidPhotoUrl
+                        ? NetworkImage(clinicianPhotoUrl.trim())
+                        : null,
+                    child: hasValidPhotoUrl
+                        ? null
+                        : Icon(
+                            Icons.person_rounded,
+                            color: const Color(0xFFE7C766),
+                            size: 50,
+                          ),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    displayName,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.right,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: const Color(0xFFFFE7B2),
+                          fontWeight: FontWeight.w900,
+                          height: 1.15,
+                          letterSpacing: 0,
+                          shadows: const [
+                            Shadow(
+                              color: Colors.black,
+                              blurRadius: 12,
+                              offset: Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

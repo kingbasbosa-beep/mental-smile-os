@@ -30,6 +30,7 @@ class _WebClinicianRegisterPortalPageState
 
   static const Color _fieldGold = Color(0xFFE8C878);
   static const Color _fieldSilver = Color(0xFFEDEDED);
+  static const Color _inputCream = Color(0xFFFFF6DE);
 
   static const List<Map<String, String>> _professionalTitles = [
     {'key': 'doctor', 'labelAr': 'د.', 'labelEn': 'Dr.'},
@@ -100,16 +101,19 @@ class _WebClinicianRegisterPortalPageState
         password: _passwordController.text,
       );
       final user = credential.user;
-      if (user == null) throw Exception('Unable to create clinician account');
-
-      WebRegistrationDraftStore.setClinicianUid(user.uid);
+      if (user == null) {
+        throw Exception('Clinician auth user is null');
+      }
       await user.updateDisplayName(name);
       await user.reload();
+      final uid = user.uid;
+
+      WebRegistrationDraftStore.setClinicianUid(uid);
 
       final now = FieldValue.serverTimestamp();
       await FirebaseFirestore.instance
           .collection('clinicians')
-          .doc(user.uid)
+          .doc(uid)
           .set({
         'displayName': name,
         'fullDisplayNameAr':
@@ -131,6 +135,7 @@ class _WebClinicianRegisterPortalPageState
         'role': 'clinician',
         'isActive': false,
         'isAdmin': false,
+        'isBlocked': false,
         'photoUrl': '',
         'photoAsset': '',
         'createdAt': now,
@@ -198,7 +203,7 @@ class _WebClinicianRegisterPortalPageState
                 child: IconButton(
                   onPressed: _signOut,
                   icon: Image.asset(
-                    'assets/branding/navigation/logout/logout_gold.png',
+                    'assets/branding/shared/navigation/logout/logout_gold.png',
                     width: 30,
                     height: 30,
                     fit: BoxFit.contain,
@@ -239,44 +244,6 @@ class _WebClinicianRegisterPortalPageState
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                l10n.webClinicianRegistrationAccountTitle,
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              OutlinedButton.icon(
-                                onPressed: () =>
-                                    Navigator.of(context).pushNamed(
-                                  Routes.webLibrary,
-                                ),
-                                icon: const Icon(Icons.menu_book_outlined,
-                                    size: 16),
-                                label: Text(l10n.webCenterGuidanceLibrary),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: webRegistrationTextTurquoise,
-                                  side: BorderSide(
-                                    color: webRegistrationBorderTurquoise
-                                        .withValues(
-                                      alpha: 0.55,
-                                    ),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                  textStyle: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w800,
-                                    shadows: webRegistrationTextShadows,
-                                  ),
-                                ),
-                              ),
                               const SizedBox(height: 16),
                               _textField(_nameController, l10n.webClinicianName,
                                   validator: _required),
@@ -286,7 +253,7 @@ class _WebClinicianRegisterPortalPageState
                                 dropdownColor: Colors.black,
                                 iconEnabledColor: _fieldGold,
                                 style: const TextStyle(
-                                  color: _fieldGold,
+                                  color: _inputCream,
                                   fontWeight: FontWeight.w700,
                                 ),
                                 decoration: _fieldDecoration(
@@ -313,7 +280,7 @@ class _WebClinicianRegisterPortalPageState
                                 dropdownColor: Colors.black,
                                 iconEnabledColor: _fieldGold,
                                 style: const TextStyle(
-                                  color: _fieldGold,
+                                  color: _inputCream,
                                   fontWeight: FontWeight.w700,
                                 ),
                                 decoration:
@@ -345,9 +312,6 @@ class _WebClinicianRegisterPortalPageState
                                   if (!email.contains('@')) {
                                     return l10n.authInvalidEmail;
                                   }
-                                  if (email.isEmpty) return l10n.authEmailRequired;
-                                  if (!email.contains('@'))
-                                    return l10n.authInvalidEmail;
                                   return null;
                                 },
                               ),
@@ -360,9 +324,6 @@ class _WebClinicianRegisterPortalPageState
                                   if (value == null || value.length < 6) {
                                     return l10n.authWeakPassword;
                                   }
-                                  if (value == null || value.length < 6) {
-                                    return l10n.authWeakPassword;
-                                  }
                                   return null;
                                 },
                               ),
@@ -372,9 +333,6 @@ class _WebClinicianRegisterPortalPageState
                                 l10n.authConfirmPassword,
                                 obscureText: true,
                                 validator: (value) {
-                                  if (value != _passwordController.text) {
-                                    return l10n.authPasswordsDoNotMatch;
-                                  }
                                   if (value != _passwordController.text) {
                                     return l10n.authPasswordsDoNotMatch;
                                   }
@@ -398,6 +356,29 @@ class _WebClinicianRegisterPortalPageState
                                 height: 44,
                                 child: ElevatedButton(
                                   onPressed: _isSubmitting ? null : _submit,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: _fieldGold,
+                                    foregroundColor: const Color(0xFF17100A),
+                                    disabledBackgroundColor:
+                                        _fieldGold.withValues(alpha: 0.45),
+                                    disabledForegroundColor:
+                                        Colors.black.withValues(alpha: 0.55),
+                                    elevation: 6,
+                                    shadowColor:
+                                        _fieldGold.withValues(alpha: 0.28),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                      side: BorderSide(
+                                        color: _fieldSilver.withValues(
+                                          alpha: 0.42,
+                                        ),
+                                      ),
+                                    ),
+                                    textStyle: const TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 0,
+                                    ),
+                                  ),
                                   child: _isSubmitting
                                       ? const SizedBox(
                                           width: 20,
@@ -436,7 +417,7 @@ class _WebClinicianRegisterPortalPageState
       keyboardType: keyboardType,
       validator: validator,
       style: const TextStyle(
-        color: _fieldGold,
+        color: _inputCream,
         fontWeight: FontWeight.w700,
       ),
       decoration: _fieldDecoration(label),

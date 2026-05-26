@@ -177,45 +177,6 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                l10n.webCenterDocumentsTitle,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              OutlinedButton.icon(
-                                onPressed: () =>
-                                    Navigator.of(context).pushNamed(
-                                  Routes.webLibrary,
-                                ),
-                                icon: const Icon(Icons.menu_book_outlined,
-                                    size: 16),
-                                label: Text(l10n.webCenterGuidanceLibrary),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: webRegistrationTextTurquoise,
-                                  side: BorderSide(
-                                    color: webRegistrationBorderTurquoise
-                                        .withValues(
-                                      alpha: 0.55,
-                                    ),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                  textStyle: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w800,
-                                    shadows: webRegistrationTextShadows,
-                                  ),
-                                ),
-                              ),
                               const SizedBox(height: 16),
                               ...kRequiredCenterDocumentTypes
                                   .map((item) => _documentSection(context, item)),
@@ -235,8 +196,26 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
                                 height: 44,
                                 child: ElevatedButton(
                                   onPressed: _isSaving ? null : _submit,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFE8C878),
+                                    foregroundColor: const Color(0xFF17100A),
+                                    elevation: 6,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    textStyle: const TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
                                   child: _isSaving
-                                      ? const CircularProgressIndicator()
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Color(0xFF17100A),
+                                          ),
+                                        )
                                       : Text(l10n.webCenterSubmitForReview),
                                 ),
                               ),
@@ -268,26 +247,56 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
           TextFormField(
             controller: _fileNameControllers[type],
             validator: _required,
+            style: const TextStyle(
+              color: Color(0xFFFFF6DE),
+              fontWeight: FontWeight.w700,
+            ),
             decoration: InputDecoration(
               labelText: l10n.webCenterFileName,
-              border: const OutlineInputBorder(),
+              labelStyle: const TextStyle(color: Color(0xFFE8C878)),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFFEDEDED), width: 1.2),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFFEDEDED), width: 1.8),
+              ),
             ),
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _fileUrlControllers[type],
+            style: const TextStyle(
+              color: Color(0xFFFFF6DE),
+              fontWeight: FontWeight.w700,
+            ),
             decoration: InputDecoration(
               labelText: l10n.webCenterFileUrlOptional,
-              border: const OutlineInputBorder(),
+              labelStyle: const TextStyle(color: Color(0xFFE8C878)),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFFEDEDED), width: 1.2),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFFEDEDED), width: 1.8),
+              ),
             ),
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _reviewNoteControllers[type],
             maxLines: 2,
+            style: const TextStyle(
+              color: Color(0xFFFFF6DE),
+              fontWeight: FontWeight.w700,
+            ),
             decoration: InputDecoration(
               labelText: l10n.webCenterReviewNoteOptional,
-              border: const OutlineInputBorder(),
+              labelStyle: const TextStyle(color: Color(0xFFE8C878)),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFFEDEDED), width: 1.2),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFFEDEDED), width: 1.8),
+              ),
             ),
           ),
         ],

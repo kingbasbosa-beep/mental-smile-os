@@ -41,6 +41,20 @@ flutter:
 
   assets:
     - assets/branding/
+    - assets/branding/web/library/hodn_amen/
+    - assets/branding/web/library/bedaya_amena/
+    - assets/branding/web/library/backgrounds/desktop/
+    - assets/branding/web/library/backgrounds/tablet/
+    - assets/branding/web/library/backgrounds/mobile/
+    - assets/branding/web/registration/centers/desktop/
+    - assets/branding/web/registration/centers/tablet/
+    - assets/branding/web/registration/centers/mobile/
+    - assets/branding/web/registration/clinicians/desktop/
+    - assets/branding/web/registration/clinicians/tablet/
+    - assets/branding/web/registration/clinicians/mobile/
+    - assets/branding/shared/logo/
+    - assets/branding/shared/navigation/back/
+    - assets/branding/shared/navigation/logout/
     - assets/branding/library/hodn_amen/
     - assets/branding/library/bedaya_amena/
     - assets/branding/library/backgrounds/desktop/

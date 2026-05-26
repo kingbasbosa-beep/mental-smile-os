@@ -27,6 +27,7 @@ import 'package:flutterprojects/features/booking/presentation/pages/center_inbox
 import 'package:flutterprojects/features/admin_surface/pages/admin_booking_queue_page.dart';
 
 import 'package:flutterprojects/features/library/presentation/pages/library_page.dart';
+import 'package:flutterprojects/features/library/presentation/pages/library_policy_page.dart';
 import 'package:flutterprojects/features/splash/presentation/pages/splash_page.dart';
 import 'package:flutterprojects/features/language/presentation/pages/language_page.dart';
 import 'package:flutterprojects/features/modules/presentation/pages/module_placeholder_page.dart';
@@ -761,6 +762,12 @@ class AppRouter {
           builder: (_) => LibraryPage(
             initialCategoryKey: _libraryCategoryKey(settings),
           ),
+          settings: settings,
+        );
+
+      case Routes.webLibraryPolicy:
+        return MaterialPageRoute(
+          builder: (_) => const LibraryPolicyPage(),
           settings: settings,
         );
 

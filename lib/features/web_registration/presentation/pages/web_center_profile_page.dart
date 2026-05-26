@@ -138,45 +138,6 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                l10n.webCenterRegistrationBasicInfoTitle,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              OutlinedButton.icon(
-                                onPressed: () =>
-                                    Navigator.of(context).pushNamed(
-                                  Routes.webLibrary,
-                                ),
-                                icon: const Icon(Icons.menu_book_outlined,
-                                    size: 16),
-                                label: Text(l10n.webCenterGuidanceLibrary),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: webRegistrationTextTurquoise,
-                                  side: BorderSide(
-                                    color: webRegistrationBorderTurquoise
-                                        .withValues(
-                                      alpha: 0.55,
-                                    ),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                  textStyle: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w800,
-                                    shadows: webRegistrationTextShadows,
-                                  ),
-                                ),
-                              ),
                               const SizedBox(height: 16),
                               _textField(
                                 _managerNameController,
@@ -233,8 +194,26 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
                                 height: 44,
                                 child: ElevatedButton(
                                   onPressed: _isSaving ? null : _save,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFE8C878),
+                                    foregroundColor: const Color(0xFF17100A),
+                                    elevation: 6,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    textStyle: const TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
                                   child: _isSaving
-                                      ? const CircularProgressIndicator()
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Color(0xFF17100A),
+                                          ),
+                                        )
                                       : Text(l10n.webCenterNextMediaGallery),
                                 ),
                               ),
@@ -266,9 +245,19 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
         controller: controller,
         maxLines: maxLines,
         keyboardType: keyboardType,
+        style: const TextStyle(
+          color: Color(0xFFFFF6DE),
+          fontWeight: FontWeight.w700,
+        ),
         decoration: InputDecoration(
           labelText: label,
-          border: const OutlineInputBorder(),
+          labelStyle: const TextStyle(color: Color(0xFFE8C878)),
+          enabledBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFEDEDED), width: 1.2),
+          ),
+          focusedBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFEDEDED), width: 1.8),
+          ),
         ),
         validator: (value) {
           if (!required) return null;

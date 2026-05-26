@@ -51,11 +51,13 @@ class AppPageBackground extends StatelessWidget {
     required this.child,
     this.showPattern = true,
     this.topAccent = true,
+    this.showDecorativeLayers = true,
   });
 
   final Widget child;
   final bool showPattern;
   final bool topAccent;
+  final bool showDecorativeLayers;
 
   @override
   Widget build(BuildContext context) {
@@ -65,39 +67,41 @@ class AppPageBackground extends StatelessWidget {
       decoration: AppDecorations.pageBackground(),
       child: Stack(
         children: [
-          Positioned(
-            top: -40,
-            left: -20,
-            child: IgnorePointer(
-              child: Opacity(
-                opacity: 0.10,
-                child: Image.asset(
-                  normalizeAssetPath('c7_branding/home/hero_art.png'),
-                  width: 260,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const SizedBox.shrink(),
+          if (showDecorativeLayers)
+            Positioned(
+              top: -40,
+              left: -20,
+              child: IgnorePointer(
+                child: Opacity(
+                  opacity: 0.10,
+                  child: Image.asset(
+                    normalizeAssetPath('c7_branding/home/hero_art.png'),
+                    width: 260,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const SizedBox.shrink(),
+                  ),
                 ),
               ),
             ),
-          ),
-          Positioned(
-            right: -30,
-            bottom: -10,
-            child: IgnorePointer(
-              child: Opacity(
-                opacity: 0.08,
-                child: Image.asset(
-                  normalizeAssetPath('c7_branding/home/home_bg.png'),
-                  width: 300,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const SizedBox.shrink(),
+          if (showDecorativeLayers)
+            Positioned(
+              right: -30,
+              bottom: -10,
+              child: IgnorePointer(
+                child: Opacity(
+                  opacity: 0.08,
+                  child: Image.asset(
+                    normalizeAssetPath('c7_branding/home/home_bg.png'),
+                    width: 300,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const SizedBox.shrink(),
+                  ),
                 ),
               ),
             ),
-          ),
-          if (showPattern)
+          if (showDecorativeLayers && showPattern)
             Positioned.fill(
               child: IgnorePointer(
                 child: Opacity(
@@ -110,7 +114,7 @@ class AppPageBackground extends StatelessWidget {
                 ),
               ),
             ),
-          if (topAccent)
+          if (showDecorativeLayers && topAccent)
             const Positioned(
               top: 6,
               left: 0,

@@ -24,7 +24,7 @@ String webRegistrationBackgroundAsset(
       : width < 1200
           ? 'tablet'
           : 'desktop';
-  return 'assets/branding/web_registration/$roleFolder/$sizeFolder/$fileName';
+  return 'assets/branding/web/registration/$roleFolder/$sizeFolder/$fileName';
 }
 
 Widget webRegistrationCompactFormTheme(

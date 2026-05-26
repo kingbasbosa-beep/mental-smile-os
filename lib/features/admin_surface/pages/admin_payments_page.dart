@@ -573,6 +573,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
               : 'Payment Review & Payouts',
         ),
         body: AppPageBackground(
+          showDecorativeLayers: false,
           child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
             stream: FirebaseFirestore.instance
                 .collection('booking_requests')

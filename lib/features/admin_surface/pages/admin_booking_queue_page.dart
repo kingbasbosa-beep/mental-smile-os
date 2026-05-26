@@ -2412,6 +2412,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
           canLogout: false,
         ),
         body: AppPageBackground(
+          showDecorativeLayers: false,
           child:
               StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
             stream: _bookingDocsStreamRef,

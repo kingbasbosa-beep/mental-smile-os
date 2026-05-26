@@ -729,6 +729,7 @@ class _AdminSessionsPageState extends State<AdminSessionsPage> {
               : 'Sessions Monitoring & Exception Control',
         ),
         body: AppPageBackground(
+          showDecorativeLayers: false,
           child:
               StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
             stream: _bookingDocsStreamRef,

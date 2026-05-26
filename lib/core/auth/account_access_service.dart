@@ -69,6 +69,26 @@ class AccountAccessService {
       );
     }
 
+    if (email.isNotEmpty) {
+      final adminByEmail = await _safeQueryByEmail('admins', email);
+      if (adminByEmail != null) {
+        final data = adminByEmail.data();
+        if ((data['active'] ?? false) == true) {
+          _accessTrace(
+            'admin_check_decision '
+            'currentAuthUid=$uid '
+            'reason=admins_email_doc_active_true',
+          );
+          return const SignedInAccessState(role: RoleNames.admin);
+        }
+        _accessTrace(
+          'admin_check_decision '
+          'currentAuthUid=$uid '
+          'reason=admins_email_doc_found_but_active_false',
+        );
+      }
+    }
+
     final clinicianDoc = await _safeGet('clinicians', uid);
     if (clinicianDoc?.exists == true) {
       final data = clinicianDoc?.data() ?? const <String, dynamic>{};
@@ -145,7 +165,6 @@ class AccountAccessService {
           docId: clientByEmail.id,
         );
       }
-      return const SignedInAccessState(role: 'client');
     }
 
     return const SignedInAccessState();

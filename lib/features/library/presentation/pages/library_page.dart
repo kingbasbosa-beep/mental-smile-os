@@ -90,36 +90,48 @@ class _LibraryPageState extends State<LibraryPage> {
         keyName: 'articles',
         titleAr: 'مقالات',
         titleEn: 'Articles',
+        noteAr: 'مقالات تثقيفية وداعمة ستتوفر تدريجيًا.',
+        noteEn: 'Educational and supportive articles will be added gradually.',
         asset: 'c6_library/categories/cat_articles.png',
       ),
       const _LibCat(
         keyName: 'exercises',
         titleAr: 'تمارين',
         titleEn: 'Exercises',
+        noteAr: 'تمارين دعم خفيفة فقط، وليست بروتوكولًا علاجيًا.',
+        noteEn: 'Light support exercises only, not a treatment protocol.',
         asset: 'c6_library/categories/cat_exercises.png',
       ),
       const _LibCat(
         keyName: 'audio',
         titleAr: 'صوتيات',
         titleEn: 'Audio',
+        noteAr: 'صوتيات للتهدئة والدعم العام، وليست تدخلًا علاجيًا.',
+        noteEn: 'Calming and general support audio, not therapeutic intervention.',
         asset: 'c6_library/categories/cat_audio.png',
       ),
       const _LibCat(
         keyName: 'videos',
         titleAr: 'فيديو',
         titleEn: 'Videos',
+        noteAr: 'موارد تعليمية مرئية، وأي روابط خارجية مستقبلًا ستحتاج مراجعة.',
+        noteEn: 'Educational video resources. Future external links will require review.',
         asset: 'c6_library/categories/cat_videos.png',
       ),
       const _LibCat(
         keyName: 'tools',
         titleAr: 'أدوات',
         titleEn: 'Tools',
+        noteAr: 'أدوات الدعم قيد التجهيز. الأدوات المهنية أو الحساسة تحتاج إشراف مختص.',
+        noteEn: 'Support tools are being prepared. Professional or sensitive tools require specialist supervision.',
         asset: 'c6_library/categories/cat_tools.png',
       ),
       const _LibCat(
         keyName: 'saved',
         titleAr: 'المحفوظات',
         titleEn: 'Saved',
+        noteAr: 'ميزة الحفظ غير مفعلة الآن، ولا يتم تخزين أي عناصر في هذه المرحلة.',
+        noteEn: 'Saving is not active yet. No items are stored in this phase.',
         asset: 'c6_library/categories/cat_saved.png',
       ),
     ];
@@ -188,9 +200,15 @@ class _LibraryPageState extends State<LibraryPage> {
                               ),
                               child: _LibraryHeader(isAr: isAr),
                             ),
+                          if (!showingCategory &&
+                              _isWebLibraryRoute(context))
+                            _LibraryPolicyLink(compact: isMobile),
                           if (!showingCategory)
                             _LibraryFeaturedEntries(
-                              compact: isMobile,
+                              compact: isMobile ||
+                                  (MediaQuery.sizeOf(context).width >
+                                          MediaQuery.sizeOf(context).height &&
+                                      MediaQuery.sizeOf(context).height < 520),
                               isAr: isAr,
                             ),
                           Expanded(
@@ -198,13 +216,19 @@ class _LibraryPageState extends State<LibraryPage> {
                                 ? _LibraryFeaturedDetail(
                                     entry: selectedFeatured,
                                     isAr: isAr,
-                                    compact: isMobile,
+                              compact: isMobile ||
+                                  (MediaQuery.sizeOf(context).width >
+                                          MediaQuery.sizeOf(context).height &&
+                                      MediaQuery.sizeOf(context).height < 520),
                                   )
                                 : selectedCategory != null
                                     ? _LibraryStandardCategoryDetail(
                                         category: selectedCategory,
                                         isAr: isAr,
-                                        compact: isMobile,
+                              compact: isMobile ||
+                                  (MediaQuery.sizeOf(context).width >
+                                          MediaQuery.sizeOf(context).height &&
+                                      MediaQuery.sizeOf(context).height < 520),
                                       )
                                     : isMobile || isTablet
                                         ? _LibraryCarousel(
@@ -223,12 +247,23 @@ class _LibraryPageState extends State<LibraryPage> {
                           ),
                           if (!showingCategory)
                             _LibraryCarouselControls(
-                              compact: isMobile,
+                              compact: isMobile ||
+                                  (MediaQuery.sizeOf(context).width >
+                                          MediaQuery.sizeOf(context).height &&
+                                      MediaQuery.sizeOf(context).height < 520),
+                              isAr: isAr,
                               onPrevious: () =>
                                   _previousPage(categories.length),
                               onNext: () => _nextPage(categories.length),
                             ),
-                          SizedBox(height: isMobile ? 16 : 28),
+                          SizedBox(
+                            height: isMobile ||
+                                    (MediaQuery.sizeOf(context).width >
+                                            MediaQuery.sizeOf(context).height &&
+                                        MediaQuery.sizeOf(context).height < 520)
+                                ? 10
+                                : 28,
+                          ),
                         ],
                       ),
                     ),
@@ -241,7 +276,10 @@ class _LibraryPageState extends State<LibraryPage> {
                             top: isMobile ? 12 : 18,
                           ),
                           child: _LibraryBackButton(
-                            compact: isMobile,
+                              compact: isMobile ||
+                                  (MediaQuery.sizeOf(context).width >
+                                          MediaQuery.sizeOf(context).height &&
+                                      MediaQuery.sizeOf(context).height < 520),
                             returnToLibraryHome: showingCategory,
                             returnRoute: widget.returnRoute,
                           ),
@@ -261,12 +299,12 @@ class _LibraryPageState extends State<LibraryPage> {
 
   String _libraryBackgroundAsset(double width) {
     if (width < 700) {
-      return 'assets/branding/library/backgrounds/mobile/library_mobile_bg.png';
+      return 'assets/branding/web/library/backgrounds/mobile/library_mobile_bg.png';
     }
     if (width < 1100) {
-      return 'assets/branding/library/backgrounds/tablet/library_tablet_bg.png';
+      return 'assets/branding/web/library/backgrounds/tablet/library_tablet_bg.png';
     }
-    return 'assets/branding/library/backgrounds/desktop/library_desktop_bg.png';
+    return 'assets/branding/web/library/backgrounds/desktop/library_desktop_bg.png';
   }
 
   Alignment _libraryBackgroundAlignment(double width) {
@@ -283,9 +321,16 @@ class _LibraryHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final landscapeCompact = size.width > size.height && size.height < 520;
+    if (landscapeCompact) {
+      return const SizedBox.shrink();
+    }
     return Text(
       isAr ? 'المكتبة' : 'Library',
-      textAlign: TextAlign.center,
+          textAlign: landscapeCompact
+              ? (isAr ? TextAlign.right : TextAlign.left)
+              : TextAlign.center,
       style: TextStyle(
         color: const Color(0xFFFFD47A),
         fontSize: MediaQuery.sizeOf(context).width < 700 ? 38 : 56,
@@ -298,6 +343,58 @@ class _LibraryHeader extends StatelessWidget {
             offset: Offset(0, 2),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _LibraryPolicyLink extends StatelessWidget {
+  const _LibraryPolicyLink({required this.compact});
+
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final isAr =
+        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+
+    return Transform.translate(
+      offset: MediaQuery.sizeOf(context).width >
+                  MediaQuery.sizeOf(context).height &&
+              MediaQuery.sizeOf(context).height < 520
+          ? const Offset(0, -8)
+          : Offset.zero,
+      child: Transform.scale(
+        scale: MediaQuery.sizeOf(context).width >
+                    MediaQuery.sizeOf(context).height &&
+                MediaQuery.sizeOf(context).height < 520
+            ? 0.88
+            : 1,
+        child: Padding(
+      padding: EdgeInsets.only(bottom: compact ? 8 : 12),
+      child: Center(
+        child: TextButton.icon(
+          onPressed: () => Navigator.of(context).pushNamed(
+            Routes.webLibraryPolicy,
+          ),
+          icon: const Icon(Icons.policy_outlined, size: 16),
+          label: Text(
+            isAr ? 'سياسة استخدام المكتبة' : 'Library usage policy',
+          ),
+          style: TextButton.styleFrom(
+            foregroundColor: const Color(0xFFFFE7B2),
+            padding: EdgeInsets.symmetric(
+              horizontal: compact ? 10 : 14,
+              vertical: compact ? 4 : 6,
+            ),
+            textStyle: TextStyle(
+              fontSize: compact ? 12 : 13,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+      ),
+        ),
       ),
     );
   }
@@ -337,7 +434,7 @@ class _LibraryBackButtonState extends State<_LibraryBackButton> {
           onTap: () {
             if (widget.returnToLibraryHome) {
               Navigator.of(context).pushReplacementNamed(
-                Routes.library,
+                _currentLibraryRouteName(context),
                 arguments: {'returnRoute': widget.returnRoute},
               );
             } else {
@@ -365,8 +462,8 @@ class _LibraryBackButtonState extends State<_LibraryBackButton> {
             ),
             child: Image.asset(
               Directionality.of(context) == TextDirection.rtl
-                  ? 'assets/branding/navigation/back/back_right_gold.png'
-                  : 'assets/branding/navigation/back/back_left_gold.png',
+                  ? 'assets/branding/shared/navigation/back/back_right_gold.png'
+                  : 'assets/branding/shared/navigation/back/back_left_gold.png',
               width: widget.compact ? 22 : 26,
               height: widget.compact ? 22 : 26,
               fit: BoxFit.contain,
@@ -396,6 +493,8 @@ class _LibraryFeaturedEntries extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final landscapeCompact = size.width > size.height && size.height < 520;
     return Padding(
       padding: EdgeInsets.fromLTRB(
         compact ? 14 : 24,
@@ -443,9 +542,7 @@ class _LibraryFeaturedHeartCardState extends State<_LibraryFeaturedHeartCard> {
 
   @override
   Widget build(BuildContext context) {
-    final routeName = ModalRoute.of(context)?.settings.name == Routes.webLibrary
-        ? Routes.webLibrary
-        : Routes.library;
+    final routeName = _currentLibraryRouteName(context);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -641,8 +738,14 @@ class _LibraryFutureBackgroundSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final isShortLandscape = size.width > size.height && size.height < 520;
+    final imageHeight = isShortLandscape
+        ? (compact ? 110.0 : 160.0)
+        : (compact ? 150.0 : 230.0);
+
     return Container(
-      height: compact ? 150 : 230,
+      height: imageHeight,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(compact ? 24 : 30),
         border: Border.all(
@@ -718,8 +821,17 @@ class _LibraryStandardCategoryDetail extends StatelessWidget {
                 _LibraryStandardCategoryImageSlot(
                   category: category,
                   compact: compact,
+                  shortLandscape: MediaQuery.sizeOf(context).width >
+                          MediaQuery.sizeOf(context).height &&
+                      MediaQuery.sizeOf(context).height < 520,
                 ),
-                SizedBox(height: compact ? 18 : 24),
+                SizedBox(
+                  height: MediaQuery.sizeOf(context).width >
+                              MediaQuery.sizeOf(context).height &&
+                          MediaQuery.sizeOf(context).height < 520
+                      ? 6
+                      : (compact ? 18 : 24),
+                ),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -751,6 +863,17 @@ class _LibraryStandardCategoryDetail extends StatelessWidget {
                     height: 1.05,
                   ),
                 ),
+                SizedBox(height: compact ? 10 : 12),
+                Text(
+                  isAr ? category.noteAr : category.noteEn,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color(0xFFFFE7B2).withValues(alpha: 0.88),
+                    fontSize: compact ? 13 : 15,
+                    height: 1.35,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
                 SizedBox(height: compact ? 14 : 18),
                 Text(
                   isAr
@@ -776,15 +899,19 @@ class _LibraryStandardCategoryImageSlot extends StatelessWidget {
   const _LibraryStandardCategoryImageSlot({
     required this.category,
     required this.compact,
+    required this.shortLandscape,
   });
 
   final _LibCat category;
   final bool compact;
+  final bool shortLandscape;
 
   @override
   Widget build(BuildContext context) {
+    final imageHeight = shortLandscape ? 82.0 : (compact ? 150.0 : 230.0);
+
     return Container(
-      height: compact ? 150 : 230,
+      height: imageHeight,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(compact ? 24 : 30),
         border: Border.all(
@@ -969,7 +1096,7 @@ class _LibraryCarouselCardState extends State<_LibraryCarouselCard> {
               widget.category.keyName,
             );
             Navigator.of(context).pushNamed(
-              Routes.library,
+              _currentLibraryRouteName(context),
               arguments: {'categoryKey': widget.category.keyName},
             );
           },
@@ -1044,11 +1171,13 @@ class _LibraryCarouselCardState extends State<_LibraryCarouselCard> {
 class _LibraryCarouselControls extends StatelessWidget {
   const _LibraryCarouselControls({
     required this.compact,
+    required this.isAr,
     required this.onPrevious,
     required this.onNext,
   });
 
   final bool compact;
+  final bool isAr;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
 
@@ -1065,17 +1194,21 @@ class _LibraryCarouselControls extends StatelessWidget {
         textDirection: TextDirection.ltr,
         children: [
           _LibraryLogoNavControl(
-            icon: Icons.arrow_forward_ios_rounded,
+            icon: isAr
+                ? Icons.arrow_forward_ios_rounded
+                : Icons.arrow_back_ios_new_rounded,
             compact: compact,
             arrowOnLeft: false,
-            onTap: onNext,
+            onTap: isAr ? onNext : onPrevious,
           ),
           SizedBox(width: compact ? 18 : 26),
           _LibraryLogoNavControl(
-            icon: Icons.arrow_back_ios_new_rounded,
+            icon: isAr
+                ? Icons.arrow_back_ios_new_rounded
+                : Icons.arrow_forward_ios_rounded,
             compact: compact,
             arrowOnLeft: true,
-            onTap: onPrevious,
+            onTap: isAr ? onPrevious : onNext,
           ),
         ],
       ),
@@ -1216,7 +1349,7 @@ class _LibraryLogoCircle extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.all(compact ? 6 : 7),
         child: Image.asset(
-          'assets/branding/logo_primary_dark.png',
+          'assets/branding/shared/logo/logo_primary_dark.png',
           fit: BoxFit.contain,
         ),
       ),
@@ -1260,20 +1393,34 @@ _LibCat? _standardLibraryCategory(String? keyName, List<_LibCat> categories) {
   return null;
 }
 
+String _currentLibraryRouteName(BuildContext context) {
+  final routeName = ModalRoute.of(context)?.settings.name;
+  if (_isWebLibraryRoute(context)) {
+    return Routes.webLibrary;
+  }
+  return Routes.library;
+}
+
+bool _isWebLibraryRoute(BuildContext context) {
+  final routeName = ModalRoute.of(context)?.settings.name;
+  return routeName == Routes.webLibrary ||
+      (routeName?.startsWith('/web/library') ?? false);
+}
+
 const _featuredLibraryEntries = <_FeaturedLibraryEntry>[
   _FeaturedLibraryEntry(
     keyName: 'family_awareness',
     titleAr: 'حضن آمن',
     titleEn: 'Safe embrace',
     icon: Icons.family_restroom_rounded,
-    cardAsset: 'assets/branding/library/hodn_amen/hodn_amen_card.png',
+    cardAsset: 'assets/branding/web/library/hodn_amen/hodn_amen_card.png',
   ),
   _FeaturedLibraryEntry(
     keyName: 'prevention_awareness',
     titleAr: 'بداية آمنة',
     titleEn: 'Safe start',
     icon: Icons.psychology_alt_rounded,
-    cardAsset: 'assets/branding/library/bedaya_amena/bedaya_amena_card.png',
+    cardAsset: 'assets/branding/web/library/bedaya_amena/bedaya_amena_card.png',
   ),
 ];
 
@@ -1298,11 +1445,15 @@ class _LibCat {
     required this.keyName,
     required this.titleAr,
     required this.titleEn,
+    required this.noteAr,
+    required this.noteEn,
     required this.asset,
   });
 
   final String keyName;
   final String titleAr;
   final String titleEn;
+  final String noteAr;
+  final String noteEn;
   final String asset;
 }

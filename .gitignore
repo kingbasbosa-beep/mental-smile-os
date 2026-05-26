@@ -123,3 +123,5 @@ HANDOFF_LATEST.md
 LATEST_STATUS.md
 SYSTEM_HQ_STATE_LATEST.md
 SAFEPOINT_HANDOFF_*.md
+serviceAccount*.json
+tools/firebase/*.json

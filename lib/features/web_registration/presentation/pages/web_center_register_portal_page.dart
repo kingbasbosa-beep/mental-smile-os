@@ -30,6 +30,7 @@ class _WebCenterRegisterPortalPageState
 
   static const Color _fieldGold = Color(0xFFE8C878);
   static const Color _fieldSilver = Color(0xFFEDEDED);
+  static const Color _inputCream = Color(0xFFFFF6DE);
 
   static const _categories = [
     {
@@ -101,7 +102,13 @@ class _WebCenterRegisterPortalPageState
         password: _passwordController.text,
       );
 
-      final uid = credential.user!.uid;
+      final user = credential.user;
+      if (user == null) {
+        throw StateError('Center registration auth user is null.');
+      }
+      await user.updateDisplayName(_centerNameController.text.trim());
+      await user.reload();
+      final uid = user.uid;
       WebRegistrationDraftStore.setCenterUid(uid);
       final now = FieldValue.serverTimestamp();
       final categoryLabels = _labels(_categories, _category);
@@ -119,12 +126,11 @@ class _WebCenterRegisterPortalPageState
         'centerType': _centerType,
         'centerTypeLabelAr': centerTypeLabels['labelAr'],
         'centerTypeLabelEn': centerTypeLabels['labelEn'],
-        'sortOrder': 0,
         'approvalStatus': 'pending_admin',
+        'isAdmin': false,
         'active': false,
         'isActive': false,
-        'imagesReady': false,
-        'documentsReady': false,
+        'isBlocked': false,
         'createdAt': now,
         'updatedAt': now,
       });
@@ -136,6 +142,10 @@ class _WebCenterRegisterPortalPageState
     } on FirebaseAuthException catch (e) {
       setState(() {
         _errorMessage = e.message ?? l10n.webCenterRegistrationFailed;
+      });
+    } on FirebaseException catch (e) {
+      setState(() {
+        _errorMessage = l10n.webCenterRegistrationFailed;
       });
     } catch (_) {
       setState(() {
@@ -152,7 +162,15 @@ class _WebCenterRegisterPortalPageState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    final mediaQuery = MediaQuery.of(context);
+    final isLandscapeCompact =
+        mediaQuery.size.width > mediaQuery.size.height &&
+            mediaQuery.size.height < 520;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    final compactGap = isLandscapeCompact ? 8.0 : 10.0;
+
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.black,
       body: webRegistrationCompactFormTheme(
         context,
@@ -174,7 +192,7 @@ class _WebCenterRegisterPortalPageState
                 child: IconButton(
                   onPressed: _signOut,
                   icon: Image.asset(
-                    'assets/branding/navigation/logout/logout_gold.png',
+                    'assets/branding/shared/navigation/logout/logout_gold.png',
                     width: 30,
                     height: 30,
                     fit: BoxFit.contain,
@@ -191,14 +209,17 @@ class _WebCenterRegisterPortalPageState
                 child: SingleChildScrollView(
                   padding: EdgeInsets.fromLTRB(
                     20,
+                    isLandscapeCompact ? 8 : 20,
                     20,
-                    20,
-                    webRegistrationFormBottomPadding(context),
+                    webRegistrationFormBottomPadding(context) +
+                        mediaQuery.viewInsets.bottom,
                   ),
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 440),
+                    constraints: BoxConstraints(
+                      maxWidth: isLandscapeCompact ? 380 : 440,
+                    ),
                     child: Card(
-                      elevation: 6,
+                      elevation: isLandscapeCompact ? 4 : 6,
                       color: webRegistrationPanelNavy.withValues(alpha: 0.18),
                       shadowColor: Colors.black.withValues(alpha: 0.32),
                       shape: RoundedRectangleBorder(
@@ -209,60 +230,17 @@ class _WebCenterRegisterPortalPageState
                         ),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(20),
+                        padding: EdgeInsets.all(isLandscapeCompact ? 14 : 20),
                         child: Form(
                           key: _formKey,
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                l10n.webCenterRegistrationPortalTitle,
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                l10n.webCenterRegistrationPortalSubtitle,
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 6),
-                              OutlinedButton.icon(
-                                onPressed: () =>
-                                    Navigator.of(context).pushNamed(
-                                  Routes.webLibrary,
-                                ),
-                                icon: const Icon(Icons.menu_book_outlined,
-                                    size: 16),
-                                label: Text(l10n.webCenterGuidanceLibrary),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: webRegistrationTextTurquoise,
-                                  side: BorderSide(
-                                    color: webRegistrationBorderTurquoise
-                                        .withValues(
-                                      alpha: 0.55,
-                                    ),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                  textStyle: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w800,
-                                    shadows: webRegistrationTextShadows,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 24),
+                              SizedBox(height: isLandscapeCompact ? 8 : 14),
                               TextFormField(
                                 controller: _centerNameController,
                                 style: const TextStyle(
-                                  color: _fieldGold,
+                                  color: _inputCream,
                                   fontWeight: FontWeight.w700,
                                 ),
                                 decoration:
@@ -274,13 +252,13 @@ class _WebCenterRegisterPortalPageState
                                   return null;
                                 },
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: compactGap),
                               DropdownButtonFormField<String>(
                                 initialValue: _category,
                                 dropdownColor: Colors.black,
                                 iconEnabledColor: _fieldGold,
                                 style: const TextStyle(
-                                  color: _fieldGold,
+                                  color: _inputCream,
                                   fontWeight: FontWeight.w700,
                                 ),
                                 decoration:
@@ -314,13 +292,13 @@ class _WebCenterRegisterPortalPageState
                                         });
                                       },
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: compactGap),
                               DropdownButtonFormField<String>(
                                 initialValue: _centerType,
                                 dropdownColor: Colors.black,
                                 iconEnabledColor: _fieldGold,
                                 style: const TextStyle(
-                                  color: _fieldGold,
+                                  color: _inputCream,
                                   fontWeight: FontWeight.w700,
                                 ),
                                 decoration:
@@ -342,11 +320,11 @@ class _WebCenterRegisterPortalPageState
                                     : (value) =>
                                         setState(() => _centerType = value),
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: compactGap),
                               TextFormField(
                                 controller: _emailController,
                                 style: const TextStyle(
-                                  color: _fieldGold,
+                                  color: _inputCream,
                                   fontWeight: FontWeight.w700,
                                 ),
                                 decoration: _fieldDecoration(l10n.authEmail),
@@ -362,11 +340,11 @@ class _WebCenterRegisterPortalPageState
                                   return null;
                                 },
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: compactGap),
                               TextFormField(
                                 controller: _passwordController,
                                 style: const TextStyle(
-                                  color: _fieldGold,
+                                  color: _inputCream,
                                   fontWeight: FontWeight.w700,
                                 ),
                                 decoration:
@@ -379,11 +357,11 @@ class _WebCenterRegisterPortalPageState
                                   return null;
                                 },
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: compactGap),
                               TextFormField(
                                 controller: _confirmPasswordController,
                                 style: const TextStyle(
-                                  color: _fieldGold,
+                                  color: _inputCream,
                                   fontWeight: FontWeight.w700,
                                 ),
                                 decoration:
@@ -409,12 +387,35 @@ class _WebCenterRegisterPortalPageState
                                   ),
                                 ),
                               ],
-                              const SizedBox(height: 22),
+                              SizedBox(height: isLandscapeCompact ? 14 : 22),
                               SizedBox(
                                 width: double.infinity,
-                                height: 44,
+                                height: isLandscapeCompact ? 40 : 44,
                                 child: ElevatedButton(
                                   onPressed: _isSubmitting ? null : _submit,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: _fieldGold,
+                                    foregroundColor: const Color(0xFF17100A),
+                                    disabledBackgroundColor:
+                                        _fieldGold.withValues(alpha: 0.45),
+                                    disabledForegroundColor:
+                                        Colors.black.withValues(alpha: 0.55),
+                                    elevation: 6,
+                                    shadowColor:
+                                        _fieldGold.withValues(alpha: 0.28),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                      side: BorderSide(
+                                        color: _fieldSilver.withValues(
+                                          alpha: 0.42,
+                                        ),
+                                      ),
+                                    ),
+                                    textStyle: const TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 0,
+                                    ),
+                                  ),
                                   child: _isSubmitting
                                       ? const SizedBox(
                                           width: 20,
