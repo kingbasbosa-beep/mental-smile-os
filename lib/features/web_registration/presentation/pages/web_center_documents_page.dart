@@ -236,12 +236,13 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
 
   Widget _documentSection(BuildContext context, Map<String, String> item) {
     final l10n = AppLocalizations.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     final type = item['key'] ?? '';
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: ExpansionTile(
         initiallyExpanded: true,
-        title: Text(item['labelEn'] ?? type),
+        title: Text(isArabic ? (item['labelAr'] ?? type) : (item['labelEn'] ?? type)),
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         children: [
           TextFormField(

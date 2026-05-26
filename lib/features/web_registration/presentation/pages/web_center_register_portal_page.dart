@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -38,19 +38,38 @@ class _WebCenterRegisterPortalPageState
       'labelAr': 'مراكز التعافي',
       'labelEn': 'Recovery Centers'
     },
-    {'key': 'detox', 'labelAr': 'مراكز سحب السموم', 'labelEn': 'Detox Centers'},
+    {
+      'key': 'detox',
+      'labelAr': 'مراكز سحب السموم',
+      'labelEn': 'Detox Centers',
+    },
     {
       'key': 'special_needs',
       'labelAr': 'مراكز رعاية ذوي الاحتياجات الخاصة',
       'labelEn': 'Special Needs Centers',
     },
-    {'key': 'hospital', 'labelAr': 'المستشفيات', 'labelEn': 'Hospitals'},
+    {
+      'key': 'hospital',
+      'labelAr': 'المستشفيات',
+      'labelEn': 'Hospitals',
+    },
   ];
-
   static const _centerTypes = [
-    {'key': 'halfway_house', 'labelAr': 'هاف واي', 'labelEn': 'Halfway House'},
-    {'key': 'detox', 'labelAr': 'ديتوكس / أعراض انسحاب', 'labelEn': 'Detox'},
-    {'key': 'hospital', 'labelAr': 'مستشفى', 'labelEn': 'Hospital'},
+    {
+      'key': 'halfway_house',
+      'labelAr': 'هاف واي',
+      'labelEn': 'Halfway House',
+    },
+    {
+      'key': 'detox',
+      'labelAr': 'ديتوكس / أعراض انسحاب',
+      'labelEn': 'Detox',
+    },
+    {
+      'key': 'hospital',
+      'labelAr': 'مستشفى',
+      'labelEn': 'Hospital',
+    },
     {
       'key': 'special_needs_care',
       'labelAr': 'رعاية ذوي الاحتياجات الخاصة',
@@ -267,7 +286,11 @@ class _WebCenterRegisterPortalPageState
                                     .map(
                                       (item) => DropdownMenuItem<String>(
                                         value: item['key'],
-                                        child: Text(item['labelEn'] ?? ''),
+                                        child: Text(
+                                          isArabic
+                                              ? (item['labelAr'] ?? '')
+                                              : (item['labelEn'] ?? ''),
+                                        ),
                                       ),
                                     )
                                     .toList(),
@@ -307,7 +330,11 @@ class _WebCenterRegisterPortalPageState
                                     .map(
                                       (item) => DropdownMenuItem<String>(
                                         value: item['key'],
-                                        child: Text(item['labelEn'] ?? ''),
+                                        child: Text(
+                                          isArabic
+                                              ? (item['labelAr'] ?? '')
+                                              : (item['labelEn'] ?? ''),
+                                        ),
                                       ),
                                     )
                                     .toList(),
@@ -482,3 +509,4 @@ class _WebCenterRegisterPortalPageState
     );
   }
 }
+

@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
@@ -155,21 +155,14 @@ class _WebClinicianRegisterPortalPageState
       Navigator.of(context).pushReplacementNamed(Routes.webClinicianProfile);
     } on FirebaseAuthException catch (e) {
       setState(() => _error = e.message ?? l10n.webClinicianRegistrationFailed);
-      return;
-      setState(() => _error = e.message ?? 'فشل إنشاء حساب الأخصائي');
     } catch (_) {
       setState(() => _error = l10n.webClinicianRegistrationFailed);
-      return;
-      setState(() => _error = 'فشل إنشاء حساب الأخصائي');
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
   String? _required(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return AppLocalizations.of(context)!.authRequiredField;
-    }
     if (value == null || value.trim().isEmpty) {
       return AppLocalizations.of(context)!.authRequiredField;
     }
@@ -464,3 +457,5 @@ class _WebClinicianRegisterPortalPageState
     );
   }
 }
+
+

@@ -158,7 +158,9 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                             children: [
                               const SizedBox(height: 16),
                               _capabilityTile(
-                                'Supports addiction cases with HIV',
+                                isArabic
+                                    ? 'يدعم حالات الإدمان المصابة بفيروس نقص المناعة'
+                                    : 'Supports addiction cases with HIV',
                                 _capabilities.supportsAddictionCasesWithHiv,
                                 (value) {
                                   setState(() {
@@ -169,7 +171,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                                 },
                               ),
                               _capabilityTile(
-                                'Accepts addiction cases',
+                                isArabic ? 'يقبل حالات الإدمان' : 'Accepts addiction cases',
                                 _capabilities.acceptsAddictionCases,
                                 (value) {
                                   setState(() {
@@ -180,7 +182,9 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                                 },
                               ),
                               _capabilityTile(
-                                'Accepts psychiatric cases without addiction',
+                                isArabic
+                                    ? 'يقبل الحالات النفسية بدون إدمان'
+                                    : 'Accepts psychiatric cases without addiction',
                                 _capabilities
                                     .acceptsPsychiatricCasesWithoutAddiction,
                                 (value) {
@@ -269,9 +273,10 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
 
   Widget _accommodationTile(BuildContext context, AccommodationCostItem item) {
     final l10n = AppLocalizations.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
     return ExpansionTile(
-      title: Text(item.labelEn),
+      title: Text(isArabic ? item.labelAr : item.labelEn),
       childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       children: [
         CheckboxListTile(
@@ -331,37 +336,37 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
           children: [
             _accommodationChip(
               item,
-              'Medication',
+              isArabic ? 'أدوية' : 'Medication',
               item.includesMedication,
               (value) => item.copyWith(includesMedication: value),
             ),
             _accommodationChip(
               item,
-              'Meals',
+              isArabic ? 'وجبات' : 'Meals',
               item.includesMeals,
               (value) => item.copyWith(includesMeals: value),
             ),
             _accommodationChip(
               item,
-              'Outdoor',
+              isArabic ? 'أنشطة خارجية' : 'Outdoor',
               item.includesOutdoorActivities,
               (value) => item.copyWith(includesOutdoorActivities: value),
             ),
             _accommodationChip(
               item,
-              'Tests',
+              isArabic ? 'تحاليل' : 'Tests',
               item.includesRequiredTests,
               (value) => item.copyWith(includesRequiredTests: value),
             ),
             _accommodationChip(
               item,
-              'Airport',
+              isArabic ? 'توصيل مطار' : 'Airport',
               item.includesAirportPickup,
               (value) => item.copyWith(includesAirportPickup: value),
             ),
             _accommodationChip(
               item,
-              'Outings',
+              isArabic ? 'نزهات خارجية' : 'Outings',
               item.includesTourismOrExternalOutings,
               (value) => item.copyWith(
                 includesTourismOrExternalOutings: value,
@@ -381,9 +386,10 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
 
   Widget _autismTile(BuildContext context, AutismCareCostItem item) {
     final l10n = AppLocalizations.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
     return ExpansionTile(
-      title: Text(item.labelEn),
+      title: Text(isArabic ? item.labelAr : item.labelEn),
       childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       children: [
         CheckboxListTile(
