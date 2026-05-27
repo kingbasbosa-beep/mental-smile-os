@@ -67,7 +67,11 @@ class AdminCenterDetailsPage extends StatelessWidget {
                 'Profile',
                 [
                   _row('Doc ID', centerId),
-                  _row('Name', data['centerName'] ?? data['displayName'] ?? data['name']),
+                  _row(
+                      'Name',
+                      data['centerName'] ??
+                          data['displayName'] ??
+                          data['name']),
                   _row('Email', data['email']),
                   _row('Category', data['category']),
                   _row('Center type', data['centerType']),
@@ -106,13 +110,15 @@ class AdminCenterDetailsPage extends StatelessWidget {
                     _row('Gallery images', '-')
                   else
                     ...galleryImages.asMap().entries.map(
-                          (entry) => _row('Gallery image ${entry.key + 1}', entry.value),
+                          (entry) => _row(
+                              'Gallery image ${entry.key + 1}', entry.value),
                         ),
                   if (galleryItems.isEmpty)
                     _row('Gallery items', '-')
                   else
                     ...galleryItems.asMap().entries.map(
-                          (entry) => _mapRow('Gallery item ${entry.key + 1}', entry.value),
+                          (entry) => _mapRow(
+                              'Gallery item ${entry.key + 1}', entry.value),
                         ),
                 ],
               ),
@@ -125,7 +131,8 @@ class AdminCenterDetailsPage extends StatelessWidget {
                     _row('Document items', '-')
                   else
                     ...documentItems.asMap().entries.map(
-                          (entry) => _mapRow('Document ${entry.key + 1}', entry.value),
+                          (entry) =>
+                              _mapRow('Document ${entry.key + 1}', entry.value),
                         ),
                 ],
               ),
@@ -138,13 +145,15 @@ class AdminCenterDetailsPage extends StatelessWidget {
                     _row('Accommodation costs', '-')
                   else
                     ...accommodationCosts.asMap().entries.map(
-                          (entry) => _mapRow('Accommodation ${entry.key + 1}', entry.value),
+                          (entry) => _mapRow(
+                              'Accommodation ${entry.key + 1}', entry.value),
                         ),
                   if (autismCareCosts.isEmpty)
                     _row('Autism care costs', '-')
                   else
                     ...autismCareCosts.asMap().entries.map(
-                          (entry) => _mapRow('Autism care ${entry.key + 1}', entry.value),
+                          (entry) => _mapRow(
+                              'Autism care ${entry.key + 1}', entry.value),
                         ),
                 ],
               ),

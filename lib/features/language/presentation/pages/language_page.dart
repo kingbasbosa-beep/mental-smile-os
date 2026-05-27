@@ -131,8 +131,7 @@ class MkLanguagePage extends ConsumerWidget {
                   const SizedBox(height: 14),
                   _registrationItem(
                     context: context,
-                    label:
-                        isArabic ? 'تسجيل أخصائي' : 'Register as clinician',
+                    label: isArabic ? 'تسجيل أخصائي' : 'Register as clinician',
                     route: Routes.webClinicianRegister,
                   ),
                   const SizedBox(height: 14),

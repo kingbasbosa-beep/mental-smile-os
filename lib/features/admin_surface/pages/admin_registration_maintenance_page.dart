@@ -35,11 +35,13 @@ class AdminRegistrationMaintenancePage extends StatelessWidget {
 
       final hasProfile = (data['bio'] ?? '').toString().trim().isNotEmpty ||
           (data['photoUrl'] ?? '').toString().trim().isNotEmpty;
-      final hasSessions =
-          (data['sessionPriceText'] ?? '').toString().trim().isNotEmpty &&
-              (data['sessionDurationText'] ?? '').toString().trim().isNotEmpty &&
-              data['sessionModes'] is List &&
-              (data['sessionModes'] as List).isNotEmpty;
+      final hasSessions = (data['sessionPriceText'] ?? '')
+              .toString()
+              .trim()
+              .isNotEmpty &&
+          (data['sessionDurationText'] ?? '').toString().trim().isNotEmpty &&
+          data['sessionModes'] is List &&
+          (data['sessionModes'] as List).isNotEmpty;
       final docsSubmitted = (data['documentsSubmitted'] ?? false) == true;
       if (!hasProfile || !hasSessions || !docsSubmitted) incomplete.add(doc.id);
 
@@ -68,7 +70,11 @@ class AdminRegistrationMaintenancePage extends StatelessWidget {
     for (final doc in docs) {
       final data = doc.data();
       final documentItems = data['documentItems'];
-      final requiredTypes = {'identity_proof', 'center_license', 'location_proof'};
+      final requiredTypes = {
+        'identity_proof',
+        'center_license',
+        'location_proof'
+      };
       final uploadedTypes = <String>{};
       if (documentItems is List) {
         for (final item in documentItems.whereType<Map>()) {
@@ -120,10 +126,11 @@ class AdminRegistrationMaintenancePage extends StatelessWidget {
     final stuck = <String>[];
     for (final doc in docs) {
       final data = doc.data();
-      final hasName = (data['displayName'] ?? data['name'] ?? data['fullName'] ?? '')
-          .toString()
-          .trim()
-          .isNotEmpty;
+      final hasName =
+          (data['displayName'] ?? data['name'] ?? data['fullName'] ?? '')
+              .toString()
+              .trim()
+              .isNotEmpty;
       final hasEmail = (data['email'] ?? '').toString().trim().isNotEmpty;
       if (!hasName || !hasEmail) incomplete.add(doc.id);
       if (_isStuckPending(data)) stuck.add(doc.id);
@@ -204,7 +211,8 @@ class AdminRegistrationMaintenancePage extends StatelessWidget {
         future: _loadReport(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('Failed to load report: ${snapshot.error}'));
+            return Center(
+                child: Text('Failed to load report: ${snapshot.error}'));
           }
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -225,10 +233,12 @@ class AdminRegistrationMaintenancePage extends StatelessWidget {
   }
 
   Widget _summaryBanner(_RegistrationHealthReport report) {
-    final totalPending =
-        report.clinicians.pending + report.centers.pending + report.clients.pending;
-    final totalBlocked =
-        report.clinicians.blocked + report.centers.blocked + report.clients.blocked;
+    final totalPending = report.clinicians.pending +
+        report.centers.pending +
+        report.clients.pending;
+    final totalBlocked = report.clinicians.blocked +
+        report.centers.blocked +
+        report.clients.blocked;
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
@@ -278,7 +288,8 @@ class AdminRegistrationMaintenancePage extends StatelessWidget {
                 _metric('Blocked', report.blocked),
                 _metric('Missing docs', report.missingRequiredDocs.length),
                 _metric('Stuck pending', report.stuckPending.length),
-                _metric('Incomplete steps', report.incompleteRegistration.length),
+                _metric(
+                    'Incomplete steps', report.incompleteRegistration.length),
                 _metric('documentsReady false', report.documentsReadyFalse),
                 _metric('imagesReady false', report.imagesReadyFalse),
                 _metric('pricingReady false', report.pricingReadyFalse),
@@ -287,7 +298,8 @@ class AdminRegistrationMaintenancePage extends StatelessWidget {
             const SizedBox(height: 12),
             _idList('Missing required docs', report.missingRequiredDocs),
             _idList('Accounts stuck pending', report.stuckPending),
-            _idList('Incomplete registration steps', report.incompleteRegistration),
+            _idList(
+                'Incomplete registration steps', report.incompleteRegistration),
           ],
         ),
       ),

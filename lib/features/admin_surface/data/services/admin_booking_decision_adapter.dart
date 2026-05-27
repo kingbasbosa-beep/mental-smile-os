@@ -454,11 +454,13 @@ class AdminBookingDecisionAdapter {
     });
   }
 
-  @Deprecated('Payment authority moved to AdminPaymentDecisionAdapter. Use that adapter for payment decisions.')
+  @Deprecated(
+      'Payment authority moved to AdminPaymentDecisionAdapter. Use that adapter for payment decisions.')
   Future<AdminApprovePaymentResult> approvePayment({
     required String requestId,
   }) async {
-    final snap = await _firestore.collection('booking_requests').doc(requestId).get();
+    final snap =
+        await _firestore.collection('booking_requests').doc(requestId).get();
     final data = snap.data() ?? const <String, dynamic>{};
     final isCenterRequest =
         (data['requestKind'] ?? '').toString().trim() == 'center' ||
@@ -475,7 +477,8 @@ class AdminBookingDecisionAdapter {
     return AdminApprovePaymentResult(isCenterRequest: isCenterRequest);
   }
 
-  @Deprecated('Payment authority moved to AdminPaymentDecisionAdapter. Use that adapter for payment decisions.')
+  @Deprecated(
+      'Payment authority moved to AdminPaymentDecisionAdapter. Use that adapter for payment decisions.')
   Future<void> rejectPayment({
     required String requestId,
   }) async {

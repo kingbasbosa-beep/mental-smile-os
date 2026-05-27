@@ -164,8 +164,7 @@ class AdminAiFollowupBoundariesPage extends StatelessWidget {
                       'لا يجوز للذكاء تقديم توجيه علاجي أو أداء وظيفة علاجية أو محاولة تعويض الرعاية المهنية.',
                   boundaryNote:
                       'المتابعة هنا دعم خفيف فقط وليست treatment flow.',
-                  supervisionNote:
-                      'الذكاء لا يعمل كبديل عن الرعاية المتخصصة.',
+                  supervisionNote: 'الذكاء لا يعمل كبديل عن الرعاية المتخصصة.',
                 ),
                 _buildBoundaryCard(
                   context,
@@ -174,8 +173,7 @@ class AdminAiFollowupBoundariesPage extends StatelessWidget {
                       'لا يجوز له تقييم المخاطر أو الحالة النفسية أو الطبية بصفته مرجعًا مهنيًا أو حاسمًا.',
                   boundaryNote:
                       'أي تقييم حساس أو طبي يبقى خارج هذه الطبقة وخارج هذا الدور.',
-                  supervisionNote:
-                      'الذكاء هنا مساعد إداري محدود لا أكثر.',
+                  supervisionNote: 'الذكاء هنا مساعد إداري محدود لا أكثر.',
                 ),
                 _buildBoundaryCard(
                   context,
@@ -232,8 +230,7 @@ class AdminAiFollowupBoundariesPage extends StatelessWidget {
                       'وظيفة الذكاء هنا تقديم اقتراحات أو ترشيحات تساعد في الاختيار ولا تستبدل التقييم الإشرافي.',
                   boundaryNote:
                       'أي اقتراح يبقى غير نافذ بذاته وغير ملزم حتى لو بدا مناسبًا.',
-                  supervisionNote:
-                      'اقتراح فقط، لا تنفيذ، لا اعتماد ذاتي.',
+                  supervisionNote: 'اقتراح فقط، لا تنفيذ، لا اعتماد ذاتي.',
                 ),
                 _buildBoundaryCard(
                   context,
@@ -242,16 +239,14 @@ class AdminAiFollowupBoundariesPage extends StatelessWidget {
                       'لا يجوز أن ينتج عن اقتراح الذكاء إرسال فعلي أو متابعة مفعلة تلقائيًا دون اعتماد واضح.',
                   boundaryNote:
                       'هذا يمنع الانزلاق من assistive mode إلى automation غير منضبطة.',
-                  supervisionNote:
-                      'لا automation هنا في المرحلة الحالية.',
+                  supervisionNote: 'لا automation هنا في المرحلة الحالية.',
                 ),
                 _buildBoundaryCard(
                   context,
                   title: 'لا تفعيل دون checkpoints',
                   summary:
                       'أي توسيع لدور الذكاء يجب أن يمر عبر checkpoints واضحة للسلامة والامتثال والرؤية الإدارية.',
-                  boundaryNote:
-                      'التفعيل لا يسبق الضوابط، بل يأتي بعدها فقط.',
+                  boundaryNote: 'التفعيل لا يسبق الضوابط، بل يأتي بعدها فقط.',
                   supervisionNote:
                       'هذا يربط الذكاء مباشرة بمنظومة الحوكمة الحالية.',
                 ),
@@ -270,8 +265,7 @@ class AdminAiFollowupBoundariesPage extends StatelessWidget {
                       'أي حالة crisis أو هشاشة مرتفعة تمنع تمامًا أي متابعة ذكية أو اقتراحات متابعة موازية.',
                   boundaryNote:
                       'السلامة تتقدم على أي رسالة أو محتوى أو pattern متابعة.',
-                  supervisionNote:
-                      'هذا حظر ثابت لا ينبغي الالتفاف حوله.',
+                  supervisionNote: 'هذا حظر ثابت لا ينبغي الالتفاف حوله.',
                 ),
                 _buildBoundaryCard(
                   context,
@@ -290,8 +284,7 @@ class AdminAiFollowupBoundariesPage extends StatelessWidget {
                       'عندما يكون المستخدم داخل جلسات نشطة، لا ينبغي للذكاء اقتراح follow-up pattern قد يتداخل مع هذا السياق.',
                   boundaryNote:
                       'هذا يمنع التضارب مع الرعاية المهنية أو تشويش تجربة المستخدم.',
-                  supervisionNote:
-                      'المتابعة الذكية هنا تبقى محجوبة بالكامل.',
+                  supervisionNote: 'المتابعة الذكية هنا تبقى محجوبة بالكامل.',
                 ),
                 _buildBoundaryCard(
                   context,
@@ -300,8 +293,7 @@ class AdminAiFollowupBoundariesPage extends StatelessWidget {
                       'أي حالة حساسة أو ملتبسة أو ذات هشاشة عاطفية مرتفعة يجب أن تمنع أي follow-up assisted by AI.',
                   boundaryNote:
                       'الحظر هنا احترازي وأخلاقي حتى قبل وجود telemetry أو automation فعلية.',
-                  supervisionNote:
-                      'الشك في الحساسية يكفي لإيقاف هذا المسار.',
+                  supervisionNote: 'الشك في الحساسية يكفي لإيقاف هذا المسار.',
                 ),
               ],
             ),
@@ -318,8 +310,7 @@ class AdminAiFollowupBoundariesPage extends StatelessWidget {
                       'يمكنه اقتراح رسالة مناسبة من الأنماط المعتمدة مسبقًا ضمن الرسائل الداعمة المعروفة.',
                   boundaryNote:
                       'لا يتحول الاقتراح إلى إرسال مستقل، ولا ينشئ من تلقاء نفسه إطارًا علاجيًا جديدًا.',
-                  supervisionNote:
-                      'الرسائل المعتمدة فقط هي نطاق العمل هنا.',
+                  supervisionNote: 'الرسائل المعتمدة فقط هي نطاق العمل هنا.',
                 ),
                 _buildBoundaryCard(
                   context,
@@ -328,8 +319,7 @@ class AdminAiFollowupBoundariesPage extends StatelessWidget {
                       'يمكنه ترشيح محتوى من المكتبة المعتمدة بما يخدم الدعم الخفيف والاستمرارية.',
                   boundaryNote:
                       'لا يجوز له إحالة المستخدم إلى محتوى غير معتمد أو خارج الإطار الآمن للمكتبة.',
-                  supervisionNote:
-                      'المكتبة تسبق الاقتراح الذكي، لا العكس.',
+                  supervisionNote: 'المكتبة تسبق الاقتراح الذكي، لا العكس.',
                 ),
                 _buildBoundaryCard(
                   context,
@@ -356,8 +346,7 @@ class AdminAiFollowupBoundariesPage extends StatelessWidget {
                       'الذكاء داخل المتابعة يعمل كمساعد اقتراحي خفيف فقط، ولا يتحول إلى صاحب قرار أو صاحب سلطة مستقلة.',
                   boundaryNote:
                       'الاقتراح يظل تابعًا للإشراف والسياسات ولا يستبدل الإدارة.',
-                  supervisionNote:
-                      'هذا هو الحد المركزي لهذه الصفحة.',
+                  supervisionNote: 'هذا هو الحد المركزي لهذه الصفحة.',
                 ),
                 _buildBoundaryCard(
                   context,
@@ -366,8 +355,7 @@ class AdminAiFollowupBoundariesPage extends StatelessWidget {
                       'كل مساهمة من الذكاء يجب أن تبقى ضمن منطق الدعم اللطيف والاستمرارية لا ضمن منطق الضغط أو الدفع.',
                   boundaryNote:
                       'الدعم يسبق أي رغبة في التوسع أو التفعيل أو التخصيص.',
-                  supervisionNote:
-                      'هذا يضمن بقاء المتابعة إنسانية وآمنة.',
+                  supervisionNote: 'هذا يضمن بقاء المتابعة إنسانية وآمنة.',
                 ),
                 _buildBoundaryCard(
                   context,
@@ -376,8 +364,7 @@ class AdminAiFollowupBoundariesPage extends StatelessWidget {
                       'السلامة تتقدم على أي اقتراح ذكي، وعلى أي متابعة، وعلى أي محاولة لتحسين engagement أو continuity.',
                   boundaryNote:
                       'أي تعارض بين السلامة والاقتراح يعني إيقاف الاقتراح فورًا من حيث المبدأ.',
-                  supervisionNote:
-                      'السلامة هنا مبدأ حاكم لا يُفاوض عليه.',
+                  supervisionNote: 'السلامة هنا مبدأ حاكم لا يُفاوض عليه.',
                 ),
                 _buildBoundaryCard(
                   context,

@@ -25,7 +25,9 @@ class ValueLabelMapper {
         return isArabic ? 'بانتظار الدفع' : 'Awaiting payment';
 
       case 'payment_review':
-        return isArabic ? 'إثبات الدفع قيد المراجعة' : 'Payment proof under review';
+        return isArabic
+            ? 'إثبات الدفع قيد المراجعة'
+            : 'Payment proof under review';
 
       /// Payout / transfer
       case 'paid_to_clinician':

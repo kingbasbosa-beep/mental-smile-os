@@ -81,16 +81,14 @@ class LibraryPolicyPage extends StatelessWidget {
                                   : 'The content is educational and supportive only. It must not be used as a replacement for a doctor or specialist. In emergencies or when there is risk of self-harm, seek immediate help from a qualified professional or local emergency service.',
                             ),
                             _PolicySection(
-                              title: isAr
-                                  ? 'الروابط الخارجية'
-                                  : 'External Links',
+                              title:
+                                  isAr ? 'الروابط الخارجية' : 'External Links',
                               body: isAr
                                   ? 'بعض الموارد قد تكون روابط خارجية. Mental Smile لا ينسخ محتوى الجهات الخارجية، ويتم عرض المصدر والحقوق عند توفرها. المستخدم مسؤول عن فتح المواقع الخارجية بحذر.'
                                   : 'Some resources may point to external links. Mental Smile does not copy third-party content, and source or rights information is shown when available. Users should open external websites carefully.',
                             ),
                             _PolicySection(
-                              title:
-                                  isAr ? 'حقوق الملكية' : 'Content Rights',
+                              title: isAr ? 'حقوق الملكية' : 'Content Rights',
                               body: isAr
                                   ? 'المحتوى الأصلي مملوك أو مرخص لـ Mental Smile. المحتوى الخارجي يستخدم كرابط أو بإذن/ترخيص عند الحاجة. أي استخدام غير مصرح به للمحتوى ممنوع.'
                                   : 'Original content is owned by or licensed to Mental Smile. External content is used as a link or with permission/license when needed. Unauthorized use of content is prohibited.',

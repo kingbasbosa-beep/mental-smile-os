@@ -1588,7 +1588,8 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                               _currentStep == 0
                                                   ? (_isArabic
                                                       ? Icons.arrow_back_rounded
-                                                      : Icons.arrow_forward_rounded)
+                                                      : Icons
+                                                          .arrow_forward_rounded)
                                                   : Icons.app_registration,
                                             ),
                                       label: Text(

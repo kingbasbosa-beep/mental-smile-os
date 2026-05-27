@@ -349,218 +349,249 @@ class _AdminClinicianRequestsPageState
                   const SizedBox(height: AppSpacing.md),
                   if (_sectionTab == 'rules') ...[
                     AppSurfaceCard(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          isArabic
-                              ? 'دليل الأخصائيين وبوابات الاعتماد'
-                              : 'Directory & Approval Gates',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          isArabic
-                              ? 'التركيز: الأخصائيون بانتظار الاعتماد. الحالات الأخرى للرجوع فقط.'
-                              : 'Focus: clinicians awaiting approval. Other states are reference views.',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.obsidian.withValues(alpha: 0.72),
-                              ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        Text(
-                          'What it is: clinician coordination layer, session-based care layer (future), and specialist involvement boundary.',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          'What it does not do currently: no active booking system, no live session orchestration, no automated matching, and no active clinician assignment.',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          'Current state: frozen, not active, not exposed to users, and not connected to other layers.',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          'Boundaries: isolated from Content & Care, isolated from Gateway, and will require strict activation rules later.',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          decoration: BoxDecoration(
-                            color: AppColors.info.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(AppRadii.lg),
-                            border: Border.all(
-                              color: AppColors.info.withValues(alpha: 0.18),
-                            ),
-                          ),
-                          child: Text(
-                            'Supervision note: medical-adjacent but not a medical system, must follow strict compliance later, and remains a safety-critical layer.',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  height: 1.35,
-                                  fontWeight: FontWeight.w600,
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isArabic
+                                ? 'دليل الأخصائيين وبوابات الاعتماد'
+                                : 'Directory & Approval Gates',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w800,
                                 ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  AppSurfaceCard(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Clinician Freeze Rules',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          'This compact section makes the current freeze status explicit without changing any workflow.',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.obsidian.withValues(alpha: 0.72),
-                              ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        Text(
-                          'Currently not allowed: no active assignment, no live scheduling, no workflow expansion, and no new integration into other layers.',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          'What must not be assumed: this layer is not production-ready, not user-facing active care, and not an approved orchestration layer.',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          'Before any future unfreeze: explicit readiness review, policy and compliance review, activation boundaries, and ownership clarification must exist first.',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          decoration: BoxDecoration(
-                            color: AppColors.danger.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(AppRadii.lg),
-                            border: Border.all(
-                              color: AppColors.danger.withValues(alpha: 0.18),
-                            ),
-                          ),
-                          child: Text(
-                            'Supervision note: frozen by design, safety-sensitive, and any change requires deliberate approval.',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  height: 1.35,
-                                  fontWeight: FontWeight.w600,
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            isArabic
+                                ? 'التركيز: الأخصائيون بانتظار الاعتماد. الحالات الأخرى للرجوع فقط.'
+                                : 'Focus: clinicians awaiting approval. Other states are reference views.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: AppColors.obsidian
+                                      .withValues(alpha: 0.72),
                                 ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  AppSurfaceCard(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Clinician Unfreeze Preconditions',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w800,
+                          const SizedBox(height: AppSpacing.md),
+                          Text(
+                            'What it is: clinician coordination layer, session-based care layer (future), and specialist involvement boundary.',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'What it does not do currently: no active booking system, no live session orchestration, no automated matching, and no active clinician assignment.',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'Current state: frozen, not active, not exposed to users, and not connected to other layers.',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'Boundaries: isolated from Content & Care, isolated from Gateway, and will require strict activation rules later.',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            decoration: BoxDecoration(
+                              color: AppColors.info.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(AppRadii.lg),
+                              border: Border.all(
+                                color: AppColors.info.withValues(alpha: 0.18),
                               ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          'This compact section clarifies what must be true before any future clinician-layer unfreeze is even considered.',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.obsidian.withValues(alpha: 0.72),
-                              ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        Text(
-                          'Preconditions before any future unfreeze: readiness review completed, policy and compliance review completed, subsystem boundaries confirmed, ownership clearly assigned, and activation sequence explicitly approved.',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          'What unfreeze does not mean: not immediate launch, not full workflow activation, and not automatic integration into other layers.',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          decoration: BoxDecoration(
-                            color: AppColors.success.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(AppRadii.lg),
-                            border: Border.all(
-                              color: AppColors.success.withValues(alpha: 0.18),
+                            ),
+                            child: Text(
+                              'Supervision note: medical-adjacent but not a medical system, must follow strict compliance later, and remains a safety-critical layer.',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    height: 1.35,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
                           ),
-                          child: Text(
-                            'Supervision note: unfreeze must be deliberate, staged activation only, and this safety-sensitive layer requires explicit approval.',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  height: 1.35,
-                                  fontWeight: FontWeight.w600,
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    AppSurfaceCard(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Clinician Freeze Rules',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w800,
                                 ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  AppSurfaceCard(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Preview Clean Workspace',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                              ),
-                              const SizedBox(height: AppSpacing.xs),
-                              Text(
-                                'Open the new parallel clinician workspace shell for controlled preview only. This does not replace or activate the frozen layer.',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(
-                                      color: AppColors.obsidian
-                                          .withValues(alpha: 0.72),
-                                    ),
-                              ),
-                            ],
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            'This compact section makes the current freeze status explicit without changing any workflow.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: AppColors.obsidian
+                                      .withValues(alpha: 0.72),
+                                ),
                           ),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        OutlinedButton(
-                          onPressed: () => Navigator.of(context).pushNamed(
-                            Routes.adminClinicianWorkspace,
+                          const SizedBox(height: AppSpacing.md),
+                          Text(
+                            'Currently not allowed: no active assignment, no live scheduling, no workflow expansion, and no new integration into other layers.',
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
-                          child: const Text('Open New Clinician Workspace'),
-                        ),
-                      ],
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'What must not be assumed: this layer is not production-ready, not user-facing active care, and not an approved orchestration layer.',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'Before any future unfreeze: explicit readiness review, policy and compliance review, activation boundaries, and ownership clarification must exist first.',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            decoration: BoxDecoration(
+                              color: AppColors.danger.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(AppRadii.lg),
+                              border: Border.all(
+                                color: AppColors.danger.withValues(alpha: 0.18),
+                              ),
+                            ),
+                            child: Text(
+                              'Supervision note: frozen by design, safety-sensitive, and any change requires deliberate approval.',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    height: 1.35,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: AppSpacing.md),
+                    AppSurfaceCard(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Clinician Unfreeze Preconditions',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            'This compact section clarifies what must be true before any future clinician-layer unfreeze is even considered.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: AppColors.obsidian
+                                      .withValues(alpha: 0.72),
+                                ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Text(
+                            'Preconditions before any future unfreeze: readiness review completed, policy and compliance review completed, subsystem boundaries confirmed, ownership clearly assigned, and activation sequence explicitly approved.',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'What unfreeze does not mean: not immediate launch, not full workflow activation, and not automatic integration into other layers.',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            decoration: BoxDecoration(
+                              color: AppColors.success.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(AppRadii.lg),
+                              border: Border.all(
+                                color:
+                                    AppColors.success.withValues(alpha: 0.18),
+                              ),
+                            ),
+                            child: Text(
+                              'Supervision note: unfreeze must be deliberate, staged activation only, and this safety-sensitive layer requires explicit approval.',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    height: 1.35,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    AppSurfaceCard(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Preview Clean Workspace',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                ),
+                                const SizedBox(height: AppSpacing.xs),
+                                Text(
+                                  'Open the new parallel clinician workspace shell for controlled preview only. This does not replace or activate the frozen layer.',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: AppColors.obsidian
+                                            .withValues(alpha: 0.72),
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          OutlinedButton(
+                            onPressed: () => Navigator.of(context).pushNamed(
+                              Routes.adminClinicianWorkspace,
+                            ),
+                            child: const Text('Open New Clinician Workspace'),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                   if (_sectionTab == 'centers') ...[
                     AppSurfaceCard(
@@ -599,8 +630,9 @@ class _AdminClinicianRequestsPageState
                             controller: _searchController,
                             onChanged: (value) =>
                                 setState(() => _search = value),
-                            textDirection:
-                                isArabic ? TextDirection.rtl : TextDirection.ltr,
+                            textDirection: isArabic
+                                ? TextDirection.rtl
+                                : TextDirection.ltr,
                             decoration: appInputDecoration(
                               context: context,
                               label: isArabic
@@ -625,15 +657,18 @@ class _AdminClinicianRequestsPageState
                                   ),
                                   DropdownMenuItem(
                                     value: 'pending_review',
-                                    child: Text(isArabic ? 'قيد المراجعة' : 'Pending'),
+                                    child: Text(
+                                        isArabic ? 'قيد المراجعة' : 'Pending'),
                                   ),
                                   DropdownMenuItem(
                                     value: 'approved',
-                                    child: Text(isArabic ? 'مقبول' : 'Approved'),
+                                    child:
+                                        Text(isArabic ? 'مقبول' : 'Approved'),
                                   ),
                                   DropdownMenuItem(
                                     value: 'rejected',
-                                    child: Text(isArabic ? 'مرفوض' : 'Rejected'),
+                                    child:
+                                        Text(isArabic ? 'مرفوض' : 'Rejected'),
                                   ),
                                 ],
                                 onChanged: (value) {
@@ -656,7 +691,8 @@ class _AdminClinicianRequestsPageState
                                   ),
                                   DropdownMenuItem(
                                     value: 'inactive',
-                                    child: Text(isArabic ? 'غير نشط' : 'Inactive'),
+                                    child:
+                                        Text(isArabic ? 'غير نشط' : 'Inactive'),
                                   ),
                                   DropdownMenuItem(
                                     value: 'blocked',
@@ -664,7 +700,8 @@ class _AdminClinicianRequestsPageState
                                   ),
                                   DropdownMenuItem(
                                     value: 'unblocked',
-                                    child: Text(isArabic ? 'غير محظور' : 'Unblocked'),
+                                    child: Text(
+                                        isArabic ? 'غير محظور' : 'Unblocked'),
                                   ),
                                 ],
                                 onChanged: (value) {
@@ -696,253 +733,260 @@ class _AdminClinicianRequestsPageState
                     ),
                     const SizedBox(height: AppSpacing.md),
                     AppSurfaceCard(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Wrap(
-                      spacing: AppSpacing.sm,
-                      runSpacing: AppSpacing.sm,
-                      alignment: WrapAlignment.end,
-                      children: [
-                        ChoiceChip(
-                          selected: _tab == 'pending',
-                          label: Text(
-                            isArabic
-                                ? 'بانتظار الإدارة ($pendingCount)'
-                                : 'Pending ($pendingCount)',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w800,
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Wrap(
+                        spacing: AppSpacing.sm,
+                        runSpacing: AppSpacing.sm,
+                        alignment: WrapAlignment.end,
+                        children: [
+                          ChoiceChip(
+                            selected: _tab == 'pending',
+                            label: Text(
+                              isArabic
+                                  ? 'بانتظار الإدارة ($pendingCount)'
+                                  : 'Pending ($pendingCount)',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
+                            onSelected: (_) => setState(() => _tab = 'pending'),
                           ),
-                          onSelected: (_) => setState(() => _tab = 'pending'),
-                        ),
-                        ChoiceChip(
-                          selected: _tab == 'approved',
-                          label: Text(
-                            isArabic
-                                ? 'مقبولون ($approvedCount)'
-                                : 'Approved ($approvedCount)',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.obsidian.withValues(alpha: 0.72),
+                          ChoiceChip(
+                            selected: _tab == 'approved',
+                            label: Text(
+                              isArabic
+                                  ? 'مقبولون ($approvedCount)'
+                                  : 'Approved ($approvedCount)',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color:
+                                    AppColors.obsidian.withValues(alpha: 0.72),
+                              ),
                             ),
+                            onSelected: (_) =>
+                                setState(() => _tab = 'approved'),
                           ),
-                          onSelected: (_) => setState(() => _tab = 'approved'),
-                        ),
-                        ChoiceChip(
-                          selected: _tab == 'rejected',
-                          label: Text(
-                            isArabic
-                                ? 'مرفوضون ($rejectedCount)'
-                                : 'Rejected ($rejectedCount)',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.obsidian.withValues(alpha: 0.72),
+                          ChoiceChip(
+                            selected: _tab == 'rejected',
+                            label: Text(
+                              isArabic
+                                  ? 'مرفوضون ($rejectedCount)'
+                                  : 'Rejected ($rejectedCount)',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color:
+                                    AppColors.obsidian.withValues(alpha: 0.72),
+                              ),
                             ),
+                            onSelected: (_) =>
+                                setState(() => _tab = 'rejected'),
                           ),
-                          onSelected: (_) => setState(() => _tab = 'rejected'),
-                        ),
-                        ChoiceChip(
-                          selected: _tab == 'blocked',
-                          label: Text(
-                            isArabic
-                                ? 'محظورون ($blockedCount)'
-                                : 'Blocked ($blockedCount)',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.obsidian.withValues(alpha: 0.72),
+                          ChoiceChip(
+                            selected: _tab == 'blocked',
+                            label: Text(
+                              isArabic
+                                  ? 'محظورون ($blockedCount)'
+                                  : 'Blocked ($blockedCount)',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color:
+                                    AppColors.obsidian.withValues(alpha: 0.72),
+                              ),
                             ),
+                            onSelected: (_) => setState(() => _tab = 'blocked'),
                           ),
-                          onSelected: (_) => setState(() => _tab = 'blocked'),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  if (docs.isEmpty)
-                    AppEmptyState(
-                      message: isArabic
-                          ? 'لا توجد طلبات في هذا القسم'
-                          : 'No requests in this section',
-                    )
-                  else
-                    ...docs.map((doc) {
-                      final data = doc.data();
-                      final id = doc.id;
-                      final name = (data['displayName'] ?? '').toString();
-                      final email = (data['email'] ?? '').toString();
-                      final specialty = (data['specialty'] ?? '').toString();
-                      final status =
-                          (data['approvalStatus'] ?? 'pending_review')
-                              .toString();
-                      final titleAr =
-                          (data['professionalTitleLabelAr'] ?? '').toString();
-                      final groupSessions =
-                          (data['offersGroupSessions'] ?? false) == true;
-                      final isBlocked = (data['isBlocked'] ?? false) == true;
-                      final blockReason =
-                          (data['blockReason'] ?? '').toString().trim();
-                      final blockedAt = _dateText(data['blockedAt']);
-                      final identityFile =
-                          (data['identityFileName'] ?? '').toString();
-                      final certificateFile =
-                          (data['certificateFileName'] ?? '').toString();
+                    const SizedBox(height: AppSpacing.md),
+                    if (docs.isEmpty)
+                      AppEmptyState(
+                        message: isArabic
+                            ? 'لا توجد طلبات في هذا القسم'
+                            : 'No requests in this section',
+                      )
+                    else
+                      ...docs.map((doc) {
+                        final data = doc.data();
+                        final id = doc.id;
+                        final name = (data['displayName'] ?? '').toString();
+                        final email = (data['email'] ?? '').toString();
+                        final specialty = (data['specialty'] ?? '').toString();
+                        final status =
+                            (data['approvalStatus'] ?? 'pending_review')
+                                .toString();
+                        final titleAr =
+                            (data['professionalTitleLabelAr'] ?? '').toString();
+                        final groupSessions =
+                            (data['offersGroupSessions'] ?? false) == true;
+                        final isBlocked = (data['isBlocked'] ?? false) == true;
+                        final blockReason =
+                            (data['blockReason'] ?? '').toString().trim();
+                        final blockedAt = _dateText(data['blockedAt']);
+                        final identityFile =
+                            (data['identityFileName'] ?? '').toString();
+                        final certificateFile =
+                            (data['certificateFileName'] ?? '').toString();
 
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                        child: AppSurfaceCard(
-                          padding: const EdgeInsets.all(AppSpacing.lg),
-                          child: Column(
-                            crossAxisAlignment: isArabic
-                                ? CrossAxisAlignment.end
-                                : CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                textDirection: isArabic
-                                    ? TextDirection.rtl
-                                    : TextDirection.ltr,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: isArabic
-                                          ? CrossAxisAlignment.end
-                                          : CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          [titleAr, name]
-                                              .where((e) => e.trim().isNotEmpty)
-                                              .join(' '),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge,
-                                          textAlign: isArabic
-                                              ? TextAlign.right
-                                              : TextAlign.left,
-                                        ),
-                                        const SizedBox(height: AppSpacing.xs),
-                                        Text(
-                                          email.isEmpty
-                                              ? (isArabic
-                                                  ? 'بدون بريد'
-                                                  : 'No email')
-                                              : email,
-                                          textAlign: isArabic
-                                              ? TextAlign.right
-                                              : TextAlign.left,
-                                        ),
-                                      ],
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                          child: AppSurfaceCard(
+                            padding: const EdgeInsets.all(AppSpacing.lg),
+                            child: Column(
+                              crossAxisAlignment: isArabic
+                                  ? CrossAxisAlignment.end
+                                  : CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  textDirection: isArabic
+                                      ? TextDirection.rtl
+                                      : TextDirection.ltr,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: isArabic
+                                            ? CrossAxisAlignment.end
+                                            : CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            [titleAr, name]
+                                                .where(
+                                                    (e) => e.trim().isNotEmpty)
+                                                .join(' '),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleLarge,
+                                            textAlign: isArabic
+                                                ? TextAlign.right
+                                                : TextAlign.left,
+                                          ),
+                                          const SizedBox(height: AppSpacing.xs),
+                                          Text(
+                                            email.isEmpty
+                                                ? (isArabic
+                                                    ? 'بدون بريد'
+                                                    : 'No email')
+                                                : email,
+                                            textAlign: isArabic
+                                                ? TextAlign.right
+                                                : TextAlign.left,
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: AppSpacing.sm),
-                                  AppStatusBadge(
-                                    label: _statusLabel(status, isArabic),
-                                    color: _statusColor(status),
-                                  ),
-                                  if (isBlocked) ...[
-                                    const SizedBox(width: AppSpacing.xs),
+                                    const SizedBox(width: AppSpacing.sm),
                                     AppStatusBadge(
-                                      label: isArabic ? 'محظور' : 'Blocked',
-                                      color: AppColors.danger,
+                                      label: _statusLabel(status, isArabic),
+                                      color: _statusColor(status),
                                     ),
+                                    if (isBlocked) ...[
+                                      const SizedBox(width: AppSpacing.xs),
+                                      AppStatusBadge(
+                                        label: isArabic ? 'محظور' : 'Blocked',
+                                        color: AppColors.danger,
+                                      ),
+                                    ],
                                   ],
-                                ],
-                              ),
-                              const SizedBox(height: AppSpacing.sm),
-                              Text(
-                                isArabic
-                                    ? 'التخصص: $specialty'
-                                    : 'Specialty: $specialty',
-                              ),
-                              const SizedBox(height: AppSpacing.xxs),
-                              Text(
-                                isArabic
-                                    ? 'جروبات جماعية: ${groupSessions ? "نعم" : "لا"}'
-                                    : 'Group sessions: ${groupSessions ? "Yes" : "No"}',
-                              ),
-                              const SizedBox(height: AppSpacing.xxs),
-                              Text(
-                                isArabic
-                                    ? 'ملف الهوية: ${identityFile.isEmpty ? "غير مرفوع" : identityFile}'
-                                    : 'Identity file: ${identityFile.isEmpty ? "Not uploaded" : identityFile}',
-                              ),
-                              const SizedBox(height: AppSpacing.xxs),
-                              Text(
-                                isArabic
-                                    ? 'ملف الشهادة: ${certificateFile.isEmpty ? "غير مرفوع" : certificateFile}'
-                                    : 'Certificate file: ${certificateFile.isEmpty ? "Not uploaded" : certificateFile}',
-                              ),
-                              if (isBlocked) ...[
+                                ),
+                                const SizedBox(height: AppSpacing.sm),
+                                Text(
+                                  isArabic
+                                      ? 'التخصص: $specialty'
+                                      : 'Specialty: $specialty',
+                                ),
                                 const SizedBox(height: AppSpacing.xxs),
                                 Text(
                                   isArabic
-                                      ? 'سبب الحظر: ${blockReason.isEmpty ? "غير محدد" : blockReason}'
-                                      : 'Block reason: ${blockReason.isEmpty ? "Not provided" : blockReason}',
+                                      ? 'جروبات جماعية: ${groupSessions ? "نعم" : "لا"}'
+                                      : 'Group sessions: ${groupSessions ? "Yes" : "No"}',
                                 ),
-                                if (blockedAt.isNotEmpty) ...[
+                                const SizedBox(height: AppSpacing.xxs),
+                                Text(
+                                  isArabic
+                                      ? 'ملف الهوية: ${identityFile.isEmpty ? "غير مرفوع" : identityFile}'
+                                      : 'Identity file: ${identityFile.isEmpty ? "Not uploaded" : identityFile}',
+                                ),
+                                const SizedBox(height: AppSpacing.xxs),
+                                Text(
+                                  isArabic
+                                      ? 'ملف الشهادة: ${certificateFile.isEmpty ? "غير مرفوع" : certificateFile}'
+                                      : 'Certificate file: ${certificateFile.isEmpty ? "Not uploaded" : certificateFile}',
+                                ),
+                                if (isBlocked) ...[
                                   const SizedBox(height: AppSpacing.xxs),
                                   Text(
                                     isArabic
-                                        ? 'تاريخ الحظر: $blockedAt'
-                                        : 'Blocked at: $blockedAt',
+                                        ? 'سبب الحظر: ${blockReason.isEmpty ? "غير محدد" : blockReason}'
+                                        : 'Block reason: ${blockReason.isEmpty ? "Not provided" : blockReason}',
                                   ),
+                                  if (blockedAt.isNotEmpty) ...[
+                                    const SizedBox(height: AppSpacing.xxs),
+                                    Text(
+                                      isArabic
+                                          ? 'تاريخ الحظر: $blockedAt'
+                                          : 'Blocked at: $blockedAt',
+                                    ),
+                                  ],
                                 ],
-                              ],
-                              const SizedBox(height: AppSpacing.md),
-                              Wrap(
-                                spacing: AppSpacing.sm,
-                                runSpacing: AppSpacing.sm,
-                                alignment: WrapAlignment.end,
-                                children: [
-                                  if (status != 'approved')
-                                    FilledButton.icon(
-                                      onPressed: () => _approve(id),
-                                      icon: const Icon(
-                                          Icons.check_circle_outline),
-                                      label:
-                                          Text(isArabic ? 'قبول' : 'Approve'),
-                                    ),
-                                  if (status != 'rejected')
+                                const SizedBox(height: AppSpacing.md),
+                                Wrap(
+                                  spacing: AppSpacing.sm,
+                                  runSpacing: AppSpacing.sm,
+                                  alignment: WrapAlignment.end,
+                                  children: [
+                                    if (status != 'approved')
+                                      FilledButton.icon(
+                                        onPressed: () => _approve(id),
+                                        icon: const Icon(
+                                            Icons.check_circle_outline),
+                                        label:
+                                            Text(isArabic ? 'قبول' : 'Approve'),
+                                      ),
+                                    if (status != 'rejected')
+                                      OutlinedButton.icon(
+                                        onPressed: () => _reject(id),
+                                        icon: const Icon(Icons.cancel_outlined),
+                                        label:
+                                            Text(isArabic ? 'رفض' : 'Reject'),
+                                        style: appDestructiveButtonStyle(),
+                                      ),
+                                    if (status != 'pending_review')
+                                      TextButton.icon(
+                                        onPressed: () => _returnToPending(id),
+                                        icon: const Icon(Icons.refresh),
+                                        label: Text(
+                                          isArabic
+                                              ? 'إرجاع للبندنج'
+                                              : 'Return to pending',
+                                        ),
+                                      ),
                                     OutlinedButton.icon(
-                                      onPressed: () => _reject(id),
-                                      icon: const Icon(Icons.cancel_outlined),
-                                      label: Text(isArabic ? 'رفض' : 'Reject'),
-                                      style: appDestructiveButtonStyle(),
-                                    ),
-                                  if (status != 'pending_review')
-                                    TextButton.icon(
-                                      onPressed: () => _returnToPending(id),
-                                      icon: const Icon(Icons.refresh),
+                                      onPressed: () => _toggleBlock(
+                                        context: context,
+                                        clinicianId: id,
+                                        currentlyBlocked: isBlocked,
+                                      ),
+                                      icon: Icon(
+                                        isBlocked
+                                            ? Icons.lock_open_outlined
+                                            : Icons.block_outlined,
+                                      ),
                                       label: Text(
-                                        isArabic
-                                            ? 'إرجاع للبندنج'
-                                            : 'Return to pending',
+                                        isBlocked
+                                            ? (isArabic
+                                                ? 'إلغاء الحظر'
+                                                : 'Unblock')
+                                            : (isArabic ? 'حظر' : 'Block'),
                                       ),
                                     ),
-                                  OutlinedButton.icon(
-                                    onPressed: () => _toggleBlock(
-                                      context: context,
-                                      clinicianId: id,
-                                      currentlyBlocked: isBlocked,
-                                    ),
-                                    icon: Icon(
-                                      isBlocked
-                                          ? Icons.lock_open_outlined
-                                          : Icons.block_outlined,
-                                    ),
-                                    label: Text(
-                                      isBlocked
-                                          ? (isArabic
-                                              ? 'إلغاء الحظر'
-                                              : 'Unblock')
-                                          : (isArabic ? 'حظر' : 'Block'),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    }),
+                        );
+                      }),
                   ],
                 ],
               );

@@ -178,8 +178,8 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const SizedBox(height: 16),
-                              ...kRequiredCenterDocumentTypes
-                                  .map((item) => _documentSection(context, item)),
+                              ...kRequiredCenterDocumentTypes.map(
+                                  (item) => _documentSection(context, item)),
                               if (_error != null) ...[
                                 const SizedBox(height: 10),
                                 Text(
@@ -242,7 +242,8 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
       padding: const EdgeInsets.only(bottom: 16),
       child: ExpansionTile(
         initiallyExpanded: true,
-        title: Text(isArabic ? (item['labelAr'] ?? type) : (item['labelEn'] ?? type)),
+        title: Text(
+            isArabic ? (item['labelAr'] ?? type) : (item['labelEn'] ?? type)),
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         children: [
           TextFormField(

@@ -44,7 +44,8 @@ class AdminPaymentDecisionAdapter {
   }
 
   Future<AdminApprovePaymentResult> approvePayment(String requestId) async {
-    final snap = await _firestore.collection('booking_requests').doc(requestId).get();
+    final snap =
+        await _firestore.collection('booking_requests').doc(requestId).get();
     final data = snap.data() ?? const <String, dynamic>{};
     final isCenterRequest =
         (data['requestKind'] ?? '').toString().trim() == 'center' ||

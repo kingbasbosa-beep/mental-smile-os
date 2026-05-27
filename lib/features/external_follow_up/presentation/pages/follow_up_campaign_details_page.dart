@@ -25,9 +25,8 @@ class _FollowUpCampaignDetailsPageState
   Widget build(BuildContext context) {
     final campaign = widget.campaign;
     final recipients = campaign.recipientSample.take(5).toList();
-    final whatsappRecipients = recipients
-        .where(_isLikelyWhatsAppRecipient)
-        .toList();
+    final whatsappRecipients =
+        recipients.where(_isLikelyWhatsAppRecipient).toList();
     final remainingCount = campaign.recipientCount > recipients.length
         ? campaign.recipientCount - recipients.length
         : 0;
@@ -129,7 +128,9 @@ class _FollowUpCampaignDetailsPageState
                         children: [
                           Text(
                             'أول 5 مستلمين',
-                            style: Theme.of(context).textTheme.bodyMedium
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w700,
                                 ),

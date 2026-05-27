@@ -903,22 +903,16 @@ class AppRouter {
 
       case Routes.clinicianChatInbox:
       case Routes.clinicianChatInboxLegacy:
-        final uid = FirebaseAuth.instance.currentUser?.uid;
-        if (uid == null || uid.isEmpty) {
-          return MaterialPageRoute(
-            builder: (ctx) => Scaffold(
-              body: Center(
-                child: Text(AppLocalizations.of(ctx)!.routeNotFound),
-              ),
-            ),
-            settings: settings,
-          );
-        }
         return MaterialPageRoute(
           builder: (_) => _RouteAccessGate(
             routeName: settings.name,
             allowedRoles: _requiredRoles(settings.name),
-            child: ClinicianChatInboxPage(clinicianUid: uid),
+            child: Builder(
+              builder: (context) {
+                final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+                return ClinicianChatInboxPage(clinicianUid: uid);
+              },
+            ),
           ),
           settings: settings,
         );
@@ -1446,7 +1440,12 @@ class _RouteAccessGate extends StatelessWidget {
         (access.role == _roleClinician || access.role == _roleCenter);
     if (needsApproval &&
         (normalizedApprovalStatus != 'approved' || !access.isActive)) {
-      final rejectedStates = {'rejected', 'denied', 'declined'};
+      final rejectedStates = {
+        'rejected',
+        'rejected_admin',
+        'denied',
+        'declined',
+      };
       final isRejected = rejectedStates.contains(normalizedApprovalStatus);
       _adminGuardTrace(
         'route=$routeName '

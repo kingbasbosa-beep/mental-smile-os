@@ -32,27 +32,32 @@ class _AdminWorkspaceCommandCenterPageState
   final List<_WorkspaceTool> _tools = const [
     _WorkspaceTool(
       title: 'Canva',
-      description: 'Design posts, thumbnails, story frames, and reusable brand kits.',
+      description:
+          'Design posts, thumbnails, story frames, and reusable brand kits.',
       url: _canvaUrl,
     ),
     _WorkspaceTool(
       title: 'CapCut',
-      description: 'Edit reels, short clips, captions, and visual timing passes.',
+      description:
+          'Edit reels, short clips, captions, and visual timing passes.',
       url: _capCutUrl,
     ),
     _WorkspaceTool(
       title: 'WhatsApp Business',
-      description: 'Marketing tool for audience messaging and business communication with no automation.',
+      description:
+          'Marketing tool for audience messaging and business communication with no automation.',
       url: _whatsAppBusinessUrl,
     ),
     _WorkspaceTool(
       title: 'Meta Business Suite',
-      description: 'Manual publishing destination and post-link follow-up surface.',
+      description:
+          'Manual publishing destination and post-link follow-up surface.',
       url: _metaBusinessSuiteUrl,
     ),
     _WorkspaceTool(
       title: 'Google Drive / Assets',
-      description: 'Open asset folders, drafts, references, and upload-ready bundles.',
+      description:
+          'Open asset folders, drafts, references, and upload-ready bundles.',
       url: _googleDriveUrl,
     ),
   ];
@@ -85,7 +90,8 @@ class _AdminWorkspaceCommandCenterPageState
       assetsFolderLink: 'https://drive.google.com/',
       exportLink: '',
       publishLink: '',
-      caption: 'A carousel draft focused on clearing common recovery myths for families.',
+      caption:
+          'A carousel draft focused on clearing common recovery myths for families.',
       script: 'Slide 1 hook, Slide 2 myth, Slide 3 correction, Slide 4 CTA.',
     ),
     _ContentCardData(
@@ -121,7 +127,8 @@ class _AdminWorkspaceCommandCenterPageState
       assetsFolderLink: 'https://drive.google.com/',
       exportLink: '',
       publishLink: '',
-      caption: 'Partnership post highlighting supervised collaboration pathways.',
+      caption:
+          'Partnership post highlighting supervised collaboration pathways.',
       script: 'Static visual pack only.',
     ),
     _ContentCardData(
@@ -579,7 +586,8 @@ class _AdminWorkspaceCommandCenterPageState
                   child: Text(
                     'No items in this section.',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: const Color(0xFF314A5C).withValues(alpha: 0.88),
+                          color:
+                              const Color(0xFF314A5C).withValues(alpha: 0.88),
                         ),
                   ),
                 )
@@ -791,7 +799,8 @@ class _AdminWorkspaceCommandCenterPageState
                   const SizedBox(height: AppSpacing.md),
                   AppSectionPanel(
                     color: const Color(0xFF0B1014).withValues(alpha: 0.92),
-                    borderColor: const Color(0xFFD8B26A).withValues(alpha: 0.18),
+                    borderColor:
+                        const Color(0xFFD8B26A).withValues(alpha: 0.18),
                     padding: const EdgeInsets.all(AppSpacing.md),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

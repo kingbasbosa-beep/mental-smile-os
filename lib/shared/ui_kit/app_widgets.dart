@@ -468,16 +468,16 @@ class GoldPageTitle extends StatelessWidget {
             title,
             textAlign: TextAlign.right,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: AppColors.mutedGold,
-                  fontWeight: FontWeight.w900,
-                  height: 1.2,
-                  shadows: [
-                    Shadow(
-                      color: AppColors.mutedGold.withValues(alpha: 0.24),
-                      blurRadius: 12,
-                    ),
-                  ],
+              color: AppColors.mutedGold,
+              fontWeight: FontWeight.w900,
+              height: 1.2,
+              shadows: [
+                Shadow(
+                  color: AppColors.mutedGold.withValues(alpha: 0.24),
+                  blurRadius: 12,
                 ),
+              ],
+            ),
           ),
         ),
       ),

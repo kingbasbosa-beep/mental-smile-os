@@ -27,7 +27,8 @@ class SpecialistsListPage extends StatelessWidget {
   }
 
   Map<String, dynamic>? _returnArguments() {
-    final parentReturnRoute = (args['parentReturnRoute'] ?? '').toString().trim();
+    final parentReturnRoute =
+        (args['parentReturnRoute'] ?? '').toString().trim();
     if (parentReturnRoute.isEmpty) return null;
     return {'returnRoute': parentReturnRoute};
   }

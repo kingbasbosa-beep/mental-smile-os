@@ -1014,429 +1014,432 @@ class _MyBookingsPageState extends State<MyBookingsPage> {
                         ),
                         _statusTabs(context),
                         Expanded(
-                        child: (u == null)
-                            ? const Center(
-                                child: Text(
-                                  'سجّل الدخول أولًا',
-                                  style: TextStyle(color: Color(0xFFFFF4D4)),
-                                ),
-                              )
-                            : StreamBuilder<
-                                List<
-                                    QueryDocumentSnapshot<
-                                        Map<String, dynamic>>>>(
-                                stream: _requestsStream(u.uid),
-                                builder: (context, snap) {
-                                  if (snap.hasError) {
-                                    return Center(
-                                      child: Text(
-                                        'خطأ: ${snap.error}',
-                                        style: const TextStyle(
-                                          color: Color(0xFFFFF4D4),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  if (!snap.hasData) {
-                                    return const Center(
-                                      child: CircularProgressIndicator(
-                                        color: Color(0xFFE7C766),
-                                      ),
-                                    );
-                                  }
-
-                                  final docs = snap.data ?? const [];
-                                  if (docs.isEmpty) {
-                                    return _emptyState(context);
-                                  }
-
-                                  final deduped = <String,
+                          child: (u == null)
+                              ? const Center(
+                                  child: Text(
+                                    'سجّل الدخول أولًا',
+                                    style: TextStyle(color: Color(0xFFFFF4D4)),
+                                  ),
+                                )
+                              : StreamBuilder<
+                                  List<
                                       QueryDocumentSnapshot<
-                                          Map<String, dynamic>>>{};
+                                          Map<String, dynamic>>>>(
+                                  stream: _requestsStream(u.uid),
+                                  builder: (context, snap) {
+                                    if (snap.hasError) {
+                                      return Center(
+                                        child: Text(
+                                          'خطأ: ${snap.error}',
+                                          style: const TextStyle(
+                                            color: Color(0xFFFFF4D4),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    if (!snap.hasData) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Color(0xFFE7C766),
+                                        ),
+                                      );
+                                    }
 
-                                  for (final doc in docs) {
-                                    final d = doc.data();
-                                    final kind =
-                                        (d['requestKind'] ?? 'clinician')
-                                            .toString();
-                                    final requestGroupId =
-                                        (d['requestGroupId'] ?? '').toString();
-                                    final centerId =
-                                        (d['centerId'] ?? '').toString();
-                                    final clinicianId =
-                                        (d['assignedClinicianId'] ??
-                                                d['clinicianId'] ??
-                                                '')
-                                            .toString();
-                                    final createdAt = _fmtTime(d['createdAt']);
+                                    final docs = snap.data ?? const [];
+                                    if (docs.isEmpty) {
+                                      return _emptyState(context);
+                                    }
 
-                                    final key = kind == 'center'
-                                        ? (requestGroupId.isNotEmpty
-                                            ? 'center-group|$requestGroupId'
-                                            : 'center|$centerId|$createdAt')
-                                        : 'clinician|$clinicianId|$createdAt';
+                                    final deduped = <String,
+                                        QueryDocumentSnapshot<
+                                            Map<String, dynamic>>>{};
 
-                                    deduped.putIfAbsent(key, () => doc);
-                                  }
-
-                                  final visibleDocs = deduped.values.toList()
-                                    ..retainWhere((doc) {
-                                      final data = doc.data();
-                                      final status =
-                                          (data['status'] ?? '').toString();
-                                      return _matchesClientView(status);
-                                    })
-                                    ..sort(_compareCreatedAt);
-
-                                  if (visibleDocs.isEmpty) {
-                                    return _emptyState(context);
-                                  }
-
-                                  return ListView.separated(
-                                    padding: const EdgeInsets.all(12),
-                                    itemCount: visibleDocs.length,
-                                    separatorBuilder: (context, index) =>
-                                        const SizedBox(height: 10),
-                                    itemBuilder: (context, i) {
-                                      final d = visibleDocs[i].data();
-
-                                      final requestKind =
+                                    for (final doc in docs) {
+                                      final d = doc.data();
+                                      final kind =
                                           (d['requestKind'] ?? 'clinician')
                                               .toString();
-                                      final isCenter = requestKind == 'center';
-                                      final clinicianName =
-                                          (d['assignedClinicianName'] ??
-                                                  d['clinicianName'] ??
-                                                  '')
+                                      final requestGroupId =
+                                          (d['requestGroupId'] ?? '')
                                               .toString();
                                       final centerId =
                                           (d['centerId'] ?? '').toString();
-                                      final centerName =
-                                          (d['centerName'] ?? '').toString();
-                                      final status =
-                                          (d['status'] ?? '').toString();
-                                      final centerAvailabilityStatus =
-                                          (d['centerAvailabilityStatus'] ?? '')
-                                              .toString()
-                                              .trim();
-                                      final centerAvailable = isCenter &&
-                                          centerAvailabilityStatus ==
-                                              'available';
-                                      final centerUnavailable = isCenter &&
-                                          centerAvailabilityStatus ==
-                                              'unavailable';
+                                      final clinicianId =
+                                          (d['assignedClinicianId'] ??
+                                                  d['clinicianId'] ??
+                                                  '')
+                                              .toString();
+                                      final createdAt =
+                                          _fmtTime(d['createdAt']);
 
-                                      final title = isCenter
-                                          ? (centerName.isEmpty
-                                              ? 'طلب مركز'
-                                              : centerName)
-                                          : (clinicianName.isEmpty
-                                              ? 'الأخصائي'
-                                              : clinicianName);
+                                      final key = kind == 'center'
+                                          ? (requestGroupId.isNotEmpty
+                                              ? 'center-group|$requestGroupId'
+                                              : 'center|$centerId|$createdAt')
+                                          : 'clinician|$clinicianId|$createdAt';
 
-                                      final subtitleParts =
-                                          _clientDetails(d, l10n);
+                                      deduped.putIfAbsent(key, () => doc);
+                                    }
 
-                                      return Container(
-                                        decoration:
-                                            _glassDecoration(alpha: 0.34),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(14),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          title,
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .titleMedium
-                                                                  ?.copyWith(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w800,
-                                                                    color: const Color(
-                                                                        0xFFE7C766),
-                                                                  ),
-                                                        ),
-                                                        const SizedBox(
-                                                            height: 8),
-                                                        Text(
-                                                          subtitleParts
-                                                              .join(' • '),
-                                                          style:
-                                                              const TextStyle(
-                                                            height: 1.5,
-                                                            color: Color(
-                                                                0xFFFFF4D4),
+                                    final visibleDocs = deduped.values.toList()
+                                      ..retainWhere((doc) {
+                                        final data = doc.data();
+                                        final status =
+                                            (data['status'] ?? '').toString();
+                                        return _matchesClientView(status);
+                                      })
+                                      ..sort(_compareCreatedAt);
+
+                                    if (visibleDocs.isEmpty) {
+                                      return _emptyState(context);
+                                    }
+
+                                    return ListView.separated(
+                                      padding: const EdgeInsets.all(12),
+                                      itemCount: visibleDocs.length,
+                                      separatorBuilder: (context, index) =>
+                                          const SizedBox(height: 10),
+                                      itemBuilder: (context, i) {
+                                        final d = visibleDocs[i].data();
+
+                                        final requestKind =
+                                            (d['requestKind'] ?? 'clinician')
+                                                .toString();
+                                        final isCenter =
+                                            requestKind == 'center';
+                                        final clinicianName =
+                                            (d['assignedClinicianName'] ??
+                                                    d['clinicianName'] ??
+                                                    '')
+                                                .toString();
+                                        final centerId =
+                                            (d['centerId'] ?? '').toString();
+                                        final centerName =
+                                            (d['centerName'] ?? '').toString();
+                                        final status =
+                                            (d['status'] ?? '').toString();
+                                        final centerAvailabilityStatus =
+                                            (d['centerAvailabilityStatus'] ??
+                                                    '')
+                                                .toString()
+                                                .trim();
+                                        final centerAvailable = isCenter &&
+                                            centerAvailabilityStatus ==
+                                                'available';
+                                        final centerUnavailable = isCenter &&
+                                            centerAvailabilityStatus ==
+                                                'unavailable';
+
+                                        final title = isCenter
+                                            ? (centerName.isEmpty
+                                                ? 'طلب مركز'
+                                                : centerName)
+                                            : (clinicianName.isEmpty
+                                                ? 'الأخصائي'
+                                                : clinicianName);
+
+                                        final subtitleParts =
+                                            _clientDetails(d, l10n);
+
+                                        return Container(
+                                          decoration:
+                                              _glassDecoration(alpha: 0.34),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(14),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            title,
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .titleMedium
+                                                                ?.copyWith(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w800,
+                                                                  color: const Color(
+                                                                      0xFFE7C766),
+                                                                ),
                                                           ),
+                                                          const SizedBox(
+                                                              height: 8),
+                                                          Text(
+                                                            subtitleParts
+                                                                .join(' • '),
+                                                            style:
+                                                                const TextStyle(
+                                                              height: 1.5,
+                                                              color: Color(
+                                                                  0xFFFFF4D4),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 12),
+                                                    Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 6,
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                        color: _badgeTint(
+                                                          requestKind,
+                                                          status,
                                                         ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 12),
-                                                  Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 6,
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                      color: _badgeTint(
-                                                        requestKind,
-                                                        status,
+                                                        border: Border.all(
+                                                          color: const Color(
+                                                                  0xFFE7C766)
+                                                              .withValues(
+                                                                  alpha: 0.24),
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(999),
                                                       ),
-                                                      border: Border.all(
-                                                        color: const Color(
-                                                                0xFFE7C766)
-                                                            .withValues(
-                                                                alpha: 0.24),
+                                                      child: Text(
+                                                        _localizedBadgeLabel(
+                                                          isArabic,
+                                                          requestKind,
+                                                          status,
+                                                          l10n,
+                                                        ),
+                                                        style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          fontSize: 12,
+                                                          color:
+                                                              Color(0xFFFFF4D4),
+                                                        ),
                                                       ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              999),
                                                     ),
-                                                    child: Text(
-                                                      _localizedBadgeLabel(
-                                                        isArabic,
-                                                        requestKind,
-                                                        status,
-                                                        l10n,
-                                                      ),
-                                                      style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        fontSize: 12,
-                                                        color:
-                                                            Color(0xFFFFF4D4),
+                                                  ],
+                                                ),
+                                                if (isCenter &&
+                                                    status ==
+                                                        'client_update_required') ...[
+                                                  const SizedBox(height: 12),
+                                                  Align(
+                                                    alignment:
+                                                        AlignmentDirectional
+                                                            .centerStart,
+                                                    child: FilledButton.icon(
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pushNamed(
+                                                          Routes
+                                                              .centerBookingRequest,
+                                                          arguments:
+                                                              CenterBookingRequestArgs(
+                                                            centerId:
+                                                                (d['centerId'] ??
+                                                                        '')
+                                                                    .toString(),
+                                                            centerName:
+                                                                centerName,
+                                                            centerType:
+                                                                (d['selectedCenterType'] ??
+                                                                        '')
+                                                                    .toString(),
+                                                            hasDetoxUnit:
+                                                                (d['centerHasDetoxUnit'] ??
+                                                                        false) ==
+                                                                    true,
+                                                            existingRequestId:
+                                                                visibleDocs[i]
+                                                                    .id,
+                                                          ),
+                                                        );
+                                                      },
+                                                      icon: const Icon(
+                                                          Icons.edit_outlined),
+                                                      label: Text(
+                                                        l10n.bookingEditAccommodation,
                                                       ),
                                                     ),
                                                   ),
                                                 ],
-                                              ),
-                                              if (isCenter &&
-                                                  status ==
-                                                      'client_update_required') ...[
-                                                const SizedBox(height: 12),
-                                                Align(
-                                                  alignment:
-                                                      AlignmentDirectional
-                                                          .centerStart,
-                                                  child: FilledButton.icon(
-                                                    onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pushNamed(
-                                                        Routes
-                                                            .centerBookingRequest,
-                                                        arguments:
-                                                            CenterBookingRequestArgs(
-                                                          centerId:
-                                                              (d['centerId'] ??
-                                                                      '')
-                                                                  .toString(),
-                                                          centerName:
-                                                              centerName,
-                                                          centerType:
-                                                              (d['selectedCenterType'] ??
-                                                                      '')
-                                                                  .toString(),
-                                                          hasDetoxUnit:
-                                                              (d['centerHasDetoxUnit'] ??
-                                                                      false) ==
-                                                                  true,
-                                                          existingRequestId:
-                                                              visibleDocs[i].id,
-                                                        ),
-                                                      );
-                                                    },
-                                                    icon: const Icon(
-                                                        Icons.edit_outlined),
-                                                    label: Text(
-                                                      l10n
-                                                          .bookingEditAccommodation,
+                                                if (isCenter &&
+                                                    status ==
+                                                        'center_intake_pending') ...[
+                                                  const SizedBox(height: 12),
+                                                  Align(
+                                                    alignment:
+                                                        AlignmentDirectional
+                                                            .centerStart,
+                                                    child: FilledButton.icon(
+                                                      onPressed: () =>
+                                                          _submitInitialIntake(
+                                                        context,
+                                                        visibleDocs[i].id,
+                                                        d,
+                                                      ),
+                                                      icon: const Icon(
+                                                        Icons
+                                                            .assignment_outlined,
+                                                      ),
+                                                      label: Text(
+                                                        l10n.bookingCompleteInitialIntake,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
-                                              if (isCenter &&
-                                                  status ==
-                                                      'center_intake_pending') ...[
-                                                const SizedBox(height: 12),
-                                                Align(
-                                                  alignment:
-                                                      AlignmentDirectional
-                                                          .centerStart,
-                                                  child: FilledButton.icon(
-                                                    onPressed: () =>
-                                                        _submitInitialIntake(
-                                                      context,
-                                                      visibleDocs[i].id,
-                                                      d,
-                                                    ),
-                                                    icon: const Icon(
-                                                      Icons.assignment_outlined,
-                                                    ),
-                                                    label: Text(
-                                                      l10n
-                                                          .bookingCompleteInitialIntake,
+                                                ],
+                                                if (status ==
+                                                    'awaiting_payment') ...[
+                                                  const SizedBox(height: 12),
+                                                  Align(
+                                                    alignment:
+                                                        AlignmentDirectional
+                                                            .centerStart,
+                                                    child: FilledButton.icon(
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pushNamed(
+                                                          Routes
+                                                              .clientPaymentProof,
+                                                        );
+                                                      },
+                                                      icon: const Icon(Icons
+                                                          .upload_file_outlined),
+                                                      label: Text(
+                                                        l10n.bookingUploadPaymentProof,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
-                                              if (status ==
-                                                  'awaiting_payment') ...[
-                                                const SizedBox(height: 12),
-                                                Align(
-                                                  alignment:
-                                                      AlignmentDirectional
-                                                          .centerStart,
-                                                  child: FilledButton.icon(
-                                                    onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pushNamed(
-                                                        Routes
-                                                            .clientPaymentProof,
-                                                      );
-                                                    },
-                                                    icon: const Icon(Icons
-                                                        .upload_file_outlined),
-                                                    label: Text(
-                                                      l10n
-                                                          .bookingUploadPaymentProof,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                              if (centerAvailable) ...[
-                                                const SizedBox(height: 12),
-                                                Container(
-                                                  width: double.infinity,
-                                                  padding:
-                                                      const EdgeInsets.all(12),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.green
-                                                        .withValues(
-                                                            alpha: 0.10),
-                                                    border: Border.all(
+                                                ],
+                                                if (centerAvailable) ...[
+                                                  const SizedBox(height: 12),
+                                                  Container(
+                                                    width: double.infinity,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            12),
+                                                    decoration: BoxDecoration(
                                                       color: Colors.green
                                                           .withValues(
-                                                              alpha: 0.30),
+                                                              alpha: 0.10),
+                                                      border: Border.all(
+                                                        color: Colors.green
+                                                            .withValues(
+                                                                alpha: 0.30),
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              14),
                                                     ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            14),
+                                                    child: const Text(
+                                                      'المركز متاح لهذا الطلب. يتم تجهيز الطلب للخطوة التالية دون الحاجة إلى إجراء منك الآن.',
+                                                      style: TextStyle(
+                                                          height: 1.5),
+                                                    ),
                                                   ),
-                                                  child: const Text(
-                                                    'المركز متاح لهذا الطلب. يتم تجهيز الطلب للخطوة التالية دون الحاجة إلى إجراء منك الآن.',
-                                                    style:
-                                                        TextStyle(height: 1.5),
-                                                  ),
-                                                ),
-                                              ],
-                                              if (centerUnavailable) ...[
-                                                const SizedBox(height: 12),
-                                                Container(
-                                                  width: double.infinity,
-                                                  padding:
-                                                      const EdgeInsets.all(12),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.orange
-                                                        .withValues(
-                                                            alpha: 0.10),
-                                                    border: Border.all(
+                                                ],
+                                                if (centerUnavailable) ...[
+                                                  const SizedBox(height: 12),
+                                                  Container(
+                                                    width: double.infinity,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            12),
+                                                    decoration: BoxDecoration(
                                                       color: Colors.orange
                                                           .withValues(
-                                                              alpha: 0.30),
+                                                              alpha: 0.10),
+                                                      border: Border.all(
+                                                        color: Colors.orange
+                                                            .withValues(
+                                                                alpha: 0.30),
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              14),
                                                     ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            14),
+                                                    child: const Text(
+                                                      'المركز المختار غير متاح لهذا الطلب. يمكنك إنشاء طلب جديد بنفس البيانات لاختيار مسار مناسب دون تعديل الطلب الحالي.',
+                                                      style: TextStyle(
+                                                          height: 1.5),
+                                                    ),
                                                   ),
-                                                  child: const Text(
-                                                    'المركز المختار غير متاح لهذا الطلب. يمكنك إنشاء طلب جديد بنفس البيانات لاختيار مسار مناسب دون تعديل الطلب الحالي.',
-                                                    style:
-                                                        TextStyle(height: 1.5),
+                                                ],
+                                                if (isCenter) ...[
+                                                  const SizedBox(height: 12),
+                                                  Align(
+                                                    alignment:
+                                                        AlignmentDirectional
+                                                            .centerStart,
+                                                    child: centerUnavailable
+                                                        ? FilledButton.icon(
+                                                            onPressed: centerId
+                                                                        .trim()
+                                                                        .isEmpty ||
+                                                                    centerName
+                                                                        .trim()
+                                                                        .isEmpty
+                                                                ? null
+                                                                : () =>
+                                                                    _createCenterRequestFromExisting(
+                                                                      context,
+                                                                      visibleDocs[
+                                                                              i]
+                                                                          .id,
+                                                                      d,
+                                                                    ),
+                                                            icon: const Icon(
+                                                              Icons
+                                                                  .copy_all_outlined,
+                                                            ),
+                                                            label: Text(
+                                                              l10n.bookingCreateNewFromRequest,
+                                                            ),
+                                                          )
+                                                        : OutlinedButton.icon(
+                                                            onPressed: centerId
+                                                                        .trim()
+                                                                        .isEmpty ||
+                                                                    centerName
+                                                                        .trim()
+                                                                        .isEmpty
+                                                                ? null
+                                                                : () =>
+                                                                    _createCenterRequestFromExisting(
+                                                                      context,
+                                                                      visibleDocs[
+                                                                              i]
+                                                                          .id,
+                                                                      d,
+                                                                    ),
+                                                            icon: const Icon(
+                                                              Icons
+                                                                  .copy_all_outlined,
+                                                            ),
+                                                            label: Text(
+                                                              l10n.bookingCreateNewFromRequest,
+                                                            ),
+                                                          ),
                                                   ),
-                                                ),
+                                                ],
                                               ],
-                                              if (isCenter) ...[
-                                                const SizedBox(height: 12),
-                                                Align(
-                                                  alignment:
-                                                      AlignmentDirectional
-                                                          .centerStart,
-                                                  child: centerUnavailable
-                                                      ? FilledButton.icon(
-                                                          onPressed: centerId
-                                                                      .trim()
-                                                                      .isEmpty ||
-                                                                  centerName
-                                                                      .trim()
-                                                                      .isEmpty
-                                                              ? null
-                                                              : () =>
-                                                                  _createCenterRequestFromExisting(
-                                                                    context,
-                                                                    visibleDocs[
-                                                                            i]
-                                                                        .id,
-                                                                    d,
-                                                                  ),
-                                                          icon: const Icon(
-                                                            Icons
-                                                                .copy_all_outlined,
-                                                          ),
-                                                          label: Text(
-                                                            l10n
-                                                                .bookingCreateNewFromRequest,
-                                                          ),
-                                                        )
-                                                      : OutlinedButton.icon(
-                                                          onPressed: centerId
-                                                                      .trim()
-                                                                      .isEmpty ||
-                                                                  centerName
-                                                                      .trim()
-                                                                      .isEmpty
-                                                              ? null
-                                                              : () =>
-                                                                  _createCenterRequestFromExisting(
-                                                                    context,
-                                                                    visibleDocs[
-                                                                            i]
-                                                                        .id,
-                                                                    d,
-                                                                  ),
-                                                          icon: const Icon(
-                                                            Icons
-                                                                .copy_all_outlined,
-                                                          ),
-                                                          label: Text(
-                                                            l10n
-                                                                .bookingCreateNewFromRequest,
-                                                          ),
-                                                        ),
-                                                ),
-                                              ],
-                                            ],
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
                         ),
                       ],
                     ),

@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -182,9 +182,8 @@ class _WebCenterRegisterPortalPageState
     final l10n = AppLocalizations.of(context)!;
 
     final mediaQuery = MediaQuery.of(context);
-    final isLandscapeCompact =
-        mediaQuery.size.width > mediaQuery.size.height &&
-            mediaQuery.size.height < 520;
+    final isLandscapeCompact = mediaQuery.size.width > mediaQuery.size.height &&
+        mediaQuery.size.height < 520;
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     final compactGap = isLandscapeCompact ? 8.0 : 10.0;
 
@@ -374,8 +373,7 @@ class _WebCenterRegisterPortalPageState
                                   color: _inputCream,
                                   fontWeight: FontWeight.w700,
                                 ),
-                                decoration:
-                                    _fieldDecoration(l10n.authPassword),
+                                decoration: _fieldDecoration(l10n.authPassword),
                                 obscureText: true,
                                 validator: (value) {
                                   if (value == null || value.length < 6) {
@@ -391,8 +389,7 @@ class _WebCenterRegisterPortalPageState
                                   color: _inputCream,
                                   fontWeight: FontWeight.w700,
                                 ),
-                                decoration:
-                                    _fieldDecoration(
+                                decoration: _fieldDecoration(
                                   l10n.webCenterConfirmPassword,
                                 ),
                                 obscureText: true,
@@ -509,4 +506,3 @@ class _WebCenterRegisterPortalPageState
     );
   }
 }
-

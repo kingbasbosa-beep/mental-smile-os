@@ -48,17 +48,20 @@ class AdminAiDevOpsCenterPage extends StatelessWidget {
   static const List<_DevToolItem> _devTools = [
     _DevToolItem(
       title: 'Android Studio',
-      summary: 'Primary local IDE for Android/Flutter project inspection and build validation.',
+      summary:
+          'Primary local IDE for Android/Flutter project inspection and build validation.',
       url: 'https://developer.android.com/studio',
     ),
     _DevToolItem(
       title: 'Flutter CLI',
-      summary: 'Local command-line entry for run, build, and validation workflows.',
+      summary:
+          'Local command-line entry for run, build, and validation workflows.',
       url: 'https://docs.flutter.dev/reference/flutter-cli',
     ),
     _DevToolItem(
       title: 'Firebase Console',
-      summary: 'Manual operational console for project services, auth, and Firestore visibility.',
+      summary:
+          'Manual operational console for project services, auth, and Firestore visibility.',
       url: 'https://console.firebase.google.com/',
     ),
     _DevToolItem(
@@ -68,12 +71,14 @@ class AdminAiDevOpsCenterPage extends StatelessWidget {
     ),
     _DevToolItem(
       title: 'Local Project Folder',
-      summary: 'Reference path for manual local inspection and workspace navigation.',
+      summary:
+          'Reference path for manual local inspection and workspace navigation.',
       url: 'file:///C:/mental_smile_workspace/app/mental-smile-app',
     ),
     _DevToolItem(
       title: 'Chrome DevTools',
-      summary: 'Browser diagnostics surface for layout, console, and runtime checks.',
+      summary:
+          'Browser diagnostics surface for layout, console, and runtime checks.',
       url: 'https://developer.chrome.com/docs/devtools/',
     ),
   ];
@@ -98,8 +103,7 @@ class AdminAiDevOpsCenterPage extends StatelessWidget {
       status: 'Draft',
       promptSummary:
           'Tighten card readability and visibility for production links without changing workflow meaning.',
-      expectedReturn:
-          'Small layout/styling patch and visual-risk notes.',
+      expectedReturn: 'Small layout/styling patch and visual-risk notes.',
       fullPrompt:
           'Refine Content Workspace card density. Scope: UI only. Reduce wasted vertical space, keep links and context buttons visible, and avoid changing workflow meaning. Return exact file changes and the smallest safe patch.',
     ),
@@ -126,8 +130,7 @@ class AdminAiDevOpsCenterPage extends StatelessWidget {
       readinessStatus: 'Ready for Codex',
       fullPrompt:
           'Create an Employee System chassis inside Admin/Control Room. Scope: UI only. Add route, page shell, directory/workspaces/task board/review queue/activity log/role boundaries sections. No auth, no persistence, no Firestore, no API, no automation.',
-      notes:
-          'Prepared for Codex execution as a safe static architecture step.',
+      notes: 'Prepared for Codex execution as a safe static architecture step.',
     ),
     _PromptIntakeItem(
       sourceChat: 'QA Chat',
@@ -137,8 +140,7 @@ class AdminAiDevOpsCenterPage extends StatelessWidget {
       readinessStatus: 'Ready for Codex',
       fullPrompt:
           'Improve text contrast inside AI & DevOps Interaction Center. Scope: styling only. Increase text readability, darken card backgrounds, and preserve the Control Room dark/gold style without changing layout or logic.',
-      notes:
-          'Ready for direct copy into Codex with no backend implications.',
+      notes: 'Ready for direct copy into Codex with no backend implications.',
     ),
   ];
 
@@ -149,12 +151,10 @@ class AdminAiDevOpsCenterPage extends StatelessWidget {
       filesChanged: [
         'admin_workspace_command_center_page.dart',
       ],
-      resultSummary:
-          'Fixed horizontal scroll issue and improved card layout.',
+      resultSummary: 'Fixed horizontal scroll issue and improved card layout.',
       riskLevel: 'Low',
       qaStatus: 'Pending QA',
-      notes:
-          'Execution Results are manual entries based on Codex outputs.',
+      notes: 'Execution Results are manual entries based on Codex outputs.',
     ),
     _ExecutionResultItem(
       title: 'Pending Content Counter Fix',
@@ -406,7 +406,8 @@ class AdminAiDevOpsCenterPage extends StatelessWidget {
                 label: const Text('Copy Prompt'),
               ),
               OutlinedButton.icon(
-                onPressed: () => _openTool(context, 'https://chatgpt.com/codex'),
+                onPressed: () =>
+                    _openTool(context, 'https://chatgpt.com/codex'),
                 icon: const Icon(Icons.open_in_new, size: 18),
                 label: const Text('Open Codex'),
               ),
@@ -509,7 +510,8 @@ class AdminAiDevOpsCenterPage extends StatelessWidget {
                 label: const Text('Move to Prompt Queue'),
               ),
               OutlinedButton.icon(
-                onPressed: () => _openTool(context, 'https://chatgpt.com/codex'),
+                onPressed: () =>
+                    _openTool(context, 'https://chatgpt.com/codex'),
                 icon: const Icon(Icons.open_in_new, size: 18),
                 label: const Text('Open Codex'),
               ),
@@ -804,10 +806,12 @@ class AdminAiDevOpsCenterPage extends StatelessWidget {
                           Expanded(
                             child: Text(
                               item,
-                              style:
-                                  Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                        color: _secondaryText,
-                                      ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: _secondaryText,
+                                  ),
                             ),
                           ),
                         ],

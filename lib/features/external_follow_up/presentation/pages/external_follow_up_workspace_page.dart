@@ -198,8 +198,7 @@ class _ExternalFollowUpWorkspacePageState
               selectedTopic: selectedTopic,
               selectedTemplateId: selectedTemplateId,
               templates: templates,
-              templatesLoading:
-                  selectedTopic != null &&
+              templatesLoading: selectedTopic != null &&
                   snapshot.connectionState == ConnectionState.waiting,
               templatesError: snapshot.hasError,
               previewRequested: previewRequested,
@@ -230,7 +229,8 @@ class _ExternalFollowUpWorkspacePageState
                 final resolvedTemplate = templates
                     .where((template) => template.id == selectedTemplateId)
                     .cast<FollowUpMessageTemplate?>()
-                    .firstWhere((template) => template != null, orElse: () => null);
+                    .firstWhere((template) => template != null,
+                        orElse: () => null);
 
                 if (selectedTopic == null ||
                     resolvedTemplate == null ||
@@ -342,10 +342,8 @@ class _ExternalFollowUpWorkspacePageState
         .where((entry) => entry.status == FollowUpRegistryStatus.active)
         .toList();
 
-    final recipients = activeEntries
-        .take(5)
-        .map(_previewRecipientLabel)
-        .toList();
+    final recipients =
+        activeEntries.take(5).map(_previewRecipientLabel).toList();
 
     return _PreviewData(
       topicLabel: _topicLabel(selectedTemplate.category, selectedTopic),
@@ -512,7 +510,8 @@ class _PreviewComposerCard extends StatelessWidget {
               )
             else
               DropdownButtonFormField<String>(
-                value: templates.any((template) => template.id == selectedTemplateId)
+                value: templates
+                        .any((template) => template.id == selectedTemplateId)
                     ? selectedTemplateId
                     : null,
                 decoration: appInputDecoration(
@@ -538,9 +537,10 @@ class _PreviewComposerCard extends StatelessWidget {
                 runSpacing: AppSpacing.sm,
                 children: [
                   FilledButton(
-                    onPressed: templatesLoading || templatesError || templates.isEmpty
-                        ? null
-                        : onPreviewPressed,
+                    onPressed:
+                        templatesLoading || templatesError || templates.isEmpty
+                            ? null
+                            : onPreviewPressed,
                     child: const Text('معاينة الإرسال'),
                   ),
                   OutlinedButton(
@@ -733,8 +733,9 @@ class _EntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayName =
-        entry.displayName.trim().isEmpty ? 'بدون اسم' : entry.displayName.trim();
+    final displayName = entry.displayName.trim().isEmpty
+        ? 'بدون اسم'
+        : entry.displayName.trim();
     final supportFrequency = _supportFrequencyLabel(entry.supportFrequency);
     final recoveryFrequency = _recoveryFrequencyLabel(entry.recoveryFrequency);
 

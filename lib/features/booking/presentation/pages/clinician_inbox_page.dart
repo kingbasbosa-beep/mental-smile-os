@@ -132,6 +132,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
         return status;
     }
   }
+
   Widget _statusTabs(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final items = <Map<String, String>>[
@@ -155,6 +156,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
       ),
     );
   }
+
   Widget _buildLegacyInboxIntro(BuildContext context) {
     final isArabic =
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
@@ -224,6 +226,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
       );
     }
   }
+
   Future<void> _onRejectPressed(BuildContext context, String docId) async {
     _rejectCtrl.text = '';
     final messenger = ScaffoldMessenger.of(context);
@@ -285,6 +288,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);

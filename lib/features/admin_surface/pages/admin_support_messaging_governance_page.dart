@@ -237,8 +237,7 @@ class _AdminSupportMessagingGovernancePageState
                       'يمكن دعمهم برسائل خفيفة تساعد على الاستمرارية والطمأنة وربطهم بالمحتوى المناسب.',
                   boundaryNote:
                       'لا يجب أن تتحول الرسائل إلى متابعة علاجية أو تدخل متخصص.',
-                  supervisionNote:
-                      'الدعم هنا خفيف واستمراري فقط.',
+                  supervisionNote: 'الدعم هنا خفيف واستمراري فقط.',
                 ),
                 _buildGovernanceCard(
                   context,
@@ -247,8 +246,7 @@ class _AdminSupportMessagingGovernancePageState
                       'يمكن توجيه رسائل داعمة وتوعوية خفيفة لهذه الفئة بما يدعم الاستمرارية والمعرفة.',
                   boundaryNote:
                       'الرسائل لا يجب أن تحمل إرشادًا علاجيًا أو ضغطًا عاطفيًا.',
-                  supervisionNote:
-                      'الفئة تُدعم ضمن إطار توعوي داعم فقط.',
+                  supervisionNote: 'الفئة تُدعم ضمن إطار توعوي داعم فقط.',
                 ),
                 _buildGovernanceCard(
                   context,
@@ -257,8 +255,7 @@ class _AdminSupportMessagingGovernancePageState
                       'يمكن أن تتلقى هذه الفئة رسائل خفيفة ترتبط بالتوعية والاستقرار وربط المحتوى المناسب.',
                   boundaryNote:
                       'لا تُفهم هذه الرسائل كبديل عن الرعاية المهنية أو كتشخيص ضمني.',
-                  supervisionNote:
-                      'المتابعة هنا للاستمرارية لا للعلاج.',
+                  supervisionNote: 'المتابعة هنا للاستمرارية لا للعلاج.',
                 ),
               ],
             ),
@@ -273,10 +270,8 @@ class _AdminSupportMessagingGovernancePageState
                   title: 'رسائل دعم',
                   summary:
                       'رسائل قصيرة داعمة وطمأنة عامة تساعد على الإحساس بالاستمرارية.',
-                  boundaryNote:
-                      'لا تحمل تشخيصًا أو تدخلًا علاجيًا.',
-                  supervisionNote:
-                      'الغرض هنا الدعم فقط.',
+                  boundaryNote: 'لا تحمل تشخيصًا أو تدخلًا علاجيًا.',
+                  supervisionNote: 'الغرض هنا الدعم فقط.',
                 ),
                 _buildGovernanceCard(
                   context,
@@ -285,18 +280,15 @@ class _AdminSupportMessagingGovernancePageState
                       'رسائل خفيفة للتفقد والاهتمام دون الدخول في متابعة علاجية أو حساسة.',
                   boundaryNote:
                       'يجب ألا تتحول إلى ملاحقة أو ضغط أو burden على المستخدم.',
-                  supervisionNote:
-                      'الرسالة هنا لطيفة ومحدودة.',
+                  supervisionNote: 'الرسالة هنا لطيفة ومحدودة.',
                 ),
                 _buildGovernanceCard(
                   context,
                   title: 'رسائل توعية',
                   summary:
                       'رسائل تربط المستخدم بمحتوى معرفي أو توعوي مناسب لفئته العامة.',
-                  boundaryNote:
-                      'تبقى معلوماتية وغير تشخيصية.',
-                  supervisionNote:
-                      'التوعية تسبق أي منطق تدخل مباشر.',
+                  boundaryNote: 'تبقى معلوماتية وغير تشخيصية.',
+                  supervisionNote: 'التوعية تسبق أي منطق تدخل مباشر.',
                 ),
                 _buildGovernanceCard(
                   context,
@@ -305,8 +297,7 @@ class _AdminSupportMessagingGovernancePageState
                       'رسائل بسيطة للمناسبات أو التشجيع الرمزي ضمن حدود آمنة وغير متطفلة.',
                   boundaryNote:
                       'لا يجب أن تستغل الحالة النفسية أو تولّد تعلقًا غير صحي.',
-                  supervisionNote:
-                      'دورها معنوي خفيف فقط.',
+                  supervisionNote: 'دورها معنوي خفيف فقط.',
                 ),
                 _buildGovernanceCard(
                   context,
@@ -315,8 +306,7 @@ class _AdminSupportMessagingGovernancePageState
                       'تنبيهات بسيطة تشجع على العودة للمحتوى أو الاستفادة من مادة داعمة.',
                   boundaryNote:
                       'يجب ألا تتحول إلى pressure flow أو تكرار مزعج.',
-                  supervisionNote:
-                      'الـ nudge هنا لطيفة وغير متطفلة.',
+                  supervisionNote: 'الـ nudge هنا لطيفة وغير متطفلة.',
                 ),
               ],
             ),
@@ -324,131 +314,124 @@ class _AdminSupportMessagingGovernancePageState
             KeyedSubtree(
               key: _examplesKey,
               child: GatewaySectionCard(
-              title: 'أمثلة رسائل يدوية معتمدة',
-              description:
-                  'هذه الأمثلة ثابتة ومرجعية فقط، ويمكن استخدامها يدويًا خارج النظام دون إنشاء أي تدفق إرسال فعلي داخل التطبيق.',
-              children: [
-                _buildGovernanceCard(
-                  context,
-                  title: 'Check-in',
-                  summary:
-                      'مرحبًا، نرسل لك هذه الرسالة كتفقد لطيف فقط. إذا كان هذا الوقت مناسبًا لك، يمكنك العودة متى أحببت إلى المحتوى الداعم داخل التطبيق.',
-                  boundaryNote:
-                      'غير طبي، غير تشخيصي، وغير مناسب لحالات الأزمة أو أثناء الجلسات النشطة.',
-                  supervisionNote:
-                      'دعم يدوي مملوك للإدارة فقط، بدون ضغط أو إلحاح أو مسار علاجي.',
-                  statusLabel: 'مثال رسالة معتمد',
-                  enableCopyMessage: true,
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'Encouragement',
-                  summary:
-                      'خطواتك الهادئة لها قيمة، حتى لو كانت بسيطة. يمكنك الاستفادة من المساحة الداعمة داخل التطبيق بالوتيرة التي تناسبك.',
-                  boundaryNote:
-                      'رسالة داعمة فقط، بلا claims علاجية، وبلا نبرة ذنب أو استعجال.',
-                  supervisionNote:
-                      'الهدف هنا التشجيع الهادئ family-safe ضمن دعم يدوي خفيف.',
-                  statusLabel: 'مثال رسالة معتمد',
-                  enableCopyMessage: true,
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'Awareness',
-                  summary:
-                      'قد يفيدك الاطلاع على محتوى توعوي مناسب داخل المكتبة عندما يكون الوقت مناسبًا لك، كجزء من الدعم الخفيف والاستمرارية.',
-                  boundaryNote:
-                      'إحالة توعوية فقط، لا تتحول إلى تدخل علاجي أو pressure flow أو تشخيص.',
-                  supervisionNote:
-                      'هذا المثال يربط الرسالة بالمحتوى بشكل داعم فقط وتحت إشراف الإدارة.',
-                  statusLabel: 'مثال رسالة معتمد',
-                  enableCopyMessage: true,
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'Congratulations / Light Nudge',
-                  summary:
-                      'أحسنت على استمرارك الهادئ. إذا رغبت، يمكنك العودة لاحقًا إلى التطبيق أو إلى مادة داعمة مناسبة لك، دون أي استعجال.',
-                  boundaryNote:
-                      'رسالة لطيفة وغير متطفلة، وليست مناسبة للأزمة أو للجلسات النشطة أو للحالات الحساسة.',
-                  supervisionNote:
-                      'نبرة داعمة وغير ضاغطة، بدون إلحاح أو urgency language أو guilt-based nudging.',
-                  statusLabel: 'مثال رسالة معتمد',
-                  enableCopyMessage: true,
-                ),
-              ],
-            ),
+                title: 'أمثلة رسائل يدوية معتمدة',
+                description:
+                    'هذه الأمثلة ثابتة ومرجعية فقط، ويمكن استخدامها يدويًا خارج النظام دون إنشاء أي تدفق إرسال فعلي داخل التطبيق.',
+                children: [
+                  _buildGovernanceCard(
+                    context,
+                    title: 'Check-in',
+                    summary:
+                        'مرحبًا، نرسل لك هذه الرسالة كتفقد لطيف فقط. إذا كان هذا الوقت مناسبًا لك، يمكنك العودة متى أحببت إلى المحتوى الداعم داخل التطبيق.',
+                    boundaryNote:
+                        'غير طبي، غير تشخيصي، وغير مناسب لحالات الأزمة أو أثناء الجلسات النشطة.',
+                    supervisionNote:
+                        'دعم يدوي مملوك للإدارة فقط، بدون ضغط أو إلحاح أو مسار علاجي.',
+                    statusLabel: 'مثال رسالة معتمد',
+                    enableCopyMessage: true,
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'Encouragement',
+                    summary:
+                        'خطواتك الهادئة لها قيمة، حتى لو كانت بسيطة. يمكنك الاستفادة من المساحة الداعمة داخل التطبيق بالوتيرة التي تناسبك.',
+                    boundaryNote:
+                        'رسالة داعمة فقط، بلا claims علاجية، وبلا نبرة ذنب أو استعجال.',
+                    supervisionNote:
+                        'الهدف هنا التشجيع الهادئ family-safe ضمن دعم يدوي خفيف.',
+                    statusLabel: 'مثال رسالة معتمد',
+                    enableCopyMessage: true,
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'Awareness',
+                    summary:
+                        'قد يفيدك الاطلاع على محتوى توعوي مناسب داخل المكتبة عندما يكون الوقت مناسبًا لك، كجزء من الدعم الخفيف والاستمرارية.',
+                    boundaryNote:
+                        'إحالة توعوية فقط، لا تتحول إلى تدخل علاجي أو pressure flow أو تشخيص.',
+                    supervisionNote:
+                        'هذا المثال يربط الرسالة بالمحتوى بشكل داعم فقط وتحت إشراف الإدارة.',
+                    statusLabel: 'مثال رسالة معتمد',
+                    enableCopyMessage: true,
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'Congratulations / Light Nudge',
+                    summary:
+                        'أحسنت على استمرارك الهادئ. إذا رغبت، يمكنك العودة لاحقًا إلى التطبيق أو إلى مادة داعمة مناسبة لك، دون أي استعجال.',
+                    boundaryNote:
+                        'رسالة لطيفة وغير متطفلة، وليست مناسبة للأزمة أو للجلسات النشطة أو للحالات الحساسة.',
+                    supervisionNote:
+                        'نبرة داعمة وغير ضاغطة، بدون إلحاح أو urgency language أو guilt-based nudging.',
+                    statusLabel: 'مثال رسالة معتمد',
+                    enableCopyMessage: true,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             KeyedSubtree(
               key: _rulesKey,
               child: GatewaySectionCard(
-              title: 'قواعد الإرسال',
-              description:
-                  'الإرسال يجب أن يبقى محدودًا وآمنًا ومنضبطًا بسياقات واضحة.',
-              children: [
-                _buildGovernanceCard(
-                  context,
-                  title: 'frequency limits',
-                  summary:
-                      'يجب أن تكون هناك حدود واضحة لتكرار الرسائل حتى لا تتحول المتابعة إلى burden.',
-                  boundaryNote:
-                      'الاستمرارية الهادئة أهم من الكثافة أو الإغراق.',
-                  supervisionNote:
-                      'هذه الصفحة توثق limits فقط، ولا تنفذها آليًا.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'منع الإزعاج',
-                  summary:
-                      'يجب أن تُصاغ الرسائل وتوقيتها بما يمنع الإزعاج أو التطفل أو الإرهاق.',
-                  boundaryNote:
-                      'الدعم يفقد شرعيته إذا أصبح مزعجًا.',
-                  supervisionNote:
-                      'هذه قاعدة إشرافية ثابتة.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'شروط الإرسال',
-                  summary:
-                      'الإرسال يجب أن يكون مشروطًا بسياقات مستقرة وآمنة ومناسبة لطبيعة الرسالة.',
-                  boundaryNote:
-                      'يمنع الإرسال العشوائي أو غير المنضبط.',
-                  supervisionNote:
-                      'الشروط هنا توصيف حوكمي فقط.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'حالات الإيقاف',
-                  summary:
-                      'يجب تحديد الحالات التي تتوقف فيها الرسائل بالكامل أو مؤقتًا.',
-                  boundaryNote:
-                      'الإيقاف قد يكون ضروريًا لحماية راحة المستخدم أو سلامته أو احترام سياق الدعم.',
-                  supervisionNote:
-                      'هذه الصفحة لا تنفذ الإيقاف آليًا، بل توثقه فقط.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'لا إرسال أثناء crisis',
-                  summary:
-                      'أي سياق crisis أو هشاشة عالية يجب أن يبقى خاليًا من الرسائل الداعمة الخفيفة.',
-                  boundaryNote:
-                      'السلامة تتقدم على أي رسالة أو استمرار.',
-                  supervisionNote:
-                      'هذا حد أخلاقي ثابت.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'لا إرسال أثناء جلسات نشطة',
-                  summary:
-                      'يجب ألا تتقاطع الرسائل الداعمة مع الجلسات النشطة أو المسارات العلاجية المنظمة.',
-                  boundaryNote:
-                      'الفصل هنا يحمي تركيز المستخدم ويحافظ على وضوح الأدوار.',
-                  supervisionNote:
-                  'الرسائل ليست امتدادًا للجلسات.',
-                ),
-              ],
-            ),
+                title: 'قواعد الإرسال',
+                description:
+                    'الإرسال يجب أن يبقى محدودًا وآمنًا ومنضبطًا بسياقات واضحة.',
+                children: [
+                  _buildGovernanceCard(
+                    context,
+                    title: 'frequency limits',
+                    summary:
+                        'يجب أن تكون هناك حدود واضحة لتكرار الرسائل حتى لا تتحول المتابعة إلى burden.',
+                    boundaryNote:
+                        'الاستمرارية الهادئة أهم من الكثافة أو الإغراق.',
+                    supervisionNote:
+                        'هذه الصفحة توثق limits فقط، ولا تنفذها آليًا.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'منع الإزعاج',
+                    summary:
+                        'يجب أن تُصاغ الرسائل وتوقيتها بما يمنع الإزعاج أو التطفل أو الإرهاق.',
+                    boundaryNote: 'الدعم يفقد شرعيته إذا أصبح مزعجًا.',
+                    supervisionNote: 'هذه قاعدة إشرافية ثابتة.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'شروط الإرسال',
+                    summary:
+                        'الإرسال يجب أن يكون مشروطًا بسياقات مستقرة وآمنة ومناسبة لطبيعة الرسالة.',
+                    boundaryNote: 'يمنع الإرسال العشوائي أو غير المنضبط.',
+                    supervisionNote: 'الشروط هنا توصيف حوكمي فقط.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'حالات الإيقاف',
+                    summary:
+                        'يجب تحديد الحالات التي تتوقف فيها الرسائل بالكامل أو مؤقتًا.',
+                    boundaryNote:
+                        'الإيقاف قد يكون ضروريًا لحماية راحة المستخدم أو سلامته أو احترام سياق الدعم.',
+                    supervisionNote:
+                        'هذه الصفحة لا تنفذ الإيقاف آليًا، بل توثقه فقط.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'لا إرسال أثناء crisis',
+                    summary:
+                        'أي سياق crisis أو هشاشة عالية يجب أن يبقى خاليًا من الرسائل الداعمة الخفيفة.',
+                    boundaryNote: 'السلامة تتقدم على أي رسالة أو استمرار.',
+                    supervisionNote: 'هذا حد أخلاقي ثابت.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'لا إرسال أثناء جلسات نشطة',
+                    summary:
+                        'يجب ألا تتقاطع الرسائل الداعمة مع الجلسات النشطة أو المسارات العلاجية المنظمة.',
+                    boundaryNote:
+                        'الفصل هنا يحمي تركيز المستخدم ويحافظ على وضوح الأدوار.',
+                    supervisionNote: 'الرسائل ليست امتدادًا للجلسات.',
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
@@ -482,72 +465,66 @@ class _AdminSupportMessagingGovernancePageState
             KeyedSubtree(
               key: _boundariesKey,
               child: GatewaySectionCard(
-              title: 'الحدود الأخلاقية',
-              description:
-                  'هذه الحدود تحكم tone الرسائل ووظيفتها بحيث تبقى آمنة ومناسبة للمنصة.',
-              children: [
-                _buildGovernanceCard(
-                  context,
-                  title: 'لا تشخيص',
-                  summary:
-                      'الرسائل لا تشخص، ولا تفسر الحالة نفسيًا أو طبيًا، ولا توحي بأنها تقييم مهني.',
-                  boundaryNote:
-                      'يحافظ ذلك على التموضع غير الطبي وغير التشخيصي.',
-                  supervisionNote:
-                      'هذا حد أخلاقي ومعماري ثابت.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'لا تدخل علاجي',
-                  summary:
-                      'الرسائل لا تقوم مقام العلاج ولا تحاول أداء وظيفة علاجية أو سريرية.',
-                  boundaryNote:
-                      'الدعم هنا خفيف واستمراري فقط.',
-                  supervisionNote:
-                      'أي انحراف عن ذلك يخرج الطبقة عن معناها الصحيح.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'لا تضارب مع المختصين',
-                  summary:
-                      'يجب ألا تتداخل الرسائل مع دور المختصين أو تقدم نفسها كبديل عنهم.',
-                  boundaryNote:
-                      'تحافظ هذه القاعدة على احترام الرعاية المتخصصة عند الحاجة.',
-                  supervisionNote:
-                      'الطبقة مملوكة للإدارة فقط، وليست أداة مهنية للمختصين.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'support-first',
-                  summary:
-                      'الرسائل يجب أن تبقى ضمن منطق دعم خفيف، وليس منطق توجيه ضاغط أو استغلالي.',
-                  boundaryNote:
-                      'الدعم أولًا، لا التأثير القسري أو الإلحاح.',
-                  supervisionNote:
-                      'هذا هو المنطق الحاكم لصياغة الرسائل.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'family-safe',
-                  summary:
-                      'الرسائل يجب أن تبقى آمنة، مناسبة، وغير حادة أو صادمة أو غير لائقة.',
-                  boundaryNote:
-                      'تحافظ هذه القاعدة على اتساق tone المنصة وثقة المستخدم.',
-                  supervisionNote:
-                      'السلامة الأسلوبية جزء من الحوكمة.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'no manipulative tone',
-                  summary:
-                      'يُمنع استخدام نبرة ضغط أو ذنب أو إلحاح أو تعلق عاطفي غير صحي.',
-                  boundaryNote:
-                      'النبرة يجب أن تبقى محترمة، هادئة، وغير استغلالية.',
-                  supervisionNote:
-                  'هذا حد أخلاقي مباشر في الرسائل الداعمة.',
-                ),
-              ],
-            ),
+                title: 'الحدود الأخلاقية',
+                description:
+                    'هذه الحدود تحكم tone الرسائل ووظيفتها بحيث تبقى آمنة ومناسبة للمنصة.',
+                children: [
+                  _buildGovernanceCard(
+                    context,
+                    title: 'لا تشخيص',
+                    summary:
+                        'الرسائل لا تشخص، ولا تفسر الحالة نفسيًا أو طبيًا، ولا توحي بأنها تقييم مهني.',
+                    boundaryNote:
+                        'يحافظ ذلك على التموضع غير الطبي وغير التشخيصي.',
+                    supervisionNote: 'هذا حد أخلاقي ومعماري ثابت.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'لا تدخل علاجي',
+                    summary:
+                        'الرسائل لا تقوم مقام العلاج ولا تحاول أداء وظيفة علاجية أو سريرية.',
+                    boundaryNote: 'الدعم هنا خفيف واستمراري فقط.',
+                    supervisionNote:
+                        'أي انحراف عن ذلك يخرج الطبقة عن معناها الصحيح.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'لا تضارب مع المختصين',
+                    summary:
+                        'يجب ألا تتداخل الرسائل مع دور المختصين أو تقدم نفسها كبديل عنهم.',
+                    boundaryNote:
+                        'تحافظ هذه القاعدة على احترام الرعاية المتخصصة عند الحاجة.',
+                    supervisionNote:
+                        'الطبقة مملوكة للإدارة فقط، وليست أداة مهنية للمختصين.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'support-first',
+                    summary:
+                        'الرسائل يجب أن تبقى ضمن منطق دعم خفيف، وليس منطق توجيه ضاغط أو استغلالي.',
+                    boundaryNote: 'الدعم أولًا، لا التأثير القسري أو الإلحاح.',
+                    supervisionNote: 'هذا هو المنطق الحاكم لصياغة الرسائل.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'family-safe',
+                    summary:
+                        'الرسائل يجب أن تبقى آمنة، مناسبة، وغير حادة أو صادمة أو غير لائقة.',
+                    boundaryNote:
+                        'تحافظ هذه القاعدة على اتساق tone المنصة وثقة المستخدم.',
+                    supervisionNote: 'السلامة الأسلوبية جزء من الحوكمة.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'no manipulative tone',
+                    summary:
+                        'يُمنع استخدام نبرة ضغط أو ذنب أو إلحاح أو تعلق عاطفي غير صحي.',
+                    boundaryNote:
+                        'النبرة يجب أن تبقى محترمة، هادئة، وغير استغلالية.',
+                    supervisionNote: 'هذا حد أخلاقي مباشر في الرسائل الداعمة.',
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
@@ -562,26 +539,22 @@ class _AdminSupportMessagingGovernancePageState
                       'هذه الرسائل وظيفتها الدعم الخفيف، والاهتمام، والاستمرارية، وربط المستخدم بمحتوى آمن.',
                   boundaryNote:
                       'لا يجب أن تُفهم كمسار علاجي أو كبديل عن الرعاية المهنية.',
-                  supervisionNote:
-                      'هذا هو التعريف الصحيح للطبقة الحالية.',
+                  supervisionNote: 'هذا هو التعريف الصحيح للطبقة الحالية.',
                 ),
                 _buildGovernanceCard(
                   context,
                   title: 'لا تحل محل الرعاية المهنية',
                   summary:
                       'أي حاجة إلى رعاية مهنية أو تدخل متخصص يجب أن تبقى خارج هذه الطبقة.',
-                  boundaryNote:
-                      'الرسائل لا تلغي الحاجة إلى المختص عند اللزوم.',
-                  supervisionNote:
-                      'هذه قاعدة أساسية في التموضع غير الطبي.',
+                  boundaryNote: 'الرسائل لا تلغي الحاجة إلى المختص عند اللزوم.',
+                  supervisionNote: 'هذه قاعدة أساسية في التموضع غير الطبي.',
                 ),
                 _buildGovernanceCard(
                   context,
                   title: 'لا تعمل كمسار علاجي',
                   summary:
                       'الرسائل ليست علاجًا، ولا session، ولا protocol متابعة علاجية.',
-                  boundaryNote:
-                      'هي طبقة استمرارية وتوعية فقط.',
+                  boundaryNote: 'هي طبقة استمرارية وتوعية فقط.',
                   supervisionNote:
                       'هذه الصفحة إشرافية بحتة ولا تضيف أي workflow علاجي.',
                 ),

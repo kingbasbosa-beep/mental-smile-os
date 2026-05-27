@@ -107,7 +107,8 @@ class _LibraryPageState extends State<LibraryPage> {
         titleAr: 'صوتيات',
         titleEn: 'Audio',
         noteAr: 'صوتيات للتهدئة والدعم العام، وليست تدخلًا علاجيًا.',
-        noteEn: 'Calming and general support audio, not therapeutic intervention.',
+        noteEn:
+            'Calming and general support audio, not therapeutic intervention.',
         asset: 'c6_library/categories/cat_audio.png',
       ),
       const _LibCat(
@@ -115,22 +116,26 @@ class _LibraryPageState extends State<LibraryPage> {
         titleAr: 'فيديو',
         titleEn: 'Videos',
         noteAr: 'موارد تعليمية مرئية، وأي روابط خارجية مستقبلًا ستحتاج مراجعة.',
-        noteEn: 'Educational video resources. Future external links will require review.',
+        noteEn:
+            'Educational video resources. Future external links will require review.',
         asset: 'c6_library/categories/cat_videos.png',
       ),
       const _LibCat(
         keyName: 'tools',
         titleAr: 'أدوات',
         titleEn: 'Tools',
-        noteAr: 'أدوات الدعم قيد التجهيز. الأدوات المهنية أو الحساسة تحتاج إشراف مختص.',
-        noteEn: 'Support tools are being prepared. Professional or sensitive tools require specialist supervision.',
+        noteAr:
+            'أدوات الدعم قيد التجهيز. الأدوات المهنية أو الحساسة تحتاج إشراف مختص.',
+        noteEn:
+            'Support tools are being prepared. Professional or sensitive tools require specialist supervision.',
         asset: 'c6_library/categories/cat_tools.png',
       ),
       const _LibCat(
         keyName: 'saved',
         titleAr: 'المحفوظات',
         titleEn: 'Saved',
-        noteAr: 'ميزة الحفظ غير مفعلة الآن، ولا يتم تخزين أي عناصر في هذه المرحلة.',
+        noteAr:
+            'ميزة الحفظ غير مفعلة الآن، ولا يتم تخزين أي عناصر في هذه المرحلة.',
         noteEn: 'Saving is not active yet. No items are stored in this phase.',
         asset: 'c6_library/categories/cat_saved.png',
       ),
@@ -200,8 +205,7 @@ class _LibraryPageState extends State<LibraryPage> {
                               ),
                               child: _LibraryHeader(isAr: isAr),
                             ),
-                          if (!showingCategory &&
-                              _isWebLibraryRoute(context))
+                          if (!showingCategory && _isWebLibraryRoute(context))
                             _LibraryPolicyLink(compact: isMobile),
                           if (!showingCategory)
                             _LibraryFeaturedEntries(
@@ -216,19 +220,24 @@ class _LibraryPageState extends State<LibraryPage> {
                                 ? _LibraryFeaturedDetail(
                                     entry: selectedFeatured,
                                     isAr: isAr,
-                              compact: isMobile ||
-                                  (MediaQuery.sizeOf(context).width >
-                                          MediaQuery.sizeOf(context).height &&
-                                      MediaQuery.sizeOf(context).height < 520),
+                                    compact: isMobile ||
+                                        (MediaQuery.sizeOf(context).width >
+                                                MediaQuery.sizeOf(context)
+                                                    .height &&
+                                            MediaQuery.sizeOf(context).height <
+                                                520),
                                   )
                                 : selectedCategory != null
                                     ? _LibraryStandardCategoryDetail(
                                         category: selectedCategory,
                                         isAr: isAr,
-                              compact: isMobile ||
-                                  (MediaQuery.sizeOf(context).width >
-                                          MediaQuery.sizeOf(context).height &&
-                                      MediaQuery.sizeOf(context).height < 520),
+                                        compact: isMobile ||
+                                            (MediaQuery.sizeOf(context).width >
+                                                    MediaQuery.sizeOf(context)
+                                                        .height &&
+                                                MediaQuery.sizeOf(context)
+                                                        .height <
+                                                    520),
                                       )
                                     : isMobile || isTablet
                                         ? _LibraryCarousel(
@@ -276,10 +285,10 @@ class _LibraryPageState extends State<LibraryPage> {
                             top: isMobile ? 12 : 18,
                           ),
                           child: _LibraryBackButton(
-                              compact: isMobile ||
-                                  (MediaQuery.sizeOf(context).width >
-                                          MediaQuery.sizeOf(context).height &&
-                                      MediaQuery.sizeOf(context).height < 520),
+                            compact: isMobile ||
+                                (MediaQuery.sizeOf(context).width >
+                                        MediaQuery.sizeOf(context).height &&
+                                    MediaQuery.sizeOf(context).height < 520),
                             returnToLibraryHome: showingCategory,
                             returnRoute: widget.returnRoute,
                           ),
@@ -328,9 +337,9 @@ class _LibraryHeader extends StatelessWidget {
     }
     return Text(
       isAr ? 'المكتبة' : 'Library',
-          textAlign: landscapeCompact
-              ? (isAr ? TextAlign.right : TextAlign.left)
-              : TextAlign.center,
+      textAlign: landscapeCompact
+          ? (isAr ? TextAlign.right : TextAlign.left)
+          : TextAlign.center,
       style: TextStyle(
         color: const Color(0xFFFFD47A),
         fontSize: MediaQuery.sizeOf(context).width < 700 ? 38 : 56,
@@ -371,29 +380,29 @@ class _LibraryPolicyLink extends StatelessWidget {
             ? 0.88
             : 1,
         child: Padding(
-      padding: EdgeInsets.only(bottom: compact ? 8 : 12),
-      child: Center(
-        child: TextButton.icon(
-          onPressed: () => Navigator.of(context).pushNamed(
-            Routes.webLibraryPolicy,
-          ),
-          icon: const Icon(Icons.policy_outlined, size: 16),
-          label: Text(
-            isAr ? 'سياسة استخدام المكتبة' : 'Library usage policy',
-          ),
-          style: TextButton.styleFrom(
-            foregroundColor: const Color(0xFFFFE7B2),
-            padding: EdgeInsets.symmetric(
-              horizontal: compact ? 10 : 14,
-              vertical: compact ? 4 : 6,
+          padding: EdgeInsets.only(bottom: compact ? 8 : 12),
+          child: Center(
+            child: TextButton.icon(
+              onPressed: () => Navigator.of(context).pushNamed(
+                Routes.webLibraryPolicy,
+              ),
+              icon: const Icon(Icons.policy_outlined, size: 16),
+              label: Text(
+                isAr ? 'سياسة استخدام المكتبة' : 'Library usage policy',
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFFFFE7B2),
+                padding: EdgeInsets.symmetric(
+                  horizontal: compact ? 10 : 14,
+                  vertical: compact ? 4 : 6,
+                ),
+                textStyle: TextStyle(
+                  fontSize: compact ? 12 : 13,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
             ),
-            textStyle: TextStyle(
-              fontSize: compact ? 12 : 13,
-              fontWeight: FontWeight.w800,
-            ),
           ),
-        ),
-      ),
         ),
       ),
     );

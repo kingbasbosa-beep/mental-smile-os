@@ -126,6 +126,12 @@ class CenterRequestInboxService {
       }
 
       final data = snap.data() ?? const <String, dynamic>{};
+      final requestCenterId = (data['centerId'] ?? '').toString().trim();
+      final requestKind = (data['requestKind'] ?? '').toString().trim();
+      if (requestCenterId != centerId || requestKind != 'center') {
+        throw Exception('Center request ownership mismatch');
+      }
+
       _log(
         operation: 'respond_update',
         documentId: requestId,
@@ -136,8 +142,7 @@ class CenterRequestInboxService {
 
       await ref.update({
         'centerAvailabilityStatus': normalizedAvailabilityStatus,
-        'centerAvailabilityRespondedAt': FieldValue.serverTimestamp(),
-        'centerAvailabilityRespondedBy': centerId,
+        'centerAvailabilityUpdatedAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
 

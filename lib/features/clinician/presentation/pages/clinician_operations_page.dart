@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterprojects/app/locale_provider.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/core/storage/locale_storage.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
@@ -34,6 +37,23 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
+  void _goToMenu() {
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      Routes.menu,
+      (route) => false,
+    );
+  }
+
+  Future<void> _toggleLocale() async {
+    final locale = Localizations.localeOf(context);
+    final nextCode = locale.languageCode.toLowerCase() == 'ar' ? 'en' : 'ar';
+    await LocaleStorage().write(nextCode);
+    if (!mounted) return;
+    ProviderScope.containerOf(context, listen: false)
+        .read(localeProvider.notifier)
+        .state = Locale(nextCode);
+  }
+
   String _dashboardBackgroundAsset(double width) {
     if (width < 700) {
       return 'assets/branding/client_dashboard/mobile/client_dashboard_mobile_bg.png';
@@ -49,6 +69,11 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
       return Alignment.topCenter;
     }
     return const Alignment(-0.08, 0);
+  }
+
+  bool _isLandscapeCompact(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    return size.width > size.height && size.width < 900 && size.height < 540;
   }
 
   double _dashboardOverlayAlpha(double width) {
@@ -368,6 +393,8 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     required String clinicianBio,
     required String clinicianPhotoUrl,
   }) {
+    final compact = _isLandscapeCompact(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -377,9 +404,9 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           clinicianName: clinicianName,
           clinicianPhotoUrl: clinicianPhotoUrl,
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: compact ? 4.0 : 8.0),
         _buildRatingsSummary(isArabic),
-        const SizedBox(height: 16),
+        SizedBox(height: compact ? 8.0 : 16.0),
         _buildOperationsActions(
           context: context,
           isArabic: isArabic,
@@ -396,7 +423,12 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final gap = constraints.maxWidth < 420 ? 8.0 : 16.0;
+        final compact = _isLandscapeCompact(context);
+        final gap = compact
+            ? 6.0
+            : constraints.maxWidth < 420
+                ? 8.0
+                : 16.0;
 
         return Row(
           textDirection: TextDirection.ltr,
@@ -411,6 +443,8 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                   isArabic: isArabic,
                   clinicianName: clinicianName,
                   clinicianPhotoUrl: clinicianPhotoUrl,
+                  onBackToMenu: _goToMenu,
+                  onToggleLanguage: _toggleLocale,
                   onSignOut: _signOut,
                 ),
               ),
@@ -622,8 +656,9 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
             const SizedBox(width: 14),
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                    isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                crossAxisAlignment: isArabic
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
                 children: [
                   Text(
                     isArabic ? 'تعديل بياناتي' : 'Edit my profile',
@@ -651,7 +686,11 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
               onPressed: () => Navigator.of(context).pushNamed(
                 Routes.clinicianProfileEditRequest,
               ),
-              child: Text(isArabic ? 'فتح' : 'Open'),
+              child: Text(
+                isArabic ? 'فتح' : 'Open',
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
@@ -1480,27 +1519,40 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                     return _matchesTab(status);
                   }).toList();
 
-                  return ListView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg,
-                      vertical: 72,
-                    ),
-                    children: [
-                      _buildHomeSummary(
-                        context: context,
-                        isArabic: isArabic,
-                        clinicianData: clinicianData,
-                        clinicianName: clinicianName,
-                        clinicianBio: clinicianBio,
-                        clinicianPhotoUrl: clinicianPhotoUrl,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildAssignmentsSection(
-                        context: context,
-                        isArabic: isArabic,
-                        docs: docs,
-                      ),
-                    ],
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      final compact = _isLandscapeCompact(context);
+                      final horizontal =
+                          constraints.maxWidth >= 700 ? 24.0 : 16.0;
+                      final vertical = compact
+                          ? 24.0
+                          : constraints.maxWidth >= 700
+                              ? 56.0
+                              : 44.0;
+
+                      return ListView(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: horizontal,
+                          vertical: vertical,
+                        ),
+                        children: [
+                          _buildHomeSummary(
+                            context: context,
+                            isArabic: isArabic,
+                            clinicianData: clinicianData,
+                            clinicianName: clinicianName,
+                            clinicianBio: clinicianBio,
+                            clinicianPhotoUrl: clinicianPhotoUrl,
+                          ),
+                          SizedBox(height: compact ? 8.0 : 12.0),
+                          _buildAssignmentsSection(
+                            context: context,
+                            isArabic: isArabic,
+                            docs: docs,
+                          ),
+                        ],
+                      );
+                    },
                   );
                 },
               );
@@ -1575,12 +1627,12 @@ class _RatingMetricChip extends StatelessWidget {
 }
 
 class _ClinicianLogoutButton extends StatelessWidget {
-  final bool isArabic;
   final VoidCallback onPressed;
+  final bool compact;
 
   const _ClinicianLogoutButton({
-    required this.isArabic,
     required this.onPressed,
+    this.compact = false,
   });
 
   @override
@@ -1595,12 +1647,12 @@ class _ClinicianLogoutButton extends StatelessWidget {
           onTap: onPressed,
           customBorder: const CircleBorder(),
           child: SizedBox(
-            width: 38,
-            height: 38,
+            width: compact ? 36 : 38,
+            height: compact ? 36 : 38,
             child: Image.asset(
               'assets/branding/navigation/logout/logout_gold.png',
-              width: 26,
-              height: 26,
+              width: compact ? 24 : 26,
+              height: compact ? 24 : 26,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
                 return const Icon(
@@ -1624,6 +1676,128 @@ class _ClinicianLogoutButton extends StatelessWidget {
   }
 }
 
+class _ClinicianHeaderIconButton extends StatelessWidget {
+  final IconData icon;
+  final String? asset;
+  final String tooltip;
+  final VoidCallback onPressed;
+  final bool compact;
+
+  const _ClinicianHeaderIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+    this.asset,
+    this.compact = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: Colors.transparent,
+        shape: const CircleBorder(),
+        child: InkWell(
+          onTap: onPressed,
+          customBorder: const CircleBorder(),
+          child: SizedBox(
+            width: compact ? 36 : 38,
+            height: compact ? 36 : 38,
+            child: asset == null
+                ? Icon(
+                    icon,
+                    color: AppColors.mutedGold,
+                    size: compact ? 21 : 22,
+                    shadows: const [
+                      Shadow(
+                        color: Colors.black,
+                        blurRadius: 7,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  )
+                : Image.asset(
+                    asset!,
+                    width: compact ? 24 : 26,
+                    height: compact ? 24 : 26,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(
+                        icon,
+                        color: AppColors.mutedGold,
+                        size: 22,
+                        shadows: const [
+                          Shadow(
+                            color: Colors.black,
+                            blurRadius: 7,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ClinicianLanguageButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onPressed;
+  final bool compact;
+
+  const _ClinicianLanguageButton({
+    required this.label,
+    required this.onPressed,
+    this.compact = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: label,
+      child: Material(
+        color: Colors.transparent,
+        shape: const CircleBorder(),
+        child: InkWell(
+          onTap: onPressed,
+          customBorder: const CircleBorder(),
+          child: Container(
+            width: compact ? 36 : 38,
+            height: compact ? 36 : 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.22),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColors.mutedGold.withValues(alpha: 0.42),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.mutedGold.withValues(alpha: 0.14),
+                  blurRadius: 10,
+                ),
+              ],
+            ),
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Color(0xFFFFE7B2),
+                fontSize: 12,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _ClinicianGoldLogo extends StatelessWidget {
   final bool isArabic;
 
@@ -1631,18 +1805,31 @@ class _ClinicianGoldLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final compact = size.width > size.height && size.width < 900;
+    final isTablet = size.width >= 700 && size.width <= 1100;
+    final logoSize = compact
+        ? 76.0
+        : isTablet
+            ? 104.0
+            : 90.0;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       child: Image.asset(
         'assets/branding/logo_icon.png',
-        width: 90,
-        height: 90,
+        width: logoSize,
+        height: logoSize,
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
-          return const Icon(
+          return Icon(
             Icons.auto_awesome_rounded,
-            color: Color(0xFFE7C766),
-            size: 84,
+            color: const Color(0xFFE7C766),
+            size: compact
+                ? 72.0
+                : isTablet
+                    ? 96.0
+                    : 84.0,
           );
         },
       ),
@@ -1654,17 +1841,26 @@ class _ClinicianCompactProfile extends StatelessWidget {
   final bool isArabic;
   final String clinicianName;
   final String clinicianPhotoUrl;
+  final VoidCallback onBackToMenu;
+  final VoidCallback onToggleLanguage;
   final VoidCallback onSignOut;
 
   const _ClinicianCompactProfile({
     required this.isArabic,
     required this.clinicianName,
     required this.clinicianPhotoUrl,
+    required this.onBackToMenu,
+    required this.onToggleLanguage,
     required this.onSignOut,
   });
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final compact = size.width > size.height && size.width < 900;
+    final isTablet = size.width >= 700 && size.width <= 1100;
+    final avatarRadius = compact ? 36.0 : 46.0;
+    final actionSpacing = compact ? 6.0 : 8.0;
     final photoUri = Uri.tryParse(clinicianPhotoUrl.trim());
     final hasValidPhotoUrl = photoUri != null &&
         (photoUri.scheme == 'http' || photoUri.scheme == 'https');
@@ -1673,18 +1869,45 @@ class _ClinicianCompactProfile extends StatelessWidget {
         : clinicianName;
 
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 300),
+      constraints: BoxConstraints(maxWidth: compact ? 260.0 : 300.0),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            _ClinicianLogoutButton(
-              isArabic: isArabic,
-              onPressed: onSignOut,
+            Padding(
+              padding: EdgeInsets.only(right: isTablet ? 8.0 : 0),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Wrap(
+                  spacing: actionSpacing,
+                  runSpacing: 4,
+                  alignment: WrapAlignment.end,
+                  children: [
+                    _ClinicianHeaderIconButton(
+                      compact: compact,
+                      icon: Icons.arrow_back_rounded,
+                      asset: isArabic
+                          ? 'assets/branding/navigation/back/back_right_gold.png'
+                          : 'assets/branding/navigation/back/back_left_gold.png',
+                      tooltip: isArabic ? 'القائمة' : 'Menu',
+                      onPressed: onBackToMenu,
+                    ),
+                    _ClinicianLanguageButton(
+                      compact: compact,
+                      label: isArabic ? 'EN' : 'AR',
+                      onPressed: onToggleLanguage,
+                    ),
+                    _ClinicianLogoutButton(
+                      compact: compact,
+                      onPressed: onSignOut,
+                    ),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: compact ? 2.0 : 4.0),
             Row(
               mainAxisSize: MainAxisSize.min,
               textDirection: TextDirection.rtl,
@@ -1695,8 +1918,7 @@ class _ClinicianCompactProfile extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color:
-                            const Color(0xFFE7C766).withValues(alpha: 0.22),
+                        color: const Color(0xFFE7C766).withValues(alpha: 0.22),
                         blurRadius: 24,
                         spreadRadius: 1,
                       ),
@@ -1708,7 +1930,7 @@ class _ClinicianCompactProfile extends StatelessWidget {
                     ],
                   ),
                   child: CircleAvatar(
-                    radius: 46,
+                    radius: avatarRadius,
                     backgroundColor:
                         const Color(0xFFE7C766).withValues(alpha: 0.18),
                     backgroundImage: hasValidPhotoUrl
@@ -1719,7 +1941,7 @@ class _ClinicianCompactProfile extends StatelessWidget {
                         : Icon(
                             Icons.person_rounded,
                             color: const Color(0xFFE7C766),
-                            size: 50,
+                            size: compact ? 40.0 : 50.0,
                           ),
                   ),
                 ),
@@ -1731,18 +1953,18 @@ class _ClinicianCompactProfile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.right,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: const Color(0xFFFFE7B2),
-                          fontWeight: FontWeight.w900,
-                          height: 1.15,
-                          letterSpacing: 0,
-                          shadows: const [
-                            Shadow(
-                              color: Colors.black,
-                              blurRadius: 12,
-                              offset: Offset(0, 1),
-                            ),
-                          ],
+                      color: const Color(0xFFFFE7B2),
+                      fontWeight: FontWeight.w900,
+                      height: 1.15,
+                      letterSpacing: 0,
+                      shadows: const [
+                        Shadow(
+                          color: Colors.black,
+                          blurRadius: 12,
+                          offset: Offset(0, 1),
                         ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -1998,10 +2220,16 @@ class _OperationActionsCarouselState extends State<_OperationActionsCarousel> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
+        final mediaSize = MediaQuery.sizeOf(context);
         final isMobile = width < 700;
         final isTablet = width >= 700 && width <= 1100;
+        final compact =
+            mediaSize.width > mediaSize.height && mediaSize.height < 540;
+        final compactHeight = (mediaSize.height * 0.30).clamp(132.0, 166.0);
         final viewportFraction = isMobile
-            ? 0.76
+            ? compact
+                ? 0.54
+                : 0.76
             : isTablet
                 ? 0.50
                 : 0.30;
@@ -2015,7 +2243,13 @@ class _OperationActionsCarouselState extends State<_OperationActionsCarousel> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1040),
             child: SizedBox(
-              height: isMobile ? 232 : 260,
+              height: compact
+                  ? compactHeight
+                  : isMobile
+                      ? 232
+                      : isTablet
+                          ? 238
+                          : 260,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -2033,12 +2267,16 @@ class _OperationActionsCarouselState extends State<_OperationActionsCarousel> {
                         duration: const Duration(milliseconds: 260),
                         curve: Curves.easeOutQuart,
                         child: AnimatedScale(
-                          scale: scale,
+                          scale: compact ? scale * 0.84 : scale,
                           duration: const Duration(milliseconds: 260),
                           curve: Curves.easeOutQuart,
                           child: Padding(
                             padding: EdgeInsets.symmetric(
-                              horizontal: isMobile ? 6 : 10,
+                              horizontal: compact
+                                  ? 2.0
+                                  : isMobile
+                                      ? 6.0
+                                      : 10.0,
                             ),
                             child: Center(child: widget.children[index]),
                           ),
@@ -2047,7 +2285,11 @@ class _OperationActionsCarouselState extends State<_OperationActionsCarousel> {
                     },
                   ),
                   PositionedDirectional(
-                    start: isMobile ? 6 : 18,
+                    start: compact
+                        ? 2
+                        : isMobile
+                            ? 6
+                            : 18,
                     child: _OperationCarouselArrow(
                       icon: Icons.chevron_left_rounded,
                       enabled: canGoBack,
@@ -2055,7 +2297,11 @@ class _OperationActionsCarouselState extends State<_OperationActionsCarousel> {
                     ),
                   ),
                   PositionedDirectional(
-                    end: isMobile ? 6 : 18,
+                    end: compact
+                        ? 2
+                        : isMobile
+                            ? 6
+                            : 18,
                     child: _OperationCarouselArrow(
                       icon: Icons.chevron_right_rounded,
                       enabled: canGoForward,
@@ -2479,8 +2725,11 @@ class _ClinicianProfileEditRequestPageState
     required bool isArabic,
     required Map<String, dynamic> clinicianData,
   }) {
+    final size = MediaQuery.sizeOf(context);
+    final compact = size.width > size.height && size.width < 900;
+
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(compact ? 14.0 : 18.0),
       decoration: _profileEditGlassDecoration(alpha: 0.34, radius: 22),
       child: DefaultTextStyle.merge(
         style: const TextStyle(color: Color(0xFFFFF4D4)),
@@ -2488,72 +2737,76 @@ class _ClinicianProfileEditRequestPageState
           crossAxisAlignment:
               isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-          Text(
-            isArabic
-                ? 'طلب تعديل الصورة أو النبذة'
-                : 'Request photo or bio update',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: const Color(0xFFE7C766),
-                  fontWeight: FontWeight.w800,
-                ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            isArabic
-                ? 'أي تعديل على الصورة الشخصية أو النبذة يذهب للمراجعة أولًا. الاسم والوثائق غير قابلة للتعديل من هنا.'
-                : 'Any update to the profile photo or bio is sent for review first. Name and documents cannot be edited here.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: const Color(0xFFFFF4D4),
-                ),
-          ),
-          const SizedBox(height: 14),
-          TextField(
-            controller: _requestedPhotoUrlController,
-            style: const TextStyle(
-              color: Color(0xFFFFF4D4),
-              fontWeight: FontWeight.w600,
+            Text(
+              isArabic
+                  ? 'طلب تعديل الصورة أو النبذة'
+                  : 'Request photo or bio update',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: const Color(0xFFE7C766),
+                    fontWeight: FontWeight.w800,
+                  ),
             ),
-            cursorColor: const Color(0xFFE7C766),
-            decoration: _profileEditInputDecoration(
-              isArabic ? 'رابط الصورة الجديدة' : 'New photo URL',
+            SizedBox(height: compact ? 6.0 : 8.0),
+            Text(
+              isArabic
+                  ? 'أي تعديل على الصورة الشخصية أو النبذة يذهب للمراجعة أولًا. الاسم والوثائق غير قابلة للتعديل من هنا.'
+                  : 'Any update to the profile photo or bio is sent for review first. Name and documents cannot be edited here.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: const Color(0xFFFFF4D4),
+                  ),
             ),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _requestedBioController,
-            maxLines: 4,
-            style: const TextStyle(
-              color: Color(0xFFFFF4D4),
-              fontWeight: FontWeight.w600,
-            ),
-            cursorColor: const Color(0xFFE7C766),
-            decoration: _profileEditInputDecoration(
-              isArabic ? 'النبذة الجديدة' : 'New bio',
-            ),
-          ),
-          const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: FilledButton.icon(
-              style: _profileEditSubmitButtonStyle(),
-              onPressed: _submittingChangeRequest
-                  ? null
-                  : () => _submitProfileChangeRequest(clinicianData),
-              icon: _submittingChangeRequest
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.fact_check_outlined),
-              label: Text(
-                _submittingChangeRequest
-                    ? (isArabic ? 'جارٍ إرسال الطلب...' : 'Sending request...')
-                    : (isArabic ? 'إرسال طلب التعديل' : 'Send change request'),
+            SizedBox(height: compact ? 10.0 : 14.0),
+            TextField(
+              controller: _requestedPhotoUrlController,
+              style: const TextStyle(
+                color: Color(0xFFFFF4D4),
+                fontWeight: FontWeight.w600,
+              ),
+              cursorColor: const Color(0xFFE7C766),
+              decoration: _profileEditInputDecoration(
+                isArabic ? 'رابط الصورة الجديدة' : 'New photo URL',
               ),
             ),
-          ),
+            SizedBox(height: compact ? 8.0 : 12.0),
+            TextField(
+              controller: _requestedBioController,
+              maxLines: compact ? 3 : 4,
+              style: const TextStyle(
+                color: Color(0xFFFFF4D4),
+                fontWeight: FontWeight.w600,
+              ),
+              cursorColor: const Color(0xFFE7C766),
+              decoration: _profileEditInputDecoration(
+                isArabic ? 'النبذة الجديدة' : 'New bio',
+              ),
+            ),
+            SizedBox(height: compact ? 10.0 : 14.0),
+            SizedBox(
+              width: double.infinity,
+              height: compact ? 48.0 : 52.0,
+              child: FilledButton.icon(
+                style: _profileEditSubmitButtonStyle(),
+                onPressed: _submittingChangeRequest
+                    ? null
+                    : () => _submitProfileChangeRequest(clinicianData),
+                icon: _submittingChangeRequest
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.fact_check_outlined),
+                label: Text(
+                  _submittingChangeRequest
+                      ? (isArabic
+                          ? 'جارٍ إرسال الطلب...'
+                          : 'Sending request...')
+                      : (isArabic
+                          ? 'إرسال طلب التعديل'
+                          : 'Send change request'),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -2574,71 +2827,71 @@ class _ClinicianProfileEditRequestPageState
           crossAxisAlignment:
               isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-          Text(
-            isArabic ? 'طلبات التعديل السابقة' : 'Previous change requests',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: const Color(0xFFE7C766),
-                  fontWeight: FontWeight.w800,
-                ),
-          ),
-          const SizedBox(height: 12),
-          if (docs.isEmpty)
-            Text(isArabic
-                ? 'لا توجد طلبات تعديل حتى الآن'
-                : 'No change requests yet')
-          else
-            ...docs.map((doc) {
-              final data = doc.data();
-              final status = (data['status'] ?? 'pending').toString();
-              final requestedBio = (data['requestedBio'] ?? '').toString();
-              final requestedPhotoUrl =
-                  (data['requestedPhotoUrl'] ?? '').toString();
-              final adminNote = (data['adminNote'] ?? '').toString().trim();
-
-              return Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE7C766).withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: const Color(0xFFE7C766).withValues(alpha: 0.22),
+            Text(
+              isArabic ? 'طلبات التعديل السابقة' : 'Previous change requests',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: const Color(0xFFE7C766),
+                    fontWeight: FontWeight.w800,
                   ),
-                ),
-                child: Column(
-                  crossAxisAlignment: isArabic
-                      ? CrossAxisAlignment.end
-                      : CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _requestStatusLabel(status, isArabic),
-                      style: const TextStyle(
-                        color: Color(0xFFE7C766),
-                        fontWeight: FontWeight.w800,
-                      ),
+            ),
+            const SizedBox(height: 12),
+            if (docs.isEmpty)
+              Text(isArabic
+                  ? 'لا توجد طلبات تعديل حتى الآن'
+                  : 'No change requests yet')
+            else
+              ...docs.map((doc) {
+                final data = doc.data();
+                final status = (data['status'] ?? 'pending').toString();
+                final requestedBio = (data['requestedBio'] ?? '').toString();
+                final requestedPhotoUrl =
+                    (data['requestedPhotoUrl'] ?? '').toString();
+                final adminNote = (data['adminNote'] ?? '').toString().trim();
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE7C766).withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: const Color(0xFFE7C766).withValues(alpha: 0.22),
                     ),
-                    if (requestedPhotoUrl.isNotEmpty) ...[
-                      const SizedBox(height: 6),
-                      Text(isArabic
-                          ? 'الصورة المطلوبة: $requestedPhotoUrl'
-                          : 'Requested photo: $requestedPhotoUrl'),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: isArabic
+                        ? CrossAxisAlignment.end
+                        : CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _requestStatusLabel(status, isArabic),
+                        style: const TextStyle(
+                          color: Color(0xFFE7C766),
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      if (requestedPhotoUrl.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Text(isArabic
+                            ? 'الصورة المطلوبة: $requestedPhotoUrl'
+                            : 'Requested photo: $requestedPhotoUrl'),
+                      ],
+                      if (requestedBio.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Text(isArabic
+                            ? 'النبذة المطلوبة: $requestedBio'
+                            : 'Requested bio: $requestedBio'),
+                      ],
+                      if (adminNote.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Text(isArabic
+                            ? 'ملاحظة الإدارة: $adminNote'
+                            : 'Admin note: $adminNote'),
+                      ],
                     ],
-                    if (requestedBio.isNotEmpty) ...[
-                      const SizedBox(height: 6),
-                      Text(isArabic
-                          ? 'النبذة المطلوبة: $requestedBio'
-                          : 'Requested bio: $requestedBio'),
-                    ],
-                    if (adminNote.isNotEmpty) ...[
-                      const SizedBox(height: 6),
-                      Text(isArabic
-                          ? 'ملاحظة الإدارة: $adminNote'
-                          : 'Admin note: $adminNote'),
-                    ],
-                  ],
-                ),
-              );
-            }),
+                  ),
+                );
+              }),
           ],
         ),
       ),
@@ -2656,6 +2909,8 @@ class _ClinicianProfileEditRequestPageState
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
     final l10n = AppLocalizations.of(context)!;
+    final size = MediaQuery.sizeOf(context);
+    final compact = size.width > size.height && size.width < 900;
 
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
@@ -2741,7 +2996,7 @@ class _ClinicianProfileEditRequestPageState
                   );
 
                   return ListView(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    padding: EdgeInsets.all(compact ? 14.0 : AppSpacing.lg),
                     children: [
                       if (hasPending)
                         Container(

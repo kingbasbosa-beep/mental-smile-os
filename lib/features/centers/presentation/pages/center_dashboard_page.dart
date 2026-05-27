@@ -129,7 +129,7 @@ class CenterDashboardPage extends StatelessWidget {
       case 'approved':
         return isArabic ? 'معتمد' : 'Approved';
       case 'center_follow_up':
-        return isArabic ? 'قيد المتابعة' : 'Follow-up';
+        return isArabic ? 'قيد المراجعة' : 'Follow-up';
       case 'rejected_admin':
       case 'rejected':
         return isArabic ? 'مرفوض' : 'Rejected';
@@ -208,6 +208,8 @@ class CenterDashboardPage extends StatelessWidget {
         body: LayoutBuilder(
           builder: (context, backgroundConstraints) {
             final width = backgroundConstraints.maxWidth;
+            final height = backgroundConstraints.maxHeight;
+            final isCompactLandscape = width < 900 && height < 520;
 
             return Stack(
               fit: StackFit.expand,
@@ -227,185 +229,199 @@ class CenterDashboardPage extends StatelessWidget {
                 StreamBuilder<Map<String, dynamic>?>(
                   stream: _centerStream(),
                   builder: (context, snapshot) {
-              final scheme = Theme.of(context).colorScheme;
-              final data = snapshot.data ?? <String, dynamic>{};
+                    final scheme = Theme.of(context).colorScheme;
+                    final data = snapshot.data ?? <String, dynamic>{};
 
-              final centerName =
-                  (data['centerName'] ?? data['displayName'] ?? '')
-                      .toString()
-                      .trim();
-              final email = (data['email'] ?? '').toString().trim();
-              final imageUrl =
-                  (data['imageUrl'] ?? data['coverImageUrl'] ?? '')
-                      .toString()
-                      .trim();
-              final phone = (data['phone'] ?? '').toString().trim();
-              final city = (data['city'] ?? '').toString().trim();
-              final address = (data['address'] ?? '').toString().trim();
-              final description = (data['description'] ?? '').toString().trim();
-              final managerName = (data['managerName'] ?? '').toString().trim();
-              final centerType = (data['centerType'] ?? '').toString().trim();
-              final hasDetoxUnit = ((data['hasDetoxUnit'] ?? false) == true) ||
-                  centerType == 'detox';
-              final approvalStatus =
-                  (data['approvalStatus'] ?? 'pending_admin').toString().trim();
-              final imagesReady = (data['imagesReady'] ?? false) == true;
-              final documentsReady = (data['documentsReady'] ?? false) == true;
+                    final centerName =
+                        (data['centerName'] ?? data['displayName'] ?? '')
+                            .toString()
+                            .trim();
+                    final email = (data['email'] ?? '').toString().trim();
+                    final imageUrl =
+                        (data['imageUrl'] ?? data['coverImageUrl'] ?? '')
+                            .toString()
+                            .trim();
+                    final phone = (data['phone'] ?? '').toString().trim();
+                    final city = (data['city'] ?? '').toString().trim();
+                    final address = (data['address'] ?? '').toString().trim();
+                    final description =
+                        (data['description'] ?? '').toString().trim();
+                    final managerName =
+                        (data['managerName'] ?? '').toString().trim();
+                    final centerType =
+                        (data['centerType'] ?? '').toString().trim();
+                    final hasDetoxUnit =
+                        ((data['hasDetoxUnit'] ?? false) == true) ||
+                            centerType == 'detox';
+                    final approvalStatus =
+                        (data['approvalStatus'] ?? 'pending_admin')
+                            .toString()
+                            .trim();
+                    final imagesReady = (data['imagesReady'] ?? false) == true;
+                    final documentsReady =
+                        (data['documentsReady'] ?? false) == true;
 
-              final gallery = _readGallery(data);
-              final documents = _readDocuments(data);
-              final galleryThumbs = gallery
-                  .map(
-                    (item) => (item['url'] ??
-                            item['imageUrl'] ??
-                            item['asset'] ??
-                            item['path'] ??
-                            '')
-                        .toString()
-                        .trim(),
-                  )
-                  .where((value) => value.isNotEmpty)
-                  .take(4)
-                  .toList();
-              final statusLabel =
-                  _approvalStatusLabel(approvalStatus, isArabic);
-              return ListView(
-                padding: EdgeInsets.fromLTRB(
-                  width < 700 ? 16 : 72,
-                  width < 700 ? 18 : 86,
-                  width < 700 ? 16 : 72,
-                  24,
-                ),
-                children: [
-                  Row(
-                    textDirection: TextDirection.ltr,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const _CenterBrandMark(),
-                      const Spacer(),
-                      _CenterFloatingProfile(
-                        isArabic: isArabic,
-                        centerName: centerName,
-                        imageUrl: imageUrl,
-                        onLogout: () => _logout(context),
+                    final gallery = _readGallery(data);
+                    final documents = _readDocuments(data);
+                    final galleryThumbs = gallery
+                        .map(
+                          (item) => (item['url'] ??
+                                  item['imageUrl'] ??
+                                  item['asset'] ??
+                                  item['path'] ??
+                                  '')
+                              .toString()
+                              .trim(),
+                        )
+                        .where((value) => value.isNotEmpty)
+                        .take(4)
+                        .toList();
+                    final statusLabel =
+                        _approvalStatusLabel(approvalStatus, isArabic);
+                    return ListView(
+                      padding: EdgeInsets.fromLTRB(
+                        width < 700 ? 14 : 72,
+                        isCompactLandscape ? 12 : (width < 700 ? 18 : 86),
+                        width < 700 ? 14 : 72,
+                        isCompactLandscape ? 16 : 24,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  _CenterInfoChips(
-                    values: [
-                      centerName.isEmpty
-                          ? (isArabic ? 'مركز' : 'Center')
-                          : centerName,
-                      email.isEmpty
-                          ? (isArabic ? 'بدون بريد' : 'No email')
-                          : email,
-                      statusLabel,
-                      _centerTypeLabel(centerType, isArabic),
-                    ],
-                  ),
-                  const SizedBox(height: 22),
-                  if (galleryThumbs.isNotEmpty) ...[
-                    _CenterTopGallery(imageUrls: galleryThumbs),
-                    const SizedBox(height: 16),
-                  ],
-                  _CenterActionCards(
-                    children: [
-                      _SectionCard(
-                        title: isArabic ? 'طلبات جديدة' : 'New requests',
-                        subtitle: isArabic
-                            ? 'وارد الطلبات بانتظار رد المركز'
-                            : 'Inbox requests awaiting center response',
-                        icon: Icons.inbox_outlined,
-                        accent: const Color(0xFFE7C766),
-                        imagePath:
-                            'assets/images/center_dashboard/actions/center_new_requests.png',
-                        onTap: () =>
-                            Navigator.of(context).pushNamed(Routes.centerInbox),
-                      ),
-                      _SectionCard(
-                        title: isArabic ? 'طلبات نشطة' : 'Active requests',
-                        subtitle: isArabic
-                            ? 'متابعة الطلبات الجارية'
-                            : 'Follow active center requests',
-                        icon: Icons.timelapse_outlined,
-                        accent: const Color(0xFF8EDBFF),
-                        imagePath:
-                            'assets/images/center_dashboard/actions/center_active_requests.png',
-                        onTap: () =>
-                            Navigator.of(context).pushNamed(Routes.centerInbox),
-                      ),
-                      _SectionCard(
-                        title: isArabic ? 'طلبات مكتملة' : 'Completed requests',
-                        subtitle: isArabic
-                            ? 'مراجعة الإقامات المكتملة'
-                            : 'Review completed residencies',
-                        icon: Icons.verified_outlined,
-                        accent: const Color(0xFF9FE6D7),
-                        imagePath:
-                            'assets/images/center_dashboard/actions/center_completed_requests.png',
-                        onTap: () => Navigator.of(context)
-                            .pushNamed(Routes.centerResidencies),
-                      ),
-                      _SectionCard(
-                        title: isArabic
-                            ? 'طلبات مرفوضة/ملغاة'
-                            : 'Rejected requests',
-                        subtitle: isArabic
-                            ? 'متابعة الطلبات غير المكتملة'
-                            : 'Review unavailable or cancelled requests',
-                        icon: Icons.cancel_outlined,
-                        accent: const Color(0xFFFF9A8A),
-                        imagePath:
-                            'assets/images/center_dashboard/actions/center_rejected_requests.png',
-                        onTap: () =>
-                            Navigator.of(context).pushNamed(Routes.centerInbox),
-                      ),
-                      _SectionCard(
-                        title: isArabic ? 'جلساتي' : 'My sessions',
-                        subtitle: isArabic
-                            ? 'الإقامات المجدولة والجارية'
-                            : 'Scheduled and active residencies',
-                        icon: Icons.hotel_outlined,
-                        accent: const Color(0xFF9FE6D7),
-                        imagePath:
-                            'assets/images/center_dashboard/actions/center_sessions.png',
-                        onTap: () => Navigator.of(context)
-                            .pushNamed(Routes.centerResidencies),
-                      ),
-                      _SectionCard(
-                        title: isArabic ? 'تحديث بياناتي' : 'Update profile',
-                        subtitle: isArabic
-                            ? 'الصور والوثائق وبيانات المركز'
-                            : 'Images, documents, and center data',
-                        icon: Icons.dashboard_customize_outlined,
-                        accent: const Color(0xFFFFB56B),
-                        imagePath:
-                            'assets/images/center_dashboard/actions/center_update_profile.png',
-                        onTap: () => Navigator.of(context)
-                            .pushNamed(Routes.centerOperations),
-                      ),
-                      _SectionCard(
-                        title: isArabic
-                            ? 'حالات الشات المحالة'
-                            : 'Transferred chats',
-                        subtitle: isArabic
-                            ? 'قناة الدعم والمتابعة مع الإدارة'
-                            : 'Support and admin follow-up channel',
-                        icon: Icons.chat_bubble_outline_rounded,
-                        accent: const Color(0xFF8EDBFF),
-                        imagePath:
-                            'assets/images/center_dashboard/actions/center_transferred_chats.png',
-                        onTap: () => Navigator.pushNamed(
-                          context,
-                          Routes.supportIssueSelector,
-                          arguments: const {'supportType': 'center_support'},
+                      children: [
+                        Row(
+                          textDirection: TextDirection.ltr,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const _CenterBrandMark(),
+                            const Spacer(),
+                            _CenterFloatingProfile(
+                              isArabic: isArabic,
+                              centerName: centerName,
+                              imageUrl: imageUrl,
+                              compact: isCompactLandscape,
+                              onLogout: () => _logout(context),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              );
+                        const SizedBox(height: 8),
+                        _CenterInfoChips(
+                          values: [
+                            centerName.isEmpty
+                                ? (isArabic ? 'مركز' : 'Center')
+                                : centerName,
+                            email.isEmpty
+                                ? (isArabic ? 'بدون بريد' : 'No email')
+                                : email,
+                            statusLabel,
+                            _centerTypeLabel(centerType, isArabic),
+                          ],
+                        ),
+                        SizedBox(height: isCompactLandscape ? 12 : 22),
+                        if (galleryThumbs.isNotEmpty) ...[
+                          _CenterTopGallery(imageUrls: galleryThumbs),
+                          const SizedBox(height: 16),
+                        ],
+                        _CenterActionCards(
+                          children: [
+                            _SectionCard(
+                              title: isArabic ? 'طلبات جديدة' : 'New requests',
+                              subtitle: isArabic
+                                  ? 'وارد الطلبات بانتظار رد المركز'
+                                  : 'Inbox requests awaiting center response',
+                              icon: Icons.inbox_outlined,
+                              accent: const Color(0xFFE7C766),
+                              imagePath:
+                                  'assets/images/center_dashboard/actions/center_new_requests.png',
+                              onTap: () => Navigator.of(context)
+                                  .pushNamed(Routes.centerInbox),
+                            ),
+                            _SectionCard(
+                              title:
+                                  isArabic ? 'طلبات نشطة' : 'Active requests',
+                              subtitle: isArabic
+                                  ? 'متابعة الطلبات الجارية'
+                                  : 'Follow active center requests',
+                              icon: Icons.timelapse_outlined,
+                              accent: const Color(0xFF8EDBFF),
+                              imagePath:
+                                  'assets/images/center_dashboard/actions/center_active_requests.png',
+                              onTap: () => Navigator.of(context)
+                                  .pushNamed(Routes.centerInbox),
+                            ),
+                            _SectionCard(
+                              title: isArabic
+                                  ? 'طلبات مكتملة'
+                                  : 'Completed requests',
+                              subtitle: isArabic
+                                  ? 'مراجعة الإقامات المكتملة'
+                                  : 'Review completed residencies',
+                              icon: Icons.verified_outlined,
+                              accent: const Color(0xFF9FE6D7),
+                              imagePath:
+                                  'assets/images/center_dashboard/actions/center_completed_requests.png',
+                              onTap: () => Navigator.of(context)
+                                  .pushNamed(Routes.centerResidencies),
+                            ),
+                            _SectionCard(
+                              title: isArabic
+                                  ? 'طلبات مرفوضة'
+                                  : 'Rejected requests',
+                              subtitle: isArabic
+                                  ? 'متابعة الطلبات المرفوضة أو غير المتاحة'
+                                  : 'Review unavailable or cancelled requests',
+                              icon: Icons.cancel_outlined,
+                              accent: const Color(0xFFFF9A8A),
+                              imagePath:
+                                  'assets/images/center_dashboard/actions/center_rejected_requests.png',
+                              onTap: () => Navigator.of(context)
+                                  .pushNamed(Routes.centerInbox),
+                            ),
+                            _SectionCard(
+                              title: isArabic ? 'الإقامات' : 'My sessions',
+                              subtitle: isArabic
+                                  ? 'الإقامات المجدولة والجارية'
+                                  : 'Scheduled and active residencies',
+                              icon: Icons.hotel_outlined,
+                              accent: const Color(0xFF9FE6D7),
+                              imagePath:
+                                  'assets/images/center_dashboard/actions/center_sessions.png',
+                              onTap: () => Navigator.of(context)
+                                  .pushNamed(Routes.centerResidencies),
+                            ),
+                            _SectionCard(
+                              title:
+                                  isArabic ? 'تحديث بياناتي' : 'Update profile',
+                              subtitle: isArabic
+                                  ? 'الصور والوثائق وبيانات المركز'
+                                  : 'Images, documents, and center data',
+                              icon: Icons.dashboard_customize_outlined,
+                              accent: const Color(0xFFFFB56B),
+                              imagePath:
+                                  'assets/images/center_dashboard/actions/center_update_profile.png',
+                              onTap: () => Navigator.of(context)
+                                  .pushNamed(Routes.centerOperations),
+                            ),
+                            _SectionCard(
+                              title: isArabic
+                                  ? 'حالات الشات المحالة'
+                                  : 'Transferred chats',
+                              subtitle: isArabic
+                                  ? 'قناة الدعم والمتابعة مع الإدارة'
+                                  : 'Support and admin follow-up channel',
+                              icon: Icons.chat_bubble_outline_rounded,
+                              accent: const Color(0xFF8EDBFF),
+                              imagePath:
+                                  'assets/images/center_dashboard/actions/center_transferred_chats.png',
+                              onTap: () => Navigator.pushNamed(
+                                context,
+                                Routes.supportIssueSelector,
+                                arguments: const {
+                                  'supportType': 'center_support'
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
                   },
                 ),
               ],
@@ -458,20 +474,21 @@ class _CenterFloatingProfile extends StatelessWidget {
   final bool isArabic;
   final String centerName;
   final String imageUrl;
+  final bool compact;
   final VoidCallback onLogout;
 
   const _CenterFloatingProfile({
     required this.isArabic,
     required this.centerName,
     required this.imageUrl,
+    this.compact = false,
     required this.onLogout,
   });
 
   @override
   Widget build(BuildContext context) {
-    final displayName = centerName.isEmpty
-        ? (isArabic ? 'مركز' : 'Center')
-        : centerName;
+    final displayName =
+        centerName.isEmpty ? (isArabic ? 'مركز' : 'Center') : centerName;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -479,14 +496,15 @@ class _CenterFloatingProfile extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         SizedBox(
-          width: 112,
-          height: 148,
+          width: compact ? 88 : 112,
+          height: compact ? 112 : 148,
           child: Stack(
             alignment: Alignment.bottomCenter,
             children: [
               _CenterProfileImage(
                 imageUrl: imageUrl,
                 fallbackText: displayName,
+                compact: compact,
               ),
               Positioned(
                 top: 0,
@@ -504,25 +522,25 @@ class _CenterFloatingProfile extends StatelessWidget {
         ),
         const SizedBox(width: 14),
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 220),
+          constraints: BoxConstraints(maxWidth: compact ? 160 : 220),
           child: Text(
             displayName,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.right,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: const Color(0xFFFFE7B2),
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0,
-                  height: 1.05,
-                  shadows: const [
-                    Shadow(
-                      color: Colors.black,
-                      blurRadius: 12,
-                      offset: Offset(0, 1),
-                    ),
-                  ],
+              color: const Color(0xFFFFE7B2),
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0,
+              height: 1.05,
+              shadows: const [
+                Shadow(
+                  color: Colors.black,
+                  blurRadius: 12,
+                  offset: Offset(0, 1),
                 ),
+              ],
+            ),
           ),
         ),
       ],
@@ -533,10 +551,12 @@ class _CenterFloatingProfile extends StatelessWidget {
 class _CenterProfileImage extends StatelessWidget {
   final String imageUrl;
   final String fallbackText;
+  final bool compact;
 
   const _CenterProfileImage({
     required this.imageUrl,
     required this.fallbackText,
+    this.compact = false,
   });
 
   @override
@@ -594,8 +614,8 @@ class _CenterProfileImage extends StatelessWidget {
       ),
       child: ClipOval(
         child: Container(
-          width: 112,
-          height: 112,
+          width: compact ? 88 : 112,
+          height: compact ? 88 : 112,
           color: const Color(0xFFE7C766).withValues(alpha: 0.18),
           child: imageChild,
         ),
@@ -865,6 +885,8 @@ class _CenterGalleryCardState extends State<_CenterGalleryCard> {
     final scheme = Theme.of(context).colorScheme;
     final isArabic =
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+    final viewport = MediaQuery.sizeOf(context);
+    final isCompactLandscape = viewport.width < 900 && viewport.height < 520;
 
     final hasItems = widget.items.isNotEmpty;
     final safeIndex = hasItems ? (_index.clamp(0, widget.items.length - 1)) : 0;
@@ -1148,9 +1170,8 @@ class _CenterActionCardsState extends State<_CenterActionCards> {
   void _syncController(double viewportFraction) {
     if (_controller != null && _viewportFraction == viewportFraction) return;
 
-    final oldPage = _controller?.hasClients == true
-        ? (_controller?.page ?? _page)
-        : _page;
+    final oldPage =
+        _controller?.hasClients == true ? (_controller?.page ?? _page) : _page;
     final maxIndex = widget.children.isEmpty ? 0 : widget.children.length - 1;
 
     _controller?.removeListener(_handlePageChange);
@@ -1183,8 +1204,10 @@ class _CenterActionCardsState extends State<_CenterActionCards> {
         final width = constraints.maxWidth;
         final isMobile = width < 700;
         final isTablet = width >= 700 && width <= 1100;
+        final isCompactLandscape =
+            width < 900 && MediaQuery.sizeOf(context).height < 520;
         final viewportFraction = isMobile
-            ? 0.82
+            ? (isCompactLandscape ? 0.64 : 0.82)
             : isTablet
                 ? 0.56
                 : 0.34;
@@ -1198,7 +1221,7 @@ class _CenterActionCardsState extends State<_CenterActionCards> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1280),
             child: SizedBox(
-              height: isMobile ? 270 : 306,
+              height: isCompactLandscape ? 214 : (isMobile ? 270 : 306),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -1325,6 +1348,8 @@ class _SectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isArabic =
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
+    final viewport = MediaQuery.sizeOf(context);
+    final isCompactLandscape = viewport.width < 900 && viewport.height < 520;
 
     return _CenterActionHover(
       accent: accent,
@@ -1338,7 +1363,7 @@ class _SectionCard extends StatelessWidget {
           highlightColor: accent.withValues(alpha: 0.06),
           child: SizedBox(
             width: double.infinity,
-            height: 264,
+            height: isCompactLandscape ? 208 : 264,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(28),
               child: Stack(

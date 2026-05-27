@@ -335,7 +335,8 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
                           final items = _applyFilter(snapshot.data ?? []);
                           if (items.isEmpty) {
                             return const Center(
-                              child: Text('لا توجد حالات تاريخية مطابقة لهذا الفلتر'),
+                              child: Text(
+                                  'لا توجد حالات تاريخية مطابقة لهذا الفلتر'),
                             );
                           }
 
@@ -485,7 +486,8 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
                                                 },
                                               );
                                             },
-                                            child: const Text('فتح المحادثة القديمة'),
+                                            child: const Text(
+                                                'فتح المحادثة القديمة'),
                                           ),
                                           if (isAdminUser &&
                                               (e.status == 'open' ||

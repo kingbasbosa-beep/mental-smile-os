@@ -37,27 +37,32 @@ class AdminMaintenanceSystemPage extends StatelessWidget {
   static const List<_DiagnosticsToolItem> _tools = [
     _DiagnosticsToolItem(
       title: 'Firebase Console',
-      summary: 'Reference console for project services and operational snapshots.',
+      summary:
+          'Reference console for project services and operational snapshots.',
       url: 'https://console.firebase.google.com/',
     ),
     _DiagnosticsToolItem(
       title: 'Firestore Viewer',
-      summary: 'Direct data inspection surface for manual review and schema awareness.',
+      summary:
+          'Direct data inspection surface for manual review and schema awareness.',
       url: 'https://console.firebase.google.com/project/_/firestore',
     ),
     _DiagnosticsToolItem(
       title: 'Chrome DevTools',
-      summary: 'Browser inspection tool for layout, console, and runtime diagnostics.',
+      summary:
+          'Browser inspection tool for layout, console, and runtime diagnostics.',
       url: 'https://developer.chrome.com/docs/devtools/',
     ),
     _DiagnosticsToolItem(
       title: 'GitHub Repository',
-      summary: 'Code review and issue-tracking entry for repository history and diffs.',
+      summary:
+          'Code review and issue-tracking entry for repository history and diffs.',
       url: 'https://github.com/',
     ),
     _DiagnosticsToolItem(
       title: 'Local Project Folder',
-      summary: 'Manual reminder for local workspace inspection and file-level diagnostics.',
+      summary:
+          'Manual reminder for local workspace inspection and file-level diagnostics.',
       url: 'file:///C:/mental_smile_workspace/app/mental-smile-app',
     ),
   ];
@@ -67,34 +72,40 @@ class AdminMaintenanceSystemPage extends StatelessWidget {
       title: 'Review admin shell consistency',
       owner: 'Maintenance Lead',
       status: 'To Investigate',
-      notes: 'Inspect new operational surfaces for visual and structural drift.',
+      notes:
+          'Inspect new operational surfaces for visual and structural drift.',
     ),
     _IssueTaskItem(
       title: 'Check content workspace rollout risks',
       owner: 'Operations Review',
       status: 'In Progress',
-      notes: 'Map future staff exposure risks before any permission activation.',
+      notes:
+          'Map future staff exposure risks before any permission activation.',
     ),
     _IssueTaskItem(
       title: 'Observe support escalation path',
       owner: 'Chat Oversight',
       status: 'Monitoring',
-      notes: 'Continue reviewing manual escalation surfaces and intervention clarity.',
+      notes:
+          'Continue reviewing manual escalation surfaces and intervention clarity.',
     ),
   ];
 
   static const List<_FixLogItem> _fixLog = [
     _FixLogItem(
       title: 'Admin Hub content signal introduced',
-      summary: 'Pending content signal was surfaced for direct Control Room visibility.',
+      summary:
+          'Pending content signal was surfaced for direct Control Room visibility.',
     ),
     _FixLogItem(
       title: 'Workspace Command Center extracted',
-      summary: 'Standalone content workspace route prepared without activating staff auth.',
+      summary:
+          'Standalone content workspace route prepared without activating staff auth.',
     ),
     _FixLogItem(
       title: 'Employee System chassis prepared',
-      summary: 'Staff-layer shells were added as static architecture guidance only.',
+      summary:
+          'Staff-layer shells were added as static architecture guidance only.',
     ),
   ];
 
@@ -257,11 +268,10 @@ class AdminMaintenanceSystemPage extends StatelessWidget {
                     children: [
                       Text(
                         task.title,
-                        style:
-                            Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: const Color(0xFFF1E5C8),
-                                  fontWeight: FontWeight.w700,
-                                ),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: const Color(0xFFF1E5C8),
+                              fontWeight: FontWeight.w700,
+                            ),
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
@@ -362,7 +372,8 @@ class AdminMaintenanceSystemPage extends StatelessWidget {
   Widget _buildDomainAvailabilityLauncher(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(AppRadii.xl),
-      onTap: () => Navigator.of(context).pushNamed(Routes.adminDomainAvailability),
+      onTap: () =>
+          Navigator.of(context).pushNamed(Routes.adminDomainAvailability),
       child: AppSectionPanel(
         padding: const EdgeInsets.all(AppSpacing.md),
         color: const Color(0xFF151C21).withValues(alpha: 0.96),
@@ -429,7 +440,8 @@ class AdminMaintenanceSystemPage extends StatelessWidget {
                   Text(
                     'This is a monitoring and diagnostics surface, not an active fixing system yet.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: const Color(0xFFD9DDE2).withValues(alpha: 0.84),
+                          color:
+                              const Color(0xFFD9DDE2).withValues(alpha: 0.84),
                           height: 1.4,
                         ),
                   ),
@@ -466,9 +478,12 @@ class AdminMaintenanceSystemPage extends StatelessWidget {
                   runSpacing: AppSpacing.md,
                   children: const [
                     _StatusSignalChip(label: 'Frontend Shell', value: 'Stable'),
-                    _StatusSignalChip(label: 'Admin Surface', value: 'Observed'),
-                    _StatusSignalChip(label: 'Content Tools', value: 'Observed'),
-                    _StatusSignalChip(label: 'Operational Traces', value: 'Stable'),
+                    _StatusSignalChip(
+                        label: 'Admin Surface', value: 'Observed'),
+                    _StatusSignalChip(
+                        label: 'Content Tools', value: 'Observed'),
+                    _StatusSignalChip(
+                        label: 'Operational Traces', value: 'Stable'),
                   ],
                 ),
               ],

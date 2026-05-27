@@ -285,8 +285,7 @@ class _AdminFollowupCareGovernancePageState
                       'رسائل خفيفة للاطمئنان والاستمرارية دون الدخول في تدخل عميق أو متابعة سريرية.',
                   boundaryNote:
                       'يجب ألا تتحول رسائل التفقد إلى ضغط أو إزعاج أو ملاحقة متكررة.',
-                  supervisionNote:
-                      'الغرض هو الاستمرارية الرقيقة فقط.',
+                  supervisionNote: 'الغرض هو الاستمرارية الرقيقة فقط.',
                 ),
                 _buildGovernanceCard(
                   context,
@@ -305,8 +304,7 @@ class _AdminFollowupCareGovernancePageState
                       'تنبيهات أو دفعات خفيفة جدًا تشجع على العودة للمحتوى أو الاستفادة من التوعية.',
                   boundaryNote:
                       'يجب ألا تصبح هذه الـ nudges مزعجة أو ضاغطة أو متكررة بصورة مرهقة.',
-                  supervisionNote:
-                      'الدفعات هنا لطيفة ومحدودة فقط.',
+                  supervisionNote: 'الدفعات هنا لطيفة ومحدودة فقط.',
                 ),
                 _buildGovernanceCard(
                   context,
@@ -315,8 +313,7 @@ class _AdminFollowupCareGovernancePageState
                       'يمكن أن ترتبط المتابعة بإحالات إلى محتوى مناسب من المكتبة لدعم الاستمرارية والاحتواء.',
                   boundaryNote:
                       'يبقى هذا الربط داعمًا فقط ولا يتحول إلى intervention flow أو برنامج علاجي.',
-                  supervisionNote:
-                      'المحتوى هنا امتداد للدعم الخفيف لا أكثر.',
+                  supervisionNote: 'المحتوى هنا امتداد للدعم الخفيف لا أكثر.',
                 ),
               ],
             ),
@@ -324,101 +321,100 @@ class _AdminFollowupCareGovernancePageState
             KeyedSubtree(
               key: _examplesKey,
               child: GatewaySectionCard(
-              title: 'أمثلة نبرة متابعة معتمدة',
-              description:
-                  'هذه أمثلة ثابتة ومرجعية فقط لاستخدام يدوي من الإدارة خارج النظام، دون إنشاء أي تدفق متابعة فعلي داخل التطبيق.',
-              children: [
-                _buildGovernanceCard(
-                  context,
-                  title: 'Gentle Check-in',
-                  summary:
-                      'مرحبًا، هذه رسالة تفقد لطيفة فقط. إذا كان الوقت مناسبًا لك، يمكنك العودة لاحقًا إلى المساحة الداعمة أو إلى محتوى مناسب داخل التطبيق.',
-                  boundaryNote:
-                      'غير طبي، غير تشخيصي، وغير مناسب للأزمة أو أثناء الجلسات النشطة أو الحالات الحساسة.',
-                  supervisionNote:
-                      'دعم يدوي مملوك للإدارة فقط، بهدوء وبدون ضغط أو إلحاح أو مسار علاجي.',
-                  statusLabel: 'مثال متابعة معتمد',
-                  enableCopyMessage: true,
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'Light Encouragement',
-                  summary:
-                      'خطواتك الهادئة مهمة، حتى لو بدت بسيطة. خذ وقتك، ويمكنك الاستفادة من الدعم أو المحتوى المناسب عندما يكون ذلك ملائمًا لك.',
-                  boundaryNote:
-                      'رسالة دعم خفيف فقط، بلا claims علاجية، وبلا نبرة ذنب أو urgency أو دفع نفسي.',
-                  supervisionNote:
-                      'نبرة مشجعة وfamily-safe ضمن متابعة يدوية غير علاجية.',
-                  statusLabel: 'مثال متابعة معتمد',
-                  enableCopyMessage: true,
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'Calm Continuity Reminder',
-                  summary:
-                      'عندما يكون الوقت مناسبًا لك، يمكنك العودة بهدوء إلى التطبيق أو إلى مادة داعمة مناسبة كجزء من الاستمرارية والاحتواء فقط.',
-                  boundaryNote:
-                      'تذكير هادئ غير ضاغط، لا يتحول إلى pressure flow أو تدخل علاجي أو تشخيصي.',
-                  supervisionNote:
-                      'هذا المثال يحافظ على الاستمرارية دون إزعاج أو إلحاح.',
-                  statusLabel: 'مثال متابعة معتمد',
-                  enableCopyMessage: true,
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'Pause / Respectful Stop Message',
-                  summary:
-                      'سنوقف رسائل المتابعة في الوقت الحالي احترامًا لطلبك أو لظروفك الحالية. يمكنك العودة لاحقًا متى رغبت إلى المساحة الداعمة داخل التطبيق.',
-                  boundaryNote:
-                      'رسالة احترام وإيقاف فقط، ليست للأزمة، وليست للجلسات النشطة، ولا تحمل أي ضغط أو guilt-based nudging.',
-                  supervisionNote:
-                      'هذا مثال يدعم الاختيار الشخصي والسلامة ويؤكد أن المتابعة تظل يدوية ومملوكة للإدارة فقط.',
-                  statusLabel: 'مثال متابعة معتمد',
-                  enableCopyMessage: true,
-                ),
-              ],
-            ),
+                title: 'أمثلة نبرة متابعة معتمدة',
+                description:
+                    'هذه أمثلة ثابتة ومرجعية فقط لاستخدام يدوي من الإدارة خارج النظام، دون إنشاء أي تدفق متابعة فعلي داخل التطبيق.',
+                children: [
+                  _buildGovernanceCard(
+                    context,
+                    title: 'Gentle Check-in',
+                    summary:
+                        'مرحبًا، هذه رسالة تفقد لطيفة فقط. إذا كان الوقت مناسبًا لك، يمكنك العودة لاحقًا إلى المساحة الداعمة أو إلى محتوى مناسب داخل التطبيق.',
+                    boundaryNote:
+                        'غير طبي، غير تشخيصي، وغير مناسب للأزمة أو أثناء الجلسات النشطة أو الحالات الحساسة.',
+                    supervisionNote:
+                        'دعم يدوي مملوك للإدارة فقط، بهدوء وبدون ضغط أو إلحاح أو مسار علاجي.',
+                    statusLabel: 'مثال متابعة معتمد',
+                    enableCopyMessage: true,
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'Light Encouragement',
+                    summary:
+                        'خطواتك الهادئة مهمة، حتى لو بدت بسيطة. خذ وقتك، ويمكنك الاستفادة من الدعم أو المحتوى المناسب عندما يكون ذلك ملائمًا لك.',
+                    boundaryNote:
+                        'رسالة دعم خفيف فقط، بلا claims علاجية، وبلا نبرة ذنب أو urgency أو دفع نفسي.',
+                    supervisionNote:
+                        'نبرة مشجعة وfamily-safe ضمن متابعة يدوية غير علاجية.',
+                    statusLabel: 'مثال متابعة معتمد',
+                    enableCopyMessage: true,
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'Calm Continuity Reminder',
+                    summary:
+                        'عندما يكون الوقت مناسبًا لك، يمكنك العودة بهدوء إلى التطبيق أو إلى مادة داعمة مناسبة كجزء من الاستمرارية والاحتواء فقط.',
+                    boundaryNote:
+                        'تذكير هادئ غير ضاغط، لا يتحول إلى pressure flow أو تدخل علاجي أو تشخيصي.',
+                    supervisionNote:
+                        'هذا المثال يحافظ على الاستمرارية دون إزعاج أو إلحاح.',
+                    statusLabel: 'مثال متابعة معتمد',
+                    enableCopyMessage: true,
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'Pause / Respectful Stop Message',
+                    summary:
+                        'سنوقف رسائل المتابعة في الوقت الحالي احترامًا لطلبك أو لظروفك الحالية. يمكنك العودة لاحقًا متى رغبت إلى المساحة الداعمة داخل التطبيق.',
+                    boundaryNote:
+                        'رسالة احترام وإيقاف فقط، ليست للأزمة، وليست للجلسات النشطة، ولا تحمل أي ضغط أو guilt-based nudging.',
+                    supervisionNote:
+                        'هذا مثال يدعم الاختيار الشخصي والسلامة ويؤكد أن المتابعة تظل يدوية ومملوكة للإدارة فقط.',
+                    statusLabel: 'مثال متابعة معتمد',
+                    enableCopyMessage: true,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             KeyedSubtree(
               key: _rulesKey,
               child: GatewaySectionCard(
-              title: 'شروط بدء المتابعة',
-              description:
-                  'المتابعة لا تبدأ إلا داخل سياقات مستقرة وآمنة ومناسبة لوظيفتها الداعمة فقط.',
-              children: [
-                _buildGovernanceCard(
-                  context,
-                  title: 'المستخدم ليس في جلسات نشطة',
-                  summary:
-                      'لا يجب التفكير في بدء المتابعة عندما يكون المستخدم داخل جلسات نشطة أو مسار جلسات قائم.',
-                  boundaryNote:
-                      'يفصل ذلك بين المتابعة الإدارية الخفيفة وبين أي مسار جلسات فعلي.',
-                  supervisionNote:
-                      'المتابعة هنا ليست امتدادًا للجلسات.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'لا يوجد تدخل علاجي حالي',
-                  summary:
-                      'تبدأ المتابعة فقط عندما لا يكون هناك تدخل علاجي أو رعاية مهنية جارية يجب احترامها وعدم التشويش عليها.',
-                  boundaryNote:
-                      'أي رعاية مهنية حالية تتقدم على المتابعة الخفيفة داخل التطبيق.',
-                  supervisionNote:
-                  'هذا الشرط يحفظ وضوح الأدوار وعدم التضارب.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'لا يوجد crisis active',
-                  summary:
-                      'لا تبدأ المتابعة أبدًا إذا كان هناك سياق أزمة أو هشاشة أو تصعيد سلامة قائم.',
-                  boundaryNote:
-                      'السلامة تتقدم على الاستمرارية أو الرسائل أو المحتوى أو أي nudges.',
-                  supervisionNote:
-                  'هذا شرط أخلاقي ثابت وليس مجرد تفضيل تنظيمي.',
-                ),
-              ],
-            ),
+                title: 'شروط بدء المتابعة',
+                description:
+                    'المتابعة لا تبدأ إلا داخل سياقات مستقرة وآمنة ومناسبة لوظيفتها الداعمة فقط.',
+                children: [
+                  _buildGovernanceCard(
+                    context,
+                    title: 'المستخدم ليس في جلسات نشطة',
+                    summary:
+                        'لا يجب التفكير في بدء المتابعة عندما يكون المستخدم داخل جلسات نشطة أو مسار جلسات قائم.',
+                    boundaryNote:
+                        'يفصل ذلك بين المتابعة الإدارية الخفيفة وبين أي مسار جلسات فعلي.',
+                    supervisionNote: 'المتابعة هنا ليست امتدادًا للجلسات.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'لا يوجد تدخل علاجي حالي',
+                    summary:
+                        'تبدأ المتابعة فقط عندما لا يكون هناك تدخل علاجي أو رعاية مهنية جارية يجب احترامها وعدم التشويش عليها.',
+                    boundaryNote:
+                        'أي رعاية مهنية حالية تتقدم على المتابعة الخفيفة داخل التطبيق.',
+                    supervisionNote:
+                        'هذا الشرط يحفظ وضوح الأدوار وعدم التضارب.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'لا يوجد crisis active',
+                    summary:
+                        'لا تبدأ المتابعة أبدًا إذا كان هناك سياق أزمة أو هشاشة أو تصعيد سلامة قائم.',
+                    boundaryNote:
+                        'السلامة تتقدم على الاستمرارية أو الرسائل أو المحتوى أو أي nudges.',
+                    supervisionNote:
+                        'هذا شرط أخلاقي ثابت وليس مجرد تفضيل تنظيمي.',
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
@@ -443,8 +439,7 @@ class _AdminFollowupCareGovernancePageState
                       'عند فتح شات دعم مباشر، يجب أن تتوقف المتابعة الخفيفة حتى لا يحدث تضارب أو تشويش.',
                   boundaryNote:
                       'الشات الداعم البشري أو التشغيلي أولى من أي متابعة خفيفة متوازية.',
-                  supervisionNote:
-                      'هذا يحافظ على وضوح المسارات داخل التطبيق.',
+                  supervisionNote: 'هذا يحافظ على وضوح المسارات داخل التطبيق.',
                 ),
                 _buildGovernanceCard(
                   context,
@@ -472,62 +467,60 @@ class _AdminFollowupCareGovernancePageState
             KeyedSubtree(
               key: _boundariesKey,
               child: GatewaySectionCard(
-              title: 'حدود المتابعة',
-              description:
-                  'هذه الحدود تحفظ الفرق بين المتابعة الداعمة وبين أي تدخل علاجي أو حسّاس أو ضاغط.',
-              children: [
-                _buildGovernanceCard(
-                  context,
-                  title: 'لا تشخيص',
-                  summary:
-                      'المتابعة لا تفسر الحالة، ولا تصف المستخدم، ولا تعطي أي قراءة تشخيصية مباشرة أو ضمنية.',
-                  boundaryNote:
-                      'هذا يحافظ على التموضع غير الطبي وغير التشخيصي للتطبيق.',
-                  supervisionNote:
-                      'أي تشخيص يخرج الطبقة عن معناها بالكامل.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'لا علاج',
-                  summary:
-                      'المتابعة لا تحاول أداء وظيفة علاجية أو تقديم intervention أو بديل عن الرعاية المهنية.',
-                  boundaryNote:
-                      'هذه الطبقة للدعم الخفيف فقط وليست برنامج علاج أو protocol متابعة علاجية.',
-                  supervisionNote:
-                      'أي انحراف هنا يكسر المعمارية والتموضع معًا.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'لا ضغط',
-                  summary:
-                      'المتابعة لا يجوز أن تتحول إلى إلحاح أو burden أو نبرة تدفع المستخدم دفعًا لمسار لا يريده.',
-                  boundaryNote:
-                      'الدعم يفقد شرعيته إذا صار ضاغطًا أو مزعجًا أو متكررًا بصورة مرهقة.',
-                  supervisionNote:
-                      'الاحتواء الهادئ أهم من كثافة التدخل.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'لا تدخل عميق',
-                  summary:
-                      'هذا المسار لا يدخل في متابعة حساسة أو معقّدة أو طويلة الأثر، ولا يحاول إدارة حالة أو تعويض غياب رعاية أعمق.',
-                  boundaryNote:
-                      'العمق العلاجي أو التشغيلي ليس وظيفة هذه الطبقة.',
-                  supervisionNote:
-                      'المتابعة هنا خفيفة بطبيعتها ويجب أن تبقى كذلك.',
-                ),
-                _buildGovernanceCard(
-                  context,
-                  title: 'لا تعارض مع المختصين',
-                  summary:
-                      'المتابعة لا يجب أن تتداخل مع المختصين أو تقدم نفسها كموازٍ أو بديل عنهم أو عن رعايتهم.',
-                  boundaryNote:
-                      'تحافظ هذه القاعدة على الفصل الواضح بين الدعم الإداري وبين الرعاية المتخصصة.',
-                  supervisionNote:
-                  'هذه الطبقة مملوكة للإدارة فقط وليست أداة للمختصين أو المراكز.',
-                ),
-              ],
-            ),
+                title: 'حدود المتابعة',
+                description:
+                    'هذه الحدود تحفظ الفرق بين المتابعة الداعمة وبين أي تدخل علاجي أو حسّاس أو ضاغط.',
+                children: [
+                  _buildGovernanceCard(
+                    context,
+                    title: 'لا تشخيص',
+                    summary:
+                        'المتابعة لا تفسر الحالة، ولا تصف المستخدم، ولا تعطي أي قراءة تشخيصية مباشرة أو ضمنية.',
+                    boundaryNote:
+                        'هذا يحافظ على التموضع غير الطبي وغير التشخيصي للتطبيق.',
+                    supervisionNote: 'أي تشخيص يخرج الطبقة عن معناها بالكامل.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'لا علاج',
+                    summary:
+                        'المتابعة لا تحاول أداء وظيفة علاجية أو تقديم intervention أو بديل عن الرعاية المهنية.',
+                    boundaryNote:
+                        'هذه الطبقة للدعم الخفيف فقط وليست برنامج علاج أو protocol متابعة علاجية.',
+                    supervisionNote:
+                        'أي انحراف هنا يكسر المعمارية والتموضع معًا.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'لا ضغط',
+                    summary:
+                        'المتابعة لا يجوز أن تتحول إلى إلحاح أو burden أو نبرة تدفع المستخدم دفعًا لمسار لا يريده.',
+                    boundaryNote:
+                        'الدعم يفقد شرعيته إذا صار ضاغطًا أو مزعجًا أو متكررًا بصورة مرهقة.',
+                    supervisionNote: 'الاحتواء الهادئ أهم من كثافة التدخل.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'لا تدخل عميق',
+                    summary:
+                        'هذا المسار لا يدخل في متابعة حساسة أو معقّدة أو طويلة الأثر، ولا يحاول إدارة حالة أو تعويض غياب رعاية أعمق.',
+                    boundaryNote:
+                        'العمق العلاجي أو التشغيلي ليس وظيفة هذه الطبقة.',
+                    supervisionNote:
+                        'المتابعة هنا خفيفة بطبيعتها ويجب أن تبقى كذلك.',
+                  ),
+                  _buildGovernanceCard(
+                    context,
+                    title: 'لا تعارض مع المختصين',
+                    summary:
+                        'المتابعة لا يجب أن تتداخل مع المختصين أو تقدم نفسها كموازٍ أو بديل عنهم أو عن رعايتهم.',
+                    boundaryNote:
+                        'تحافظ هذه القاعدة على الفصل الواضح بين الدعم الإداري وبين الرعاية المتخصصة.',
+                    supervisionNote:
+                        'هذه الطبقة مملوكة للإدارة فقط وليست أداة للمختصين أو المراكز.',
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
@@ -542,8 +535,7 @@ class _AdminFollowupCareGovernancePageState
                       'يمكن للمتابعة أن تستفيد من الرسائل الخفيفة والإحالات إلى المكتبة من أجل الاستمرارية والاحتواء وربط المستخدم بمحتوى نافع.',
                   boundaryNote:
                       'الوظيفة هنا دعمية فقط، وليست workflow علاجية أو pressure flow أو مسار تدخل.',
-                  supervisionNote:
-                      'المحتوى والرسائل هنا أدوات دعم خفيف فقط.',
+                  supervisionNote: 'المحتوى والرسائل هنا أدوات دعم خفيف فقط.',
                 ),
                 _buildGovernanceCard(
                   context,
@@ -580,8 +572,7 @@ class _AdminFollowupCareGovernancePageState
                       'هذه الطبقة لا تحل محل المختصين ولا الرعاية المهنية ولا أي تدخل متخصص عند الحاجة.',
                   boundaryNote:
                       'أي حاجة إلى رعاية أعمق تبقى خارج هذه الطبقة وبعيدة عن منطق المتابعة الخفيفة.',
-                  supervisionNote:
-                      'التموضع غير العلاجي هنا ثابت وواضح.',
+                  supervisionNote: 'التموضع غير العلاجي هنا ثابت وواضح.',
                 ),
                 _buildGovernanceCard(
                   context,

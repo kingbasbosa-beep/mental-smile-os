@@ -280,7 +280,8 @@ Manual notes: ...
                 ),
                 _buildCheckpointCard(
                   context,
-                  title: 'No active integrations unless explicitly approved later',
+                  title:
+                      'No active integrations unless explicitly approved later',
                   summary:
                       'All gateway families must stay in shell/supervision mode until explicit activation checkpoints are met.',
                   boundaryNote:
@@ -366,7 +367,8 @@ Manual notes: ...
                 ),
                 _buildCheckpointCard(
                   context,
-                  title: 'Operations / Communications separate from Gateway / Growth',
+                  title:
+                      'Operations / Communications separate from Gateway / Growth',
                   summary:
                       'Business workflows must remain clearly separated from technical gateways and future growth/exposure layers.',
                   boundaryNote:
@@ -399,8 +401,7 @@ Manual notes: ...
                       'Exposure rules, ethical guardrails, blocked-state handling, and approved-surface controls must be defined first.',
                   boundaryNote:
                       'Ensures monetization can never outrun safety or ethical readiness.',
-                  supervisionNote:
-                      'No monetization system is activated here.',
+                  supervisionNote: 'No monetization system is activated here.',
                 ),
                 _buildCheckpointCard(
                   context,

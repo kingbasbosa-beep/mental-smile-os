@@ -224,15 +224,18 @@ Manual notes: ...
                 ),
                 SizedBox(height: AppSpacing.sm),
                 GatewaySupervisionNote(
-                  text: 'الامتثال أولًا قبل أي integration أو automation أو activation أعمق.',
+                  text:
+                      'الامتثال أولًا قبل أي integration أو automation أو activation أعمق.',
                 ),
                 SizedBox(height: AppSpacing.sm),
                 GatewaySupervisionNote(
-                  text: 'لا يوجد deep activation بدون safeguards واضحة وmonitoring حقيقية وownership واضحة.',
+                  text:
+                      'لا يوجد deep activation بدون safeguards واضحة وmonitoring حقيقية وownership واضحة.',
                 ),
                 SizedBox(height: AppSpacing.sm),
                 GatewaySupervisionNote(
-                  text: 'لا monetization بدون approval واضح لقواعد الظهور والتعرض والقيود الأخلاقية.',
+                  text:
+                      'لا monetization بدون approval واضح لقواعد الظهور والتعرض والقيود الأخلاقية.',
                 ),
               ],
             ),

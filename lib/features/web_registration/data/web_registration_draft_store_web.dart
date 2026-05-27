@@ -5,8 +5,7 @@ class WebRegistrationDraftStore {
   static const _clinicianUidKey = 'webClinicianDraftUid';
 
   static String? get centerUid => html.window.localStorage[_centerUidKey];
-  static String? get clinicianUid =>
-      html.window.localStorage[_clinicianUidKey];
+  static String? get clinicianUid => html.window.localStorage[_clinicianUidKey];
 
   static void setCenterUid(String uid) {
     html.window.localStorage[_centerUidKey] = uid;

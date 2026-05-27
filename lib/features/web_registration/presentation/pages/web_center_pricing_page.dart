@@ -110,6 +110,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -171,7 +172,9 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                                 },
                               ),
                               _capabilityTile(
-                                isArabic ? 'يقبل حالات الإدمان' : 'Accepts addiction cases',
+                                isArabic
+                                    ? 'يقبل حالات الإدمان'
+                                    : 'Accepts addiction cases',
                                 _capabilities.acceptsAddictionCases,
                                 (value) {
                                   setState(() {

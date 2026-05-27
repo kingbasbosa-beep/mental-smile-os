@@ -196,16 +196,15 @@ class _GoldLogoutAction extends StatelessWidget {
                   'خروج',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: const Color(0xFFFFD98A),
-                        fontWeight: FontWeight.w800,
-                        shadows: [
-                          Shadow(
-                            color:
-                                const Color(0xFFE7A94C).withValues(alpha: 0.30),
-                            blurRadius: 8,
-                          ),
-                        ],
+                    color: const Color(0xFFFFD98A),
+                    fontWeight: FontWeight.w800,
+                    shadows: [
+                      Shadow(
+                        color: const Color(0xFFE7A94C).withValues(alpha: 0.30),
+                        blurRadius: 8,
                       ),
+                    ],
+                  ),
                 ),
               ],
             ],
@@ -330,7 +329,8 @@ class _AccountRoleBanner extends StatelessWidget {
                   Text(
                     identity,
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          color: const Color(0xFF314A5C).withValues(alpha: 0.88),
+                          color:
+                              const Color(0xFF314A5C).withValues(alpha: 0.88),
                         ),
                   ),
                 ],

@@ -76,6 +76,11 @@ class ClinicianSessionsPage extends StatelessWidget {
     );
   }
 
+  bool _isLandscapeCompact(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    return size.width > size.height && size.width < 900 && size.height < 540;
+  }
+
   bool _isSessionRelated(Map<String, dynamic> data) {
     final status = (data['status'] ?? '').toString();
     return status == 'session_setup_pending' ||
@@ -183,6 +188,8 @@ class ClinicianSessionsPage extends StatelessWidget {
       icon: const Icon(Icons.rate_review_outlined),
       label: Text(
         isArabic ? 'الانتقال إلى تقييم الجلسة' : 'Continue to session review',
+        softWrap: true,
+        textAlign: TextAlign.center,
       ),
     );
   }
@@ -358,11 +365,16 @@ class ClinicianSessionsPage extends StatelessWidget {
                           );
                         }
 
+                        final compact = _isLandscapeCompact(context);
+                        final pagePadding = compact ? 12.0 : 16.0;
+                        final cardPadding = compact ? 12.0 : 16.0;
+                        final cardGap = compact ? 10.0 : 14.0;
+
                         return ListView(
-                          padding: const EdgeInsets.all(16),
+                          padding: EdgeInsets.all(pagePadding),
                           children: [
                             _buildSessionsIntro(context, isArabic),
-                            const SizedBox(height: 16),
+                            SizedBox(height: compact ? 10.0 : 16.0),
                             ...docs.map((data) {
                               final requestId = (data['_id'] ?? '').toString();
                               final status = (data['status'] ?? '').toString();
@@ -379,8 +391,8 @@ class ClinicianSessionsPage extends StatelessWidget {
                               final createdAt = _dateText(data['createdAt']);
 
                               return Container(
-                                margin: const EdgeInsets.only(bottom: 14),
-                                padding: const EdgeInsets.all(16),
+                                margin: EdgeInsets.only(bottom: cardGap),
+                                padding: EdgeInsets.all(cardPadding),
                                 decoration:
                                     _glassDecoration(alpha: 0.34, radius: 22),
                                 child: DefaultTextStyle.merge(
@@ -447,7 +459,7 @@ class ClinicianSessionsPage extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 14),
+                                      SizedBox(height: compact ? 10.0 : 14.0),
                                       if (sessionDate.trim().isNotEmpty)
                                         Text(
                                           isArabic
@@ -455,7 +467,7 @@ class ClinicianSessionsPage extends StatelessWidget {
                                               : 'Session date: $sessionDate',
                                         ),
                                       if (sessionLink.trim().isNotEmpty) ...[
-                                        const SizedBox(height: 8),
+                                        SizedBox(height: compact ? 6.0 : 8.0),
                                         SelectableText(
                                           isArabic
                                               ? 'رابط الجلسة: $sessionLink'
@@ -463,7 +475,7 @@ class ClinicianSessionsPage extends StatelessWidget {
                                         ),
                                       ],
                                       if (sessionCode.trim().isNotEmpty) ...[
-                                        const SizedBox(height: 8),
+                                        SizedBox(height: compact ? 6.0 : 8.0),
                                         SelectableText(
                                           isArabic
                                               ? 'كود الجلسة: $sessionCode'
@@ -471,7 +483,7 @@ class ClinicianSessionsPage extends StatelessWidget {
                                         ),
                                       ],
                                       if (sessionNotes.trim().isNotEmpty) ...[
-                                        const SizedBox(height: 8),
+                                        SizedBox(height: compact ? 6.0 : 8.0),
                                         Text(
                                           isArabic
                                               ? 'ملاحظات الجلسة: $sessionNotes'
@@ -481,7 +493,7 @@ class ClinicianSessionsPage extends StatelessWidget {
                                       if (sessionDate.trim().isEmpty &&
                                           sessionLink.trim().isEmpty &&
                                           sessionCode.trim().isEmpty) ...[
-                                        const SizedBox(height: 8),
+                                        SizedBox(height: compact ? 6.0 : 8.0),
                                         Text(
                                           isArabic
                                               ? 'لم يتم تجهيز بيانات الجلسة بعد.'
@@ -489,7 +501,7 @@ class ClinicianSessionsPage extends StatelessWidget {
                                         ),
                                       ],
                                       if (_canClinicianReview(data)) ...[
-                                        const SizedBox(height: 14),
+                                        SizedBox(height: compact ? 10.0 : 14.0),
                                         _buildReviewHandoffAction(
                                           context,
                                           isArabic: isArabic,

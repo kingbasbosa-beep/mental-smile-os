@@ -193,8 +193,7 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   currentState: 'Built / Monitored',
                   availableNow:
                       'حدود AI/workspace وbackend/source control وdiagnostics بشكل إشرافي.',
-                  supervisionNote:
-                      'جاهزة إداريًا كلوحة إشراف تقني فقط.',
+                  supervisionNote: 'جاهزة إداريًا كلوحة إشراف تقني فقط.',
                 ),
                 _buildReadinessCard(
                   context,
@@ -229,8 +228,7 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   currentState: 'Built / Conceptual',
                   availableNow:
                       'قيود واضحة للحالات المحجوبة، والأسطح المسموح بها، والأولوية الأخلاقية.',
-                  supervisionNote:
-                      'جاهزة كمرجع سياساتي قبل أي تفعيل مستقبلي.',
+                  supervisionNote: 'جاهزة كمرجع سياساتي قبل أي تفعيل مستقبلي.',
                 ),
                 _buildReadinessCard(
                   context,
@@ -241,8 +239,7 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   currentState: 'Built / Conceptual',
                   availableNow:
                       'صفحة checkpoint واضحة تربط التنفيذ المستقبلي بالحدود المعتمدة.',
-                  supervisionNote:
-                      'جاهزة كمصفوفة مراجعة قبل أي توسع جديد.',
+                  supervisionNote: 'جاهزة كمصفوفة مراجعة قبل أي توسع جديد.',
                 ),
                 _buildReadinessCard(
                   context,
@@ -253,8 +250,7 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   currentState: 'Built / Documentation',
                   availableNow:
                       'صفحة handoff معمارية واضحة تدعم الانتقال المنظم بين مراحل المشروع.',
-                  supervisionNote:
-                      'جاهزة كمرجع تنفيذي/معماري للحالة الحالية.',
+                  supervisionNote: 'جاهزة كمرجع تنفيذي/معماري للحالة الحالية.',
                 ),
               ],
             ),
@@ -268,8 +264,7 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   context,
                   title: 'Support Email boundary',
                   readinessLabel: 'مفعّل يدويًا بشكل آمن',
-                  summary:
-                      'بريد الدعم يعمل كإجراء يدوي آمن عبر mailto فقط.',
+                  summary: 'بريد الدعم يعمل كإجراء يدوي آمن عبر mailto فقط.',
                   currentState: 'Activated in safe manual form',
                   availableNow:
                       'فتح عميل البريد الافتراضي مع subject/body مجهزين مسبقًا.',
@@ -280,8 +275,7 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   context,
                   title: 'Support Email intent presets',
                   readinessLabel: 'مفعّل يدويًا بشكل آمن',
-                  summary:
-                      'توجد presets لتحديد نية الرسالة قبل فتح البريد.',
+                  summary: 'توجد presets لتحديد نية الرسالة قبل فتح البريد.',
                   currentState: 'Activated in safe manual form',
                   availableNow:
                       'General Support / Technical Issue / Account Help كقوالب فقط.',
@@ -327,8 +321,7 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   summary:
                       'حدود الأدوات الهندسية واضحة، لكن الصفحات لا تقوم بتنفيذ أو probing فعلي.',
                   currentState: 'Monitored / Shell',
-                  availableNow:
-                      'رؤية واضحة للأدوات التقنية وحدودها ومجالاتها.',
+                  availableNow: 'رؤية واضحة للأدوات التقنية وحدودها ومجالاتها.',
                   supervisionNote:
                       'مفيدة كإشراف تقني فقط وليست console تشغيلية.',
                 ),
@@ -368,73 +361,57 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   context,
                   title: 'real external follow-up integration',
                   readinessLabel: 'مفاهيمي / مخطط فقط',
-                  summary:
-                      'لا يوجد تكامل واتساب حقيقي حتى الآن.',
+                  summary: 'لا يوجد تكامل واتساب حقيقي حتى الآن.',
                   currentState: 'Conceptual',
                   availableNow:
                       'فقط boundary dialog داخل Communication Gateway.',
-                  supervisionNote:
-                      'غير جاهز للتشغيل الآن.',
+                  supervisionNote: 'غير جاهز للتشغيل الآن.',
                 ),
                 _buildReadinessCard(
                   context,
                   title: 'Telegram integration',
                   readinessLabel: 'مفاهيمي / مخطط فقط',
-                  summary:
-                      'لا يوجد تكامل Telegram حقيقي حتى الآن.',
+                  summary: 'لا يوجد تكامل Telegram حقيقي حتى الآن.',
                   currentState: 'Conceptual',
-                  availableNow:
-                      'فقط boundary dialog إشرافية.',
-                  supervisionNote:
-                      'غير جاهز للتشغيل الآن.',
+                  availableNow: 'فقط boundary dialog إشرافية.',
+                  supervisionNote: 'غير جاهز للتشغيل الآن.',
                 ),
                 _buildReadinessCard(
                   context,
                   title: 'Facebook / Messenger integration',
                   readinessLabel: 'مفاهيمي / مخطط فقط',
-                  summary:
-                      'لا يوجد تكامل Facebook / Messenger حقيقي حتى الآن.',
+                  summary: 'لا يوجد تكامل Facebook / Messenger حقيقي حتى الآن.',
                   currentState: 'Conceptual',
-                  availableNow:
-                      'فقط boundary dialog إشرافية.',
-                  supervisionNote:
-                      'غير جاهز للتشغيل الآن.',
+                  availableNow: 'فقط boundary dialog إشرافية.',
+                  supervisionNote: 'غير جاهز للتشغيل الآن.',
                 ),
                 _buildReadinessCard(
                   context,
                   title: 'Website live intake sync',
                   readinessLabel: 'مفاهيمي / مخطط فقط',
-                  summary:
-                      'لا توجد مزامنة حية فعلية لاستقبال Website Chat.',
+                  summary: 'لا توجد مزامنة حية فعلية لاستقبال Website Chat.',
                   currentState: 'Conceptual',
-                  availableNow:
-                      'فقط شرح boundary والحالة الحالية.',
-                  supervisionNote:
-                      'غير جاهز للتشغيل الآن.',
+                  availableNow: 'فقط شرح boundary والحالة الحالية.',
+                  supervisionNote: 'غير جاهز للتشغيل الآن.',
                 ),
                 _buildReadinessCard(
                   context,
                   title: 'Campaign automation',
                   readinessLabel: 'مفاهيمي / مخطط فقط',
-                  summary:
-                      'لا توجد أي أتمتة للحملات أو التوزيع أو الظهور.',
+                  summary: 'لا توجد أي أتمتة للحملات أو التوزيع أو الظهور.',
                   currentState: 'Conceptual',
-                  availableNow:
-                      'فقط تخطيط مفاهيمي داخل Growth & Awareness.',
-                  supervisionNote:
-                      'غير جاهز للتشغيل الآن.',
+                  availableNow: 'فقط تخطيط مفاهيمي داخل Growth & Awareness.',
+                  supervisionNote: 'غير جاهز للتشغيل الآن.',
                 ),
                 _buildReadinessCard(
                   context,
                   title: 'Monetized placements',
                   readinessLabel: 'مفاهيمي / مخطط فقط',
-                  summary:
-                      'لا توجد أماكن ربحية مفعلة فعليًا داخل المنتج.',
+                  summary: 'لا توجد أماكن ربحية مفعلة فعليًا داخل المنتج.',
                   currentState: 'Conceptual / Blocked from activation',
                   availableNow:
                       'فقط تعريف أسطح محتملة ضمن قيود Exposure Rules.',
-                  supervisionNote:
-                      'غير جاهز للتشغيل الآن.',
+                  supervisionNote: 'غير جاهز للتشغيل الآن.',
                 ),
                 _buildReadinessCard(
                   context,
@@ -443,10 +420,8 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   summary:
                       'لا توجد telemetry متقدمة للأجهزة أو القنوات أو الأدوات أو الظهور.',
                   currentState: 'Conceptual',
-                  availableNow:
-                      'فقط health summaries إشرافية مبسطة.',
-                  supervisionNote:
-                      'غير جاهز للتشغيل الآن.',
+                  availableNow: 'فقط health summaries إشرافية مبسطة.',
+                  supervisionNote: 'غير جاهز للتشغيل الآن.',
                 ),
                 _buildReadinessCard(
                   context,
@@ -457,8 +432,7 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   currentState: 'Conceptual',
                   availableNow:
                       'فقط حدود channel boundaries وتعريفات supervision.',
-                  supervisionNote:
-                      'غير جاهز للتشغيل الآن.',
+                  supervisionNote: 'غير جاهز للتشغيل الآن.',
                 ),
               ],
             ),
@@ -475,8 +449,7 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   summary:
                       'أي ظهور إعلاني أو توعوي داخل سياقات الأزمة أو الحساسية العالية غير مسموح به.',
                   currentState: 'Blocked by fixed safety rule',
-                  availableNow:
-                      'غير مسموح بالتفعيل إطلاقًا ضمن هذه السياقات.',
+                  availableNow: 'غير مسموح بالتفعيل إطلاقًا ضمن هذه السياقات.',
                   supervisionNote:
                       'المنع مرتبط بضوابط سلامة ثابتة، وليس مجرد تأجيل مؤقت.',
                 ),
@@ -487,8 +460,7 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   summary:
                       'أي targeting يعتمد على الهشاشة أو القابلية النفسية أو الاعتمادية غير مسموح به.',
                   currentState: 'Blocked by fixed ethical rule',
-                  availableNow:
-                      'غير مسموح بالتفعيل إطلاقًا.',
+                  availableNow: 'غير مسموح بالتفعيل إطلاقًا.',
                   supervisionNote:
                       'المنع هنا ثابت وأخلاقي، وليس مجرد تجميد مرحلي.',
                 ),
@@ -511,8 +483,7 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   summary:
                       'أي أتمتة لا تمتلك logs وrollback وmanual override وhuman supervision تبقى محجوبة.',
                   currentState: 'Blocked pending safeguards',
-                  availableNow:
-                      'غير مسموح بالتفعيل الآن.',
+                  availableNow: 'غير مسموح بالتفعيل الآن.',
                   supervisionNote:
                       'المنع مؤقت حتى تكتمل متطلبات الجاهزية الحقيقية.',
                 ),
@@ -523,10 +494,8 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   summary:
                       'هذا المسار مجمّد ومحمي ولا يُسمح بتفعيله أو إعادة هيكلته عبر خطوات جانبية.',
                   currentState: 'Blocked / Frozen',
-                  availableNow:
-                      'يُترك كما هو حتى يبدأ له مسار rebuild مستقل.',
-                  supervisionNote:
-                      'المنع هنا تجميد معماري مقصود.',
+                  availableNow: 'يُترك كما هو حتى يبدأ له مسار rebuild مستقل.',
+                  supervisionNote: 'المنع هنا تجميد معماري مقصود.',
                 ),
                 _buildReadinessCard(
                   context,
@@ -535,10 +504,8 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   summary:
                       'أي integration مباشرة غير آمنة أو بلا ownership أو safeguards تبقى غير مسموح بها.',
                   currentState: 'Blocked pending readiness',
-                  availableNow:
-                      'غير مسموح بالتفعيل الآن.',
-                  supervisionNote:
-                      'المنع مؤقت ومشروط بتحقق readiness حقيقية.',
+                  availableNow: 'غير مسموح بالتفعيل الآن.',
+                  supervisionNote: 'المنع مؤقت ومشروط بتحقق readiness حقيقية.',
                 ),
               ],
             ),
@@ -606,7 +573,8 @@ class AdminActivationReadinessPage extends StatelessWidget {
                   readinessLabel: 'المرحلة الحالية',
                   summary:
                       'النظام حاليًا في مرحلة Supervised Activation Phase: البناء موجود، والإشراف موجود، وبعض boundaries مفعلة، لكن التفعيل العميق ما زال محدودًا ومشروطًا.',
-                  currentState: 'Built + Supervised + Partially activated at boundary level',
+                  currentState:
+                      'Built + Supervised + Partially activated at boundary level',
                   availableNow:
                       'يمكن استخدام الطبقات الإشرافية، والصفحات التوثيقية، وبعض الحدود اليدوية الآمنة مثل Support Email.',
                   supervisionNote:

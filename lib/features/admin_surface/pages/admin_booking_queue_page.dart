@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -1142,17 +1142,13 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
   String _centerCareLevelLabel(String value, bool isArabic) {
     switch (value.trim()) {
       case 'residential_psych':
-        return isArabic
-            ? 'إقامة نفسية داخلية'
-            : 'Residential psychiatric care';
+        return isArabic ? 'إقامة نفسية داخلية' : 'Residential psychiatric care';
       case 'detox':
         return isArabic ? 'سحب سموم ومتابعة' : 'Detox and monitoring';
       case 'dual_diagnosis':
         return isArabic ? 'رعاية مزدوجة' : 'Dual diagnosis care';
       case 'diagnostic_observation':
-        return isArabic
-            ? 'ملاحظة تشخيصية داخلية'
-            : 'Diagnostic observation';
+        return isArabic ? 'ملاحظة تشخيصية داخلية' : 'Diagnostic observation';
       default:
         return value.trim();
     }
@@ -1276,15 +1272,21 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                 ? 'بانتظار المراجعة المحاسبية'
                 : 'Waiting for accounting review');
       case 'completed_success':
-        return isArabic ? 'جاهز للأرشفة أو المراجعة' : 'Ready for archive or review';
+        return isArabic
+            ? 'جاهز للأرشفة أو المراجعة'
+            : 'Ready for archive or review';
       case 'rejected_admin':
       case 'clinician_rejected':
       case 'reschedule_pending':
       case 'cancellation_pending':
       case 'dispute_pending':
-        return isArabic ? 'حالة استثناء أو استرداد' : 'Exception or recovery state';
+        return isArabic
+            ? 'حالة استثناء أو استرداد'
+            : 'Exception or recovery state';
       default:
-        return isArabic ? 'بانتظار متابعة إدارية' : 'Waiting for admin monitoring';
+        return isArabic
+            ? 'بانتظار متابعة إدارية'
+            : 'Waiting for admin monitoring';
     }
   }
 
@@ -1317,14 +1319,14 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                 : 'Clinician receives the request directly in the normal path');
       case 'center_follow_up':
         return centerAvailabilityStatus == 'available'
-            ? (isArabic
-                ? 'فتح التقييم الأولي'
-                : 'Open intake review')
+            ? (isArabic ? 'فتح التقييم الأولي' : 'Open intake review')
             : (isArabic
                 ? 'إرجاع للعميل عند عدم التوفر'
                 : 'Return to client when unavailable');
       case 'center_intake_pending':
-        return isArabic ? 'العميل يرسل بيانات التقييم' : 'Client submits intake';
+        return isArabic
+            ? 'العميل يرسل بيانات التقييم'
+            : 'Client submits intake';
       case 'center_recommendation_pending':
         return isArabic
             ? 'المركز يرسل التوصية'
@@ -1337,9 +1339,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
             : 'Clinician accepts or rejects';
       case 'awaiting_payment':
         return paymentReceiptFileName.isNotEmpty
-            ? (isArabic
-                ? 'مراجعة السداد'
-                : 'Review payment proof')
+            ? (isArabic ? 'مراجعة السداد' : 'Review payment proof')
             : (isArabic
                 ? 'العميل يرفع إثبات السداد'
                 : 'Client uploads payment proof');
@@ -2165,8 +2165,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                 Wrap(
                   spacing: 10,
                   runSpacing: 10,
-                  alignment:
-                      isArabic ? WrapAlignment.end : WrapAlignment.start,
+                  alignment: isArabic ? WrapAlignment.end : WrapAlignment.start,
                   children: [
                     if (status == 'pending_admin')
                       OutlinedButton.icon(
@@ -2217,8 +2216,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                       FilledButton.icon(
                         onPressed:
                             busy ? null : () => _confirmCenterPayout(requestId),
-                        icon:
-                            const Icon(Icons.account_balance_wallet_outlined),
+                        icon: const Icon(Icons.account_balance_wallet_outlined),
                         label: Text(
                           isArabic
                               ? 'تم تحويل مستحق المركز'
@@ -2240,8 +2238,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                         onPressed: busy
                             ? null
                             : () => _sendToFinancialArchive(requestId),
-                        icon:
-                            const Icon(Icons.account_balance_wallet_outlined),
+                        icon: const Icon(Icons.account_balance_wallet_outlined),
                         label: Text(
                           isArabic ? 'أرشفة مالية' : 'Financial archive',
                         ),
@@ -2322,8 +2319,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
                                   : () => _assignToClinician(
                                         requestId: requestId,
                                       ),
-                              icon:
-                                  const Icon(Icons.forward_to_inbox_outlined),
+                              icon: const Icon(Icons.forward_to_inbox_outlined),
                               label: Text(
                                 isArabic
                                     ? 'تحويل للأخصائي (استثناء)'

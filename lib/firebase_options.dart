@@ -73,5 +73,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'mental-smile-app-clean.firebasestorage.app',
     measurementId: 'G-FCTE266FRR',
   );
-
 }

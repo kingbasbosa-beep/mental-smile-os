@@ -329,10 +329,10 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
                             );
                           },
                           child: AppSurfaceCard(
-                            color: const Color(0xFF10161A)
-                                .withValues(alpha: 0.94),
-                            borderColor: const Color(0xFFD8B26A)
-                                .withValues(alpha: 0.18),
+                            color:
+                                const Color(0xFF10161A).withValues(alpha: 0.94),
+                            borderColor:
+                                const Color(0xFFD8B26A).withValues(alpha: 0.18),
                             padding: const EdgeInsets.all(AppSpacing.md),
                             child: Row(
                               textDirection: isArabic
@@ -462,5 +462,3 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
     );
   }
 }
-
-

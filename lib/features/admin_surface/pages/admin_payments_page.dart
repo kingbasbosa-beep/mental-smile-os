@@ -454,9 +454,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
             ? 'مراجعة محاسبية قبل التحويل'
             : 'Confirm accounting review before payout';
       }
-      return isArabic
-          ? 'تأكيد تحويل المستحق'
-          : 'Confirm payout transfer';
+      return isArabic ? 'تأكيد تحويل المستحق' : 'Confirm payout transfer';
     }
     if (status == 'completed_success') {
       return isArabic ? 'بوابة أرشفة' : 'Archive gate';
@@ -493,9 +491,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
     final status = (data['status'] ?? '').toString();
 
     if (_isInPaymentReview(data) || status == 'payout_pending') {
-      return isArabic
-          ? 'بوابة مالية استثنائية'
-          : 'Financial exception gate';
+      return isArabic ? 'بوابة مالية استثنائية' : 'Financial exception gate';
     }
     if (status == 'completed_success') {
       return isArabic
@@ -643,12 +639,14 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                               : 'This section monitors system flows. Actions here are exception-based and should not replace normal workflow progression.',
                           textAlign:
                               isArabic ? TextAlign.right : TextAlign.left,
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppColors.obsidian
-                                        .withValues(alpha: 0.72),
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                                color:
+                                    AppColors.obsidian.withValues(alpha: 0.72),
+                                fontWeight: FontWeight.w600,
+                              ),
                         ),
                         const SizedBox(height: AppSpacing.md),
                         Wrap(
@@ -727,12 +725,9 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                       final archiveSection =
                           (data['archiveSection'] ?? '').toString();
                       final whyHere = _whyHereLabel(data, isArabic);
-                      final requiredGate =
-                          _requiredGateLabel(data, isArabic);
-                      final nextStructuredStep =
-                          _nextStepLabel(data, isArabic);
-                      final ownershipCue =
-                          _ownershipCueLabel(data, isArabic);
+                      final requiredGate = _requiredGateLabel(data, isArabic);
+                      final nextStructuredStep = _nextStepLabel(data, isArabic);
+                      final ownershipCue = _ownershipCueLabel(data, isArabic);
                       final blockingReason =
                           _blockingReasonLabel(data, isArabic);
                       final hasFinancialGateActions =
@@ -888,7 +883,7 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                   Text(
                                     isArabic
                                         ? 'بوابة مالية / الخطوة التالية'
-                                    : 'Why this is here / Next expected step',
+                                        : 'Why this is here / Next expected step',
                                     textAlign: isArabic
                                         ? TextAlign.right
                                         : TextAlign.left,
@@ -1029,8 +1024,8 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                     FilledButton.icon(
                                       onPressed: busy
                                           ? null
-                                          : () =>
-                                              _confirmClinicianPayout(requestId),
+                                          : () => _confirmClinicianPayout(
+                                              requestId),
                                       icon: const Icon(Icons.payments_outlined),
                                       label: Text(
                                         isArabic
@@ -1044,12 +1039,14 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                     FilledButton.icon(
                                       onPressed: busy
                                           ? null
-                                          : () => _confirmCenterAccountingReview(
+                                          : () =>
+                                              _confirmCenterAccountingReview(
                                                 context,
                                                 requestId,
                                                 data,
                                               ),
-                                      icon: const Icon(Icons.calculate_outlined),
+                                      icon:
+                                          const Icon(Icons.calculate_outlined),
                                       label: Text(
                                         isArabic
                                             ? 'مراجعة محاسبية'
@@ -1103,7 +1100,8 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                           ? null
                                           : () =>
                                               _sendToSessionArchive(requestId),
-                                      icon: const Icon(Icons.video_call_outlined),
+                                      icon:
+                                          const Icon(Icons.video_call_outlined),
                                       label: Text(
                                         isArabic
                                             ? 'أرشفة جلسية'
@@ -1115,8 +1113,8 @@ class _AdminPaymentsPageState extends State<AdminPaymentsPage> {
                                     FilledButton.tonalIcon(
                                       onPressed: busy
                                           ? null
-                                          : () =>
-                                              _sendToFinancialArchive(requestId),
+                                          : () => _sendToFinancialArchive(
+                                              requestId),
                                       icon: const Icon(
                                         Icons.account_balance_wallet_outlined,
                                       ),

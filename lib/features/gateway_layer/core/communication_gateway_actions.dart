@@ -123,7 +123,8 @@ class CommunicationGatewayActions {
           );
         }
 
-        Widget buildReadOnlyField(String label, String value, {int maxLines = 6}) {
+        Widget buildReadOnlyField(String label, String value,
+            {int maxLines = 6}) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -165,7 +166,8 @@ class CommunicationGatewayActions {
                   'Unable to open the default email client. You can still copy the support details below.',
                 ),
                 const SizedBox(height: 16),
-                buildReadOnlyField('Support email', supportEmailAddress, maxLines: 2),
+                buildReadOnlyField('Support email', supportEmailAddress,
+                    maxLines: 2),
                 const SizedBox(height: 12),
                 buildReadOnlyField('Subject', subject, maxLines: 3),
                 const SizedBox(height: 12),

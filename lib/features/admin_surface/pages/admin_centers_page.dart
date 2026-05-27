@@ -517,8 +517,7 @@ class _AdminCentersPageState extends State<AdminCentersPage> {
                       children: [
                         TextField(
                           controller: _searchController,
-                          onChanged: (value) =>
-                              setState(() => _search = value),
+                          onChanged: (value) => setState(() => _search = value),
                           decoration: InputDecoration(
                             prefixIcon: const Icon(Icons.search),
                             labelText: isArabic
@@ -543,11 +542,13 @@ class _AdminCentersPageState extends State<AdminCentersPage> {
                                 ),
                                 DropdownMenuItem(
                                   value: 'pending',
-                                  child: Text(isArabic ? 'قيد المراجعة' : 'Pending'),
+                                  child: Text(
+                                      isArabic ? 'قيد المراجعة' : 'Pending'),
                                 ),
                                 DropdownMenuItem(
                                   value: 'center_follow_up',
-                                  child: Text(isArabic ? 'متابعة' : 'Follow-up'),
+                                  child:
+                                      Text(isArabic ? 'متابعة' : 'Follow-up'),
                                 ),
                                 DropdownMenuItem(
                                   value: 'approved',
@@ -578,7 +579,8 @@ class _AdminCentersPageState extends State<AdminCentersPage> {
                                 ),
                                 DropdownMenuItem(
                                   value: 'inactive',
-                                  child: Text(isArabic ? 'غير نشط' : 'Inactive'),
+                                  child:
+                                      Text(isArabic ? 'غير نشط' : 'Inactive'),
                                 ),
                                 DropdownMenuItem(
                                   value: 'blocked',
@@ -586,7 +588,8 @@ class _AdminCentersPageState extends State<AdminCentersPage> {
                                 ),
                                 DropdownMenuItem(
                                   value: 'unblocked',
-                                  child: Text(isArabic ? 'غير محظور' : 'Unblocked'),
+                                  child: Text(
+                                      isArabic ? 'غير محظور' : 'Unblocked'),
                                 ),
                               ],
                               onChanged: (value) {

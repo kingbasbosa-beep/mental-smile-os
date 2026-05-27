@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
@@ -111,10 +111,7 @@ class _WebClinicianRegisterPortalPageState
       WebRegistrationDraftStore.setClinicianUid(uid);
 
       final now = FieldValue.serverTimestamp();
-      await FirebaseFirestore.instance
-          .collection('clinicians')
-          .doc(uid)
-          .set({
+      await FirebaseFirestore.instance.collection('clinicians').doc(uid).set({
         'displayName': name,
         'fullDisplayNameAr':
             titleLabelAr.isEmpty ? name : '$titleLabelAr $name',
@@ -276,8 +273,8 @@ class _WebClinicianRegisterPortalPageState
                                   color: _inputCream,
                                   fontWeight: FontWeight.w700,
                                 ),
-                                decoration:
-                                    _fieldDecoration(l10n.webClinicianSpecialty),
+                                decoration: _fieldDecoration(
+                                    l10n.webClinicianSpecialty),
                                 items: _specialties
                                     .map((specialty) => DropdownMenuItem(
                                           value: specialty['key'],
@@ -457,5 +454,3 @@ class _WebClinicianRegisterPortalPageState
     );
   }
 }
-
-

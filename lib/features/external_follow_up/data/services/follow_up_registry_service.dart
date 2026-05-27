@@ -17,9 +17,8 @@ class FollowUpRegistryService {
   Future<FollowUpRegistryEntry> createEntry(
     FollowUpRegistryEntry entry,
   ) async {
-    final doc = entry.id.trim().isEmpty
-        ? _collection.doc()
-        : _collection.doc(entry.id);
+    final doc =
+        entry.id.trim().isEmpty ? _collection.doc() : _collection.doc(entry.id);
     final now = DateTime.now();
     final normalized = entry.copyWith(
       id: doc.id,
@@ -49,7 +48,8 @@ class FollowUpRegistryService {
     );
   }
 
-  Stream<List<FollowUpRegistryEntry>> streamActiveEntriesByType(String followUpType) {
+  Stream<List<FollowUpRegistryEntry>> streamActiveEntriesByType(
+      String followUpType) {
     return _collection
         .where('status', isEqualTo: FollowUpRegistryStatus.active)
         .where('followUpTypes', arrayContains: followUpType)

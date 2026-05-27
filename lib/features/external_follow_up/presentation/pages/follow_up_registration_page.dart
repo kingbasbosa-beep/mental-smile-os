@@ -64,8 +64,7 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
   Alignment get _sectionTitleAlignment =>
       _isArabic ? Alignment.center : Alignment.centerLeft;
 
-  String _copy({required String ar, required String en}) =>
-      _isArabic ? ar : en;
+  String _copy({required String ar, required String en}) => _isArabic ? ar : en;
 
   String _backgroundAsset(double width) {
     if (width < 700) {
@@ -421,375 +420,377 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                                             .textTheme
                                             .headlineSmall
                                             ?.copyWith(
-                                              color: const Color(0xFFE7C766),
-                                              fontWeight: FontWeight.w900,
-                                              shadows: [
-                                                Shadow(
-                                                  color: const Color(0xFFE7C766)
-                                                      .withValues(alpha: 0.24),
-                                                  blurRadius: 12,
-                                                ),
-                                              ],
+                                          color: const Color(0xFFE7C766),
+                                          fontWeight: FontWeight.w900,
+                                          shadows: [
+                                            Shadow(
+                                              color: const Color(0xFFE7C766)
+                                                  .withValues(alpha: 0.24),
+                                              blurRadius: 12,
                                             ),
+                                          ],
+                                        ),
                                       ),
                                   ],
                                 ),
                               ),
                               const SizedBox(height: AppSpacing.lg),
-                            Container(
-                              padding: const EdgeInsets.all(AppSpacing.lg),
-                              decoration: _glassDecoration(alpha: 0.34),
-                              child: Column(
-                                crossAxisAlignment: _contentAlignment,
-                                children: [
-                                  Align(
-                                    alignment: _sectionTitleAlignment,
-                                    child: Text(
-                                      _copy(
-                                        ar: 'أنواع المتابعة',
-                                        en: 'Follow-up Types',
+                              Container(
+                                padding: const EdgeInsets.all(AppSpacing.lg),
+                                decoration: _glassDecoration(alpha: 0.34),
+                                child: Column(
+                                  crossAxisAlignment: _contentAlignment,
+                                  children: [
+                                    Align(
+                                      alignment: _sectionTitleAlignment,
+                                      child: Text(
+                                        _copy(
+                                          ar: 'أنواع المتابعة',
+                                          en: 'Follow-up Types',
+                                        ),
+                                        textAlign: _isArabic
+                                            ? TextAlign.center
+                                            : TextAlign.left,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                              color: const Color(0xFFE7C766),
+                                              fontWeight: FontWeight.w900,
+                                            ),
                                       ),
-                                      textAlign: _isArabic
-                                          ? TextAlign.center
-                                          : TextAlign.left,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.copyWith(
-                                          color: const Color(0xFFE7C766),
-                                          fontWeight: FontWeight.w900,
-                                        ),
                                     ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.sm),
-                                  Text(
-                                    _copy(
-                                      ar: 'اختر نوعًا واحدًا أو أكثر من خدمات الدعم المناسبة لك.',
-                                      en: 'Choose one or more support categories.',
-                                    ),
-                                    textAlign: _contentTextAlign,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                            color: const Color(0xFFFFF4D4)),
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  _buildTypeSelector(
-                                    title: _copy(
-                                      ar: 'تهنئة أعياد الميلاد',
-                                      en: 'Birthday greetings',
-                                    ),
-                                    value: FollowUpRegistryType.birthday,
-                                  ),
-                                  _buildTypeSelector(
-                                    title: _copy(
-                                      ar: 'متابعة التعافي',
-                                      en: 'Recovery follow-up',
-                                    ),
-                                    value: FollowUpRegistryType.recoverySupport,
-                                  ),
-                                  _buildTypeSelector(
-                                    title: _copy(
-                                      ar: 'رسائل الدعم العامة',
-                                      en: 'General support messages',
-                                    ),
-                                    value: FollowUpRegistryType.generalSupport,
-                                  ),
-                                  _buildTypeSelector(
-                                    title: _copy(
-                                      ar: 'محتوى توعوي وتثقيفي',
-                                      en: 'Educational / awareness content',
-                                    ),
-                                    value: FollowUpRegistryType
-                                        .educationalAwareness,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.lg),
-                            Container(
-                              padding: const EdgeInsets.all(AppSpacing.lg),
-                              decoration: _glassDecoration(alpha: 0.34),
-                              child: Column(
-                                crossAxisAlignment: _contentAlignment,
-                                children: [
-                                  Align(
-                                    alignment: _sectionTitleAlignment,
-                                    child: Text(
+                                    const SizedBox(height: AppSpacing.sm),
+                                    Text(
                                       _copy(
-                                        ar: 'توضيح سياسة المتابعة',
-                                        en: 'Follow-up Policy Clarification',
-                                      ),
-                                      textAlign: _isArabic
-                                          ? TextAlign.center
-                                          : TextAlign.left,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.copyWith(
-                                          color: const Color(0xFFE7C766),
-                                          fontWeight: FontWeight.w900,
-                                        ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.sm),
-                                  Text(
-                                    _copy(
-                                      ar: 'المتابعة مقدمة من الإدارة كخدمة دعم مجانية وليست خدمة علاجية.\n'
-                                          'المتابعة بعد الجلسات أو الإقامة فقط، وليست أثناء تقديم الخدمة.\n'
-                                          'المتابعة أثناء الجلسات أو الإقامة حق من حقوقك ويقدمها لك مقدم الخدمة مباشرة.',
-                                      en: 'Administrative follow-up is a free support service, not a therapeutic service.\n'
-                                          'Follow-up applies after sessions or residency, not during active service delivery.\n'
-                                          'During sessions or residency, therapeutic follow-up is your right and is provided directly by the service provider.',
-                                    ),
-                                    textAlign: _contentTextAlign,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          color: const Color(0xFFFFF4D4),
-                                          fontWeight: FontWeight.w600,
-                                          height: 1.7,
-                                        ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  CheckboxListTile(
-                                    value: _policyAcknowledged,
-                                    contentPadding: EdgeInsets.zero,
-                                    controlAffinity:
-                                        ListTileControlAffinity.leading,
-                                    title: Text(
-                                      _copy(
-                                        ar: 'أقر بأن المتابعة المقدمة من الإدارة خدمة دعم مجانية وليست خدمة علاجية، وأن المتابعة العلاجية أثناء الجلسات أو الإقامة مسؤولية مقدم الخدمة ضمن الخدمة المدفوعة.',
-                                        en: "I acknowledge that administrative follow-up is a free support service, not a therapeutic service, and that therapeutic follow-up during sessions or residency is the provider's responsibility as part of the paid service.",
+                                        ar: 'اختر نوعًا واحدًا أو أكثر من خدمات الدعم المناسبة لك.',
+                                        en: 'Choose one or more support categories.',
                                       ),
                                       textAlign: _contentTextAlign,
-                                      style: const TextStyle(
-                                        color: Color(0xFFFFF4D4),
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                              color: const Color(0xFFFFF4D4)),
                                     ),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _policyAcknowledged = value == true;
-                                      });
-                                    },
-                                  ),
-                                ],
+                                    const SizedBox(height: AppSpacing.md),
+                                    _buildTypeSelector(
+                                      title: _copy(
+                                        ar: 'تهنئة أعياد الميلاد',
+                                        en: 'Birthday greetings',
+                                      ),
+                                      value: FollowUpRegistryType.birthday,
+                                    ),
+                                    _buildTypeSelector(
+                                      title: _copy(
+                                        ar: 'متابعة التعافي',
+                                        en: 'Recovery follow-up',
+                                      ),
+                                      value:
+                                          FollowUpRegistryType.recoverySupport,
+                                    ),
+                                    _buildTypeSelector(
+                                      title: _copy(
+                                        ar: 'رسائل الدعم العامة',
+                                        en: 'General support messages',
+                                      ),
+                                      value:
+                                          FollowUpRegistryType.generalSupport,
+                                    ),
+                                    _buildTypeSelector(
+                                      title: _copy(
+                                        ar: 'محتوى توعوي وتثقيفي',
+                                        en: 'Educational / awareness content',
+                                      ),
+                                      value: FollowUpRegistryType
+                                          .educationalAwareness,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: AppSpacing.lg),
-                            Container(
-                              padding: const EdgeInsets.all(AppSpacing.lg),
-                              decoration: _glassDecoration(alpha: 0.34),
-                              child: Column(
-                                crossAxisAlignment: _contentAlignment,
-                                children: [
-                                  Align(
-                                    alignment: _sectionTitleAlignment,
-                                    child: Text(
-                                      _copy(
-                                        ar: 'بيانات التواصل',
-                                        en: 'Contact Details',
-                                      ),
-                                      textAlign: _isArabic
-                                          ? TextAlign.center
-                                          : TextAlign.left,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.copyWith(
-                                          color: const Color(0xFFE7C766),
-                                          fontWeight: FontWeight.w900,
+                              const SizedBox(height: AppSpacing.lg),
+                              Container(
+                                padding: const EdgeInsets.all(AppSpacing.lg),
+                                decoration: _glassDecoration(alpha: 0.34),
+                                child: Column(
+                                  crossAxisAlignment: _contentAlignment,
+                                  children: [
+                                    Align(
+                                      alignment: _sectionTitleAlignment,
+                                      child: Text(
+                                        _copy(
+                                          ar: 'توضيح سياسة المتابعة',
+                                          en: 'Follow-up Policy Clarification',
                                         ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  TextFormField(
-                                    controller: _displayNameController,
-                                    textAlign: _contentTextAlign,
-                                    decoration: appInputDecoration(
-                                      context: context,
-                                      label: _copy(
-                                        ar: 'الاسم أو اللقب',
-                                        en: 'Name or nickname',
+                                        textAlign: _isArabic
+                                            ? TextAlign.center
+                                            : TextAlign.left,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                              color: const Color(0xFFE7C766),
+                                              fontWeight: FontWeight.w900,
+                                            ),
                                       ),
-                                      icon: Icons.person_outline,
                                     ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  TextFormField(
-                                    controller: _phoneNumberController,
-                                    keyboardType: TextInputType.phone,
-                                    textAlign: _contentTextAlign,
-                                    onChanged: (_) => setState(() {}),
-                                    decoration: appInputDecoration(
-                                      context: context,
-                                      label: _copy(
-                                        ar: 'رقم واتساب',
-                                        en: 'WhatsApp number',
+                                    const SizedBox(height: AppSpacing.sm),
+                                    Text(
+                                      _copy(
+                                        ar: 'المتابعة مقدمة من الإدارة كخدمة دعم مجانية وليست خدمة علاجية.\n'
+                                            'المتابعة بعد الجلسات أو الإقامة فقط، وليست أثناء تقديم الخدمة.\n'
+                                            'المتابعة أثناء الجلسات أو الإقامة حق من حقوقك ويقدمها لك مقدم الخدمة مباشرة.',
+                                        en: 'Administrative follow-up is a free support service, not a therapeutic service.\n'
+                                            'Follow-up applies after sessions or residency, not during active service delivery.\n'
+                                            'During sessions or residency, therapeutic follow-up is your right and is provided directly by the service provider.',
                                       ),
-                                      icon: Icons.phone_outlined,
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  TextFormField(
-                                    controller: _emailController,
-                                    keyboardType: TextInputType.emailAddress,
-                                    textAlign: _contentTextAlign,
-                                    onChanged: (_) => setState(() {}),
-                                    decoration: appInputDecoration(
-                                      context: context,
-                                      label: _copy(
-                                        ar: 'البريد الإلكتروني',
-                                        en: 'Email',
-                                      ),
-                                      icon: Icons.email_outlined,
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  Container(
-                                    padding:
-                                        const EdgeInsets.all(AppSpacing.md),
-                                    decoration: _glassDecoration(
-                                      alpha: 0.28,
-                                      radius: 18,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        const Icon(Icons.link_outlined),
-                                        const SizedBox(width: AppSpacing.sm),
-                                        Expanded(
-                                          child: Text(
-                                            '${_copy(ar: 'وسيلة التواصل المفضلة', en: 'Preferred contact channel')}: ${_preferredContactChannelLabel()}',
-                                            textAlign: _contentTextAlign,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium
-                                                ?.copyWith(
-                                                  color:
-                                                      const Color(0xFFFFF4D4),
-                                                ),
+                                      textAlign: _contentTextAlign,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            color: const Color(0xFFFFF4D4),
+                                            fontWeight: FontWeight.w600,
+                                            height: 1.7,
                                           ),
-                                        ),
-                                      ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            if (_isBirthdaySelected) ...[
-                              const SizedBox(height: AppSpacing.lg),
-                              _buildBirthdaySection(),
-                            ],
-                            if (_isRecoverySelected) ...[
-                              const SizedBox(height: AppSpacing.lg),
-                              _buildRecoverySection(),
-                            ],
-                            if (_isGeneralSupportSelected) ...[
-                              const SizedBox(height: AppSpacing.lg),
-                              _buildGeneralSupportSection(),
-                            ],
-                            if (_isEducationSelected) ...[
-                              const SizedBox(height: AppSpacing.lg),
-                              _buildEducationSection(),
-                            ],
-                            const SizedBox(height: AppSpacing.lg),
-                            Container(
-                              padding: const EdgeInsets.all(AppSpacing.lg),
-                              decoration: _glassDecoration(alpha: 0.34),
-                              child: Column(
-                                crossAxisAlignment: _contentAlignment,
-                                children: [
-                                  Align(
-                                    alignment: _sectionTitleAlignment,
-                                    child: Text(
-                                      _copy(
-                                        ar: 'الموافقة',
-                                        en: 'Consent',
+                                    const SizedBox(height: AppSpacing.md),
+                                    CheckboxListTile(
+                                      value: _policyAcknowledged,
+                                      contentPadding: EdgeInsets.zero,
+                                      controlAffinity:
+                                          ListTileControlAffinity.leading,
+                                      title: Text(
+                                        _copy(
+                                          ar: 'أقر بأن المتابعة المقدمة من الإدارة خدمة دعم مجانية وليست خدمة علاجية، وأن المتابعة العلاجية أثناء الجلسات أو الإقامة مسؤولية مقدم الخدمة ضمن الخدمة المدفوعة.',
+                                          en: "I acknowledge that administrative follow-up is a free support service, not a therapeutic service, and that therapeutic follow-up during sessions or residency is the provider's responsibility as part of the paid service.",
+                                        ),
+                                        textAlign: _contentTextAlign,
+                                        style: const TextStyle(
+                                          color: Color(0xFFFFF4D4),
+                                        ),
                                       ),
-                                      textAlign: _isArabic
-                                          ? TextAlign.center
-                                          : TextAlign.left,
-                                    style: Theme.of(context)
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _policyAcknowledged = value == true;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.lg),
+                              Container(
+                                padding: const EdgeInsets.all(AppSpacing.lg),
+                                decoration: _glassDecoration(alpha: 0.34),
+                                child: Column(
+                                  crossAxisAlignment: _contentAlignment,
+                                  children: [
+                                    Align(
+                                      alignment: _sectionTitleAlignment,
+                                      child: Text(
+                                        _copy(
+                                          ar: 'بيانات التواصل',
+                                          en: 'Contact Details',
+                                        ),
+                                        textAlign: _isArabic
+                                            ? TextAlign.center
+                                            : TextAlign.left,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                              color: const Color(0xFFE7C766),
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.md),
+                                    TextFormField(
+                                      controller: _displayNameController,
+                                      textAlign: _contentTextAlign,
+                                      decoration: appInputDecoration(
+                                        context: context,
+                                        label: _copy(
+                                          ar: 'الاسم أو اللقب',
+                                          en: 'Name or nickname',
+                                        ),
+                                        icon: Icons.person_outline,
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.md),
+                                    TextFormField(
+                                      controller: _phoneNumberController,
+                                      keyboardType: TextInputType.phone,
+                                      textAlign: _contentTextAlign,
+                                      onChanged: (_) => setState(() {}),
+                                      decoration: appInputDecoration(
+                                        context: context,
+                                        label: _copy(
+                                          ar: 'رقم واتساب',
+                                          en: 'WhatsApp number',
+                                        ),
+                                        icon: Icons.phone_outlined,
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.md),
+                                    TextFormField(
+                                      controller: _emailController,
+                                      keyboardType: TextInputType.emailAddress,
+                                      textAlign: _contentTextAlign,
+                                      onChanged: (_) => setState(() {}),
+                                      decoration: appInputDecoration(
+                                        context: context,
+                                        label: _copy(
+                                          ar: 'البريد الإلكتروني',
+                                          en: 'Email',
+                                        ),
+                                        icon: Icons.email_outlined,
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.md),
+                                    Container(
+                                      padding:
+                                          const EdgeInsets.all(AppSpacing.md),
+                                      decoration: _glassDecoration(
+                                        alpha: 0.28,
+                                        radius: 18,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.link_outlined),
+                                          const SizedBox(width: AppSpacing.sm),
+                                          Expanded(
+                                            child: Text(
+                                              '${_copy(ar: 'وسيلة التواصل المفضلة', en: 'Preferred contact channel')}: ${_preferredContactChannelLabel()}',
+                                              textAlign: _contentTextAlign,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                    color:
+                                                        const Color(0xFFFFF4D4),
+                                                  ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (_isBirthdaySelected) ...[
+                                const SizedBox(height: AppSpacing.lg),
+                                _buildBirthdaySection(),
+                              ],
+                              if (_isRecoverySelected) ...[
+                                const SizedBox(height: AppSpacing.lg),
+                                _buildRecoverySection(),
+                              ],
+                              if (_isGeneralSupportSelected) ...[
+                                const SizedBox(height: AppSpacing.lg),
+                                _buildGeneralSupportSection(),
+                              ],
+                              if (_isEducationSelected) ...[
+                                const SizedBox(height: AppSpacing.lg),
+                                _buildEducationSection(),
+                              ],
+                              const SizedBox(height: AppSpacing.lg),
+                              Container(
+                                padding: const EdgeInsets.all(AppSpacing.lg),
+                                decoration: _glassDecoration(alpha: 0.34),
+                                child: Column(
+                                  crossAxisAlignment: _contentAlignment,
+                                  children: [
+                                    Align(
+                                      alignment: _sectionTitleAlignment,
+                                      child: Text(
+                                        _copy(
+                                          ar: 'الموافقة',
+                                          en: 'Consent',
+                                        ),
+                                        textAlign: _isArabic
+                                            ? TextAlign.center
+                                            : TextAlign.left,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                              color: const Color(0xFFE7C766),
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.md),
+                                    CheckboxListTile(
+                                      value: _consentAccepted,
+                                      contentPadding: EdgeInsets.zero,
+                                      controlAffinity:
+                                          ListTileControlAffinity.leading,
+                                      title: Text(
+                                        _copy(
+                                          ar: 'أوافق على استقبال رسائل المتابعة والدعم والتوعية من فريق الدعم.',
+                                          en: 'I agree to receive follow-up, support, and awareness messages from the support team.',
+                                        ),
+                                        textAlign: _contentTextAlign,
+                                        style: const TextStyle(
+                                          color: Color(0xFFFFF4D4),
+                                        ),
+                                      ),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _consentAccepted = value == true;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.lg),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 56,
+                                child: FilledButton.icon(
+                                  onPressed: _submitting ? null : _submit,
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: const Color(0xFFE7C766),
+                                    foregroundColor: const Color(0xFF1B1007),
+                                    disabledBackgroundColor: const Color(
+                                      0xFFE7C766,
+                                    ).withValues(alpha: 0.44),
+                                    disabledForegroundColor: const Color(
+                                      0xFF1B1007,
+                                    ).withValues(alpha: 0.70),
+                                    textStyle: Theme.of(context)
                                         .textTheme
-                                        .titleLarge
+                                        .titleMedium
                                         ?.copyWith(
-                                          color: const Color(0xFFE7C766),
                                           fontWeight: FontWeight.w900,
                                         ),
-                                    ),
                                   ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  CheckboxListTile(
-                                    value: _consentAccepted,
-                                    contentPadding: EdgeInsets.zero,
-                                    controlAffinity:
-                                        ListTileControlAffinity.leading,
-                                    title: Text(
-                                      _copy(
-                                        ar: 'أوافق على استقبال رسائل المتابعة والدعم والتوعية من فريق الدعم.',
-                                        en: 'I agree to receive follow-up, support, and awareness messages from the support team.',
-                                      ),
-                                      textAlign: _contentTextAlign,
-                                      style: const TextStyle(
-                                        color: Color(0xFFFFF4D4),
-                                      ),
-                                    ),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _consentAccepted = value == true;
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.lg),
-                            SizedBox(
-                              width: double.infinity,
-                              height: 56,
-                              child: FilledButton.icon(
-                                onPressed: _submitting ? null : _submit,
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: const Color(0xFFE7C766),
-                                  foregroundColor: const Color(0xFF1B1007),
-                                  disabledBackgroundColor: const Color(
-                                    0xFFE7C766,
-                                  ).withValues(alpha: 0.44),
-                                  disabledForegroundColor: const Color(
-                                    0xFF1B1007,
-                                  ).withValues(alpha: 0.70),
-                                  textStyle: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.w900,
-                                      ),
-                                ),
-                                icon: _submitting
-                                    ? const SizedBox(
-                                        width: 18,
-                                        height: 18,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Color(0xFF1B1007),
-                                        ),
-                                      )
-                                    : const Icon(Icons.how_to_reg_outlined),
-                                label: Text(
-                                  _submitting
-                                      ? _copy(
-                                          ar: 'جارٍ الإرسال...',
-                                          en: 'Submitting...',
+                                  icon: _submitting
+                                      ? const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Color(0xFF1B1007),
+                                          ),
                                         )
-                                      : _copy(
-                                          ar: 'إتمام التسجيل',
-                                          en: 'Submit registration',
-                                        ),
+                                      : const Icon(Icons.how_to_reg_outlined),
+                                  label: Text(
+                                    _submitting
+                                        ? _copy(
+                                            ar: 'جارٍ الإرسال...',
+                                            en: 'Submitting...',
+                                          )
+                                        : _copy(
+                                            ar: 'إتمام التسجيل',
+                                            en: 'Submit registration',
+                                          ),
+                                  ),
                                 ),
                               ),
-                            ),
                             ],
                           ),
                         ),
@@ -867,10 +868,10 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
             child: Text(
               _copy(ar: 'تاريخ الميلاد', en: 'Birthday Details'),
               textAlign: _isArabic ? TextAlign.center : TextAlign.left,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: const Color(0xFFE7C766),
-                  fontWeight: FontWeight.w900,
-                ),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: const Color(0xFFE7C766),
+                    fontWeight: FontWeight.w900,
+                  ),
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -934,10 +935,10 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
             child: Text(
               _copy(ar: 'متابعة التعافي', en: 'Recovery Follow-up'),
               textAlign: _isArabic ? TextAlign.center : TextAlign.left,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: const Color(0xFFE7C766),
-                  fontWeight: FontWeight.w900,
-                ),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: const Color(0xFFE7C766),
+                    fontWeight: FontWeight.w900,
+                  ),
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -1030,10 +1031,10 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                 en: 'General Support Messages',
               ),
               textAlign: _isArabic ? TextAlign.center : TextAlign.left,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: const Color(0xFFE7C766),
-                  fontWeight: FontWeight.w900,
-                ),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: const Color(0xFFE7C766),
+                    fontWeight: FontWeight.w900,
+                  ),
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -1077,10 +1078,10 @@ class _FollowUpRegistrationPageState extends State<FollowUpRegistrationPage> {
                 en: 'Preferred Educational Topics',
               ),
               textAlign: _isArabic ? TextAlign.center : TextAlign.left,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: const Color(0xFFE7C766),
-                  fontWeight: FontWeight.w900,
-                ),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: const Color(0xFFE7C766),
+                    fontWeight: FontWeight.w900,
+                  ),
             ),
           ),
           const SizedBox(height: AppSpacing.sm),

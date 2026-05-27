@@ -29,8 +29,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   }
 
   Future<void> _toggleLocale(Locale locale) async {
-    final nextCode =
-        locale.languageCode.toLowerCase() == 'ar' ? 'en' : 'ar';
+    final nextCode = locale.languageCode.toLowerCase() == 'ar' ? 'en' : 'ar';
     await LocaleStorage().write(nextCode);
     ref.read(localeProvider.notifier).state = Locale(nextCode);
   }
@@ -67,8 +66,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                 message: isArabic ? 'English' : 'العربية',
                 child: GestureDetector(
                   onTapDown: (_) => setState(() => _languagePressed = true),
-                  onTapCancel: () =>
-                      setState(() => _languagePressed = false),
+                  onTapCancel: () => setState(() => _languagePressed = false),
                   onTapUp: (_) => setState(() => _languagePressed = false),
                   onTap: () => _toggleLocale(activeLocale),
                   child: AnimatedScale(

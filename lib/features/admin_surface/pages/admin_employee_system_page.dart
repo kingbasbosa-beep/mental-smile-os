@@ -65,7 +65,8 @@ class AdminEmployeeSystemPage extends StatelessWidget {
       priority: 'Review',
       status: 'Open',
       outputLink: '',
-      notes: 'Flag visibility gaps in handoff steps and workspace traceability.',
+      notes:
+          'Flag visibility gaps in handoff steps and workspace traceability.',
     ),
   ];
 
@@ -77,7 +78,8 @@ class AdminEmployeeSystemPage extends StatelessWidget {
       actionType: 'Status Update',
       timestampLabel: 'Today • 10:20',
       relatedItem: 'Create Reel: AI بدون نظام = خطر',
-      notes: 'The reel draft was moved from In Progress to Review for QA visibility.',
+      notes:
+          'The reel draft was moved from In Progress to Review for QA visibility.',
     ),
     _EmployeeActivityItem(
       actionTitle: 'Output link added to reel task',
@@ -86,7 +88,8 @@ class AdminEmployeeSystemPage extends StatelessWidget {
       actionType: 'Link Update',
       timestampLabel: 'Today • 11:05',
       relatedItem: 'Create Reel: AI بدون نظام = خطر',
-      notes: 'A manual output link placeholder was attached for final review follow-up.',
+      notes:
+          'A manual output link placeholder was attached for final review follow-up.',
     ),
     _EmployeeActivityItem(
       actionTitle: 'QA note added to content workflow',
@@ -95,7 +98,8 @@ class AdminEmployeeSystemPage extends StatelessWidget {
       actionType: 'Review Note',
       timestampLabel: 'Today • 12:10',
       relatedItem: 'Content workflow visibility',
-      notes: 'Added a visibility note around handoff traceability and review-step clarity.',
+      notes:
+          'Added a visibility note around handoff traceability and review-step clarity.',
     ),
   ];
 
@@ -106,7 +110,8 @@ class AdminEmployeeSystemPage extends StatelessWidget {
       canViewSensitiveData: 'Yes',
       canControlCoreFlows: 'Yes',
       canPublishOrApprove: 'Yes',
-      notes: 'Full control-plane role with governance, approvals, and core flow ownership.',
+      notes:
+          'Full control-plane role with governance, approvals, and core flow ownership.',
     ),
     _EmployeeRoleBoundaryItem(
       role: 'Content Operator',
@@ -114,7 +119,8 @@ class AdminEmployeeSystemPage extends StatelessWidget {
       canViewSensitiveData: 'No',
       canControlCoreFlows: 'No',
       canPublishOrApprove: 'No',
-      notes: 'Prepares content operations only; escalates for review and publishing decisions.',
+      notes:
+          'Prepares content operations only; escalates for review and publishing decisions.',
     ),
     _EmployeeRoleBoundaryItem(
       role: 'Support Agent',
@@ -122,7 +128,8 @@ class AdminEmployeeSystemPage extends StatelessWidget {
       canViewSensitiveData: 'Limited',
       canControlCoreFlows: 'No',
       canPublishOrApprove: 'No',
-      notes: 'Handles supervised support follow-up without domain-wide admin controls.',
+      notes:
+          'Handles supervised support follow-up without domain-wide admin controls.',
     ),
     _EmployeeRoleBoundaryItem(
       role: 'QA Reviewer',
@@ -130,7 +137,8 @@ class AdminEmployeeSystemPage extends StatelessWidget {
       canViewSensitiveData: 'Limited',
       canControlCoreFlows: 'No',
       canPublishOrApprove: 'Review only',
-      notes: 'Flags quality findings and review notes without final approval authority.',
+      notes:
+          'Flags quality findings and review notes without final approval authority.',
     ),
     _EmployeeRoleBoundaryItem(
       role: 'Finance Assistant',
@@ -138,7 +146,8 @@ class AdminEmployeeSystemPage extends StatelessWidget {
       canViewSensitiveData: 'Limited',
       canControlCoreFlows: 'No',
       canPublishOrApprove: 'No',
-      notes: 'Prepares finance follow-through surfaces without payout or approval ownership.',
+      notes:
+          'Prepares finance follow-through surfaces without payout or approval ownership.',
     ),
     _EmployeeRoleBoundaryItem(
       role: 'Operations Assistant',
@@ -146,7 +155,8 @@ class AdminEmployeeSystemPage extends StatelessWidget {
       canViewSensitiveData: 'Limited',
       canControlCoreFlows: 'No',
       canPublishOrApprove: 'No',
-      notes: 'Coordinates operational movement and blockers without controlling core system flows.',
+      notes:
+          'Coordinates operational movement and blockers without controlling core system flows.',
     ),
   ];
 
@@ -304,7 +314,9 @@ class AdminEmployeeSystemPage extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            hasOutputLink ? 'Output link available' : 'Output link: Not added yet',
+            hasOutputLink
+                ? 'Output link available'
+                : 'Output link: Not added yet',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: hasOutputLink
                       ? const Color(0xFFC9A75B)
@@ -422,7 +434,9 @@ class AdminEmployeeSystemPage extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            hasOutputLink ? 'Output link available' : 'Output link: Not added yet',
+            hasOutputLink
+                ? 'Output link available'
+                : 'Output link: Not added yet',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: hasOutputLink
                       ? const Color(0xFFC9A75B)
@@ -628,7 +642,8 @@ class AdminEmployeeSystemPage extends StatelessWidget {
                   Text(
                     'Employee System is a controlled staff layer, not full admin access.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: const Color(0xFFD9DDE2).withValues(alpha: 0.84),
+                          color:
+                              const Color(0xFFD9DDE2).withValues(alpha: 0.84),
                           height: 1.4,
                         ),
                   ),

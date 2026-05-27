@@ -218,7 +218,8 @@ class AdminGrowthLayerPage extends StatelessWidget {
                   summary:
                       'Standalone content operations surface for tools, board tracking, content cards, and production links.',
                   route: Routes.contentWorkspace,
-                  statusLabel: 'Future employee-ready surface • no admin controls',
+                  statusLabel:
+                      'Future employee-ready surface • no admin controls',
                   counterLabel: 'Pending Content',
                   counterValue: 6,
                 ),

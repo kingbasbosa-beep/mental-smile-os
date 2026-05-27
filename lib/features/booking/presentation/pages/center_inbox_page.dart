@@ -27,7 +27,7 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
         return isArabic ? 'غير متاح' : 'Unavailable';
       case 'pending':
       default:
-        return isArabic ? 'بانتظار رد المركز' : 'Pending center response';
+        return isArabic ? 'قيد المراجعة' : 'Pending center response';
     }
   }
 
@@ -42,7 +42,7 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
       case 'pending_admin':
         return isArabic ? 'مرئي للمركز' : 'Visible to center';
       case 'center_follow_up':
-        return isArabic ? 'بانتظار رد المركز' : 'Pending center response';
+        return isArabic ? 'قيد المراجعة' : 'Pending center response';
       case 'session_setup_pending':
         return isArabic ? 'بانتظار تجهيز الإقامة' : 'Residency setup pending';
       case 'session_scheduled':
@@ -171,285 +171,303 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
         appBar: AppBar(
           title: Text(l10n.centerInboxTitle),
         ),
-        body: Builder(
-          builder: (context) {
-            final centerId = FirebaseAuth.instance.currentUser?.uid ?? '';
-            if (centerId.isEmpty) {
-              return Center(
-                child: Text(
-                  isArabic ? 'يجب تسجيل الدخول أولًا' : 'Please sign in first',
-                ),
-              );
-            }
-            _ensureRequestsStream(centerId);
-
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
-                  child: Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: [
-                      ChoiceChip(
-                        label: Text(l10n.commonAll),
-                        selected: _filter == 'all',
-                        onSelected: (_) => setState(() => _filter = 'all'),
-                      ),
-                      ChoiceChip(
-                        label: Text(l10n.statusPending),
-                        selected: _filter == 'pending',
-                        onSelected: (_) => setState(() => _filter = 'pending'),
-                      ),
-                      ChoiceChip(
-                        label: Text(l10n.centerAvailable),
-                        selected: _filter == 'available',
-                        onSelected: (_) =>
-                            setState(() => _filter = 'available'),
-                      ),
-                      ChoiceChip(
-                        label: Text(l10n.centerUnavailable),
-                        selected: _filter == 'unavailable',
-                        onSelected: (_) =>
-                            setState(() => _filter = 'unavailable'),
-                      ),
-                    ],
+        body: SafeArea(
+          child: Builder(
+            builder: (context) {
+              final centerId = FirebaseAuth.instance.currentUser?.uid ?? '';
+              if (centerId.isEmpty) {
+                return Center(
+                  child: Text(
+                    isArabic
+                        ? 'يجب تسجيل الدخول أولًا'
+                        : 'Please sign in first',
                   ),
-                ),
-                Expanded(
-                  child: StreamBuilder<List<CenterInboxRequest>>(
-                    stream: _activeRequestsStream,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Center(
-                          child: Text(
-                            isArabic
-                                ? 'تعذر تحميل طلبات المركز'
-                                : 'Unable to load center requests',
-                          ),
-                        );
-                      }
-                      if (!snapshot.hasData) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
+                );
+              }
+              _ensureRequestsStream(centerId);
 
-                      final visible = snapshot.data!.where((request) {
-                        final availability =
-                            (request.data['centerAvailabilityStatus'] ??
-                                    'pending')
-                                .toString()
-                                .trim();
-                        final status =
-                            (request.data['status'] ?? '').toString().trim();
-                        if (_isResidencyStage(status)) {
-                          return _filter == 'all' || _filter == 'pending';
-                        }
-                        if (_filter == 'all') return true;
-                        return availability == _filter;
-                      }).toList();
-
-                      if (visible.isEmpty) {
-                        return Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  isArabic
-                                      ? 'لا توجد طلبات موجهة إلى هذا المركز حاليًا'
-                                      : 'No center-routed requests for this center right now',
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  isArabic
-                                      ? 'وارد المركز يعرض طلبات رد التوفر وبدايات الإقامة التي تحتاج متابعة من المركز.'
-                                      : 'Center inbox shows availability requests and residency-start actions that still need center follow-up.',
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
-                                      ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
-                                      ),
-                                ),
-                                const SizedBox(height: 16),
-                                OutlinedButton.icon(
-                                  onPressed: () {
-                                    Navigator.of(context).pushNamed(
-                                      Routes.centerResidencies,
-                                    );
-                                  },
-                                  icon: const Icon(Icons.home_work_outlined),
-                                  label: Text(
-                                    isArabic
-                                        ? 'فتح الإقامات والمتابعة'
-                                        : 'Open residencies',
-                                  ),
-                                ),
-                              ],
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+                    child: Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        ChoiceChip(
+                          label: Text(l10n.commonAll),
+                          selected: _filter == 'all',
+                          onSelected: (_) => setState(() => _filter = 'all'),
+                        ),
+                        ChoiceChip(
+                          label: Text(l10n.statusPending),
+                          selected: _filter == 'pending',
+                          onSelected: (_) =>
+                              setState(() => _filter = 'pending'),
+                        ),
+                        ChoiceChip(
+                          label: Text(l10n.centerAvailable),
+                          selected: _filter == 'available',
+                          onSelected: (_) =>
+                              setState(() => _filter = 'available'),
+                        ),
+                        ChoiceChip(
+                          label: Text(l10n.centerUnavailable),
+                          selected: _filter == 'unavailable',
+                          onSelected: (_) =>
+                              setState(() => _filter = 'unavailable'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: StreamBuilder<List<CenterInboxRequest>>(
+                      stream: _activeRequestsStream,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Text(
+                              isArabic
+                                  ? 'تعذر تحميل طلبات المركز'
+                                  : 'Unable to load center requests',
                             ),
-                          ),
-                        );
-                      }
+                          );
+                        }
+                        if (!snapshot.hasData) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
 
-                      return ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(12, 6, 12, 18),
-                        itemCount: visible.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder: (context, index) {
-                          final request = visible[index];
-                          final data = request.data;
-                          final clientName =
-                              (data['clientName'] ?? 'Client').toString();
-                          final note = (data['note'] ?? '').toString().trim();
-                          final adminNote = (data['adminFollowUpNote'] ?? '')
-                              .toString()
-                              .trim();
-                          final createdAt = _dateText(data['createdAt']);
+                        final visible = snapshot.data!.where((request) {
                           final availability =
-                              (data['centerAvailabilityStatus'] ?? 'pending')
+                              (request.data['centerAvailabilityStatus'] ??
+                                      'pending')
                                   .toString()
                                   .trim();
                           final status =
-                              (data['status'] ?? '').toString().trim();
-                          final availabilityNote =
-                              (data['centerAvailabilityNote'] ?? '')
-                                  .toString()
-                                  .trim();
+                              (request.data['status'] ?? '').toString().trim();
+                          if (_isResidencyStage(status)) {
+                            return _filter == 'all' || _filter == 'pending';
+                          }
+                          if (_filter == 'all') return true;
+                          return availability == _filter;
+                        }).toList();
 
-                          return Card(
+                        if (visible.isEmpty) {
+                          return Center(
                             child: Padding(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(24),
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          clientName,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium,
-                                        ),
-                                      ),
-                                      Chip(
-                                        label: Text(
-                                          status == 'pending_admin' ||
-                                                  status == 'center_follow_up'
-                                              ? _availabilityLabel(
-                                                  availability,
-                                                  isArabic,
-                                                )
-                                              : _statusLabel(
-                                                  status,
-                                                  isArabic,
-                                                ),
-                                        ),
-                                      ),
-                                    ],
+                                  Text(
+                                    isArabic
+                                        ? 'لا توجد طلبات موجهة إلى هذا المركز حاليًا'
+                                        : 'No center-routed requests for this center right now',
+                                    textAlign: TextAlign.center,
                                   ),
-                                  if (createdAt.isNotEmpty) ...[
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      isArabic
-                                          ? 'تاريخ الطلب: $createdAt'
-                                          : 'Created at: $createdAt',
-                                    ),
-                                  ],
-                                  if (note.isNotEmpty) ...[
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      isArabic
-                                          ? 'ملاحظة العميل: $note'
-                                          : 'Client note: $note',
-                                    ),
-                                  ],
-                                  if (adminNote.isNotEmpty) ...[
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      isArabic
-                                          ? 'ملاحظة الإدارة: $adminNote'
-                                          : 'Admin note: $adminNote',
-                                    ),
-                                  ],
-                                  if (availabilityNote.isNotEmpty) ...[
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      isArabic
-                                          ? 'رد المركز: $availabilityNote'
-                                          : 'Center note: $availabilityNote',
-                                    ),
-                                  ],
-                                  if (_isResidencyStage(status)) ...[
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      isArabic
-                                          ? 'هذا الطلب في مرحلة الإقامة وما زال يحتاج متابعة من المركز.'
-                                          : 'This request is now in the residency stage and still needs center follow-up.',
-                                    ),
-                                    const SizedBox(height: 12),
-                                    OutlinedButton.icon(
-                                      onPressed: () {
-                                        Navigator.of(context).pushNamed(
-                                          Routes.centerResidencies,
-                                        );
-                                      },
-                                      icon:
-                                          const Icon(Icons.home_work_outlined),
-                                      label: Text(
-                                        isArabic
-                                            ? 'فتح ملف الإقامة'
-                                            : 'Open residency file',
-                                      ),
-                                    ),
-                                  ],
                                   const SizedBox(height: 12),
-                                  if (status == 'pending_admin' ||
-                                      status == 'center_follow_up')
-                                    Wrap(
-                                      spacing: 10,
-                                      runSpacing: 10,
-                                      children: [
-                                        FilledButton.icon(
-                                          onPressed: () => _respond(
-                                            request: request,
-                                            availabilityStatus: 'available',
-                                          ),
-                                          icon: const Icon(
-                                            Icons.check_circle_outline,
-                                          ),
-                                          label: Text(l10n.centerAvailable),
+                                  Text(
+                                    isArabic
+                                        ? 'وارد المركز يعرض طلبات رد التوفر وبدايات الإقامة التي تحتاج متابعة من المركز.'
+                                        : 'Center inbox shows availability requests and residency-start actions that still need center follow-up.',
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant,
                                         ),
-                                        OutlinedButton.icon(
-                                          onPressed: () => _respond(
-                                            request: request,
-                                            availabilityStatus: 'unavailable',
-                                          ),
-                                          icon: const Icon(
-                                              Icons.event_busy_outlined),
-                                          label: Text(l10n.centerUnavailable),
-                                        ),
-                                      ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  OutlinedButton.icon(
+                                    onPressed: () {
+                                      Navigator.of(context).pushNamed(
+                                        Routes.centerResidencies,
+                                      );
+                                    },
+                                    icon: const Icon(Icons.home_work_outlined),
+                                    label: Text(
+                                      isArabic
+                                          ? 'فتح الإقامات والمتابعة'
+                                          : 'Open residencies',
                                     ),
+                                  ),
                                 ],
                               ),
                             ),
                           );
-                        },
-                      );
-                    },
+                        }
+
+                        return ListView.separated(
+                          padding: const EdgeInsets.fromLTRB(12, 6, 12, 18),
+                          itemCount: visible.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 10),
+                          itemBuilder: (context, index) {
+                            final request = visible[index];
+                            final data = request.data;
+                            final clientName =
+                                (data['clientName'] ?? 'Client').toString();
+                            final note = (data['note'] ?? '').toString().trim();
+                            final adminNote = (data['adminFollowUpNote'] ?? '')
+                                .toString()
+                                .trim();
+                            final createdAt = _dateText(data['createdAt']);
+                            final availability =
+                                (data['centerAvailabilityStatus'] ?? 'pending')
+                                    .toString()
+                                    .trim();
+                            final status =
+                                (data['status'] ?? '').toString().trim();
+                            final availabilityNote =
+                                (data['centerAvailabilityNote'] ?? '')
+                                    .toString()
+                                    .trim();
+
+                            return Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            clientName,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium,
+                                          ),
+                                        ),
+                                        Flexible(
+                                          child: Align(
+                                            alignment: isArabic
+                                                ? Alignment.centerLeft
+                                                : Alignment.centerRight,
+                                            child: Chip(
+                                              label: Text(
+                                                status == 'pending_admin' ||
+                                                        status ==
+                                                            'center_follow_up'
+                                                    ? _availabilityLabel(
+                                                        availability,
+                                                        isArabic,
+                                                      )
+                                                    : _statusLabel(
+                                                        status,
+                                                        isArabic,
+                                                      ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    if (createdAt.isNotEmpty) ...[
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        isArabic
+                                            ? 'تاريخ الطلب: $createdAt'
+                                            : 'Created at: $createdAt',
+                                      ),
+                                    ],
+                                    if (note.isNotEmpty) ...[
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        isArabic
+                                            ? 'ملاحظة العميل: $note'
+                                            : 'Client note: $note',
+                                      ),
+                                    ],
+                                    if (adminNote.isNotEmpty) ...[
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        isArabic
+                                            ? 'ملاحظة الإدارة: $adminNote'
+                                            : 'Admin note: $adminNote',
+                                      ),
+                                    ],
+                                    if (availabilityNote.isNotEmpty) ...[
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        isArabic
+                                            ? 'رد المركز: $availabilityNote'
+                                            : 'Center note: $availabilityNote',
+                                      ),
+                                    ],
+                                    if (_isResidencyStage(status)) ...[
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        isArabic
+                                            ? 'هذا الطلب في مرحلة الإقامة وما زال يحتاج متابعة من المركز.'
+                                            : 'This request is now in the residency stage and still needs center follow-up.',
+                                      ),
+                                      const SizedBox(height: 12),
+                                      OutlinedButton.icon(
+                                        onPressed: () {
+                                          Navigator.of(context).pushNamed(
+                                            Routes.centerResidencies,
+                                          );
+                                        },
+                                        icon: const Icon(
+                                            Icons.home_work_outlined),
+                                        label: Text(
+                                          isArabic
+                                              ? 'فتح ملف الإقامة'
+                                              : 'Open residency file',
+                                        ),
+                                      ),
+                                    ],
+                                    const SizedBox(height: 12),
+                                    if (status == 'pending_admin' ||
+                                        status == 'center_follow_up')
+                                      Wrap(
+                                        spacing: 10,
+                                        runSpacing: 10,
+                                        children: [
+                                          FilledButton.icon(
+                                            onPressed: () => _respond(
+                                              request: request,
+                                              availabilityStatus: 'available',
+                                            ),
+                                            icon: const Icon(
+                                              Icons.check_circle_outline,
+                                            ),
+                                            label: Text(l10n.centerAvailable),
+                                          ),
+                                          OutlinedButton.icon(
+                                            onPressed: () => _respond(
+                                              request: request,
+                                              availabilityStatus: 'unavailable',
+                                            ),
+                                            icon: const Icon(
+                                                Icons.event_busy_outlined),
+                                            label: Text(l10n.centerUnavailable),
+                                          ),
+                                        ],
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
-            );
-          },
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

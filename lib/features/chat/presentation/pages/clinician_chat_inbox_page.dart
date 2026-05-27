@@ -87,6 +87,11 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
     );
   }
 
+  bool _isLandscapeCompact(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    return size.width > size.height && size.width < 900 && size.height < 540;
+  }
+
   String _statusLabel(String status) {
     switch (status) {
       case 'open':
@@ -236,22 +241,27 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
   }
 
   Widget _buildIntroCard() {
+    final compact = _isLandscapeCompact(context);
+
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: EdgeInsets.all(compact ? 14.0 : AppSpacing.lg),
       decoration: _glassDecoration(alpha: 0.34, radius: 22),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            _isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
             'حالات الشات للأخصائي',
+            textAlign: _isArabic ? TextAlign.right : TextAlign.left,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: const Color(0xFFE7C766),
                   fontWeight: FontWeight.w900,
                 ),
           ),
-          const SizedBox(height: AppSpacing.xs),
+          SizedBox(height: compact ? 4.0 : AppSpacing.xs),
           Text(
             'هذه المساحة مخصصة للحالات المصعّدة أو المُحالة من الشات، وهي منفصلة عن الجلسات والطلبات التشغيلية.',
+            textAlign: _isArabic ? TextAlign.right : TextAlign.left,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: const Color(0xFFFFF4D4),
                 ),
@@ -262,11 +272,13 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
   }
 
   Widget _buildUnauthenticatedState() {
+    final compact = _isLandscapeCompact(context);
+
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(compact ? 16.0 : 24.0),
         child: Container(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: EdgeInsets.all(compact ? 14.0 : AppSpacing.lg),
           decoration: _glassDecoration(alpha: 0.36, radius: 22),
           child: Text(
             'يجب تسجيل الدخول كأخصائي لرؤية هذه الصفحة.',
@@ -281,8 +293,10 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
   }
 
   Widget _buildEmptyState() {
+    final compact = _isLandscapeCompact(context);
+
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.xl),
+      padding: EdgeInsets.all(compact ? 18.0 : AppSpacing.xl),
       decoration: _glassDecoration(alpha: 0.34, radius: 22),
       child: Column(
         children: [
@@ -291,7 +305,7 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
             color: Color(0xFFE7C766),
             size: 34,
           ),
-          const SizedBox(height: AppSpacing.sm),
+          SizedBox(height: compact ? 6.0 : AppSpacing.sm),
           Text(
             'لا توجد حالات شات مصعّدة أو مُحالة لك حالياً',
             textAlign: TextAlign.center,
@@ -307,6 +321,7 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
 
   Widget _buildCaseCard(
       ChatEscalationModel escalation, ChatThreadModel? thread) {
+    final compact = _isLandscapeCompact(context);
     final currentState = _currentStateLabel(escalation, thread);
     final preview = _previewText(escalation, thread);
     final identity = _identityLabel(escalation, thread);
@@ -315,99 +330,104 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
     final canMarkHandled = escalation.status != 'resolved';
 
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: EdgeInsets.all(compact ? 14.0 : AppSpacing.lg),
       decoration: _glassDecoration(alpha: 0.34, radius: 22),
       child: DefaultTextStyle.merge(
         style: const TextStyle(color: Color(0xFFFFF4D4)),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment:
+              _isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  identity,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: const Color(0xFFFFF4D4),
-                        fontWeight: FontWeight.w800,
-                      ),
+            Row(
+              textDirection: _isArabic ? TextDirection.rtl : TextDirection.ltr,
+              children: [
+                Expanded(
+                  child: Text(
+                    identity,
+                    textAlign: _isArabic ? TextAlign.right : TextAlign.left,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: const Color(0xFFFFF4D4),
+                          fontWeight: FontWeight.w800,
+                        ),
+                  ),
                 ),
-              ),
-              AppStatusBadge(
-                label: origin,
-                color: _originColor(thread),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Wrap(
-            spacing: AppSpacing.xs,
-            runSpacing: AppSpacing.xs,
-            children: [
-              AppStatusBadge(
-                label: 'State: $currentState',
-                color: AppColors.deepTeal,
-              ),
-              AppStatusBadge(
-                label: 'Risk: $risk',
-                color: AppColors.info,
-              ),
-              AppStatusBadge(
-                label: 'Score: ${escalation.riskScore}',
-                color: AppColors.mist,
-              ),
-              if ((escalation.bookingRequestId ?? '').isNotEmpty)
                 AppStatusBadge(
-                  label: 'Request: ${escalation.bookingRequestId}',
-                  color: AppColors.accentLavender,
+                  label: origin,
+                  color: _originColor(thread),
                 ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            preview,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: const Color(0xFFFFF4D4),
-                ),
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-          ),
-          if (escalation.reasonCodes.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.md),
+              ],
+            ),
+            SizedBox(height: compact ? 6.0 : AppSpacing.sm),
             Wrap(
               spacing: AppSpacing.xs,
               runSpacing: AppSpacing.xs,
-              children: escalation.reasonCodes
-                  .map(
-                    (reason) => Chip(
-                      label: Text(_reasonLabel(reason)),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ],
-          const SizedBox(height: AppSpacing.md),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: [
-              OutlinedButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    Routes.chat,
-                    arguments: {'threadId': escalation.threadId},
-                  );
-                },
-                child: const Text('فتح الشات'),
-              ),
-              if (canMarkHandled)
-                FilledButton.tonal(
-                  onPressed:
-                      _resolvingCase ? null : () => _markAsHandled(escalation),
-                  child: const Text('تم التعامل معها'),
+              children: [
+                AppStatusBadge(
+                  label: 'State: $currentState',
+                  color: AppColors.deepTeal,
                 ),
+                AppStatusBadge(
+                  label: 'Risk: $risk',
+                  color: AppColors.info,
+                ),
+                AppStatusBadge(
+                  label: 'Score: ${escalation.riskScore}',
+                  color: AppColors.mist,
+                ),
+                if ((escalation.bookingRequestId ?? '').isNotEmpty)
+                  AppStatusBadge(
+                    label: 'Request: ${escalation.bookingRequestId}',
+                    color: AppColors.accentLavender,
+                  ),
+              ],
+            ),
+            SizedBox(height: compact ? 8.0 : AppSpacing.md),
+            Text(
+              preview,
+              textAlign: _isArabic ? TextAlign.right : TextAlign.left,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: const Color(0xFFFFF4D4),
+                  ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+            if (escalation.reasonCodes.isNotEmpty) ...[
+              SizedBox(height: compact ? 8.0 : AppSpacing.md),
+              Wrap(
+                spacing: AppSpacing.xs,
+                runSpacing: AppSpacing.xs,
+                children: escalation.reasonCodes
+                    .map(
+                      (reason) => Chip(
+                        label: Text(_reasonLabel(reason)),
+                      ),
+                    )
+                    .toList(),
+              ),
             ],
-          ),
+            SizedBox(height: compact ? 8.0 : AppSpacing.md),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                      Routes.chat,
+                      arguments: {'threadId': escalation.threadId},
+                    );
+                  },
+                  child: const Text('فتح الشات'),
+                ),
+                if (canMarkHandled)
+                  FilledButton.tonal(
+                    onPressed: _resolvingCase
+                        ? null
+                        : () => _markAsHandled(escalation),
+                    child: const Text('تم التعامل معها'),
+                  ),
+              ],
+            ),
           ],
         ),
       ),
@@ -517,21 +537,23 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
         }
 
         final items = snapshot.data ?? [];
+        final compact = _isLandscapeCompact(context);
         if (items.isEmpty) {
           return ListView(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(compact ? 12.0 : 16.0),
             children: [
               _buildIntroCard(),
-              const SizedBox(height: 16),
+              SizedBox(height: compact ? 10.0 : 16.0),
               _buildEmptyState(),
             ],
           );
         }
 
         return ListView.separated(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(compact ? 12.0 : 16.0),
           itemCount: items.length + 1,
-          separatorBuilder: (context, index) => const SizedBox(height: 12),
+          separatorBuilder: (context, index) =>
+              SizedBox(height: compact ? 8.0 : 12.0),
           itemBuilder: (context, index) {
             if (index == 0) {
               return _buildIntroCard();

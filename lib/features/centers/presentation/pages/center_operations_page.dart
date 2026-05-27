@@ -1059,6 +1059,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         appBar: AppShellActions.buildAppBar(
           context,
           title: isArabic ? 'غرفة عمليات المركز' : 'Center Operations',
@@ -1085,419 +1086,452 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                 StreamBuilder<Map<String, dynamic>?>(
                   stream: _centerStream(),
                   builder: (context, snapshot) {
-              final scheme = Theme.of(context).colorScheme;
-              final data = snapshot.data ?? <String, dynamic>{};
-              final centerName =
-                  (data['centerName'] ?? data['displayName'] ?? '')
-                      .toString()
-                      .trim();
+                    final scheme = Theme.of(context).colorScheme;
+                    final data = snapshot.data ?? <String, dynamic>{};
+                    final centerName =
+                        (data['centerName'] ?? data['displayName'] ?? '')
+                            .toString()
+                            .trim();
 
-              final docs = _readDocs(data);
-              final gallery = _readGallery(data);
-              _syncProfileFields(data);
-              _syncRequestedGalleryFields(gallery);
-              _syncPricingFields(data);
-              final category = (data['category'] ?? '').toString().trim();
-              final usesAutismPricing = usesAutismCarePricing(category);
+                    final docs = _readDocs(data);
+                    final gallery = _readGallery(data);
+                    _syncProfileFields(data);
+                    _syncRequestedGalleryFields(gallery);
+                    _syncPricingFields(data);
+                    final category = (data['category'] ?? '').toString().trim();
+                    final usesAutismPricing = usesAutismCarePricing(category);
 
-              if (snapshot.hasData && gallery.isNotEmpty) {
-                _prefillGallery(gallery);
-              }
+                    if (snapshot.hasData && gallery.isNotEmpty) {
+                      _prefillGallery(gallery);
+                    }
 
-              return ListView(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                children: [
-                  AppSurfaceCard(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      crossAxisAlignment: isArabic
-                          ? CrossAxisAlignment.end
-                          : CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          centerName.isEmpty
-                              ? (isArabic
-                                  ? 'غرفة عمليات المركز'
-                                  : 'Center Operations')
-                              : centerName,
-                          style:
-                              Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          isArabic
-                              ? 'الوضع الحالي بدون Firebase Storage. الصور والوثائق تُسجل مؤقتًا كبيانات وروابط داخل Firestore لحين تفعيل التخزين.'
-                              : 'Temporary mode without Firebase Storage. Images and documents are stored as metadata/links in Firestore until storage is enabled.',
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _buildProfileEditRequestEntryCard(
-                    context: context,
-                    isArabic: isArabic,
-                  ),
-                  const SizedBox(height: 12),
-                  AppSurfaceCard(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      crossAxisAlignment: isArabic
-                          ? CrossAxisAlignment.end
-                          : CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          isArabic
-                              ? 'صور المركز الأساسية'
-                              : 'Main Center Images',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          isArabic
-                              ? 'أدخل روابط الصور الأربع الأساسية مؤقتًا. لاحقًا سنحوّلها لرفع مباشر.'
-                              : 'Enter the 4 main image URLs temporarily. Later we will switch them to direct uploads.',
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        TextField(
-                          controller: _frontImageController,
-                          decoration: appInputDecoration(
-                            context: context,
-                            label: isArabic
-                                ? 'رابط صورة الواجهة'
-                                : 'Front image URL',
-                            icon: Icons.storefront_outlined,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: _receptionImageController,
-                          decoration: InputDecoration(
-                            labelText: isArabic
-                                ? 'رابط صورة الاستقبال'
-                                : 'Reception image URL',
-                            border: const OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: _inside1ImageController,
-                          decoration: InputDecoration(
-                            labelText: isArabic
-                                ? 'رابط الصورة الداخلية 1'
-                                : 'Inside image 1 URL',
-                            border: const OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: _inside2ImageController,
-                          decoration: InputDecoration(
-                            labelText: isArabic
-                                ? 'رابط الصورة الداخلية 2'
-                                : 'Inside image 2 URL',
-                            border: const OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: FilledButton.icon(
-                            onPressed: _savingImages
-                                ? null
-                                : () => _saveImages(
-                                      currentData: data,
-                                      currentDocs: docs,
-                                    ),
-                            icon: _savingImages
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Icon(Icons.photo_library_outlined),
-                            label: Text(
-                              _savingImages
-                                  ? (isArabic ? 'جارٍ الحفظ...' : 'Saving...')
-                                  : (isArabic
-                                      ? 'حفظ الصور الأربع'
-                                      : 'Save 4 images'),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: scheme.surface,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: scheme.outline.withValues(alpha: 0.12),
+                    return ListView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: width < 700 ? 14 : 24,
+                        vertical: width < 700 ? 14 : 20,
                       ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: isArabic
-                          ? CrossAxisAlignment.end
-                          : CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          isArabic
-                              ? 'رفع الوثائق المنظمة'
-                              : 'Structured Documents',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          isArabic
-                              ? 'أدخل بيانات الوثيقة يدويًا مؤقتًا: النوع، اسم الملف، والرابط إن وجد.'
-                              : 'Temporarily enter document metadata manually: type, file name, and URL if available.',
-                        ),
-                        const SizedBox(height: 14),
-                        DropdownButtonFormField<String>(
-                          initialValue: _selectedDocType,
-                          isExpanded: true,
-                          items: kRequiredCenterDocumentTypes
-                              .map(
-                                (item) => DropdownMenuItem<String>(
-                                  value: item['key'],
-                                  child: Text(
-                                    centerDocumentLabel(
-                                      item['key'] ?? '',
-                                      isArabic,
-                                    ),
-                                    textAlign: isArabic
-                                        ? TextAlign.right
-                                        : TextAlign.left,
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: _savingDocument
-                              ? null
-                              : (value) {
-                                  setState(() => _selectedDocType = value);
-                                },
-                          decoration: InputDecoration(
-                            labelText:
-                                isArabic ? 'نوع الوثيقة *' : 'Document type *',
-                            border: const OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: _docFileNameController,
-                          decoration: InputDecoration(
-                            labelText: isArabic ? 'اسم الملف' : 'File name',
-                            border: const OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: _docUrlController,
-                          decoration: InputDecoration(
-                            labelText: isArabic
-                                ? 'رابط الملف (اختياري)'
-                                : 'File URL (optional)',
-                            border: const OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        AppSectionPanel(
-                          color:
-                              AppColors.accentLavender.withValues(alpha: 0.08),
-                          borderColor:
-                              AppColors.accentLavender.withValues(alpha: 0.12),
-                          child: Text(
-                            isArabic
-                                ? 'تُرسل كل وثيقة جديدة بحالة "بانتظار المراجعة"، وتقوم الإدارة فقط بتحديث حالة المراجعة لاحقًا.'
-                                : 'Each new document is sent as "Pending review", and only admin updates the review status later.',
-                            textAlign:
-                                isArabic ? TextAlign.right : TextAlign.left,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: _docReviewNoteController,
-                          maxLines: 3,
-                          decoration: InputDecoration(
-                            labelText:
-                                isArabic ? 'ملاحظة إضافية' : 'Additional note',
-                            border: const OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: FilledButton.icon(
-                            onPressed: _savingDocument
-                                ? null
-                                : () => _addDocument(
-                                      currentData: data,
-                                      currentDocs: docs,
-                                    ),
-                            icon: _savingDocument
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Icon(Icons.upload_file_outlined),
-                            label: Text(
-                              _savingDocument
-                                  ? (isArabic ? 'جارٍ الإضافة...' : 'Adding...')
-                                  : (isArabic ? 'إضافة وثيقة' : 'Add document'),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  if (docs.isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: scheme.surface,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: scheme.outline.withValues(alpha: 0.12),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: isArabic
-                            ? CrossAxisAlignment.end
-                            : CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            isArabic ? 'الوثائق الحالية' : 'Current Documents',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                ),
-                          ),
-                          const SizedBox(height: 12),
-                          ...docs.asMap().entries.map((entry) {
-                            final index = entry.key;
-                            final doc = entry.value;
-
-                            final type = (doc['documentType'] ?? '').toString();
-                            final fileName = (doc['originalFileName'] ??
-                                    doc['fileName'] ??
-                                    '')
-                                .toString();
-                            final status =
-                                (doc['status'] ?? 'pending').toString();
-                            final reviewNote =
-                                (doc['reviewNote'] ?? '').toString().trim();
-
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 10),
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: scheme.primary.withValues(alpha: 0.05),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: isArabic
-                                    ? CrossAxisAlignment.end
-                                    : CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    type.isEmpty
-                                        ? (isArabic ? 'وثيقة' : 'Document')
-                                        : type,
-                                    style: const TextStyle(
+                        AppSurfaceCard(
+                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          child: Column(
+                            crossAxisAlignment: isArabic
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                centerName.isEmpty
+                                    ? (isArabic
+                                        ? 'غرفة عمليات المركز'
+                                        : 'Center Operations')
+                                    : centerName,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
                                       fontWeight: FontWeight.w800,
                                     ),
-                                  ),
-                                  if (fileName.isNotEmpty) ...[
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      isArabic
-                                          ? 'الملف: $fileName'
-                                          : 'File: $fileName',
-                                    ),
-                                  ],
-                                  const SizedBox(height: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 6,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF6C55B3)
-                                          .withValues(alpha: 0.10),
-                                      borderRadius: BorderRadius.circular(999),
-                                    ),
-                                    child: Text(
-                                      _docStatusLabel(status, isArabic),
-                                      style: const TextStyle(
-                                        color: Color(0xFF6C55B3),
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                  if (reviewNote.isNotEmpty) ...[
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      isArabic
-                                          ? 'الملاحظة: $reviewNote'
-                                          : 'Note: $reviewNote',
-                                    ),
-                                  ],
-                                  const SizedBox(height: 8),
-                                  Align(
-                                    alignment: isArabic
-                                        ? Alignment.centerLeft
-                                        : Alignment.centerRight,
-                                    child: OutlinedButton.icon(
-                                      onPressed: _savingDocument
-                                          ? null
-                                          : () => _removeDocument(
-                                                index: index,
-                                                currentData: data,
-                                                currentDocs: docs,
-                                              ),
-                                      icon: const Icon(Icons.delete_outline),
-                                      label: Text(isArabic ? 'حذف' : 'Delete'),
-                                    ),
-                                  ),
-                                ],
                               ),
-                            );
-                          }),
-                        ],
-                      ),
-                    ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    height: 52,
-                    child: OutlinedButton.icon(
-                      onPressed: () => _logout(context),
-                      icon: const Icon(Icons.logout),
-                      label: Text(isArabic ? 'تسجيل الخروج' : 'Logout'),
-                    ),
-                  ),
-                ],
-              );
+                              const SizedBox(height: 8),
+                              Text(
+                                isArabic
+                                    ? 'الوضع الحالي بدون Firebase Storage. الصور والوثائق تُسجل مؤقتًا كبيانات وروابط داخل Firestore لحين تفعيل التخزين.'
+                                    : 'Temporary mode without Firebase Storage. Images and documents are stored as metadata/links in Firestore until storage is enabled.',
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        _buildProfileEditRequestEntryCard(
+                          context: context,
+                          isArabic: isArabic,
+                        ),
+                        const SizedBox(height: 12),
+                        AppSurfaceCard(
+                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          child: Column(
+                            crossAxisAlignment: isArabic
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isArabic
+                                    ? 'صور المركز الأساسية'
+                                    : 'Main Center Images',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                isArabic
+                                    ? 'أدخل روابط الصور الأربع الأساسية مؤقتًا. لاحقًا سنحوّلها لرفع مباشر.'
+                                    : 'Enter the 4 main image URLs temporarily. Later we will switch them to direct uploads.',
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              TextField(
+                                controller: _frontImageController,
+                                decoration: appInputDecoration(
+                                  context: context,
+                                  label: isArabic
+                                      ? 'رابط صورة الواجهة'
+                                      : 'Front image URL',
+                                  icon: Icons.storefront_outlined,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _receptionImageController,
+                                decoration: InputDecoration(
+                                  labelText: isArabic
+                                      ? 'رابط صورة الاستقبال'
+                                      : 'Reception image URL',
+                                  border: const OutlineInputBorder(),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _inside1ImageController,
+                                decoration: InputDecoration(
+                                  labelText: isArabic
+                                      ? 'رابط الصورة الداخلية 1'
+                                      : 'Inside image 1 URL',
+                                  border: const OutlineInputBorder(),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _inside2ImageController,
+                                decoration: InputDecoration(
+                                  labelText: isArabic
+                                      ? 'رابط الصورة الداخلية 2'
+                                      : 'Inside image 2 URL',
+                                  border: const OutlineInputBorder(),
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 52,
+                                child: FilledButton.icon(
+                                  onPressed: _savingImages
+                                      ? null
+                                      : () => _saveImages(
+                                            currentData: data,
+                                            currentDocs: docs,
+                                          ),
+                                  icon: _savingImages
+                                      ? const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : const Icon(
+                                          Icons.photo_library_outlined),
+                                  label: Text(
+                                    _savingImages
+                                        ? (isArabic
+                                            ? 'جارٍ الحفظ...'
+                                            : 'Saving...')
+                                        : (isArabic
+                                            ? 'حفظ الصور الأربع'
+                                            : 'Save 4 images'),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: scheme.surface,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: scheme.outline.withValues(alpha: 0.12),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: isArabic
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isArabic
+                                    ? 'رفع الوثائق المنظمة'
+                                    : 'Structured Documents',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                isArabic
+                                    ? 'أدخل بيانات الوثيقة يدويًا مؤقتًا: النوع، اسم الملف، والرابط إن وجد.'
+                                    : 'Temporarily enter document metadata manually: type, file name, and URL if available.',
+                              ),
+                              const SizedBox(height: 14),
+                              DropdownButtonFormField<String>(
+                                initialValue: _selectedDocType,
+                                isExpanded: true,
+                                items: kRequiredCenterDocumentTypes
+                                    .map(
+                                      (item) => DropdownMenuItem<String>(
+                                        value: item['key'],
+                                        child: Text(
+                                          centerDocumentLabel(
+                                            item['key'] ?? '',
+                                            isArabic,
+                                          ),
+                                          textAlign: isArabic
+                                              ? TextAlign.right
+                                              : TextAlign.left,
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: _savingDocument
+                                    ? null
+                                    : (value) {
+                                        setState(
+                                            () => _selectedDocType = value);
+                                      },
+                                decoration: InputDecoration(
+                                  labelText: isArabic
+                                      ? 'نوع الوثيقة *'
+                                      : 'Document type *',
+                                  border: const OutlineInputBorder(),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _docFileNameController,
+                                decoration: InputDecoration(
+                                  labelText:
+                                      isArabic ? 'اسم الملف' : 'File name',
+                                  border: const OutlineInputBorder(),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _docUrlController,
+                                decoration: InputDecoration(
+                                  labelText: isArabic
+                                      ? 'رابط الملف (اختياري)'
+                                      : 'File URL (optional)',
+                                  border: const OutlineInputBorder(),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              AppSectionPanel(
+                                color: AppColors.accentLavender
+                                    .withValues(alpha: 0.08),
+                                borderColor: AppColors.accentLavender
+                                    .withValues(alpha: 0.12),
+                                child: Text(
+                                  isArabic
+                                      ? 'تُرسل كل وثيقة جديدة بحالة "بانتظار المراجعة"، وتقوم الإدارة فقط بتحديث حالة المراجعة لاحقًا.'
+                                      : 'Each new document is sent as "Pending review", and only admin updates the review status later.',
+                                  textAlign: isArabic
+                                      ? TextAlign.right
+                                      : TextAlign.left,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _docReviewNoteController,
+                                maxLines: 3,
+                                decoration: InputDecoration(
+                                  labelText: isArabic
+                                      ? 'ملاحظة إضافية'
+                                      : 'Additional note',
+                                  border: const OutlineInputBorder(),
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 52,
+                                child: FilledButton.icon(
+                                  onPressed: _savingDocument
+                                      ? null
+                                      : () => _addDocument(
+                                            currentData: data,
+                                            currentDocs: docs,
+                                          ),
+                                  icon: _savingDocument
+                                      ? const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : const Icon(Icons.upload_file_outlined),
+                                  label: Text(
+                                    _savingDocument
+                                        ? (isArabic
+                                            ? 'جارٍ الإضافة...'
+                                            : 'Adding...')
+                                        : (isArabic
+                                            ? 'إضافة وثيقة'
+                                            : 'Add document'),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        if (docs.isNotEmpty)
+                          Container(
+                            padding: const EdgeInsets.all(18),
+                            decoration: BoxDecoration(
+                              color: scheme.surface,
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                color: scheme.outline.withValues(alpha: 0.12),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: isArabic
+                                  ? CrossAxisAlignment.end
+                                  : CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isArabic
+                                      ? 'الوثائق الحالية'
+                                      : 'Current Documents',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                ),
+                                const SizedBox(height: 12),
+                                ...docs.asMap().entries.map((entry) {
+                                  final index = entry.key;
+                                  final doc = entry.value;
+
+                                  final type =
+                                      (doc['documentType'] ?? '').toString();
+                                  final fileName = (doc['originalFileName'] ??
+                                          doc['fileName'] ??
+                                          '')
+                                      .toString();
+                                  final status =
+                                      (doc['status'] ?? 'pending').toString();
+                                  final reviewNote = (doc['reviewNote'] ?? '')
+                                      .toString()
+                                      .trim();
+
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 10),
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: scheme.primary
+                                          .withValues(alpha: 0.05),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: isArabic
+                                          ? CrossAxisAlignment.end
+                                          : CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          type.isEmpty
+                                              ? (isArabic
+                                                  ? 'وثيقة'
+                                                  : 'Document')
+                                              : type,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                        if (fileName.isNotEmpty) ...[
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            isArabic
+                                                ? 'الملف: $fileName'
+                                                : 'File: $fileName',
+                                          ),
+                                        ],
+                                        const SizedBox(height: 6),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF6C55B3)
+                                                .withValues(alpha: 0.10),
+                                            borderRadius:
+                                                BorderRadius.circular(999),
+                                          ),
+                                          child: Text(
+                                            _docStatusLabel(status, isArabic),
+                                            style: const TextStyle(
+                                              color: Color(0xFF6C55B3),
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ),
+                                        if (reviewNote.isNotEmpty) ...[
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            isArabic
+                                                ? 'الملاحظة: $reviewNote'
+                                                : 'Note: $reviewNote',
+                                          ),
+                                        ],
+                                        const SizedBox(height: 8),
+                                        Align(
+                                          alignment: isArabic
+                                              ? Alignment.centerLeft
+                                              : Alignment.centerRight,
+                                          child: OutlinedButton.icon(
+                                            onPressed: _savingDocument
+                                                ? null
+                                                : () => _removeDocument(
+                                                      index: index,
+                                                      currentData: data,
+                                                      currentDocs: docs,
+                                                    ),
+                                            icon: const Icon(
+                                                Icons.delete_outline),
+                                            label: Text(
+                                                isArabic ? 'حذف' : 'Delete'),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 52,
+                          child: OutlinedButton.icon(
+                            onPressed: () => _logout(context),
+                            icon: const Icon(Icons.logout),
+                            label: Text(isArabic ? 'تسجيل الخروج' : 'Logout'),
+                          ),
+                        ),
+                      ],
+                    );
                   },
                 ),
               ],
@@ -1959,48 +1993,56 @@ class _CenterProfileEditRequestPageState
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         appBar: AppShellActions.buildAppBar(
           context,
           title: isArabic ? 'تعديل بياناتي' : 'Edit my data',
         ),
-        body: AppPageBackground(
-          child: StreamBuilder<Map<String, dynamic>?>(
-            stream: _centerStream(),
-            builder: (context, centerSnapshot) {
-              final data = centerSnapshot.data ?? <String, dynamic>{};
-              _seedFields(data);
+        body: SafeArea(
+          child: AppPageBackground(
+            child: StreamBuilder<Map<String, dynamic>?>(
+              stream: _centerStream(),
+              builder: (context, centerSnapshot) {
+                final data = centerSnapshot.data ?? <String, dynamic>{};
+                _seedFields(data);
 
-              return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: _requestsStream(),
-                builder: (context, requestSnapshot) {
-                  final docs = requestSnapshot.data?.docs ?? const [];
-                  final hasPending = docs.any(
-                    (doc) => (doc.data()['status'] ?? 'pending') == 'pending',
-                  );
+                return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: _requestsStream(),
+                  builder: (context, requestSnapshot) {
+                    final docs = requestSnapshot.data?.docs ?? const [];
+                    final hasPending = docs.any(
+                      (doc) => (doc.data()['status'] ?? 'pending') == 'pending',
+                    );
 
-                  return ListView(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    children: [
-                      if (hasPending)
-                        AppSurfaceCard(
-                          padding: const EdgeInsets.all(18),
-                          child: Text(
-                            isArabic
-                                ? 'يوجد طلب تعديل بيانات مركز قيد المراجعة. يمكنك متابعة حالته هنا.'
-                                : 'A center data change request is pending. You can track it here.',
-                            textAlign:
-                                isArabic ? TextAlign.right : TextAlign.left,
-                          ),
-                        )
-                      else
-                        _buildForm(context, isArabic, data),
-                      const SizedBox(height: 12),
-                      _buildStatusList(context, isArabic, docs),
-                    ],
-                  );
-                },
-              );
-            },
+                    return ListView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                        vertical: AppSpacing.md,
+                      ),
+                      children: [
+                        if (hasPending)
+                          AppSurfaceCard(
+                            padding: const EdgeInsets.all(18),
+                            child: Text(
+                              isArabic
+                                  ? 'يوجد طلب تعديل بيانات مركز قيد المراجعة. يمكنك متابعة حالته هنا.'
+                                  : 'A center data change request is pending. You can track it here.',
+                              textAlign:
+                                  isArabic ? TextAlign.right : TextAlign.left,
+                            ),
+                          )
+                        else
+                          _buildForm(context, isArabic, data),
+                        const SizedBox(height: 12),
+                        _buildStatusList(context, isArabic, docs),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ),
       ),

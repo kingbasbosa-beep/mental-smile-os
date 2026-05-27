@@ -89,7 +89,8 @@ class CenterDetailsPage extends StatelessWidget {
     if (raw.isEmpty) return null;
 
     final parsed = Uri.tryParse(raw);
-    if (parsed != null && (parsed.scheme == 'http' || parsed.scheme == 'https')) {
+    if (parsed != null &&
+        (parsed.scheme == 'http' || parsed.scheme == 'https')) {
       return parsed;
     }
 
@@ -859,8 +860,7 @@ class CenterDetailsPage extends StatelessWidget {
 
   Widget _buildContent(BuildContext context, CenterModel c) {
     final l10n = AppLocalizations.of(context)!;
-    final name =
-        c.name.trim().isEmpty ? l10n.centerDefaultName : c.name.trim();
+    final name = c.name.trim().isEmpty ? l10n.centerDefaultName : c.name.trim();
     final categoryLabel = _categoryLabelAr(c);
     final loc = _locationLine(c);
     final desc = c.description.trim();

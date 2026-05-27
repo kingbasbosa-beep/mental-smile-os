@@ -152,8 +152,11 @@ class AdminDomainAvailabilityPage extends StatelessWidget {
             spacing: AppSpacing.sm,
             runSpacing: AppSpacing.sm,
             children: [
-              _InfoBadge(label: 'State: ${item.currentState}', color: const Color(0xFFD8B26A)),
-              _InfoBadge(label: 'Severity: ${item.severity}', color: severityColor),
+              _InfoBadge(
+                  label: 'State: ${item.currentState}',
+                  color: const Color(0xFFD8B26A)),
+              _InfoBadge(
+                  label: 'Severity: ${item.severity}', color: severityColor),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),

@@ -196,9 +196,8 @@ class FollowUpRegistryEntry {
       recoveryStartYear: clearRecoveryStartYear
           ? null
           : (recoveryStartYear ?? this.recoveryStartYear),
-      recoveryStatus: clearRecoveryStatus
-          ? null
-          : (recoveryStatus ?? this.recoveryStatus),
+      recoveryStatus:
+          clearRecoveryStatus ? null : (recoveryStatus ?? this.recoveryStatus),
       educationalTopics: educationalTopics ?? this.educationalTopics,
       consentAccepted: consentAccepted ?? this.consentAccepted,
       consentAcceptedAt: clearConsentAcceptedAt

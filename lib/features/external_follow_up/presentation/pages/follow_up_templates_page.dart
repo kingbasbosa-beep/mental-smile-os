@@ -75,10 +75,10 @@ class _FollowUpTemplatesPageState extends State<FollowUpTemplatesPage> {
                             const SizedBox(height: AppSpacing.sm),
                         itemBuilder: (context, index) {
                           final template = templates[index];
-                          final neutralPreview =
-                              (template.variants[FollowUpMessageTemplateVariant.neutral] ??
-                                      '')
-                                  .trim();
+                          final neutralPreview = (template.variants[
+                                      FollowUpMessageTemplateVariant.neutral] ??
+                                  '')
+                              .trim();
 
                           return AppSurfaceCard(
                             padding: const EdgeInsets.all(AppSpacing.md),
@@ -148,7 +148,8 @@ class _FollowUpTemplatesPageState extends State<FollowUpTemplatesPage> {
               selectedTopic,
             );
 
-            if (selectedTopic != null && !topicOptions.contains(selectedTopic)) {
+            if (selectedTopic != null &&
+                !topicOptions.contains(selectedTopic)) {
               selectedTopic = null;
             }
             if (selectedMessage != null &&
@@ -336,8 +337,9 @@ class _FollowUpTemplatesPageState extends State<FollowUpTemplatesPage> {
               ),
               actions: [
                 TextButton(
-                  onPressed:
-                      submitting ? null : () => Navigator.of(dialogContext).pop(),
+                  onPressed: submitting
+                      ? null
+                      : () => Navigator.of(dialogContext).pop(),
                   child: const Text('إلغاء'),
                 ),
                 FilledButton(

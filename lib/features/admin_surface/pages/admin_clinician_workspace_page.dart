@@ -147,9 +147,10 @@ class AdminClinicianWorkspacePage extends StatelessWidget {
                       children: [
                         Text(
                           'Pending preview count: ${pendingDocs.length}',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                  ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         if (previewDocs.isEmpty)
@@ -170,15 +171,18 @@ class AdminClinicianWorkspacePage extends StatelessWidget {
                               final createdAt = _dateText(data['createdAt']);
 
                               return Padding(
-                                padding:
-                                    const EdgeInsets.only(bottom: AppSpacing.md),
+                                padding: const EdgeInsets.only(
+                                    bottom: AppSpacing.md),
                                 child: AppSectionPanel(
                                   padding: const EdgeInsets.all(AppSpacing.md),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        name.isEmpty ? 'Unnamed clinician' : name,
+                                        name.isEmpty
+                                            ? 'Unnamed clinician'
+                                            : name,
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleMedium
@@ -277,10 +281,9 @@ class AdminClinicianWorkspacePage extends StatelessWidget {
                     }).toList();
 
                     bool hasBasicInfo(Map<String, dynamic> data) {
-                      final name =
-                          (data['displayName'] ?? data['name'] ?? '')
-                              .toString()
-                              .trim();
+                      final name = (data['displayName'] ?? data['name'] ?? '')
+                          .toString()
+                          .trim();
                       final email = (data['email'] ?? '').toString().trim();
                       return name.isNotEmpty && email.isNotEmpty;
                     }

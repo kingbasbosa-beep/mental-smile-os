@@ -68,7 +68,8 @@ ClinicianStateTranslation translateClinicianState(String rawState) {
         progress: 'terminal accepted outcome after clinician decision',
         ownership: 'clinician-owned if used in clinician flow',
         operationalSignal: 'approval recorded',
-        ambiguity: 'current runtime use is unconfirmed and newer code uses different names',
+        ambiguity:
+            'current runtime use is unconfirmed and newer code uses different names',
       );
     case 'approved':
       return const ClinicianStateTranslation(

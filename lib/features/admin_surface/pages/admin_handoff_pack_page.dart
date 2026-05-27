@@ -155,8 +155,7 @@ class AdminHandoffPackPage extends StatelessWidget {
                   title: 'تكاملات القنوات الحقيقية',
                   summary:
                       'لا توجد حتى الآن تكاملات فعلية مع External Follow-up أو Telegram أو Facebook/Messenger أو Website live sync.',
-                  supervisionNote:
-                      'ما يزال هذا المسار planned فقط.',
+                  supervisionNote: 'ما يزال هذا المسار planned فقط.',
                   statusLabel: 'مفاهيمي / مخطط',
                 ),
                 _buildHandoffCard(
@@ -164,8 +163,7 @@ class AdminHandoffPackPage extends StatelessWidget {
                   title: 'Automation وMonetization',
                   summary:
                       'لا توجد أتمتة حقيقية، ولا monetized placements، ولا channel orchestration، ولا advanced telemetry.',
-                  supervisionNote:
-                      'كل ذلك ما يزال مؤجلًا ومشروطًا.',
+                  supervisionNote: 'كل ذلك ما يزال مؤجلًا ومشروطًا.',
                   statusLabel: 'مفاهيمي / مخطط',
                 ),
               ],
@@ -181,8 +179,7 @@ class AdminHandoffPackPage extends StatelessWidget {
                   title: 'Gateway signals',
                   summary:
                       'توجد مؤشرات Gateway صحية ومفيدة إشرافيًا، لكنها ليست telemetry تشغيلية متقدمة.',
-                  supervisionNote:
-                      'مفيدة في الوعي والمتابعة فقط.',
+                  supervisionNote: 'مفيدة في الوعي والمتابعة فقط.',
                   statusLabel: 'مراقبة فقط',
                 ),
                 _buildHandoffCard(
@@ -207,8 +204,7 @@ class AdminHandoffPackPage extends StatelessWidget {
                   title: 'clinician-request flow',
                   summary:
                       'هذا المسار مجمّد ويحتاج rebuild مستقل لاحقًا بدل patching المستمر.',
-                  supervisionNote:
-                      'ممنوع لمسه في الأعمال الجانبية الحالية.',
+                  supervisionNote: 'ممنوع لمسه في الأعمال الجانبية الحالية.',
                   statusLabel: 'مجمّد / محمي',
                 ),
                 _buildHandoffCard(
@@ -216,8 +212,7 @@ class AdminHandoffPackPage extends StatelessWidget {
                   title: 'التكاملات غير الآمنة',
                   summary:
                       'أي تكامل مباشر غير آمن أو غير مملوك إشرافيًا يبقى محجوبًا حاليًا.',
-                  supervisionNote:
-                      'الحظر هنا مقصود لحماية الاستقرار.',
+                  supervisionNote: 'الحظر هنا مقصود لحماية الاستقرار.',
                   statusLabel: 'مجمّد / محمي',
                 ),
               ],
@@ -225,8 +220,7 @@ class AdminHandoffPackPage extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             GatewaySectionCard(
               title: 'ما الذي لا يجب لمسه',
-              description:
-                  'قائمة مختصرة بالأشياء التي يجب تجنب تعديلها الآن.',
+              description: 'قائمة مختصرة بالأشياء التي يجب تجنب تعديلها الآن.',
               children: [
                 _buildHandoffCard(
                   context,
@@ -259,8 +253,7 @@ class AdminHandoffPackPage extends StatelessWidget {
                   title: 'تنظيم الصفحات المرجعية',
                   summary:
                       'يمكن لاحقًا ربط صفحات handoff/compliance/exposure/readiness/system activation pack ضمن مسار إداري مرجعي واضح.',
-                  supervisionNote:
-                      'خطوة آمنة ومنخفضة المخاطر.',
+                  supervisionNote: 'خطوة آمنة ومنخفضة المخاطر.',
                   statusLabel: 'الخطوة التالية',
                 ),
                 _buildHandoffCard(
@@ -268,8 +261,7 @@ class AdminHandoffPackPage extends StatelessWidget {
                   title: 'الاستمرار في supervised architecture',
                   summary:
                       'الاستمرار في الإضافات الإشرافية والتنظيمية الصغيرة أفضل من القفز إلى integrations أو monetization أو automation.',
-                  supervisionNote:
-                      'هذا هو الاتجاه الأكثر أمانًا حاليًا.',
+                  supervisionNote: 'هذا هو الاتجاه الأكثر أمانًا حاليًا.',
                   statusLabel: 'الخطوة التالية',
                 ),
                 _buildHandoffCard(

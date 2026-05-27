@@ -78,8 +78,7 @@ Widget webRegistrationCompactFormTheme(
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: theme.elevatedButtonTheme.style?.copyWith(
-              foregroundColor:
-                  WidgetStateProperty.all(webRegistrationDarkNavy),
+              foregroundColor: WidgetStateProperty.all(webRegistrationDarkNavy),
             ) ??
             ElevatedButton.styleFrom(foregroundColor: webRegistrationDarkNavy),
       ),

@@ -576,45 +576,46 @@ class _AdminHubPageState extends State<AdminHubPage> {
                             child: Padding(
                               padding: EdgeInsets.only(right: sideInset),
                               child: width >= 960
-                                ? Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      _AdminHeaderShortcutBar(
-                                        isArabic: isArabic,
-                                        governanceActions: governanceActions,
-                                        entryActions: mainSectionCards,
-                                      ),
-                                      const SizedBox(height: 18),
-                                      Align(
-                                        alignment: Alignment.topRight,
-                                        child: FractionallySizedBox(
-                                          widthFactor: 0.52,
-                                          child: _AdminDepartmentSection(
-                                            isArabic: isArabic,
-                                            cards: departmentSectionCards,
+                                  ? Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        _AdminHeaderShortcutBar(
+                                          isArabic: isArabic,
+                                          governanceActions: governanceActions,
+                                          entryActions: mainSectionCards,
+                                        ),
+                                        const SizedBox(height: 18),
+                                        Align(
+                                          alignment: Alignment.topRight,
+                                          child: FractionallySizedBox(
+                                            widthFactor: 0.52,
+                                            child: _AdminDepartmentSection(
+                                              isArabic: isArabic,
+                                              cards: departmentSectionCards,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 14),
-                                      Align(
-                                        alignment: Alignment.topRight,
-                                        child: FractionallySizedBox(
-                                          widthFactor: 0.52,
-                                          child: _AdminTitledLaunchpad(
-                                            title: isArabic
-                                                ? 'متابعة التسجيلات والحسابات'
-                                                : 'Registration & Account Follow-up',
-                                            cards: registrationSectionCards,
+                                        const SizedBox(height: 14),
+                                        Align(
+                                          alignment: Alignment.topRight,
+                                          child: FractionallySizedBox(
+                                            widthFactor: 0.52,
+                                            child: _AdminTitledLaunchpad(
+                                              title: isArabic
+                                                  ? 'متابعة التسجيلات والحسابات'
+                                                  : 'Registration & Account Follow-up',
+                                              cards: registrationSectionCards,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  )
-                                : _AdminHeaderShortcutBar(
-                                    isArabic: isArabic,
-                                    governanceActions: governanceActions,
-                                    entryActions: mainSectionCards,
-                                  ),
+                                      ],
+                                    )
+                                  : _AdminHeaderShortcutBar(
+                                      isArabic: isArabic,
+                                      governanceActions: governanceActions,
+                                      entryActions: mainSectionCards,
+                                    ),
                             ),
                           ),
                           const SizedBox(width: AppSpacing.sm),
@@ -940,18 +941,18 @@ class _AdminHeaderShortcutBar extends StatelessWidget {
           children: [
             for (int rowIndex = 0; rowIndex < rows.length; rowIndex++) ...[
               Row(
-                  mainAxisSize: MainAxisSize.min,
-                  textDirection: TextDirection.rtl,
-                  children: [
-                    for (int index = 0;
-                        index < rows[rowIndex].length;
-                        index++) ...[
-                      rows[rowIndex][index],
-                      if (index != rows[rowIndex].length - 1)
-                        const SizedBox(width: 10),
-                    ],
+                mainAxisSize: MainAxisSize.min,
+                textDirection: TextDirection.rtl,
+                children: [
+                  for (int index = 0;
+                      index < rows[rowIndex].length;
+                      index++) ...[
+                    rows[rowIndex][index],
+                    if (index != rows[rowIndex].length - 1)
+                      const SizedBox(width: 10),
                   ],
-                ),
+                ],
+              ),
               if (rowIndex != rows.length - 1) const SizedBox(height: 9),
             ],
           ],

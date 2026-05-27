@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
@@ -88,7 +88,8 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
           shape: BoxShape.circle,
           color: Colors.black.withValues(alpha: 0.08),
           border: Border.all(
-            color: isSelected ? _clientGold : _clientGold.withValues(alpha: 0.38),
+            color:
+                isSelected ? _clientGold : _clientGold.withValues(alpha: 0.38),
             width: isSelected ? 3 : 1.3,
           ),
           boxShadow: isSelected
@@ -218,10 +219,9 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context);
-    final textDirection =
-        locale.languageCode.toLowerCase() == 'ar'
-            ? TextDirection.rtl
-            : TextDirection.ltr;
+    final textDirection = locale.languageCode.toLowerCase() == 'ar'
+        ? TextDirection.rtl
+        : TextDirection.ltr;
 
     return Directionality(
       textDirection: textDirection,
@@ -242,10 +242,8 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
             SafeArea(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final sideSpacing =
-                      constraints.maxWidth < 520 ? 40.0 : 78.0;
-                  final avatarTop =
-                      constraints.maxHeight < 720 ? 60.0 : 84.0;
+                  final sideSpacing = constraints.maxWidth < 520 ? 40.0 : 78.0;
+                  final avatarTop = constraints.maxHeight < 720 ? 60.0 : 84.0;
 
                   return Stack(
                     children: [
@@ -359,7 +357,8 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
                                     borderRadius: BorderRadius.circular(18),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: _clientGold.withValues(alpha: 0.28),
+                                        color:
+                                            _clientGold.withValues(alpha: 0.28),
                                         blurRadius: 16,
                                         offset: const Offset(0, 6),
                                       ),
@@ -374,7 +373,8 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
                                         foregroundColor: _clientDarkText,
                                         shadowColor: Colors.transparent,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(18),
+                                          borderRadius:
+                                              BorderRadius.circular(18),
                                         ),
                                         textStyle: const TextStyle(
                                           fontWeight: FontWeight.w800,

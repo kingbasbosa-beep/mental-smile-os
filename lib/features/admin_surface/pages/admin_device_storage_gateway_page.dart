@@ -50,7 +50,8 @@ class AdminDeviceStorageGatewayPage extends StatelessWidget {
     return GatewaySectionCard(
       title: title,
       description: description,
-      children: entries.map((entry) => _buildEntryBlock(context, entry)).toList(),
+      children:
+          entries.map((entry) => _buildEntryBlock(context, entry)).toList(),
     );
   }
 
