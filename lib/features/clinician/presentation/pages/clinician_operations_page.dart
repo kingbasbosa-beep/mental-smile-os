@@ -38,10 +38,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
   void _goToMenu() {
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      Routes.menu,
-      (route) => false,
-    );
+    AppShellActions.returnToMenu(context);
   }
 
   Future<void> _toggleLocale() async {
@@ -376,13 +373,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
   }
 
   Future<void> _signOut() async {
-    await FirebaseAuth.instance.signOut();
-    if (!mounted) return;
-
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      Routes.login,
-      (route) => false,
-    );
+    await AppShellActions.signOutToLogin(context);
   }
 
   Widget _buildHomeSummary({
@@ -2917,16 +2908,7 @@ class _ClinicianProfileEditRequestPageState
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            onPressed: () {
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).maybePop();
-              } else {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  Routes.menu,
-                  (route) => false,
-                );
-              }
-            },
+            onPressed: () => AppShellActions.goBackOrMenu(context),
             icon: Container(
               width: 44,
               height: 44,

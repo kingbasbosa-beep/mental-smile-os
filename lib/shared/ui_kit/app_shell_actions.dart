@@ -5,6 +5,30 @@ import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 
 class AppShellActions {
+  static void goBackOrMenu(BuildContext context) {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).maybePop();
+    } else {
+      returnToMenu(context);
+    }
+  }
+
+  static void returnToMenu(BuildContext context) {
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      Routes.menu,
+      (route) => false,
+    );
+  }
+
+  static Future<void> signOutToLogin(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    if (!context.mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      Routes.login,
+      (route) => false,
+    );
+  }
+
   static Widget buildOverlayActions({
     Key? key,
     VoidCallback? onBack,
@@ -76,16 +100,7 @@ class AppShellActions {
       foregroundColor: const Color(0xFFC9A75B),
       elevation: 0,
       leading: IconButton(
-        onPressed: () {
-          if (Navigator.of(context).canPop()) {
-            Navigator.of(context).maybePop();
-          } else {
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              Routes.menu,
-              (route) => false,
-            );
-          }
-        },
+        onPressed: () => goBackOrMenu(context),
         icon: const _GoldBackIcon(compact: true),
         tooltip: isArabic ? 'رجوع' : 'Back',
       ),
@@ -93,14 +108,7 @@ class AppShellActions {
         if (canLogout)
           IconButton(
             tooltip: isArabic ? 'تسجيل الخروج' : 'Logout',
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              if (!context.mounted) return;
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                Routes.login,
-                (route) => false,
-              );
-            },
+            onPressed: () => signOutToLogin(context),
             icon: const Icon(Icons.logout_rounded, color: Color(0xFFC9A75B)),
           ),
       ],
@@ -293,6 +301,9 @@ class _AccountRoleBanner extends StatelessWidget {
             final identity = (user.email ?? '').trim().isNotEmpty
                 ? user.email!.trim()
                 : user.uid;
+            final identityMaxWidth = (MediaQuery.sizeOf(context).width - 32)
+                .clamp(120.0, 420.0)
+                .toDouble();
 
             return Container(
               width: double.infinity,
@@ -326,12 +337,17 @@ class _AccountRoleBanner extends StatelessWidget {
                           ),
                     ),
                   ),
-                  Text(
-                    identity,
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          color:
-                              const Color(0xFF314A5C).withValues(alpha: 0.88),
-                        ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: identityMaxWidth),
+                    child: Text(
+                      identity,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            color:
+                                const Color(0xFF314A5C).withValues(alpha: 0.88),
+                          ),
+                    ),
                   ),
                 ],
               ),

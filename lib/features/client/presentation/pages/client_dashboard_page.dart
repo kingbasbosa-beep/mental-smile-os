@@ -9,6 +9,7 @@ import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/contracts/role_names.dart';
 import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class ClientDashboardPage extends StatelessWidget {
@@ -579,30 +580,14 @@ class _DashboardTopActionsState extends ConsumerState<_DashboardTopActions> {
           icon: Icons.arrow_back_rounded,
           asset: 'assets/branding/navigation/back/back_right_gold.png',
           tooltip: l10n.commonBack,
-          onTap: () {
-            if (Navigator.of(context).canPop()) {
-              Navigator.of(context).maybePop();
-            } else {
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                Routes.menu,
-                (route) => false,
-              );
-            }
-          },
+          onTap: () => AppShellActions.goBackOrMenu(context),
         ),
         const SizedBox(width: 12),
         _TopIconButton(
           icon: Icons.logout_rounded,
           asset: 'assets/branding/navigation/logout/logout_gold.png',
           tooltip: l10n.commonLogout,
-          onTap: () async {
-            await FirebaseAuth.instance.signOut();
-            if (!context.mounted) return;
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              Routes.login,
-              (route) => false,
-            );
-          },
+          onTap: () => AppShellActions.signOutToLogin(context),
         ),
       ],
     );

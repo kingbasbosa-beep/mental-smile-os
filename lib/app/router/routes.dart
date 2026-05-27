@@ -14,7 +14,8 @@ class Routes {
   static const webRegistrationSuccess = '/web/register/success';
   static const splash = '/';
   static const language = '/language';
-  // Alias: /home intentionally opens the same menu surface as /menu.
+  // Shell alias: /home intentionally opens the operational menu hub.
+  // HomePage remains a welcome/legacy entry surface, not the primary shell.
   static const home = '/home';
   static const login = '/login';
   static const blockedAccount = '/account-blocked';

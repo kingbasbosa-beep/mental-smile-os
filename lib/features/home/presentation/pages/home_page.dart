@@ -3,34 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
+  // Welcome/legacy entry surface. The operational shell entry is MenuPage,
+  // reached through Routes.menu and the Routes.home alias in AppRouter.
   bool _isArabic(BuildContext context) {
     final locale = Localizations.localeOf(context);
     return locale.languageCode.toLowerCase() == 'ar';
   }
 
-  Future<void> _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-    if (!context.mounted) return;
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      Routes.login,
-      (route) => false,
-    );
-  }
-
   void _goBack(BuildContext context) {
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).maybePop();
-    } else {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        Routes.menu,
-        (route) => false,
-      );
-    }
+    AppShellActions.goBackOrMenu(context);
   }
 
   @override
@@ -131,9 +118,9 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: AppSpacing.lg),
-                                const AppLogoWordmark(
-                                  width: 240,
-                                  height: 140,
+                                AppLogoWordmark(
+                                  width: isMobile ? 154 : 240,
+                                  height: isMobile ? 90 : 140,
                                 ),
                               ],
                             ),

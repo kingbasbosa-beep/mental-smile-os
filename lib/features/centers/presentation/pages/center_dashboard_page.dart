@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
 class CenterDashboardPage extends StatelessWidget {
   const CenterDashboardPage({super.key});
@@ -53,12 +54,7 @@ class CenterDashboardPage extends StatelessWidget {
   }
 
   Future<void> _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-    if (!context.mounted) return;
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      Routes.login,
-      (route) => false,
-    );
+    await AppShellActions.signOutToLogin(context);
   }
 
   List<Map<String, dynamic>> _readDocuments(Map<String, dynamic> data) {

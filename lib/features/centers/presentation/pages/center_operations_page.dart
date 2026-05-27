@@ -106,12 +106,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
   }
 
   Future<void> _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-    if (!context.mounted) return;
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      Routes.login,
-      (route) => false,
-    );
+    await AppShellActions.signOutToLogin(context);
   }
 
   List<Map<String, dynamic>> _readDocs(Map<String, dynamic> data) {

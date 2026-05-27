@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
@@ -11,73 +10,14 @@ import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
 
-  Future<bool> _isAdminResolved() async {
+  Future<SignedInAccessState?> _resolveSignedInAccess() async {
     final user = FirebaseAuth.instance.currentUser;
-    final uid = user?.uid;
-    if (uid == null || uid.isEmpty || user?.isAnonymous == true) return false;
+    if (user == null || user.isAnonymous) return null;
 
     try {
-      final adminDoc =
-          await FirebaseFirestore.instance.collection('admins').doc(uid).get();
-      final data = adminDoc.data();
-      if (data != null && (data['active'] ?? false) == true) {
-        return true;
-      }
-    } on FirebaseException {
-      return false;
-    }
-    return false;
-  }
-
-  Future<bool> _isClinicianResolved() async {
-    final user = FirebaseAuth.instance.currentUser;
-    final uid = user?.uid;
-    final email = (user?.email ?? '').trim().toLowerCase();
-    if (uid == null || uid.isEmpty || user?.isAnonymous == true) return false;
-
-    try {
-      final clinicianDoc = await FirebaseFirestore.instance
-          .collection('clinicians')
-          .doc(uid)
-          .get();
-      final data = clinicianDoc.data();
-      if (data != null) {
-        return (data['role'] ?? '') == 'clinician';
-      }
-    } on FirebaseException {
-      return false;
-    }
-
-    if (email.isEmpty) return false;
-
-    try {
-      final byEmail = await FirebaseFirestore.instance
-          .collection('clinicians')
-          .where('email', isEqualTo: email)
-          .limit(1)
-          .get();
-
-      if (byEmail.docs.isEmpty) return false;
-      final emailData = byEmail.docs.first.data();
-      return (emailData['role'] ?? '') == 'clinician';
-    } on FirebaseException {
-      return false;
-    }
-  }
-
-  Future<bool> _isCenterResolved() async {
-    final user = FirebaseAuth.instance.currentUser;
-    final uid = user?.uid;
-    if (uid == null || uid.isEmpty || user?.isAnonymous == true) return false;
-
-    try {
-      final doc =
-          await FirebaseFirestore.instance.collection('centers').doc(uid).get();
-      final data = doc.data();
-      if (data == null) return false;
-      return (data['role'] ?? '') == 'center';
-    } on FirebaseException {
-      return false;
+      return AccountAccessService().resolve(user);
+    } catch (_) {
+      return null;
     }
   }
 
@@ -87,49 +27,42 @@ class MenuPage extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return null;
 
-    final isAdmin = await _isAdminResolved();
-    if (isAdmin) {
-      return (
-        label: isArabic ? 'لوحة الإدارة' : 'Admin Hub',
-        icon: Icons.admin_panel_settings_outlined,
-        route: Routes.adminHub,
-      );
-    }
-
-    final isClinician = await _isClinicianResolved();
-    if (isClinician) {
-      return (
-        label: isArabic ? 'غرفة العمليات' : 'Operations Room',
-        icon: Icons.medical_services_outlined,
-        route: Routes.clinicianOperations,
-      );
-    }
-
-    final isCenter = await _isCenterResolved();
-    if (isCenter) {
-      return (
-        label: isArabic ? 'صفحة المركز' : 'Center Dashboard',
-        icon: Icons.business_outlined,
-        route: Routes.centerDashboard,
-      );
-    }
-
-    if (_isClientLoggedIn()) {
-      return (
-        label: isArabic ? 'صفحتي الشخصية' : 'My Dashboard',
-        icon: Icons.person_outline_rounded,
-        route: Routes.clientDashboard,
-      );
+    // UX shortcut only: protected routes remain enforced by RouteAccessGate.
+    // Unknown signed-in users do not get a dashboard shortcut.
+    final access = await _resolveSignedInAccess();
+    switch (access?.role) {
+      case 'admin':
+        return (
+          label: isArabic ? 'لوحة الإدارة' : 'Admin Hub',
+          icon: Icons.admin_panel_settings_outlined,
+          route: Routes.adminHub,
+        );
+      case 'clinician':
+        return (
+          label: isArabic ? 'غرفة العمليات' : 'Operations Room',
+          icon: Icons.medical_services_outlined,
+          route: Routes.clinicianOperations,
+        );
+      case 'center':
+        return (
+          label: isArabic ? 'لوحة المركز' : 'Center Dashboard',
+          icon: Icons.business_outlined,
+          route: Routes.centerDashboard,
+        );
+      case 'client':
+        return (
+          label: isArabic ? 'لوحتي' : 'My Dashboard',
+          icon: Icons.person_outline_rounded,
+          route: Routes.clientDashboard,
+        );
     }
 
     return null;
   }
 
-  bool _isClientLoggedIn() {
+  bool _hasSignedInUser() {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return false;
-    final email = (user.email ?? '').trim();
-    return email.isNotEmpty;
+    return user != null && !user.isAnonymous;
   }
 
   @override
@@ -221,7 +154,7 @@ class MenuPage extends StatelessWidget {
                       future: _resolvePrimaryAction(isArabic),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState != ConnectionState.done) {
-                          if (!_isClientLoggedIn()) {
+                          if (!_hasSignedInUser()) {
                             return const SizedBox.shrink();
                           }
 
@@ -234,7 +167,7 @@ class MenuPage extends StatelessWidget {
                         }
 
                         return Transform.translate(
-                          offset: const Offset(38, 0),
+                          offset: Offset(isArabic ? -8 : 8, 0),
                           child: _FloatingProfileButton(
                             label: action.label,
                             icon: action.icon,
@@ -255,10 +188,11 @@ class MenuPage extends StatelessWidget {
                   final width = constraints.maxWidth;
                   final height = constraints.maxHeight;
                   final isMobile = width < 700;
-                  final usePentagon = width >= 700 && height >= 420;
-                  final avatarSize = isMobile ? 74.0 : 90.0;
-                  final avatarTop = isMobile ? 66.0 : 72.0;
-                  final avatarLeft = isMobile ? 78.0 : 82.0;
+                  final isShort = height < 560;
+                  final usePentagon = width >= 700 && !isShort;
+                  final avatarSize = isShort ? 62.0 : (isMobile ? 74.0 : 90.0);
+                  final avatarTop = isShort ? 52.0 : (isMobile ? 66.0 : 72.0);
+                  final avatarLeft = isMobile ? 72.0 : 82.0;
 
                   return Stack(
                     alignment: Alignment.center,
@@ -330,7 +264,7 @@ class MenuPage extends StatelessWidget {
                       Padding(
                         padding: EdgeInsets.fromLTRB(
                           isMobile ? 16 : 32,
-                          isMobile ? 140 : 110,
+                          isShort ? 112 : (isMobile ? 140 : 110),
                           isMobile ? 16 : 32,
                           24,
                         ),
@@ -342,7 +276,7 @@ class MenuPage extends StatelessWidget {
                             : _MenuWrapLayout(cards: cards),
                       ),
                       Positioned(
-                        top: isMobile ? 128 : 74,
+                        top: isShort ? 108 : (isMobile ? 128 : 74),
                         left: isMobile ? 18 : null,
                         right: isMobile ? 18 : null,
                         child: _MenuLibraryTeaserHearts(
@@ -408,39 +342,49 @@ class _FloatingProfileButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final maxButtonWidth =
+        (MediaQuery.sizeOf(context).width - 36).clamp(160.0, 240.0).toDouble();
+
     return Material(
       color: AppColors.obsidian.withValues(alpha: 0.48),
       borderRadius: BorderRadius.circular(999),
       child: InkWell(
         borderRadius: BorderRadius.circular(999),
         onTap: onPressed,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color: AppColors.mutedGold.withValues(alpha: 0.58),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxButtonWidth),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(
+                color: AppColors.mutedGold.withValues(alpha: 0.58),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.deepTeal.withValues(alpha: 0.18),
+                  blurRadius: 14,
+                ),
+              ],
             ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.deepTeal.withValues(alpha: 0.18),
-                blurRadius: 14,
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: AppColors.mutedGold, size: 18),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: AppColors.mutedGold,
-                      fontWeight: FontWeight.w900,
-                    ),
-              ),
-            ],
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: AppColors.mutedGold, size: 18),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: AppColors.mutedGold,
+                          fontWeight: FontWeight.w900,
+                        ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
