@@ -16,6 +16,10 @@ class ClinicianSessionsPage extends StatelessWidget {
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
+  String _metadataValue(String value, bool isArabic) {
+    return isArabic ? '\u2068$value\u2069' : value;
+  }
+
   String _backgroundAsset(double width) {
     if (width < 700) {
       return 'assets/images/backgrounds/specialists_bg_mobile.png';
@@ -428,7 +432,7 @@ class ClinicianSessionsPage extends StatelessWidget {
                                                   const SizedBox(height: 6),
                                                   Text(
                                                     isArabic
-                                                        ? 'تاريخ الطلب: $createdAt'
+                                                        ? 'تاريخ الطلب: ${_metadataValue(createdAt, isArabic)}'
                                                         : 'Request date: $createdAt',
                                                     style: const TextStyle(
                                                       color: Color(0xFFEBDDB7),
@@ -463,14 +467,14 @@ class ClinicianSessionsPage extends StatelessWidget {
                                       if (sessionDate.trim().isNotEmpty)
                                         Text(
                                           isArabic
-                                              ? 'موعد الجلسة: $sessionDate'
+                                              ? 'موعد الجلسة: ${_metadataValue(sessionDate, isArabic)}'
                                               : 'Session date: $sessionDate',
                                         ),
                                       if (sessionLink.trim().isNotEmpty) ...[
                                         SizedBox(height: compact ? 6.0 : 8.0),
                                         SelectableText(
                                           isArabic
-                                              ? 'رابط الجلسة: $sessionLink'
+                                              ? 'رابط الجلسة: ${_metadataValue(sessionLink, isArabic)}'
                                               : 'Session link: $sessionLink',
                                         ),
                                       ],
@@ -478,7 +482,7 @@ class ClinicianSessionsPage extends StatelessWidget {
                                         SizedBox(height: compact ? 6.0 : 8.0),
                                         SelectableText(
                                           isArabic
-                                              ? 'كود الجلسة: $sessionCode'
+                                              ? 'كود الجلسة: ${_metadataValue(sessionCode, isArabic)}'
                                               : 'Session code: $sessionCode',
                                         ),
                                       ],

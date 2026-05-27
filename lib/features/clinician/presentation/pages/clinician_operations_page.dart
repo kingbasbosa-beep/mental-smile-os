@@ -843,6 +843,9 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
             isArabic
                 ? 'أي تعديل على الصورة الشخصية أو النبذة يذهب للمراجعة أولًا. الاسم والوثائق غير قابلة للتعديل من هنا.'
                 : 'Any update to the profile photo or bio is sent for review first. Name and documents cannot be edited here.',
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            style:
+                Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.35),
           ),
           const SizedBox(height: 14),
           TextField(
@@ -883,6 +886,9 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                 _submittingChangeRequest
                     ? l10n.clinicianSendingRequest
                     : l10n.clinicianSendChangeRequest,
+                maxLines: 2,
+                softWrap: true,
+                textAlign: TextAlign.center,
               ),
             ),
           ),
@@ -1223,19 +1229,34 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                 FilledButton.icon(
                   onPressed: busy ? null : () => _acceptRequest(requestId),
                   icon: const Icon(Icons.check_circle_outline),
-                  label: Text(l10n.clinicianAcceptRequest),
+                  label: Text(
+                    l10n.clinicianAcceptRequest,
+                    maxLines: 2,
+                    softWrap: true,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               if (status == 'assigned_clinician' && !clinicianAccepted)
                 OutlinedButton.icon(
                   onPressed: busy ? null : () => _rejectRequest(requestId),
                   icon: const Icon(Icons.cancel_outlined),
-                  label: Text(l10n.clinicianRejectRequest),
+                  label: Text(
+                    l10n.clinicianRejectRequest,
+                    maxLines: 2,
+                    softWrap: true,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               if (canMarkCompleted)
                 FilledButton.tonalIcon(
                   onPressed: busy ? null : () => _markCompleted(requestId),
                   icon: const Icon(Icons.task_alt_outlined),
-                  label: Text(l10n.clinicianEndSession),
+                  label: Text(
+                    l10n.clinicianEndSession,
+                    maxLines: 2,
+                    softWrap: true,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               if (canReviewSession)
                 FilledButton.icon(
@@ -1251,7 +1272,12 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                           );
                         },
                   icon: const Icon(Icons.rate_review_outlined),
-                  label: Text(l10n.clinicianReviewSession),
+                  label: Text(
+                    l10n.clinicianReviewSession,
+                    maxLines: 2,
+                    softWrap: true,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
             ],
           ),
@@ -1865,16 +1891,19 @@ class _ClinicianCompactProfile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment:
+              isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.only(right: isTablet ? 8.0 : 0),
+              padding: EdgeInsetsDirectional.only(
+                start: isTablet ? 8.0 : 0,
+              ),
               child: Align(
-                alignment: Alignment.centerRight,
+                alignment: AlignmentDirectional.centerStart,
                 child: Wrap(
                   spacing: actionSpacing,
                   runSpacing: 4,
-                  alignment: WrapAlignment.end,
+                  alignment: isArabic ? WrapAlignment.end : WrapAlignment.start,
                   children: [
                     _ClinicianHeaderIconButton(
                       compact: compact,
@@ -1942,7 +1971,7 @@ class _ClinicianCompactProfile extends StatelessWidget {
                     displayName,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.right,
+                    textAlign: isArabic ? TextAlign.right : TextAlign.left,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: const Color(0xFFFFE7B2),
                       fontWeight: FontWeight.w900,
@@ -2742,8 +2771,10 @@ class _ClinicianProfileEditRequestPageState
               isArabic
                   ? 'أي تعديل على الصورة الشخصية أو النبذة يذهب للمراجعة أولًا. الاسم والوثائق غير قابلة للتعديل من هنا.'
                   : 'Any update to the profile photo or bio is sent for review first. Name and documents cannot be edited here.',
+              textAlign: isArabic ? TextAlign.right : TextAlign.left,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: const Color(0xFFFFF4D4),
+                    height: 1.35,
                   ),
             ),
             SizedBox(height: compact ? 10.0 : 14.0),
@@ -2795,6 +2826,9 @@ class _ClinicianProfileEditRequestPageState
                       : (isArabic
                           ? 'إرسال طلب التعديل'
                           : 'Send change request'),
+                  maxLines: 2,
+                  softWrap: true,
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),

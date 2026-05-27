@@ -465,6 +465,7 @@ class ClientDashboardPage extends StatelessWidget {
                                         children: [
                                           _GreetingText(
                                             l10n: l10n,
+                                            isArabic: isArabic,
                                             name: name,
                                             textTheme:
                                                 Theme.of(context).textTheme,
@@ -577,8 +578,11 @@ class _DashboardTopActionsState extends ConsumerState<_DashboardTopActions> {
         ),
         const SizedBox(width: 12),
         _TopIconButton(
-          icon: Icons.arrow_back_rounded,
-          asset: 'assets/branding/navigation/back/back_right_gold.png',
+          icon:
+              isArabic ? Icons.arrow_forward_rounded : Icons.arrow_back_rounded,
+          asset: isArabic
+              ? 'assets/branding/navigation/back/back_right_gold.png'
+              : 'assets/branding/navigation/back/back_left_gold.png',
           tooltip: l10n.commonBack,
           onTap: () => AppShellActions.goBackOrMenu(context),
         ),
@@ -769,11 +773,11 @@ class _ProfileBanner extends StatelessWidget {
     return SizedBox(
       height: avatarSize + 18,
       child: Row(
-        textDirection: TextDirection.ltr,
+        textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 19),
+            padding: const EdgeInsetsDirectional.only(start: 19),
             child: _ClientAvatarBadge(
               avatarAsset: avatarAsset,
               isActive: isActive,
@@ -786,6 +790,7 @@ class _ProfileBanner extends StatelessWidget {
             Expanded(
               child: _GreetingText(
                 l10n: AppLocalizations.of(context)!,
+                isArabic: isArabic,
                 name: name,
                 textTheme: textTheme,
               ),
@@ -800,11 +805,13 @@ class _ProfileBanner extends StatelessWidget {
 
 class _GreetingText extends StatelessWidget {
   final AppLocalizations l10n;
+  final bool isArabic;
   final String name;
   final TextTheme textTheme;
 
   const _GreetingText({
     required this.l10n,
+    required this.isArabic,
     required this.name,
     required this.textTheme,
   });
@@ -813,7 +820,8 @@ class _GreetingText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment:
+          isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         Text(
           l10n.clientDashboardWelcome(name),
@@ -831,7 +839,7 @@ class _GreetingText extends StatelessWidget {
               ),
             ],
           ),
-          textAlign: TextAlign.start,
+          textAlign: isArabic ? TextAlign.right : TextAlign.left,
         ),
         const SizedBox(height: 4),
         Text(
@@ -850,7 +858,7 @@ class _GreetingText extends StatelessWidget {
               ),
             ],
           ),
-          textAlign: TextAlign.start,
+          textAlign: isArabic ? TextAlign.right : TextAlign.left,
         ),
       ],
     );

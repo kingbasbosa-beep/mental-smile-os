@@ -19,6 +19,10 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
+  String _metadataValue(String value, bool isArabic) {
+    return isArabic ? '\u2068$value\u2069' : value;
+  }
+
   String _availabilityLabel(String value, bool isArabic) {
     switch (value) {
       case 'available':
@@ -294,6 +298,9 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                       isArabic
                                           ? 'فتح الإقامات والمتابعة'
                                           : 'Open residencies',
+                                      maxLines: 2,
+                                      softWrap: true,
+                                      textAlign: TextAlign.center,
                                     ),
                                   ),
                                 ],
@@ -376,7 +383,7 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                       const SizedBox(height: 8),
                                       Text(
                                         isArabic
-                                            ? 'تاريخ الطلب: $createdAt'
+                                            ? 'تاريخ الطلب: ${_metadataValue(createdAt, isArabic)}'
                                             : 'Created at: $createdAt',
                                       ),
                                     ],
@@ -424,6 +431,9 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                           isArabic
                                               ? 'فتح ملف الإقامة'
                                               : 'Open residency file',
+                                          maxLines: 2,
+                                          softWrap: true,
+                                          textAlign: TextAlign.center,
                                         ),
                                       ),
                                     ],
@@ -442,7 +452,12 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                             icon: const Icon(
                                               Icons.check_circle_outline,
                                             ),
-                                            label: Text(l10n.centerAvailable),
+                                            label: Text(
+                                              l10n.centerAvailable,
+                                              maxLines: 2,
+                                              softWrap: true,
+                                              textAlign: TextAlign.center,
+                                            ),
                                           ),
                                           OutlinedButton.icon(
                                             onPressed: () => _respond(
@@ -451,7 +466,12 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                             ),
                                             icon: const Icon(
                                                 Icons.event_busy_outlined),
-                                            label: Text(l10n.centerUnavailable),
+                                            label: Text(
+                                              l10n.centerUnavailable,
+                                              maxLines: 2,
+                                              softWrap: true,
+                                              textAlign: TextAlign.center,
+                                            ),
                                           ),
                                         ],
                                       ),

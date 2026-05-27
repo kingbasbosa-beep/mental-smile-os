@@ -72,6 +72,10 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
   bool _isArabic(BuildContext context) =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
+  String _metadataValue(String value, bool isArabic) {
+    return isArabic ? '\u2068$value\u2069' : value;
+  }
+
   String _backgroundAsset(double width) {
     if (width < 700) {
       return 'assets/images/backgrounds/specialists_bg_mobile.png';
@@ -720,7 +724,7 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                                                   const SizedBox(height: 6),
                                                   Text(
                                                     isArabic
-                                                        ? 'تاريخ الطلب: $createdAt'
+                                                        ? 'تاريخ الطلب: ${_metadataValue(createdAt, isArabic)}'
                                                         : 'Request date: $createdAt',
                                                   ),
                                                 ],
@@ -761,7 +765,7 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                                       if (stayStartText.isNotEmpty)
                                         Text(
                                           isArabic
-                                              ? '${isCenterRequest ? 'موعد بداية الإقامة' : 'موعد الجلسة'}: $stayStartText'
+                                              ? '${isCenterRequest ? 'موعد بداية الإقامة' : 'موعد الجلسة'}: ${_metadataValue(stayStartText, isArabic)}'
                                               : '${isCenterRequest ? 'Residency start' : 'Session date'}: $stayStartText',
                                         ),
                                       if (isCenterRequest &&
@@ -769,7 +773,7 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                                         const SizedBox(height: 8),
                                         Text(
                                           isArabic
-                                              ? 'نهاية الإقامة المبدئية: $stayEndText'
+                                              ? 'نهاية الإقامة المبدئية: ${_metadataValue(stayEndText, isArabic)}'
                                               : 'Preliminary residency end: $stayEndText',
                                         ),
                                       ],
@@ -804,7 +808,7 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                                         const SizedBox(height: 8),
                                         SelectableText(
                                           isArabic
-                                              ? '${isCenterRequest ? 'رابط المتابعة' : 'رابط الجلسة'}: $sessionLink'
+                                              ? '${isCenterRequest ? 'رابط المتابعة' : 'رابط الجلسة'}: ${_metadataValue(sessionLink, isArabic)}'
                                               : '${isCenterRequest ? 'Follow-up link' : 'Session link'}: $sessionLink',
                                         ),
                                       ],
@@ -812,7 +816,7 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                                         const SizedBox(height: 8),
                                         SelectableText(
                                           isArabic
-                                              ? '${isCenterRequest ? 'كود الإقامة' : 'كود الجلسة'}: $sessionCode'
+                                              ? '${isCenterRequest ? 'كود الإقامة' : 'كود الجلسة'}: ${_metadataValue(sessionCode, isArabic)}'
                                               : '${isCenterRequest ? 'Residency code' : 'Session code'}: $sessionCode',
                                         ),
                                       ],
@@ -886,6 +890,9 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                                             isArabic
                                                 ? 'تأكيد بداية الإقامة'
                                                 : 'Confirm residency start',
+                                            maxLines: 2,
+                                            softWrap: true,
+                                            textAlign: TextAlign.center,
                                           ),
                                         ),
                                       ],
@@ -896,6 +903,13 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                                           isArabic
                                               ? 'سيظهر تأكيد بداية الإقامة بعد إرسال بيانات الإقامة المبدئية كاملة من الإدارة.'
                                               : 'Residency start confirmation will appear after the admin sends the preliminary stay details.',
+                                          textAlign: isArabic
+                                              ? TextAlign.right
+                                              : TextAlign.left,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(height: 1.35),
                                         ),
                                       ],
                                       if (_canClientReview(data)) ...[
@@ -920,6 +934,9 @@ class _ClientSessionsPageState extends State<ClientSessionsPage> {
                                                 : (isArabic
                                                     ? 'تقييم الجلسة'
                                                     : 'Review session'),
+                                            maxLines: 2,
+                                            softWrap: true,
+                                            textAlign: TextAlign.center,
                                           ),
                                         ),
                                       ],

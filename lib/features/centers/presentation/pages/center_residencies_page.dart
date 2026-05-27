@@ -58,6 +58,10 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
     return '';
   }
 
+  String _metadataValue(String value, bool isArabic) {
+    return isArabic ? '\u2068$value\u2069' : value;
+  }
+
   bool _matchesTab(String status) {
     switch (_tab) {
       case 'in_progress':
@@ -465,7 +469,7 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                       const SizedBox(height: AppSpacing.xs),
                                       Text(
                                         isArabic
-                                            ? 'تاريخ الطلب: $createdAt'
+                                            ? 'تاريخ الطلب: ${_metadataValue(createdAt, isArabic)}'
                                             : 'Request date: $createdAt',
                                       ),
                                     ],
@@ -506,7 +510,7 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                       const SizedBox(height: AppSpacing.xs),
                                       Text(
                                         isArabic
-                                            ? 'موعد بداية الإقامة: $stayStartText'
+                                            ? 'موعد بداية الإقامة: ${_metadataValue(stayStartText, isArabic)}'
                                             : 'Stay start: $stayStartText',
                                       ),
                                     ],
@@ -514,7 +518,7 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                       const SizedBox(height: AppSpacing.xs),
                                       Text(
                                         isArabic
-                                            ? 'نهاية الإقامة المبدئية: $stayEndText'
+                                            ? 'نهاية الإقامة المبدئية: ${_metadataValue(stayEndText, isArabic)}'
                                             : 'Preliminary residency end: $stayEndText',
                                       ),
                                     ],
@@ -690,7 +694,7 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                       const SizedBox(height: AppSpacing.xs),
                                       SelectableText(
                                         isArabic
-                                            ? 'رابط المتابعة: $sessionLink'
+                                            ? 'رابط المتابعة: ${_metadataValue(sessionLink, isArabic)}'
                                             : 'Follow-up link: $sessionLink',
                                       ),
                                     ],
@@ -698,7 +702,7 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                       const SizedBox(height: AppSpacing.xs),
                                       SelectableText(
                                         isArabic
-                                            ? 'الكود: $sessionCode'
+                                            ? 'الكود: ${_metadataValue(sessionCode, isArabic)}'
                                             : 'Code: $sessionCode',
                                       ),
                                     ],
@@ -748,6 +752,9 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                             isArabic
                                                 ? 'إرسال التوصية الأولية'
                                                 : 'Submit initial recommendation',
+                                            maxLines: 2,
+                                            softWrap: true,
+                                            textAlign: TextAlign.center,
                                           ),
                                         ),
                                       if (status ==
@@ -772,6 +779,9 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                             isArabic
                                                 ? 'تأكيد الوصول والتقييم الأولي'
                                                 : 'Confirm arrival & initial assessment',
+                                            maxLines: 2,
+                                            softWrap: true,
+                                            textAlign: TextAlign.center,
                                           ),
                                         ),
                                       if (!centerArrivalConfirmed &&
@@ -797,6 +807,13 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                                       'center_recommendation_pending'
                                                   ? 'After sending the initial recommendation, the admin will receive the request for residency setup.'
                                                   : 'Arrival confirmation will appear after the admin sends the full preliminary residency details.'),
+                                          textAlign: isArabic
+                                              ? TextAlign.right
+                                              : TextAlign.left,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(height: 1.35),
                                         ),
                                     ],
                                     if (_canCenterDischargeReview(data)) ...[
@@ -817,6 +834,9 @@ class _CenterResidenciesPageState extends State<CenterResidenciesPage> {
                                           isArabic
                                               ? 'إرسال تقرير الخروج'
                                               : 'Submit discharge report',
+                                          maxLines: 2,
+                                          softWrap: true,
+                                          textAlign: TextAlign.center,
                                         ),
                                       ),
                                     ],

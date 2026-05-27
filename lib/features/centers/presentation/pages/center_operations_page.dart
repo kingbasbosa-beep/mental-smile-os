@@ -1133,6 +1133,12 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                 isArabic
                                     ? 'الوضع الحالي بدون Firebase Storage. الصور والوثائق تُسجل مؤقتًا كبيانات وروابط داخل Firestore لحين تفعيل التخزين.'
                                     : 'Temporary mode without Firebase Storage. Images and documents are stored as metadata/links in Firestore until storage is enabled.',
+                                textAlign:
+                                    isArabic ? TextAlign.right : TextAlign.left,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(height: 1.35),
                               ),
                             ],
                           ),
@@ -1166,6 +1172,12 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                 isArabic
                                     ? 'أدخل روابط الصور الأربع الأساسية مؤقتًا. لاحقًا سنحوّلها لرفع مباشر.'
                                     : 'Enter the 4 main image URLs temporarily. Later we will switch them to direct uploads.',
+                                textAlign:
+                                    isArabic ? TextAlign.right : TextAlign.left,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(height: 1.35),
                               ),
                               const SizedBox(height: AppSpacing.md),
                               TextField(
@@ -1237,6 +1249,9 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                         : (isArabic
                                             ? 'حفظ الصور الأربع'
                                             : 'Save 4 images'),
+                                    maxLines: 2,
+                                    softWrap: true,
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                               ),
@@ -1340,6 +1355,10 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                   textAlign: isArabic
                                       ? TextAlign.right
                                       : TextAlign.left,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(height: 1.35),
                                 ),
                               ),
                               const SizedBox(height: 12),
@@ -1381,6 +1400,9 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                         : (isArabic
                                             ? 'إضافة وثيقة'
                                             : 'Add document'),
+                                    maxLines: 2,
+                                    softWrap: true,
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                               ),
@@ -1831,6 +1853,9 @@ class _CenterProfileEditRequestPageState
             isArabic
                 ? 'عدّل البيانات هنا ثم أرسلها للإدارة. سيبقى الطلب قيد المراجعة حتى يعتمد.'
                 : 'Update the fields here, then send them to admin for review.',
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+            style:
+                Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.35),
           ),
           const SizedBox(height: AppSpacing.md),
           TextField(
@@ -1959,6 +1984,9 @@ class _CenterProfileEditRequestPageState
                     : (isArabic
                         ? 'إرسال طلب تعديل البيانات'
                         : 'Send data change request'),
+                maxLines: 2,
+                softWrap: true,
+                textAlign: TextAlign.center,
               ),
             ),
           ),
