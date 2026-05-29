@@ -120,6 +120,137 @@ class AdminBookingCommandWrapper {
     }
   }
 
+  Future<void> rejectRequest({
+    required String requestId,
+    required bool isCenterRequest,
+    required String adminUid,
+  }) async {
+    final snapshot = await _readSnapshotForDiagnostics(requestId);
+    final data = snapshot?.data();
+    final envelope = _buildRejectRequestEnvelope(
+      requestId: requestId,
+      adminUid: adminUid,
+      data: data,
+    );
+    final warnings = _rejectRequestWarnings(
+      snapshotExists: snapshot?.exists ?? false,
+      data: data,
+      adminUid: adminUid,
+    );
+
+    _logShadow(
+      envelope: envelope,
+      warningCount: warnings.length,
+      resultStatus: 'delegating',
+    );
+
+    try {
+      await _delegate.rejectRequest(
+        requestId: requestId,
+        isCenterRequest: isCenterRequest,
+        adminUid: adminUid,
+      );
+      _logShadow(
+        envelope: envelope,
+        warningCount: warnings.length,
+        resultStatus: 'completed',
+      );
+    } catch (_) {
+      _logShadow(
+        envelope: envelope,
+        warningCount: warnings.length,
+        resultStatus: 'failed',
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> returnToPending({
+    required String requestId,
+    required String adminUid,
+  }) async {
+    final snapshot = await _readSnapshotForDiagnostics(requestId);
+    final data = snapshot?.data();
+    final envelope = _buildReturnToPendingEnvelope(
+      requestId: requestId,
+      adminUid: adminUid,
+      data: data,
+    );
+    final warnings = _returnToPendingWarnings(
+      snapshotExists: snapshot?.exists ?? false,
+      data: data,
+      adminUid: adminUid,
+    );
+
+    _logShadow(
+      envelope: envelope,
+      warningCount: warnings.length,
+      resultStatus: 'delegating',
+    );
+
+    try {
+      await _delegate.returnToPending(
+        requestId: requestId,
+        adminUid: adminUid,
+      );
+      _logShadow(
+        envelope: envelope,
+        warningCount: warnings.length,
+        resultStatus: 'completed',
+      );
+    } catch (_) {
+      _logShadow(
+        envelope: envelope,
+        warningCount: warnings.length,
+        resultStatus: 'failed',
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> approveCenterRequest({
+    required String requestId,
+    required String adminUid,
+  }) async {
+    final snapshot = await _readSnapshotForDiagnostics(requestId);
+    final data = snapshot?.data();
+    final envelope = _buildApproveCenterRequestEnvelope(
+      requestId: requestId,
+      adminUid: adminUid,
+      data: data,
+    );
+    final warnings = _approveCenterRequestWarnings(
+      snapshotExists: snapshot?.exists ?? false,
+      data: data,
+      adminUid: adminUid,
+    );
+
+    _logShadow(
+      envelope: envelope,
+      warningCount: warnings.length,
+      resultStatus: 'delegating',
+    );
+
+    try {
+      await _delegate.approveCenterRequest(
+        requestId: requestId,
+        adminUid: adminUid,
+      );
+      _logShadow(
+        envelope: envelope,
+        warningCount: warnings.length,
+        resultStatus: 'completed',
+      );
+    } catch (_) {
+      _logShadow(
+        envelope: envelope,
+        warningCount: warnings.length,
+        resultStatus: 'failed',
+      );
+      rethrow;
+    }
+  }
+
   Future<DocumentSnapshot<Map<String, dynamic>>?> _readSnapshotForDiagnostics(
     String requestId,
   ) async {
@@ -162,6 +293,110 @@ class AdminBookingCommandWrapper {
       idempotencyKey: idempotencyKey,
       previousStateSummary: _previousStateSummary(data),
       requestedPatchSummary: _requestedPatchSummary(clinicianId),
+    );
+  }
+
+  BookingCommandEnvelope _buildRejectRequestEnvelope({
+    required String requestId,
+    required String adminUid,
+    required Map<String, dynamic>? data,
+  }) {
+    final correlationId = _newCorrelationId(requestId);
+    final idempotencyKey = [
+      'booking.reject_request',
+      requestId,
+      adminUid,
+      _stringValue(data?['status']) ?? '',
+    ].join(':');
+
+    return BookingCommandEnvelope(
+      commandName: 'booking.reject_request',
+      commandVersion: 'v1',
+      riskTier: BookingCommandRiskTier.critical,
+      requestedByUid: adminUid,
+      requestedByRole: 'admin',
+      targetCollection: 'booking_requests',
+      targetDocId: requestId,
+      targetClinicianId: _stringValue(data?['clinicianId']),
+      sourceAdapter: 'AdminBookingDecisionAdapter',
+      sourceRoute: _sourceRoute,
+      dryRun: true,
+      shadowMode: true,
+      createdAt: DateTime.now().toUtc(),
+      correlationId: correlationId,
+      idempotencyKey: idempotencyKey,
+      previousStateSummary: _previousStateSummary(data),
+      requestedPatchSummary: _rejectRequestPatchSummary(),
+    );
+  }
+
+  BookingCommandEnvelope _buildReturnToPendingEnvelope({
+    required String requestId,
+    required String adminUid,
+    required Map<String, dynamic>? data,
+  }) {
+    final correlationId = _newCorrelationId(requestId);
+    final idempotencyKey = [
+      'booking.return_to_pending',
+      requestId,
+      adminUid,
+      _stringValue(data?['status']) ?? '',
+    ].join(':');
+
+    return BookingCommandEnvelope(
+      commandName: 'booking.return_to_pending',
+      commandVersion: 'v1',
+      riskTier: BookingCommandRiskTier.critical,
+      requestedByUid: adminUid,
+      requestedByRole: 'admin',
+      targetCollection: 'booking_requests',
+      targetDocId: requestId,
+      targetClinicianId: _stringValue(data?['clinicianId']),
+      sourceAdapter: 'AdminBookingDecisionAdapter',
+      sourceRoute: _sourceRoute,
+      dryRun: true,
+      shadowMode: true,
+      createdAt: DateTime.now().toUtc(),
+      correlationId: correlationId,
+      idempotencyKey: idempotencyKey,
+      previousStateSummary: _previousStateSummary(data),
+      requestedPatchSummary: _returnToPendingPatchSummary(),
+    );
+  }
+
+  BookingCommandEnvelope _buildApproveCenterRequestEnvelope({
+    required String requestId,
+    required String adminUid,
+    required Map<String, dynamic>? data,
+  }) {
+    final centerId = _stringValue(data?['centerId']);
+    final correlationId = _newCorrelationId(requestId);
+    final idempotencyKey = [
+      'center_request.approve',
+      requestId,
+      adminUid,
+      centerId ?? '',
+      _stringValue(data?['status']) ?? '',
+    ].join(':');
+
+    return BookingCommandEnvelope(
+      commandName: 'center_request.approve',
+      commandVersion: 'v1',
+      riskTier: BookingCommandRiskTier.critical,
+      requestedByUid: adminUid,
+      requestedByRole: 'admin',
+      targetCollection: 'booking_requests',
+      targetDocId: requestId,
+      targetClinicianId: _stringValue(data?['clinicianId']),
+      sourceAdapter: 'AdminBookingDecisionAdapter',
+      sourceRoute: _sourceRoute,
+      dryRun: true,
+      shadowMode: true,
+      createdAt: DateTime.now().toUtc(),
+      correlationId: correlationId,
+      idempotencyKey: idempotencyKey,
+      previousStateSummary: _previousStateSummary(data),
+      requestedPatchSummary: _approveCenterRequestPatchSummary(),
     );
   }
 
@@ -223,7 +458,7 @@ class AdminBookingCommandWrapper {
     }
     if (status.isNotEmpty && status != 'pending_admin') {
       warnings.add(
-        BookingCommandValidationWarning(
+        const BookingCommandValidationWarning(
           code: 'unexpected_booking_status',
           message: 'Booking status is not the expected pending_admin state.',
         ),
@@ -248,6 +483,264 @@ class AdminBookingCommandWrapper {
         const BookingCommandValidationWarning(
           code: 'possible_duplicate_command',
           message: 'A matching shadow idempotency key was already observed.',
+        ),
+      );
+    }
+    if (_sourceRoute.trim().isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_source_route',
+          message: 'Source route is missing.',
+        ),
+      );
+    }
+
+    return warnings;
+  }
+
+  List<BookingCommandValidationWarning> _rejectRequestWarnings({
+    required bool snapshotExists,
+    required Map<String, dynamic>? data,
+    required String adminUid,
+  }) {
+    final warnings = <BookingCommandValidationWarning>[];
+    if (!snapshotExists || data == null) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_booking_snapshot',
+          message:
+              'Booking snapshot was unavailable during shadow diagnostics.',
+        ),
+      );
+    }
+
+    final status = _stringValue(data?['status']) ?? '';
+    final paymentStatus = _stringValue(data?['paymentStatus']) ?? '';
+    final sessionStatus = _stringValue(data?['sessionStatus']) ?? '';
+    final payoutStatus = _stringValue(data?['payoutStatus']) ?? '';
+
+    if (adminUid.trim().isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_admin_uid',
+          message: 'Admin uid is missing.',
+        ),
+      );
+    }
+    if (status.isNotEmpty && !_isExpectedRejectableStatus(status)) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'rejection_from_unexpected_status',
+          message: 'Booking status is not an expected rejection state.',
+        ),
+      );
+    }
+    if (paymentStatus == 'approved' || paymentStatus == 'paid') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'payment_already_finalized',
+          message: 'Payment appears finalized before rejection.',
+        ),
+      );
+    }
+    if (sessionStatus == 'completed') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'session_already_completed',
+          message: 'Session appears completed before rejection.',
+        ),
+      );
+    }
+    if (payoutStatus == 'paid_to_center' ||
+        payoutStatus == 'paid_to_clinician') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'payout_already_confirmed',
+          message: 'Payout appears confirmed before rejection.',
+        ),
+      );
+    }
+    warnings.add(
+      const BookingCommandValidationWarning(
+        code: 'missing_rejection_reason',
+        message: 'Current rejectRequest contract does not include a reason.',
+      ),
+    );
+    if (_sourceRoute.trim().isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_source_route',
+          message: 'Source route is missing.',
+        ),
+      );
+    }
+
+    return warnings;
+  }
+
+  List<BookingCommandValidationWarning> _returnToPendingWarnings({
+    required bool snapshotExists,
+    required Map<String, dynamic>? data,
+    required String adminUid,
+  }) {
+    final warnings = <BookingCommandValidationWarning>[];
+    if (!snapshotExists || data == null) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_booking_snapshot',
+          message:
+              'Booking snapshot was unavailable during shadow diagnostics.',
+        ),
+      );
+    }
+
+    final status = _stringValue(data?['status']) ?? '';
+    final paymentStatus = _stringValue(data?['paymentStatus']) ?? '';
+    final sessionStatus = _stringValue(data?['sessionStatus']) ?? '';
+    final payoutStatus = _stringValue(data?['payoutStatus']) ?? '';
+
+    if (adminUid.trim().isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_admin_uid',
+          message: 'Admin uid is missing.',
+        ),
+      );
+    }
+    if (status.isNotEmpty && !_isExpectedReturnToPendingStatus(status)) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'return_from_unexpected_status',
+          message: 'Booking status is not an expected return-to-pending state.',
+        ),
+      );
+    }
+    if (paymentStatus == 'approved' || paymentStatus == 'paid') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'payment_already_finalized',
+          message: 'Payment appears finalized before return to pending.',
+        ),
+      );
+    }
+    if (sessionStatus == 'completed') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'session_already_completed',
+          message: 'Session appears completed before return to pending.',
+        ),
+      );
+    }
+    if (payoutStatus == 'paid_to_center' ||
+        payoutStatus == 'paid_to_clinician') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'payout_already_confirmed',
+          message: 'Payout appears confirmed before return to pending.',
+        ),
+      );
+    }
+    if (_sourceRoute.trim().isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_source_route',
+          message: 'Source route is missing.',
+        ),
+      );
+    }
+
+    return warnings;
+  }
+
+  List<BookingCommandValidationWarning> _approveCenterRequestWarnings({
+    required bool snapshotExists,
+    required Map<String, dynamic>? data,
+    required String adminUid,
+  }) {
+    final warnings = <BookingCommandValidationWarning>[];
+    if (!snapshotExists || data == null) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_booking_snapshot',
+          message:
+              'Booking snapshot was unavailable during shadow diagnostics.',
+        ),
+      );
+    }
+
+    final status = _stringValue(data?['status']) ?? '';
+    final requestKind = _stringValue(data?['requestKind']) ?? '';
+    final centerId = _stringValue(data?['centerId']);
+    final centerName = _stringValue(data?['centerName']);
+    final paymentStatus = _stringValue(data?['paymentStatus']) ?? '';
+    final sessionStatus = _stringValue(data?['sessionStatus']) ?? '';
+    final payoutStatus = _stringValue(data?['payoutStatus']) ?? '';
+
+    if (adminUid.trim().isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_admin_uid',
+          message: 'Admin uid is missing.',
+        ),
+      );
+    }
+    if (status.isNotEmpty && !_isExpectedCenterApprovalStatus(status)) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'approval_from_unexpected_status',
+          message: 'Booking status is not an expected center approval state.',
+        ),
+      );
+    }
+    if (requestKind != 'center' && (centerId == null || centerId.isEmpty)) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'request_is_not_center_request',
+          message: 'Request does not appear to be a center request.',
+        ),
+      );
+    }
+    if (centerId == null || centerId.isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_center_id',
+          message: 'Center id is missing.',
+        ),
+      );
+    }
+    if (centerName == null || centerName.isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_center_name',
+          message: 'Center name is missing.',
+        ),
+      );
+    }
+    if (paymentStatus == 'approved' || paymentStatus == 'paid') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'payment_already_finalized',
+          message: 'Payment appears finalized before center approval.',
+        ),
+      );
+    }
+    if (sessionStatus == 'scheduled' ||
+        sessionStatus == 'in_progress' ||
+        sessionStatus == 'completed') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'session_already_created_or_completed',
+          message:
+              'Session appears created or completed before center approval.',
+        ),
+      );
+    }
+    if (payoutStatus == 'paid_to_center' ||
+        payoutStatus == 'paid_to_clinician') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'payout_already_confirmed',
+          message: 'Payout appears confirmed before center approval.',
         ),
       );
     }
@@ -292,6 +785,98 @@ class AdminBookingCommandWrapper {
       'reviewStatus': 'not_started',
       'payoutStatus': 'blocked',
     };
+  }
+
+  Map<String, Object?> _rejectRequestPatchSummary() {
+    return const <String, Object?>{
+      'status': 'rejected_admin',
+      'workflowStage': 'rejected_admin',
+      'adminApproved': false,
+      'adminRejected': true,
+      'adminForwarded': false,
+      'adminDecisionType': 'rejected',
+      'paymentStatus': 'blocked',
+      'payment_confirmed': false,
+      'sessionStatus': 'cancelled',
+      'reviewStatus': 'blocked',
+      'payoutStatus': 'blocked',
+    };
+  }
+
+  Map<String, Object?> _returnToPendingPatchSummary() {
+    return const <String, Object?>{
+      'status': 'pending_admin',
+      'workflowStage': 'pending_admin',
+      'adminApproved': false,
+      'adminRejected': false,
+      'adminForwarded': false,
+      'adminAssignedBy': '',
+      'assignedClinicianId': '',
+      'assignedClinicianName': '',
+      'clinicianId': '',
+      'clinicianName': '',
+      'clinicianUid': '',
+      'paymentStatus': 'not_started',
+      'payment_confirmed': false,
+      'sessionStatus': 'not_created',
+      'reviewStatus': 'not_started',
+      'payoutStatus': 'blocked',
+    };
+  }
+
+  Map<String, Object?> _approveCenterRequestPatchSummary() {
+    return const <String, Object?>{
+      'status': 'session_setup_pending',
+      'workflowStage': 'session_setup_pending',
+      'adminApproved': true,
+      'adminRejected': false,
+      'adminForwarded': false,
+      'adminDecisionType': 'approved',
+      'paymentStatus': 'pending_client_transfer',
+      'sessionStatus': 'not_created',
+      'reviewStatus': 'not_started',
+      'payoutStatus': 'blocked',
+      'assignedClinicianId': '',
+      'assignedClinicianName': '',
+      'clinicianId': '',
+      'clinicianName': '',
+      'clinicianUid': '',
+    };
+  }
+
+  bool _isExpectedRejectableStatus(String status) {
+    return const <String>{
+      'pending_admin',
+      'assigned_clinician',
+      'center_follow_up',
+      'center_intake_pending',
+      'client_update_required',
+      'session_setup_pending',
+      'awaiting_payment',
+      'payment_review',
+    }.contains(status);
+  }
+
+  bool _isExpectedReturnToPendingStatus(String status) {
+    return const <String>{
+      'rejected_admin',
+      'assigned_clinician',
+      'center_follow_up',
+      'center_intake_pending',
+      'client_update_required',
+      'session_setup_pending',
+      'awaiting_payment',
+      'payment_review',
+    }.contains(status);
+  }
+
+  bool _isExpectedCenterApprovalStatus(String status) {
+    return const <String>{
+      'center_follow_up',
+      'center_intake_pending',
+      'client_update_required',
+      'pending_admin',
+    }.contains(status);
   }
 
   void _logShadow({

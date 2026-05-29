@@ -543,7 +543,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      await _bookingDecisionAdapter.rejectRequest(
+      await _bookingCommandWrapper.rejectRequest(
         requestId: requestId,
         isCenterRequest: isCenterRequest,
         adminUid: FirebaseAuth.instance.currentUser?.uid ?? '',
@@ -573,7 +573,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      await _bookingDecisionAdapter.returnToPending(
+      await _bookingCommandWrapper.returnToPending(
         requestId: requestId,
         adminUid: FirebaseAuth.instance.currentUser?.uid ?? '',
       );
@@ -674,7 +674,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     final isArabic = _isArabic(context);
     await _setBusy(requestId, true);
     try {
-      await _bookingDecisionAdapter.approveCenterRequest(
+      await _bookingCommandWrapper.approveCenterRequest(
         requestId: requestId,
         adminUid: FirebaseAuth.instance.currentUser?.uid ?? '',
       );
