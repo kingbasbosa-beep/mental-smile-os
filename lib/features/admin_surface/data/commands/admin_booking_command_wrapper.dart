@@ -251,6 +251,139 @@ class AdminBookingCommandWrapper {
     }
   }
 
+  Future<void> returnCenterRequestToClient({
+    required String requestId,
+    required Map<String, dynamic> data,
+    required String adminUid,
+  }) async {
+    final snapshot = await _readSnapshotForDiagnostics(requestId);
+    final snapshotData = snapshot?.data();
+    final envelope = _buildReturnCenterRequestToClientEnvelope(
+      requestId: requestId,
+      adminUid: adminUid,
+      data: snapshotData,
+      feedbackData: data,
+    );
+    final warnings = _returnCenterRequestToClientWarnings(
+      snapshotExists: snapshot?.exists ?? false,
+      data: snapshotData,
+      feedbackData: data,
+      adminUid: adminUid,
+    );
+
+    _logShadow(
+      envelope: envelope,
+      warningCount: warnings.length,
+      resultStatus: 'delegating',
+    );
+
+    try {
+      await _delegate.returnCenterRequestToClient(
+        requestId: requestId,
+        data: data,
+        adminUid: adminUid,
+      );
+      _logShadow(
+        envelope: envelope,
+        warningCount: warnings.length,
+        resultStatus: 'completed',
+      );
+    } catch (_) {
+      _logShadow(
+        envelope: envelope,
+        warningCount: warnings.length,
+        resultStatus: 'failed',
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> openCenterIntakeStep({
+    required String requestId,
+    required String adminUid,
+  }) async {
+    final snapshot = await _readSnapshotForDiagnostics(requestId);
+    final data = snapshot?.data();
+    final envelope = _buildOpenCenterIntakeStepEnvelope(
+      requestId: requestId,
+      adminUid: adminUid,
+      data: data,
+    );
+    final warnings = _openCenterIntakeStepWarnings(
+      snapshotExists: snapshot?.exists ?? false,
+      data: data,
+      adminUid: adminUid,
+    );
+
+    _logShadow(
+      envelope: envelope,
+      warningCount: warnings.length,
+      resultStatus: 'delegating',
+    );
+
+    try {
+      await _delegate.openCenterIntakeStep(
+        requestId: requestId,
+        adminUid: adminUid,
+      );
+      _logShadow(
+        envelope: envelope,
+        warningCount: warnings.length,
+        resultStatus: 'completed',
+      );
+    } catch (_) {
+      _logShadow(
+        envelope: envelope,
+        warningCount: warnings.length,
+        resultStatus: 'failed',
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> moveCenterToFollowUp({
+    required String requestId,
+    required String adminUid,
+  }) async {
+    final snapshot = await _readSnapshotForDiagnostics(requestId);
+    final data = snapshot?.data();
+    final envelope = _buildMoveCenterToFollowUpEnvelope(
+      requestId: requestId,
+      adminUid: adminUid,
+      data: data,
+    );
+    final warnings = _moveCenterToFollowUpWarnings(
+      snapshotExists: snapshot?.exists ?? false,
+      data: data,
+      adminUid: adminUid,
+    );
+
+    _logShadow(
+      envelope: envelope,
+      warningCount: warnings.length,
+      resultStatus: 'delegating',
+    );
+
+    try {
+      await _delegate.moveCenterToFollowUp(
+        requestId: requestId,
+        adminUid: adminUid,
+      );
+      _logShadow(
+        envelope: envelope,
+        warningCount: warnings.length,
+        resultStatus: 'completed',
+      );
+    } catch (_) {
+      _logShadow(
+        envelope: envelope,
+        warningCount: warnings.length,
+        resultStatus: 'failed',
+      );
+      rethrow;
+    }
+  }
+
   Future<DocumentSnapshot<Map<String, dynamic>>?> _readSnapshotForDiagnostics(
     String requestId,
   ) async {
@@ -397,6 +530,118 @@ class AdminBookingCommandWrapper {
       idempotencyKey: idempotencyKey,
       previousStateSummary: _previousStateSummary(data),
       requestedPatchSummary: _approveCenterRequestPatchSummary(),
+    );
+  }
+
+  BookingCommandEnvelope _buildReturnCenterRequestToClientEnvelope({
+    required String requestId,
+    required String adminUid,
+    required Map<String, dynamic>? data,
+    required Map<String, dynamic> feedbackData,
+  }) {
+    final centerId = _stringValue(data?['centerId']);
+    final revision = feedbackData['clientRevisionNumber'];
+    final correlationId = _newCorrelationId(requestId);
+    final idempotencyKey = [
+      'center_request.return_to_client',
+      requestId,
+      adminUid,
+      centerId ?? '',
+      _stringValue(data?['status']) ?? '',
+      revision?.toString() ?? '',
+    ].join(':');
+
+    return BookingCommandEnvelope(
+      commandName: 'center_request.return_to_client',
+      commandVersion: 'v1',
+      riskTier: BookingCommandRiskTier.highRisk,
+      requestedByUid: adminUid,
+      requestedByRole: 'admin',
+      targetCollection: 'booking_requests',
+      targetDocId: requestId,
+      targetClinicianId: _stringValue(data?['clinicianId']),
+      sourceAdapter: 'AdminBookingDecisionAdapter',
+      sourceRoute: _sourceRoute,
+      dryRun: true,
+      shadowMode: true,
+      createdAt: DateTime.now().toUtc(),
+      correlationId: correlationId,
+      idempotencyKey: idempotencyKey,
+      previousStateSummary: _previousStateSummary(data),
+      requestedPatchSummary:
+          _returnCenterRequestToClientPatchSummary(feedbackData),
+    );
+  }
+
+  BookingCommandEnvelope _buildOpenCenterIntakeStepEnvelope({
+    required String requestId,
+    required String adminUid,
+    required Map<String, dynamic>? data,
+  }) {
+    final centerId = _stringValue(data?['centerId']);
+    final correlationId = _newCorrelationId(requestId);
+    final idempotencyKey = [
+      'center_request.open_intake_step',
+      requestId,
+      adminUid,
+      centerId ?? '',
+      _stringValue(data?['status']) ?? '',
+    ].join(':');
+
+    return BookingCommandEnvelope(
+      commandName: 'center_request.open_intake_step',
+      commandVersion: 'v1',
+      riskTier: BookingCommandRiskTier.highRisk,
+      requestedByUid: adminUid,
+      requestedByRole: 'admin',
+      targetCollection: 'booking_requests',
+      targetDocId: requestId,
+      targetClinicianId: _stringValue(data?['clinicianId']),
+      sourceAdapter: 'AdminBookingDecisionAdapter',
+      sourceRoute: _sourceRoute,
+      dryRun: true,
+      shadowMode: true,
+      createdAt: DateTime.now().toUtc(),
+      correlationId: correlationId,
+      idempotencyKey: idempotencyKey,
+      previousStateSummary: _previousStateSummary(data),
+      requestedPatchSummary: _openCenterIntakeStepPatchSummary(),
+    );
+  }
+
+  BookingCommandEnvelope _buildMoveCenterToFollowUpEnvelope({
+    required String requestId,
+    required String adminUid,
+    required Map<String, dynamic>? data,
+  }) {
+    final centerId = _stringValue(data?['centerId']);
+    final correlationId = _newCorrelationId(requestId);
+    final idempotencyKey = [
+      'center_request.move_to_follow_up',
+      requestId,
+      adminUid,
+      centerId ?? '',
+      _stringValue(data?['status']) ?? '',
+    ].join(':');
+
+    return BookingCommandEnvelope(
+      commandName: 'center_request.move_to_follow_up',
+      commandVersion: 'v1',
+      riskTier: BookingCommandRiskTier.highRisk,
+      requestedByUid: adminUid,
+      requestedByRole: 'admin',
+      targetCollection: 'booking_requests',
+      targetDocId: requestId,
+      targetClinicianId: _stringValue(data?['clinicianId']),
+      sourceAdapter: 'AdminBookingDecisionAdapter',
+      sourceRoute: _sourceRoute,
+      dryRun: true,
+      shadowMode: true,
+      createdAt: DateTime.now().toUtc(),
+      correlationId: correlationId,
+      idempotencyKey: idempotencyKey,
+      previousStateSummary: _previousStateSummary(data),
+      requestedPatchSummary: _moveCenterToFollowUpPatchSummary(),
     );
   }
 
@@ -756,6 +1001,342 @@ class AdminBookingCommandWrapper {
     return warnings;
   }
 
+  List<BookingCommandValidationWarning> _returnCenterRequestToClientWarnings({
+    required bool snapshotExists,
+    required Map<String, dynamic>? data,
+    required Map<String, dynamic> feedbackData,
+    required String adminUid,
+  }) {
+    final warnings = <BookingCommandValidationWarning>[];
+    if (!snapshotExists || data == null) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_booking_snapshot',
+          message:
+              'Booking snapshot was unavailable during shadow diagnostics.',
+        ),
+      );
+    }
+
+    final status = _stringValue(data?['status']) ?? '';
+    final requestKind = _stringValue(data?['requestKind']) ?? '';
+    final centerId = _stringValue(data?['centerId']);
+    final paymentStatus = _stringValue(data?['paymentStatus']) ?? '';
+    final sessionStatus = _stringValue(data?['sessionStatus']) ?? '';
+    final payoutStatus = _stringValue(data?['payoutStatus']) ?? '';
+    final centerAvailabilityStatus =
+        _stringValue(feedbackData['centerAvailabilityStatus']);
+    final centerAvailabilityNote =
+        _stringValue(feedbackData['centerAvailabilityNote']);
+    final revision = feedbackData['clientRevisionNumber'];
+
+    if (adminUid.trim().isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_admin_uid',
+          message: 'Admin uid is missing.',
+        ),
+      );
+    }
+    if (status.isNotEmpty && !_isExpectedReturnToClientStatus(status)) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'return_to_client_from_unexpected_status',
+          message: 'Booking status is not an expected return-to-client state.',
+        ),
+      );
+    }
+    if (requestKind != 'center' && (centerId == null || centerId.isEmpty)) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'request_is_not_center_request',
+          message: 'Request does not appear to be a center request.',
+        ),
+      );
+    }
+    if (centerId == null || centerId.isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_center_id',
+          message: 'Center id is missing.',
+        ),
+      );
+    }
+    if ((centerAvailabilityStatus == null ||
+            centerAvailabilityStatus.isEmpty) &&
+        (centerAvailabilityNote == null || centerAvailabilityNote.isEmpty)) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_center_feedback_snapshot',
+          message: 'Center feedback snapshot appears missing.',
+        ),
+      );
+    }
+    if (revision == null) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_client_update_revision_context',
+          message: 'Client update/revision context is missing.',
+        ),
+      );
+    }
+    if (paymentStatus == 'approved' || paymentStatus == 'paid') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'payment_already_finalized',
+          message: 'Payment appears finalized before return to client.',
+        ),
+      );
+    }
+    if (sessionStatus == 'scheduled' ||
+        sessionStatus == 'in_progress' ||
+        sessionStatus == 'completed') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'session_already_created_or_completed',
+          message:
+              'Session appears created or completed before return to client.',
+        ),
+      );
+    }
+    if (payoutStatus == 'paid_to_center' ||
+        payoutStatus == 'paid_to_clinician') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'payout_already_confirmed',
+          message: 'Payout appears confirmed before return to client.',
+        ),
+      );
+    }
+    if (_sourceRoute.trim().isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_source_route',
+          message: 'Source route is missing.',
+        ),
+      );
+    }
+
+    return warnings;
+  }
+
+  List<BookingCommandValidationWarning> _openCenterIntakeStepWarnings({
+    required bool snapshotExists,
+    required Map<String, dynamic>? data,
+    required String adminUid,
+  }) {
+    final warnings = <BookingCommandValidationWarning>[];
+    if (!snapshotExists || data == null) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_booking_snapshot',
+          message:
+              'Booking snapshot was unavailable during shadow diagnostics.',
+        ),
+      );
+    }
+
+    final status = _stringValue(data?['status']) ?? '';
+    final requestKind = _stringValue(data?['requestKind']) ?? '';
+    final centerId = _stringValue(data?['centerId']);
+    final paymentStatus = _stringValue(data?['paymentStatus']) ?? '';
+    final sessionStatus = _stringValue(data?['sessionStatus']) ?? '';
+    final payoutStatus = _stringValue(data?['payoutStatus']) ?? '';
+    final centerAvailabilityStatus =
+        _stringValue(data?['centerAvailabilityStatus']);
+    final centerAvailabilityNote =
+        _stringValue(data?['centerAvailabilityNote']);
+
+    if (adminUid.trim().isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_admin_uid',
+          message: 'Admin uid is missing.',
+        ),
+      );
+    }
+    if (status.isNotEmpty && !_isExpectedOpenIntakeStatus(status)) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'open_intake_from_unexpected_status',
+          message: 'Booking status is not an expected open-intake state.',
+        ),
+      );
+    }
+    if (requestKind != 'center' && (centerId == null || centerId.isEmpty)) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'request_is_not_center_request',
+          message: 'Request does not appear to be a center request.',
+        ),
+      );
+    }
+    if (centerId == null || centerId.isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_center_id',
+          message: 'Center id is missing.',
+        ),
+      );
+    }
+    if ((centerAvailabilityStatus == null ||
+            centerAvailabilityStatus.isEmpty) &&
+        (centerAvailabilityNote == null || centerAvailabilityNote.isEmpty)) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_center_feedback',
+          message: 'Center feedback appears missing.',
+        ),
+      );
+    }
+    if (paymentStatus == 'approved' || paymentStatus == 'paid') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'payment_already_finalized',
+          message: 'Payment appears finalized before opening center intake.',
+        ),
+      );
+    }
+    if (sessionStatus == 'scheduled' ||
+        sessionStatus == 'in_progress' ||
+        sessionStatus == 'completed') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'session_already_created_or_completed',
+          message:
+              'Session appears created or completed before opening intake.',
+        ),
+      );
+    }
+    if (payoutStatus == 'paid_to_center' ||
+        payoutStatus == 'paid_to_clinician') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'payout_already_confirmed',
+          message: 'Payout appears confirmed before opening center intake.',
+        ),
+      );
+    }
+    if (_sourceRoute.trim().isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_source_route',
+          message: 'Source route is missing.',
+        ),
+      );
+    }
+
+    return warnings;
+  }
+
+  List<BookingCommandValidationWarning> _moveCenterToFollowUpWarnings({
+    required bool snapshotExists,
+    required Map<String, dynamic>? data,
+    required String adminUid,
+  }) {
+    final warnings = <BookingCommandValidationWarning>[];
+    if (!snapshotExists || data == null) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_booking_snapshot',
+          message:
+              'Booking snapshot was unavailable during shadow diagnostics.',
+        ),
+      );
+    }
+
+    final status = _stringValue(data?['status']) ?? '';
+    final requestKind = _stringValue(data?['requestKind']) ?? '';
+    final centerId = _stringValue(data?['centerId']);
+    final paymentStatus = _stringValue(data?['paymentStatus']) ?? '';
+    final sessionStatus = _stringValue(data?['sessionStatus']) ?? '';
+    final payoutStatus = _stringValue(data?['payoutStatus']) ?? '';
+    final centerAvailabilityStatus =
+        _stringValue(data?['centerAvailabilityStatus']);
+    final centerAvailabilityNote =
+        _stringValue(data?['centerAvailabilityNote']);
+
+    if (adminUid.trim().isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_admin_uid',
+          message: 'Admin uid is missing.',
+        ),
+      );
+    }
+    if (status.isNotEmpty && !_isExpectedMoveToFollowUpStatus(status)) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'follow_up_from_unexpected_status',
+          message: 'Booking status is not an expected center follow-up state.',
+        ),
+      );
+    }
+    if (requestKind != 'center' && (centerId == null || centerId.isEmpty)) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'request_is_not_center_request',
+          message: 'Request does not appear to be a center request.',
+        ),
+      );
+    }
+    if (centerId == null || centerId.isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_center_id',
+          message: 'Center id is missing.',
+        ),
+      );
+    }
+    if ((centerAvailabilityStatus == null ||
+            centerAvailabilityStatus.isEmpty) &&
+        (centerAvailabilityNote == null || centerAvailabilityNote.isEmpty)) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_center_feedback',
+          message: 'Center feedback appears missing.',
+        ),
+      );
+    }
+    if (paymentStatus == 'approved' || paymentStatus == 'paid') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'payment_already_finalized',
+          message: 'Payment appears finalized before moving to follow-up.',
+        ),
+      );
+    }
+    if (sessionStatus == 'scheduled' ||
+        sessionStatus == 'in_progress' ||
+        sessionStatus == 'completed') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'session_already_created_or_completed',
+          message: 'Session appears created or completed before follow-up.',
+        ),
+      );
+    }
+    if (payoutStatus == 'paid_to_center' ||
+        payoutStatus == 'paid_to_clinician') {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'payout_already_confirmed',
+          message: 'Payout appears confirmed before moving to follow-up.',
+        ),
+      );
+    }
+    if (_sourceRoute.trim().isEmpty) {
+      warnings.add(
+        const BookingCommandValidationWarning(
+          code: 'missing_source_route',
+          message: 'Source route is missing.',
+        ),
+      );
+    }
+
+    return warnings;
+  }
+
   Map<String, Object?> _previousStateSummary(Map<String, dynamic>? data) {
     if (data == null) return const <String, Object?>{};
     return <String, Object?>{
@@ -844,6 +1425,52 @@ class AdminBookingCommandWrapper {
     };
   }
 
+  Map<String, Object?> _returnCenterRequestToClientPatchSummary(
+    Map<String, dynamic> feedbackData,
+  ) {
+    final revision = feedbackData['clientRevisionNumber'];
+    return <String, Object?>{
+      'status': 'client_update_required',
+      'workflowStage': 'client_update_required',
+      'lastCenterAvailabilityStatus':
+          _stringValue(feedbackData['centerAvailabilityStatus']),
+      'lastCenterAvailabilityNotePresent':
+          (_stringValue(feedbackData['centerAvailabilityNote']) ?? '')
+              .isNotEmpty,
+      'lastCenterSuggestedAlternativeKey':
+          _stringValue(feedbackData['centerSuggestedAlternativeKey']),
+      'lastCenterSuggestedAlternativeLabelArPresent': (_stringValue(
+                feedbackData['centerSuggestedAlternativeLabelAr'],
+              ) ??
+              '')
+          .isNotEmpty,
+      'lastCenterFeedbackRevisionNumber': revision is num
+          ? revision.toInt()
+          : int.tryParse('${revision ?? ''}') ?? 0,
+      'adminCanApproveWithoutCenterRecheck': false,
+      'adminDecisionType': 'returned_to_client',
+    };
+  }
+
+  Map<String, Object?> _openCenterIntakeStepPatchSummary() {
+    return const <String, Object?>{
+      'status': 'center_intake_pending',
+      'workflowStage': 'center_intake_pending',
+      'adminDecisionType': 'center_intake_opened',
+    };
+  }
+
+  Map<String, Object?> _moveCenterToFollowUpPatchSummary() {
+    return const <String, Object?>{
+      'status': 'center_follow_up',
+      'workflowStage': 'center_follow_up',
+      'adminApproved': false,
+      'adminRejected': false,
+      'adminForwarded': false,
+      'adminDecisionType': 'center_follow_up',
+    };
+  }
+
   bool _isExpectedRejectableStatus(String status) {
     return const <String>{
       'pending_admin',
@@ -876,6 +1503,31 @@ class AdminBookingCommandWrapper {
       'center_intake_pending',
       'client_update_required',
       'pending_admin',
+    }.contains(status);
+  }
+
+  bool _isExpectedReturnToClientStatus(String status) {
+    return const <String>{
+      'center_follow_up',
+      'center_intake_pending',
+      'session_setup_pending',
+      'pending_admin',
+    }.contains(status);
+  }
+
+  bool _isExpectedOpenIntakeStatus(String status) {
+    return const <String>{
+      'center_follow_up',
+      'client_update_required',
+      'pending_admin',
+    }.contains(status);
+  }
+
+  bool _isExpectedMoveToFollowUpStatus(String status) {
+    return const <String>{
+      'pending_admin',
+      'client_update_required',
+      'center_intake_pending',
     }.contains(status);
   }
 
