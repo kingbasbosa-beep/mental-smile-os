@@ -7,6 +7,7 @@ import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/system/domain_registry.dart';
 import 'package:flutterprojects/core/system/domain_status.dart';
 import 'package:flutterprojects/core/system/domain_status_service.dart';
+import 'package:flutterprojects/features/admin_surface/data/commands/admin_booking_command_wrapper.dart';
 import 'package:flutterprojects/features/admin_surface/data/services/admin_booking_decision_adapter.dart';
 import 'package:flutterprojects/features/booking/data/services/booking_legacy_chat_adapter.dart';
 import 'package:flutterprojects/features/booking/data/services/booking_health_service.dart';
@@ -27,6 +28,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
   static const DomainStatusService _domainStatusService = DomainStatusService();
   static const bool _adminClinicianForwardBridgeEnabled = false;
   late final AdminBookingDecisionAdapter _bookingDecisionAdapter;
+  late final AdminBookingCommandWrapper _bookingCommandWrapper;
   final BookingLegacyChatAdapter _bookingChatAdapter =
       BookingLegacyChatAdapter();
 
@@ -56,6 +58,9 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
     _bookingDecisionAdapter = AdminBookingDecisionAdapter(
       refreshAuthContextForFirestore: _refreshAuthContextForFirestore,
       logFirestore: _logFirestore,
+    );
+    _bookingCommandWrapper = AdminBookingCommandWrapper(
+      delegate: _bookingDecisionAdapter,
     );
     _bookingDocsStreamRef = _bookingDocsStream();
     _cliniciansStreamRef = _cliniciansStream();
@@ -977,7 +982,7 @@ class _AdminBookingQueuePageState extends State<AdminBookingQueuePage> {
         throw Exception('Admin authentication context is unavailable');
       }
 
-      final result = await _bookingDecisionAdapter.assignClinician(
+      final result = await _bookingCommandWrapper.assignClinician(
         requestId: requestId,
         adminUid: adminUid,
       );
