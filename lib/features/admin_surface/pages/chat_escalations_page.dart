@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
+import 'package:flutterprojects/features/chat/data/commands/chat_escalation_command_wrapper.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_escalation_model.dart';
 import 'package:flutterprojects/features/chat/data/models/clinician_option_model.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_firestore_service.dart';
@@ -17,6 +18,8 @@ class ChatEscalationsPage extends StatefulWidget {
 
 class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
   final ChatFirestoreService _service = ChatFirestoreService();
+  static const ChatEscalationCommandWrapper _escalationCommandWrapper =
+      ChatEscalationCommandWrapper();
   static const ChatHealthService _chatHealthService = ChatHealthService();
   String _filter = 'all';
 
@@ -183,10 +186,15 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
 
       if (selected == null) return;
 
-      await _service.forwardEscalationToClinician(
+      await _escalationCommandWrapper.forwardEscalationToClinician(
         escalationId: escalation.id,
         threadId: escalation.threadId,
         clinicianUid: selected.id,
+        delegate: () => _service.forwardEscalationToClinician(
+          escalationId: escalation.id,
+          threadId: escalation.threadId,
+          clinicianUid: selected.id,
+        ),
       );
 
       if (context.mounted) {
@@ -210,10 +218,15 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null || uid.isEmpty) return;
 
-    await _service.assignEscalationToAdmin(
+    await _escalationCommandWrapper.assignEscalationToAdmin(
       escalationId: escalation.id,
       threadId: escalation.threadId,
       adminUid: uid,
+      delegate: () => _service.assignEscalationToAdmin(
+        escalationId: escalation.id,
+        threadId: escalation.threadId,
+        adminUid: uid,
+      ),
     );
 
     if (!context.mounted) return;
@@ -229,10 +242,15 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null || uid.isEmpty) return;
 
-    await _service.resolveEscalation(
+    await _escalationCommandWrapper.resolveEscalation(
       escalationId: escalation.id,
       threadId: escalation.threadId,
       resolverUid: uid,
+      delegate: () => _service.resolveEscalation(
+        escalationId: escalation.id,
+        threadId: escalation.threadId,
+        resolverUid: uid,
+      ),
     );
 
     if (!context.mounted) return;
