@@ -491,7 +491,7 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           ),
         ),
         _OperationActionButton(
-          label: l10n.clinicianMySessions,
+          label: isArabic ? 'تنسيق الخدمة' : 'Service coordination',
           icon: Icons.video_call_outlined,
           imageAsset:
               'assets/images/clinicians_dashboard/actions/clinician_sessions.png',

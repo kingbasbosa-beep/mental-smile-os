@@ -21,20 +21,21 @@ class AdminOperationsPage extends StatelessWidget {
             _OperationsIntroCard(),
             SizedBox(height: AppSpacing.md),
             _OperationsEntryCard(
-              title: 'Requests Queue',
-              summary: 'Review and route active booking workflow items.',
+              title: 'Legacy service request queue',
+              summary: 'Review and route legacy request workflow signals.',
               route: Routes.adminBookingQueue,
             ),
             SizedBox(height: AppSpacing.md),
             _OperationsEntryCard(
-              title: 'Payments Review',
-              summary: 'Open payment review and transfer handling.',
+              title: 'Legacy payment review',
+              summary: 'Open legacy payment visibility and exception review.',
               route: Routes.adminPayments,
             ),
             SizedBox(height: AppSpacing.md),
             _OperationsEntryCard(
-              title: 'Sessions & Scheduling',
-              summary: 'Open sessions, links, and scheduling actions.',
+              title: 'Service coordination signals',
+              summary:
+                  'Open legacy coordination signals, links, and scheduling visibility.',
               route: Routes.adminSessions,
             ),
           ],

@@ -954,7 +954,13 @@ class CenterDetailsPage extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.send_outlined),
-                    label: Text(l10n.centerRequestViaAdmin),
+                    label: Text(
+                      Localizations.localeOf(context).languageCode
+                                  .toLowerCase() ==
+                              'ar'
+                          ? 'طلب تواصل مع المركز'
+                          : 'Request center contact',
+                    ),
                   ),
                 ),
             ],
@@ -1080,7 +1086,12 @@ class CenterDetailsPage extends StatelessWidget {
               );
             },
             icon: const Icon(Icons.send_outlined),
-            label: Text(l10n.centerRequestViaAdmin),
+            label: Text(
+              Localizations.localeOf(context).languageCode.toLowerCase() ==
+                      'ar'
+                  ? 'طلب تواصل مع المركز'
+                  : 'Request center contact',
+            ),
           ),
         ),
         const SizedBox(height: 24),

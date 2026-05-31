@@ -318,7 +318,9 @@ class CenterDashboardPage extends StatelessWidget {
                         _CenterActionCards(
                           children: [
                             _SectionCard(
-                              title: isArabic ? 'طلبات جديدة' : 'New requests',
+                              title: isArabic
+                                  ? 'طلبات خدمة جديدة'
+                                  : 'New service requests',
                               subtitle: isArabic
                                   ? 'وارد الطلبات بانتظار رد المركز'
                                   : 'Inbox requests awaiting center response',
@@ -330,8 +332,9 @@ class CenterDashboardPage extends StatelessWidget {
                                   .pushNamed(Routes.centerInbox),
                             ),
                             _SectionCard(
-                              title:
-                                  isArabic ? 'طلبات نشطة' : 'Active requests',
+                              title: isArabic
+                                  ? 'طلبات خدمة نشطة'
+                                  : 'Active service requests',
                               subtitle: isArabic
                                   ? 'متابعة الطلبات الجارية'
                                   : 'Follow active center requests',
@@ -344,8 +347,8 @@ class CenterDashboardPage extends StatelessWidget {
                             ),
                             _SectionCard(
                               title: isArabic
-                                  ? 'طلبات مكتملة'
-                                  : 'Completed requests',
+                                  ? 'طلبات خدمة مكتملة'
+                                  : 'Completed service requests',
                               subtitle: isArabic
                                   ? 'مراجعة الإقامات المكتملة'
                                   : 'Review completed residencies',
@@ -358,8 +361,8 @@ class CenterDashboardPage extends StatelessWidget {
                             ),
                             _SectionCard(
                               title: isArabic
-                                  ? 'طلبات مرفوضة'
-                                  : 'Rejected requests',
+                                  ? 'طلبات خدمة مرفوضة'
+                                  : 'Rejected service requests',
                               subtitle: isArabic
                                   ? 'متابعة الطلبات المرفوضة أو غير المتاحة'
                                   : 'Review unavailable or cancelled requests',
@@ -371,7 +374,9 @@ class CenterDashboardPage extends StatelessWidget {
                                   .pushNamed(Routes.centerInbox),
                             ),
                             _SectionCard(
-                              title: isArabic ? 'الإقامات' : 'My sessions',
+                              title: isArabic
+                                  ? 'تنسيق الخدمة'
+                                  : 'Service coordination',
                               subtitle: isArabic
                                   ? 'الإقامات المجدولة والجارية'
                                   : 'Scheduled and active residencies',

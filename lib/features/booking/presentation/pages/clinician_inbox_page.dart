@@ -177,7 +177,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
             isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
-            isArabic ? 'صندوق وارد توافق/legacy' : 'Legacy compatibility inbox',
+            isArabic ? 'صندوق طلبات خدمة قديم' : 'Legacy request inbox',
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),

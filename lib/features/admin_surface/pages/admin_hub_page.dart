@@ -212,7 +212,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
         route: Routes.adminOperations,
       ),
       _QuickStatItem(
-        title: isArabic ? 'بوابة مراقبة السداد' : 'Payment monitoring gate',
+        title: isArabic ? 'إشارات مالية قديمة' : 'Legacy financial signals',
         group: AdminVisualGroup.payments,
         stream: _paymentsReviewStream,
         route: Routes.adminPayments,
@@ -281,7 +281,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
         title: isArabic ? 'مراقبة الطلبات والبوابات' : 'Requests & Gates',
         subtitle: isArabic
             ? 'مراقبة الطلبات والمدفوعات والجلسات دون ملكية التشغيل اليومي'
-            : 'Monitor requests, payments, and sessions without daily operational ownership',
+            : 'Monitor legacy requests, financial signals, and coordination without daily operational ownership',
         icon: Icons.assignment_outlined,
         group: AdminVisualGroup.requests,
         route: Routes.adminOperations,
@@ -374,10 +374,12 @@ class _AdminHubPageState extends State<AdminHubPage> {
         route: Routes.marketingWorkspace,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'قسم المحاسبة' : 'Accounting',
+        title: isArabic
+            ? 'معاينة موديول محاسبة اختياري'
+            : 'Optional accounting module preview',
         subtitle: isArabic
-            ? 'مراجعة السداد والمستحقات ودفاتر المحاسبة'
-            : 'Payment Review & Payouts, Payments Ledger, and Accounting Ledger',
+            ? 'رؤية مالية قديمة ومحدودة وليست جزءًا من قلب المنصة'
+            : 'Legacy financial visibility, not a core platform dependency',
         icon: Icons.account_balance_wallet_outlined,
         group: AdminVisualGroup.payments,
         route: Routes.adminAccountingWorkspace,

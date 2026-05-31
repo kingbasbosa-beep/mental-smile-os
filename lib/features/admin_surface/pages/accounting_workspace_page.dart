@@ -45,7 +45,7 @@ class _AccountingWorkspacePageState extends State<AccountingWorkspacePage> {
       ),
       _SectionData(
         titleAr: 'مراجعة السداد والتحويلات',
-        titleEn: 'Payment & Transfer Review',
+        titleEn: 'Legacy payment visibility',
         icon: Icons.payments_outlined,
         status: _SectionStatus.active,
         actions: const [
@@ -56,19 +56,19 @@ class _AccountingWorkspacePageState extends State<AccountingWorkspacePage> {
           ),
           _ActionData(
             labelAr: 'اعتماد / رفض السداد',
-            labelEn: 'Approve / Reject Payment',
+            labelEn: 'Review legacy payment signal',
             route: Routes.adminPayments,
           ),
           _ActionData(
             labelAr: 'تجميد المبلغ',
-            labelEn: 'Freeze Amount',
+            labelEn: 'Legacy finance hold marker',
             route: Routes.adminPayments,
           ),
         ],
       ),
       _SectionData(
         titleAr: 'المستحقات والإغلاق المالي',
-        titleEn: 'Dues & Financial Close',
+        titleEn: 'Optional accounting module preview',
         icon: Icons.account_balance_wallet_outlined,
         status: _SectionStatus.partial,
         actions: const [
@@ -80,11 +80,11 @@ class _AccountingWorkspacePageState extends State<AccountingWorkspacePage> {
           ),
           _ActionData(
             labelAr: 'خصم العمولة / الضرائب',
-            labelEn: 'Commission / Tax Deduction',
+            labelEn: 'Legacy finance placeholder - disabled',
           ),
           _ActionData(
             labelAr: 'الإغلاق المالي',
-            labelEn: 'Financial Closing',
+            labelEn: 'Legacy financial closing visibility',
             route: Routes.adminArchiveAccounting,
           ),
         ],
@@ -97,12 +97,12 @@ class _AccountingWorkspacePageState extends State<AccountingWorkspacePage> {
         actions: const [
           _ActionData(
             labelAr: 'سجل المدفوعات',
-            labelEn: 'Payments Ledger',
+            labelEn: 'Legacy payments ledger',
             route: Routes.adminArchivePayments,
           ),
           _ActionData(
             labelAr: 'السجل المحاسبي',
-            labelEn: 'Accounting Ledger',
+            labelEn: 'Legacy accounting ledger',
             route: Routes.adminArchiveAccounting,
           ),
           _ActionData(

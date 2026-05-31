@@ -34,9 +34,11 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
   String _sectionTitle(String key, bool isArabic) {
     switch (key) {
       case 'sessions':
-        return isArabic ? 'أرشيف الجلسات' : 'Sessions Archive';
+        return isArabic
+            ? 'أرشيف تنسيق الخدمة القديم'
+            : 'Legacy sessions archive';
       case 'payments':
-        return isArabic ? 'أرشيف المدفوعات' : 'Payments Archive';
+        return isArabic ? 'أرشيف المدفوعات القديم' : 'Legacy payments archive';
       case 'clinicians':
         return isArabic ? 'أرشيف الأخصائيين' : 'Clinicians Archive';
       case 'centers':
@@ -46,7 +48,7 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
       case 'reports':
         return isArabic ? 'أرشيف التقارير' : 'Reports Archive';
       case 'accounting':
-        return isArabic ? 'أرشيف المحاسبة' : 'Accounting Archive';
+        return isArabic ? 'أرشيف المحاسبة القديم' : 'Legacy accounting archive';
       default:
         return key;
     }
@@ -56,12 +58,12 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
     switch (key) {
       case 'sessions':
         return isArabic
-            ? 'العمليات والجلسات المكتملة والمؤرشفة'
-            : 'Completed sessions and archived flows';
+            ? 'إشارات تنسيق الخدمة القديمة والمكتملة والمؤرشفة'
+            : 'Legacy service coordination and archived flows';
       case 'payments':
         return isArabic
-            ? 'سجلات الدفع والتحويلات المالية'
-            : 'Payments and transfer records';
+            ? 'سجلات مالية قديمة للعرض فقط'
+            : 'Legacy payment and transfer visibility records';
       case 'clinicians':
         return isArabic
             ? 'طلبات الأخصائيين وسجل الأداء'
@@ -80,8 +82,8 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
             : 'Unified administrative reports';
       case 'accounting':
         return isArabic
-            ? 'الهيكل المالي والمحاسبي'
-            : 'Financial and accounting structure';
+            ? 'رؤية محاسبية قديمة وليست موديولًا أساسيًا'
+            : 'Legacy accounting visibility, not a core module';
       default:
         return '';
     }

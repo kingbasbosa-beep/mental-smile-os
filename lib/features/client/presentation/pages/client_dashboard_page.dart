@@ -347,17 +347,6 @@ class ClientDashboardPage extends StatelessWidget {
                             },
                           ),
                           _ActionButton(
-                            title: isArabic
-                                ? 'إثبات التحويل النقدي'
-                                : 'Payment proof',
-                            subtitle: l10n.clientUploadPaymentProof,
-                            asset:
-                                'assets/images/client_dashboard/actions/client_payment_proof.png',
-                            icon: Icons.receipt_long_outlined,
-                            onTap: () => Navigator.of(context)
-                                .pushNamed(Routes.clientPaymentProof),
-                          ),
-                          _ActionButton(
                             title: isArabic ? 'جلساتي' : 'My sessions',
                             subtitle: l10n.clientLinksAndCodes,
                             asset:

@@ -702,7 +702,9 @@ class SpecialistDetailsPage extends StatelessWidget {
                   );
                 },
           icon: const Icon(Icons.calendar_month_outlined),
-          label: Text(isArabic ? 'طلب حجز' : 'Request booking'),
+          label: Text(
+            isArabic ? 'طلب تواصل مع مقدم الخدمة' : 'Request provider contact',
+          ),
           style: FilledButton.styleFrom(
             minimumSize: const Size.fromHeight(56),
             backgroundColor: const Color(0xFFE7C766).withValues(alpha: 0.16),

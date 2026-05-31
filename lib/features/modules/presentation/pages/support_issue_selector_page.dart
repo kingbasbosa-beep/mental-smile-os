@@ -60,11 +60,12 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
       return [
         _SupportIssueOption(
           key: 'booking_issue',
-          label: isArabic ? 'مشكلة في الحجز' : 'Booking issue',
+          label: isArabic ? 'مشكلة في طلب الخدمة' : 'Service request issue',
         ),
         _SupportIssueOption(
           key: 'payment_follow_up',
-          label: isArabic ? 'متابعة دفعة أو تحويل' : 'Payment follow-up',
+          label:
+              isArabic ? 'متابعة الحساب أو الدعم' : 'Account/support follow-up',
         ),
         _SupportIssueOption(
           key: 'session_timing_issue',
@@ -97,7 +98,7 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
       return [
         _SupportIssueOption(
           key: 'booking_issue',
-          label: isArabic ? 'مشكلة في الحجز' : 'Booking issue',
+          label: isArabic ? 'مشكلة في طلب الخدمة' : 'Service request issue',
         ),
         _SupportIssueOption(
           key: 'client_no_show',
@@ -113,7 +114,9 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
         ),
         _SupportIssueOption(
           key: 'payout_question',
-          label: isArabic ? 'استفسار بخصوص المستحقات' : 'Payout question',
+          label: isArabic
+              ? 'استفسار بخصوص حساب مقدم الخدمة'
+              : 'Provider account question',
         ),
         _SupportIssueOption(
           key: 'general_admin_request',
@@ -138,7 +141,9 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
         ),
         _SupportIssueOption(
           key: 'payment_question',
-          label: isArabic ? 'استفسار بخصوص الدفع' : 'Payment question',
+          label: isArabic
+              ? 'استفسار بخصوص الحساب أو الدعم'
+              : 'Account/support question',
         ),
         _SupportIssueOption(
           key: 'system_issue',

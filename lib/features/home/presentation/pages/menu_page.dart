@@ -76,8 +76,8 @@ class MenuPage extends StatelessWidget {
       _MenuCardData(
         title: l10n.menuSpecialists,
         subtitle: isArabic
-            ? 'استعرض التخصصات وابدأ طلب الحجز'
-            : 'Browse specialists and request a booking',
+            ? 'استعرض التخصصات وقارن خدمات مقدمي الخدمة'
+            : 'Browse specialists and compare provider services',
         icon: Icons.psychology_alt_outlined,
         route: Routes.specialists,
         accent: AppColors.accentLavender,

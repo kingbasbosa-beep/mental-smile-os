@@ -33,24 +33,24 @@ const List<AdminSectionEntry> adminSectionEntries = [
   ),
   AdminSectionEntry(
     route: '/admin/booking-queue',
-    title: 'Booking Monitoring & Exception Board',
+    title: 'Legacy request monitoring board',
     section: AdminTopLevelSection.operations,
     purpose:
-        'Monitoring and exception review for booking flow signals. Normal workflow progression should remain with the core owners.',
+        'Monitoring and exception review for legacy request signals. Normal workflow progression should remain outside core ownership.',
   ),
   AdminSectionEntry(
     route: Routes.adminPayments,
-    title: 'Payment Review & Payouts',
+    title: 'Legacy payment visibility',
     section: AdminTopLevelSection.operations,
     purpose:
-        'Monitoring, financial gate review, and exception-only payout confirmation. Normal flow ownership should remain outside Control Room.',
+        'Legacy financial visibility and exception review only. Normal flow ownership should remain outside Control Room.',
   ),
   AdminSectionEntry(
     route: Routes.adminSessions,
-    title: 'Sessions Monitoring & Exception Control',
+    title: 'Service coordination monitoring',
     section: AdminTopLevelSection.operations,
     purpose:
-        'Session readiness monitoring, link visibility, and exception-only state correction. Normal workflow progression should remain with the core owners.',
+        'Service coordination monitoring, link visibility, and exception-only state correction. Normal workflow progression should remain with the responsible providers.',
   ),
   AdminSectionEntry(
     route: Routes.adminSessionReport,
@@ -129,9 +129,9 @@ const List<AdminSectionEntry> adminSectionEntries = [
   ),
   AdminSectionEntry(
     route: Routes.adminArchivePayments,
-    title: 'Payments Ledger',
+    title: 'Legacy payments ledger',
     section: AdminTopLevelSection.archive,
-    purpose: 'Archived payment and transfer records.',
+    purpose: 'Archived legacy payment and transfer visibility records.',
   ),
   AdminSectionEntry(
     route: Routes.adminArchiveReports,
@@ -159,8 +159,9 @@ const List<AdminSectionEntry> adminSectionEntries = [
   ),
   AdminSectionEntry(
     route: Routes.adminArchiveAccounting,
-    title: 'Accounting Ledger',
+    title: 'Legacy accounting ledger',
     section: AdminTopLevelSection.archive,
-    purpose: 'Archived accounting and finance-oriented records.',
+    purpose:
+        'Archived legacy accounting and finance-oriented visibility records.',
   ),
 ];
