@@ -1,18 +1,19 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../../lib/features/trust/domain/mappers/provider_trust_summary_mapper.dart';
+import '../../fixtures/provider_trust_summary_fixtures.dart';
 
 void main() {
   group('ProviderTrustSummaryMapper.fromRatings', () {
     test('empty list returns empty summary values', () {
       final summary = ProviderTrustSummaryMapper.fromRatings(
-        const <Map<String, dynamic>>[],
-        providerId: 'provider-1',
-        providerType: 'clinician',
+        ProviderTrustSummaryFixtures.rawRatingsEmpty,
+        providerId: ProviderTrustSummaryFixtures.providerId,
+        providerType: ProviderTrustSummaryFixtures.providerType,
       );
 
-      expect(summary.providerId, 'provider-1');
-      expect(summary.providerType, 'clinician');
+      expect(summary.providerId, ProviderTrustSummaryFixtures.providerId);
+      expect(summary.providerType, ProviderTrustSummaryFixtures.providerType);
       expect(summary.averageRating, 0);
       expect(summary.reviewCount, 0);
       expect(summary.totalStarCount, 0);
@@ -23,11 +24,9 @@ void main() {
 
     test('single rating calculates average and counts correctly', () {
       final summary = ProviderTrustSummaryMapper.fromRatings(
-        <Map<String, dynamic>>[
-          <String, dynamic>{'rating': 5, 'createdAt': '2026-01-01T10:00:00Z'},
-        ],
-        providerId: 'provider-1',
-        providerType: 'clinician',
+        ProviderTrustSummaryFixtures.rawRatingsSingleFiveStar,
+        providerId: ProviderTrustSummaryFixtures.providerId,
+        providerType: ProviderTrustSummaryFixtures.providerType,
       );
 
       expect(summary.averageRating, 5);
@@ -44,39 +43,29 @@ void main() {
 
     test('multiple ratings calculate average and star distribution', () {
       final summary = ProviderTrustSummaryMapper.fromRatings(
-        <Map<String, dynamic>>[
-          <String, dynamic>{'rating': 5},
-          <String, dynamic>{'score': 4},
-          <String, dynamic>{'stars': 3},
-          <String, dynamic>{'rating': 2},
-          <String, dynamic>{'rating': 1},
-        ],
-        providerId: 'provider-1',
-        providerType: 'clinician',
+        ProviderTrustSummaryFixtures.rawRatingsMixedValid,
+        providerId: ProviderTrustSummaryFixtures.providerId,
+        providerType: ProviderTrustSummaryFixtures.providerType,
+        sourceVersion: ProviderTrustSummaryFixtures.sourceVersion,
       );
 
-      expect(summary.averageRating, 3);
-      expect(summary.reviewCount, 5);
-      expect(summary.fiveStarCount, 1);
-      expect(summary.fourStarCount, 1);
-      expect(summary.threeStarCount, 1);
-      expect(summary.twoStarCount, 1);
-      expect(summary.oneStarCount, 1);
+      final expected = ProviderTrustSummaryFixtures.expectedMixedSummary;
+      expect(summary.averageRating, expected.averageRating);
+      expect(summary.reviewCount, expected.reviewCount);
+      expect(summary.fiveStarCount, expected.fiveStarCount);
+      expect(summary.fourStarCount, expected.fourStarCount);
+      expect(summary.threeStarCount, expected.threeStarCount);
+      expect(summary.twoStarCount, expected.twoStarCount);
+      expect(summary.oneStarCount, expected.oneStarCount);
+      expect(summary.sourceVersion, expected.sourceVersion);
       expect(summary.totalStarCount, summary.reviewCount);
     });
 
     test('invalid rating values are ignored safely', () {
       final summary = ProviderTrustSummaryMapper.fromRatings(
-        <Map<String, dynamic>>[
-          <String, dynamic>{'rating': 0},
-          <String, dynamic>{'rating': 6},
-          <String, dynamic>{'rating': null},
-          <String, dynamic>{'rating': '5'},
-          <String, dynamic>{'rating': true},
-          <String, dynamic>{'rating': 4},
-        ],
-        providerId: 'provider-1',
-        providerType: 'clinician',
+        ProviderTrustSummaryFixtures.rawRatingsWithInvalidValues,
+        providerId: ProviderTrustSummaryFixtures.providerId,
+        providerType: ProviderTrustSummaryFixtures.providerType,
       );
 
       expect(summary.averageRating, 4);
@@ -88,12 +77,9 @@ void main() {
 
     test('decimal ratings are counted and string ratings are ignored', () {
       final summary = ProviderTrustSummaryMapper.fromRatings(
-        <Map<String, dynamic>>[
-          <String, dynamic>{'rating': 4.5},
-          <String, dynamic>{'rating': '3'},
-        ],
-        providerId: 'provider-1',
-        providerType: 'clinician',
+        ProviderTrustSummaryFixtures.rawRatingsWithStringAndDecimalValues,
+        providerId: ProviderTrustSummaryFixtures.providerId,
+        providerType: ProviderTrustSummaryFixtures.providerType,
       );
 
       expect(summary.averageRating, 4.5);
@@ -104,12 +90,9 @@ void main() {
 
     test('trustScore currently equals averageRating', () {
       final summary = ProviderTrustSummaryMapper.fromRatings(
-        <Map<String, dynamic>>[
-          <String, dynamic>{'rating': 4},
-          <String, dynamic>{'rating': 2},
-        ],
-        providerId: 'provider-1',
-        providerType: 'clinician',
+        ProviderTrustSummaryFixtures.rawRatingsMixedValid,
+        providerId: ProviderTrustSummaryFixtures.providerId,
+        providerType: ProviderTrustSummaryFixtures.providerType,
       );
 
       expect(summary.averageRating, 3);
@@ -118,21 +101,12 @@ void main() {
 
     test('lastReviewAt uses the latest supported review date', () {
       final summary = ProviderTrustSummaryMapper.fromRatings(
-        <Map<String, dynamic>>[
-          <String, dynamic>{
-            'rating': 4,
-            'createdAt': '2026-01-01T10:00:00Z',
-          },
-          <String, dynamic>{
-            'rating': 5,
-            'reviewDate': DateTime.utc(2026, 1, 2),
-          },
-        ],
-        providerId: 'provider-1',
-        providerType: 'clinician',
+        ProviderTrustSummaryFixtures.rawRatingsMixedValid,
+        providerId: ProviderTrustSummaryFixtures.providerId,
+        providerType: ProviderTrustSummaryFixtures.providerType,
       );
 
-      expect(summary.lastReviewAt, DateTime.utc(2026, 1, 2));
+      expect(summary.lastReviewAt, DateTime.parse('2026-01-05T10:00:00Z'));
     });
   });
 }
