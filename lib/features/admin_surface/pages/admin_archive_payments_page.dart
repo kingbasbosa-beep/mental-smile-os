@@ -133,19 +133,6 @@ class _AdminArchivePaymentsPageState extends State<AdminArchivePaymentsPage> {
     }
   }
 
-  String _paymentLabel(String value, bool isArabic) {
-    switch (value) {
-      case 'approved':
-        return isArabic ? 'سداد معتمد' : 'Approved payment';
-      case 'submitted_by_client':
-        return isArabic ? 'إثبات مرفوع من العميل' : 'Submitted by client';
-      case 'rejected':
-        return isArabic ? 'سداد مرفوض' : 'Rejected payment';
-      default:
-        return value.isEmpty ? (isArabic ? 'غير محدد' : 'Unknown') : value;
-    }
-  }
-
   Color _payoutColor(String value) {
     switch (value) {
       case 'paid_to_clinician':
