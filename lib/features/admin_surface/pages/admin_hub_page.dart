@@ -686,6 +686,7 @@ class _AdminDetailPanelSection {
     required this.subtitle,
     required this.icon,
     this.route,
+    // ignore: unused_element_parameter
     this.missingRouteTodo,
   });
 
@@ -792,7 +793,6 @@ class _AdminDetailNavigationPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isRtl = Directionality.of(context) == TextDirection.rtl;
     return Tooltip(
       message: section.subtitle,
       child: InkWell(

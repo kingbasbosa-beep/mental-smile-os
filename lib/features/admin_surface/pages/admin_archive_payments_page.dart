@@ -146,6 +146,7 @@ class _AdminArchivePaymentsPageState extends State<AdminArchivePaymentsPage> {
     }
   }
 
+  // ignore: unused_element
   String _payoutLabel(String value, bool isArabic) {
     switch (value) {
       case 'paid_to_clinician':

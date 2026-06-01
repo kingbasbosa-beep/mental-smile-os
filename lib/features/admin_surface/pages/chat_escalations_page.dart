@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/features/chat/data/commands/chat_escalation_command_wrapper.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_escalation_model.dart';
 import 'package:flutterprojects/features/chat/data/models/clinician_option_model.dart';
