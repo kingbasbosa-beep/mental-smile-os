@@ -85,13 +85,37 @@ class PortalServiceRequestPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _PortalScaffold(
+    return _PortalScaffold(
       currentRoute: '/request/service',
-      child: _PortalTextPage(
+      child: _PortalIntakePage(
         title: 'Service Request',
-        subtitle: 'Phase 1 Intake Placeholder',
-        body:
-            'Coming Next Phase. This page will route service requests for marketing, content, technical, AI, white label, and partnership review.',
+        subtitle: 'Commerce Intake + Service Request',
+        disclaimer:
+            'This is an intake request only. Mental Smile will review the request and contact you manually. No quote, approval, payment, or execution is guaranteed by submitting this form.',
+        submitLabel: 'Submit request - coming next phase',
+        fields: [
+          _PortalReadOnlyField(label: 'Requester name'),
+          _PortalReadOnlyField(label: 'Email'),
+          _PortalReadOnlyField(label: 'Phone'),
+          _PortalReadOnlyField(label: 'Organization name'),
+          _PortalSelectField(
+            label: 'Service type',
+            value: 'Marketing Campaign',
+            options: [
+              'Marketing Campaign',
+              'Content Creation',
+              'Technical Service',
+              'AI Service',
+              'White Label / Tenant',
+              'Partnership',
+            ],
+          ),
+          _PortalReadOnlyField(label: 'Request summary', maxLines: 4),
+          _PortalReadOnlyField(label: 'Budget range'),
+          _PortalReadOnlyField(label: 'Timeline'),
+          _PortalBooleanField(label: 'Needs discovery call'),
+          _PortalReadOnlyField(label: 'Notes', maxLines: 3),
+        ],
       ),
     );
   }
@@ -102,13 +126,34 @@ class PortalPackageRequestPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _PortalScaffold(
+    return _PortalScaffold(
       currentRoute: '/request/package',
-      child: _PortalTextPage(
+      child: _PortalIntakePage(
         title: 'Package Request',
-        subtitle: 'Phase 1 Intake Placeholder',
-        body:
-            'Coming Next Phase. This page will route subscription, verification, visibility, tools, AI, and optional module requests for manual review.',
+        subtitle: 'Package + Subscription Intake',
+        disclaimer:
+            'Package requests are reviewed manually. Payment instructions and receipts are issued only after review by Mental Smile.',
+        submitLabel: 'Request package - coming next phase',
+        fields: [
+          _PortalReadOnlyField(label: 'Requester name'),
+          _PortalReadOnlyField(label: 'Email'),
+          _PortalReadOnlyField(label: 'Phone'),
+          _PortalReadOnlyField(label: 'Provider / center name'),
+          _PortalSelectField(
+            label: 'Package type',
+            value: 'Subscription',
+            options: [
+              'Subscription',
+              'Verification',
+              'Visibility Package',
+              'Tool / AI Package',
+              'Optional Module Rental',
+            ],
+          ),
+          _PortalReadOnlyField(label: 'Billing preference'),
+          _PortalBooleanField(label: 'Needs quote'),
+          _PortalReadOnlyField(label: 'Notes', maxLines: 3),
+        ],
       ),
     );
   }
@@ -119,13 +164,33 @@ class PortalContactPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _PortalScaffold(
+    return _PortalScaffold(
       currentRoute: '/contact',
-      child: _PortalTextPage(
+      child: _PortalIntakePage(
         title: 'Contact',
-        subtitle: 'Phase 1 Contact Placeholder',
-        body:
-            'Coming Next Phase. This page will provide a simple email-driven contact intake without backend or form submission logic.',
+        subtitle: 'General Contact Gateway',
+        disclaimer:
+            'This contact form is for general intake only. Urgent or emergency support is not handled through this portal.',
+        submitLabel: 'Send message - coming next phase',
+        fields: [
+          _PortalReadOnlyField(label: 'Name'),
+          _PortalReadOnlyField(label: 'Email'),
+          _PortalReadOnlyField(label: 'Phone'),
+          _PortalSelectField(
+            label: 'Topic',
+            value: 'General inquiry',
+            options: [
+              'General inquiry',
+              'Provider question',
+              'Center question',
+              'Business request',
+              'Support program',
+              'Other',
+            ],
+          ),
+          _PortalReadOnlyField(label: 'Message', maxLines: 4),
+          _PortalReadOnlyField(label: 'Preferred contact method'),
+        ],
       ),
     );
   }
@@ -366,6 +431,177 @@ class _PortalTextPage extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PortalIntakePage extends StatelessWidget {
+  const _PortalIntakePage({
+    required this.title,
+    required this.subtitle,
+    required this.disclaimer,
+    required this.submitLabel,
+    required this.fields,
+  });
+
+  final String title;
+  final String subtitle;
+  final String disclaimer;
+  final String submitLabel;
+  final List<Widget> fields;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          title,
+          style: const TextStyle(
+            color: Color(0xFF172033),
+            fontSize: 40,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          subtitle,
+          style: const TextStyle(
+            color: Color(0xFF4A6CF7),
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 18),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF8E6),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFE8D8A8)),
+          ),
+          child: Text(
+            disclaimer,
+            style: const TextStyle(
+              color: Color(0xFF5E4B1B),
+              fontSize: 15,
+              height: 1.45,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        const SizedBox(height: 22),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 760),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE1E5EE)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  const Text(
+                    'Phase 1 UI only',
+                    style: TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  for (final field in fields) ...[
+                    field,
+                    const SizedBox(height: 14),
+                  ],
+                  FilledButton(
+                    onPressed: null,
+                    child: Text(submitLabel),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PortalReadOnlyField extends StatelessWidget {
+  const _PortalReadOnlyField({
+    required this.label,
+    this.maxLines = 1,
+  });
+
+  final String label;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      readOnly: true,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        labelText: label,
+        helperText: 'Coming next phase',
+        border: const OutlineInputBorder(),
+      ),
+    );
+  }
+}
+
+class _PortalSelectField extends StatelessWidget {
+  const _PortalSelectField({
+    required this.label,
+    required this.value,
+    required this.options,
+  });
+
+  final String label;
+  final String value;
+  final List<String> options;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<String>(
+      initialValue: value,
+      decoration: InputDecoration(
+        labelText: label,
+        helperText: 'Coming next phase',
+        border: const OutlineInputBorder(),
+      ),
+      items: options
+          .map(
+            (option) => DropdownMenuItem<String>(
+              value: option,
+              child: Text(option),
+            ),
+          )
+          .toList(),
+      onChanged: null,
+    );
+  }
+}
+
+class _PortalBooleanField extends StatelessWidget {
+  const _PortalBooleanField({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return CheckboxListTile(
+      value: false,
+      onChanged: null,
+      contentPadding: EdgeInsets.zero,
+      title: Text(label),
+      subtitle: const Text('Coming next phase'),
+      controlAffinity: ListTileControlAffinity.leading,
     );
   }
 }
