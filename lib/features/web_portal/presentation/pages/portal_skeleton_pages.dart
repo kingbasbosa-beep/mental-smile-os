@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PortalHomePage extends StatelessWidget {
   const PortalHomePage({super.key});
@@ -88,17 +89,19 @@ class PortalServiceRequestPage extends StatelessWidget {
     return _PortalScaffold(
       currentRoute: '/request/service',
       child: _PortalIntakePage(
+        intakeType: _PortalIntakeType.service,
         title: 'Service Request',
         subtitle: 'Commerce Intake + Service Request',
         disclaimer:
             'This is an intake request only. Mental Smile will review the request and contact you manually. No quote, approval, payment, or execution is guaranteed by submitting this form.',
-        submitLabel: 'Submit request - coming next phase',
+        submitLabel: 'Open Gmail Draft / فتح مسودة Gmail',
         fields: [
-          _PortalReadOnlyField(label: 'Requester name'),
-          _PortalReadOnlyField(label: 'Email'),
-          _PortalReadOnlyField(label: 'Phone'),
-          _PortalReadOnlyField(label: 'Organization name'),
-          _PortalSelectField(
+          _PortalTextFieldSpec(key: 'requester', label: 'Requester name'),
+          _PortalTextFieldSpec(key: 'email', label: 'Email'),
+          _PortalTextFieldSpec(key: 'phone', label: 'Phone'),
+          _PortalTextFieldSpec(key: 'organization', label: 'Organization name'),
+          _PortalSelectFieldSpec(
+            key: 'serviceType',
             label: 'Service type',
             value: 'Marketing Campaign',
             options: [
@@ -110,11 +113,18 @@ class PortalServiceRequestPage extends StatelessWidget {
               'Partnership',
             ],
           ),
-          _PortalReadOnlyField(label: 'Request summary', maxLines: 4),
-          _PortalReadOnlyField(label: 'Budget range'),
-          _PortalReadOnlyField(label: 'Timeline'),
-          _PortalBooleanField(label: 'Needs discovery call'),
-          _PortalReadOnlyField(label: 'Notes', maxLines: 3),
+          _PortalTextFieldSpec(
+            key: 'summary',
+            label: 'Request summary',
+            maxLines: 4,
+          ),
+          _PortalTextFieldSpec(key: 'budget', label: 'Budget range'),
+          _PortalTextFieldSpec(key: 'timeline', label: 'Timeline'),
+          _PortalBooleanFieldSpec(
+            key: 'discoveryCall',
+            label: 'Needs discovery call',
+          ),
+          _PortalTextFieldSpec(key: 'notes', label: 'Notes', maxLines: 3),
         ],
       ),
     );
@@ -129,17 +139,22 @@ class PortalPackageRequestPage extends StatelessWidget {
     return _PortalScaffold(
       currentRoute: '/request/package',
       child: _PortalIntakePage(
+        intakeType: _PortalIntakeType.package,
         title: 'Package Request',
         subtitle: 'Package + Subscription Intake',
         disclaimer:
             'Package requests are reviewed manually. Payment instructions and receipts are issued only after review by Mental Smile.',
-        submitLabel: 'Request package - coming next phase',
+        submitLabel: 'Open Gmail Draft / فتح مسودة Gmail',
         fields: [
-          _PortalReadOnlyField(label: 'Requester name'),
-          _PortalReadOnlyField(label: 'Email'),
-          _PortalReadOnlyField(label: 'Phone'),
-          _PortalReadOnlyField(label: 'Provider / center name'),
-          _PortalSelectField(
+          _PortalTextFieldSpec(key: 'requester', label: 'Requester name'),
+          _PortalTextFieldSpec(key: 'email', label: 'Email'),
+          _PortalTextFieldSpec(key: 'phone', label: 'Phone'),
+          _PortalTextFieldSpec(
+            key: 'providerCenter',
+            label: 'Provider / center name',
+          ),
+          _PortalSelectFieldSpec(
+            key: 'packageType',
             label: 'Package type',
             value: 'Subscription',
             options: [
@@ -150,9 +165,12 @@ class PortalPackageRequestPage extends StatelessWidget {
               'Optional Module Rental',
             ],
           ),
-          _PortalReadOnlyField(label: 'Billing preference'),
-          _PortalBooleanField(label: 'Needs quote'),
-          _PortalReadOnlyField(label: 'Notes', maxLines: 3),
+          _PortalTextFieldSpec(
+            key: 'billingPreference',
+            label: 'Billing preference',
+          ),
+          _PortalBooleanFieldSpec(key: 'needsQuote', label: 'Needs quote'),
+          _PortalTextFieldSpec(key: 'notes', label: 'Notes', maxLines: 3),
         ],
       ),
     );
@@ -167,16 +185,18 @@ class PortalContactPage extends StatelessWidget {
     return _PortalScaffold(
       currentRoute: '/contact',
       child: _PortalIntakePage(
+        intakeType: _PortalIntakeType.contact,
         title: 'Contact',
         subtitle: 'General Contact Gateway',
         disclaimer:
             'This contact form is for general intake only. Urgent or emergency support is not handled through this portal.',
-        submitLabel: 'Send message - coming next phase',
+        submitLabel: 'Open Gmail Draft / فتح مسودة Gmail',
         fields: [
-          _PortalReadOnlyField(label: 'Name'),
-          _PortalReadOnlyField(label: 'Email'),
-          _PortalReadOnlyField(label: 'Phone'),
-          _PortalSelectField(
+          _PortalTextFieldSpec(key: 'name', label: 'Name'),
+          _PortalTextFieldSpec(key: 'email', label: 'Email'),
+          _PortalTextFieldSpec(key: 'phone', label: 'Phone'),
+          _PortalSelectFieldSpec(
+            key: 'topic',
             label: 'Topic',
             value: 'General inquiry',
             options: [
@@ -188,8 +208,11 @@ class PortalContactPage extends StatelessWidget {
               'Other',
             ],
           ),
-          _PortalReadOnlyField(label: 'Message', maxLines: 4),
-          _PortalReadOnlyField(label: 'Preferred contact method'),
+          _PortalTextFieldSpec(key: 'message', label: 'Message', maxLines: 4),
+          _PortalTextFieldSpec(
+            key: 'preferredContact',
+            label: 'Preferred contact method',
+          ),
         ],
       ),
     );
@@ -435,8 +458,11 @@ class _PortalTextPage extends StatelessWidget {
   }
 }
 
-class _PortalIntakePage extends StatelessWidget {
+enum _PortalIntakeType { service, package, contact }
+
+class _PortalIntakePage extends StatefulWidget {
   const _PortalIntakePage({
+    required this.intakeType,
     required this.title,
     required this.subtitle,
     required this.disclaimer,
@@ -444,11 +470,153 @@ class _PortalIntakePage extends StatelessWidget {
     required this.fields,
   });
 
+  final _PortalIntakeType intakeType;
   final String title;
   final String subtitle;
   final String disclaimer;
   final String submitLabel;
-  final List<Widget> fields;
+  final List<_PortalFieldSpec> fields;
+
+  @override
+  State<_PortalIntakePage> createState() => _PortalIntakePageState();
+}
+
+class _PortalIntakePageState extends State<_PortalIntakePage> {
+  static const String _primaryInbox = 'mentalsmile.platform@gmail.com';
+
+  late final Map<String, TextEditingController> _controllers;
+  late final Map<String, String> _selectValues;
+  late final Map<String, bool> _boolValues;
+
+  @override
+  void initState() {
+    super.initState();
+    _controllers = <String, TextEditingController>{};
+    _selectValues = <String, String>{};
+    _boolValues = <String, bool>{};
+
+    for (final field in widget.fields) {
+      if (field is _PortalTextFieldSpec) {
+        _controllers[field.key] = TextEditingController();
+      } else if (field is _PortalSelectFieldSpec) {
+        _selectValues[field.key] = field.value;
+      } else if (field is _PortalBooleanFieldSpec) {
+        _boolValues[field.key] = false;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final controller in _controllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  String _textValue(String key) => _controllers[key]?.text.trim() ?? '';
+
+  String _selectValue(String key) => _selectValues[key] ?? '';
+
+  String _boolValue(String key) => (_boolValues[key] ?? false) ? 'Yes' : 'No';
+
+  Future<void> _openGmailDraft() async {
+    final nameKey =
+        widget.intakeType == _PortalIntakeType.contact ? 'name' : 'requester';
+    final name = _textValue(nameKey);
+    final email = _textValue('email');
+
+    if (name.isEmpty || email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter name and email before opening Gmail.'),
+        ),
+      );
+      return;
+    }
+
+    final subject = _subject();
+    final body = _body();
+    final uri = Uri.https(
+      'mail.google.com',
+      '/mail/',
+      <String, String>{
+        'view': 'cm',
+        'fs': '1',
+        'to': _primaryInbox,
+        'su': subject,
+        'body': body,
+      },
+    );
+
+    final opened = await launchUrl(uri);
+    if (!opened && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Gmail could not be opened for this request.'),
+        ),
+      );
+    }
+  }
+
+  String _subject() {
+    switch (widget.intakeType) {
+      case _PortalIntakeType.service:
+        return '[Mental Smile Service Request] ${_selectValue('serviceType')}';
+      case _PortalIntakeType.package:
+        return '[Mental Smile Package Request]';
+      case _PortalIntakeType.contact:
+        return '[Mental Smile Contact Request]';
+    }
+  }
+
+  String _body() {
+    switch (widget.intakeType) {
+      case _PortalIntakeType.service:
+        return '''
+Mental Smile Service Request
+
+Requester name: ${_textValue('requester')}
+Email: ${_textValue('email')}
+Phone: ${_textValue('phone')}
+Organization: ${_textValue('organization')}
+Service type: ${_selectValue('serviceType')}
+Budget: ${_textValue('budget')}
+Timeline: ${_textValue('timeline')}
+Discovery call: ${_boolValue('discoveryCall')}
+Notes: ${_textValue('notes')}
+
+Request summary:
+${_textValue('summary')}
+''';
+      case _PortalIntakeType.package:
+        return '''
+Mental Smile Package Request
+
+Requester: ${_textValue('requester')}
+Email: ${_textValue('email')}
+Phone: ${_textValue('phone')}
+Provider / center: ${_textValue('providerCenter')}
+Package type: ${_selectValue('packageType')}
+Billing preference: ${_textValue('billingPreference')}
+Quote request: ${_boolValue('needsQuote')}
+Notes: ${_textValue('notes')}
+''';
+      case _PortalIntakeType.contact:
+        return '''
+Mental Smile Contact Request
+
+Name: ${_textValue('name')}
+Email: ${_textValue('email')}
+Phone: ${_textValue('phone')}
+Topic: ${_selectValue('topic')}
+Preferred contact method: ${_textValue('preferredContact')}
+
+Message:
+${_textValue('message')}
+''';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -456,7 +624,7 @@ class _PortalIntakePage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          title,
+          widget.title,
           style: const TextStyle(
             color: Color(0xFF172033),
             fontSize: 40,
@@ -465,7 +633,7 @@ class _PortalIntakePage extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          subtitle,
+          widget.subtitle,
           style: const TextStyle(
             color: Color(0xFF4A6CF7),
             fontSize: 22,
@@ -482,7 +650,7 @@ class _PortalIntakePage extends StatelessWidget {
             border: Border.all(color: const Color(0xFFE8D8A8)),
           ),
           child: Text(
-            disclaimer,
+            widget.disclaimer,
             style: const TextStyle(
               color: Color(0xFF5E4B1B),
               fontSize: 15,
@@ -514,13 +682,13 @@ class _PortalIntakePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  for (final field in fields) ...[
-                    field,
+                  for (final field in widget.fields) ...[
+                    _buildField(field),
                     const SizedBox(height: 14),
                   ],
                   FilledButton(
-                    onPressed: null,
-                    child: Text(submitLabel),
+                    onPressed: _openGmailDraft,
+                    child: Text(widget.submitLabel),
                   ),
                 ],
               ),
@@ -530,80 +698,93 @@ class _PortalIntakePage extends StatelessWidget {
       ],
     );
   }
-}
 
-class _PortalReadOnlyField extends StatelessWidget {
-  const _PortalReadOnlyField({
-    required this.label,
-    this.maxLines = 1,
-  });
-
-  final String label;
-  final int maxLines;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      readOnly: true,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: label,
-        helperText: 'Coming next phase',
-        border: const OutlineInputBorder(),
-      ),
-    );
+  Widget _buildField(_PortalFieldSpec field) {
+    if (field is _PortalTextFieldSpec) {
+      return TextFormField(
+        controller: _controllers[field.key],
+        maxLines: field.maxLines,
+        decoration: InputDecoration(
+          labelText: field.label,
+          border: const OutlineInputBorder(),
+        ),
+      );
+    }
+    if (field is _PortalSelectFieldSpec) {
+      return DropdownButtonFormField<String>(
+        value: _selectValues[field.key],
+        decoration: InputDecoration(
+          labelText: field.label,
+          border: const OutlineInputBorder(),
+        ),
+        items: field.options
+            .map(
+              (option) => DropdownMenuItem<String>(
+                value: option,
+                child: Text(option),
+              ),
+            )
+            .toList(),
+        onChanged: (value) {
+          if (value == null) return;
+          setState(() => _selectValues[field.key] = value);
+        },
+      );
+    }
+    if (field is _PortalBooleanFieldSpec) {
+      return CheckboxListTile(
+        value: _boolValues[field.key] ?? false,
+        onChanged: (value) {
+          setState(() => _boolValues[field.key] = value ?? false);
+        },
+        contentPadding: EdgeInsets.zero,
+        title: Text(field.label),
+        controlAffinity: ListTileControlAffinity.leading,
+      );
+    }
+    return const SizedBox.shrink();
   }
 }
 
-class _PortalSelectField extends StatelessWidget {
-  const _PortalSelectField({
+abstract class _PortalFieldSpec {
+  const _PortalFieldSpec({
     required this.label,
+  });
+
+  final String label;
+}
+
+class _PortalTextFieldSpec extends _PortalFieldSpec {
+  const _PortalTextFieldSpec({
+    required this.key,
+    required super.label,
+    this.maxLines = 1,
+  });
+
+  final String key;
+  final int maxLines;
+}
+
+class _PortalSelectFieldSpec extends _PortalFieldSpec {
+  const _PortalSelectFieldSpec({
+    required this.key,
+    required super.label,
     required this.value,
     required this.options,
   });
 
-  final String label;
+  final String key;
   final String value;
   final List<String> options;
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      decoration: InputDecoration(
-        labelText: label,
-        helperText: 'Coming next phase',
-        border: const OutlineInputBorder(),
-      ),
-      items: options
-          .map(
-            (option) => DropdownMenuItem<String>(
-              value: option,
-              child: Text(option),
-            ),
-          )
-          .toList(),
-      onChanged: null,
-    );
-  }
 }
 
-class _PortalBooleanField extends StatelessWidget {
-  const _PortalBooleanField({required this.label});
+class _PortalBooleanFieldSpec extends _PortalFieldSpec {
+  const _PortalBooleanFieldSpec({
+    required this.key,
+    required super.label,
+  });
 
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return CheckboxListTile(
-      value: false,
-      onChanged: null,
-      contentPadding: EdgeInsets.zero,
-      title: Text(label),
-      subtitle: const Text('Coming next phase'),
-      controlAffinity: ListTileControlAffinity.leading,
-    );
-  }
+  final String key;
 }
 
 class _PortalActionButton extends StatelessWidget {
