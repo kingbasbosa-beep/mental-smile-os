@@ -158,6 +158,27 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const SizedBox(height: 16),
+                              const Text(
+                                'Service disclosure step: prices and capabilities are provider-declared information for review. This is not a payment, booking, or activation promise.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.35,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextButton(
+                                onPressed: () => Navigator.of(context)
+                                    .pushNamed(Routes.portalHome),
+                                child: Text(
+                                  isArabic
+                                      ? 'العودة إلى بوابة Mental Smile'
+                                      : 'Back to Mental Smile Portal',
+                                ),
+                              ),
+                              const SizedBox(height: 8),
                               _capabilityTile(
                                 isArabic
                                     ? 'يدعم حالات الإدمان المصابة بفيروس نقص المناعة'

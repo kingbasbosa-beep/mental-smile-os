@@ -123,59 +123,104 @@ class _SplashPageState extends ConsumerState<SplashPage> {
               alignment: Alignment.centerRight,
               child: Padding(
                 padding: const EdgeInsets.only(right: 92),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pushReplacementNamed(Routes.login);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 22, vertical: 14),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(999),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFFFFF4C2),
-                          Color(0xFFD4AF37),
-                          Color(0xFF7A4E12),
-                        ],
-                      ),
-                      border: Border.all(
-                        color: const Color(0xFFFFE8A3),
-                        width: 1.3,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color:
-                              const Color(0xFFD4AF37).withValues(alpha: 0.65),
-                          blurRadius: 24,
-                          spreadRadius: 3,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed(Routes.login);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 22,
+                          vertical: 14,
                         ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          isArabic ? 'ابدأ الرحلة' : 'Start Journey',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Color(0xFFF4F1E8),
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.3,
-                            shadows: [
-                              Shadow(
-                                color: Colors.black54,
-                                blurRadius: 6,
-                                offset: Offset(0, 1),
-                              ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(999),
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFFFFF4C2),
+                              Color(0xFFD4AF37),
+                              Color(0xFF7A4E12),
                             ],
                           ),
+                          border: Border.all(
+                            color: const Color(0xFFFFE8A3),
+                            width: 1.3,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFD4AF37)
+                                  .withValues(alpha: 0.65),
+                              blurRadius: 24,
+                              spreadRadius: 3,
+                            ),
+                          ],
                         ),
-                      ],
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              isArabic ? 'ابدأ الرحلة' : 'Start Journey',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Color(0xFFF4F1E8),
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.3,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black54,
+                                    blurRadius: 6,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context)
+                            .pushReplacementNamed(Routes.portalHome);
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFFFFE8A3),
+                        backgroundColor: Colors.black.withValues(alpha: 0.18),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(999),
+                          side: BorderSide(
+                            color: const Color(0xFFFFE8A3)
+                                .withValues(alpha: 0.34),
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        isArabic
+                            ? 'العودة إلى بوابة الويب'
+                            : 'Back to Web Portal',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black54,
+                              blurRadius: 4,
+                              offset: Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

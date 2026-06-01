@@ -157,6 +157,30 @@ class _WebCenterMediaPageState extends State<WebCenterMediaPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const SizedBox(height: 16),
+                              const Text(
+                                'Media review step: images and links are submitted for review only. Submission does not mean automatic approval, activation, booking, or visibility.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.35,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextButton(
+                                onPressed: () => Navigator.of(context)
+                                    .pushNamed(Routes.portalHome),
+                                child: Text(
+                                  Localizations.localeOf(context)
+                                              .languageCode
+                                              .toLowerCase() ==
+                                          'ar'
+                                      ? 'العودة إلى بوابة Mental Smile'
+                                      : 'Back to Mental Smile Portal',
+                                ),
+                              ),
+                              const SizedBox(height: 8),
                               _textField(
                                 _frontImageController,
                                 l10n.webCenterFrontImageUrl,

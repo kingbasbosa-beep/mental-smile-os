@@ -255,6 +255,27 @@ class _WebCenterRegisterPortalPageState
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               SizedBox(height: isLandscapeCompact ? 8 : 14),
+                              const Text(
+                                'Intake / Review Request: submitting this data or creating an account does not mean automatic approval, activation, payment, booking, or visibility. Licenses and documents remain the applicant responsibility.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.35,
+                                ),
+                              ),
+                              SizedBox(height: compactGap),
+                              TextButton(
+                                onPressed: () => Navigator.of(context)
+                                    .pushNamed(Routes.portalHome),
+                                child: Text(
+                                  isArabic
+                                      ? 'العودة إلى بوابة Mental Smile'
+                                      : 'Back to Mental Smile Portal',
+                                ),
+                              ),
+                              SizedBox(height: compactGap),
                               TextFormField(
                                 controller: _centerNameController,
                                 style: const TextStyle(

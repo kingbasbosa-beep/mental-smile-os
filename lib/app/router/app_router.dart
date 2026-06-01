@@ -16,6 +16,7 @@ import 'package:flutterprojects/features/web_registration/presentation/pages/web
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_sessions_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_documents_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_registration_success_page.dart';
+import 'package:flutterprojects/features/web_portal/presentation/pages/portal_skeleton_pages.dart';
 
 import 'package:flutterprojects/features/booking/presentation/pages/booking_page.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/booking_request_page.dart';
@@ -658,6 +659,51 @@ class AppRouter {
       case Routes.menu:
         return MaterialPageRoute(
           builder: (_) => const MenuPage(),
+          settings: settings,
+        );
+
+      case Routes.portalHome:
+        return MaterialPageRoute(
+          builder: (_) => const PortalHomePage(),
+          settings: settings,
+        );
+
+      case Routes.portalAbout:
+        return MaterialPageRoute(
+          builder: (_) => const PortalAboutPage(),
+          settings: settings,
+        );
+
+      case Routes.portalLibrary:
+        return MaterialPageRoute(
+          builder: (_) => LibraryPage(
+            initialCategoryKey: _libraryCategoryKey(settings),
+            returnRoute: Routes.portalHome,
+          ),
+          settings: settings,
+        );
+
+      case Routes.portalProviderRegister:
+        return MaterialPageRoute(
+          builder: (_) => const WebClinicianRegisterPortalPage(),
+          settings: settings,
+        );
+
+      case Routes.portalServiceRequest:
+        return MaterialPageRoute(
+          builder: (_) => const PortalServiceRequestPage(),
+          settings: settings,
+        );
+
+      case Routes.portalPackageRequest:
+        return MaterialPageRoute(
+          builder: (_) => const PortalPackageRequestPage(),
+          settings: settings,
+        );
+
+      case Routes.portalContact:
+        return MaterialPageRoute(
+          builder: (_) => const PortalContactPage(),
           settings: settings,
         );
 

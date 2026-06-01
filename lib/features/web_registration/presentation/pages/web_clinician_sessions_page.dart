@@ -141,6 +141,30 @@ class _WebClinicianSessionsPageState extends State<WebClinicianSessionsPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const SizedBox(height: 16),
+                              const Text(
+                                'Service disclosure step: prices, duration, and delivery options are reviewed as provider-declared information. This is not a booking, payment, or session promise.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.35,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextButton(
+                                onPressed: () => Navigator.of(context)
+                                    .pushNamed(Routes.portalHome),
+                                child: Text(
+                                  Localizations.localeOf(context)
+                                              .languageCode
+                                              .toLowerCase() ==
+                                          'ar'
+                                      ? 'العودة إلى بوابة Mental Smile'
+                                      : 'Back to Mental Smile Portal',
+                                ),
+                              ),
+                              const SizedBox(height: 8),
                               _textField(
                                 _sessionPriceController,
                                 l10n.webClinicianSessionPrice,

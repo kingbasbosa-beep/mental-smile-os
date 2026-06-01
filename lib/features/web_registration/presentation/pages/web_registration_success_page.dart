@@ -54,8 +54,8 @@ class WebRegistrationSuccessPage extends StatelessWidget {
                               ? 'تم إرسال طلب تسجيل الأخصائي بنجاح.'
                               : 'تم إرسال طلب تسجيل المركز بنجاح.')
                           : (isClinician
-                              ? 'Your clinician registration request has been submitted successfully.'
-                              : 'Your center registration request has been submitted successfully.'),
+                              ? 'Your clinician intake/review request has been submitted successfully.'
+                              : 'Your center intake/review request has been submitted successfully.'),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Color(0xFFE8C878),
@@ -84,6 +84,46 @@ class WebRegistrationSuccessPage extends StatelessWidget {
                           Shadow(color: Colors.black, blurRadius: 8),
                         ],
                       ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'This is an intake/review request only. Submission does not mean automatic approval, immediate activation, payment, booking, or guaranteed visibility. Mental Smile will contact you after review.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        height: 1.35,
+                        shadows: [
+                          Shadow(color: Colors.black, blurRadius: 8),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context)
+                              .pushNamed(Routes.portalHome),
+                          child: Text(
+                            isArabic
+                                ? 'العودة إلى بوابة الويب'
+                                : 'Back to Web Portal',
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () =>
+                              Navigator.of(context).pushNamed(Routes.splash),
+                          child: Text(
+                            isArabic
+                                ? 'الدخول إلى التطبيق'
+                                : 'Open Mental Smile App',
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

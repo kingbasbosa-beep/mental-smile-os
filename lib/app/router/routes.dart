@@ -1,4 +1,14 @@
 class Routes {
+  // Web Portal Phase 1 Skeleton
+  static const portalHome = '/';
+  static const portalAbout = '/about';
+  static const portalLibrary = '/library';
+  static const portalProviderRegister = '/register/provider';
+  static const portalServiceRequest = '/request/service';
+  static const portalPackageRequest = '/request/package';
+  static const portalContact = '/contact';
+  static const splash = '/splash';
+
   // Web Registration Portal
   static const webCenterRegister = '/web/center/register';
   static const webCenterProfile = '/web/center/profile';
@@ -12,7 +22,6 @@ class Routes {
   static const webLibrary = '/web/library';
   static const webLibraryPolicy = '/web/library/policy';
   static const webRegistrationSuccess = '/web/register/success';
-  static const splash = '/';
   static const language = '/language';
   // Shell alias: /home intentionally opens the operational menu hub.
   // HomePage remains a welcome/legacy entry surface, not the primary shell.
