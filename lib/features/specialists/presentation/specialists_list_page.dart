@@ -80,17 +80,95 @@ class SpecialistsListPage extends StatelessWidget {
     if (value.isNotEmpty) return value;
     return isArabic ? 'لا توجد نبذة متاحة حاليًا.' : 'No bio available yet.';
   }
-
-  String _price(Map<String, dynamic> data, bool isArabic) {
-    final value = (data['sessionPriceText'] ?? '').toString().trim();
-    if (value.isNotEmpty) return value;
-    return isArabic ? 'يحدد لاحقًا' : 'To be determined';
+  List<String> _stringList(dynamic value) {
+    if (value is List) {
+      return value
+          .map((e) => e.toString().trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+    }
+    return const [];
   }
 
-  String _duration(Map<String, dynamic> data, bool isArabic) {
-    final value = (data['sessionDurationText'] ?? '').toString().trim();
-    if (value.isNotEmpty) return value;
-    return isArabic ? 'غير محددة' : 'Not specified';
+  String _providerSignalLabel(String key, bool isArabic) {
+    if (isArabic) {
+      switch (key) {
+        case 'addiction_counselor':
+        case 'recovery_support':
+          return 'إدمان وتعافي';
+        case 'family_counselor':
+        case 'family_support':
+          return 'مشورة أسرية';
+        case 'children_support':
+          return 'أطفال';
+        case 'speech_specialist':
+        case 'speech_support':
+          return 'تخاطب';
+        case 'coach':
+          return 'كوتشينج';
+        case 'hearing_support':
+          return 'دعم صعوبات السمع';
+        case 'text_based_support':
+        case 'text':
+          return 'تواصل نصي';
+        case 'clinical_psychologist':
+        case 'psychologist':
+        case 'mental_health_support':
+          return 'دعم نفسي';
+      }
+    }
+
+    switch (key) {
+      case 'addiction_counselor':
+      case 'recovery_support':
+        return 'Recovery support';
+      case 'family_counselor':
+      case 'family_support':
+        return 'Family support';
+      case 'children_support':
+        return 'Children';
+      case 'speech_specialist':
+      case 'speech_support':
+        return 'Speech support';
+      case 'coach':
+        return 'Coaching';
+      case 'hearing_support':
+        return 'Hearing support';
+      case 'text_based_support':
+      case 'text':
+        return 'Text support';
+      case 'clinical_psychologist':
+      case 'psychologist':
+      case 'mental_health_support':
+        return 'Mental health support';
+    }
+    return '';
+  }
+
+  List<String> _providerSignalBadges(
+    Map<String, dynamic> data,
+    bool isArabic, {
+    int max = 3,
+  }) {
+    // [S] Provider Signals
+    // Approved by Wave S-3 Classification Board.
+    // Display-only signal badges; do not couple to booking/session/payment.
+    final signals = data['providerSignals'];
+    if (signals is! Map) return const [];
+    final keys = <String>[
+      ..._stringList(signals['capabilitySignals']),
+      ..._stringList(signals['accessibilitySignals']),
+      ..._stringList(signals['communicationSignals']),
+    ];
+    final labels = <String>[];
+    for (final key in keys) {
+      final label = _providerSignalLabel(key, isArabic);
+      if (label.isNotEmpty && !labels.contains(label)) {
+        labels.add(label);
+      }
+      if (labels.length >= max) break;
+    }
+    return labels;
   }
 
   String _initials(String name) {
@@ -221,8 +299,8 @@ class SpecialistsListPage extends StatelessWidget {
                             final name = _displayName(data, isArabic);
                             final specialty = _specialty(data, isArabic);
                             final bio = _bio(data, isArabic);
-                            final price = _price(data, isArabic);
-                            final duration = _duration(data, isArabic);
+                            final signalBadges =
+                                _providerSignalBadges(data, isArabic);
                             final photoAsset =
                                 (data['photoAsset'] ?? '').toString().trim();
                             final photoUrl = _safePhotoUrl(
@@ -233,8 +311,6 @@ class SpecialistsListPage extends StatelessWidget {
                                 : (photoAsset.startsWith('assets/')
                                     ? safeAssetImageProvider(photoAsset)
                                     : null);
-                            final offersGroups =
-                                (data['offersGroupSessions'] ?? false) == true;
 
                             return InkWell(
                               borderRadius: BorderRadius.circular(24),
@@ -340,6 +416,12 @@ class SpecialistsListPage extends StatelessWidget {
                                       ],
                                     ),
                                     const SizedBox(height: 12),
+                                    _ProviderCardSignalBadges(
+                                      labels: signalBadges,
+                                      alignEnd: isArabic,
+                                    ),
+                                    if (signalBadges.isNotEmpty)
+                                      const SizedBox(height: 10),
                                     Text(
                                       bio,
                                       maxLines: 3,
@@ -356,58 +438,6 @@ class SpecialistsListPage extends StatelessWidget {
                                                 .withValues(alpha: 0.84),
                                           ),
                                     ),
-                                    const SizedBox(height: 14),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: _MiniInfoBox(
-                                            title: isArabic ? 'السعر' : 'Price',
-                                            value: price,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: _MiniInfoBox(
-                                            title:
-                                                isArabic ? 'المدة' : 'Duration',
-                                            value: duration,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    if (offersGroups) ...[
-                                      const SizedBox(height: 10),
-                                      Align(
-                                        alignment: isArabic
-                                            ? Alignment.centerRight
-                                            : Alignment.centerLeft,
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 7,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFE7C766)
-                                                .withValues(alpha: 0.16),
-                                            borderRadius:
-                                                BorderRadius.circular(999),
-                                            border: Border.all(
-                                              color: const Color(0xFFE7C766)
-                                                  .withValues(alpha: 0.30),
-                                            ),
-                                          ),
-                                          child: Text(
-                                            isArabic
-                                                ? 'يقدم جروبات جماعية'
-                                                : 'Offers group sessions',
-                                            style: const TextStyle(
-                                              color: Color(0xFFFFE7B2),
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
                                     const Spacer(),
                                     SizedBox(
                                       width: double.infinity,
@@ -633,6 +663,48 @@ class _MiniInfoBox extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ProviderCardSignalBadges extends StatelessWidget {
+  const _ProviderCardSignalBadges({
+    required this.labels,
+    required this.alignEnd,
+  });
+
+  final List<String> labels;
+  final bool alignEnd;
+
+  @override
+  Widget build(BuildContext context) {
+    if (labels.isEmpty) return const SizedBox.shrink();
+
+    return Wrap(
+      alignment: alignEnd ? WrapAlignment.end : WrapAlignment.start,
+      spacing: 6,
+      runSpacing: 6,
+      children: [
+        for (final label in labels)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE7C766).withValues(alpha: 0.13),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(
+                color: const Color(0xFFE7C766).withValues(alpha: 0.28),
+              ),
+            ),
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Color(0xFFFFE7B2),
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

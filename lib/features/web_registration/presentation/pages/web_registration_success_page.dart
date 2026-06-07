@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
@@ -51,8 +51,8 @@ class WebRegistrationSuccessPage extends StatelessWidget {
                     Text(
                       isArabic
                           ? (isClinician
-                              ? 'تم إرسال طلب تسجيل الأخصائي بنجاح.'
-                              : 'تم إرسال طلب تسجيل المركز بنجاح.')
+                              ? 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ Ø¨Ù†Ø¬Ø§Ø­.'
+                              : 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…Ø±ÙƒØ² Ø¨Ù†Ø¬Ø§Ø­.')
                           : (isClinician
                               ? 'Your clinician intake/review request has been submitted successfully.'
                               : 'Your center intake/review request has been submitted successfully.'),
@@ -70,8 +70,8 @@ class WebRegistrationSuccessPage extends StatelessWidget {
                     Text(
                       isArabic
                           ? (isClinician
-                              ? 'سيتم مراجعة بيانات الأخصائي قبل التفعيل.'
-                              : 'سيتم مراجعة بيانات المركز قبل التفعيل.')
+                              ? 'Ø³ÙŠØªÙ… Ù…Ø±Ø§Ø¬Ø¹Ø© Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ Ù‚Ø¨Ù„ Ø§Ù„ØªÙØ¹ÙŠÙ„.'
+                              : 'Ø³ÙŠØªÙ… Ù…Ø±Ø§Ø¬Ø¹Ø© Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ² Ù‚Ø¨Ù„ Ø§Ù„ØªÙØ¹ÙŠÙ„.')
                           : (isClinician
                               ? 'Your clinician information will be reviewed before activation.'
                               : 'Your center information will be reviewed before activation.'),
@@ -87,7 +87,7 @@ class WebRegistrationSuccessPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     const Text(
-                      'This is an intake/review request only. Submission does not mean automatic approval, immediate activation, payment, booking, or guaranteed visibility. Mental Smile will contact you after review.',
+                      'This is an intake/review request only. Submission does not mean automatic approval, immediate activation, lifecycle ownership, or guaranteed visibility. Mental Smile will contact you after review.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white70,
@@ -110,7 +110,7 @@ class WebRegistrationSuccessPage extends StatelessWidget {
                               .pushNamed(Routes.portalHome),
                           child: Text(
                             isArabic
-                                ? 'العودة إلى بوابة الويب'
+                                ? 'Ø§Ù„Ø¹ÙˆØ¯Ø© Ø¥Ù„Ù‰ Ø¨ÙˆØ§Ø¨Ø© Ø§Ù„ÙˆÙŠØ¨'
                                 : 'Back to Web Portal',
                           ),
                         ),
@@ -119,7 +119,7 @@ class WebRegistrationSuccessPage extends StatelessWidget {
                               Navigator.of(context).pushNamed(Routes.splash),
                           child: Text(
                             isArabic
-                                ? 'الدخول إلى التطبيق'
+                                ? 'Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¥Ù„Ù‰ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚'
                                 : 'Open Mental Smile App',
                           ),
                         ),
@@ -135,3 +135,4 @@ class WebRegistrationSuccessPage extends StatelessWidget {
     );
   }
 }
+

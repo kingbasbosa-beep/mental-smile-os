@@ -21,6 +21,38 @@ service cloud.firestore {
       return signedIn() && request.auth.token.role == 'admin';
     }
 
+    // TRANSITIONAL AUTHORITY SPLIT
+    // New constitutional roles are introduced before admin is removed.
+    // During transition, legacy admin remains a temporary compatibility
+    // fallback only for roles that have not reached independence yet.
+    // Owner never inherits admin authority.
+    // C-2: monitoring_operator and registry_steward no longer inherit admin.
+    // C-3: declaration_reviewer no longer inherits admin.
+    // C-4: support_observer no longer inherits admin.
+    function hasRole(roleName) {
+      return signedIn() && request.auth.token.role == roleName;
+    }
+
+    function isOwner() {
+      return hasRole('owner');
+    }
+
+    function isMonitoringOperator() {
+      return hasRole('monitoring_operator');
+    }
+
+    function isRegistrySteward() {
+      return hasRole('registry_steward');
+    }
+
+    function isDeclarationReviewer() {
+      return hasRole('declaration_reviewer');
+    }
+
+    function isSupportObserver() {
+      return hasRole('support_observer');
+    }
+
     function isClient() {
       return signedIn() && request.auth.token.role == 'client';
     }
@@ -98,6 +130,12 @@ service cloud.firestore {
           'displayName',
           'avatarAsset',
           'photoUrl',
+          'clientSignals',
+          'privacyPreferences',
+          'roomPreferences',
+          'enabledToolKeys',
+          'roomSchemaVersion',
+          'signalSchemaVersion',
           'updatedAt'
         ]);
     }
@@ -201,6 +239,7 @@ service cloud.firestore {
         'accommodationCosts',
         'autismCareCosts',
         'centerCapabilities',
+        'signalSchemaVersion',
         'services',
         'pricingReady',
         'documentItems',
@@ -256,12 +295,6 @@ service cloud.firestore {
           'note',
           'threadId',
           'contract',
-          'paymentStatus',
-          'payment_confirmed',
-          'paymentReceiptFileName',
-          'paymentReceiptUrl',
-          'paymentSubmittedAt',
-          'paymentClientNote',
           'centerAvailabilityStatus',
           'centerAvailabilityNote',
           'centerAvailabilityUpdatedAt',
@@ -317,7 +350,7 @@ service cloud.firestore {
     }
 
     function profileRequestAdminUpdateValid() {
-      return isAdmin()
+      return isDeclarationReviewer()
         && (
           !request.resource.data.diff(resource.data).affectedKeys().hasAny(['status'])
           || request.resource.data.status in ['approved', 'rejected', 'applied']
@@ -354,82 +387,127 @@ service cloud.firestore {
     }
 
     match /clinicians/{clinicianId} {
-      allow read: if isAdmin()
+      allow read: if isDeclarationReviewer()
         || (signedIn() && clinicianId == uid())
         || approvedActive();
-      allow create: if clinicianCreateValid(clinicianId) || isAdmin();
-      allow update: if isAdmin() || clinicianSelfUpdateValid(clinicianId);
+      allow create: if clinicianCreateValid(clinicianId) || isDeclarationReviewer();
+      allow update: if isDeclarationReviewer() || clinicianSelfUpdateValid(clinicianId);
       allow delete: if false;
     }
 
     match /centers/{centerId} {
-      allow read: if isAdmin()
+      allow read: if isDeclarationReviewer()
         || (signedIn() && centerId == uid())
         || approvedActive();
-      allow create: if centerCreateValid(centerId) || isAdmin();
-      allow update: if isAdmin() || centerSelfUpdateValid(centerId);
+      allow create: if centerCreateValid(centerId) || isDeclarationReviewer();
+      allow update: if isDeclarationReviewer() || centerSelfUpdateValid(centerId);
       allow delete: if false;
     }
 
+    // LEGACY READ/UPDATE ONLY - NO NEW BOOKING AUTHORITY
+    // booking_requests is retained for historical compatibility only.
+    // New booking lifecycle creation is constitutionally frozen.
     match /booking_requests/{requestId} {
       allow get, list: if isAdmin() || isOwnBooking();
-      allow create: if bookingCreateValid() || isAdmin();
+      allow create: if false;
       allow update: if isAdmin() || bookingUserUpdateValid();
       allow delete: if false;
     }
 
+    // ARCHIVE-DEAD LEGACY MIRROR - NO READS, WRITES, OR CREATION.
     match /bookingRequests/{requestId} {
       allow read, write: if false;
     }
 
+    // L-B REMOVED - LEGACY READ ONLY, NO NEW SESSION RATING AUTHORITY.
     match /sessionRatings/{ratingId} {
       allow get, list: if canReadRating();
-      allow create: if ratingWriteValid();
-      allow update: if ratingWriteValid()
-        && resource.data.reviewerUid == uid()
-        && request.resource.data.reviewerUid == resource.data.reviewerUid
-        && request.resource.data.requestId == resource.data.requestId
-        && request.resource.data.reviewerType == resource.data.reviewerType;
+      allow create, update: if false;
       allow delete: if false;
     }
 
     match /clinician_profile_change_requests/{requestId} {
-      allow read: if isAdmin() || ownClinicianProfileRequest();
+      allow read: if isDeclarationReviewer() || ownClinicianProfileRequest();
       allow create: if profileRequestCreateValid('clinicianId');
       allow update: if profileRequestAdminUpdateValid();
       allow delete: if false;
     }
 
     match /center_profile_change_requests/{requestId} {
-      allow read: if isAdmin() || ownCenterProfileRequest();
+      allow read: if isDeclarationReviewer() || ownCenterProfileRequest();
       allow create: if profileRequestCreateValid('centerId');
       allow update: if profileRequestAdminUpdateValid();
       allow delete: if false;
     }
 
     match /support_requests/{requestId} {
-      allow get, list: if isAdmin()
+      allow get, list: if isSupportObserver()
         || (signedIn() && resource.data.createdByUid == uid());
       allow create: if signedIn()
         && request.resource.data.createdByUid == uid()
         && request.resource.data.status == 'new'
         && request.resource.data.source == 'structured_support';
-      allow update: if isAdmin();
+      allow update: if isSupportObserver();
+      allow delete: if false;
+    }
+
+    match /provider_contact_requests/{requestId} {
+      allow get, list: if isSupportObserver()
+        || (
+          signedIn()
+          && (
+            resource.data.clientId == uid()
+            || resource.data.providerId == uid()
+          )
+        );
+      allow create: if signedIn()
+        && request.resource.data.clientId == uid();
+      allow update, delete: if false;
+    }
+
+    match /center_contact_requests/{requestId} {
+      allow get, list: if isSupportObserver()
+        || (
+          signedIn()
+          && (
+            resource.data.clientId == uid()
+            || resource.data.centerId == uid()
+          )
+        );
+      allow create: if signedIn()
+        && request.resource.data.clientId == uid();
+      allow update, delete: if false;
+    }
+
+    match /saved_destinations/{savedId} {
+      allow get, list: if isSupportObserver()
+        || (signedIn() && resource.data.clientId == uid());
+      allow create: if signedIn()
+        && request.resource.data.clientId == uid();
+      allow update: if signedIn()
+        && resource.data.clientId == uid()
+        && request.resource.data.clientId == resource.data.clientId;
+      allow delete: if false;
+    }
+
+    match /tool_registry/{toolId} {
+      allow read: if signedIn();
+      allow write: if isRegistrySteward();
       allow delete: if false;
     }
 
     match /chat_threads/{threadId} {
-      allow read: if isAdmin()
+      allow read: if isSupportObserver()
         || (signedIn() && resource.data.ownerUid == uid())
         || (signedIn() && resource.data.assignedClinicianUid == uid());
       allow create: if signedIn()
         && request.resource.data.ownerUid == uid();
-      allow update: if isAdmin()
+      allow update: if isSupportObserver()
         || (signedIn() && resource.data.ownerUid == uid());
       allow delete: if false;
 
       match /messages/{messageId} {
-        allow read: if isAdmin()
+        allow read: if isSupportObserver()
           || (
             signedIn()
             && exists(/databases/$(database)/documents/chat_threads/$(threadId))
@@ -445,18 +523,18 @@ service cloud.firestore {
     }
 
     match /chat_escalations/{escalationId} {
-      allow read: if isAdmin()
+      allow read: if isSupportObserver()
         || (
           isClinician()
           && resource.data.assignedToType == 'clinician'
           && resource.data.assignedToUid == uid()
         );
       allow create: if signedIn();
-      allow update: if isAdmin();
+      allow update: if isSupportObserver();
       allow delete: if false;
 
       match /reports/{reportId} {
-        allow read: if isAdmin()
+        allow read: if isSupportObserver()
           || (
             isClinician()
             && exists(/databases/$(database)/documents/chat_escalations/$(escalationId))
@@ -467,13 +545,15 @@ service cloud.firestore {
       }
     }
 
+    // LEGACY ADMIN AUTHORITY - TO BE PURGED
+    // The admins collection is retained only for transition compatibility.
     match /admins/{adminId} {
       allow read, write: if isAdmin();
       allow delete: if false;
     }
 
     match /system_health/{docId} {
-      allow read: if isAdmin();
+      allow read: if isMonitoringOperator();
       allow write: if false;
     }
 
@@ -481,43 +561,43 @@ service cloud.firestore {
     // Written only by trusted Admin SDK tooling.
     // Client/app writes remain denied.
     match /system_alerts/{docId} {
-      allow read: if isAdmin();
+      allow read: if isMonitoringOperator();
       allow write: if false;
     }
 
     match /analytics_summaries/{docId} {
-      allow read: if isAdmin();
+      allow read: if isMonitoringOperator();
       allow write: if false;
     }
 
     match /system_domains/{docId} {
-      allow read, write: if isAdmin();
+      allow read, write: if isRegistrySteward();
       allow delete: if false;
     }
 
     match /ai_policies/{docId} {
-      allow read, write: if isAdmin();
+      allow read, write: if isRegistrySteward();
       allow delete: if false;
     }
 
     match /resources/{docId} {
       allow read: if signedIn();
-      allow write: if isAdmin();
+      allow write: if isRegistrySteward();
       allow delete: if false;
     }
 
     match /external_follow_up_registry/{docId} {
-      allow read, write: if isAdmin();
+      allow read, write: if isRegistrySteward();
       allow delete: if false;
     }
 
     match /external_follow_up_message_templates/{docId} {
-      allow read, write: if isAdmin();
+      allow read, write: if isRegistrySteward();
       allow delete: if false;
     }
 
     match /external_follow_up_campaigns/{docId} {
-      allow read, write: if isAdmin();
+      allow read, write: if isRegistrySteward();
       allow delete: if false;
     }
 

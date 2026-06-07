@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
@@ -94,6 +94,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
         'autismCareCosts':
             _currentAutismCareCosts().map((item) => item.toMap()).toList(),
         'centerCapabilities': _capabilities.toMap(),
+        'signalSchemaVersion': 'center_signals_v1',
         'pricingReady': true,
         'updatedAt': FieldValue.serverTimestamp(),
       });
@@ -159,7 +160,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                             children: [
                               const SizedBox(height: 16),
                               const Text(
-                                'Service disclosure step: prices and capabilities are provider-declared information for review. This is not a payment, booking, or activation promise.',
+                                'Service disclosure step: prices and capabilities are provider-declared information for review. This is not a lifecycle or activation promise.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white70,
@@ -168,20 +169,124 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                                   height: 1.35,
                                 ),
                               ),
+                              _capabilityTile(
+                                isArabic
+                                    ? 'Ù…Ù†Ø§Ø³Ø¨ Ù„Ù„Ø£Ø·ÙØ§Ù„'
+                                    : 'Suitable for children',
+                                _capabilities.supportsChildren,
+                                (value) {
+                                  setState(() {
+                                    _capabilities = _capabilities.copyWith(
+                                      supportsChildren: value,
+                                    );
+                                  });
+                                },
+                              ),
+                              _capabilityTile(
+                                isArabic
+                                    ? 'Ù…Ù†Ø§Ø³Ø¨ Ù„Ù„Ø£Ø³Ø±'
+                                    : 'Suitable for families',
+                                _capabilities.supportsFamilies,
+                                (value) {
+                                  setState(() {
+                                    _capabilities = _capabilities.copyWith(
+                                      supportsFamilies: value,
+                                    );
+                                  });
+                                },
+                              ),
+                              _capabilityTile(
+                                isArabic
+                                    ? 'ÙŠØ¯Ø¹Ù… Ø®Ø¯Ù…Ø§Øª Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„ØªØ¹Ø§ÙÙŠ'
+                                    : 'Supports recovery-related services',
+                                _capabilities.supportsRecovery,
+                                (value) {
+                                  setState(() {
+                                    _capabilities = _capabilities.copyWith(
+                                      supportsRecovery: value,
+                                    );
+                                  });
+                                },
+                              ),
+                              _capabilityTile(
+                                isArabic
+                                    ? 'ÙŠØ¯Ø¹Ù… ØµØ¹ÙˆØ¨Ø§Øª Ø§Ù„Ø³Ù…Ø¹'
+                                    : 'Supports hearing difficulties',
+                                _capabilities.supportsHearingSupport,
+                                (value) {
+                                  setState(() {
+                                    _capabilities = _capabilities.copyWith(
+                                      supportsHearingSupport: value,
+                                    );
+                                  });
+                                },
+                              ),
+                              _capabilityTile(
+                                isArabic
+                                    ? 'ÙŠØ¯Ø¹Ù… ØµØ¹ÙˆØ¨Ø§Øª Ø§Ù„Ù†Ø·Ù‚'
+                                    : 'Supports speech difficulties',
+                                _capabilities.supportsSpeechSupport,
+                                (value) {
+                                  setState(() {
+                                    _capabilities = _capabilities.copyWith(
+                                      supportsSpeechSupport: value,
+                                    );
+                                  });
+                                },
+                              ),
+                              _capabilityTile(
+                                isArabic
+                                    ? 'ÙŠØ¯Ø¹Ù… Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„ÙˆØµÙˆÙ„ ÙˆØ§Ù„Ø¥ØªØ§Ø­Ø©'
+                                    : 'Supports accessibility needs',
+                                _capabilities.supportsAccessibilitySupport,
+                                (value) {
+                                  setState(() {
+                                    _capabilities = _capabilities.copyWith(
+                                      supportsAccessibilitySupport: value,
+                                    );
+                                  });
+                                },
+                              ),
+                              _capabilityTile(
+                                isArabic
+                                    ? 'ÙŠØ¯Ø¹Ù… Ø¨Ø±Ø§Ù…Ø¬ Ø§Ù„ÙƒÙˆØªØ´ÙŠÙ†Ø¬'
+                                    : 'Supports coaching programs',
+                                _capabilities.supportsCoachingPrograms,
+                                (value) {
+                                  setState(() {
+                                    _capabilities = _capabilities.copyWith(
+                                      supportsCoachingPrograms: value,
+                                    );
+                                  });
+                                },
+                              ),
+                              _capabilityTile(
+                                isArabic
+                                    ? 'ÙŠØ¯Ø¹Ù… Ø§Ù„Ø¨Ø±Ø§Ù…Ø¬ Ø§Ù„ØªØ¹Ù„ÙŠÙ…ÙŠØ©'
+                                    : 'Supports education programs',
+                                _capabilities.supportsEducationPrograms,
+                                (value) {
+                                  setState(() {
+                                    _capabilities = _capabilities.copyWith(
+                                      supportsEducationPrograms: value,
+                                    );
+                                  });
+                                },
+                              ),
                               const SizedBox(height: 12),
                               TextButton(
                                 onPressed: () => Navigator.of(context)
                                     .pushNamed(Routes.portalHome),
                                 child: Text(
                                   isArabic
-                                      ? 'العودة إلى بوابة Mental Smile'
+                                      ? 'Ø§Ù„Ø¹ÙˆØ¯Ø© Ø¥Ù„Ù‰ Ø¨ÙˆØ§Ø¨Ø© Mental Smile'
                                       : 'Back to Mental Smile Portal',
                                 ),
                               ),
                               const SizedBox(height: 8),
                               _capabilityTile(
                                 isArabic
-                                    ? 'يدعم حالات الإدمان المصابة بفيروس نقص المناعة'
+                                    ? 'ÙŠØ¯Ø¹Ù… Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø¥Ø¯Ù…Ø§Ù† Ø§Ù„Ù…ØµØ§Ø¨Ø© Ø¨ÙÙŠØ±ÙˆØ³ Ù†Ù‚Øµ Ø§Ù„Ù…Ù†Ø§Ø¹Ø©'
                                     : 'Supports addiction cases with HIV',
                                 _capabilities.supportsAddictionCasesWithHiv,
                                 (value) {
@@ -194,7 +299,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                               ),
                               _capabilityTile(
                                 isArabic
-                                    ? 'يقبل حالات الإدمان'
+                                    ? 'ÙŠÙ‚Ø¨Ù„ Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø¥Ø¯Ù…Ø§Ù†'
                                     : 'Accepts addiction cases',
                                 _capabilities.acceptsAddictionCases,
                                 (value) {
@@ -207,7 +312,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                               ),
                               _capabilityTile(
                                 isArabic
-                                    ? 'يقبل الحالات النفسية بدون إدمان'
+                                    ? 'ÙŠÙ‚Ø¨Ù„ Ø§Ù„Ø­Ø§Ù„Ø§Øª Ø§Ù„Ù†ÙØ³ÙŠØ© Ø¨Ø¯ÙˆÙ† Ø¥Ø¯Ù…Ø§Ù†'
                                     : 'Accepts psychiatric cases without addiction',
                                 _capabilities
                                     .acceptsPsychiatricCasesWithoutAddiction,
@@ -360,37 +465,37 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
           children: [
             _accommodationChip(
               item,
-              isArabic ? 'أدوية' : 'Medication',
+              isArabic ? 'Ø£Ø¯ÙˆÙŠØ©' : 'Medication',
               item.includesMedication,
               (value) => item.copyWith(includesMedication: value),
             ),
             _accommodationChip(
               item,
-              isArabic ? 'وجبات' : 'Meals',
+              isArabic ? 'ÙˆØ¬Ø¨Ø§Øª' : 'Meals',
               item.includesMeals,
               (value) => item.copyWith(includesMeals: value),
             ),
             _accommodationChip(
               item,
-              isArabic ? 'أنشطة خارجية' : 'Outdoor',
+              isArabic ? 'Ø£Ù†Ø´Ø·Ø© Ø®Ø§Ø±Ø¬ÙŠØ©' : 'Outdoor',
               item.includesOutdoorActivities,
               (value) => item.copyWith(includesOutdoorActivities: value),
             ),
             _accommodationChip(
               item,
-              isArabic ? 'تحاليل' : 'Tests',
+              isArabic ? 'ØªØ­Ø§Ù„ÙŠÙ„' : 'Tests',
               item.includesRequiredTests,
               (value) => item.copyWith(includesRequiredTests: value),
             ),
             _accommodationChip(
               item,
-              isArabic ? 'توصيل مطار' : 'Airport',
+              isArabic ? 'ØªÙˆØµÙŠÙ„ Ù…Ø·Ø§Ø±' : 'Airport',
               item.includesAirportPickup,
               (value) => item.copyWith(includesAirportPickup: value),
             ),
             _accommodationChip(
               item,
-              isArabic ? 'نزهات خارجية' : 'Outings',
+              isArabic ? 'Ù†Ø²Ù‡Ø§Øª Ø®Ø§Ø±Ø¬ÙŠØ©' : 'Outings',
               item.includesTourismOrExternalOutings,
               (value) => item.copyWith(
                 includesTourismOrExternalOutings: value,
@@ -532,3 +637,4 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
     );
   }
 }
+

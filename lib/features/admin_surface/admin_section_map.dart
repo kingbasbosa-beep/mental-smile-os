@@ -32,33 +32,6 @@ const List<AdminSectionEntry> adminSectionEntries = [
     purpose: 'Executive launchpad with advisory, health, and section entry.',
   ),
   AdminSectionEntry(
-    route: '/admin/booking-queue',
-    title: 'Legacy request monitoring board',
-    section: AdminTopLevelSection.operations,
-    purpose:
-        'Monitoring and exception review for legacy request signals. Normal workflow progression should remain outside core ownership.',
-  ),
-  AdminSectionEntry(
-    route: Routes.adminPayments,
-    title: 'Legacy payment visibility',
-    section: AdminTopLevelSection.operations,
-    purpose:
-        'Legacy financial visibility and exception review only. Normal flow ownership should remain outside Control Room.',
-  ),
-  AdminSectionEntry(
-    route: Routes.adminSessions,
-    title: 'Service coordination monitoring',
-    section: AdminTopLevelSection.operations,
-    purpose:
-        'Service coordination monitoring, link visibility, and exception-only state correction. Normal workflow progression should remain with the responsible providers.',
-  ),
-  AdminSectionEntry(
-    route: Routes.adminSessionReport,
-    title: 'Session Report',
-    section: AdminTopLevelSection.operations,
-    purpose: 'Secondary reporting utility for session-related review.',
-  ),
-  AdminSectionEntry(
     route: Routes.adminSupportChats,
     title: 'Legacy Support Threads',
     section: AdminTopLevelSection.communications,
@@ -122,18 +95,6 @@ const List<AdminSectionEntry> adminSectionEntries = [
     purpose: 'Archive landing for historical lookup and reporting.',
   ),
   AdminSectionEntry(
-    route: Routes.adminArchiveSessions,
-    title: 'Sessions Archive',
-    section: AdminTopLevelSection.archive,
-    purpose: 'Archived session records and historical session flows.',
-  ),
-  AdminSectionEntry(
-    route: Routes.adminArchivePayments,
-    title: 'Legacy payments ledger',
-    section: AdminTopLevelSection.archive,
-    purpose: 'Archived legacy payment and transfer visibility records.',
-  ),
-  AdminSectionEntry(
     route: Routes.adminArchiveReports,
     title: 'Reports Archive',
     section: AdminTopLevelSection.archive,
@@ -156,12 +117,5 @@ const List<AdminSectionEntry> adminSectionEntries = [
     title: 'Support Archive',
     section: AdminTopLevelSection.archive,
     purpose: 'Archived support threads, messages, and escalations.',
-  ),
-  AdminSectionEntry(
-    route: Routes.adminArchiveAccounting,
-    title: 'Legacy accounting ledger',
-    section: AdminTopLevelSection.archive,
-    purpose:
-        'Archived legacy accounting and finance-oriented visibility records.',
   ),
 ];

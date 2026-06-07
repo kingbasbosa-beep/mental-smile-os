@@ -450,24 +450,6 @@ class ChatFirestoreService {
     });
   }
 
-  Future<void> linkBookingToThread({
-    required String threadId,
-    required String bookingRequestId,
-    required String officialClientUid,
-  }) async {
-    await _threads.doc(threadId).update({
-      'threadType': 'booking_followup',
-      'bookingLinked': true,
-      'bookingRequestId': bookingRequestId,
-      'convertedToOfficialClient': true,
-      'officialClientUid': officialClientUid,
-      'isTemporary': false,
-      'identityState': 'upgraded',
-      'sourceType': 'booking_flow',
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
-  }
-
   Future<void> assignEscalationToAdmin({
     required String escalationId,
     required String threadId,

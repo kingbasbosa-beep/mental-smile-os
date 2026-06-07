@@ -287,22 +287,6 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                         ),
                                   ),
                                   const SizedBox(height: 16),
-                                  OutlinedButton.icon(
-                                    onPressed: () {
-                                      Navigator.of(context).pushNamed(
-                                        Routes.centerResidencies,
-                                      );
-                                    },
-                                    icon: const Icon(Icons.home_work_outlined),
-                                    label: Text(
-                                      isArabic
-                                          ? 'فتح الإقامات والمتابعة'
-                                          : 'Open residencies',
-                                      maxLines: 2,
-                                      softWrap: true,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
@@ -409,32 +393,6 @@ class _CenterInboxPageState extends State<CenterInboxPage> {
                                         isArabic
                                             ? 'رد المركز: $availabilityNote'
                                             : 'Center note: $availabilityNote',
-                                      ),
-                                    ],
-                                    if (_isResidencyStage(status)) ...[
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        isArabic
-                                            ? 'هذا الطلب في مرحلة الإقامة وما زال يحتاج متابعة من المركز.'
-                                            : 'This request is now in the residency stage and still needs center follow-up.',
-                                      ),
-                                      const SizedBox(height: 12),
-                                      OutlinedButton.icon(
-                                        onPressed: () {
-                                          Navigator.of(context).pushNamed(
-                                            Routes.centerResidencies,
-                                          );
-                                        },
-                                        icon: const Icon(
-                                            Icons.home_work_outlined),
-                                        label: Text(
-                                          isArabic
-                                              ? 'فتح ملف الإقامة'
-                                              : 'Open residency file',
-                                          maxLines: 2,
-                                          softWrap: true,
-                                          textAlign: TextAlign.center,
-                                        ),
                                       ),
                                     ],
                                     const SizedBox(height: 12),

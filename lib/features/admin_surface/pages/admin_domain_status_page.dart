@@ -391,20 +391,6 @@ class AdminDomainStatusPage extends StatelessWidget {
                                 ),
                                 _buildMetadataLine(
                                   context,
-                                  label: 'awaitingPaymentCount',
-                                  value: _stringText(
-                                    status.metadata['awaitingPaymentCount'],
-                                  ),
-                                ),
-                                _buildMetadataLine(
-                                  context,
-                                  label: 'paymentReviewCount',
-                                  value: _stringText(
-                                    status.metadata['paymentReviewCount'],
-                                  ),
-                                ),
-                                _buildMetadataLine(
-                                  context,
                                   label: 'sessionSetupPendingCount',
                                   value: _stringText(
                                     status.metadata['sessionSetupPendingCount'],
@@ -415,13 +401,6 @@ class AdminDomainStatusPage extends StatelessWidget {
                                   label: 'pendingReviewsCount',
                                   value: _stringText(
                                     status.metadata['pendingReviewsCount'],
-                                  ),
-                                ),
-                                _buildMetadataLine(
-                                  context,
-                                  label: 'payoutPendingCount',
-                                  value: _stringText(
-                                    status.metadata['payoutPendingCount'],
                                   ),
                                 ),
                                 _buildMetadataLine(

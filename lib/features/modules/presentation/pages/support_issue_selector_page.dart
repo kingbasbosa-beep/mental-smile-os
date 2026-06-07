@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
@@ -60,36 +60,31 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
       return [
         _SupportIssueOption(
           key: 'booking_issue',
-          label: isArabic ? 'مشكلة في طلب الخدمة' : 'Service request issue',
-        ),
-        _SupportIssueOption(
-          key: 'payment_follow_up',
-          label:
-              isArabic ? 'متابعة الحساب أو الدعم' : 'Account/support follow-up',
+          label: isArabic ? 'Ù…Ø´ÙƒÙ„Ø© ÙÙŠ Ø·Ù„Ø¨ Ø§Ù„Ø®Ø¯Ù…Ø©' : 'Service request issue',
         ),
         _SupportIssueOption(
           key: 'session_timing_issue',
-          label: isArabic ? 'مشكلة في موعد الجلسة' : 'Session timing issue',
+          label: isArabic ? 'Ù…Ø´ÙƒÙ„Ø© ÙÙŠ Ù…ÙˆØ¹Ø¯ Ø§Ù„Ø¬Ù„Ø³Ø©' : 'Session timing issue',
         ),
         _SupportIssueOption(
           key: 'account_profile_issue',
           label: isArabic
-              ? 'مشكلة في الحساب أو الملف الشخصي'
+              ? 'Ù…Ø´ÙƒÙ„Ø© ÙÙŠ Ø§Ù„Ø­Ø³Ø§Ø¨ Ø£Ùˆ Ø§Ù„Ù…Ù„Ù Ø§Ù„Ø´Ø®ØµÙŠ'
               : 'Account/profile issue',
         ),
         _SupportIssueOption(
           key: 'complaint_bad_experience',
           label: isArabic
-              ? 'شكوى أو تجربة غير جيدة'
+              ? 'Ø´ÙƒÙˆÙ‰ Ø£Ùˆ ØªØ¬Ø±Ø¨Ø© ØºÙŠØ± Ø¬ÙŠØ¯Ø©'
               : 'Complaint / bad experience',
         ),
         _SupportIssueOption(
           key: 'need_human_follow_up',
-          label: isArabic ? 'أحتاج متابعة بشرية' : 'Need human follow-up',
+          label: isArabic ? 'Ø£Ø­ØªØ§Ø¬ Ù…ØªØ§Ø¨Ø¹Ø© Ø¨Ø´Ø±ÙŠØ©' : 'Need human follow-up',
         ),
         _SupportIssueOption(
           key: 'general_admin_question',
-          label: isArabic ? 'استفسار إداري عام' : 'General admin question',
+          label: isArabic ? 'Ø§Ø³ØªÙØ³Ø§Ø± Ø¥Ø¯Ø§Ø±ÙŠ Ø¹Ø§Ù…' : 'General admin question',
         ),
       ];
     }
@@ -98,29 +93,23 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
       return [
         _SupportIssueOption(
           key: 'booking_issue',
-          label: isArabic ? 'مشكلة في طلب الخدمة' : 'Service request issue',
+          label: isArabic ? 'Ù…Ø´ÙƒÙ„Ø© ÙÙŠ Ø·Ù„Ø¨ Ø§Ù„Ø®Ø¯Ù…Ø©' : 'Service request issue',
         ),
         _SupportIssueOption(
           key: 'client_no_show',
-          label: isArabic ? 'العميل لم يحضر' : 'Client no-show',
+          label: isArabic ? 'Ø§Ù„Ø¹Ù…ÙŠÙ„ Ù„Ù… ÙŠØ­Ø¶Ø±' : 'Client no-show',
         ),
         _SupportIssueOption(
           key: 'scheduling_problem',
-          label: isArabic ? 'مشكلة في الجدولة' : 'Scheduling problem',
+          label: isArabic ? 'Ù…Ø´ÙƒÙ„Ø© ÙÙŠ Ø§Ù„Ø¬Ø¯ÙˆÙ„Ø©' : 'Scheduling problem',
         ),
         _SupportIssueOption(
           key: 'system_issue',
-          label: isArabic ? 'مشكلة في النظام' : 'System issue',
-        ),
-        _SupportIssueOption(
-          key: 'payout_question',
-          label: isArabic
-              ? 'استفسار بخصوص حساب مقدم الخدمة'
-              : 'Provider account question',
+          label: isArabic ? 'Ù…Ø´ÙƒÙ„Ø© ÙÙŠ Ø§Ù„Ù†Ø¸Ø§Ù…' : 'System issue',
         ),
         _SupportIssueOption(
           key: 'general_admin_request',
-          label: isArabic ? 'طلب إداري عام' : 'General admin request',
+          label: isArabic ? 'Ø·Ù„Ø¨ Ø¥Ø¯Ø§Ø±ÙŠ Ø¹Ø§Ù…' : 'General admin request',
         ),
       ];
     }
@@ -129,29 +118,23 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
       return [
         _SupportIssueOption(
           key: 'case_issue',
-          label: isArabic ? 'مشكلة في الحالة' : 'Case issue',
+          label: isArabic ? 'Ù…Ø´ÙƒÙ„Ø© ÙÙŠ Ø§Ù„Ø­Ø§Ù„Ø©' : 'Case issue',
         ),
         _SupportIssueOption(
           key: 'session_problem',
-          label: isArabic ? 'مشكلة في الجلسة' : 'Session problem',
+          label: isArabic ? 'Ù…Ø´ÙƒÙ„Ø© ÙÙŠ Ø§Ù„Ø¬Ù„Ø³Ø©' : 'Session problem',
         ),
         _SupportIssueOption(
           key: 'assignment_problem',
-          label: isArabic ? 'مشكلة في الإسناد' : 'Assignment problem',
-        ),
-        _SupportIssueOption(
-          key: 'payment_question',
-          label: isArabic
-              ? 'استفسار بخصوص الحساب أو الدعم'
-              : 'Account/support question',
+          label: isArabic ? 'Ù…Ø´ÙƒÙ„Ø© ÙÙŠ Ø§Ù„Ø¥Ø³Ù†Ø§Ø¯' : 'Assignment problem',
         ),
         _SupportIssueOption(
           key: 'system_issue',
-          label: isArabic ? 'مشكلة في النظام' : 'System issue',
+          label: isArabic ? 'Ù…Ø´ÙƒÙ„Ø© ÙÙŠ Ø§Ù„Ù†Ø¸Ø§Ù…' : 'System issue',
         ),
         _SupportIssueOption(
           key: 'need_admin_support',
-          label: isArabic ? 'أحتاج دعم إداري' : 'Need admin support',
+          label: isArabic ? 'Ø£Ø­ØªØ§Ø¬ Ø¯Ø¹Ù… Ø¥Ø¯Ø§Ø±ÙŠ' : 'Need admin support',
         ),
       ];
     }
@@ -160,27 +143,27 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
       return [
         _SupportIssueOption(
           key: 'need_specialist',
-          label: isArabic ? 'محتاج أخصائي مناسب' : 'Need a suitable specialist',
+          label: isArabic ? 'Ù…Ø­ØªØ§Ø¬ Ø£Ø®ØµØ§Ø¦ÙŠ Ù…Ù†Ø§Ø³Ø¨' : 'Need a suitable specialist',
         ),
         _SupportIssueOption(
           key: 'need_center',
-          label: isArabic ? 'محتاج مركز مناسب' : 'Need a suitable center',
+          label: isArabic ? 'Ù…Ø­ØªØ§Ø¬ Ù…Ø±ÙƒØ² Ù…Ù†Ø§Ø³Ø¨' : 'Need a suitable center',
         ),
         _SupportIssueOption(
           key: 'recovery_support',
-          label: isArabic ? 'دعم في التعافي' : 'Recovery support',
+          label: isArabic ? 'Ø¯Ø¹Ù… ÙÙŠ Ø§Ù„ØªØ¹Ø§ÙÙŠ' : 'Recovery support',
         ),
         _SupportIssueOption(
           key: 'relapse_concern',
-          label: isArabic ? 'قلق من الانتكاسة' : 'Relapse concern',
+          label: isArabic ? 'Ù‚Ù„Ù‚ Ù…Ù† Ø§Ù„Ø§Ù†ØªÙƒØ§Ø³Ø©' : 'Relapse concern',
         ),
         _SupportIssueOption(
           key: 'risk_report',
-          label: isArabic ? 'بلاغ خطر' : 'Risk report',
+          label: isArabic ? 'Ø¨Ù„Ø§Øº Ø®Ø·Ø±' : 'Risk report',
         ),
         _SupportIssueOption(
           key: 'general_help',
-          label: isArabic ? 'طلب مساعدة عامة' : 'General help request',
+          label: isArabic ? 'Ø·Ù„Ø¨ Ù…Ø³Ø§Ø¹Ø¯Ø© Ø¹Ø§Ù…Ø©' : 'General help request',
         ),
       ];
     }
@@ -188,29 +171,29 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
     return [
       _SupportIssueOption(
         key: 'need_specialist',
-        label: isArabic ? 'محتاج أخصائي مناسب' : 'Need a suitable specialist',
+        label: isArabic ? 'Ù…Ø­ØªØ§Ø¬ Ø£Ø®ØµØ§Ø¦ÙŠ Ù…Ù†Ø§Ø³Ø¨' : 'Need a suitable specialist',
       ),
       _SupportIssueOption(
         key: 'need_center',
-        label: isArabic ? 'محتاج مركز مناسب' : 'Need a suitable center',
+        label: isArabic ? 'Ù…Ø­ØªØ§Ø¬ Ù…Ø±ÙƒØ² Ù…Ù†Ø§Ø³Ø¨' : 'Need a suitable center',
       ),
       _SupportIssueOption(
         key: 'family_guidance',
-        label: isArabic ? 'إرشاد أسري' : 'Family guidance',
+        label: isArabic ? 'Ø¥Ø±Ø´Ø§Ø¯ Ø£Ø³Ø±ÙŠ' : 'Family guidance',
       ),
       _SupportIssueOption(
         key: 'special_case_support',
         label: isArabic
-            ? 'دعم لطفل / حالة خاصة'
+            ? 'Ø¯Ø¹Ù… Ù„Ø·ÙÙ„ / Ø­Ø§Ù„Ø© Ø®Ø§ØµØ©'
             : 'Support for a child / special case',
       ),
       _SupportIssueOption(
         key: 'risk_report',
-        label: isArabic ? 'بلاغ خطر' : 'Risk report',
+        label: isArabic ? 'Ø¨Ù„Ø§Øº Ø®Ø·Ø±' : 'Risk report',
       ),
       _SupportIssueOption(
         key: 'general_help',
-        label: isArabic ? 'طلب مساعدة عامة' : 'General help request',
+        label: isArabic ? 'Ø·Ù„Ø¨ Ù…Ø³Ø§Ø¹Ø¯Ø© Ø¹Ø§Ù…Ø©' : 'General help request',
       ),
     ];
   }
@@ -253,7 +236,7 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'تم استلام طلبك وسيتم متابعته'
+                ? 'ØªÙ… Ø§Ø³ØªÙ„Ø§Ù… Ø·Ù„Ø¨Ùƒ ÙˆØ³ÙŠØªÙ… Ù…ØªØ§Ø¨Ø¹ØªÙ‡'
                 : 'Your request was received and will be reviewed.',
           ),
         ),
@@ -265,7 +248,7 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'تعذر إرسال الطلب الآن'
+                ? 'ØªØ¹Ø°Ø± Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ø¢Ù†'
                 : 'Unable to submit the request right now.',
           ),
         ),
@@ -282,9 +265,9 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
   @override
   Widget build(BuildContext context) {
     final isArabic = _isArabic(context);
-    final title = isArabic ? 'الدعم' : 'Support';
+    final title = isArabic ? 'Ø§Ù„Ø¯Ø¹Ù…' : 'Support';
     final selectorTitle =
-        isArabic ? 'اختر نوع المساعدة' : 'Choose support type';
+        isArabic ? 'Ø§Ø®ØªØ± Ù†ÙˆØ¹ Ø§Ù„Ù…Ø³Ø§Ø¹Ø¯Ø©' : 'Choose support type';
     final options = _options(isArabic);
 
     return Directionality(
@@ -347,7 +330,7 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
                           const SizedBox(height: AppSpacing.sm),
                           Text(
                             isArabic
-                                ? 'اختر المشكلة الأقرب لاحتياجك الحالي ليتم استلامها كطلب منظم.'
+                                ? 'Ø§Ø®ØªØ± Ø§Ù„Ù…Ø´ÙƒÙ„Ø© Ø§Ù„Ø£Ù‚Ø±Ø¨ Ù„Ø§Ø­ØªÙŠØ§Ø¬Ùƒ Ø§Ù„Ø­Ø§Ù„ÙŠ Ù„ÙŠØªÙ… Ø§Ø³ØªÙ„Ø§Ù…Ù‡Ø§ ÙƒØ·Ù„Ø¨ Ù…Ù†Ø¸Ù….'
                                 : 'Choose the issue that best matches your current need so it can be received as a structured request.',
                             textAlign:
                                 isArabic ? TextAlign.right : TextAlign.left,

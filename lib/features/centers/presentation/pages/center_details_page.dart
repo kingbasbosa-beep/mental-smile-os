@@ -1,9 +1,12 @@
+﻿import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/features/booking/presentation/pages/center_booking_request_page.dart';
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
 import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
 import 'package:flutterprojects/features/centers/data/services/centers_firestore_service.dart';
+import 'package:flutterprojects/features/contact_requests/data/contact_request_repository.dart';
+import 'package:flutterprojects/features/saved_destinations/data/saved_destination_repository.dart';
+import 'package:flutterprojects/features/saved_destinations/domain/models/saved_destination.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -18,36 +21,159 @@ class CenterDetailsPage extends StatelessWidget {
     this.centerId,
   });
 
+  List<String> _centerSignalTags(CenterModel center) {
+    final capabilities = center.capabilities;
+    return <String>[
+      center.category,
+      center.centerType,
+      ...center.services,
+      if (center.hasDetoxUnit) 'detox_unit',
+      if (capabilities.acceptsAddictionCases) 'addiction_cases',
+      if (capabilities.acceptsPsychiatricCasesWithoutAddiction)
+        'psychiatric_without_addiction',
+      if (capabilities.supportsChildren) 'children',
+      if (capabilities.supportsFamilies) 'families',
+      if (capabilities.supportsRecovery) 'recovery',
+      if (capabilities.supportsHearingSupport) 'hearing_support',
+      if (capabilities.supportsSpeechSupport) 'speech_support',
+      if (capabilities.supportsAccessibilitySupport) 'accessibility_support',
+      if (capabilities.supportsCoachingPrograms) 'coaching',
+      if (capabilities.supportsEducationPrograms) 'education',
+    ].where((value) => value.trim().isNotEmpty).toSet().toList();
+  }
+
+  Future<void> _sendCenterContactRequest({
+    required BuildContext context,
+    required String centerId,
+    required bool isArabic,
+  }) async {
+    final clientId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    if (clientId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'ÙŠØ±Ø¬Ù‰ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ù„Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ Ø§Ù„ØªÙˆØ§ØµÙ„.'
+                : 'Please sign in to send a contact request.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    try {
+      await ContactRequestRepository().createCenterContactRequest(
+        clientId: clientId,
+        centerId: centerId,
+        message: isArabic
+            ? 'Ø£Ø±ØºØ¨ ÙÙŠ Ø§Ù„ØªÙˆØ§ØµÙ„ Ù…Ø¹ Ø§Ù„Ù…Ø±ÙƒØ² Ù„Ù…Ø¹Ø±ÙØ© Ø§Ù„Ø®ÙŠØ§Ø±Ø§Øª Ø§Ù„Ù…Ù†Ø§Ø³Ø¨Ø©.'
+            : 'I would like this center to contact me about suitable options.',
+      );
+      if (!context.mounted) return;
+      AppAnalytics.logPathSelected('centers', 'center_contact_request_created');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ Ø§Ù„ØªÙˆØ§ØµÙ„. ÙŠÙ…ÙƒÙ†Ùƒ Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø¯Ø¹Ù… Ø£Ùˆ Ø­ÙØ¸ Ø§Ù„Ù…Ø±ÙƒØ² Ù„Ù„Ø±Ø¬ÙˆØ¹ Ù„Ø§Ø­Ù‚Ù‹Ø§.'
+                : 'Contact request sent. You can continue with support or save this center for later.',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'ØªØ¹Ø°Ø± Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ Ø§Ù„ØªÙˆØ§ØµÙ„: $e'
+                : 'Could not send contact request: $e',
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _saveCenterDestination({
+    required BuildContext context,
+    required CenterModel center,
+    required String title,
+    required bool isArabic,
+  }) async {
+    final clientId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    if (clientId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'ÙŠØ±Ø¬Ù‰ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ù„Ø­ÙØ¸ Ø§Ù„Ù…Ø±ÙƒØ².'
+                : 'Please sign in to save this center.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    try {
+      await SavedDestinationRepository().saveDestination(
+        clientId: clientId,
+        destinationType: SavedDestinationType.center,
+        destinationId: center.id,
+        title: title,
+        route: Routes.centerDetails,
+        signalTags: _centerSignalTags(center),
+      );
+      if (!context.mounted) return;
+      AppAnalytics.logPathSelected('centers', 'save_center_destination');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic ? 'ØªÙ… Ø­ÙØ¸ Ø§Ù„Ù…Ø±ÙƒØ² Ù„Ù„Ø±Ø¬ÙˆØ¹ Ù„Ø§Ø­Ù‚Ù‹Ø§.' : 'Center saved for later.',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic ? 'ØªØ¹Ø°Ø± Ø­ÙØ¸ Ø§Ù„Ù…Ø±ÙƒØ²: $e' : 'Could not save center: $e',
+          ),
+        ),
+      );
+    }
+  }
+
   String _categoryLabelAr(CenterModel c) {
     final label = c.categoryLabelAr.trim();
     if (label.isNotEmpty) return label;
 
     switch (c.category.trim()) {
       case 'recovery':
-        return 'مراكز التعافي';
+        return 'Ù…Ø±Ø§ÙƒØ² Ø§Ù„ØªØ¹Ø§ÙÙŠ';
       case 'detox':
-        return 'مراكز سحب السموم';
+        return 'Ù…Ø±Ø§ÙƒØ² Ø³Ø­Ø¨ Ø§Ù„Ø³Ù…ÙˆÙ…';
       case 'hospital':
       case 'hospitals':
-        return 'المستشفيات';
+        return 'Ø§Ù„Ù…Ø³ØªØ´ÙÙŠØ§Øª';
       case 'special_needs':
-        return 'مراكز رعاية ذوي الاحتياجات الخاصة';
+        return 'Ù…Ø±Ø§ÙƒØ² Ø±Ø¹Ø§ÙŠØ© Ø°ÙˆÙŠ Ø§Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„Ø®Ø§ØµØ©';
       default:
-        return 'مركز';
+        return 'Ù…Ø±ÙƒØ²';
     }
   }
 
   String _centerTypeLabelAr(CenterModel c) {
     switch (c.centerType.trim()) {
       case 'detox':
-        return 'ديتوكس / أعراض انسحاب';
+        return 'Ø¯ÙŠØªÙˆÙƒØ³ / Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù†Ø³Ø­Ø§Ø¨';
       case 'hospital':
-        return 'مستشفى';
+        return 'Ù…Ø³ØªØ´ÙÙ‰';
       case 'special_needs_care':
-        return 'رعاية ذوي الاحتياجات الخاصة';
+        return 'Ø±Ø¹Ø§ÙŠØ© Ø°ÙˆÙŠ Ø§Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„Ø®Ø§ØµØ©';
       case 'halfway_house':
       default:
-        return 'هاف واي';
+        return 'Ù‡Ø§Ù ÙˆØ§ÙŠ';
     }
   }
 
@@ -265,10 +391,10 @@ class CenterDetailsPage extends StatelessWidget {
   Widget _gallerySection(BuildContext context, List<String> values) {
     final l10n = AppLocalizations.of(context)!;
     const frameLabels = [
-      'الواجهة',
-      'الاستقبال',
-      'داخلي 1',
-      'داخلي 2',
+      'Ø§Ù„ÙˆØ§Ø¬Ù‡Ø©',
+      'Ø§Ù„Ø§Ø³ØªÙ‚Ø¨Ø§Ù„',
+      'Ø¯Ø§Ø®Ù„ÙŠ 1',
+      'Ø¯Ø§Ø®Ù„ÙŠ 2',
     ];
     final padded = List<String>.from(
       values.map((e) => e.trim()).where((e) => e.isNotEmpty).take(4),
@@ -311,9 +437,9 @@ class CenterDetailsPage extends StatelessWidget {
     String unitLabel(String unit) {
       switch (unit) {
         case 'day':
-          return 'يومي';
+          return 'ÙŠÙˆÙ…ÙŠ';
         case 'month':
-          return 'شهري';
+          return 'Ø´Ù‡Ø±ÙŠ';
         default:
           return '';
       }
@@ -341,11 +467,11 @@ class CenterDetailsPage extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     [
-                      'السعر: ${item.price}',
+                      'Ø§Ù„Ø³Ø¹Ø±: ${item.price}',
                       if (item.pricingUnit.isNotEmpty)
-                        'الوحدة: ${unitLabel(item.pricingUnit)}',
-                      item.taxIncluded ? 'الضريبة شاملة' : 'الضريبة غير شاملة',
-                    ].join(' • '),
+                        'Ø§Ù„ÙˆØ­Ø¯Ø©: ${unitLabel(item.pricingUnit)}',
+                      item.taxIncluded ? 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© Ø´Ø§Ù…Ù„Ø©' : 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© ØºÙŠØ± Ø´Ø§Ù…Ù„Ø©',
+                    ].join(' â€¢ '),
                     textAlign: TextAlign.start,
                   ),
                   const SizedBox(height: 10),
@@ -362,19 +488,19 @@ class CenterDetailsPage extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     [
-                      'السعر: ${item.price}',
+                      'Ø§Ù„Ø³Ø¹Ø±: ${item.price}',
                       if (item.pricingUnit.isNotEmpty)
-                        'الوحدة: ${unitLabel(item.pricingUnit)}',
-                      if (item.acMode == 'ac') 'مكيف',
-                      if (item.acMode == 'non_ac') 'غير مكيف',
-                      if (item.includesMedication) 'يشمل الدواء',
-                      if (item.includesMeals) 'يشمل الوجبات',
-                      if (item.includesOutdoorActivities) 'أنشطة خارجية',
-                      if (item.includesRequiredTests) 'يشمل الفحوصات',
-                      if (item.includesAirportPickup) 'استقبال مطار',
-                      if (item.includesTourismOrExternalOutings) 'جولات خارجية',
-                      item.taxIncluded ? 'الضريبة شاملة' : 'الضريبة غير شاملة',
-                    ].join(' • '),
+                        'Ø§Ù„ÙˆØ­Ø¯Ø©: ${unitLabel(item.pricingUnit)}',
+                      if (item.acMode == 'ac') 'Ù…ÙƒÙŠÙ',
+                      if (item.acMode == 'non_ac') 'ØºÙŠØ± Ù…ÙƒÙŠÙ',
+                      if (item.includesMedication) 'ÙŠØ´Ù…Ù„ Ø§Ù„Ø¯ÙˆØ§Ø¡',
+                      if (item.includesMeals) 'ÙŠØ´Ù…Ù„ Ø§Ù„ÙˆØ¬Ø¨Ø§Øª',
+                      if (item.includesOutdoorActivities) 'Ø£Ù†Ø´Ø·Ø© Ø®Ø§Ø±Ø¬ÙŠØ©',
+                      if (item.includesRequiredTests) 'ÙŠØ´Ù…Ù„ Ø§Ù„ÙØ­ÙˆØµØ§Øª',
+                      if (item.includesAirportPickup) 'Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ù…Ø·Ø§Ø±',
+                      if (item.includesTourismOrExternalOutings) 'Ø¬ÙˆÙ„Ø§Øª Ø®Ø§Ø±Ø¬ÙŠØ©',
+                      item.taxIncluded ? 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© Ø´Ø§Ù…Ù„Ø©' : 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© ØºÙŠØ± Ø´Ø§Ù…Ù„Ø©',
+                    ].join(' â€¢ '),
                     textAlign: TextAlign.start,
                   ),
                   const SizedBox(height: 10),
@@ -400,14 +526,14 @@ class CenterDetailsPage extends StatelessWidget {
               _sectionTitle(context, l10n.centerTypeAndService),
               const SizedBox(height: 10),
               Text(
-                'النوع التشغيلي: ${_centerTypeLabelAr(c)}',
+                'Ø§Ù„Ù†ÙˆØ¹ Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠ: ${_centerTypeLabelAr(c)}',
                 textAlign: TextAlign.start,
               ),
               const SizedBox(height: 6),
               Text(
                 c.hasDetoxUnit
-                    ? 'يوجد قسم داخلي لأعراض الانسحاب.'
-                    : 'لا يوجد قسم داخلي مستقل لأعراض الانسحاب.',
+                    ? 'ÙŠÙˆØ¬Ø¯ Ù‚Ø³Ù… Ø¯Ø§Ø®Ù„ÙŠ Ù„Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù„Ø§Ù†Ø³Ø­Ø§Ø¨.'
+                    : 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù‚Ø³Ù… Ø¯Ø§Ø®Ù„ÙŠ Ù…Ø³ØªÙ‚Ù„ Ù„Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù„Ø§Ù†Ø³Ø­Ø§Ø¨.',
                 textAlign: TextAlign.start,
               ),
             ],
@@ -422,13 +548,40 @@ class CenterDetailsPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final items = <String>[];
     if (c.capabilities.supportsAddictionCasesWithHiv) {
-      items.add('يدعم حالات الإدمان المصاحبة لفيروس HIV');
+      items.add('ÙŠØ¯Ø¹Ù… Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„Ø¥Ø¯Ù…Ø§Ù† Ù…Ø¹ Ø­Ø³Ø§Ø³ÙŠØ© Ù„ÙÙŠØ±ÙˆØ³ HIV');
     }
     if (c.capabilities.acceptsAddictionCases) {
-      items.add('يستقبل حالات الإدمان');
+      items.add('ÙŠØ¯Ø¹Ù… Ø®Ø¯Ù…Ø§Øª Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„Ø¥Ø¯Ù…Ø§Ù† ÙˆØ§Ù„ØªØ¹Ø§ÙÙŠ');
     }
     if (c.capabilities.acceptsPsychiatricCasesWithoutAddiction) {
-      items.add('يستقبل الحالات النفسية بدون إدمان');
+      items.add('ÙŠØ¯Ø¹Ù… Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ù†ÙØ³ÙŠØ© ØºÙŠØ± Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„Ø¥Ø¯Ù…Ø§Ù†');
+    }
+    if (c.hasDetoxUnit) {
+      items.add('ÙŠÙˆÙØ± ÙˆØ­Ø¯Ø© Ø¯Ø§Ø®Ù„ÙŠØ© Ù„Ø³Ø­Ø¨ Ø§Ù„Ø³Ù…ÙˆÙ…');
+    }
+    if (c.capabilities.supportsChildren) {
+      items.add('Ù…Ù†Ø§Ø³Ø¨ Ù„Ù„Ø£Ø·ÙØ§Ù„');
+    }
+    if (c.capabilities.supportsFamilies) {
+      items.add('Ù…Ù†Ø§Ø³Ø¨ Ù„Ù„Ø£Ø³Ø±');
+    }
+    if (c.capabilities.supportsRecovery) {
+      items.add('ÙŠØ¯Ø¹Ù… Ø®Ø¯Ù…Ø§Øª Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„ØªØ¹Ø§ÙÙŠ');
+    }
+    if (c.capabilities.supportsHearingSupport) {
+      items.add('ÙŠØ¯Ø¹Ù… ØµØ¹ÙˆØ¨Ø§Øª Ø§Ù„Ø³Ù…Ø¹');
+    }
+    if (c.capabilities.supportsSpeechSupport) {
+      items.add('ÙŠØ¯Ø¹Ù… ØµØ¹ÙˆØ¨Ø§Øª Ø§Ù„Ù†Ø·Ù‚');
+    }
+    if (c.capabilities.supportsAccessibilitySupport) {
+      items.add('ÙŠØ¯Ø¹Ù… Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„ÙˆØµÙˆÙ„ ÙˆØ§Ù„Ø¥ØªØ§Ø­Ø©');
+    }
+    if (c.capabilities.supportsCoachingPrograms) {
+      items.add('ÙŠØ¯Ø¹Ù… Ø¨Ø±Ø§Ù…Ø¬ Ø§Ù„ÙƒÙˆØªØ´ÙŠÙ†Ø¬');
+    }
+    if (c.capabilities.supportsEducationPrograms) {
+      items.add('ÙŠØ¯Ø¹Ù… Ø§Ù„Ø¨Ø±Ø§Ù…Ø¬ Ø§Ù„ØªØ¹Ù„ÙŠÙ…ÙŠØ©');
     }
     if (items.isEmpty) return const SizedBox.shrink();
 
@@ -538,7 +691,7 @@ class CenterDetailsPage extends StatelessWidget {
               const SizedBox(height: 10),
               if (false)
                 Text(
-                  'نبذة',
+                  'Ù†Ø¨Ø°Ø©',
                   textAlign: TextAlign.start,
                   style: Theme.of(context)
                       .textTheme
@@ -738,9 +891,9 @@ class CenterDetailsPage extends StatelessWidget {
     String unitLabel(String unit) {
       switch (unit) {
         case 'day':
-          return 'يومي';
+          return 'ÙŠÙˆÙ…ÙŠ';
         case 'month':
-          return 'شهري';
+          return 'Ø´Ù‡Ø±ÙŠ';
         default:
           return '';
       }
@@ -751,30 +904,30 @@ class CenterDetailsPage extends StatelessWidget {
           in c.autismCareCosts.where((e) => e.enabled && e.price > 0)) {
         lines.add([
           item.labelAr,
-          'السعر: ${item.price}',
+          'Ø§Ù„Ø³Ø¹Ø±: ${item.price}',
           if (item.pricingUnit.isNotEmpty)
-            'الوحدة: ${unitLabel(item.pricingUnit)}',
-          item.taxIncluded ? 'الضريبة شاملة' : 'الضريبة غير شاملة',
-        ].join(' • '));
+            'Ø§Ù„ÙˆØ­Ø¯Ø©: ${unitLabel(item.pricingUnit)}',
+          item.taxIncluded ? 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© Ø´Ø§Ù…Ù„Ø©' : 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© ØºÙŠØ± Ø´Ø§Ù…Ù„Ø©',
+        ].join(' â€¢ '));
       }
     } else {
       for (final item
           in c.accommodationCosts.where((e) => e.enabled && e.price > 0)) {
         lines.add([
           item.labelAr,
-          'السعر: ${item.price}',
+          'Ø§Ù„Ø³Ø¹Ø±: ${item.price}',
           if (item.pricingUnit.isNotEmpty)
-            'الوحدة: ${unitLabel(item.pricingUnit)}',
-          if (item.acMode == 'ac') 'مكيف',
-          if (item.acMode == 'non_ac') 'غير مكيف',
-          if (item.includesMedication) 'يشمل الدواء',
-          if (item.includesMeals) 'يشمل الوجبات',
-          if (item.includesOutdoorActivities) 'أنشطة خارجية',
-          if (item.includesRequiredTests) 'يشمل الفحوصات',
-          if (item.includesAirportPickup) 'استقبال مطار',
-          if (item.includesTourismOrExternalOutings) 'جولات خارجية',
-          item.taxIncluded ? 'الضريبة شاملة' : 'الضريبة غير شاملة',
-        ].join(' • '));
+            'Ø§Ù„ÙˆØ­Ø¯Ø©: ${unitLabel(item.pricingUnit)}',
+          if (item.acMode == 'ac') 'Ù…ÙƒÙŠÙ',
+          if (item.acMode == 'non_ac') 'ØºÙŠØ± Ù…ÙƒÙŠÙ',
+          if (item.includesMedication) 'ÙŠØ´Ù…Ù„ Ø§Ù„Ø¯ÙˆØ§Ø¡',
+          if (item.includesMeals) 'ÙŠØ´Ù…Ù„ Ø§Ù„ÙˆØ¬Ø¨Ø§Øª',
+          if (item.includesOutdoorActivities) 'Ø£Ù†Ø´Ø·Ø© Ø®Ø§Ø±Ø¬ÙŠØ©',
+          if (item.includesRequiredTests) 'ÙŠØ´Ù…Ù„ Ø§Ù„ÙØ­ÙˆØµØ§Øª',
+          if (item.includesAirportPickup) 'Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ù…Ø·Ø§Ø±',
+          if (item.includesTourismOrExternalOutings) 'Ø¬ÙˆÙ„Ø§Øª Ø®Ø§Ø±Ø¬ÙŠØ©',
+          item.taxIncluded ? 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© Ø´Ø§Ù…Ù„Ø©' : 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© ØºÙŠØ± Ø´Ø§Ù…Ù„Ø©',
+        ].join(' â€¢ '));
       }
     }
     return lines;
@@ -783,13 +936,13 @@ class CenterDetailsPage extends StatelessWidget {
   List<String> _capabilityLines(CenterModel c) {
     final items = <String>[];
     if (c.capabilities.supportsAddictionCasesWithHiv) {
-      items.add('يدعم حالات الإدمان المصاحبة لفيروس HIV');
+      items.add('ÙŠØ¯Ø¹Ù… Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø¥Ø¯Ù…Ø§Ù† Ø§Ù„Ù…ØµØ§Ø­Ø¨Ø© Ù„ÙÙŠØ±ÙˆØ³ HIV');
     }
     if (c.capabilities.acceptsAddictionCases) {
-      items.add('يستقبل حالات الإدمان');
+      items.add('ÙŠØ³ØªÙ‚Ø¨Ù„ Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø¥Ø¯Ù…Ø§Ù†');
     }
     if (c.capabilities.acceptsPsychiatricCasesWithoutAddiction) {
-      items.add('يستقبل الحالات النفسية بدون إدمان');
+      items.add('ÙŠØ³ØªÙ‚Ø¨Ù„ Ø§Ù„Ø­Ø§Ù„Ø§Øª Ø§Ù„Ù†ÙØ³ÙŠØ© Ø¨Ø¯ÙˆÙ† Ø¥Ø¯Ù…Ø§Ù†');
     }
     return items;
   }
@@ -807,21 +960,21 @@ class CenterDetailsPage extends StatelessWidget {
         lines: [
           _centerTypeLabelAr(c),
           c.hasDetoxUnit
-              ? 'يوجد قسم أعراض انسحاب'
-              : 'بدون قسم أعراض انسحاب مستقل',
+              ? 'ÙŠÙˆØ¬Ø¯ Ù‚Ø³Ù… Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù†Ø³Ø­Ø§Ø¨'
+              : 'Ø¨Ø¯ÙˆÙ† Ù‚Ø³Ù… Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù†Ø³Ø­Ø§Ø¨ Ù…Ø³ØªÙ‚Ù„',
         ],
       ),
       _GridInfoCard(
-        icon: Icons.payments_outlined,
+        icon: Icons.sell_outlined,
         title: l10n.centerPricing,
         lines:
-            _pricingLines(c).isEmpty ? const ['غير محددة'] : _pricingLines(c),
+            _pricingLines(c).isEmpty ? const ['ØºÙŠØ± Ù…Ø­Ø¯Ø¯Ø©'] : _pricingLines(c),
       ),
       _GridInfoCard(
         icon: Icons.verified_user_outlined,
         title: l10n.centerCapabilities,
         lines: _capabilityLines(c).isEmpty
-            ? const ['غير محددة']
+            ? const ['ØºÙŠØ± Ù…Ø­Ø¯Ø¯Ø©']
             : _capabilityLines(c),
       ),
       if (services.isNotEmpty)
@@ -941,25 +1094,20 @@ class CenterDetailsPage extends StatelessWidget {
                     onPressed: () {
                       AppAnalytics.logPathSelected(
                         'centers',
-                        'start_booking',
+                        'legacy_contact_disabled',
                       );
                       Navigator.of(context).pushNamed(
-                        Routes.centerBookingRequest,
-                        arguments: CenterBookingRequestArgs(
-                          centerId: c.id,
-                          centerName: name,
-                          centerType: c.centerType,
-                          hasDetoxUnit: c.hasDetoxUnit,
-                        ),
+                        Routes.centerDetails,
                       );
                     },
                     icon: const Icon(Icons.send_outlined),
                     label: Text(
-                      Localizations.localeOf(context).languageCode
+                      Localizations.localeOf(context)
+                                  .languageCode
                                   .toLowerCase() ==
                               'ar'
-                          ? 'طلب تواصل مع المركز'
-                          : 'Request center contact',
+                          ? 'Ø·Ù„Ø¨ ØªÙˆØ§ØµÙ„ Ù…Ø¹ Ø§Ù„Ù…Ø±ÙƒØ²'
+                          : 'Contact center',
                     ),
                   ),
                 ),
@@ -1073,24 +1221,75 @@ class CenterDetailsPage extends StatelessWidget {
             onPressed: () {
               AppAnalytics.logPathSelected(
                 'centers',
-                'start_booking',
+                'support_choose_center',
               );
               Navigator.of(context).pushNamed(
-                Routes.centerBookingRequest,
-                arguments: CenterBookingRequestArgs(
-                  centerId: c.id,
-                  centerName: name,
-                  centerType: c.centerType,
-                  hasDetoxUnit: c.hasDetoxUnit,
-                ),
+                Routes.supportIssueSelector,
+                arguments: const {
+                  'supportType': 'recovery_support',
+                },
               );
             },
-            icon: const Icon(Icons.send_outlined),
+            icon: const Icon(Icons.support_agent_outlined),
             label: Text(
-              Localizations.localeOf(context).languageCode.toLowerCase() ==
-                      'ar'
-                  ? 'طلب تواصل مع المركز'
-                  : 'Request center contact',
+              Localizations.localeOf(context).languageCode.toLowerCase() == 'ar'
+                  ? 'Ø·Ù„Ø¨ Ø¯Ø¹Ù… Ù„Ù„Ù…Ø³Ø§Ø¹Ø¯Ø© ÙÙŠ Ø§Ù„Ø§Ø®ØªÙŠØ§Ø±'
+                  : 'Get help choosing a center',
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFFFFE7B2),
+              side: BorderSide(
+                color: const Color(0xFFE7C766).withValues(alpha: 0.28),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+            ),
+            onPressed: () {
+              _sendCenterContactRequest(
+                context: context,
+                centerId: c.id,
+                isArabic: Localizations.localeOf(context)
+                        .languageCode
+                        .toLowerCase() ==
+                    'ar',
+              );
+            },
+            icon: const Icon(Icons.contact_page_outlined),
+            label: Text(
+              Localizations.localeOf(context).languageCode.toLowerCase() == 'ar'
+                  ? 'Ø§Ù„ØªÙˆØ§ØµÙ„ Ù…Ø¹ Ø§Ù„Ù…Ø±ÙƒØ²'
+                  : 'Contact center',
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          child: TextButton.icon(
+            onPressed: () => _saveCenterDestination(
+              context: context,
+              center: c,
+              title: name,
+              isArabic:
+                  Localizations.localeOf(context).languageCode.toLowerCase() ==
+                      'ar',
+            ),
+            icon: const Icon(Icons.bookmark_add_outlined),
+            label: Text(
+              Localizations.localeOf(context).languageCode.toLowerCase() == 'ar'
+                  ? 'Ø­ÙØ¸ Ø§Ù„Ù…Ø±ÙƒØ²'
+                  : 'Save center',
+            ),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFFFFE7B2),
             ),
           ),
         ),
@@ -1546,7 +1745,7 @@ class _CenterGalleryCarouselState extends State<_CenterGalleryCarousel> {
                       final value = slides[index];
                       final label = index < widget.labels.length
                           ? widget.labels[index]
-                          : 'صورة المركز';
+                          : 'ØµÙˆØ±Ø© Ø§Ù„Ù…Ø±ÙƒØ²';
 
                       return Padding(
                         padding: const EdgeInsetsDirectional.only(end: 12),
@@ -1762,3 +1961,4 @@ class _CarouselArrow extends StatelessWidget {
     );
   }
 }
+

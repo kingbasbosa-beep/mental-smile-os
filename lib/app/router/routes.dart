@@ -9,6 +9,46 @@ class Routes {
   static const portalContact = '/contact';
   static const splash = '/splash';
 
+  // Signal-first Web Surfaces [S]
+  static const sIndex = '/s';
+  static const sPersonalSpace = '/s/personal-space';
+
+  // Public City Web [S]: marketplace/discovery surface only.
+  static const sCityHome = '/s/city';
+  static const sCityServices = '/s/city/services';
+  static const sCityTools = '/s/city/tools';
+  static const sCityLibrary = '/s/city/library';
+  static const sCityProviders = '/s/city/providers';
+  static const sCityCenters = '/s/city/centers';
+  static const sCityOrganizations = '/s/city/organizations';
+  static const sCityPrograms = '/s/city/programs';
+  static const sCityMarketplace = '/s/city/marketplace';
+
+  // Administrative Capital Web [S]: observability and departments only.
+  static const sCapitalHome = '/s/capital';
+  static const sCapitalAdminOffice = '/s/capital/admin-office';
+  static const sCapitalIncidents = '/s/capital/incidents';
+  static const sCapitalMaintenance = '/s/capital/maintenance';
+  static const sCapitalBroadcasts = '/s/capital/broadcasts';
+  static const sCapitalEmergencyBrief = '/s/capital/emergency-brief';
+  static const sSignalControlRoom = '/s/capital/signal-control-room';
+  static const sCapitalDepartments = '/s/capital/departments';
+  static const sTrustSafety = '/s/capital/trust-safety';
+  static const sFollowUpContinuity = '/s/capital/follow-up-continuity';
+  static const sCapitalReports = '/s/capital/reports';
+  static const sAdministrativeArchive = '/s/capital/admin-archive';
+
+  // Sovereign Owner Web [S]: sovereign decision and memory surface only.
+  static const sOwnerHome = '/s/owner';
+  static const sOwnerRoom = '/s/owner/room';
+  static const sSovereignIntelligence = '/s/owner/sovereign-intelligence';
+  static const sStrategicArchive = '/s/owner/strategic-archive';
+  static const sSovereignVault = '/s/owner/sovereign-vault';
+  static const sConstitutionalMemory = '/s/owner/constitutional-memory';
+  static const sRecoveryConsole = '/s/owner/recovery-console';
+  static const sOwnerCapsules = '/s/owner/capsules';
+  static const sOwnerRegeneration = '/s/owner/regeneration';
+
   // Web Registration Portal
   static const webCenterRegister = '/web/center/register';
   static const webCenterProfile = '/web/center/profile';
@@ -17,7 +57,6 @@ class Routes {
   static const webCenterDocuments = '/web/center/documents';
   static const webClinicianRegister = '/web/clinician/register';
   static const webClinicianProfile = '/web/clinician/profile';
-  static const webClinicianSessions = '/web/clinician/sessions';
   static const webClinicianDocuments = '/web/clinician/documents';
   static const webLibrary = '/web/library';
   static const webLibraryPolicy = '/web/library/policy';
@@ -43,21 +82,17 @@ class Routes {
 
   static const clinicianOperations = '/clinician/operations';
   static const clinicianProfileEditRequest = '/clinician/profile-edit-request';
-  static const clinicianSessions = '/clinician/sessions';
   static const clinicianInbox = '/clinician/inbox';
   static const clinicianChatInbox = '/clinician/chat-inbox';
   // Alias retained for old deep links into the clinician chat inbox.
   static const clinicianChatInboxLegacy = '/chat/clinician/inbox';
 
   static const clientDashboard = '/client/dashboard';
-  static const clientPaymentProof = '/client/payment-proof';
-  static const clientSessions = '/client/sessions';
 
   static const centerDashboard = '/center/dashboard';
   static const centerOperations = '/center/operations';
   static const centerProfileEditRequest = '/center/profile-edit-request';
   static const centerInbox = '/center/inbox';
-  static const centerResidencies = '/center/residencies';
 
   static const chat = '/chat';
   static const chatEscalations = '/chat/escalations';
@@ -75,17 +110,12 @@ class Routes {
   static const centers = '/module/centers';
   static const centersList = '/module/centers/list';
   static const centerDetails = '/module/centers/details';
-  static const centerBookingRequest = '/booking/center-request';
 
   // Alias: webLibrary opens the same LibraryPage as this in-app library route.
   static const library = '/module/library';
-  static const booking = '/booking';
-  static const bookingRequest = '/booking/request';
-  static const myBookings = '/booking/my';
 
   static const adminHub = '/admin/hub';
   static const adminOperations = '/admin/operations';
-  static const adminBookingQueue = '/admin/booking-queue';
   static const adminCommunications = '/admin/communications';
   static const adminClients = '/admin/clients';
   static const adminRegistrationMaintenance = '/admin/registration-maintenance';
@@ -137,17 +167,8 @@ class Routes {
   static const adminCenters = '/admin/centers';
   static const adminCenterDetails = '/admin/centers/details';
   static const adminArchive = '/admin/archive';
-  static const adminArchiveSessions = '/admin/archive/sessions';
-  static const adminArchivePayments = '/admin/archive/payments';
   static const adminArchiveReports = '/admin/archive/reports';
   static const adminArchiveClinicians = '/admin/archive/clinicians';
   static const adminArchiveCenters = '/admin/archive/centers';
   static const adminArchiveSupport = '/admin/archive/support';
-  static const adminArchiveAccounting = '/admin/archive/accounting';
-  static const adminAccountingWorkspace = '/admin/accounting';
-  static const adminPayments = '/admin/payments';
-  static const adminSessions = '/admin/sessions';
-  static const adminSessionReport = '/admin/session-report';
-
-  static const sessionReview = '/session/review';
 }

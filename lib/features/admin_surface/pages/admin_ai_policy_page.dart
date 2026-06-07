@@ -215,6 +215,9 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
         responseTemplates[entry.key] = entry.value.text.trim();
       }
 
+      // [S] AI Policy Asset
+      // Approved by Wave S-3 Classification Board.
+      // Policy documents only; do not couple to booking/session/payment.
       await FirebaseFirestore.instance
           .collection('ai_policies')
           .doc('draft')
@@ -321,6 +324,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
     });
 
     try {
+      // [S] AI Policy Asset
+      // Reads draft policy document only; not a legacy workflow source.
       final draftSnapshot = await FirebaseFirestore.instance
           .collection('ai_policies')
           .doc('draft')
@@ -340,6 +345,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
 
       final draftVersion = _stringValue(draftData, 'policyVersion');
 
+      // [S] AI Policy Asset
+      // Publishes policy document only; not an execution authority.
       await FirebaseFirestore.instance
           .collection('ai_policies')
           .doc('published')
@@ -717,6 +724,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
     required Color accent,
   }) {
     final isDraft = documentId == 'draft';
+    // [S] AI Policy Asset
+    // Display-only policy document stream.
     final stream = FirebaseFirestore.instance
         .collection('ai_policies')
         .doc(documentId)
@@ -942,6 +951,8 @@ class _AdminAiPolicyPageState extends State<AdminAiPolicyPage> {
   }
 
   Widget _buildComparisonSection(BuildContext context, bool isArabic) {
+    // [S] AI Policy Asset
+    // Comparison reads policy documents only.
     final draftStream = FirebaseFirestore.instance
         .collection('ai_policies')
         .doc('draft')

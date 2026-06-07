@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
@@ -124,8 +124,6 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
     switch (status) {
       case 'assigned_clinician':
         return l10n.clinicianNewRequests;
-      case 'awaiting_payment':
-        return l10n.clinicianAwaitingPayment;
       case 'clinician_rejected':
         return l10n.clinicianClosed;
       default:
@@ -137,7 +135,6 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
     final l10n = AppLocalizations.of(context)!;
     final items = <Map<String, String>>[
       {'key': 'assigned_clinician', 'label': l10n.clinicianNewRequests},
-      {'key': 'awaiting_payment', 'label': l10n.clinicianAwaitingPayment},
       {'key': 'clinician_rejected', 'label': l10n.clinicianClosed},
     ];
 
@@ -177,7 +174,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
             isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
-            isArabic ? 'صندوق طلبات خدمة قديم' : 'Legacy request inbox',
+            isArabic ? 'ØµÙ†Ø¯ÙˆÙ‚ Ø·Ù„Ø¨Ø§Øª Ø®Ø¯Ù…Ø© Ù‚Ø¯ÙŠÙ…' : 'Legacy request inbox',
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -186,7 +183,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
           const SizedBox(height: 6),
           Text(
             isArabic
-                ? 'هذه الصفحة ما زالت متاحة للتوافق والمتابعة، لكن المساحة الأساسية لطلبات الأخصائي داخل Specialist Workspace أصبحت غرفة عمليات الأخصائي.'
+                ? 'Ù‡Ø°Ù‡ Ø§Ù„ØµÙØ­Ø© Ù…Ø§ Ø²Ø§Ù„Øª Ù…ØªØ§Ø­Ø© Ù„Ù„ØªÙˆØ§ÙÙ‚ ÙˆØ§Ù„Ù…ØªØ§Ø¨Ø¹Ø©ØŒ Ù„ÙƒÙ† Ø§Ù„Ù…Ø³Ø§Ø­Ø© Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ© Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ Ø¯Ø§Ø®Ù„ Specialist Workspace Ø£ØµØ¨Ø­Øª ØºØ±ÙØ© Ø¹Ù…Ù„ÙŠØ§Øª Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ.'
                 : 'This page remains available for compatibility and follow-up, but the primary specialist workspace for assignments is now Clinician Operations.',
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.start,
@@ -205,20 +202,18 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
 
     try {
       await _updateRequestEverywhere(docId, {
-        'status': 'awaiting_payment',
+        'status': 'clinician_confirmed_legacy',
         'approvedSlot': slot.isEmpty ? 'Next available' : slot,
         'handledByClinicianId': clinicianUid,
         'clinicianDecisionType': 'approved',
         'clinicianDecisionBy': clinicianUid,
         'clinicianDecisionAt': FieldValue.serverTimestamp(),
         'clinicianDecisionNote': slot.isEmpty ? 'Next available' : slot,
-        'paymentStatus': 'not_started',
         'sessionStatus': 'not_created',
         'reviewStatus': 'not_started',
-        'payoutStatus': 'blocked',
       });
       messenger.showSnackBar(
-        SnackBar(content: Text(l10n.clinicianApprovalSent)),
+        SnackBar(content: Text(l10n.clinicianAcceptRequest)),
       );
     } catch (e) {
       messenger.showSnackBar(
@@ -270,13 +265,12 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
     try {
       await _updateRequestEverywhere(docId, {
         'status': 'clinician_rejected',
-        'rejectReason': reason.isEmpty ? 'تم الرفض' : reason,
+        'rejectReason': reason.isEmpty ? 'ØªÙ… Ø§Ù„Ø±ÙØ¶' : reason,
         'handledByClinicianId': clinicianUid,
         'clinicianDecisionType': 'rejected',
         'clinicianDecisionBy': clinicianUid,
         'clinicianDecisionAt': FieldValue.serverTimestamp(),
-        'clinicianDecisionNote': reason.isEmpty ? 'تم الرفض' : reason,
-        'paymentStatus': 'blocked',
+        'clinicianDecisionNote': reason.isEmpty ? 'ØªÙ… Ø§Ù„Ø±ÙØ¶' : reason,
         'sessionStatus': 'cancelled',
       });
       messenger.showSnackBar(
@@ -305,7 +299,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
             child: Padding(
               padding: EdgeInsets.all(24),
               child: Text(
-                'تم إيقاف صندوق الوارد القديم مؤقتًا. استخدم غرفة عمليات الأخصائي.',
+                'ØªÙ… Ø¥ÙŠÙ‚Ø§Ù ØµÙ†Ø¯ÙˆÙ‚ Ø§Ù„ÙˆØ§Ø±Ø¯ Ø§Ù„Ù‚Ø¯ÙŠÙ… Ù…Ø¤Ù‚ØªÙ‹Ø§. Ø§Ø³ØªØ®Ø¯Ù… ØºØ±ÙØ© Ø¹Ù…Ù„ÙŠØ§Øª Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ.',
                 textAlign: TextAlign.center,
               ),
             ),
@@ -333,7 +327,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
                 child: TextField(
                   controller: _slotCtrl,
                   decoration: const InputDecoration(
-                    labelText: 'موعد أو ملاحظة القبول',
+                    labelText: 'Ù…ÙˆØ¹Ø¯ Ø£Ùˆ Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„Ù‚Ø¨ÙˆÙ„',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -343,7 +337,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
                 stream: q.snapshots(),
                 builder: (context, snap) {
                   if (snap.hasError) {
-                    return Center(child: Text('خطأ: ${snap.error}'));
+                    return Center(child: Text('Ø®Ø·Ø£: ${snap.error}'));
                   }
                   if (!snap.hasData) {
                     return const Center(child: CircularProgressIndicator());
@@ -361,8 +355,8 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
                     return Center(
                       child: Text(
                         _statusFilter == 'assigned_clinician'
-                            ? 'لا توجد طلبات جديدة بانتظار الأخصائي'
-                            : 'لا توجد نتائج',
+                            ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª Ø¬Ø¯ÙŠØ¯Ø© Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ'
+                            : 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù†ØªØ§Ø¦Ø¬',
                       ),
                     );
                   }
@@ -377,7 +371,7 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
                       final data = d.data();
 
                       final clientName =
-                          (data['clientName'] ?? data['clientId'] ?? 'عميل')
+                          (data['clientName'] ?? data['clientId'] ?? 'Ø¹Ù…ÙŠÙ„')
                               .toString();
                       final createdAt = _fmtCreatedAt(data['createdAt']);
                       final status = (data['status'] ?? '').toString();
@@ -388,8 +382,6 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
                           (data['approvedSlot'] ?? '').toString();
                       final adminDecisionNote =
                           (data['adminDecisionNote'] ?? '').toString();
-                      final paymentStatus =
-                          (data['paymentStatus'] ?? '').toString();
                       final sessionStatus =
                           (data['sessionStatus'] ?? '').toString();
 
@@ -412,34 +404,30 @@ class _ClinicianInboxPageState extends State<ClinicianInboxPage> {
                                     Text(
                                       createdAt.isEmpty
                                           ? _statusLabel(status, l10n)
-                                          : '${_statusLabel(status, l10n)} • $createdAt',
+                                          : '${_statusLabel(status, l10n)} â€¢ $createdAt',
                                       style:
                                           Theme.of(context).textTheme.bodySmall,
                                     ),
                                     if (note.isNotEmpty) ...[
                                       const SizedBox(height: 8),
-                                      Text('ملاحظة العميل: $note'),
+                                      Text('Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„Ø¹Ù…ÙŠÙ„: $note'),
                                     ],
                                     if (adminDecisionNote.isNotEmpty) ...[
                                       const SizedBox(height: 8),
                                       Text(
-                                          'ملاحظة الإدارة: $adminDecisionNote'),
+                                          'Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©: $adminDecisionNote'),
                                     ],
                                     if (approvedSlot.isNotEmpty) ...[
                                       const SizedBox(height: 8),
-                                      Text('موعد/ملاحظة القبول: $approvedSlot'),
+                                      Text('Ù…ÙˆØ¹Ø¯/Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„Ù‚Ø¨ÙˆÙ„: $approvedSlot'),
                                     ],
                                     if (rejectReason.isNotEmpty) ...[
                                       const SizedBox(height: 8),
-                                      Text('سبب الرفض: $rejectReason'),
-                                    ],
-                                    if (paymentStatus.isNotEmpty) ...[
-                                      const SizedBox(height: 8),
-                                      Text('حالة الدفع: $paymentStatus'),
+                                      Text('Ø³Ø¨Ø¨ Ø§Ù„Ø±ÙØ¶: $rejectReason'),
                                     ],
                                     if (sessionStatus.isNotEmpty) ...[
                                       const SizedBox(height: 8),
-                                      Text('حالة الجلسة: $sessionStatus'),
+                                      Text('Ø­Ø§Ù„Ø© Ø§Ù„Ø¬Ù„Ø³Ø©: $sessionStatus'),
                                     ],
                                   ],
                                 ),

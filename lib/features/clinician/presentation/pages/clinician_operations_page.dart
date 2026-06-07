@@ -154,7 +154,6 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
         'clinicianRejected': false,
         'clinicianCompleted': false,
         'clinicianRespondedAt': FieldValue.serverTimestamp(),
-        'payment_confirmed': false,
         'sessionStatus': 'not_created',
         'reviewStatus': 'not_started',
       });
@@ -199,34 +198,6 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
       await _setBusy(requestId, false);
     }
   }
-
-  Future<void> _markCompleted(String requestId) async {
-    await _setBusy(requestId, true);
-    try {
-      await _updateRequestEverywhere(requestId, {
-        'status': 'session_completed_pending_reviews',
-        'clinicianAccepted': true,
-        'clinicianRejected': false,
-        'clinicianCompleted': true,
-        'completedAt': FieldValue.serverTimestamp(),
-        'reviewStatus': 'pending_reviews',
-      });
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            _isArabic(context)
-                ? 'تم تعليم الجلسة كمكتملة وبانتظار التقييمات'
-                : 'Session marked completed and now pending reviews.',
-          ),
-        ),
-      );
-    } finally {
-      await _setBusy(requestId, false);
-    }
-  }
-
   bool _matchesTab(String status) {
     switch (_tab) {
       case 'in_progress':
@@ -245,13 +216,6 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
       default:
         return status == 'assigned_clinician';
     }
-  }
-
-  bool _paymentConfirmedFrom(Map<String, dynamic> data) {
-    final explicitGate = data['payment_confirmed'] ?? data['paymentConfirmed'];
-    if (explicitGate is bool) return explicitGate;
-
-    return false;
   }
 
   String _statusLabel(String status, AppLocalizations l10n) {
@@ -396,8 +360,6 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
           clinicianPhotoUrl: clinicianPhotoUrl,
         ),
         SizedBox(height: compact ? 4.0 : 8.0),
-        _buildRatingsSummary(isArabic),
-        SizedBox(height: compact ? 8.0 : 16.0),
         _buildOperationsActions(
           context: context,
           isArabic: isArabic,
@@ -488,16 +450,6 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
               'assets/images/clinicians_dashboard/actions/clinician_edit_profile.png',
           onTap: () => Navigator.of(context).pushNamed(
             Routes.clinicianProfileEditRequest,
-          ),
-        ),
-        _OperationActionButton(
-          label: isArabic ? 'تنسيق الخدمة' : 'Service coordination',
-          icon: Icons.video_call_outlined,
-          imageAsset:
-              'assets/images/clinicians_dashboard/actions/clinician_sessions.png',
-          primary: true,
-          onTap: () => Navigator.of(context).pushNamed(
-            Routes.clinicianSessions,
           ),
         ),
       ],
@@ -1118,21 +1070,11 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
     final clientId = (data['clientId'] ?? '').toString();
     final note = (data['note'] ?? '').toString();
     final status = (data['status'] ?? 'assigned_clinician').toString();
-    final clinicianReviewSubmitted =
-        (data['clinicianReviewSubmitted'] ?? false) == true;
     final createdAt = _dateText(data['createdAt']);
     final assignedName = (data['assignedClinicianName'] ?? '').toString();
     final sessionStatus = (data['sessionStatus'] ?? '').toString();
     final reviewStatus = (data['reviewStatus'] ?? '').toString();
     final clinicianAccepted = (data['clinicianAccepted'] ?? false) == true;
-    final paymentConfirmed = _paymentConfirmedFrom(data);
-    final canReviewSession = !clinicianReviewSubmitted &&
-        (status == 'session_completed_pending_reviews' ||
-            (sessionStatus == 'completed' &&
-                (reviewStatus == 'pending_reviews' ||
-                    reviewStatus == 'partial')));
-    final canMarkCompleted =
-        paymentConfirmed && status == 'session_in_progress';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -1247,141 +1189,12 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-              if (canMarkCompleted)
-                FilledButton.tonalIcon(
-                  onPressed: busy ? null : () => _markCompleted(requestId),
-                  icon: const Icon(Icons.task_alt_outlined),
-                  label: Text(
-                    l10n.clinicianEndSession,
-                    maxLines: 2,
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              if (canReviewSession)
-                FilledButton.icon(
-                  onPressed: busy
-                      ? null
-                      : () {
-                          Navigator.of(context).pushNamed(
-                            Routes.sessionReview,
-                            arguments: {
-                              'requestId': requestId,
-                              'reviewerType': 'clinician',
-                            },
-                          );
-                        },
-                  icon: const Icon(Icons.rate_review_outlined),
-                  label: Text(
-                    l10n.clinicianReviewSession,
-                    maxLines: 2,
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
             ],
           ),
         ],
       ),
     );
   }
-
-  Widget _buildRatingsSummary(bool isArabic) {
-    if (_uid.isEmpty) return const SizedBox.shrink();
-
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance
-          .collection('sessionRatings')
-          .where('clinicianId', isEqualTo: _uid)
-          .where('reviewerType', isEqualTo: 'client')
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return _buildRatingsCompactCounters(
-            l10n: AppLocalizations.of(context)!,
-            isArabic: isArabic,
-            count: '--',
-            avgStars: '--',
-            avgPercentage: '--',
-          );
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting &&
-            !snapshot.hasData) {
-          return const Center(
-            child: SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 1.6,
-                color: Color(0xFFE7C766),
-              ),
-            ),
-          );
-        }
-
-        final docs = snapshot.data?.docs ?? const [];
-        final compactCount = docs.length;
-        double compactTotalStars = 0;
-        double compactTotalPercentage = 0;
-
-        for (final doc in docs) {
-          final data = doc.data();
-          compactTotalStars += ((data['derivedStars'] ?? 0) as num).toDouble();
-          compactTotalPercentage +=
-              ((data['percentageScore'] ?? 0) as num).toDouble();
-        }
-
-        final compactAvgStars =
-            compactCount == 0 ? 0.0 : compactTotalStars / compactCount;
-        final compactAvgPercentage =
-            compactCount == 0 ? 0.0 : compactTotalPercentage / compactCount;
-
-        return _buildRatingsCompactCounters(
-          l10n: AppLocalizations.of(context)!,
-          isArabic: isArabic,
-          count: '$compactCount',
-          avgStars: compactAvgStars.toStringAsFixed(1),
-          avgPercentage: '${compactAvgPercentage.toStringAsFixed(1)}%',
-        );
-      },
-    );
-  }
-
-  Widget _buildRatingsCompactCounters({
-    required AppLocalizations l10n,
-    required bool isArabic,
-    required String count,
-    required String avgStars,
-    required String avgPercentage,
-  }) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 460),
-        child: Wrap(
-          alignment: WrapAlignment.center,
-          runAlignment: WrapAlignment.center,
-          spacing: 7,
-          runSpacing: 7,
-          children: [
-            _RatingMetricChip(
-              title: l10n.clinicianRatings,
-              value: count,
-            ),
-            _RatingMetricChip(
-              title: l10n.clinicianStars,
-              value: avgStars,
-            ),
-            _RatingMetricChip(
-              title: l10n.clinicianOverall,
-              value: avgPercentage,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Future<void> _submitProfileChangeRequest(
     BuildContext context,
     Map<String, dynamic>? clinicianData,
@@ -1581,67 +1394,6 @@ class _ClinicianOperationsPageState extends State<ClinicianOperationsPage> {
   }
 }
 
-class _RatingMetricChip extends StatelessWidget {
-  final String title;
-  final String value;
-
-  const _RatingMetricChip({
-    required this.title,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minWidth: 86),
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: const Color(0xFFE7C766).withValues(alpha: 0.22),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFE7C766).withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            value,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: const Color(0xFFFFE7B2),
-                  fontWeight: FontWeight.w900,
-                  height: 1.0,
-                  letterSpacing: 0,
-                ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.64),
-                  fontWeight: FontWeight.w600,
-                  height: 1.0,
-                  letterSpacing: 0,
-                ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _ClinicianLogoutButton extends StatelessWidget {
   final VoidCallback onPressed;

@@ -13,19 +13,18 @@ import 'package:flutterprojects/features/web_registration/presentation/pages/web
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_center_documents_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_register_portal_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_profile_page.dart';
-import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_sessions_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_documents_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_registration_success_page.dart';
 import 'package:flutterprojects/features/web_portal/presentation/pages/portal_skeleton_pages.dart';
+import 'package:flutterprojects/features/s_capital/presentation/pages/s_admin_operations_office_page.dart';
+import 'package:flutterprojects/features/s_capital/presentation/pages/s_signal_control_room_page.dart';
+import 'package:flutterprojects/features/s_city/presentation/pages/s_city_district_page.dart';
+import 'package:flutterprojects/features/s_owner/presentation/pages/s_owner_district_page.dart';
+import 'package:flutterprojects/features/s_web_surfaces/presentation/pages/s_web_surface_pages.dart';
+import 'package:flutterprojects/features/s_personal_space/presentation/pages/s_personal_space_page.dart';
 
-import 'package:flutterprojects/features/booking/presentation/pages/booking_page.dart';
-import 'package:flutterprojects/features/booking/presentation/pages/booking_request_page.dart';
-import 'package:flutterprojects/features/clinician/presentation/pages/clinician_sessions_page.dart';
-import 'package:flutterprojects/features/booking/presentation/pages/center_booking_request_page.dart';
-import 'package:flutterprojects/features/booking/presentation/pages/my_bookings_page.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/clinician_inbox_page.dart';
 import 'package:flutterprojects/features/booking/presentation/pages/center_inbox_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_booking_queue_page.dart';
 
 import 'package:flutterprojects/features/library/presentation/pages/library_page.dart';
 import 'package:flutterprojects/features/library/presentation/pages/library_policy_page.dart';
@@ -95,25 +94,14 @@ import 'package:flutterprojects/features/admin_surface/pages/admin_alerts_review
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_centers_page.dart';
 import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_clinicians_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_archive_support_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_accounting_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_archive_sessions_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_archive_payments_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_archive_reports_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_session_report_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_profile_requests_page.dart';
-import 'package:flutterprojects/features/reviews/presentation/pages/session_review_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_payments_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/accounting_workspace_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_sessions_page.dart';
-import 'package:flutterprojects/features/client/presentation/pages/client_payment_proof_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_requests_page.dart';
 import 'package:flutterprojects/features/admin_surface/pages/admin_support_chat_page.dart';
 import 'package:flutterprojects/features/clinician/presentation/pages/clinician_operations_page.dart';
 import 'package:flutterprojects/features/client/presentation/pages/client_dashboard_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_dashboard_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_operations_page.dart';
-import 'package:flutterprojects/features/centers/presentation/pages/center_residencies_page.dart';
-import 'package:flutterprojects/features/client/presentation/pages/client_sessions_page.dart';
 
 const String _roleAdmin = 'admin';
 const String _roleClinician = 'clinician';
@@ -124,15 +112,12 @@ class AppRouter {
   static const Set<String> _adminOnlyRoutes = {
     Routes.adminHub,
     Routes.adminOperations,
-    Routes.adminBookingQueue,
     Routes.adminCommunications,
     Routes.adminClinicianRequests,
     Routes.adminClinicianWorkspace,
     Routes.adminClinicianProfileRequests,
     Routes.adminClients,
     Routes.adminRegistrationMaintenance,
-    Routes.adminPayments,
-    Routes.adminSessions,
     Routes.adminSupportChats,
     Routes.adminAlertsReview,
     Routes.adminAiPolicies,
@@ -169,15 +154,10 @@ class AppRouter {
     Routes.adminEngineeringGateway,
     Routes.adminDeviceStorageGateway,
     Routes.adminArchive,
-    Routes.adminArchiveSessions,
-    Routes.adminArchivePayments,
     Routes.adminArchiveReports,
     Routes.adminArchiveClinicians,
     Routes.adminArchiveCenters,
     Routes.adminArchiveSupport,
-    Routes.adminArchiveAccounting,
-    Routes.adminAccountingWorkspace,
-    Routes.adminSessionReport,
     Routes.adminCenters,
     Routes.adminCenterDetails,
     Routes.chatEscalations,
@@ -190,7 +170,6 @@ class AppRouter {
     Routes.clinicianInbox,
     Routes.clinicianChatInbox,
     Routes.clinicianChatInboxLegacy,
-    Routes.clinicianSessions,
   };
 
   static const Set<String> _centerOnlyRoutes = {
@@ -198,16 +177,11 @@ class AppRouter {
     Routes.centerOperations,
     Routes.centerProfileEditRequest,
     Routes.centerInbox,
-    Routes.centerResidencies,
   };
 
   static const Set<String> _clientOnlyRoutes = {
+    Routes.sPersonalSpace,
     Routes.clientDashboard,
-    Routes.clientPaymentProof,
-    Routes.clientSessions,
-    Routes.myBookings,
-    Routes.bookingRequest,
-    Routes.centerBookingRequest,
   };
 
   static bool _isAdminRoute(String? routeName) {
@@ -225,21 +199,14 @@ class AppRouter {
       case Routes.centerOperations:
       case Routes.centerProfileEditRequest:
       case Routes.centerInbox:
-      case Routes.centerResidencies:
       case Routes.clinicianOperations:
       case Routes.clinicianProfileEditRequest:
       case Routes.clinicianInbox:
       case Routes.clinicianChatInbox:
       case Routes.clinicianChatInboxLegacy:
-      case Routes.clinicianSessions:
       case Routes.blockedAccount:
       case Routes.clientDashboard:
-      case Routes.clientPaymentProof:
-      case Routes.clientSessions:
-      case Routes.myBookings:
-      case Routes.bookingRequest:
-      case Routes.centerBookingRequest:
-      case Routes.sessionReview:
+      case Routes.sPersonalSpace:
         return true;
       default:
         return false;
@@ -584,18 +551,6 @@ class AppRouter {
           settings: settings,
         );
 
-      case Routes.adminAccountingWorkspace:
-        return _adminProtectedRoute(
-          child: const AccountingWorkspacePage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchivePayments:
-        return _adminProtectedRoute(
-          child: const AdminArchivePaymentsPage(),
-          settings: settings,
-        );
-
       case Routes.adminArchiveClinicians:
         return _adminProtectedRoute(
           child: const AdminArchiveCliniciansPage(),
@@ -614,21 +569,9 @@ class AppRouter {
           settings: settings,
         );
 
-      case Routes.adminArchiveAccounting:
-        return _adminProtectedRoute(
-          child: const AdminArchiveAccountingPage(),
-          settings: settings,
-        );
-
       case Routes.adminArchiveReports:
         return _adminProtectedRoute(
           child: const AdminArchiveReportsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveSessions:
-        return _adminProtectedRoute(
-          child: const AdminArchiveSessionsPage(),
           settings: settings,
         );
 
@@ -641,6 +584,25 @@ class AppRouter {
       default:
         return null;
     }
+  }
+
+  static Route<dynamic> _sWebSurfaceRoute({
+    required RouteSettings settings,
+    required String surfaceName,
+    required String surfaceType,
+    required String description,
+    required List<String> items,
+  }) {
+    return MaterialPageRoute(
+      builder: (_) => SWebSurfacePage(
+        surfaceName: surfaceName,
+        surfaceType: surfaceType,
+        routeName: settings.name ?? '',
+        description: description,
+        items: items,
+      ),
+      settings: settings,
+    );
   }
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -656,6 +618,348 @@ class AppRouter {
     }
 
     switch (settings.name) {
+      case Routes.sIndex:
+        return MaterialPageRoute(
+          builder: (_) => const SSurfaceIndexPage(),
+          settings: settings,
+        );
+
+      case Routes.sPersonalSpace:
+        return _protectedRoute(
+          child: const SPersonalSpacePage(),
+          settings: settings,
+        );
+
+      case Routes.sCityHome:
+        return MaterialPageRoute(
+          builder: (_) => const SCityDistrictPage(),
+          settings: settings,
+        );
+
+      case Routes.sCityServices:
+        return _sWebSurfaceRoute(
+          settings: settings,
+          surfaceName: 'City Services',
+          surfaceType: 'Public City Web [S]',
+          description:
+              'Future public service catalog surface. This is not booking and does not submit operational requests.',
+          items: const <String>[
+            'Professional Services',
+            'Education Services',
+            'Marketing Services',
+            'Technical Services',
+          ],
+        );
+
+      case Routes.sCityTools:
+        return _sWebSurfaceRoute(
+          settings: settings,
+          surfaceName: 'City Tools',
+          surfaceType: 'Public City Web [S]',
+          description:
+              'Future public tool catalog for discoverable tools and destinations.',
+          items: const <String>[
+            'Support Tools',
+            'Learning Tools',
+            'Family Tools',
+            'Provider Tools',
+            'Center Tools',
+          ],
+        );
+
+      case Routes.sCityLibrary:
+        return _sWebSurfaceRoute(
+          settings: settings,
+          surfaceName: 'City Library',
+          surfaceType: 'Public City Web [S]',
+          description:
+              'Future public knowledge and library discovery surface separated from the personal app room.',
+          items: const <String>[
+            'Public Knowledge',
+            'Guides',
+            'Exercises',
+            'Videos',
+            'Audio',
+            'Saved destination targets',
+          ],
+        );
+
+      case Routes.sCityProviders:
+        return _sWebSurfaceRoute(
+          settings: settings,
+          surfaceName: 'Provider Directory',
+          surfaceType: 'Public City Web [S]',
+          description:
+              'Future provider discovery surface. Matching and personal recommendations remain outside this placeholder.',
+          items: const <String>[
+            'Provider Profiles',
+            'Capability Labels',
+            'Accessibility Labels',
+            'Public Discovery',
+          ],
+        );
+
+      case Routes.sCityCenters:
+        return _sWebSurfaceRoute(
+          settings: settings,
+          surfaceName: 'Center Directory',
+          surfaceType: 'Public City Web [S]',
+          description:
+              'Future center and institution discovery surface without legacy booking movement.',
+          items: const <String>[
+            'Center Profiles',
+            'Programs',
+            'Capability Labels',
+            'Accessibility Labels',
+          ],
+        );
+
+      case Routes.sCityOrganizations:
+        return _sWebSurfaceRoute(
+          settings: settings,
+          surfaceName: 'Organization Directory',
+          surfaceType: 'Public City Web [S]',
+          description:
+              'Future organizations surface for NGOs, community groups, institutions, and human impact networks.',
+          items: const <String>[
+            'NGOs',
+            'Foundations',
+            'Community Groups',
+            'Educational Institutions',
+            'Accessibility Organizations',
+          ],
+        );
+
+      case Routes.sCityPrograms:
+        return _sWebSurfaceRoute(
+          settings: settings,
+          surfaceName: 'Programs',
+          surfaceType: 'Public City Web [S]',
+          description:
+              'Future public program catalog for education, awareness, recovery, accessibility, and family support programs.',
+          items: const <String>[
+            'Education Programs',
+            'Awareness Programs',
+            'Recovery Programs',
+            'Family Programs',
+            'Accessibility Programs',
+          ],
+        );
+
+      case Routes.sCityMarketplace:
+        return _sWebSurfaceRoute(
+          settings: settings,
+          surfaceName: 'Marketplace',
+          surfaceType: 'Public City Web [S]',
+          description:
+              'Future marketplace surface for catalogs and service discovery. This placeholder does not create purchases, payments, or subscriptions.',
+          items: const <String>[
+            'Service Catalog',
+            'Tool Catalog',
+            'Course Catalog',
+            'Professional Services',
+          ],
+        );
+
+      case Routes.sCapitalHome:
+        return MaterialPageRoute(
+          builder: (_) => const SAdminOperationsOfficePage(),
+          settings: settings,
+        );
+
+      case Routes.sCapitalAdminOffice:
+        return MaterialPageRoute(
+          builder: (_) => const SAdminOperationsOfficePage(
+            focus: SCapitalOfficeFocus.adminOffice,
+          ),
+          settings: settings,
+        );
+
+      case Routes.sCapitalIncidents:
+        return MaterialPageRoute(
+          builder: (_) => const SAdminOperationsOfficePage(
+            focus: SCapitalOfficeFocus.incidents,
+          ),
+          settings: settings,
+        );
+
+      case Routes.sCapitalMaintenance:
+        return MaterialPageRoute(
+          builder: (_) => const SAdminOperationsOfficePage(
+            focus: SCapitalOfficeFocus.maintenance,
+          ),
+          settings: settings,
+        );
+
+      case Routes.sCapitalBroadcasts:
+        return MaterialPageRoute(
+          builder: (_) => const SAdminOperationsOfficePage(
+            focus: SCapitalOfficeFocus.broadcasts,
+          ),
+          settings: settings,
+        );
+
+      case Routes.sCapitalEmergencyBrief:
+        return MaterialPageRoute(
+          builder: (_) => const SAdminOperationsOfficePage(
+            focus: SCapitalOfficeFocus.emergencyBrief,
+          ),
+          settings: settings,
+        );
+
+      case Routes.sSignalControlRoom:
+        return MaterialPageRoute(
+          builder: (_) => const SSignalControlRoomPage(),
+          settings: settings,
+        );
+
+      case Routes.sCapitalDepartments:
+        return _sWebSurfaceRoute(
+          settings: settings,
+          surfaceName: 'Departments',
+          surfaceType: 'Administrative Capital Web [S]',
+          description:
+              'Future department operating surface for non-sovereign execution units.',
+          items: const <String>[
+            'Marketing Studio',
+            'Technical Studio',
+            'Education Services',
+            'Provider Operations',
+            'Center Operations',
+            'Partnership Office',
+          ],
+        );
+
+      case Routes.sTrustSafety:
+        return _sWebSurfaceRoute(
+          settings: settings,
+          surfaceName: 'Trust & Safety',
+          surfaceType: 'Administrative Capital Web [S]',
+          description:
+              'Future trust, safety, complaints, and escalation monitoring surface. Not a legacy admin queue.',
+          items: const <String>[
+            'Safety Signals',
+            'Complaint Patterns',
+            'Escalation Visibility',
+            'Policy References',
+          ],
+        );
+
+      case Routes.sFollowUpContinuity:
+        return _sWebSurfaceRoute(
+          settings: settings,
+          surfaceName: 'Follow-up Continuity',
+          surfaceType: 'Administrative Capital Web [S]',
+          description:
+              'Future continuity surface for non-diagnostic support follow-up signals and outreach visibility.',
+          items: const <String>[
+            'Continuity Signals',
+            'Check-in Visibility',
+            'Support Handoffs',
+            'Human Review Notes',
+          ],
+        );
+
+      case Routes.sCapitalReports:
+        return _sWebSurfaceRoute(
+          settings: settings,
+          surfaceName: 'Reports',
+          surfaceType: 'Administrative Capital Web [S]',
+          description:
+              'Future reporting surface for department, signal, content, and operational reports.',
+          items: const <String>[
+            'Signal Reports',
+            'Department Reports',
+            'Content Reports',
+            'Support Reports',
+          ],
+        );
+
+      case Routes.sAdministrativeArchive:
+        return _sWebSurfaceRoute(
+          settings: settings,
+          surfaceName: 'Administrative Archive',
+          surfaceType: 'Administrative Capital Web [S]',
+          description:
+              'Administrative memory surface for non-sovereign operational records and references.',
+          items: const <String>[
+            'Operational Records',
+            'Reports Archive',
+            'Incident References',
+            'Department Memory',
+          ],
+        );
+
+      case Routes.sOwnerHome:
+        return MaterialPageRoute(
+          builder: (_) => const SOwnerDistrictPage(),
+          settings: settings,
+        );
+
+      case Routes.sOwnerRoom:
+        return MaterialPageRoute(
+          builder: (_) => const SOwnerDistrictPage(
+            focus: SOwnerDistrictFocus.ownerRoom,
+          ),
+          settings: settings,
+        );
+
+      case Routes.sSovereignIntelligence:
+        return MaterialPageRoute(
+          builder: (_) => const SOwnerDistrictPage(
+            focus: SOwnerDistrictFocus.executiveIntelligence,
+          ),
+          settings: settings,
+        );
+
+      case Routes.sStrategicArchive:
+        return MaterialPageRoute(
+          builder: (_) => const SOwnerDistrictPage(
+            focus: SOwnerDistrictFocus.strategicArchive,
+          ),
+          settings: settings,
+        );
+
+      case Routes.sSovereignVault:
+        return MaterialPageRoute(
+          builder: (_) => const SOwnerDistrictPage(
+            focus: SOwnerDistrictFocus.sovereignVault,
+          ),
+          settings: settings,
+        );
+
+      case Routes.sConstitutionalMemory:
+        return MaterialPageRoute(
+          builder: (_) => const SOwnerDistrictPage(
+            focus: SOwnerDistrictFocus.constitutionalMemory,
+          ),
+          settings: settings,
+        );
+
+      case Routes.sRecoveryConsole:
+        return MaterialPageRoute(
+          builder: (_) => const SOwnerDistrictPage(
+            focus: SOwnerDistrictFocus.recoveryConsole,
+          ),
+          settings: settings,
+        );
+
+      case Routes.sOwnerCapsules:
+        return MaterialPageRoute(
+          builder: (_) => const SOwnerDistrictPage(
+            focus: SOwnerDistrictFocus.survivalCapsules,
+          ),
+          settings: settings,
+        );
+
+      case Routes.sOwnerRegeneration:
+        return MaterialPageRoute(
+          builder: (_) => const SOwnerDistrictPage(
+            focus: SOwnerDistrictFocus.regenerationBoard,
+          ),
+          settings: settings,
+        );
+
       case Routes.menu:
         return MaterialPageRoute(
           builder: (_) => const MenuPage(),
@@ -707,18 +1011,6 @@ class AppRouter {
           settings: settings,
         );
 
-      case Routes.adminPayments:
-        return _adminProtectedRoute(
-          child: const AdminPaymentsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminSessions:
-        return _adminProtectedRoute(
-          child: const AdminSessionsPage(),
-          settings: settings,
-        );
-
       case Routes.clinicianOperations:
         return _protectedRoute(
           child: const ClinicianOperationsPage(),
@@ -734,12 +1026,6 @@ class AppRouter {
       case Routes.clientDashboard:
         return _protectedRoute(
           child: const ClientDashboardPage(),
-          settings: settings,
-        );
-
-      case Routes.adminBookingQueue:
-        return _adminProtectedRoute(
-          child: const AdminBookingQueuePage(),
           settings: settings,
         );
 
@@ -788,12 +1074,6 @@ class AppRouter {
       case Routes.webClinicianProfile:
         return MaterialPageRoute(
           builder: (_) => const WebClinicianProfilePage(),
-          settings: settings,
-        );
-
-      case Routes.webClinicianSessions:
-        return MaterialPageRoute(
-          builder: (_) => const WebClinicianSessionsPage(),
           settings: settings,
         );
 
@@ -858,12 +1138,6 @@ class AppRouter {
       case Routes.centerInbox:
         return _protectedRoute(
           child: const CenterInboxPage(),
-          settings: settings,
-        );
-
-      case Routes.centerResidencies:
-        return _protectedRoute(
-          child: const CenterResidenciesPage(),
           settings: settings,
         );
 
@@ -990,139 +1264,6 @@ class AppRouter {
           ),
           settings: settings,
         );
-
-      case Routes.bookingRequest:
-        final rawArgs = settings.arguments;
-        if (rawArgs is! BookingRequestArgs) {
-          return MaterialPageRoute(
-            builder: (ctx) => Scaffold(
-              appBar: AppBar(
-                title: Text(
-                  Localizations.localeOf(ctx).languageCode.toLowerCase() == 'ar'
-                      ? 'طلب حجز'
-                      : 'Booking request',
-                ),
-              ),
-              body: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Text(
-                    Localizations.localeOf(ctx).languageCode.toLowerCase() ==
-                            'ar'
-                        ? 'تعذر فتح صفحة الحجز مباشرة. ارجع إلى صفحة الأخصائيين ثم اختر الأخصائي مرة أخرى.'
-                        : 'Unable to open the booking page directly. Please go back to specialists and choose the specialist again.',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
-            settings: settings,
-          );
-        }
-
-        return _protectedRoute(
-          child: BookingRequestPage(args: rawArgs),
-          settings: settings,
-        );
-
-      case Routes.centerBookingRequest:
-        final rawArgs = settings.arguments;
-        if (rawArgs is! CenterBookingRequestArgs) {
-          return MaterialPageRoute(
-            builder: (ctx) => Scaffold(
-              body: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Text(
-                    AppLocalizations.of(ctx)!.routeNotFound,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
-            settings: settings,
-          );
-        }
-        return _protectedRoute(
-          child: CenterBookingRequestPage(args: rawArgs),
-          settings: settings,
-        );
-
-      case Routes.adminSessionReport:
-        return _adminProtectedRoute(
-          child: const AdminSessionReportPage(),
-          settings: settings,
-        );
-
-      case Routes.sessionReview:
-        final rawArgs = settings.arguments;
-        final args =
-            rawArgs is Map<String, dynamic> ? rawArgs : <String, dynamic>{};
-        final reviewerType = (args['reviewerType'] ?? '').toString();
-        Set<String>? allowedRoles;
-        if (reviewerType == _roleClient) {
-          allowedRoles = {_roleClient};
-        } else if (reviewerType == _roleClinician) {
-          allowedRoles = {_roleClinician, _roleCenter};
-        } else if (reviewerType == _roleCenter) {
-          allowedRoles = {_roleCenter};
-        }
-        final requestId = (args['requestId'] ?? '').toString();
-        if (requestId.isEmpty || reviewerType.isEmpty) {
-          return MaterialPageRoute(
-            builder: (_) => const Scaffold(
-              body: Center(
-                child: Text(
-                  'Missing session review arguments',
-                  textDirection: TextDirection.ltr,
-                ),
-              ),
-            ),
-            settings: settings,
-          );
-        }
-        return MaterialPageRoute(
-          builder: (_) => _RouteAccessGate(
-            routeName: settings.name,
-            allowedRoles: allowedRoles,
-            child: SessionReviewPage(
-              requestId: requestId,
-              reviewerType: reviewerType,
-            ),
-          ),
-          settings: settings,
-        );
-
-      case Routes.clientSessions:
-        return _protectedRoute(
-          child: const ClientSessionsPage(),
-          settings: settings,
-        );
-
-      case Routes.clinicianSessions:
-        return _protectedRoute(
-          child: const ClinicianSessionsPage(),
-          settings: settings,
-        );
-
-      case Routes.clientPaymentProof:
-        return _protectedRoute(
-          child: const ClientPaymentProofPage(),
-          settings: settings,
-        );
-
-      case Routes.myBookings:
-        return _protectedRoute(
-          child: const MyBookingsPage(),
-          settings: settings,
-        );
-
-      case Routes.booking:
-        return MaterialPageRoute(
-          builder: (_) => const BookingPage(),
-          settings: settings,
-        );
-
       case Routes.splash:
         return MaterialPageRoute(
           builder: (_) => const SplashPage(),

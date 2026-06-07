@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -35,44 +35,44 @@ class _WebCenterRegisterPortalPageState
   static const _categories = [
     {
       'key': 'recovery',
-      'labelAr': 'مراكز التعافي',
+      'labelAr': 'Ù…Ø±Ø§ÙƒØ² Ø§Ù„ØªØ¹Ø§ÙÙŠ',
       'labelEn': 'Recovery Centers'
     },
     {
       'key': 'detox',
-      'labelAr': 'مراكز سحب السموم',
+      'labelAr': 'Ù…Ø±Ø§ÙƒØ² Ø³Ø­Ø¨ Ø§Ù„Ø³Ù…ÙˆÙ…',
       'labelEn': 'Detox Centers',
     },
     {
       'key': 'special_needs',
-      'labelAr': 'مراكز رعاية ذوي الاحتياجات الخاصة',
+      'labelAr': 'Ù…Ø±Ø§ÙƒØ² Ø±Ø¹Ø§ÙŠØ© Ø°ÙˆÙŠ Ø§Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„Ø®Ø§ØµØ©',
       'labelEn': 'Special Needs Centers',
     },
     {
       'key': 'hospital',
-      'labelAr': 'المستشفيات',
+      'labelAr': 'Ø§Ù„Ù…Ø³ØªØ´ÙÙŠØ§Øª',
       'labelEn': 'Hospitals',
     },
   ];
   static const _centerTypes = [
     {
       'key': 'halfway_house',
-      'labelAr': 'هاف واي',
+      'labelAr': 'Ù‡Ø§Ù ÙˆØ§ÙŠ',
       'labelEn': 'Halfway House',
     },
     {
       'key': 'detox',
-      'labelAr': 'ديتوكس / أعراض انسحاب',
+      'labelAr': 'Ø¯ÙŠØªÙˆÙƒØ³ / Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù†Ø³Ø­Ø§Ø¨',
       'labelEn': 'Detox',
     },
     {
       'key': 'hospital',
-      'labelAr': 'مستشفى',
+      'labelAr': 'Ù…Ø³ØªØ´ÙÙ‰',
       'labelEn': 'Hospital',
     },
     {
       'key': 'special_needs_care',
-      'labelAr': 'رعاية ذوي الاحتياجات الخاصة',
+      'labelAr': 'Ø±Ø¹Ø§ÙŠØ© Ø°ÙˆÙŠ Ø§Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„Ø®Ø§ØµØ©',
       'labelEn': 'Special Needs Care',
     },
   ];
@@ -256,7 +256,7 @@ class _WebCenterRegisterPortalPageState
                             children: [
                               SizedBox(height: isLandscapeCompact ? 8 : 14),
                               const Text(
-                                'Intake / Review Request: submitting this data or creating an account does not mean automatic approval, activation, payment, booking, or visibility. Licenses and documents remain the applicant responsibility.',
+                                'Intake / Review Request: submitting this data or creating an account does not mean automatic approval, activation, lifecycle ownership, or visibility. Licenses and documents remain the applicant responsibility.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white70,
@@ -271,7 +271,7 @@ class _WebCenterRegisterPortalPageState
                                     .pushNamed(Routes.portalHome),
                                 child: Text(
                                   isArabic
-                                      ? 'العودة إلى بوابة Mental Smile'
+                                      ? 'Ø§Ù„Ø¹ÙˆØ¯Ø© Ø¥Ù„Ù‰ Ø¨ÙˆØ§Ø¨Ø© Mental Smile'
                                       : 'Back to Mental Smile Portal',
                                 ),
                               ),
@@ -527,3 +527,4 @@ class _WebCenterRegisterPortalPageState
     );
   }
 }
+

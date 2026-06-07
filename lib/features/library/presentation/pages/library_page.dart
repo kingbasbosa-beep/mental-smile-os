@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/features/library/data/library_signal_metadata.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
@@ -715,6 +716,12 @@ class _LibraryFeaturedDetail extends StatelessWidget {
                     height: 1.05,
                   ),
                 ),
+                SizedBox(height: compact ? 10 : 12),
+                _LibrarySignalBadges(
+                  keyName: entry.keyName,
+                  isAr: isAr,
+                  maxBadges: 3,
+                ),
                 SizedBox(height: compact ? 14 : 18),
                 Text(
                   isAr
@@ -871,6 +878,12 @@ class _LibraryStandardCategoryDetail extends StatelessWidget {
                     fontWeight: FontWeight.w900,
                     height: 1.05,
                   ),
+                ),
+                SizedBox(height: compact ? 10 : 12),
+                _LibrarySignalBadges(
+                  keyName: category.keyName,
+                  isAr: isAr,
+                  maxBadges: 3,
                 ),
                 SizedBox(height: compact ? 10 : 12),
                 Text(
@@ -1148,6 +1161,16 @@ class _LibraryCarouselCardState extends State<_LibraryCarouselCard> {
               Positioned(
                 left: widget.compact ? 14 : 20,
                 right: widget.compact ? 14 : 20,
+                bottom: widget.compact ? 78 : 96,
+                child: _LibrarySignalBadges(
+                  keyName: widget.category.keyName,
+                  isAr: widget.isAr,
+                  maxBadges: 2,
+                ),
+              ),
+              Positioned(
+                left: widget.compact ? 14 : 20,
+                right: widget.compact ? 14 : 20,
                 bottom: widget.compact ? 18 : 26,
                 child: Text(
                   title,
@@ -1362,6 +1385,58 @@ class _LibraryLogoCircle extends StatelessWidget {
           fit: BoxFit.contain,
         ),
       ),
+    );
+  }
+}
+
+class _LibrarySignalBadges extends StatelessWidget {
+  const _LibrarySignalBadges({
+    required this.keyName,
+    required this.isAr,
+    this.maxBadges = 3,
+  });
+
+  final String keyName;
+  final bool isAr;
+  final int maxBadges;
+
+  @override
+  Widget build(BuildContext context) {
+    final metadata = LibrarySignalCatalog.forKey(keyName);
+    if (metadata == null) return const SizedBox.shrink();
+
+    final labels = metadata.displaySignalKeys
+        .take(maxBadges)
+        .map((key) => LibrarySignalLabels.label(key, isArabic: isAr))
+        .where((label) => label.trim().isNotEmpty)
+        .toList();
+    if (labels.isEmpty) return const SizedBox.shrink();
+
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 6,
+      runSpacing: 6,
+      children: [
+        for (final label in labels)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+            decoration: BoxDecoration(
+              color: const Color(0xFFD8A13F).withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(
+                color: const Color(0xFFFFD98A).withValues(alpha: 0.32),
+              ),
+            ),
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Color(0xFFFFE7B2),
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

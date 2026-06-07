@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/features/booking/presentation/pages/booking_request_page.dart';
+import 'package:flutterprojects/features/contact_requests/data/contact_request_repository.dart';
+import 'package:flutterprojects/features/saved_destinations/data/saved_destination_repository.dart';
+import 'package:flutterprojects/features/saved_destinations/domain/models/saved_destination.dart';
 import 'package:flutterprojects/features/specialists/data/clinician_specialty_catalog.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
@@ -38,6 +41,217 @@ class SpecialistDetailsPage extends StatelessWidget {
           .toList();
     }
     return const [];
+  }
+
+  List<String> _providerSignalTags(Map<String, dynamic> data) {
+    return <String>[
+      _text(data['specialtyKey'], ''),
+      _text(data['specialty'], ''),
+      _text(data['professionalTitleKey'], ''),
+    ].where((value) => value.trim().isNotEmpty).toSet().toList();
+  }
+
+  Future<void> _sendProviderContactRequest({
+    required BuildContext context,
+    required String providerId,
+    required bool isArabic,
+  }) async {
+    final clientId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    if (clientId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'يرجى تسجيل الدخول لإرسال طلب التواصل.'
+                : 'Please sign in to send a contact request.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    try {
+      await ContactRequestRepository().createProviderContactRequest(
+        clientId: clientId,
+        providerId: providerId,
+        message: isArabic
+            ? 'أرغب في التواصل مع مقدم الخدمة لمعرفة الخيارات المناسبة.'
+            : 'I would like this provider to contact me about suitable options.',
+      );
+      if (!context.mounted) return;
+      AppAnalytics.logPathSelected(
+        'specialists',
+        'provider_contact_request_created',
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'تم إرسال طلب التواصل. يمكنك متابعة الدعم أو حفظ مقدم الخدمة للرجوع لاحقًا.'
+                : 'Contact request sent. You can continue with support or save this provider for later.',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'تعذر إرسال طلب التواصل: $e'
+                : 'Could not send contact request: $e',
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _saveProviderDestination({
+    required BuildContext context,
+    required Map<String, dynamic> data,
+    required String providerId,
+    required String providerName,
+    required bool isArabic,
+  }) async {
+    final clientId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    if (clientId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'يرجى تسجيل الدخول لحفظ مقدم الخدمة.'
+                : 'Please sign in to save this provider.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    try {
+      await SavedDestinationRepository().saveDestination(
+        clientId: clientId,
+        destinationType: SavedDestinationType.provider,
+        destinationId: providerId,
+        title: providerName,
+        route: Routes.specialistDetails,
+        signalTags: _providerSignalTags(data),
+      );
+      if (!context.mounted) return;
+      AppAnalytics.logPathSelected('specialists', 'save_provider_destination');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'تم حفظ مقدم الخدمة للرجوع لاحقًا.'
+                : 'Provider saved for later.',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic
+                ? 'تعذر حفظ مقدم الخدمة: $e'
+                : 'Could not save provider: $e',
+          ),
+        ),
+      );
+    }
+  }
+
+  String _providerSignalLabel(String key, bool isArabic) {
+    if (isArabic) {
+      switch (key) {
+        case 'addiction_counselor':
+        case 'recovery_support':
+          return 'إدمان وتعافي';
+        case 'family_counselor':
+        case 'family_support':
+          return 'مشورة أسرية';
+        case 'children_support':
+          return 'أطفال';
+        case 'speech_specialist':
+        case 'speech_support':
+          return 'تخاطب';
+        case 'coach':
+          return 'كوتشينج';
+        case 'hearing_support':
+          return 'دعم صعوبات السمع';
+        case 'text_based_support':
+        case 'text':
+          return 'تواصل نصي';
+        case 'clinical_psychologist':
+        case 'psychologist':
+        case 'mental_health_support':
+          return 'دعم نفسي';
+        case 'hiv_sensitive_support':
+          return 'دعم حساس';
+        case 'simplified_communication':
+          return 'تواصل مبسط';
+        case 'group_sessions':
+          return 'جلسات جماعية';
+      }
+    }
+
+    switch (key) {
+      case 'addiction_counselor':
+      case 'recovery_support':
+        return 'Recovery support';
+      case 'family_counselor':
+      case 'family_support':
+        return 'Family support';
+      case 'children_support':
+        return 'Children';
+      case 'speech_specialist':
+      case 'speech_support':
+        return 'Speech support';
+      case 'coach':
+        return 'Coaching';
+      case 'hearing_support':
+        return 'Hearing support';
+      case 'text_based_support':
+      case 'text':
+        return 'Text support';
+      case 'clinical_psychologist':
+      case 'psychologist':
+      case 'mental_health_support':
+        return 'Mental health support';
+      case 'hiv_sensitive_support':
+        return 'Sensitive support';
+      case 'simplified_communication':
+        return 'Simplified communication';
+      case 'group_sessions':
+        return 'Group sessions';
+    }
+    return '';
+  }
+
+  List<String> _providerSignalBadges(
+    Map<String, dynamic> data,
+    bool isArabic, {
+    int max = 5,
+  }) {
+    // [S] Provider Signals
+    // Approved by Wave S-3 Classification Board.
+    // Display-only signal badges; do not couple to booking/session/payment.
+    final signals = data['providerSignals'];
+    if (signals is! Map) return const [];
+    final keys = <String>[
+      ..._stringList(signals['capabilitySignals']),
+      ..._stringList(signals['accessibilitySignals']),
+      ..._stringList(signals['communicationSignals']),
+    ];
+    final labels = <String>[];
+    for (final key in keys) {
+      final label = _providerSignalLabel(key, isArabic);
+      if (label.isNotEmpty && !labels.contains(label)) {
+        labels.add(label);
+      }
+      if (labels.length >= max) break;
+    }
+    return labels;
   }
 
   String _prefix(bool isArabic, String key, String ar, String en) {
@@ -208,233 +422,6 @@ class SpecialistDetailsPage extends StatelessWidget {
       ),
     );
   }
-
-  String _fallbackPrice(bool isArabic) {
-    return isArabic ? 'يحدد لاحقًا' : 'To be determined';
-  }
-
-  String _fallbackDuration(bool isArabic) {
-    return isArabic ? 'غير محددة' : 'Not specified';
-  }
-
-  List<String> _fallbackModes(bool isArabic) {
-    return [
-      isArabic ? 'حضوري' : 'In person',
-      isArabic ? 'أونلاين' : 'Online',
-    ];
-  }
-
-  num _numFromAny(Map<String, dynamic> data, List<String> keys) {
-    for (final key in keys) {
-      final value = data[key];
-      if (value is num) return value;
-      if (value is String) {
-        final parsed = num.tryParse(value.trim());
-        if (parsed != null) return parsed;
-      }
-    }
-    return 0;
-  }
-
-  Widget _ratingsCountersCard(
-    BuildContext context, {
-    required bool isArabic,
-    required int count,
-    required double avgStars,
-    required double avgPercentage,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.34),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: const Color(0xFFE7C766).withValues(alpha: 0.30),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment:
-            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
-          Text(
-            isArabic ? 'التقييمات' : 'Ratings',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: const Color(0xFFFFE7B2),
-                  fontWeight: FontWeight.w800,
-                ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _InfoMiniCard(
-                  title: isArabic ? 'عدد التقييمات' : 'Ratings count',
-                  value: '$count',
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _InfoMiniCard(
-                  title: isArabic ? 'متوسط النجوم' : 'Average stars',
-                  value: avgStars.toStringAsFixed(1),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _InfoMiniCard(
-            title: isArabic ? 'المتوسط العام' : 'Overall average',
-            value: '${avgPercentage.toStringAsFixed(1)}%',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRatingsSummary(
-    BuildContext context, {
-    required bool isArabic,
-    required String clinicianId,
-    required Map<String, dynamic> data,
-  }) {
-    if (clinicianId.trim().isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    final fallbackCount = _numFromAny(data, const [
-      'publicRatingsCount',
-      'clientRatingsCount',
-      'ratingsCount',
-      'ratingCount',
-      'totalRatings',
-    ]).toInt();
-    final fallbackStars = _numFromAny(data, const [
-      'publicAvgStars',
-      'clientAvgStars',
-      'avgStars',
-      'averageStars',
-      'ratingAverage',
-    ]).toDouble();
-    final fallbackPercentage = _numFromAny(data, const [
-      'publicAvgPercentage',
-      'clientAvgPercentage',
-      'avgPercentage',
-      'averagePercentage',
-      'ratingPercentage',
-    ]).toDouble();
-
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance
-          .collection('sessionRatings')
-          .where('clinicianId', isEqualTo: clinicianId)
-          .where('reviewerType', isEqualTo: 'client')
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return _ratingsCountersCard(
-            context,
-            isArabic: isArabic,
-            count: fallbackCount,
-            avgStars: fallbackStars,
-            avgPercentage: fallbackPercentage,
-          );
-          return Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.34),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: const Color(0xFFE7C766).withValues(alpha: 0.30),
-              ),
-            ),
-            child: Text(
-              isArabic ? 'تعذر تحميل التقييمات' : 'Unable to load ratings',
-              textAlign: isArabic ? TextAlign.right : TextAlign.left,
-            ),
-          );
-        }
-
-        if (!snapshot.hasData) {
-          return Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.34),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: const Color(0xFFE7C766).withValues(alpha: 0.30),
-              ),
-            ),
-            child: const Center(
-              child: CircularProgressIndicator(color: Color(0xFFE7C766)),
-            ),
-          );
-        }
-
-        final docs = snapshot.data!.docs;
-        final count = docs.length;
-
-        double totalStars = 0;
-        double totalPercentage = 0;
-
-        for (final doc in docs) {
-          final data = doc.data();
-          totalStars += ((data['derivedStars'] ?? 0) as num).toDouble();
-          totalPercentage += ((data['percentageScore'] ?? 0) as num).toDouble();
-        }
-
-        final avgStars = count == 0 ? 0.0 : totalStars / count;
-        final avgPercentage = count == 0 ? 0.0 : totalPercentage / count;
-
-        return Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.34),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: const Color(0xFFE7C766).withValues(alpha: 0.30),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment:
-                isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-            children: [
-              Text(
-                isArabic ? 'التقييمات' : 'Ratings',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: const Color(0xFFFFE7B2),
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: _InfoMiniCard(
-                      title: isArabic ? 'عدد التقييمات' : 'Ratings count',
-                      value: '$count',
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _InfoMiniCard(
-                      title: isArabic ? 'متوسط النجوم' : 'Average stars',
-                      value: avgStars.toStringAsFixed(1),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _InfoMiniCard(
-                title: isArabic ? 'المتوسط العام' : 'Overall average',
-                value: '${avgPercentage.toStringAsFixed(1)}%',
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   Widget _buildContent(
     BuildContext context, {
     required bool isArabic,
@@ -454,16 +441,8 @@ class SpecialistDetailsPage extends StatelessWidget {
       data['bio'],
       isArabic ? 'لا توجد نبذة متاحة حاليًا.' : 'No bio available yet.',
     );
-    final offersGroups = _boolValue(data['offersGroupSessions']);
     final asset = _text(data['photoAsset'], '');
     final network = _text(data['photoUrl'], '');
-    final price = _text(data['sessionPriceText'], _fallbackPrice(isArabic));
-    final duration = _text(
-      data['sessionDurationText'],
-      _fallbackDuration(isArabic),
-    );
-    final modes = _stringList(data['sessionModes']);
-    final sessionModes = modes.isEmpty ? _fallbackModes(isArabic) : modes;
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -563,93 +542,11 @@ class SpecialistDetailsPage extends StatelessWidget {
                       ),
                 ),
               ),
-              if (offersGroups) ...[
-                const SizedBox(height: 12),
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 7,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE7C766).withValues(alpha: 0.16),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Text(
-                      isArabic ? 'يقدم جروبات جماعية' : 'Offers group sessions',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFFFFE7B2),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  Expanded(
-                    child: _InfoMiniCard(
-                      title: isArabic ? 'السعر' : 'Price',
-                      value: price,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _InfoMiniCard(
-                      title: isArabic ? 'مدة الجلسة' : 'Duration',
-                      value: duration,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              Text(
-                isArabic ? 'وسائل الجلسة' : 'Session methods',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: const Color(0xFFFFE7B2),
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                alignment: WrapAlignment.end,
-                children: [
-                  for (final mode in sessionModes)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.24),
-                        borderRadius: BorderRadius.circular(999),
-                        border: Border.all(
-                          color:
-                              const Color(0xFFE7C766).withValues(alpha: 0.24),
-                        ),
-                      ),
-                      child: Text(
-                        mode,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFFFFF4D4),
-                        ),
-                      ),
-                    ),
-                ],
+              _ProviderSignalBadges(
+                labels: _providerSignalBadges(data, isArabic),
               ),
             ],
           ),
-        ),
-        const SizedBox(height: 14),
-        _buildRatingsSummary(
-          context,
-          isArabic: isArabic,
-          clinicianId: uid,
-          data: data,
         ),
         const SizedBox(height: 14),
         Container(
@@ -691,19 +588,20 @@ class SpecialistDetailsPage extends StatelessWidget {
               : () {
                   AppAnalytics.logPathSelected(
                     'specialists',
-                    'start_booking',
+                    'support_choose_provider',
                   );
                   Navigator.of(context).pushNamed(
-                    Routes.bookingRequest,
-                    arguments: BookingRequestArgs(
-                      clinicianId: uid,
-                      clinicianName: name,
-                    ),
+                    Routes.supportIssueSelector,
+                    arguments: const {
+                      'supportType': 'recovery_support',
+                    },
                   );
                 },
-          icon: const Icon(Icons.calendar_month_outlined),
+          icon: const Icon(Icons.support_agent_outlined),
           label: Text(
-            isArabic ? 'طلب تواصل مع مقدم الخدمة' : 'Request provider contact',
+            isArabic
+                ? 'طلب دعم للمساعدة في الاختيار'
+                : 'Get help choosing a provider',
           ),
           style: FilledButton.styleFrom(
             minimumSize: const Size.fromHeight(56),
@@ -714,6 +612,55 @@ class SpecialistDetailsPage extends StatelessWidget {
             ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: uid.isEmpty
+                ? null
+                : () {
+                    _sendProviderContactRequest(
+                      context: context,
+                      providerId: uid,
+                      isArabic: isArabic,
+                    );
+                  },
+            icon: const Icon(Icons.contact_page_outlined),
+            label: Text(
+              isArabic ? 'إرسال طلب تواصل' : 'Contact provider',
+            ),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+              foregroundColor: const Color(0xFFFFE7B2),
+              side: BorderSide(
+                color: const Color(0xFFE7C766).withValues(alpha: 0.28),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          child: TextButton.icon(
+            onPressed: uid.isEmpty
+                ? null
+                : () => _saveProviderDestination(
+                      context: context,
+                      data: data,
+                      providerId: uid,
+                      providerName: name,
+                      isArabic: isArabic,
+                    ),
+            icon: const Icon(Icons.bookmark_add_outlined),
+            label: Text(isArabic ? 'حفظ مقدم الخدمة' : 'Save provider'),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFFFFE7B2),
             ),
           ),
         ),
@@ -860,6 +807,50 @@ class _GoldBackIcon extends StatelessWidget {
   }
 }
 
+class _ProviderSignalBadges extends StatelessWidget {
+  const _ProviderSignalBadges({required this.labels});
+
+  final List<String> labels;
+
+  @override
+  Widget build(BuildContext context) {
+    if (labels.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Center(
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final label in labels)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE7C766).withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: const Color(0xFFE7C766).withValues(alpha: 0.30),
+                  ),
+                ),
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    color: Color(0xFFFFE7B2),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _InfoMiniCard extends StatelessWidget {
   const _InfoMiniCard({
     required this.title,
@@ -905,3 +896,4 @@ class _InfoMiniCard extends StatelessWidget {
     );
   }
 }
+

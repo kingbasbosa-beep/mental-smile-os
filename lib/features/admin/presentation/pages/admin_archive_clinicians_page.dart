@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
@@ -65,13 +65,11 @@ class _AdminArchiveCliniciansPageState
   String _statusLabel(String status, bool isArabic) {
     switch (status) {
       case 'completed_success':
-        return isArabic ? 'مكتمل ومغلق' : 'Completed and closed';
-      case 'payout_pending':
-        return isArabic ? 'بانتظار تحويل المستحق' : 'Payout pending';
+        return isArabic ? 'Ù…ÙƒØªÙ…Ù„ ÙˆÙ…ØºÙ„Ù‚' : 'Completed and closed';
       case 'session_completed_pending_reviews':
-        return isArabic ? 'بانتظار التقييمات' : 'Pending reviews';
+        return isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª' : 'Pending reviews';
       default:
-        return status.isEmpty ? (isArabic ? 'غير محدد' : 'Unknown') : status;
+        return status.isEmpty ? (isArabic ? 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯' : 'Unknown') : status;
     }
   }
 
@@ -117,7 +115,7 @@ class _AdminArchiveCliniciansPageState
       child: Scaffold(
         appBar: AppShellActions.buildAppBar(
           context,
-          title: isArabic ? 'أرشيف الأخصائيين' : 'Clinicians Archive',
+          title: isArabic ? 'Ø£Ø±Ø´ÙŠÙ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠÙŠÙ†' : 'Clinicians Archive',
           canLogout: false,
         ),
         body: AppPageBackground(
@@ -130,7 +128,7 @@ class _AdminArchiveCliniciansPageState
               if (snap.hasError) {
                 return AppEmptyState(
                   message: isArabic
-                      ? 'تعذر تحميل أرشيف الأخصائيين'
+                      ? 'ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ Ø£Ø±Ø´ÙŠÙ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠÙŠÙ†'
                       : 'Unable to load clinicians archive',
                   icon: Icons.error_outline,
                 );
@@ -178,7 +176,7 @@ class _AdminArchiveCliniciansPageState
                           : CrossAxisAlignment.start,
                       children: [
                         Text(
-                          isArabic ? 'أرشيف الأخصائيين' : 'Clinicians Archive',
+                          isArabic ? 'Ø£Ø±Ø´ÙŠÙ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠÙŠÙ†' : 'Clinicians Archive',
                           style: Theme.of(context)
                               .textTheme
                               .titleLarge
@@ -187,7 +185,7 @@ class _AdminArchiveCliniciansPageState
                         const SizedBox(height: 10),
                         Text(
                           isArabic
-                              ? 'عرض خاص بسجل الأخصائي داخل الطلبات المؤرشفة: الجلسات، الأداء، والتقييم النهائي.'
+                              ? 'Ø¹Ø±Ø¶ Ø®Ø§Øµ Ø¨Ø³Ø¬Ù„ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ Ø¯Ø§Ø®Ù„ Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ù…Ø¤Ø±Ø´ÙØ©: Ø§Ù„Ø¬Ù„Ø³Ø§ØªØŒ Ø§Ù„Ø£Ø¯Ø§Ø¡ØŒ ÙˆØ§Ù„ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ.'
                               : 'A clinician-focused view across archived requests showing sessions, performance, and final review data.',
                         ),
                         const SizedBox(height: 16),
@@ -197,7 +195,7 @@ class _AdminArchiveCliniciansPageState
                               setState(() => _search = value.trim()),
                           decoration: appInputDecoration(
                             context: context,
-                            label: isArabic ? 'بحث' : 'Search',
+                            label: isArabic ? 'Ø¨Ø­Ø«' : 'Search',
                             icon: Icons.search,
                           ),
                         ),
@@ -212,13 +210,13 @@ class _AdminArchiveCliniciansPageState
                                 initialValue: _clinicianFilter,
                                 decoration: appInputDecoration(
                                   context: context,
-                                  label: isArabic ? 'الأخصائي' : 'Clinician',
+                                  label: isArabic ? 'Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ' : 'Clinician',
                                   icon: Icons.medical_services_outlined,
                                 ),
                                 items: [
                                   DropdownMenuItem(
                                     value: 'all',
-                                    child: Text(isArabic ? 'الكل' : 'All'),
+                                    child: Text(isArabic ? 'Ø§Ù„ÙƒÙ„' : 'All'),
                                   ),
                                   ...clinicianNames.map(
                                     (e) => DropdownMenuItem(
@@ -238,17 +236,16 @@ class _AdminArchiveCliniciansPageState
                                 initialValue: _statusFilter,
                                 decoration: appInputDecoration(
                                   context: context,
-                                  label: isArabic ? 'الحالة' : 'Status',
+                                  label: isArabic ? 'Ø§Ù„Ø­Ø§Ù„Ø©' : 'Status',
                                   icon: Icons.filter_alt_outlined,
                                 ),
                                 items: [
                                   DropdownMenuItem(
                                     value: 'all',
-                                    child: Text(isArabic ? 'الكل' : 'All'),
+                                    child: Text(isArabic ? 'Ø§Ù„ÙƒÙ„' : 'All'),
                                   ),
                                   ...[
                                     'completed_success',
-                                    'payout_pending',
                                     'session_completed_pending_reviews',
                                   ].map(
                                     (e) => DropdownMenuItem(
@@ -272,7 +269,7 @@ class _AdminArchiveCliniciansPageState
                     padding: const EdgeInsets.all(AppSpacing.md),
                     child: Text(
                       isArabic
-                          ? 'عدد النتائج بعد الفلترة: ${filtered.length}'
+                          ? 'Ø¹Ø¯Ø¯ Ø§Ù„Ù†ØªØ§Ø¦Ø¬ Ø¨Ø¹Ø¯ Ø§Ù„ÙÙ„ØªØ±Ø©: ${filtered.length}'
                           : 'Filtered results: ${filtered.length}',
                       style: Theme.of(context)
                           .textTheme
@@ -284,7 +281,7 @@ class _AdminArchiveCliniciansPageState
                   if (filtered.isEmpty)
                     AppEmptyState(
                       message: isArabic
-                          ? 'لا توجد نتائج مطابقة'
+                          ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù†ØªØ§Ø¦Ø¬ Ù…Ø·Ø§Ø¨Ù‚Ø©'
                           : 'No matching results',
                       icon: Icons.search_off_rounded,
                     )
@@ -322,7 +319,7 @@ class _AdminArchiveCliniciansPageState
                                     child: Text(
                                       clinicianName.isNotEmpty
                                           ? clinicianName
-                                          : (isArabic ? 'أخصائي' : 'Clinician'),
+                                          : (isArabic ? 'Ø£Ø®ØµØ§Ø¦ÙŠ' : 'Clinician'),
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleLarge
@@ -340,7 +337,7 @@ class _AdminArchiveCliniciansPageState
                               if (clientName.isNotEmpty)
                                 Text(
                                   isArabic
-                                      ? 'العميل: $clientName'
+                                      ? 'Ø§Ù„Ø¹Ù…ÙŠÙ„: $clientName'
                                       : 'Client: $clientName',
                                 ),
                               if ((item['assignedClinicianId'] ??
@@ -353,7 +350,7 @@ class _AdminArchiveCliniciansPageState
                                   padding: const EdgeInsets.only(top: 6),
                                   child: Text(
                                     isArabic
-                                        ? 'معرف الأخصائي: ${(item['assignedClinicianId'] ?? item['clinicianId']).toString()}'
+                                        ? 'Ù…Ø¹Ø±Ù Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ: ${(item['assignedClinicianId'] ?? item['clinicianId']).toString()}'
                                         : 'Clinician ID: ${(item['assignedClinicianId'] ?? item['clinicianId']).toString()}',
                                   ),
                                 ),
@@ -362,7 +359,7 @@ class _AdminArchiveCliniciansPageState
                                   padding: const EdgeInsets.only(top: 6),
                                   child: Text(
                                     isArabic
-                                        ? 'حالة الجلسة: $sessionStatus'
+                                        ? 'Ø­Ø§Ù„Ø© Ø§Ù„Ø¬Ù„Ø³Ø©: $sessionStatus'
                                         : 'Session status: $sessionStatus',
                                   ),
                                 ),
@@ -371,7 +368,7 @@ class _AdminArchiveCliniciansPageState
                                   padding: const EdgeInsets.only(top: 6),
                                   child: Text(
                                     isArabic
-                                        ? 'حالة التقييم: $reviewStatus'
+                                        ? 'Ø­Ø§Ù„Ø© Ø§Ù„ØªÙ‚ÙŠÙŠÙ…: $reviewStatus'
                                         : 'Review status: $reviewStatus',
                                   ),
                                 ),
@@ -380,7 +377,7 @@ class _AdminArchiveCliniciansPageState
                                   padding: const EdgeInsets.only(top: 6),
                                   child: Text(
                                     isArabic
-                                        ? 'النسبة النهائية: ${finalReviewPercentage.toStringAsFixed(1)}%'
+                                        ? 'Ø§Ù„Ù†Ø³Ø¨Ø© Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠØ©: ${finalReviewPercentage.toStringAsFixed(1)}%'
                                         : 'Final percentage: ${finalReviewPercentage.toStringAsFixed(1)}%',
                                   ),
                                 ),
@@ -392,7 +389,7 @@ class _AdminArchiveCliniciansPageState
                                   padding: const EdgeInsets.only(top: 6),
                                   child: Text(
                                     isArabic
-                                        ? 'قسم الأرشفة الأصلي: ${(item['archiveSection'] ?? '').toString()}'
+                                        ? 'Ù‚Ø³Ù… Ø§Ù„Ø£Ø±Ø´ÙØ© Ø§Ù„Ø£ØµÙ„ÙŠ: ${(item['archiveSection'] ?? '').toString()}'
                                         : 'Archive source section: ${(item['archiveSection'] ?? '').toString()}',
                                   ),
                                 ),
@@ -401,7 +398,7 @@ class _AdminArchiveCliniciansPageState
                                   padding: const EdgeInsets.only(top: 6),
                                   child: Text(
                                     isArabic
-                                        ? 'تاريخ الأرشفة: $archivedAt'
+                                        ? 'ØªØ§Ø±ÙŠØ® Ø§Ù„Ø£Ø±Ø´ÙØ©: $archivedAt'
                                         : 'Archived at: $archivedAt',
                                   ),
                                 ),

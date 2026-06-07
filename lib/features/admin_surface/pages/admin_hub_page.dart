@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,7 +17,6 @@ import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 enum AdminVisualGroup {
   requests,
   sessions,
-  payments,
   support,
   analytics,
   system,
@@ -29,8 +28,6 @@ Color _adminVisualGroupColor(AdminVisualGroup? group) {
       return const Color(0xFF7891C8);
     case AdminVisualGroup.sessions:
       return const Color(0xFF6CB7D6);
-    case AdminVisualGroup.payments:
-      return const Color(0xFFB89B79);
     case AdminVisualGroup.support:
       return const Color(0xFFE08A68);
     case AdminVisualGroup.analytics:
@@ -59,9 +56,6 @@ class _AdminHubPageState extends State<AdminHubPage> {
   static const int aiDevOpsCount = 4;
   static const int domainAvailabilityCount = 2;
   static const int externalFollowUpCount = 2;
-  late final Stream<int> _bookingOpenStream;
-  late final Stream<int> _paymentsReviewStream;
-  late final Stream<int> _sessionsActionStream;
   late final Stream<int> _escalationsOpenStream;
   late final Stream<int> _pendingApprovalsStream;
   late final Stream<int> _gatewayAttentionStream;
@@ -69,30 +63,6 @@ class _AdminHubPageState extends State<AdminHubPage> {
   @override
   void initState() {
     super.initState();
-    _bookingOpenStream = FirebaseFirestore.instance
-        .collection('booking_requests')
-        .where('archived', isEqualTo: false)
-        .snapshots()
-        .map((snapshot) => snapshot.docs.length)
-        .asBroadcastStream();
-
-    _paymentsReviewStream = FirebaseFirestore.instance
-        .collection('booking_requests')
-        .where('payment_confirmed', isEqualTo: false)
-        .snapshots()
-        .map((snapshot) => snapshot.docs.length)
-        .asBroadcastStream();
-
-    _sessionsActionStream = FirebaseFirestore.instance
-        .collection('booking_requests')
-        .where('status', whereIn: [
-          'session_setup_pending',
-          'reschedule_pending',
-        ])
-        .snapshots()
-        .map((snapshot) => snapshot.docs.length)
-        .asBroadcastStream();
-
     _escalationsOpenStream = ChatFirestoreService()
         .streamAdminSupportInboxThreads()
         .map((threads) => threads.length)
@@ -205,71 +175,51 @@ class _AdminHubPageState extends State<AdminHubPage> {
 
     final compactCounters = <_QuickStatItem>[
       _QuickStatItem(
-        title: isArabic ? 'إشارات الطلبات المفتوحة' : 'Open request signals',
-        group: AdminVisualGroup.requests,
-        stream: _bookingOpenStream,
-        crossSignalStream: _escalationsOpenStream,
-        route: Routes.adminOperations,
-      ),
-      _QuickStatItem(
-        title: isArabic ? 'إشارات مالية قديمة' : 'Legacy financial signals',
-        group: AdminVisualGroup.payments,
-        stream: _paymentsReviewStream,
-        route: Routes.adminPayments,
-      ),
-      _QuickStatItem(
-        title: isArabic ? 'إشارات جاهزية الجلسات' : 'Session readiness signals',
-        group: AdminVisualGroup.sessions,
-        stream: _sessionsActionStream,
-        route: Routes.adminSessions,
-      ),
-      _QuickStatItem(
         title: isArabic
-            ? 'حالات مصعّدة (سجل قديم)'
+            ? 'Ø­Ø§Ù„Ø§Øª Ù…ØµØ¹Ù‘Ø¯Ø© (Ø³Ø¬Ù„ Ù‚Ø¯ÙŠÙ…)'
             : 'Escalated Cases (Historical)',
         group: AdminVisualGroup.support,
         stream: _escalationsOpenStream,
-        crossSignalStream: _bookingOpenStream,
         route: Routes.adminSupportChats,
       ),
       _QuickStatItem(
-        title: isArabic ? 'طلبات تحتاج انتباه' : 'Requests Requiring Attention',
+        title: isArabic ? 'Ø·Ù„Ø¨Ø§Øª ØªØ­ØªØ§Ø¬ Ø§Ù†ØªØ¨Ø§Ù‡' : 'Requests Requiring Attention',
         group: AdminVisualGroup.requests,
         stream: _pendingApprovalsStream,
         route: Routes.adminClinicianRequests,
       ),
       _QuickStatItem(
-        title: isArabic ? 'إشارات بوابات/أجهزة' : 'Gateway/device signals',
+        title: isArabic ? 'Ø¥Ø´Ø§Ø±Ø§Øª Ø¨ÙˆØ§Ø¨Ø§Øª/Ø£Ø¬Ù‡Ø²Ø©' : 'Gateway/device signals',
         group: AdminVisualGroup.system,
         stream: _gatewayAttentionStream,
         route: Routes.adminGatewayLayer,
       ),
       _QuickStatItem(
-        title: isArabic ? 'مشاكل مفتوحة' : 'Open Issues',
+        title: isArabic ? 'Ù…Ø´Ø§ÙƒÙ„ Ù…ÙØªÙˆØ­Ø©' : 'Open Issues',
         group: AdminVisualGroup.system,
         staticCount: openIssuesCount,
         route: Routes.adminMaintenanceSystem,
       ),
       _QuickStatItem(
-        title: isArabic ? 'حالة الأقسام' : 'Domains',
+        title: isArabic ? 'Ø­Ø§Ù„Ø© Ø§Ù„Ø£Ù‚Ø³Ø§Ù…' : 'Domains',
         group: AdminVisualGroup.system,
         staticCount: domainAvailabilityCount,
         route: Routes.adminDomainAvailability,
       ),
       _QuickStatItem(
-        title: isArabic ? 'رسائل متابعة' : 'Follow-up Messages',
+        title: isArabic ? 'Ø±Ø³Ø§Ø¦Ù„ Ù…ØªØ§Ø¨Ø¹Ø©' : 'Follow-up Messages',
         group: AdminVisualGroup.support,
         staticCount: externalFollowUpCount,
         route: Routes.adminCommunicationGateway,
       ),
       _QuickStatItem(
-        title: isArabic ? 'تشغيل الذكاء والكود' : 'AI DevOps',
+        title: isArabic ? 'ØªØ´ØºÙŠÙ„ Ø§Ù„Ø°ÙƒØ§Ø¡ ÙˆØ§Ù„ÙƒÙˆØ¯' : 'AI DevOps',
         group: AdminVisualGroup.analytics,
         staticCount: aiDevOpsCount,
         route: Routes.adminAiDevOpsCenter,
       ),
       _QuickStatItem(
-        title: isArabic ? 'محتوى قيد التنفيذ' : 'Pending Content',
+        title: isArabic ? 'Ù…Ø­ØªÙˆÙ‰ Ù‚ÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ°' : 'Pending Content',
         group: AdminVisualGroup.analytics,
         staticCount: pendingContentCount,
         route: Routes.contentWorkspace,
@@ -278,20 +228,20 @@ class _AdminHubPageState extends State<AdminHubPage> {
 
     final mainSectionCards = <_AdminSectionLaunchCardData>[
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'مراقبة الطلبات والبوابات' : 'Requests & Gates',
+        title: isArabic ? 'Ø±Ø¤ÙŠØ© Ø§Ù„Ø¹Ù…Ù„ÙŠØ§Øª Ø§Ù„Ù‚Ø¯ÙŠÙ…Ø©' : 'Legacy Operations Visibility',
         subtitle: isArabic
-            ? 'مراقبة الطلبات والمدفوعات والجلسات دون ملكية التشغيل اليومي'
-            : 'Monitor legacy requests, financial signals, and coordination without daily operational ownership',
+            ? 'Ø±Ø¤ÙŠØ© Ù…Ø§Ù„ÙŠØ© ÙˆØªÙ†Ø³ÙŠÙ‚ÙŠØ© Ù‚Ø¯ÙŠÙ…Ø© Ø¯ÙˆÙ† Ù…Ù„ÙƒÙŠØ© Ø§Ù„ØªØ´ØºÙŠÙ„ Ø§Ù„ÙŠÙˆÙ…ÙŠ'
+            : 'Monitor legacy financial signals and coordination without daily operational ownership',
         icon: Icons.assignment_outlined,
         group: AdminVisualGroup.requests,
         route: Routes.adminOperations,
       ),
       _AdminSectionLaunchCardData(
         title: isArabic
-            ? 'المراجعة البشرية والسجل القديم'
+            ? 'Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø¨Ø´Ø±ÙŠØ© ÙˆØ§Ù„Ø³Ø¬Ù„ Ø§Ù„Ù‚Ø¯ÙŠÙ…'
             : 'Human Review & Historical Cases',
         subtitle: isArabic
-            ? 'هذا القسم يعرض محادثات الشات القديمة فقط. طلبات الدعم الجديدة تتم عبر طلبات دعم منظّمة.'
+            ? 'Ù‡Ø°Ø§ Ø§Ù„Ù‚Ø³Ù… ÙŠØ¹Ø±Ø¶ Ù…Ø­Ø§Ø¯Ø«Ø§Øª Ø§Ù„Ø´Ø§Øª Ø§Ù„Ù‚Ø¯ÙŠÙ…Ø© ÙÙ‚Ø·. Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¯Ø¹Ù… Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© ØªØªÙ… Ø¹Ø¨Ø± Ø·Ù„Ø¨Ø§Øª Ø¯Ø¹Ù… Ù…Ù†Ø¸Ù‘Ù…Ø©.'
             : 'This section shows historical chat threads only. New support requests are handled via structured support requests.',
         icon: Icons.support_agent_outlined,
         group: AdminVisualGroup.support,
@@ -299,45 +249,45 @@ class _AdminHubPageState extends State<AdminHubPage> {
       ),
       _AdminSectionLaunchCardData(
         title:
-            isArabic ? 'الدليل وبوابات الاعتماد' : 'Directory & Approval Gates',
+            isArabic ? 'Ø§Ù„Ø¯Ù„ÙŠÙ„ ÙˆØ¨ÙˆØ§Ø¨Ø§Øª Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯' : 'Directory & Approval Gates',
         subtitle: isArabic
-            ? 'العملاء والمراكز وبوابات الاعتماد'
+            ? 'Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ ÙˆØ§Ù„Ù…Ø±Ø§ÙƒØ² ÙˆØ¨ÙˆØ§Ø¨Ø§Øª Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯'
             : 'Clients, centers, and approval-gate visibility',
         icon: Icons.apartment_outlined,
         group: AdminVisualGroup.requests,
         route: Routes.adminClinicianRequests,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'الحوكمة' : 'Governance',
+        title: isArabic ? 'Ø§Ù„Ø­ÙˆÙƒÙ…Ø©' : 'Governance',
         subtitle: isArabic
-            ? 'السياسات وحالة الأقسام ورؤية الحوكمة'
+            ? 'Ø§Ù„Ø³ÙŠØ§Ø³Ø§Øª ÙˆØ­Ø§Ù„Ø© Ø§Ù„Ø£Ù‚Ø³Ø§Ù… ÙˆØ±Ø¤ÙŠØ© Ø§Ù„Ø­ÙˆÙƒÙ…Ø©'
             : 'Policies, domains, and governance visibility',
         icon: Icons.policy_outlined,
         group: AdminVisualGroup.system,
         route: Routes.adminDomainStatus,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'برامج المحتوى والرعاية' : 'Content & Care Programs',
+        title: isArabic ? 'Ø¨Ø±Ø§Ù…Ø¬ Ø§Ù„Ù…Ø­ØªÙˆÙ‰ ÙˆØ§Ù„Ø±Ø¹Ø§ÙŠØ©' : 'Content & Care Programs',
         subtitle: isArabic
-            ? 'حوكمة المحتوى ورسائل الدعم والرعاية اللاحقة'
+            ? 'Ø­ÙˆÙƒÙ…Ø© Ø§Ù„Ù…Ø­ØªÙˆÙ‰ ÙˆØ±Ø³Ø§Ø¦Ù„ Ø§Ù„Ø¯Ø¹Ù… ÙˆØ§Ù„Ø±Ø¹Ø§ÙŠØ© Ø§Ù„Ù„Ø§Ø­Ù‚Ø©'
             : 'Governance for content, support messaging, and follow-up care',
         icon: Icons.menu_book_outlined,
         group: AdminVisualGroup.support,
         route: Routes.adminContentCarePrograms,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'النمو والانتشار' : 'Growth & Awareness',
+        title: isArabic ? 'Ø§Ù„Ù†Ù…Ùˆ ÙˆØ§Ù„Ø§Ù†ØªØ´Ø§Ø±' : 'Growth & Awareness',
         subtitle: isArabic
-            ? 'التوعية والتوزيع وتخطيط الظهور الموجّه'
+            ? 'Ø§Ù„ØªÙˆØ¹ÙŠØ© ÙˆØ§Ù„ØªÙˆØ²ÙŠØ¹ ÙˆØªØ®Ø·ÙŠØ· Ø§Ù„Ø¸Ù‡ÙˆØ± Ø§Ù„Ù…ÙˆØ¬Ù‘Ù‡'
             : 'Awareness, distribution, and supervised exposure planning',
         icon: Icons.campaign_outlined,
         group: AdminVisualGroup.analytics,
         route: Routes.adminGrowthLayer,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
+        title: isArabic ? 'Ø·Ø¨Ù‚Ø© Ø§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª' : 'Gateway Layer',
         subtitle: isArabic
-            ? 'القنوات والأدوات والأجهزة والصيانة'
+            ? 'Ø§Ù„Ù‚Ù†ÙˆØ§Øª ÙˆØ§Ù„Ø£Ø¯ÙˆØ§Øª ÙˆØ§Ù„Ø£Ø¬Ù‡Ø²Ø© ÙˆØ§Ù„ØµÙŠØ§Ù†Ø©'
             : 'Channels, tools, devices, and maintenance',
         icon: Icons.hub_outlined,
         group: AdminVisualGroup.system,
@@ -347,56 +297,45 @@ class _AdminHubPageState extends State<AdminHubPage> {
 
     final departmentSectionCards = <_AdminSectionLaunchCardData>[
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'المتابعة وخدمة العملاء' : 'Customer Follow-up',
+        title: isArabic ? 'Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© ÙˆØ®Ø¯Ù…Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡' : 'Customer Follow-up',
         subtitle: isArabic
-            ? 'طلبات الويب والبريد والمتابعة التشغيلية'
+            ? 'Ø·Ù„Ø¨Ø§Øª Ø§Ù„ÙˆÙŠØ¨ ÙˆØ§Ù„Ø¨Ø±ÙŠØ¯ ÙˆØ§Ù„Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠØ©'
             : 'Web requests, email, and operational follow-up',
         icon: Icons.support_agent_outlined,
         group: AdminVisualGroup.support,
         route: Routes.customerFollowUpWorkspace,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'الدعم التقني والصيانة' : 'Technical Support',
+        title: isArabic ? 'Ø§Ù„Ø¯Ø¹Ù… Ø§Ù„ØªÙ‚Ù†ÙŠ ÙˆØ§Ù„ØµÙŠØ§Ù†Ø©' : 'Technical Support',
         subtitle: isArabic
-            ? 'التشخيص والصيانة ومعالجة المشاكل وصحة النظام'
+            ? 'Ø§Ù„ØªØ´Ø®ÙŠØµ ÙˆØ§Ù„ØµÙŠØ§Ù†Ø© ÙˆÙ…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„Ù…Ø´Ø§ÙƒÙ„ ÙˆØµØ­Ø© Ø§Ù„Ù†Ø¸Ø§Ù…'
             : 'Diagnostics, maintenance, issue handling, and system health',
         icon: Icons.build_circle_outlined,
         group: AdminVisualGroup.system,
         route: Routes.technicalSupportWorkspace,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'الدعاية والمحتوى' : 'Marketing',
+        title: isArabic ? 'Ø§Ù„Ø¯Ø¹Ø§ÙŠØ© ÙˆØ§Ù„Ù…Ø­ØªÙˆÙ‰' : 'Marketing',
         subtitle: isArabic
-            ? 'المحتوى والحملات وتجهيز النشر والمواد التعليمية'
+            ? 'Ø§Ù„Ù…Ø­ØªÙˆÙ‰ ÙˆØ§Ù„Ø­Ù…Ù„Ø§Øª ÙˆØªØ¬Ù‡ÙŠØ² Ø§Ù„Ù†Ø´Ø± ÙˆØ§Ù„Ù…ÙˆØ§Ø¯ Ø§Ù„ØªØ¹Ù„ÙŠÙ…ÙŠØ©'
             : 'Content, campaigns, publish prep, and educational materials',
         icon: Icons.campaign_outlined,
         group: AdminVisualGroup.analytics,
         route: Routes.marketingWorkspace,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic
-            ? 'معاينة موديول محاسبة اختياري'
-            : 'Optional accounting module preview',
+        title: isArabic ? 'Ø§Ù„Ø£Ø±Ø´ÙŠÙ' : 'Archive',
         subtitle: isArabic
-            ? 'رؤية مالية قديمة ومحدودة وليست جزءًا من قلب المنصة'
-            : 'Legacy financial visibility, not a core platform dependency',
-        icon: Icons.account_balance_wallet_outlined,
-        group: AdminVisualGroup.payments,
-        route: Routes.adminAccountingWorkspace,
-      ),
-      _AdminSectionLaunchCardData(
-        title: isArabic ? 'الأرشيف' : 'Archive',
-        subtitle: isArabic
-            ? 'اختصار لسجلات الأقسام المؤرشفة'
+            ? 'Ø§Ø®ØªØµØ§Ø± Ù„Ø³Ø¬Ù„Ø§Øª Ø§Ù„Ø£Ù‚Ø³Ø§Ù… Ø§Ù„Ù…Ø¤Ø±Ø´ÙØ©'
             : 'Shortcut to archived department records',
         icon: Icons.archive_outlined,
         group: AdminVisualGroup.system,
         route: Routes.adminArchive,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'المتابعة الخارجية' : 'External Follow-up',
+        title: isArabic ? 'Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø®Ø§Ø±Ø¬ÙŠØ©' : 'External Follow-up',
         subtitle: isArabic
-            ? 'إدارة تسجيلات المتابعة والدعم والتهنئة والتوعية'
+            ? 'Ø¥Ø¯Ø§Ø±Ø© ØªØ³Ø¬ÙŠÙ„Ø§Øª Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© ÙˆØ§Ù„Ø¯Ø¹Ù… ÙˆØ§Ù„ØªÙ‡Ù†Ø¦Ø© ÙˆØ§Ù„ØªÙˆØ¹ÙŠØ©'
             : 'Manage follow-up, support, greeting, and awareness registrations',
         icon: Icons.mark_email_read_outlined,
         group: AdminVisualGroup.support,
@@ -406,27 +345,27 @@ class _AdminHubPageState extends State<AdminHubPage> {
 
     final registrationSectionCards = <_AdminSectionLaunchCardData>[
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'العملاء' : 'Clients',
+        title: isArabic ? 'Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡' : 'Clients',
         subtitle: isArabic
-            ? 'متابعة حسابات العملاء وحالات الحظر'
+            ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø­Ø³Ø§Ø¨Ø§Øª Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ ÙˆØ­Ø§Ù„Ø§Øª Ø§Ù„Ø­Ø¸Ø±'
             : 'Review client accounts and block status',
         icon: Icons.people_alt_outlined,
         group: AdminVisualGroup.requests,
         route: Routes.adminClients,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'المراكز' : 'Centers',
+        title: isArabic ? 'Ø§Ù„Ù…Ø±Ø§ÙƒØ²' : 'Centers',
         subtitle: isArabic
-            ? 'اعتماد ومتابعة تسجيلات المراكز'
+            ? 'Ø§Ø¹ØªÙ…Ø§Ø¯ ÙˆÙ…ØªØ§Ø¨Ø¹Ø© ØªØ³Ø¬ÙŠÙ„Ø§Øª Ø§Ù„Ù…Ø±Ø§ÙƒØ²'
             : 'Approve and follow center registrations',
         icon: Icons.apartment_outlined,
         group: AdminVisualGroup.requests,
         route: Routes.adminCenters,
       ),
       _AdminSectionLaunchCardData(
-        title: isArabic ? 'الأخصائيين' : 'Clinicians',
+        title: isArabic ? 'Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠÙŠÙ†' : 'Clinicians',
         subtitle: isArabic
-            ? 'اعتماد ومتابعة تسجيلات الأخصائيين'
+            ? 'Ø§Ø¹ØªÙ…Ø§Ø¯ ÙˆÙ…ØªØ§Ø¨Ø¹Ø© ØªØ³Ø¬ÙŠÙ„Ø§Øª Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠÙŠÙ†'
             : 'Approve and follow clinician registrations',
         icon: Icons.medical_services_outlined,
         group: AdminVisualGroup.requests,
@@ -434,9 +373,9 @@ class _AdminHubPageState extends State<AdminHubPage> {
       ),
       _AdminSectionLaunchCardData(
         title:
-            isArabic ? 'تقارير التسجيل والصيانة' : 'Registration Maintenance',
+            isArabic ? 'ØªÙ‚Ø§Ø±ÙŠØ± Ø§Ù„ØªØ³Ø¬ÙŠÙ„ ÙˆØ§Ù„ØµÙŠØ§Ù†Ø©' : 'Registration Maintenance',
         subtitle: isArabic
-            ? 'تقارير صحة التسجيل والحسابات'
+            ? 'ØªÙ‚Ø§Ø±ÙŠØ± ØµØ­Ø© Ø§Ù„ØªØ³Ø¬ÙŠÙ„ ÙˆØ§Ù„Ø­Ø³Ø§Ø¨Ø§Øª'
             : 'Registration health and account reports',
         icon: Icons.fact_check_outlined,
         group: AdminVisualGroup.system,
@@ -473,41 +412,41 @@ class _AdminHubPageState extends State<AdminHubPage> {
 
     final detailSections = <_AdminDetailPanelSection>[
       _AdminDetailPanelSection(
-        title: isArabic ? 'المسارات الموجّهة' : 'Guided Workflows',
+        title: isArabic ? 'Ø§Ù„Ù…Ø³Ø§Ø±Ø§Øª Ø§Ù„Ù…ÙˆØ¬Ù‘Ù‡Ø©' : 'Guided Workflows',
         subtitle: isArabic
-            ? 'مسارات مراجعة موجّهة متاحة دون تمديد الهب الرئيسي.'
+            ? 'Ù…Ø³Ø§Ø±Ø§Øª Ù…Ø±Ø§Ø¬Ø¹Ø© Ù…ÙˆØ¬Ù‘Ù‡Ø© Ù…ØªØ§Ø­Ø© Ø¯ÙˆÙ† ØªÙ…Ø¯ÙŠØ¯ Ø§Ù„Ù‡Ø¨ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ.'
             : 'Guided review paths kept available without stretching the main hub.',
         icon: Icons.route_outlined,
         route: Routes.adminGuidedWorkflows,
       ),
       _AdminDetailPanelSection(
-        title: isArabic ? 'المراجع' : 'References',
+        title: isArabic ? 'Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹' : 'References',
         subtitle: isArabic
-            ? 'صفحات المراجع واختصارات السياسات محفوظة أسفل الصفحة.'
+            ? 'ØµÙØ­Ø§Øª Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹ ÙˆØ§Ø®ØªØµØ§Ø±Ø§Øª Ø§Ù„Ø³ÙŠØ§Ø³Ø§Øª Ù…Ø­ÙÙˆØ¸Ø© Ø£Ø³ÙÙ„ Ø§Ù„ØµÙØ­Ø©.'
             : 'Reference pages and policy shortcuts kept below the fold.',
         icon: Icons.menu_book_outlined,
         route: Routes.adminReferences,
       ),
       _AdminDetailPanelSection(
-        title: isArabic ? 'طبقة البوابات' : 'Gateway Layer',
+        title: isArabic ? 'Ø·Ø¨Ù‚Ø© Ø§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª' : 'Gateway Layer',
         subtitle: isArabic
-            ? 'حالة البوابات وتفاصيل الاتصال في قسم مختصر.'
+            ? 'Ø­Ø§Ù„Ø© Ø§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª ÙˆØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø§ØªØµØ§Ù„ ÙÙŠ Ù‚Ø³Ù… Ù…Ø®ØªØµØ±.'
             : 'Gateway status and connectivity details in a condensed section.',
         icon: Icons.hub_outlined,
         route: Routes.adminGatewayLayer,
       ),
       _AdminDetailPanelSection(
-        title: isArabic ? 'متابعة تفصيلية' : 'Detailed Monitoring',
+        title: isArabic ? 'Ù…ØªØ§Ø¨Ø¹Ø© ØªÙØµÙŠÙ„ÙŠØ©' : 'Detailed Monitoring',
         subtitle: isArabic
-            ? 'التنبيهات والصحة وإشارات البوابات في قسم واحد قابل للطي.'
+            ? 'Ø§Ù„ØªÙ†Ø¨ÙŠÙ‡Ø§Øª ÙˆØ§Ù„ØµØ­Ø© ÙˆØ¥Ø´Ø§Ø±Ø§Øª Ø§Ù„Ø¨ÙˆØ§Ø¨Ø§Øª ÙÙŠ Ù‚Ø³Ù… ÙˆØ§Ø­Ø¯ Ù‚Ø§Ø¨Ù„ Ù„Ù„Ø·ÙŠ.'
             : 'Alerts, health, and gateway signals in one collapsible section.',
         icon: Icons.monitor_heart_outlined,
         route: Routes.adminDetailedMonitoring,
       ),
       _AdminDetailPanelSection(
-        title: isArabic ? 'تفاصيل التحليلات' : 'Analytics Details',
+        title: isArabic ? 'ØªÙØ§ØµÙŠÙ„ Ø§Ù„ØªØ­Ù„ÙŠÙ„Ø§Øª' : 'Analytics Details',
         subtitle: isArabic
-            ? 'تحليلات السلوك والمراقبة متاحة دون تمديد الصفحة الرئيسية.'
+            ? 'ØªØ­Ù„ÙŠÙ„Ø§Øª Ø§Ù„Ø³Ù„ÙˆÙƒ ÙˆØ§Ù„Ù…Ø±Ø§Ù‚Ø¨Ø© Ù…ØªØ§Ø­Ø© Ø¯ÙˆÙ† ØªÙ…Ø¯ÙŠØ¯ Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©.'
             : 'Behavior and monitoring analytics kept available without stretching the main page.',
         icon: Icons.analytics_outlined,
         route: Routes.adminAnalyticsDetails,
@@ -529,13 +468,13 @@ class _AdminHubPageState extends State<AdminHubPage> {
           title: const SizedBox.shrink(),
           actions: [
             _AdminHubTopButton(
-              label: isArabic ? 'القائمة' : 'Back to Menu',
+              label: isArabic ? 'Ø§Ù„Ù‚Ø§Ø¦Ù…Ø©' : 'Back to Menu',
               icon: Icons.grid_view_rounded,
               onPressed: () => _backToMenu(context),
             ),
             const SizedBox(width: 8),
             _AdminHubTopButton(
-              label: isArabic ? 'تسجيل الخروج' : 'Logout',
+              label: isArabic ? 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬' : 'Logout',
               icon: Icons.logout_rounded,
               onPressed: () => _logout(context),
             ),
@@ -605,7 +544,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
                                             widthFactor: 0.52,
                                             child: _AdminTitledLaunchpad(
                                               title: isArabic
-                                                  ? 'متابعة التسجيلات والحسابات'
+                                                  ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„ØªØ³Ø¬ÙŠÙ„Ø§Øª ÙˆØ§Ù„Ø­Ø³Ø§Ø¨Ø§Øª'
                                                   : 'Registration & Account Follow-up',
                                               cards: registrationSectionCards,
                                             ),
@@ -657,7 +596,7 @@ class _AdminHubPageState extends State<AdminHubPage> {
                         const SizedBox(height: 14),
                         _AdminTitledLaunchpad(
                           title: isArabic
-                              ? 'متابعة التسجيلات والحسابات'
+                              ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„ØªØ³Ø¬ÙŠÙ„Ø§Øª ÙˆØ§Ù„Ø­Ø³Ø§Ø¨Ø§Øª'
                               : 'Registration & Account Follow-up',
                           cards: registrationSectionCards,
                         ),
@@ -1081,7 +1020,7 @@ class _AdminGovernanceToolsButton extends StatelessWidget {
                     : CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isArabic ? 'أدوات الحوكمة' : 'Governance Tools',
+                    isArabic ? 'Ø£Ø¯ÙˆØ§Øª Ø§Ù„Ø­ÙˆÙƒÙ…Ø©' : 'Governance Tools',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: const Color(0xFFF1E5C8),
                           fontWeight: FontWeight.w800,
@@ -1125,7 +1064,7 @@ class _AdminGovernanceToolsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: isArabic ? 'أدوات الحوكمة' : 'Governance Tools',
+      message: isArabic ? 'Ø£Ø¯ÙˆØ§Øª Ø§Ù„Ø­ÙˆÙƒÙ…Ø©' : 'Governance Tools',
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadii.xl),
         onTap: () => _showTools(context),
@@ -1176,7 +1115,7 @@ class _AdminGovernanceToolsButton extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                isArabic ? 'أدوات الحوكمة' : 'Governance Tools',
+                isArabic ? 'Ø£Ø¯ÙˆØ§Øª Ø§Ù„Ø­ÙˆÙƒÙ…Ø©' : 'Governance Tools',
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
@@ -1644,35 +1583,30 @@ class _QuickStatCard extends StatelessWidget {
       required int? count,
     }) {
       final isOpenRequestsCounter = item.group == AdminVisualGroup.requests;
-      final isPaymentReviewCounter = item.group == AdminVisualGroup.payments;
       final isSessionReadinessCounter = item.group == AdminVisualGroup.sessions;
       final isHumanReviewCounter = item.group == AdminVisualGroup.support;
       final isGatewaySignalsCounter = item.group == AdminVisualGroup.system;
       final openRequestsCountText =
-          hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
-      final countText = hasError ? '!' : (count == null ? '—' : '$count');
+          hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
+      final countText = hasError ? '!' : (count == null ? 'â€”' : '$count');
       final humanReviewCountText =
-          hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
-      final paymentReviewCountText =
-          hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
+          hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
       final sessionReadinessCountText =
-          hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
+          hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
       final gatewaySignalsCountText =
-          hasError ? '—' : (waiting ? '...' : '${count ?? 0}');
+          hasError ? 'â€”' : (waiting ? '...' : '${count ?? 0}');
       final statusText = hasError
-          ? (isArabic ? 'فشل التحميل' : 'Load failed')
-          : (waiting ? (isArabic ? 'جارٍ التحديث' : 'Updating') : item.title);
+          ? (isArabic ? 'ÙØ´Ù„ Ø§Ù„ØªØ­Ù…ÙŠÙ„' : 'Load failed')
+          : (waiting ? (isArabic ? 'Ø¬Ø§Ø±Ù Ø§Ù„ØªØ­Ø¯ÙŠØ«' : 'Updating') : item.title);
       final displayCountText = isOpenRequestsCounter
           ? openRequestsCountText
-          : (isPaymentReviewCounter
-              ? paymentReviewCountText
-              : (isSessionReadinessCounter
-                  ? sessionReadinessCountText
-                  : (isHumanReviewCounter
-                      ? humanReviewCountText
-                      : (isGatewaySignalsCounter
-                          ? gatewaySignalsCountText
-                          : countText))));
+          : (isSessionReadinessCounter
+              ? sessionReadinessCountText
+              : (isHumanReviewCounter
+                  ? humanReviewCountText
+                  : (isGatewaySignalsCounter
+                      ? gatewaySignalsCountText
+                      : countText)));
       final isTopPriority = (count ?? 0) > 0 && (count ?? 0) == maxCount;
 
       return Column(

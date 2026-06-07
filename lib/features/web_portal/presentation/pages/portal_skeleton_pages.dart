@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PortalHomePage extends StatelessWidget {
@@ -93,8 +93,8 @@ class PortalServiceRequestPage extends StatelessWidget {
         title: 'Service Request',
         subtitle: 'Commerce Intake + Service Request',
         disclaimer:
-            'This is an intake request only. Mental Smile will review the request and contact you manually. No quote, approval, payment, or execution is guaranteed by submitting this form.',
-        submitLabel: 'Open Gmail Draft / فتح مسودة Gmail',
+            'This is an intake request only. Mental Smile will review the request and contact you manually. No quote, approval, lifecycle ownership, or execution is guaranteed by submitting this form.',
+        submitLabel: 'Open Gmail Draft / ÙØªØ­ Ù…Ø³ÙˆØ¯Ø© Gmail',
         fields: [
           _PortalTextFieldSpec(key: 'requester', label: 'Requester name'),
           _PortalTextFieldSpec(key: 'email', label: 'Email'),
@@ -144,7 +144,7 @@ class PortalPackageRequestPage extends StatelessWidget {
         subtitle: 'Package + Subscription Intake',
         disclaimer:
             'Package requests are reviewed manually. Payment instructions and receipts are issued only after review by Mental Smile.',
-        submitLabel: 'Open Gmail Draft / فتح مسودة Gmail',
+        submitLabel: 'Open Gmail Draft / ÙØªØ­ Ù…Ø³ÙˆØ¯Ø© Gmail',
         fields: [
           _PortalTextFieldSpec(key: 'requester', label: 'Requester name'),
           _PortalTextFieldSpec(key: 'email', label: 'Email'),
@@ -190,7 +190,7 @@ class PortalContactPage extends StatelessWidget {
         subtitle: 'General Contact Gateway',
         disclaimer:
             'This contact form is for general intake only. Urgent or emergency support is not handled through this portal.',
-        submitLabel: 'Open Gmail Draft / فتح مسودة Gmail',
+        submitLabel: 'Open Gmail Draft / ÙØªØ­ Ù…Ø³ÙˆØ¯Ø© Gmail',
         fields: [
           _PortalTextFieldSpec(key: 'name', label: 'Name'),
           _PortalTextFieldSpec(key: 'email', label: 'Email'),
@@ -401,7 +401,7 @@ class _PortalHeroHome extends StatelessWidget {
             _PortalActionButton(label: 'Library', route: '/library'),
             _PortalActionButton(label: 'Contact', route: '/contact'),
             _PortalActionButton(
-              label: 'Open Mental Smile App / الدخول إلى التطبيق',
+              label: 'Open Mental Smile App / Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¥Ù„Ù‰ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚',
               route: '/splash',
             ),
           ],
@@ -837,3 +837,4 @@ class _PortalNavItem {
   final String label;
   final String route;
 }
+

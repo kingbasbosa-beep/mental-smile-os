@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -46,12 +46,12 @@ import 'app_localizations_en.dart';
 ///
 /// iOS applications define key application metadata, including supported
 /// locales, in an Info.plist file that is built into the application bundle.
-/// To configure the locales supported by your app, you’ll need to edit this
+/// To configure the locales supported by your app, youâ€™ll need to edit this
 /// file.
 ///
-/// First, open your project’s ios/Runner.xcworkspace Xcode workspace file.
+/// First, open your projectâ€™s ios/Runner.xcworkspace Xcode workspace file.
 /// Then, in the Project Navigator, open the Info.plist file under the Runner
-/// project’s Runner folder.
+/// projectâ€™s Runner folder.
 ///
 /// Next, select the Information Property List item, select Add Item from the
 /// Editor menu, then select Localizations from the pop-up menu.
@@ -98,1672 +98,1406 @@ abstract class AppLocalizations {
     Locale('en')
   ];
 
-  /// عنوان التطبيق
+  /// Ø¹Ù†ÙˆØ§Ù† Ø§Ù„ØªØ·Ø¨ÙŠÙ‚
   ///
   /// In ar, this message translates to:
-  /// **'مينتال كي'**
+  /// **'Ù…ÙŠÙ†ØªØ§Ù„ ÙƒÙŠ'**
   String get appTitle;
 
   /// No description provided for @homeTitle.
   ///
   /// In ar, this message translates to:
-  /// **'الرئيسية'**
+  /// **'Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©'**
   String get homeTitle;
 
   /// No description provided for @changeLanguage.
   ///
   /// In ar, this message translates to:
-  /// **'تغيير اللغة'**
+  /// **'ØªØºÙŠÙŠØ± Ø§Ù„Ù„ØºØ©'**
   String get changeLanguage;
 
   /// No description provided for @localeLabel.
   ///
   /// In ar, this message translates to:
-  /// **'اللغة: {code} (اضغط أو 🌐)'**
+  /// **'Ø§Ù„Ù„ØºØ©: {code} (Ø§Ø¶ØºØ· Ø£Ùˆ ðŸŒ)'**
   String localeLabel(String code);
 
   /// No description provided for @splashTitle.
   ///
   /// In ar, this message translates to:
-  /// **'شاشة البداية'**
+  /// **'Ø´Ø§Ø´Ø© Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©'**
   String get splashTitle;
 
   /// No description provided for @routeNotFound.
   ///
   /// In ar, this message translates to:
-  /// **'المسار غير موجود'**
+  /// **'Ø§Ù„Ù…Ø³Ø§Ø± ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯'**
   String get routeNotFound;
 
   /// No description provided for @moduleSpecialists.
   ///
   /// In ar, this message translates to:
-  /// **'المختصون'**
+  /// **'Ø§Ù„Ù…Ø®ØªØµÙˆÙ†'**
   String get moduleSpecialists;
 
   /// No description provided for @moduleLearningLibrary.
   ///
   /// In ar, this message translates to:
-  /// **'مكتبة المعرفة'**
+  /// **'Ù…ÙƒØªØ¨Ø© Ø§Ù„Ù…Ø¹Ø±ÙØ©'**
   String get moduleLearningLibrary;
 
   /// No description provided for @moduleAddictionSupport.
   ///
   /// In ar, this message translates to:
-  /// **'دعم الإدمان'**
+  /// **'Ø¯Ø¹Ù… Ø§Ù„Ø¥Ø¯Ù…Ø§Ù†'**
   String get moduleAddictionSupport;
 
   /// No description provided for @moduleCenters.
   ///
   /// In ar, this message translates to:
-  /// **'المراكز'**
+  /// **'Ø§Ù„Ù…Ø±Ø§ÙƒØ²'**
   String get moduleCenters;
 
   /// No description provided for @moduleSpecialNeedsFamilies.
   ///
   /// In ar, this message translates to:
-  /// **'أسر ذوي الاحتياجات الخاصة'**
+  /// **'Ø£Ø³Ø± Ø°ÙˆÙŠ Ø§Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„Ø®Ø§ØµØ©'**
   String get moduleSpecialNeedsFamilies;
 
   /// No description provided for @moduleFamilyStress.
   ///
   /// In ar, this message translates to:
-  /// **'ضغط الأسرة'**
+  /// **'Ø¶ØºØ· Ø§Ù„Ø£Ø³Ø±Ø©'**
   String get moduleFamilyStress;
 
   /// No description provided for @commonBack.
   ///
   /// In ar, this message translates to:
-  /// **'رجوع'**
+  /// **'Ø±Ø¬ÙˆØ¹'**
   String get commonBack;
 
   /// No description provided for @commonClose.
   ///
   /// In ar, this message translates to:
-  /// **'إغلاق'**
+  /// **'Ø¥ØºÙ„Ø§Ù‚'**
   String get commonClose;
 
   /// No description provided for @commonRetry.
   ///
   /// In ar, this message translates to:
-  /// **'إعادة المحاولة'**
+  /// **'Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©'**
   String get commonRetry;
 
   /// No description provided for @commonLoading.
   ///
   /// In ar, this message translates to:
-  /// **'جارٍ التحميل'**
+  /// **'Ø¬Ø§Ø±Ù Ø§Ù„ØªØ­Ù…ÙŠÙ„'**
   String get commonLoading;
 
   /// No description provided for @commonLogout.
   ///
   /// In ar, this message translates to:
-  /// **'تسجيل الخروج'**
+  /// **'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬'**
   String get commonLogout;
 
   /// No description provided for @menuSpecialists.
   ///
   /// In ar, this message translates to:
-  /// **'الأخصائيون'**
+  /// **'Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠÙˆÙ†'**
   String get menuSpecialists;
 
   /// No description provided for @menuCenters.
   ///
   /// In ar, this message translates to:
-  /// **'المراكز'**
+  /// **'Ø§Ù„Ù…Ø±Ø§ÙƒØ²'**
   String get menuCenters;
 
   /// No description provided for @menuLibrary.
   ///
   /// In ar, this message translates to:
-  /// **'المكتبة'**
+  /// **'Ø§Ù„Ù…ÙƒØªØ¨Ø©'**
   String get menuLibrary;
 
   /// No description provided for @menuAddictionSupport.
   ///
   /// In ar, this message translates to:
-  /// **'دعم المتعافي'**
+  /// **'Ø¯Ø¹Ù… Ø§Ù„Ù…ØªØ¹Ø§ÙÙŠ'**
   String get menuAddictionSupport;
 
   /// No description provided for @menuSpecialNeedsFamilies.
   ///
   /// In ar, this message translates to:
-  /// **'رعاية أسر ذوي الاحتياجات الخاصة'**
+  /// **'Ø±Ø¹Ø§ÙŠØ© Ø£Ø³Ø± Ø°ÙˆÙŠ Ø§Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„Ø®Ø§ØµØ©'**
   String get menuSpecialNeedsFamilies;
 
   /// No description provided for @menuChatSupport.
   ///
   /// In ar, this message translates to:
-  /// **'دعم المحادثة'**
+  /// **'Ø¯Ø¹Ù… Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø©'**
   String get menuChatSupport;
 
   /// No description provided for @homeStartJourney.
   ///
   /// In ar, this message translates to:
-  /// **'ابدأ رحلتك نحو التعافي'**
+  /// **'Ø§Ø¨Ø¯Ø£ Ø±Ø­Ù„ØªÙƒ Ù†Ø­Ùˆ Ø§Ù„ØªØ¹Ø§ÙÙŠ'**
   String get homeStartJourney;
 
   /// No description provided for @homeLogin.
   ///
   /// In ar, this message translates to:
-  /// **'تسجيل الدخول'**
+  /// **'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„'**
   String get homeLogin;
 
   /// No description provided for @homeBack.
   ///
   /// In ar, this message translates to:
-  /// **'رجوع'**
+  /// **'Ø±Ø¬ÙˆØ¹'**
   String get homeBack;
 
   /// No description provided for @authLoginTitle.
   ///
   /// In ar, this message translates to:
-  /// **'تسجيل الدخول'**
+  /// **'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„'**
   String get authLoginTitle;
 
   /// No description provided for @authEmail.
   ///
   /// In ar, this message translates to:
-  /// **'البريد الإلكتروني'**
+  /// **'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ'**
   String get authEmail;
 
   /// No description provided for @authPassword.
   ///
   /// In ar, this message translates to:
-  /// **'كلمة المرور'**
+  /// **'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±'**
   String get authPassword;
 
   /// No description provided for @authLoginButton.
   ///
   /// In ar, this message translates to:
-  /// **'دخول'**
+  /// **'Ø¯Ø®ÙˆÙ„'**
   String get authLoginButton;
 
   /// No description provided for @authLoggingIn.
   ///
   /// In ar, this message translates to:
-  /// **'جارٍ تسجيل الدخول'**
+  /// **'Ø¬Ø§Ø±Ù ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„'**
   String get authLoggingIn;
 
   /// No description provided for @authInvalidCredentials.
   ///
   /// In ar, this message translates to:
-  /// **'بيانات الدخول غير صحيحة'**
+  /// **'Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¯Ø®ÙˆÙ„ ØºÙŠØ± ØµØ­ÙŠØ­Ø©'**
   String get authInvalidCredentials;
 
   /// No description provided for @authRequiredField.
   ///
   /// In ar, this message translates to:
-  /// **'هذا الحقل مطلوب'**
+  /// **'Ù‡Ø°Ø§ Ø§Ù„Ø­Ù‚Ù„ Ù…Ø·Ù„ÙˆØ¨'**
   String get authRequiredField;
 
   /// No description provided for @authForgotPassword.
   ///
   /// In ar, this message translates to:
-  /// **'نسيت كلمة المرور؟'**
+  /// **'Ù†Ø³ÙŠØª ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±ØŸ'**
   String get authForgotPassword;
 
   /// No description provided for @authCreateAccount.
   ///
   /// In ar, this message translates to:
-  /// **'للتسجيل اضغط هنا'**
+  /// **'Ù„Ù„ØªØ³Ø¬ÙŠÙ„ Ø§Ø¶ØºØ· Ù‡Ù†Ø§'**
   String get authCreateAccount;
 
   /// No description provided for @authClientRegister.
   ///
   /// In ar, this message translates to:
-  /// **'إنشاء حساب عميل'**
+  /// **'Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨ Ø¹Ù…ÙŠÙ„'**
   String get authClientRegister;
 
   /// No description provided for @authBackToHome.
   ///
   /// In ar, this message translates to:
-  /// **'العودة للرئيسية'**
+  /// **'Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„Ø±Ø¦ÙŠØ³ÙŠØ©'**
   String get authBackToHome;
 
   /// No description provided for @authLogoutConfirm.
   ///
   /// In ar, this message translates to:
-  /// **'تأكيد تسجيل الخروج'**
+  /// **'ØªØ£ÙƒÙŠØ¯ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬'**
   String get authLogoutConfirm;
 
   /// No description provided for @authLogoutQuestion.
   ///
   /// In ar, this message translates to:
-  /// **'هل تريد تسجيل الخروج؟'**
+  /// **'Ù‡Ù„ ØªØ±ÙŠØ¯ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬ØŸ'**
   String get authLogoutQuestion;
 
   /// No description provided for @authCancel.
   ///
   /// In ar, this message translates to:
-  /// **'إلغاء'**
+  /// **'Ø¥Ù„ØºØ§Ø¡'**
   String get authCancel;
 
   /// No description provided for @authName.
   ///
   /// In ar, this message translates to:
-  /// **'الاسم'**
+  /// **'Ø§Ù„Ø§Ø³Ù…'**
   String get authName;
 
   /// No description provided for @authConfirmPassword.
   ///
   /// In ar, this message translates to:
-  /// **'تأكيد كلمة المرور'**
+  /// **'ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±'**
   String get authConfirmPassword;
 
   /// No description provided for @authCreatingAccount.
   ///
   /// In ar, this message translates to:
-  /// **'جارٍ إنشاء الحساب...'**
+  /// **'Ø¬Ø§Ø±Ù Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø­Ø³Ø§Ø¨...'**
   String get authCreatingAccount;
 
   /// No description provided for @authEmailRequired.
   ///
   /// In ar, this message translates to:
-  /// **'اكتب البريد الإلكتروني'**
+  /// **'Ø§ÙƒØªØ¨ Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ'**
   String get authEmailRequired;
 
   /// No description provided for @authPasswordRequired.
   ///
   /// In ar, this message translates to:
-  /// **'اكتب كلمة المرور'**
+  /// **'Ø§ÙƒØªØ¨ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±'**
   String get authPasswordRequired;
 
   /// No description provided for @authNameRequired.
   ///
   /// In ar, this message translates to:
-  /// **'اكتب الاسم'**
+  /// **'Ø§ÙƒØªØ¨ Ø§Ù„Ø§Ø³Ù…'**
   String get authNameRequired;
 
   /// No description provided for @authPasswordsDoNotMatch.
   ///
   /// In ar, this message translates to:
-  /// **'تأكيد كلمة المرور غير مطابق'**
+  /// **'ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± ØºÙŠØ± Ù…Ø·Ø§Ø¨Ù‚'**
   String get authPasswordsDoNotMatch;
 
   /// No description provided for @authInvalidEmail.
   ///
   /// In ar, this message translates to:
-  /// **'البريد الإلكتروني غير صالح'**
+  /// **'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ØºÙŠØ± ØµØ§Ù„Ø­'**
   String get authInvalidEmail;
 
   /// No description provided for @authWeakPassword.
   ///
   /// In ar, this message translates to:
-  /// **'كلمة المرور يجب أن تكون 6 أحرف على الأقل'**
+  /// **'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± ÙŠØ¬Ø¨ Ø£Ù† ØªÙƒÙˆÙ† 6 Ø£Ø­Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„'**
   String get authWeakPassword;
 
   /// No description provided for @authLoginFailed.
   ///
   /// In ar, this message translates to:
-  /// **'فشل تسجيل الدخول'**
+  /// **'ÙØ´Ù„ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„'**
   String get authLoginFailed;
 
   /// No description provided for @authRegistrationFailed.
   ///
   /// In ar, this message translates to:
-  /// **'فشل إنشاء الحساب'**
+  /// **'ÙØ´Ù„ Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø­Ø³Ø§Ø¨'**
   String get authRegistrationFailed;
 
   /// No description provided for @authUnexpectedError.
   ///
   /// In ar, this message translates to:
-  /// **'حدث خطأ غير متوقع'**
+  /// **'Ø­Ø¯Ø« Ø®Ø·Ø£ ØºÙŠØ± Ù…ØªÙˆÙ‚Ø¹'**
   String get authUnexpectedError;
 
   /// No description provided for @authPleaseWait.
   ///
   /// In ar, this message translates to:
-  /// **'من فضلك انتظر'**
+  /// **'Ù…Ù† ÙØ¶Ù„Ùƒ Ø§Ù†ØªØ¸Ø±'**
   String get authPleaseWait;
 
   /// No description provided for @authInvalidCredentialsMessage.
   ///
   /// In ar, this message translates to:
-  /// **'بيانات الدخول غير صحيحة'**
+  /// **'Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¯Ø®ÙˆÙ„ ØºÙŠØ± ØµØ­ÙŠØ­Ø©'**
   String get authInvalidCredentialsMessage;
 
   /// No description provided for @authAccountCreated.
   ///
   /// In ar, this message translates to:
-  /// **'تم إنشاء الحساب'**
+  /// **'ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø­Ø³Ø§Ø¨'**
   String get authAccountCreated;
 
   /// No description provided for @authTryAgain.
   ///
   /// In ar, this message translates to:
-  /// **'تعذر إكمال العملية، حاول مرة أخرى'**
+  /// **'ØªØ¹Ø°Ø± Ø¥ÙƒÙ…Ø§Ù„ Ø§Ù„Ø¹Ù…Ù„ÙŠØ©ØŒ Ø­Ø§ÙˆÙ„ Ù…Ø±Ø© Ø£Ø®Ø±Ù‰'**
   String get authTryAgain;
 
   /// No description provided for @commonNext.
   ///
   /// In ar, this message translates to:
-  /// **'التالي'**
+  /// **'Ø§Ù„ØªØ§Ù„ÙŠ'**
   String get commonNext;
 
   /// No description provided for @centersLoadError.
   ///
   /// In ar, this message translates to:
-  /// **'حدث خطأ أثناء تحميل المراكز'**
+  /// **'Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ø±Ø§ÙƒØ²'**
   String get centersLoadError;
 
   /// No description provided for @centersEmpty.
   ///
   /// In ar, this message translates to:
-  /// **'لا توجد مراكز متاحة في هذه الفئة حاليًا'**
+  /// **'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø±Ø§ÙƒØ² Ù…ØªØ§Ø­Ø© ÙÙŠ Ù‡Ø°Ù‡ Ø§Ù„ÙØ¦Ø© Ø­Ø§Ù„ÙŠÙ‹Ø§'**
   String get centersEmpty;
 
   /// No description provided for @centersReadMore.
   ///
   /// In ar, this message translates to:
-  /// **'اضغط للمزيد'**
+  /// **'Ø§Ø¶ØºØ· Ù„Ù„Ù…Ø²ÙŠØ¯'**
   String get centersReadMore;
 
   /// No description provided for @centerDefaultName.
   ///
   /// In ar, this message translates to:
-  /// **'مركز'**
+  /// **'Ù…Ø±ÙƒØ²'**
   String get centerDefaultName;
 
   /// No description provided for @centerDetoxUnitAvailable.
   ///
   /// In ar, this message translates to:
-  /// **'يوجد قسم أعراض انسحاب'**
+  /// **'ÙŠÙˆØ¬Ø¯ Ù‚Ø³Ù… Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù†Ø³Ø­Ø§Ø¨'**
   String get centerDetoxUnitAvailable;
 
   /// No description provided for @centerDetailsTitle.
   ///
   /// In ar, this message translates to:
-  /// **'تفاصيل المركز'**
+  /// **'ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ù…Ø±ÙƒØ²'**
   String get centerDetailsTitle;
 
   /// No description provided for @centerDataNotFound.
   ///
   /// In ar, this message translates to:
-  /// **'تعذّر العثور على بيانات المركز'**
+  /// **'ØªØ¹Ø°Ù‘Ø± Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ²'**
   String get centerDataNotFound;
 
   /// No description provided for @centerDataLoadError.
   ///
   /// In ar, this message translates to:
-  /// **'حدث خطأ أثناء تحميل بيانات المركز'**
+  /// **'Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ ØªØ­Ù…ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ²'**
   String get centerDataLoadError;
 
   /// No description provided for @centerAvailable.
   ///
   /// In ar, this message translates to:
-  /// **'متاح'**
+  /// **'Ù…ØªØ§Ø­'**
   String get centerAvailable;
 
   /// No description provided for @centerUnavailable.
   ///
   /// In ar, this message translates to:
-  /// **'غير متاح'**
+  /// **'ØºÙŠØ± Ù…ØªØ§Ø­'**
   String get centerUnavailable;
 
   /// No description provided for @centerGallery.
   ///
   /// In ar, this message translates to:
-  /// **'صور المركز'**
+  /// **'ØµÙˆØ± Ø§Ù„Ù…Ø±ÙƒØ²'**
   String get centerGallery;
 
   /// No description provided for @centerPricing.
   ///
   /// In ar, this message translates to:
-  /// **'تكلفة الإقامة'**
+  /// **'ØªÙƒÙ„ÙØ© Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©'**
   String get centerPricing;
 
   /// No description provided for @centerTypeAndService.
   ///
   /// In ar, this message translates to:
-  /// **'نوع المركز وخدمته'**
+  /// **'Ù†ÙˆØ¹ Ø§Ù„Ù…Ø±ÙƒØ² ÙˆØ®Ø¯Ù…ØªÙ‡'**
   String get centerTypeAndService;
 
   /// No description provided for @centerCapabilities.
   ///
   /// In ar, this message translates to:
-  /// **'قدرات المركز'**
+  /// **'Ù‚Ø¯Ø±Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ²'**
   String get centerCapabilities;
 
   /// No description provided for @centerContactLocation.
   ///
   /// In ar, this message translates to:
-  /// **'التواصل والموقع'**
+  /// **'Ø§Ù„ØªÙˆØ§ØµÙ„ ÙˆØ§Ù„Ù…ÙˆÙ‚Ø¹'**
   String get centerContactLocation;
 
   /// No description provided for @centerAddress.
   ///
   /// In ar, this message translates to:
-  /// **'العنوان'**
+  /// **'Ø§Ù„Ø¹Ù†ÙˆØ§Ù†'**
   String get centerAddress;
 
   /// No description provided for @centerCity.
   ///
   /// In ar, this message translates to:
-  /// **'المدينة'**
+  /// **'Ø§Ù„Ù…Ø¯ÙŠÙ†Ø©'**
   String get centerCity;
 
   /// No description provided for @centerPhone.
   ///
   /// In ar, this message translates to:
-  /// **'الهاتف'**
+  /// **'Ø§Ù„Ù‡Ø§ØªÙ'**
   String get centerPhone;
 
   /// No description provided for @centerWhatsapp.
   ///
   /// In ar, this message translates to:
-  /// **'واتساب'**
+  /// **'ÙˆØ§ØªØ³Ø§Ø¨'**
   String get centerWhatsapp;
 
   /// No description provided for @centerServices.
   ///
   /// In ar, this message translates to:
-  /// **'الخدمات'**
+  /// **'Ø§Ù„Ø®Ø¯Ù…Ø§Øª'**
   String get centerServices;
 
   /// No description provided for @centerAbout.
   ///
   /// In ar, this message translates to:
-  /// **'نبذة عن المركز'**
+  /// **'Ù†Ø¨Ø°Ø© Ø¹Ù† Ø§Ù„Ù…Ø±ÙƒØ²'**
   String get centerAbout;
 
   /// No description provided for @centerRequestViaAdmin.
   ///
   /// In ar, this message translates to:
-  /// **'اطلب المركز عبر الإدارة'**
+  /// **'Ø§Ø·Ù„Ø¨ Ø§Ù„Ù…Ø±ÙƒØ² Ø¹Ø¨Ø± Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©'**
   String get centerRequestViaAdmin;
 
   /// No description provided for @centerInboxTitle.
   ///
   /// In ar, this message translates to:
-  /// **'وارد المركز'**
+  /// **'ÙˆØ§Ø±Ø¯ Ø§Ù„Ù…Ø±ÙƒØ²'**
   String get centerInboxTitle;
 
   /// No description provided for @commonAll.
   ///
   /// In ar, this message translates to:
-  /// **'الكل'**
+  /// **'Ø§Ù„ÙƒÙ„'**
   String get commonAll;
 
   /// No description provided for @statusPending.
   ///
   /// In ar, this message translates to:
-  /// **'بانتظار الرد'**
+  /// **'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø±Ø¯'**
   String get statusPending;
 
   /// No description provided for @centerSaveResponse.
   ///
   /// In ar, this message translates to:
-  /// **'حفظ الرد'**
+  /// **'Ø­ÙØ¸ Ø§Ù„Ø±Ø¯'**
   String get centerSaveResponse;
 
   /// No description provided for @webCenterRegistrationPortalTitle.
   ///
   /// In ar, this message translates to:
-  /// **'بوابة تسجيل المراكز'**
+  /// **'Ø¨ÙˆØ§Ø¨Ø© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…Ø±Ø§ÙƒØ²'**
   String get webCenterRegistrationPortalTitle;
 
   /// No description provided for @webCenterRegistrationPortalSubtitle.
   ///
   /// In ar, this message translates to:
-  /// **'أنشئ حساب المركز ليتم مراجعته من الإدارة.'**
+  /// **'Ø£Ù†Ø´Ø¦ Ø­Ø³Ø§Ø¨ Ø§Ù„Ù…Ø±ÙƒØ² Ù„ÙŠØªÙ… Ù…Ø±Ø§Ø¬Ø¹ØªÙ‡ Ù…Ù† Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©.'**
   String get webCenterRegistrationPortalSubtitle;
 
   /// No description provided for @webCenterRegistrationBasicInfoTitle.
   ///
   /// In ar, this message translates to:
-  /// **'تسجيل المركز - البيانات الأساسية'**
+  /// **'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…Ø±ÙƒØ² - Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©'**
   String get webCenterRegistrationBasicInfoTitle;
 
   /// No description provided for @webCenterGuidanceLibrary.
   ///
   /// In ar, this message translates to:
-  /// **'مكتبة الإرشاد'**
+  /// **'Ù…ÙƒØªØ¨Ø© Ø§Ù„Ø¥Ø±Ø´Ø§Ø¯'**
   String get webCenterGuidanceLibrary;
 
   /// No description provided for @webCenterCenterName.
   ///
   /// In ar, this message translates to:
-  /// **'اسم المركز'**
+  /// **'Ø§Ø³Ù… Ø§Ù„Ù…Ø±ÙƒØ²'**
   String get webCenterCenterName;
 
   /// No description provided for @webCenterCategory.
   ///
   /// In ar, this message translates to:
-  /// **'الفئة'**
+  /// **'Ø§Ù„ÙØ¦Ø©'**
   String get webCenterCategory;
 
   /// No description provided for @webCenterType.
   ///
   /// In ar, this message translates to:
-  /// **'نوع المركز'**
+  /// **'Ù†ÙˆØ¹ Ø§Ù„Ù…Ø±ÙƒØ²'**
   String get webCenterType;
 
   /// No description provided for @webCenterConfirmPassword.
   ///
   /// In ar, this message translates to:
-  /// **'تأكيد كلمة المرور'**
+  /// **'ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±'**
   String get webCenterConfirmPassword;
 
   /// No description provided for @webCenterNextBasicInfo.
   ///
   /// In ar, this message translates to:
-  /// **'التالي: البيانات الأساسية'**
+  /// **'Ø§Ù„ØªØ§Ù„ÙŠ: Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©'**
   String get webCenterNextBasicInfo;
 
   /// No description provided for @webCenterManagerName.
   ///
   /// In ar, this message translates to:
-  /// **'اسم المسؤول'**
+  /// **'Ø§Ø³Ù… Ø§Ù„Ù…Ø³Ø¤ÙˆÙ„'**
   String get webCenterManagerName;
 
   /// No description provided for @webCenterArea.
   ///
   /// In ar, this message translates to:
-  /// **'المنطقة'**
+  /// **'Ø§Ù„Ù…Ù†Ø·Ù‚Ø©'**
   String get webCenterArea;
 
   /// No description provided for @webCenterDescription.
   ///
   /// In ar, this message translates to:
-  /// **'الوصف'**
+  /// **'Ø§Ù„ÙˆØµÙ'**
   String get webCenterDescription;
 
   /// No description provided for @webCenterHasDetoxUnit.
   ///
   /// In ar, this message translates to:
-  /// **'يوجد قسم سحب سموم'**
+  /// **'ÙŠÙˆØ¬Ø¯ Ù‚Ø³Ù… Ø³Ø­Ø¨ Ø³Ù…ÙˆÙ…'**
   String get webCenterHasDetoxUnit;
 
   /// No description provided for @webCenterNextMediaGallery.
   ///
   /// In ar, this message translates to:
-  /// **'التالي: الصور والمعرض'**
+  /// **'Ø§Ù„ØªØ§Ù„ÙŠ: Ø§Ù„ØµÙˆØ± ÙˆØ§Ù„Ù…Ø¹Ø±Ø¶'**
   String get webCenterNextMediaGallery;
 
   /// No description provided for @webCenterMediaGalleryTitle.
   ///
   /// In ar, this message translates to:
-  /// **'تسجيل المركز - الصور والمعرض'**
+  /// **'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…Ø±ÙƒØ² - Ø§Ù„ØµÙˆØ± ÙˆØ§Ù„Ù…Ø¹Ø±Ø¶'**
   String get webCenterMediaGalleryTitle;
 
   /// No description provided for @webCenterFrontImageUrl.
   ///
   /// In ar, this message translates to:
-  /// **'رابط صورة الواجهة'**
+  /// **'Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© Ø§Ù„ÙˆØ§Ø¬Ù‡Ø©'**
   String get webCenterFrontImageUrl;
 
   /// No description provided for @webCenterReceptionImageUrl.
   ///
   /// In ar, this message translates to:
-  /// **'رابط صورة الاستقبال'**
+  /// **'Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© Ø§Ù„Ø§Ø³ØªÙ‚Ø¨Ø§Ù„'**
   String get webCenterReceptionImageUrl;
 
   /// No description provided for @webCenterInsideImage1Url.
   ///
   /// In ar, this message translates to:
-  /// **'رابط صورة داخلية 1'**
+  /// **'Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© Ø¯Ø§Ø®Ù„ÙŠØ© 1'**
   String get webCenterInsideImage1Url;
 
   /// No description provided for @webCenterInsideImage2Url.
   ///
   /// In ar, this message translates to:
-  /// **'رابط صورة داخلية 2'**
+  /// **'Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© Ø¯Ø§Ø®Ù„ÙŠØ© 2'**
   String get webCenterInsideImage2Url;
 
   /// No description provided for @webCenterNextPricingCapabilities.
   ///
   /// In ar, this message translates to:
-  /// **'التالي: التسعير والقدرات'**
+  /// **'Ø§Ù„ØªØ§Ù„ÙŠ: Ø§Ù„ØªØ³Ø¹ÙŠØ± ÙˆØ§Ù„Ù‚Ø¯Ø±Ø§Øª'**
   String get webCenterNextPricingCapabilities;
 
   /// No description provided for @webCenterPricingCapabilitiesTitle.
   ///
   /// In ar, this message translates to:
-  /// **'تسجيل المركز - التسعير والقدرات'**
+  /// **'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…Ø±ÙƒØ² - Ø§Ù„ØªØ³Ø¹ÙŠØ± ÙˆØ§Ù„Ù‚Ø¯Ø±Ø§Øª'**
   String get webCenterPricingCapabilitiesTitle;
 
   /// No description provided for @webCenterEnabled.
   ///
   /// In ar, this message translates to:
-  /// **'مفعل'**
+  /// **'Ù…ÙØ¹Ù„'**
   String get webCenterEnabled;
 
   /// No description provided for @webCenterPrice.
   ///
   /// In ar, this message translates to:
-  /// **'السعر'**
+  /// **'Ø§Ù„Ø³Ø¹Ø±'**
   String get webCenterPrice;
 
   /// No description provided for @webCenterPricingUnit.
   ///
   /// In ar, this message translates to:
-  /// **'وحدة التسعير'**
+  /// **'ÙˆØ­Ø¯Ø© Ø§Ù„ØªØ³Ø¹ÙŠØ±'**
   String get webCenterPricingUnit;
 
   /// No description provided for @webCenterAcMode.
   ///
   /// In ar, this message translates to:
-  /// **'نظام التكييف'**
+  /// **'Ù†Ø¸Ø§Ù… Ø§Ù„ØªÙƒÙŠÙŠÙ'**
   String get webCenterAcMode;
 
   /// No description provided for @webCenterTaxIncluded.
   ///
   /// In ar, this message translates to:
-  /// **'يشمل الضريبة'**
+  /// **'ÙŠØ´Ù…Ù„ Ø§Ù„Ø¶Ø±ÙŠØ¨Ø©'**
   String get webCenterTaxIncluded;
 
   /// No description provided for @webCenterNextDocuments.
   ///
   /// In ar, this message translates to:
-  /// **'التالي: المستندات'**
+  /// **'Ø§Ù„ØªØ§Ù„ÙŠ: Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª'**
   String get webCenterNextDocuments;
 
   /// No description provided for @webCenterDocumentsTitle.
   ///
   /// In ar, this message translates to:
-  /// **'تسجيل المركز - المستندات'**
+  /// **'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…Ø±ÙƒØ² - Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª'**
   String get webCenterDocumentsTitle;
 
   /// No description provided for @webCenterFileName.
   ///
   /// In ar, this message translates to:
-  /// **'اسم الملف'**
+  /// **'Ø§Ø³Ù… Ø§Ù„Ù…Ù„Ù'**
   String get webCenterFileName;
 
   /// No description provided for @webCenterFileUrlOptional.
   ///
   /// In ar, this message translates to:
-  /// **'رابط الملف (اختياري)'**
+  /// **'Ø±Ø§Ø¨Ø· Ø§Ù„Ù…Ù„Ù (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)'**
   String get webCenterFileUrlOptional;
 
   /// No description provided for @webCenterReviewNoteOptional.
   ///
   /// In ar, this message translates to:
-  /// **'ملاحظة المراجعة (اختياري)'**
+  /// **'Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)'**
   String get webCenterReviewNoteOptional;
 
   /// No description provided for @webCenterSubmitForReview.
   ///
   /// In ar, this message translates to:
-  /// **'إرسال للمراجعة'**
+  /// **'Ø¥Ø±Ø³Ø§Ù„ Ù„Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©'**
   String get webCenterSubmitForReview;
 
   /// No description provided for @webRegistrationBrowseLibraryDuringReview.
   ///
   /// In ar, this message translates to:
-  /// **'تصفح مكتبة الإرشاد أثناء مراجعة حسابك'**
+  /// **'ØªØµÙØ­ Ù…ÙƒØªØ¨Ø© Ø§Ù„Ø¥Ø±Ø´Ø§Ø¯ Ø£Ø«Ù†Ø§Ø¡ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø­Ø³Ø§Ø¨Ùƒ'**
   String get webRegistrationBrowseLibraryDuringReview;
 
   /// No description provided for @webCenterCenterNameRequired.
   ///
   /// In ar, this message translates to:
-  /// **'اكتب اسم المركز'**
+  /// **'Ø§ÙƒØªØ¨ Ø§Ø³Ù… Ø§Ù„Ù…Ø±ÙƒØ²'**
   String get webCenterCenterNameRequired;
 
   /// No description provided for @webCenterRegistrationFailed.
   ///
   /// In ar, this message translates to:
-  /// **'تعذر إكمال التسجيل، حاول مرة أخرى.'**
+  /// **'ØªØ¹Ø°Ø± Ø¥ÙƒÙ…Ø§Ù„ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ØŒ Ø­Ø§ÙˆÙ„ Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.'**
   String get webCenterRegistrationFailed;
 
   /// No description provided for @webCenterPleaseRegisterBeforeSaving.
   ///
   /// In ar, this message translates to:
-  /// **'يرجى التسجيل أو تسجيل الدخول قبل الحفظ.'**
+  /// **'ÙŠØ±Ø¬Ù‰ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ Ø£Ùˆ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ù‚Ø¨Ù„ Ø§Ù„Ø­ÙØ¸.'**
   String get webCenterPleaseRegisterBeforeSaving;
 
   /// No description provided for @webCenterMissingSession.
   ///
   /// In ar, this message translates to:
-  /// **'جلسة المركز غير متاحة'**
+  /// **'Ø¬Ù„Ø³Ø© Ø§Ù„Ù…Ø±ÙƒØ² ØºÙŠØ± Ù…ØªØ§Ø­Ø©'**
   String get webCenterMissingSession;
 
   /// No description provided for @webCenterSaveProfileFailed.
   ///
   /// In ar, this message translates to:
-  /// **'تعذر حفظ بيانات المركز'**
+  /// **'ØªØ¹Ø°Ø± Ø­ÙØ¸ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ²'**
   String get webCenterSaveProfileFailed;
 
   /// No description provided for @webCenterSaveMediaFailed.
   ///
   /// In ar, this message translates to:
-  /// **'تعذر حفظ الصور'**
+  /// **'ØªØ¹Ø°Ø± Ø­ÙØ¸ Ø§Ù„ØµÙˆØ±'**
   String get webCenterSaveMediaFailed;
 
   /// No description provided for @webCenterSavePricingFailed.
   ///
   /// In ar, this message translates to:
-  /// **'تعذر حفظ التسعير'**
+  /// **'ØªØ¹Ø°Ø± Ø­ÙØ¸ Ø§Ù„ØªØ³Ø¹ÙŠØ±'**
   String get webCenterSavePricingFailed;
 
   /// No description provided for @webCenterSubmitDocumentsFailed.
   ///
   /// In ar, this message translates to:
-  /// **'تعذر إرسال المستندات'**
+  /// **'ØªØ¹Ø°Ø± Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª'**
   String get webCenterSubmitDocumentsFailed;
 
   /// No description provided for @webClinicianRegistrationAccountTitle.
   ///
   /// In ar, this message translates to:
-  /// **'تسجيل الأخصائي - الحساب'**
+  /// **'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ - Ø§Ù„Ø­Ø³Ø§Ø¨'**
   String get webClinicianRegistrationAccountTitle;
 
   /// No description provided for @webClinicianRegistrationProfileTitle.
   ///
   /// In ar, this message translates to:
-  /// **'تسجيل الأخصائي - الملف الشخصي'**
+  /// **'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ - Ø§Ù„Ù…Ù„Ù Ø§Ù„Ø´Ø®ØµÙŠ'**
   String get webClinicianRegistrationProfileTitle;
 
   /// No description provided for @webClinicianName.
   ///
   /// In ar, this message translates to:
-  /// **'الاسم'**
+  /// **'Ø§Ù„Ø§Ø³Ù…'**
   String get webClinicianName;
 
   /// No description provided for @webClinicianProfessionalTitle.
   ///
   /// In ar, this message translates to:
-  /// **'اللقب المهني'**
+  /// **'Ø§Ù„Ù„Ù‚Ø¨ Ø§Ù„Ù…Ù‡Ù†ÙŠ'**
   String get webClinicianProfessionalTitle;
 
   /// No description provided for @webClinicianSpecialty.
   ///
   /// In ar, this message translates to:
-  /// **'التخصص'**
+  /// **'Ø§Ù„ØªØ®ØµØµ'**
   String get webClinicianSpecialty;
 
   /// No description provided for @webClinicianNextProfile.
   ///
   /// In ar, this message translates to:
-  /// **'التالي: الملف الشخصي'**
+  /// **'Ø§Ù„ØªØ§Ù„ÙŠ: Ø§Ù„Ù…Ù„Ù Ø§Ù„Ø´Ø®ØµÙŠ'**
   String get webClinicianNextProfile;
 
   /// No description provided for @webClinicianPhotoUrl.
   ///
   /// In ar, this message translates to:
-  /// **'رابط الصورة'**
+  /// **'Ø±Ø§Ø¨Ø· Ø§Ù„ØµÙˆØ±Ø©'**
   String get webClinicianPhotoUrl;
 
   /// No description provided for @webClinicianBio.
   ///
   /// In ar, this message translates to:
-  /// **'النبذة'**
+  /// **'Ø§Ù„Ù†Ø¨Ø°Ø©'**
   String get webClinicianBio;
-
-  /// No description provided for @webClinicianNextSessions.
-  ///
-  /// In ar, this message translates to:
-  /// **'التالي: الجلسات'**
-  String get webClinicianNextSessions;
-
-  /// No description provided for @webClinicianSessionsTitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'تسجيل الأخصائي - الجلسات'**
-  String get webClinicianSessionsTitle;
 
   /// No description provided for @webClinicianSessionPrice.
   ///
   /// In ar, this message translates to:
-  /// **'سعر الجلسة'**
+  /// **'Ø³Ø¹Ø± Ø§Ù„Ø¬Ù„Ø³Ø©'**
   String get webClinicianSessionPrice;
 
   /// No description provided for @webClinicianSessionDuration.
   ///
   /// In ar, this message translates to:
-  /// **'مدة الجلسة'**
+  /// **'Ù…Ø¯Ø© Ø§Ù„Ø¬Ù„Ø³Ø©'**
   String get webClinicianSessionDuration;
-
-  /// No description provided for @webClinicianOnlineSessions.
-  ///
-  /// In ar, this message translates to:
-  /// **'جلسات أونلاين'**
-  String get webClinicianOnlineSessions;
-
-  /// No description provided for @webClinicianInPersonSessions.
-  ///
-  /// In ar, this message translates to:
-  /// **'جلسات حضورية'**
-  String get webClinicianInPersonSessions;
-
-  /// No description provided for @webClinicianGroupSessions.
-  ///
-  /// In ar, this message translates to:
-  /// **'يقدم جلسات جماعية'**
-  String get webClinicianGroupSessions;
 
   /// No description provided for @webClinicianDocumentsTitle.
   ///
   /// In ar, this message translates to:
-  /// **'تسجيل الأخصائي - المستندات'**
+  /// **'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ - Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª'**
   String get webClinicianDocumentsTitle;
 
   /// No description provided for @webClinicianIdentityFileName.
   ///
   /// In ar, this message translates to:
-  /// **'اسم ملف الهوية'**
+  /// **'Ø§Ø³Ù… Ù…Ù„Ù Ø§Ù„Ù‡ÙˆÙŠØ©'**
   String get webClinicianIdentityFileName;
 
   /// No description provided for @webClinicianCertificateFileName.
   ///
   /// In ar, this message translates to:
-  /// **'اسم ملف الشهادة'**
+  /// **'Ø§Ø³Ù… Ù…Ù„Ù Ø§Ù„Ø´Ù‡Ø§Ø¯Ø©'**
   String get webClinicianCertificateFileName;
 
   /// No description provided for @webClinicianExtraFileNameOptional.
   ///
   /// In ar, this message translates to:
-  /// **'اسم ملف إضافي (اختياري)'**
+  /// **'Ø§Ø³Ù… Ù…Ù„Ù Ø¥Ø¶Ø§ÙÙŠ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)'**
   String get webClinicianExtraFileNameOptional;
 
   /// No description provided for @webClinicianRegistrationFailed.
   ///
   /// In ar, this message translates to:
-  /// **'تعذر إنشاء حساب الأخصائي'**
+  /// **'ØªØ¹Ø°Ø± Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ'**
   String get webClinicianRegistrationFailed;
 
   /// No description provided for @webClinicianStartFromAccountStep.
   ///
   /// In ar, this message translates to:
-  /// **'يرجى بدء التسجيل من خطوة الحساب'**
+  /// **'ÙŠØ±Ø¬Ù‰ Ø¨Ø¯Ø¡ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ Ù…Ù† Ø®Ø·ÙˆØ© Ø§Ù„Ø­Ø³Ø§Ø¨'**
   String get webClinicianStartFromAccountStep;
 
   /// No description provided for @webClinicianAuthenticationSessionMissing.
   ///
   /// In ar, this message translates to:
-  /// **'جلسة تسجيل الدخول غير متاحة'**
+  /// **'Ø¬Ù„Ø³Ø© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ ØºÙŠØ± Ù…ØªØ§Ø­Ø©'**
   String get webClinicianAuthenticationSessionMissing;
 
   /// No description provided for @webClinicianSaveProfileFailed.
   ///
   /// In ar, this message translates to:
-  /// **'تعذر حفظ الملف الشخصي'**
+  /// **'ØªØ¹Ø°Ø± Ø­ÙØ¸ Ø§Ù„Ù…Ù„Ù Ø§Ù„Ø´Ø®ØµÙŠ'**
   String get webClinicianSaveProfileFailed;
 
   /// No description provided for @webClinicianSelectSessionMode.
   ///
   /// In ar, this message translates to:
-  /// **'اختر طريقة جلسة واحدة على الأقل'**
+  /// **'Ø§Ø®ØªØ± Ø·Ø±ÙŠÙ‚Ø© Ø¬Ù„Ø³Ø© ÙˆØ§Ø­Ø¯Ø© Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„'**
   String get webClinicianSelectSessionMode;
-
-  /// No description provided for @webClinicianSaveSessionsFailed.
-  ///
-  /// In ar, this message translates to:
-  /// **'تعذر حفظ بيانات الجلسات'**
-  String get webClinicianSaveSessionsFailed;
 
   /// No description provided for @webClinicianSubmitDocumentsFailed.
   ///
   /// In ar, this message translates to:
-  /// **'تعذر إرسال المستندات'**
+  /// **'ØªØ¹Ø°Ø± Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª'**
   String get webClinicianSubmitDocumentsFailed;
 
-  /// No description provided for @bookingRequestTitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'طلب حجز'**
-  String get bookingRequestTitle;
-
-  /// No description provided for @bookingCenterRequestTitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'طلب حجز مركز'**
-  String get bookingCenterRequestTitle;
-
-  /// No description provided for @bookingMyRequestsTitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'طلباتي'**
-  String get bookingMyRequestsTitle;
-
-  /// No description provided for @bookingBookSpecialistTitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'حجز مع أخصائي'**
-  String get bookingBookSpecialistTitle;
-
-  /// No description provided for @bookingNoSpecialistsYet.
-  ///
-  /// In ar, this message translates to:
-  /// **'لا يوجد أخصائيون بعد.'**
-  String get bookingNoSpecialistsYet;
-
-  /// No description provided for @bookingTrustedSpecialistHint.
-  ///
-  /// In ar, this message translates to:
-  /// **'اختر أخصائيًا موثوقًا وأرسل طلبك للإدارة.'**
-  String get bookingTrustedSpecialistHint;
-
-  /// No description provided for @bookingDevUiEnabled.
-  ///
-  /// In ar, this message translates to:
-  /// **'واجهة التطوير مفعلة'**
-  String get bookingDevUiEnabled;
-
-  /// No description provided for @bookingAdditionalNotes.
-  ///
-  /// In ar, this message translates to:
-  /// **'ملاحظات إضافية'**
-  String get bookingAdditionalNotes;
-
-  /// No description provided for @bookingWriteNoteHint.
-  ///
-  /// In ar, this message translates to:
-  /// **'اكتب ملاحظتك هنا...'**
-  String get bookingWriteNoteHint;
-
-  /// No description provided for @bookingSendRequest.
-  ///
-  /// In ar, this message translates to:
-  /// **'إرسال الطلب'**
-  String get bookingSendRequest;
-
-  /// No description provided for @bookingSendRequestToAdmin.
-  ///
-  /// In ar, this message translates to:
-  /// **'إرسال الطلب إلى الإدارة'**
-  String get bookingSendRequestToAdmin;
-
-  /// No description provided for @bookingSending.
-  ///
-  /// In ar, this message translates to:
-  /// **'جارٍ الإرسال...'**
-  String get bookingSending;
-
-  /// No description provided for @bookingRequestSent.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم إرسال الطلب بنجاح'**
-  String get bookingRequestSent;
-
-  /// No description provided for @bookingRequestFailed.
-  ///
-  /// In ar, this message translates to:
-  /// **'تعذّر إرسال الطلب'**
-  String get bookingRequestFailed;
-
-  /// No description provided for @bookingRequestSentAdminChat.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم إرسال الطلب وفتح محادثة المتابعة مع الإدارة'**
-  String get bookingRequestSentAdminChat;
-
-  /// No description provided for @bookingCenterRequestSent.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم إرسال طلب المركز إلى الإدارة بنجاح'**
-  String get bookingCenterRequestSent;
-
-  /// No description provided for @bookingCenterRequestSentToAdmin.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم إرسال طلب المركز إلى الإدارة'**
-  String get bookingCenterRequestSentToAdmin;
-
-  /// No description provided for @bookingUploadPaymentProof.
-  ///
-  /// In ar, this message translates to:
-  /// **'رفع إثبات التحويل'**
-  String get bookingUploadPaymentProof;
 
   /// No description provided for @bookingEditAccommodation.
   ///
   /// In ar, this message translates to:
-  /// **'تعديل نوع الإقامة'**
+  /// **'ØªØ¹Ø¯ÙŠÙ„ Ù†ÙˆØ¹ Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©'**
   String get bookingEditAccommodation;
 
   /// No description provided for @bookingCompleteInitialIntake.
   ///
   /// In ar, this message translates to:
-  /// **'استكمال بيانات التقييم الأولي'**
+  /// **'Ø§Ø³ØªÙƒÙ…Ø§Ù„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø£ÙˆÙ„ÙŠ'**
   String get bookingCompleteInitialIntake;
-
-  /// No description provided for @bookingCreateNewRequest.
-  ///
-  /// In ar, this message translates to:
-  /// **'إنشاء طلب جديد'**
-  String get bookingCreateNewRequest;
-
-  /// No description provided for @bookingCreateNewFromRequest.
-  ///
-  /// In ar, this message translates to:
-  /// **'إنشاء طلب جديد من هذا الطلب'**
-  String get bookingCreateNewFromRequest;
-
-  /// No description provided for @bookingNewCenterRequestCreated.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم إنشاء طلب مركز جديد'**
-  String get bookingNewCenterRequestCreated;
 
   /// No description provided for @bookingCurrent.
   ///
   /// In ar, this message translates to:
-  /// **'الجارية'**
+  /// **'Ø§Ù„Ø¬Ø§Ø±ÙŠØ©'**
   String get bookingCurrent;
 
   /// No description provided for @bookingActionNeeded.
   ///
   /// In ar, this message translates to:
-  /// **'تحتاج منك إجراء'**
+  /// **'ØªØ­ØªØ§Ø¬ Ù…Ù†Ùƒ Ø¥Ø¬Ø±Ø§Ø¡'**
   String get bookingActionNeeded;
 
   /// No description provided for @bookingCompleted.
   ///
   /// In ar, this message translates to:
-  /// **'المكتملة'**
+  /// **'Ø§Ù„Ù…ÙƒØªÙ…Ù„Ø©'**
   String get bookingCompleted;
 
   /// No description provided for @bookingClosed.
   ///
   /// In ar, this message translates to:
-  /// **'المغلقة'**
+  /// **'Ø§Ù„Ù…ØºÙ„Ù‚Ø©'**
   String get bookingClosed;
 
   /// No description provided for @bookingEmptyCurrent.
   ///
   /// In ar, this message translates to:
-  /// **'لا توجد طلبات جارية الآن'**
+  /// **'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª Ø¬Ø§Ø±ÙŠØ© Ø§Ù„Ø¢Ù†'**
   String get bookingEmptyCurrent;
 
   /// No description provided for @bookingEmptyActionNeeded.
   ///
   /// In ar, this message translates to:
-  /// **'لا توجد طلبات تحتاج منك إجراء الآن'**
+  /// **'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª ØªØ­ØªØ§Ø¬ Ù…Ù†Ùƒ Ø¥Ø¬Ø±Ø§Ø¡ Ø§Ù„Ø¢Ù†'**
   String get bookingEmptyActionNeeded;
 
   /// No description provided for @bookingEmptyCompleted.
   ///
   /// In ar, this message translates to:
-  /// **'لا توجد طلبات مكتملة بعد'**
+  /// **'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª Ù…ÙƒØªÙ…Ù„Ø© Ø¨Ø¹Ø¯'**
   String get bookingEmptyCompleted;
 
   /// No description provided for @bookingEmptyClosed.
   ///
   /// In ar, this message translates to:
-  /// **'لا توجد طلبات مغلقة'**
+  /// **'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª Ù…ØºÙ„Ù‚Ø©'**
   String get bookingEmptyClosed;
 
   /// No description provided for @bookingSpecialistFallback.
   ///
   /// In ar, this message translates to:
-  /// **'الأخصائي'**
+  /// **'Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ'**
   String get bookingSpecialistFallback;
-
-  /// No description provided for @bookingCenterRequestFallback.
-  ///
-  /// In ar, this message translates to:
-  /// **'طلب مركز'**
-  String get bookingCenterRequestFallback;
 
   /// No description provided for @clientDashboardWelcome.
   ///
   /// In ar, this message translates to:
-  /// **'مرحبًا {name}'**
+  /// **'Ù…Ø±Ø­Ø¨Ù‹Ø§ {name}'**
   String clientDashboardWelcome(String name);
 
   /// No description provided for @clientDashboardSubtitle.
   ///
   /// In ar, this message translates to:
-  /// **'كل خطواتك موجودة هنا بهدوء.'**
+  /// **'ÙƒÙ„ Ø®Ø·ÙˆØ§ØªÙƒ Ù…ÙˆØ¬ÙˆØ¯Ø© Ù‡Ù†Ø§ Ø¨Ù‡Ø¯ÙˆØ¡.'**
   String get clientDashboardSubtitle;
-
-  /// No description provided for @clientBookings.
-  ///
-  /// In ar, this message translates to:
-  /// **'طلبات الحجز'**
-  String get clientBookings;
-
-  /// No description provided for @clientBookingRequests.
-  ///
-  /// In ar, this message translates to:
-  /// **'طلبات الحجز'**
-  String get clientBookingRequests;
 
   /// No description provided for @clientSupport.
   ///
   /// In ar, this message translates to:
-  /// **'الدعم'**
+  /// **'Ø§Ù„Ø¯Ø¹Ù…'**
   String get clientSupport;
 
   /// No description provided for @clientSupportRequests.
   ///
   /// In ar, this message translates to:
-  /// **'طلبات الدعم'**
+  /// **'Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¯Ø¹Ù…'**
   String get clientSupportRequests;
 
-  /// No description provided for @clientPaymentProof.
-  ///
-  /// In ar, this message translates to:
-  /// **'إثبات التحويل النقدي'**
-  String get clientPaymentProof;
 
-  /// No description provided for @clientUploadPaymentProof.
-  ///
-  /// In ar, this message translates to:
-  /// **'رفع إثبات التحويل'**
-  String get clientUploadPaymentProof;
-
-  /// No description provided for @clientMySessions.
-  ///
-  /// In ar, this message translates to:
-  /// **'جلساتي'**
-  String get clientMySessions;
 
   /// No description provided for @clientLinksAndCodes.
   ///
   /// In ar, this message translates to:
-  /// **'الروابط والأكواد'**
+  /// **'Ø§Ù„Ø±ÙˆØ§Ø¨Ø· ÙˆØ§Ù„Ø£ÙƒÙˆØ§Ø¯'**
   String get clientLinksAndCodes;
 
   /// No description provided for @clientFollowUp.
   ///
   /// In ar, this message translates to:
-  /// **'المتابعة'**
+  /// **'Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©'**
   String get clientFollowUp;
 
   /// No description provided for @clientMessagePreferences.
   ///
   /// In ar, this message translates to:
-  /// **'تفضيلات الرسائل'**
+  /// **'ØªÙØ¶ÙŠÙ„Ø§Øª Ø§Ù„Ø±Ø³Ø§Ø¦Ù„'**
   String get clientMessagePreferences;
 
   /// No description provided for @clientRatingsCount.
   ///
   /// In ar, this message translates to:
-  /// **'عدد التقييمات'**
+  /// **'Ø¹Ø¯Ø¯ Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª'**
   String get clientRatingsCount;
 
   /// No description provided for @clientAverageStars.
   ///
   /// In ar, this message translates to:
-  /// **'متوسط النجوم'**
+  /// **'Ù…ØªÙˆØ³Ø· Ø§Ù„Ù†Ø¬ÙˆÙ…'**
   String get clientAverageStars;
 
   /// No description provided for @clientOverallAverage.
   ///
   /// In ar, this message translates to:
-  /// **'المتوسط العام'**
+  /// **'Ø§Ù„Ù…ØªÙˆØ³Ø· Ø§Ù„Ø¹Ø§Ù…'**
   String get clientOverallAverage;
 
   /// No description provided for @clinicianOperations.
   ///
   /// In ar, this message translates to:
-  /// **'العمليات'**
+  /// **'Ø§Ù„Ø¹Ù…Ù„ÙŠØ§Øª'**
   String get clinicianOperations;
 
   /// No description provided for @clinicianDashboard.
   ///
   /// In ar, this message translates to:
-  /// **'لوحة الأخصائي'**
+  /// **'Ù„ÙˆØ­Ø© Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ'**
   String get clinicianDashboard;
 
   /// No description provided for @clinicianOpenCases.
   ///
   /// In ar, this message translates to:
-  /// **'فتح الحالات'**
+  /// **'ÙØªØ­ Ø§Ù„Ø­Ø§Ù„Ø§Øª'**
   String get clinicianOpenCases;
 
   /// No description provided for @clinicianSendSupportRequest.
   ///
   /// In ar, this message translates to:
-  /// **'إرسال طلب دعم'**
+  /// **'Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ Ø¯Ø¹Ù…'**
   String get clinicianSendSupportRequest;
 
   /// No description provided for @clinicianEditProfile.
   ///
   /// In ar, this message translates to:
-  /// **'تعديل بياناتي'**
+  /// **'ØªØ¹Ø¯ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§ØªÙŠ'**
   String get clinicianEditProfile;
-
-  /// No description provided for @clinicianMySessions.
-  ///
-  /// In ar, this message translates to:
-  /// **'جلساتي'**
-  String get clinicianMySessions;
 
   /// No description provided for @clinicianSupportRequest.
   ///
   /// In ar, this message translates to:
-  /// **'طلب دعم'**
+  /// **'Ø·Ù„Ø¨ Ø¯Ø¹Ù…'**
   String get clinicianSupportRequest;
 
   /// No description provided for @clinicianCurrentSupportRequests.
   ///
   /// In ar, this message translates to:
-  /// **'عدد طلبات الدعم الحالية'**
+  /// **'Ø¹Ø¯Ø¯ Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¯Ø¹Ù… Ø§Ù„Ø­Ø§Ù„ÙŠØ©'**
   String get clinicianCurrentSupportRequests;
 
   /// No description provided for @clinicianReferredChatCases.
   ///
   /// In ar, this message translates to:
-  /// **'حالات الشات المحالة'**
+  /// **'Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø´Ø§Øª Ø§Ù„Ù…Ø­Ø§Ù„Ø©'**
   String get clinicianReferredChatCases;
 
   /// No description provided for @clinicianReferredChatCasesCount.
   ///
   /// In ar, this message translates to:
-  /// **'حالات الشات المحالة'**
+  /// **'Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø´Ø§Øª Ø§Ù„Ù…Ø­Ø§Ù„Ø©'**
   String get clinicianReferredChatCasesCount;
 
   /// No description provided for @clinicianNewRequests.
   ///
   /// In ar, this message translates to:
-  /// **'طلبات جديدة'**
+  /// **'Ø·Ù„Ø¨Ø§Øª Ø¬Ø¯ÙŠØ¯Ø©'**
   String get clinicianNewRequests;
 
   /// No description provided for @clinicianActiveRequests.
   ///
   /// In ar, this message translates to:
-  /// **'طلبات نشطة'**
+  /// **'Ø·Ù„Ø¨Ø§Øª Ù†Ø´Ø·Ø©'**
   String get clinicianActiveRequests;
 
   /// No description provided for @clinicianCompleted.
   ///
   /// In ar, this message translates to:
-  /// **'مكتملة'**
+  /// **'Ù…ÙƒØªÙ…Ù„Ø©'**
   String get clinicianCompleted;
 
   /// No description provided for @clinicianClosed.
   ///
   /// In ar, this message translates to:
-  /// **'مرفوضة/مغلقة'**
+  /// **'Ù…Ø±ÙÙˆØ¶Ø©/Ù…ØºÙ„Ù‚Ø©'**
   String get clinicianClosed;
 
   /// No description provided for @clinicianAcceptRequest.
   ///
   /// In ar, this message translates to:
-  /// **'قبول الطلب'**
+  /// **'Ù‚Ø¨ÙˆÙ„ Ø§Ù„Ø·Ù„Ø¨'**
   String get clinicianAcceptRequest;
 
   /// No description provided for @clinicianRejectRequest.
   ///
   /// In ar, this message translates to:
-  /// **'رفض الطلب'**
+  /// **'Ø±ÙØ¶ Ø§Ù„Ø·Ù„Ø¨'**
   String get clinicianRejectRequest;
-
-  /// No description provided for @clinicianEndSession.
-  ///
-  /// In ar, this message translates to:
-  /// **'إنهاء الجلسة'**
-  String get clinicianEndSession;
-
-  /// No description provided for @clinicianReviewSession.
-  ///
-  /// In ar, this message translates to:
-  /// **'تقييم الجلسة'**
-  String get clinicianReviewSession;
 
   /// No description provided for @clinicianAssignedRequest.
   ///
   /// In ar, this message translates to:
-  /// **'طلب مخصص لك'**
+  /// **'Ø·Ù„Ø¨ Ù…Ø®ØµØµ Ù„Ùƒ'**
   String get clinicianAssignedRequest;
 
   /// No description provided for @clinicianProfileChangeTitle.
   ///
   /// In ar, this message translates to:
-  /// **'طلب تعديل الصورة أو النبذة'**
+  /// **'Ø·Ù„Ø¨ ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„ØµÙˆØ±Ø© Ø£Ùˆ Ø§Ù„Ù†Ø¨Ø°Ø©'**
   String get clinicianProfileChangeTitle;
 
   /// No description provided for @clinicianNewPhotoUrl.
   ///
   /// In ar, this message translates to:
-  /// **'رابط الصورة الجديدة'**
+  /// **'Ø±Ø§Ø¨Ø· Ø§Ù„ØµÙˆØ±Ø© Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©'**
   String get clinicianNewPhotoUrl;
 
   /// No description provided for @clinicianNewBio.
   ///
   /// In ar, this message translates to:
-  /// **'النبذة الجديدة'**
+  /// **'Ø§Ù„Ù†Ø¨Ø°Ø© Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©'**
   String get clinicianNewBio;
 
   /// No description provided for @clinicianSendingRequest.
   ///
   /// In ar, this message translates to:
-  /// **'جارٍ إرسال الطلب...'**
+  /// **'Ø¬Ø§Ø±Ù Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨...'**
   String get clinicianSendingRequest;
 
   /// No description provided for @clinicianSendChangeRequest.
   ///
   /// In ar, this message translates to:
-  /// **'إرسال طلب التعديل'**
+  /// **'Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ Ø§Ù„ØªØ¹Ø¯ÙŠÙ„'**
   String get clinicianSendChangeRequest;
-
-  /// No description provided for @clinicianRatings.
-  ///
-  /// In ar, this message translates to:
-  /// **'عدد التقييمات'**
-  String get clinicianRatings;
-
-  /// No description provided for @clinicianStars.
-  ///
-  /// In ar, this message translates to:
-  /// **'متوسط النجوم'**
-  String get clinicianStars;
-
-  /// No description provided for @clinicianOverall.
-  ///
-  /// In ar, this message translates to:
-  /// **'المتوسط العام'**
-  String get clinicianOverall;
 
   /// No description provided for @clinicianLogout.
   ///
   /// In ar, this message translates to:
-  /// **'خروج'**
+  /// **'Ø®Ø±ÙˆØ¬'**
   String get clinicianLogout;
 
   /// No description provided for @clinicianPleaseSignIn.
   ///
   /// In ar, this message translates to:
-  /// **'يجب تسجيل الدخول أولًا'**
+  /// **'ÙŠØ¬Ø¨ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø£ÙˆÙ„Ù‹Ø§'**
   String get clinicianPleaseSignIn;
 
   /// No description provided for @clinicianInboxTitle.
   ///
   /// In ar, this message translates to:
-  /// **'وارد الأخصائي'**
+  /// **'ÙˆØ§Ø±Ø¯ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ'**
   String get clinicianInboxTitle;
 
-  /// No description provided for @clinicianAwaitingPayment.
-  ///
-  /// In ar, this message translates to:
-  /// **'بانتظار التحويل'**
-  String get clinicianAwaitingPayment;
 
   /// No description provided for @clinicianReject.
   ///
   /// In ar, this message translates to:
-  /// **'رفض'**
+  /// **'Ø±ÙØ¶'**
   String get clinicianReject;
 
   /// No description provided for @clinicianAccept.
   ///
   /// In ar, this message translates to:
-  /// **'قبول'**
+  /// **'Ù‚Ø¨ÙˆÙ„'**
   String get clinicianAccept;
 
   /// No description provided for @clinicianRejectRequestTitle.
   ///
   /// In ar, this message translates to:
-  /// **'رفض الطلب'**
+  /// **'Ø±ÙØ¶ Ø§Ù„Ø·Ù„Ø¨'**
   String get clinicianRejectRequestTitle;
 
   /// No description provided for @clinicianRejectReason.
   ///
   /// In ar, this message translates to:
-  /// **'سبب الرفض'**
+  /// **'Ø³Ø¨Ø¨ Ø§Ù„Ø±ÙØ¶'**
   String get clinicianRejectReason;
 
   /// No description provided for @clinicianRejectReasonHint.
   ///
   /// In ar, this message translates to:
-  /// **'اكتب سبب الرفض هنا...'**
+  /// **'Ø§ÙƒØªØ¨ Ø³Ø¨Ø¨ Ø§Ù„Ø±ÙØ¶ Ù‡Ù†Ø§...'**
   String get clinicianRejectReasonHint;
 
   /// No description provided for @clinicianConfirmReject.
   ///
   /// In ar, this message translates to:
-  /// **'تأكيد الرفض'**
+  /// **'ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø±ÙØ¶'**
   String get clinicianConfirmReject;
 
-  /// No description provided for @clinicianApprovalSent.
-  ///
-  /// In ar, this message translates to:
-  /// **'تمت موافقة الأخصائي وتحويل الطلب لانتظار الدفع'**
-  String get clinicianApprovalSent;
 
   /// No description provided for @clinicianRejectFailed.
   ///
   /// In ar, this message translates to:
-  /// **'فشل الرفض'**
+  /// **'ÙØ´Ù„ Ø§Ù„Ø±ÙØ¶'**
   String get clinicianRejectFailed;
 
   /// No description provided for @clinicianAcceptFailed.
   ///
   /// In ar, this message translates to:
-  /// **'فشل القبول'**
+  /// **'ÙØ´Ù„ Ø§Ù„Ù‚Ø¨ÙˆÙ„'**
   String get clinicianAcceptFailed;
 
   /// No description provided for @clinicianRequestRejected.
   ///
   /// In ar, this message translates to:
-  /// **'تم رفض الطلب'**
+  /// **'ØªÙ… Ø±ÙØ¶ Ø§Ù„Ø·Ù„Ø¨'**
   String get clinicianRequestRejected;
 
   /// No description provided for @statusPendingReview.
   ///
   /// In ar, this message translates to:
-  /// **'قيد المراجعة'**
+  /// **'Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©'**
   String get statusPendingReview;
 
   /// No description provided for @statusRequestUnderReview.
   ///
   /// In ar, this message translates to:
-  /// **'طلبك قيد المراجعة'**
+  /// **'Ø·Ù„Ø¨Ùƒ Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©'**
   String get statusRequestUnderReview;
 
   /// No description provided for @statusCenterFollowUp.
   ///
   /// In ar, this message translates to:
-  /// **'الطلب لدى المركز للتحقق من التوفر'**
+  /// **'Ø§Ù„Ø·Ù„Ø¨ Ù„Ø¯Ù‰ Ø§Ù„Ù…Ø±ÙƒØ² Ù„Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„ØªÙˆÙØ±'**
   String get statusCenterFollowUp;
 
   /// No description provided for @statusClientUpdateRequired.
   ///
   /// In ar, this message translates to:
-  /// **'المركز طلب تعديل نوع الإقامة'**
+  /// **'Ø§Ù„Ù…Ø±ÙƒØ² Ø·Ù„Ø¨ ØªØ¹Ø¯ÙŠÙ„ Ù†ÙˆØ¹ Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©'**
   String get statusClientUpdateRequired;
 
   /// No description provided for @statusCenterIntakePending.
   ///
   /// In ar, this message translates to:
-  /// **'بانتظار استكمال بيانات التقييم الأولي'**
+  /// **'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ø³ØªÙƒÙ…Ø§Ù„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø£ÙˆÙ„ÙŠ'**
   String get statusCenterIntakePending;
 
   /// No description provided for @statusCenterRecommendationPending.
   ///
   /// In ar, this message translates to:
-  /// **'بانتظار توصية المركز بعد مراجعة الحالة'**
+  /// **'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙˆØµÙŠØ© Ø§Ù„Ù…Ø±ÙƒØ² Ø¨Ø¹Ø¯ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø­Ø§Ù„Ø©'**
   String get statusCenterRecommendationPending;
 
   /// No description provided for @statusApproved.
   ///
   /// In ar, this message translates to:
-  /// **'تمت الموافقة'**
+  /// **'ØªÙ…Øª Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø©'**
   String get statusApproved;
 
   /// No description provided for @statusRequestApproved.
   ///
   /// In ar, this message translates to:
-  /// **'تمت الموافقة على طلبك'**
+  /// **'ØªÙ…Øª Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø© Ø¹Ù„Ù‰ Ø·Ù„Ø¨Ùƒ'**
   String get statusRequestApproved;
 
-  /// No description provided for @statusAwaitingPayment.
-  ///
-  /// In ar, this message translates to:
-  /// **'بانتظار الدفع'**
-  String get statusAwaitingPayment;
 
-  /// No description provided for @statusUploadPaymentProof.
-  ///
-  /// In ar, this message translates to:
-  /// **'يرجى رفع إثبات التحويل'**
-  String get statusUploadPaymentProof;
 
-  /// No description provided for @statusPaymentReview.
-  ///
-  /// In ar, this message translates to:
-  /// **'إثبات الدفع قيد المراجعة'**
-  String get statusPaymentReview;
 
   /// No description provided for @statusSessionSetupPending.
   ///
   /// In ar, this message translates to:
-  /// **'بانتظار تجهيز الجلسة'**
+  /// **'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ¬Ù‡ÙŠØ² Ø§Ù„Ø¬Ù„Ø³Ø©'**
   String get statusSessionSetupPending;
 
   /// No description provided for @statusResidencySetupPending.
   ///
   /// In ar, this message translates to:
-  /// **'بانتظار تجهيز الإقامة'**
+  /// **'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ¬Ù‡ÙŠØ² Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©'**
   String get statusResidencySetupPending;
 
   /// No description provided for @statusSessionScheduled.
   ///
   /// In ar, this message translates to:
-  /// **'جلسة مجدولة'**
+  /// **'Ø¬Ù„Ø³Ø© Ù…Ø¬Ø¯ÙˆÙ„Ø©'**
   String get statusSessionScheduled;
 
   /// No description provided for @statusResidencyScheduled.
   ///
   /// In ar, this message translates to:
-  /// **'إقامة مجدولة'**
+  /// **'Ø¥Ù‚Ø§Ù…Ø© Ù…Ø¬Ø¯ÙˆÙ„Ø©'**
   String get statusResidencyScheduled;
 
   /// No description provided for @statusSessionInProgress.
   ///
   /// In ar, this message translates to:
-  /// **'الجلسة جارية'**
+  /// **'Ø§Ù„Ø¬Ù„Ø³Ø© Ø¬Ø§Ø±ÙŠØ©'**
   String get statusSessionInProgress;
 
   /// No description provided for @statusResidencyInProgress.
   ///
   /// In ar, this message translates to:
-  /// **'الإقامة جارية'**
+  /// **'Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ø¬Ø§Ø±ÙŠØ©'**
   String get statusResidencyInProgress;
 
   /// No description provided for @statusPendingReviews.
   ///
   /// In ar, this message translates to:
-  /// **'بانتظار التقييمات'**
+  /// **'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª'**
   String get statusPendingReviews;
 
   /// No description provided for @statusPendingDischargeReviews.
   ///
   /// In ar, this message translates to:
-  /// **'بانتظار تقارير الخروج'**
+  /// **'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚Ø§Ø±ÙŠØ± Ø§Ù„Ø®Ø±ÙˆØ¬'**
   String get statusPendingDischargeReviews;
 
-  /// No description provided for @statusPayoutPending.
-  ///
-  /// In ar, this message translates to:
-  /// **'بانتظار الإغلاق المالي'**
-  String get statusPayoutPending;
 
-  /// No description provided for @statusCenterAccountingReview.
-  ///
-  /// In ar, this message translates to:
-  /// **'بانتظار المراجعة المحاسبية للمركز'**
-  String get statusCenterAccountingReview;
 
   /// No description provided for @statusCompleted.
   ///
   /// In ar, this message translates to:
-  /// **'مكتمل'**
+  /// **'Ù…ÙƒØªÙ…Ù„'**
   String get statusCompleted;
 
   /// No description provided for @statusCompletedSuccessfully.
   ///
   /// In ar, this message translates to:
-  /// **'مكتمل بنجاح'**
+  /// **'Ù…ÙƒØªÙ…Ù„ Ø¨Ù†Ø¬Ø§Ø­'**
   String get statusCompletedSuccessfully;
 
   /// No description provided for @statusRequestCompleted.
   ///
   /// In ar, this message translates to:
-  /// **'اكتمل الطلب'**
+  /// **'Ø§ÙƒØªÙ…Ù„ Ø§Ù„Ø·Ù„Ø¨'**
   String get statusRequestCompleted;
 
   /// No description provided for @statusReschedulePending.
   ///
   /// In ar, this message translates to:
-  /// **'بانتظار إعادة الجدولة'**
+  /// **'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ø¬Ø¯ÙˆÙ„Ø©'**
   String get statusReschedulePending;
 
   /// No description provided for @statusAwaitingStartConfirmations.
   ///
   /// In ar, this message translates to:
-  /// **'بانتظار تأكيد البداية'**
+  /// **'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©'**
   String get statusAwaitingStartConfirmations;
 
   /// No description provided for @statusRejected.
   ///
   /// In ar, this message translates to:
-  /// **'تعذّر قبول الطلب'**
+  /// **'ØªØ¹Ø°Ù‘Ø± Ù‚Ø¨ÙˆÙ„ Ø§Ù„Ø·Ù„Ø¨'**
   String get statusRejected;
 
   /// No description provided for @statusClinicianRejected.
   ///
   /// In ar, this message translates to:
-  /// **'تعذّر تأكيد الأخصائي'**
+  /// **'ØªØ¹Ø°Ù‘Ø± ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ'**
   String get statusClinicianRejected;
 
   /// No description provided for @statusCancelled.
   ///
   /// In ar, this message translates to:
-  /// **'ملغي'**
+  /// **'Ù…Ù„ØºÙŠ'**
   String get statusCancelled;
 
   /// No description provided for @statusCancellationPending.
   ///
   /// In ar, this message translates to:
-  /// **'طلب الإلغاء قيد المراجعة'**
+  /// **'Ø·Ù„Ø¨ Ø§Ù„Ø¥Ù„ØºØ§Ø¡ Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©'**
   String get statusCancellationPending;
 
   /// No description provided for @statusDisputeReceived.
   ///
   /// In ar, this message translates to:
-  /// **'تم استلام الشكوى'**
+  /// **'ØªÙ… Ø§Ø³ØªÙ„Ø§Ù… Ø§Ù„Ø´ÙƒÙˆÙ‰'**
   String get statusDisputeReceived;
 
   /// No description provided for @statusRequestCoordination.
   ///
   /// In ar, this message translates to:
-  /// **'يجري تنسيق الطلب'**
+  /// **'ÙŠØ¬Ø±ÙŠ ØªÙ†Ø³ÙŠÙ‚ Ø§Ù„Ø·Ù„Ø¨'**
   String get statusRequestCoordination;
 
   /// No description provided for @statusRequestUpdateInProgress.
   ///
   /// In ar, this message translates to:
-  /// **'يتم تحديث حالة الطلب'**
+  /// **'ÙŠØªÙ… ØªØ­Ø¯ÙŠØ« Ø­Ø§Ù„Ø© Ø§Ù„Ø·Ù„Ø¨'**
   String get statusRequestUpdateInProgress;
 
   /// No description provided for @statusNewRequest.
   ///
   /// In ar, this message translates to:
-  /// **'طلب جديد'**
+  /// **'Ø·Ù„Ø¨ Ø¬Ø¯ÙŠØ¯'**
   String get statusNewRequest;
 
   /// No description provided for @statusCenterAvailableResponse.
   ///
   /// In ar, this message translates to:
-  /// **'رد المركز: متاح'**
+  /// **'Ø±Ø¯ Ø§Ù„Ù…Ø±ÙƒØ²: Ù…ØªØ§Ø­'**
   String get statusCenterAvailableResponse;
 
   /// No description provided for @statusCenterUnavailableResponse.
   ///
   /// In ar, this message translates to:
-  /// **'رد المركز: غير متاح'**
+  /// **'Ø±Ø¯ Ø§Ù„Ù…Ø±ÙƒØ²: ØºÙŠØ± Ù…ØªØ§Ø­'**
   String get statusCenterUnavailableResponse;
 
   /// No description provided for @statusCenterNoResponse.
   ///
   /// In ar, this message translates to:
-  /// **'رد المركز: لم يرد بعد'**
+  /// **'Ø±Ø¯ Ø§Ù„Ù…Ø±ÙƒØ²: Ù„Ù… ÙŠØ±Ø¯ Ø¨Ø¹Ø¯'**
   String get statusCenterNoResponse;
 
   /// No description provided for @comingSoon.
   ///
   /// In ar, this message translates to:
-  /// **'{title} — قريبًا'**
+  /// **'{title} â€” Ù‚Ø±ÙŠØ¨Ù‹Ø§'**
   String comingSoon(String title);
 
   /// No description provided for @modulePlaceholderBody.
   ///
   /// In ar, this message translates to:
-  /// **'المحتوى قريبًا.'**
+  /// **'Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ù‚Ø±ÙŠØ¨Ù‹Ø§.'**
   String get modulePlaceholderBody;
 }
 
@@ -1799,3 +1533,6 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       'on GitHub with a reproducible sample app and the gen-l10n configuration '
       'that was used.');
 }
+
+
+

@@ -21,13 +21,6 @@ ClinicianStateTranslation translateClinicianState(String rawState) {
         operationalSignal: 'assignment indicator present',
         ambiguity: 'used in both booking flow and chat lifecycle',
       );
-    case 'awaiting_payment':
-      return const ClinicianStateTranslation(
-        progress: 'in payment-waiting phase after clinician decision',
-        ownership: 'non-clinician primary',
-        operationalSignal: 'payment dependency indicator present',
-        ambiguity: null,
-      );
     case 'clinician_rejected':
       return const ClinicianStateTranslation(
         progress: 'terminal rejected outcome after clinician decision',

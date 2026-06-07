@@ -83,7 +83,7 @@ class _WebClinicianProfilePageState extends State<WebClinicianProfilePage> {
       await _saveProfileFields(uid);
 
       if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed(Routes.webClinicianSessions);
+      Navigator.of(context).pushReplacementNamed(Routes.webClinicianDocuments);
     } on FirebaseException {
       if (mounted) {
         setState(() => _error = l10n.webClinicianSaveProfileFailed);
@@ -217,7 +217,14 @@ class _WebClinicianProfilePageState extends State<WebClinicianProfilePage> {
                                             color: Color(0xFF17100A),
                                           ),
                                         )
-                                      : Text(l10n.webClinicianNextSessions),
+                                      : Text(
+                                          Localizations.localeOf(context)
+                                                      .languageCode
+                                                      .toLowerCase() ==
+                                                  'ar'
+                                              ? 'التالي: المستندات'
+                                              : 'Next: Documents',
+                                        ),
                                 ),
                               ),
                             ],

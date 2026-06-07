@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
@@ -33,22 +33,14 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
 
   String _sectionTitle(String key, bool isArabic) {
     switch (key) {
-      case 'sessions':
-        return isArabic
-            ? 'أرشيف تنسيق الخدمة القديم'
-            : 'Legacy sessions archive';
-      case 'payments':
-        return isArabic ? 'أرشيف المدفوعات القديم' : 'Legacy payments archive';
       case 'clinicians':
-        return isArabic ? 'أرشيف الأخصائيين' : 'Clinicians Archive';
+        return isArabic ? 'Ø£Ø±Ø´ÙŠÙ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠÙŠÙ†' : 'Clinicians Archive';
       case 'centers':
-        return isArabic ? 'أرشيف المراكز' : 'Centers Archive';
+        return isArabic ? 'Ø£Ø±Ø´ÙŠÙ Ø§Ù„Ù…Ø±Ø§ÙƒØ²' : 'Centers Archive';
       case 'support':
-        return isArabic ? 'أرشيف الرسائل والدعم' : 'Support Archive';
+        return isArabic ? 'Ø£Ø±Ø´ÙŠÙ Ø§Ù„Ø±Ø³Ø§Ø¦Ù„ ÙˆØ§Ù„Ø¯Ø¹Ù…' : 'Support Archive';
       case 'reports':
-        return isArabic ? 'أرشيف التقارير' : 'Reports Archive';
-      case 'accounting':
-        return isArabic ? 'أرشيف المحاسبة القديم' : 'Legacy accounting archive';
+        return isArabic ? 'Ø£Ø±Ø´ÙŠÙ Ø§Ù„ØªÙ‚Ø§Ø±ÙŠØ±' : 'Reports Archive';
       default:
         return key;
     }
@@ -56,34 +48,22 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
 
   String _sectionSubtitle(String key, bool isArabic) {
     switch (key) {
-      case 'sessions':
-        return isArabic
-            ? 'إشارات تنسيق الخدمة القديمة والمكتملة والمؤرشفة'
-            : 'Legacy service coordination and archived flows';
-      case 'payments':
-        return isArabic
-            ? 'سجلات مالية قديمة للعرض فقط'
-            : 'Legacy payment and transfer visibility records';
       case 'clinicians':
         return isArabic
-            ? 'طلبات الأخصائيين وسجل الأداء'
+            ? 'Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠÙŠÙ† ÙˆØ³Ø¬Ù„ Ø§Ù„Ø£Ø¯Ø§Ø¡'
             : 'Clinician requests and performance history';
       case 'centers':
         return isArabic
-            ? 'طلبات المراكز والموافقات'
+            ? 'Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ù…Ø±Ø§ÙƒØ² ÙˆØ§Ù„Ù…ÙˆØ§ÙÙ‚Ø§Øª'
             : 'Center requests and approvals';
       case 'support':
         return isArabic
-            ? 'الدعم، الرسائل، والتصعيدات المغلقة'
+            ? 'Ø§Ù„Ø¯Ø¹Ù…ØŒ Ø§Ù„Ø±Ø³Ø§Ø¦Ù„ØŒ ÙˆØ§Ù„ØªØµØ¹ÙŠØ¯Ø§Øª Ø§Ù„Ù…ØºÙ„Ù‚Ø©'
             : 'Support, messages, and closed escalations';
       case 'reports':
         return isArabic
-            ? 'التقارير الإدارية الموحدة'
+            ? 'Ø§Ù„ØªÙ‚Ø§Ø±ÙŠØ± Ø§Ù„Ø¥Ø¯Ø§Ø±ÙŠØ© Ø§Ù„Ù…ÙˆØ­Ø¯Ø©'
             : 'Unified administrative reports';
-      case 'accounting':
-        return isArabic
-            ? 'رؤية محاسبية قديمة وليست موديولًا أساسيًا'
-            : 'Legacy accounting visibility, not a core module';
       default:
         return '';
     }
@@ -91,10 +71,6 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
 
   IconData _sectionIcon(String key) {
     switch (key) {
-      case 'sessions':
-        return Icons.video_call_outlined;
-      case 'payments':
-        return Icons.account_balance_wallet_outlined;
       case 'clinicians':
         return Icons.verified_user_outlined;
       case 'centers':
@@ -103,8 +79,6 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
         return Icons.support_agent_outlined;
       case 'reports':
         return Icons.assessment_outlined;
-      case 'accounting':
-        return Icons.receipt_long_outlined;
       default:
         return Icons.archive_outlined;
     }
@@ -112,10 +86,6 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
 
   Color _sectionColor(String key) {
     switch (key) {
-      case 'sessions':
-        return const Color(0xFF6F9DC7);
-      case 'payments':
-        return const Color(0xFF9A7A6E);
       case 'clinicians':
         return const Color(0xFFE2A067);
       case 'centers':
@@ -124,8 +94,6 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
         return const Color(0xFFE58667);
       case 'reports':
         return const Color(0xFF6C55B3);
-      case 'accounting':
-        return const Color(0xFF4D7C6A);
       default:
         return const Color(0xFF6C55B3);
     }
@@ -153,19 +121,6 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
         centerId.isNotEmpty;
   }
 
-  bool _hasPaymentContext(Map<String, dynamic> item) {
-    final paymentStatus = (item['paymentStatus'] ?? '').toString().trim();
-    final payoutStatus = (item['payoutStatus'] ?? '').toString().trim();
-    final proof = (item['paymentReceiptFileName'] ?? '').toString().trim();
-    final note = (item['paymentClientNote'] ?? '').toString().trim();
-    return (paymentStatus.isNotEmpty && paymentStatus != 'not_started') ||
-        (payoutStatus.isNotEmpty && payoutStatus != 'not_started') ||
-        proof.isNotEmpty ||
-        note.isNotEmpty ||
-        item['paymentApprovedAt'] != null ||
-        item['paymentSubmittedAt'] != null ||
-        item['payoutTransferredAt'] != null;
-  }
 
   bool _hasSessionContext(Map<String, dynamic> item) {
     final status = (item['status'] ?? '').toString().trim();
@@ -182,7 +137,6 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
           'session_scheduled',
           'session_in_progress',
           'session_completed_pending_reviews',
-          'payout_pending',
           'completed_success',
         }.contains(status);
   }
@@ -210,10 +164,6 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
     if (archiveSection == section) return true;
 
     switch (section) {
-      case 'sessions':
-        return _hasSessionContext(item);
-      case 'payments':
-        return _hasPaymentContext(item);
       case 'clinicians':
         return _hasClinicianContext(item);
       case 'centers':
@@ -222,8 +172,6 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
         return _hasSupportContext(item);
       case 'reports':
         return _hasReportContext(item);
-      case 'accounting':
-        return _hasPaymentContext(item);
       default:
         return false;
     }
@@ -231,12 +179,6 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
 
   void _openSection(BuildContext context, String key) {
     switch (key) {
-      case 'sessions':
-        Navigator.of(context).pushNamed(Routes.adminArchiveSessions);
-        return;
-      case 'payments':
-        Navigator.of(context).pushNamed(Routes.adminArchivePayments);
-        return;
       case 'clinicians':
         Navigator.of(context).pushNamed(Routes.adminArchiveClinicians);
         return;
@@ -248,9 +190,6 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
         return;
       case 'reports':
         Navigator.of(context).pushNamed(Routes.adminArchiveReports);
-        return;
-      case 'accounting':
-        Navigator.of(context).pushNamed(Routes.adminArchiveAccounting);
         return;
     }
   }
@@ -264,7 +203,7 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
       child: Scaffold(
         appBar: AppShellActions.buildAppBar(
           context,
-          title: isArabic ? 'الأرشيف' : 'Archive',
+          title: isArabic ? 'Ø§Ù„Ø£Ø±Ø´ÙŠÙ' : 'Archive',
           canLogout: false,
         ),
         body: AppPageBackground(
@@ -277,7 +216,7 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
               if (snap.hasError) {
                 return AppEmptyState(
                   message: isArabic
-                      ? 'تعذر تحميل الأرشيف'
+                      ? 'ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø£Ø±Ø´ÙŠÙ'
                       : 'Unable to load archive',
                   icon: Icons.error_outline,
                 );
@@ -290,13 +229,10 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
               final items =
                   _normalizeDocs(snap.data!.docs, 'booking_requests').toList();
               final sectionKeys = [
-                'sessions',
-                'payments',
                 'clinicians',
                 'centers',
                 'support',
                 'reports',
-                'accounting',
               ];
               final counts = <String, int>{
                 for (final key in sectionKeys) key: 0,
@@ -324,7 +260,7 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
                       children: [
                         Text(
                           isArabic
-                              ? 'الأرشيف الفعلي المرتبط بالبيانات'
+                              ? 'Ø§Ù„Ø£Ø±Ø´ÙŠÙ Ø§Ù„ÙØ¹Ù„ÙŠ Ø§Ù„Ù…Ø±ØªØ¨Ø· Ø¨Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª'
                               : 'Live archive connected to real data',
                           style:
                               Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -334,7 +270,7 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
                         const SizedBox(height: 10),
                         Text(
                           isArabic
-                              ? 'الصفحة الرئيسية للأرشيف تعرض الأقسام فقط. كل العناصر المؤرشفة ستجدها داخل القسم المناسب لها، حتى لا تتكدس العمليات في شاشة واحدة.'
+                              ? 'Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ© Ù„Ù„Ø£Ø±Ø´ÙŠÙ ØªØ¹Ø±Ø¶ Ø§Ù„Ø£Ù‚Ø³Ø§Ù… ÙÙ‚Ø·. ÙƒÙ„ Ø§Ù„Ø¹Ù†Ø§ØµØ± Ø§Ù„Ù…Ø¤Ø±Ø´ÙØ© Ø³ØªØ¬Ø¯Ù‡Ø§ Ø¯Ø§Ø®Ù„ Ø§Ù„Ù‚Ø³Ù… Ø§Ù„Ù…Ù†Ø§Ø³Ø¨ Ù„Ù‡Ø§ØŒ Ø­ØªÙ‰ Ù„Ø§ ØªØªÙƒØ¯Ø³ Ø§Ù„Ø¹Ù…Ù„ÙŠØ§Øª ÙÙŠ Ø´Ø§Ø´Ø© ÙˆØ§Ø­Ø¯Ø©.'
                               : 'The archive home shows sections only. Archived items live inside their own section pages so operations do not pile up in one screen.',
                           textAlign:
                               isArabic ? TextAlign.right : TextAlign.left,
@@ -342,7 +278,7 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
                         const SizedBox(height: 12),
                         AppStatusBadge(
                           label: isArabic
-                              ? '${items.length} عنصر مؤرشف إجمالًا'
+                              ? '${items.length} Ø¹Ù†ØµØ± Ù…Ø¤Ø±Ø´Ù Ø¥Ø¬Ù…Ø§Ù„Ù‹Ø§'
                               : '${items.length} total archived items',
                           color: const Color(0xFF4D7C6A),
                         ),
@@ -408,7 +344,7 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
                               const SizedBox(height: 4),
                               Text(
                                 isArabic
-                                    ? '${counts[key] ?? 0} عنصر'
+                                    ? '${counts[key] ?? 0} Ø¹Ù†ØµØ±'
                                     : '${counts[key] ?? 0} items',
                                 textAlign: TextAlign.center,
                                 style: Theme.of(context)
@@ -464,7 +400,7 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
                         const SizedBox(height: 12),
                         AppStatusBadge(
                           label: isArabic
-                              ? '${counts[selectedSection] ?? 0} عنصر'
+                              ? '${counts[selectedSection] ?? 0} Ø¹Ù†ØµØ±'
                               : '${counts[selectedSection] ?? 0} items',
                           color: selectedColor,
                         ),
@@ -478,7 +414,7 @@ class _AdminArchivePageState extends State<AdminArchivePage> {
                                 _openSection(context, selectedSection),
                             icon: const Icon(Icons.arrow_forward),
                             label: Text(
-                              isArabic ? 'فتح القسم' : 'Open section',
+                              isArabic ? 'ÙØªØ­ Ø§Ù„Ù‚Ø³Ù…' : 'Open section',
                             ),
                           ),
                         ),

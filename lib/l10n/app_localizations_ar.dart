@@ -1,4 +1,4 @@
-// ignore: unused_import
+﻿// ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
@@ -9,859 +9,728 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get appTitle => 'مينتال كي';
+  String get appTitle => 'Ù…ÙŠÙ†ØªØ§Ù„ ÙƒÙŠ';
 
   @override
-  String get homeTitle => 'الرئيسية';
+  String get homeTitle => 'Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©';
 
   @override
-  String get changeLanguage => 'تغيير اللغة';
+  String get changeLanguage => 'ØªØºÙŠÙŠØ± Ø§Ù„Ù„ØºØ©';
 
   @override
   String localeLabel(String code) {
-    return 'اللغة: $code (اضغط أو 🌐)';
+    return 'Ø§Ù„Ù„ØºØ©: $code (Ø§Ø¶ØºØ· Ø£Ùˆ ðŸŒ)';
   }
 
   @override
-  String get splashTitle => 'شاشة البداية';
+  String get splashTitle => 'Ø´Ø§Ø´Ø© Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©';
 
   @override
-  String get routeNotFound => 'المسار غير موجود';
+  String get routeNotFound => 'Ø§Ù„Ù…Ø³Ø§Ø± ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯';
 
   @override
-  String get moduleSpecialists => 'المختصون';
+  String get moduleSpecialists => 'Ø§Ù„Ù…Ø®ØªØµÙˆÙ†';
 
   @override
-  String get moduleLearningLibrary => 'مكتبة المعرفة';
+  String get moduleLearningLibrary => 'Ù…ÙƒØªØ¨Ø© Ø§Ù„Ù…Ø¹Ø±ÙØ©';
 
   @override
-  String get moduleAddictionSupport => 'دعم الإدمان';
+  String get moduleAddictionSupport => 'Ø¯Ø¹Ù… Ø§Ù„Ø¥Ø¯Ù…Ø§Ù†';
 
   @override
-  String get moduleCenters => 'المراكز';
+  String get moduleCenters => 'Ø§Ù„Ù…Ø±Ø§ÙƒØ²';
 
   @override
-  String get moduleSpecialNeedsFamilies => 'أسر ذوي الاحتياجات الخاصة';
+  String get moduleSpecialNeedsFamilies => 'Ø£Ø³Ø± Ø°ÙˆÙŠ Ø§Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„Ø®Ø§ØµØ©';
 
   @override
-  String get moduleFamilyStress => 'ضغط الأسرة';
+  String get moduleFamilyStress => 'Ø¶ØºØ· Ø§Ù„Ø£Ø³Ø±Ø©';
 
   @override
-  String get commonBack => 'رجوع';
+  String get commonBack => 'Ø±Ø¬ÙˆØ¹';
 
   @override
-  String get commonClose => 'إغلاق';
+  String get commonClose => 'Ø¥ØºÙ„Ø§Ù‚';
 
   @override
-  String get commonRetry => 'إعادة المحاولة';
+  String get commonRetry => 'Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©';
 
   @override
-  String get commonLoading => 'جارٍ التحميل';
+  String get commonLoading => 'Ø¬Ø§Ø±Ù Ø§Ù„ØªØ­Ù…ÙŠÙ„';
 
   @override
-  String get commonLogout => 'تسجيل الخروج';
+  String get commonLogout => 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬';
 
   @override
-  String get menuSpecialists => 'الأخصائيون';
+  String get menuSpecialists => 'Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠÙˆÙ†';
 
   @override
-  String get menuCenters => 'المراكز';
+  String get menuCenters => 'Ø§Ù„Ù…Ø±Ø§ÙƒØ²';
 
   @override
-  String get menuLibrary => 'المكتبة';
+  String get menuLibrary => 'Ø§Ù„Ù…ÙƒØªØ¨Ø©';
 
   @override
-  String get menuAddictionSupport => 'دعم المتعافي';
+  String get menuAddictionSupport => 'Ø¯Ø¹Ù… Ø§Ù„Ù…ØªØ¹Ø§ÙÙŠ';
 
   @override
-  String get menuSpecialNeedsFamilies => 'رعاية أسر ذوي الاحتياجات الخاصة';
+  String get menuSpecialNeedsFamilies => 'Ø±Ø¹Ø§ÙŠØ© Ø£Ø³Ø± Ø°ÙˆÙŠ Ø§Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„Ø®Ø§ØµØ©';
 
   @override
-  String get menuChatSupport => 'دعم المحادثة';
+  String get menuChatSupport => 'Ø¯Ø¹Ù… Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø©';
 
   @override
-  String get homeStartJourney => 'ابدأ رحلتك نحو التعافي';
+  String get homeStartJourney => 'Ø§Ø¨Ø¯Ø£ Ø±Ø­Ù„ØªÙƒ Ù†Ø­Ùˆ Ø§Ù„ØªØ¹Ø§ÙÙŠ';
 
   @override
-  String get homeLogin => 'تسجيل الدخول';
+  String get homeLogin => 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„';
 
   @override
-  String get homeBack => 'رجوع';
+  String get homeBack => 'Ø±Ø¬ÙˆØ¹';
 
   @override
-  String get authLoginTitle => 'تسجيل الدخول';
+  String get authLoginTitle => 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„';
 
   @override
-  String get authEmail => 'البريد الإلكتروني';
+  String get authEmail => 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ';
 
   @override
-  String get authPassword => 'كلمة المرور';
+  String get authPassword => 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±';
 
   @override
-  String get authLoginButton => 'دخول';
+  String get authLoginButton => 'Ø¯Ø®ÙˆÙ„';
 
   @override
-  String get authLoggingIn => 'جارٍ تسجيل الدخول';
+  String get authLoggingIn => 'Ø¬Ø§Ø±Ù ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„';
 
   @override
-  String get authInvalidCredentials => 'بيانات الدخول غير صحيحة';
+  String get authInvalidCredentials => 'Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¯Ø®ÙˆÙ„ ØºÙŠØ± ØµØ­ÙŠØ­Ø©';
 
   @override
-  String get authRequiredField => 'هذا الحقل مطلوب';
+  String get authRequiredField => 'Ù‡Ø°Ø§ Ø§Ù„Ø­Ù‚Ù„ Ù…Ø·Ù„ÙˆØ¨';
 
   @override
-  String get authForgotPassword => 'نسيت كلمة المرور؟';
+  String get authForgotPassword => 'Ù†Ø³ÙŠØª ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±ØŸ';
 
   @override
-  String get authCreateAccount => 'للتسجيل اضغط هنا';
+  String get authCreateAccount => 'Ù„Ù„ØªØ³Ø¬ÙŠÙ„ Ø§Ø¶ØºØ· Ù‡Ù†Ø§';
 
   @override
-  String get authClientRegister => 'إنشاء حساب عميل';
+  String get authClientRegister => 'Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨ Ø¹Ù…ÙŠÙ„';
 
   @override
-  String get authBackToHome => 'العودة للرئيسية';
+  String get authBackToHome => 'Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„Ø±Ø¦ÙŠØ³ÙŠØ©';
 
   @override
-  String get authLogoutConfirm => 'تأكيد تسجيل الخروج';
+  String get authLogoutConfirm => 'ØªØ£ÙƒÙŠØ¯ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬';
 
   @override
-  String get authLogoutQuestion => 'هل تريد تسجيل الخروج؟';
+  String get authLogoutQuestion => 'Ù‡Ù„ ØªØ±ÙŠØ¯ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬ØŸ';
 
   @override
-  String get authCancel => 'إلغاء';
+  String get authCancel => 'Ø¥Ù„ØºØ§Ø¡';
 
   @override
-  String get authName => 'الاسم';
+  String get authName => 'Ø§Ù„Ø§Ø³Ù…';
 
   @override
-  String get authConfirmPassword => 'تأكيد كلمة المرور';
+  String get authConfirmPassword => 'ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±';
 
   @override
-  String get authCreatingAccount => 'جارٍ إنشاء الحساب...';
+  String get authCreatingAccount => 'Ø¬Ø§Ø±Ù Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø­Ø³Ø§Ø¨...';
 
   @override
-  String get authEmailRequired => 'اكتب البريد الإلكتروني';
+  String get authEmailRequired => 'Ø§ÙƒØªØ¨ Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ';
 
   @override
-  String get authPasswordRequired => 'اكتب كلمة المرور';
+  String get authPasswordRequired => 'Ø§ÙƒØªØ¨ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±';
 
   @override
-  String get authNameRequired => 'اكتب الاسم';
+  String get authNameRequired => 'Ø§ÙƒØªØ¨ Ø§Ù„Ø§Ø³Ù…';
 
   @override
-  String get authPasswordsDoNotMatch => 'تأكيد كلمة المرور غير مطابق';
+  String get authPasswordsDoNotMatch => 'ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± ØºÙŠØ± Ù…Ø·Ø§Ø¨Ù‚';
 
   @override
-  String get authInvalidEmail => 'البريد الإلكتروني غير صالح';
+  String get authInvalidEmail => 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ØºÙŠØ± ØµØ§Ù„Ø­';
 
   @override
-  String get authWeakPassword => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+  String get authWeakPassword => 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± ÙŠØ¬Ø¨ Ø£Ù† ØªÙƒÙˆÙ† 6 Ø£Ø­Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„';
 
   @override
-  String get authLoginFailed => 'فشل تسجيل الدخول';
+  String get authLoginFailed => 'ÙØ´Ù„ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„';
 
   @override
-  String get authRegistrationFailed => 'فشل إنشاء الحساب';
+  String get authRegistrationFailed => 'ÙØ´Ù„ Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø­Ø³Ø§Ø¨';
 
   @override
-  String get authUnexpectedError => 'حدث خطأ غير متوقع';
+  String get authUnexpectedError => 'Ø­Ø¯Ø« Ø®Ø·Ø£ ØºÙŠØ± Ù…ØªÙˆÙ‚Ø¹';
 
   @override
-  String get authPleaseWait => 'من فضلك انتظر';
+  String get authPleaseWait => 'Ù…Ù† ÙØ¶Ù„Ùƒ Ø§Ù†ØªØ¸Ø±';
 
   @override
-  String get authInvalidCredentialsMessage => 'بيانات الدخول غير صحيحة';
+  String get authInvalidCredentialsMessage => 'Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¯Ø®ÙˆÙ„ ØºÙŠØ± ØµØ­ÙŠØ­Ø©';
 
   @override
-  String get authAccountCreated => 'تم إنشاء الحساب';
+  String get authAccountCreated => 'ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø­Ø³Ø§Ø¨';
 
   @override
-  String get authTryAgain => 'تعذر إكمال العملية، حاول مرة أخرى';
+  String get authTryAgain => 'ØªØ¹Ø°Ø± Ø¥ÙƒÙ…Ø§Ù„ Ø§Ù„Ø¹Ù…Ù„ÙŠØ©ØŒ Ø­Ø§ÙˆÙ„ Ù…Ø±Ø© Ø£Ø®Ø±Ù‰';
 
   @override
-  String get commonNext => 'التالي';
+  String get commonNext => 'Ø§Ù„ØªØ§Ù„ÙŠ';
 
   @override
-  String get centersLoadError => 'حدث خطأ أثناء تحميل المراكز';
+  String get centersLoadError => 'Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ø±Ø§ÙƒØ²';
 
   @override
-  String get centersEmpty => 'لا توجد مراكز متاحة في هذه الفئة حاليًا';
+  String get centersEmpty => 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø±Ø§ÙƒØ² Ù…ØªØ§Ø­Ø© ÙÙŠ Ù‡Ø°Ù‡ Ø§Ù„ÙØ¦Ø© Ø­Ø§Ù„ÙŠÙ‹Ø§';
 
   @override
-  String get centersReadMore => 'اضغط للمزيد';
+  String get centersReadMore => 'Ø§Ø¶ØºØ· Ù„Ù„Ù…Ø²ÙŠØ¯';
 
   @override
-  String get centerDefaultName => 'مركز';
+  String get centerDefaultName => 'Ù…Ø±ÙƒØ²';
 
   @override
-  String get centerDetoxUnitAvailable => 'يوجد قسم أعراض انسحاب';
+  String get centerDetoxUnitAvailable => 'ÙŠÙˆØ¬Ø¯ Ù‚Ø³Ù… Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù†Ø³Ø­Ø§Ø¨';
 
   @override
-  String get centerDetailsTitle => 'تفاصيل المركز';
+  String get centerDetailsTitle => 'ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ù…Ø±ÙƒØ²';
 
   @override
-  String get centerDataNotFound => 'تعذّر العثور على بيانات المركز';
+  String get centerDataNotFound => 'ØªØ¹Ø°Ù‘Ø± Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ²';
 
   @override
-  String get centerDataLoadError => 'حدث خطأ أثناء تحميل بيانات المركز';
+  String get centerDataLoadError => 'Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ ØªØ­Ù…ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ²';
 
   @override
-  String get centerAvailable => 'متاح';
+  String get centerAvailable => 'Ù…ØªØ§Ø­';
 
   @override
-  String get centerUnavailable => 'غير متاح';
+  String get centerUnavailable => 'ØºÙŠØ± Ù…ØªØ§Ø­';
 
   @override
-  String get centerGallery => 'صور المركز';
+  String get centerGallery => 'ØµÙˆØ± Ø§Ù„Ù…Ø±ÙƒØ²';
 
   @override
-  String get centerPricing => 'تكلفة الإقامة';
+  String get centerPricing => 'ØªÙƒÙ„ÙØ© Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©';
 
   @override
-  String get centerTypeAndService => 'نوع المركز وخدمته';
+  String get centerTypeAndService => 'Ù†ÙˆØ¹ Ø§Ù„Ù…Ø±ÙƒØ² ÙˆØ®Ø¯Ù…ØªÙ‡';
 
   @override
-  String get centerCapabilities => 'قدرات المركز';
+  String get centerCapabilities => 'Ù‚Ø¯Ø±Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ²';
 
   @override
-  String get centerContactLocation => 'التواصل والموقع';
+  String get centerContactLocation => 'Ø§Ù„ØªÙˆØ§ØµÙ„ ÙˆØ§Ù„Ù…ÙˆÙ‚Ø¹';
 
   @override
-  String get centerAddress => 'العنوان';
+  String get centerAddress => 'Ø§Ù„Ø¹Ù†ÙˆØ§Ù†';
 
   @override
-  String get centerCity => 'المدينة';
+  String get centerCity => 'Ø§Ù„Ù…Ø¯ÙŠÙ†Ø©';
 
   @override
-  String get centerPhone => 'الهاتف';
+  String get centerPhone => 'Ø§Ù„Ù‡Ø§ØªÙ';
 
   @override
-  String get centerWhatsapp => 'واتساب';
+  String get centerWhatsapp => 'ÙˆØ§ØªØ³Ø§Ø¨';
 
   @override
-  String get centerServices => 'الخدمات';
+  String get centerServices => 'Ø§Ù„Ø®Ø¯Ù…Ø§Øª';
 
   @override
-  String get centerAbout => 'نبذة عن المركز';
+  String get centerAbout => 'Ù†Ø¨Ø°Ø© Ø¹Ù† Ø§Ù„Ù…Ø±ÙƒØ²';
 
   @override
-  String get centerRequestViaAdmin => 'اطلب المركز عبر الإدارة';
+  String get centerRequestViaAdmin => 'Ø§Ø·Ù„Ø¨ Ø§Ù„Ù…Ø±ÙƒØ² Ø¹Ø¨Ø± Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©';
 
   @override
-  String get centerInboxTitle => 'وارد المركز';
+  String get centerInboxTitle => 'ÙˆØ§Ø±Ø¯ Ø§Ù„Ù…Ø±ÙƒØ²';
 
   @override
-  String get commonAll => 'الكل';
+  String get commonAll => 'Ø§Ù„ÙƒÙ„';
 
   @override
-  String get statusPending => 'بانتظار الرد';
+  String get statusPending => 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ø±Ø¯';
 
   @override
-  String get centerSaveResponse => 'حفظ الرد';
+  String get centerSaveResponse => 'Ø­ÙØ¸ Ø§Ù„Ø±Ø¯';
 
   @override
-  String get webCenterRegistrationPortalTitle => 'بوابة تسجيل المراكز';
+  String get webCenterRegistrationPortalTitle => 'Ø¨ÙˆØ§Ø¨Ø© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…Ø±Ø§ÙƒØ²';
 
   @override
   String get webCenterRegistrationPortalSubtitle =>
-      'أنشئ حساب المركز ليتم مراجعته من الإدارة.';
+      'Ø£Ù†Ø´Ø¦ Ø­Ø³Ø§Ø¨ Ø§Ù„Ù…Ø±ÙƒØ² Ù„ÙŠØªÙ… Ù…Ø±Ø§Ø¬Ø¹ØªÙ‡ Ù…Ù† Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©.';
 
   @override
   String get webCenterRegistrationBasicInfoTitle =>
-      'تسجيل المركز - البيانات الأساسية';
+      'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…Ø±ÙƒØ² - Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©';
 
   @override
-  String get webCenterGuidanceLibrary => 'مكتبة الإرشاد';
+  String get webCenterGuidanceLibrary => 'Ù…ÙƒØªØ¨Ø© Ø§Ù„Ø¥Ø±Ø´Ø§Ø¯';
 
   @override
-  String get webCenterCenterName => 'اسم المركز';
+  String get webCenterCenterName => 'Ø§Ø³Ù… Ø§Ù„Ù…Ø±ÙƒØ²';
 
   @override
-  String get webCenterCategory => 'الفئة';
+  String get webCenterCategory => 'Ø§Ù„ÙØ¦Ø©';
 
   @override
-  String get webCenterType => 'نوع المركز';
+  String get webCenterType => 'Ù†ÙˆØ¹ Ø§Ù„Ù…Ø±ÙƒØ²';
 
   @override
-  String get webCenterConfirmPassword => 'تأكيد كلمة المرور';
+  String get webCenterConfirmPassword => 'ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±';
 
   @override
-  String get webCenterNextBasicInfo => 'التالي: البيانات الأساسية';
+  String get webCenterNextBasicInfo => 'Ø§Ù„ØªØ§Ù„ÙŠ: Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©';
 
   @override
-  String get webCenterManagerName => 'اسم المسؤول';
+  String get webCenterManagerName => 'Ø§Ø³Ù… Ø§Ù„Ù…Ø³Ø¤ÙˆÙ„';
 
   @override
-  String get webCenterArea => 'المنطقة';
+  String get webCenterArea => 'Ø§Ù„Ù…Ù†Ø·Ù‚Ø©';
 
   @override
-  String get webCenterDescription => 'الوصف';
+  String get webCenterDescription => 'Ø§Ù„ÙˆØµÙ';
 
   @override
-  String get webCenterHasDetoxUnit => 'يوجد قسم سحب سموم';
+  String get webCenterHasDetoxUnit => 'ÙŠÙˆØ¬Ø¯ Ù‚Ø³Ù… Ø³Ø­Ø¨ Ø³Ù…ÙˆÙ…';
 
   @override
-  String get webCenterNextMediaGallery => 'التالي: الصور والمعرض';
+  String get webCenterNextMediaGallery => 'Ø§Ù„ØªØ§Ù„ÙŠ: Ø§Ù„ØµÙˆØ± ÙˆØ§Ù„Ù…Ø¹Ø±Ø¶';
 
   @override
-  String get webCenterMediaGalleryTitle => 'تسجيل المركز - الصور والمعرض';
+  String get webCenterMediaGalleryTitle => 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…Ø±ÙƒØ² - Ø§Ù„ØµÙˆØ± ÙˆØ§Ù„Ù…Ø¹Ø±Ø¶';
 
   @override
-  String get webCenterFrontImageUrl => 'رابط صورة الواجهة';
+  String get webCenterFrontImageUrl => 'Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© Ø§Ù„ÙˆØ§Ø¬Ù‡Ø©';
 
   @override
-  String get webCenterReceptionImageUrl => 'رابط صورة الاستقبال';
+  String get webCenterReceptionImageUrl => 'Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© Ø§Ù„Ø§Ø³ØªÙ‚Ø¨Ø§Ù„';
 
   @override
-  String get webCenterInsideImage1Url => 'رابط صورة داخلية 1';
+  String get webCenterInsideImage1Url => 'Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© Ø¯Ø§Ø®Ù„ÙŠØ© 1';
 
   @override
-  String get webCenterInsideImage2Url => 'رابط صورة داخلية 2';
+  String get webCenterInsideImage2Url => 'Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© Ø¯Ø§Ø®Ù„ÙŠØ© 2';
 
   @override
-  String get webCenterNextPricingCapabilities => 'التالي: التسعير والقدرات';
+  String get webCenterNextPricingCapabilities => 'Ø§Ù„ØªØ§Ù„ÙŠ: Ø§Ù„ØªØ³Ø¹ÙŠØ± ÙˆØ§Ù„Ù‚Ø¯Ø±Ø§Øª';
 
   @override
   String get webCenterPricingCapabilitiesTitle =>
-      'تسجيل المركز - التسعير والقدرات';
+      'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…Ø±ÙƒØ² - Ø§Ù„ØªØ³Ø¹ÙŠØ± ÙˆØ§Ù„Ù‚Ø¯Ø±Ø§Øª';
 
   @override
-  String get webCenterEnabled => 'مفعل';
+  String get webCenterEnabled => 'Ù…ÙØ¹Ù„';
 
   @override
-  String get webCenterPrice => 'السعر';
+  String get webCenterPrice => 'Ø§Ù„Ø³Ø¹Ø±';
 
   @override
-  String get webCenterPricingUnit => 'وحدة التسعير';
+  String get webCenterPricingUnit => 'ÙˆØ­Ø¯Ø© Ø§Ù„ØªØ³Ø¹ÙŠØ±';
 
   @override
-  String get webCenterAcMode => 'نظام التكييف';
+  String get webCenterAcMode => 'Ù†Ø¸Ø§Ù… Ø§Ù„ØªÙƒÙŠÙŠÙ';
 
   @override
-  String get webCenterTaxIncluded => 'يشمل الضريبة';
+  String get webCenterTaxIncluded => 'ÙŠØ´Ù…Ù„ Ø§Ù„Ø¶Ø±ÙŠØ¨Ø©';
 
   @override
-  String get webCenterNextDocuments => 'التالي: المستندات';
+  String get webCenterNextDocuments => 'Ø§Ù„ØªØ§Ù„ÙŠ: Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª';
 
   @override
-  String get webCenterDocumentsTitle => 'تسجيل المركز - المستندات';
+  String get webCenterDocumentsTitle => 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…Ø±ÙƒØ² - Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª';
 
   @override
-  String get webCenterFileName => 'اسم الملف';
+  String get webCenterFileName => 'Ø§Ø³Ù… Ø§Ù„Ù…Ù„Ù';
 
   @override
-  String get webCenterFileUrlOptional => 'رابط الملف (اختياري)';
+  String get webCenterFileUrlOptional => 'Ø±Ø§Ø¨Ø· Ø§Ù„Ù…Ù„Ù (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)';
 
   @override
-  String get webCenterReviewNoteOptional => 'ملاحظة المراجعة (اختياري)';
+  String get webCenterReviewNoteOptional => 'Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)';
 
   @override
-  String get webCenterSubmitForReview => 'إرسال للمراجعة';
+  String get webCenterSubmitForReview => 'Ø¥Ø±Ø³Ø§Ù„ Ù„Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©';
 
   @override
   String get webRegistrationBrowseLibraryDuringReview =>
-      'تصفح مكتبة الإرشاد أثناء مراجعة حسابك';
+      'ØªØµÙØ­ Ù…ÙƒØªØ¨Ø© Ø§Ù„Ø¥Ø±Ø´Ø§Ø¯ Ø£Ø«Ù†Ø§Ø¡ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø­Ø³Ø§Ø¨Ùƒ';
 
   @override
-  String get webCenterCenterNameRequired => 'اكتب اسم المركز';
+  String get webCenterCenterNameRequired => 'Ø§ÙƒØªØ¨ Ø§Ø³Ù… Ø§Ù„Ù…Ø±ÙƒØ²';
 
   @override
   String get webCenterRegistrationFailed =>
-      'تعذر إكمال التسجيل، حاول مرة أخرى.';
+      'ØªØ¹Ø°Ø± Ø¥ÙƒÙ…Ø§Ù„ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ØŒ Ø­Ø§ÙˆÙ„ Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.';
 
   @override
   String get webCenterPleaseRegisterBeforeSaving =>
-      'يرجى التسجيل أو تسجيل الدخول قبل الحفظ.';
+      'ÙŠØ±Ø¬Ù‰ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ Ø£Ùˆ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ù‚Ø¨Ù„ Ø§Ù„Ø­ÙØ¸.';
 
   @override
-  String get webCenterMissingSession => 'جلسة المركز غير متاحة';
+  String get webCenterMissingSession => 'Ø¬Ù„Ø³Ø© Ø§Ù„Ù…Ø±ÙƒØ² ØºÙŠØ± Ù…ØªØ§Ø­Ø©';
 
   @override
-  String get webCenterSaveProfileFailed => 'تعذر حفظ بيانات المركز';
+  String get webCenterSaveProfileFailed => 'ØªØ¹Ø°Ø± Ø­ÙØ¸ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ²';
 
   @override
-  String get webCenterSaveMediaFailed => 'تعذر حفظ الصور';
+  String get webCenterSaveMediaFailed => 'ØªØ¹Ø°Ø± Ø­ÙØ¸ Ø§Ù„ØµÙˆØ±';
 
   @override
-  String get webCenterSavePricingFailed => 'تعذر حفظ التسعير';
+  String get webCenterSavePricingFailed => 'ØªØ¹Ø°Ø± Ø­ÙØ¸ Ø§Ù„ØªØ³Ø¹ÙŠØ±';
 
   @override
-  String get webCenterSubmitDocumentsFailed => 'تعذر إرسال المستندات';
+  String get webCenterSubmitDocumentsFailed => 'ØªØ¹Ø°Ø± Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª';
 
   @override
-  String get webClinicianRegistrationAccountTitle => 'تسجيل الأخصائي - الحساب';
+  String get webClinicianRegistrationAccountTitle => 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ - Ø§Ù„Ø­Ø³Ø§Ø¨';
 
   @override
   String get webClinicianRegistrationProfileTitle =>
-      'تسجيل الأخصائي - الملف الشخصي';
+      'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ - Ø§Ù„Ù…Ù„Ù Ø§Ù„Ø´Ø®ØµÙŠ';
 
   @override
-  String get webClinicianName => 'الاسم';
+  String get webClinicianName => 'Ø§Ù„Ø§Ø³Ù…';
 
   @override
-  String get webClinicianProfessionalTitle => 'اللقب المهني';
+  String get webClinicianProfessionalTitle => 'Ø§Ù„Ù„Ù‚Ø¨ Ø§Ù„Ù…Ù‡Ù†ÙŠ';
 
   @override
-  String get webClinicianSpecialty => 'التخصص';
+  String get webClinicianSpecialty => 'Ø§Ù„ØªØ®ØµØµ';
 
   @override
-  String get webClinicianNextProfile => 'التالي: الملف الشخصي';
+  String get webClinicianNextProfile => 'Ø§Ù„ØªØ§Ù„ÙŠ: Ø§Ù„Ù…Ù„Ù Ø§Ù„Ø´Ø®ØµÙŠ';
 
   @override
-  String get webClinicianPhotoUrl => 'رابط الصورة';
+  String get webClinicianPhotoUrl => 'Ø±Ø§Ø¨Ø· Ø§Ù„ØµÙˆØ±Ø©';
 
   @override
-  String get webClinicianBio => 'النبذة';
+  String get webClinicianBio => 'Ø§Ù„Ù†Ø¨Ø°Ø©';
 
   @override
-  String get webClinicianNextSessions => 'التالي: الجلسات';
+  String get webClinicianSessionPrice => 'Ø³Ø¹Ø± Ø§Ù„Ø¬Ù„Ø³Ø©';
 
   @override
-  String get webClinicianSessionsTitle => 'تسجيل الأخصائي - الجلسات';
+  String get webClinicianSessionDuration => 'Ù…Ø¯Ø© Ø§Ù„Ø¬Ù„Ø³Ø©';
 
   @override
-  String get webClinicianSessionPrice => 'سعر الجلسة';
+  String get webClinicianDocumentsTitle => 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ - Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª';
 
   @override
-  String get webClinicianSessionDuration => 'مدة الجلسة';
+  String get webClinicianIdentityFileName => 'Ø§Ø³Ù… Ù…Ù„Ù Ø§Ù„Ù‡ÙˆÙŠØ©';
 
   @override
-  String get webClinicianOnlineSessions => 'جلسات أونلاين';
+  String get webClinicianCertificateFileName => 'Ø§Ø³Ù… Ù…Ù„Ù Ø§Ù„Ø´Ù‡Ø§Ø¯Ø©';
 
   @override
-  String get webClinicianInPersonSessions => 'جلسات حضورية';
+  String get webClinicianExtraFileNameOptional => 'Ø§Ø³Ù… Ù…Ù„Ù Ø¥Ø¶Ø§ÙÙŠ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)';
 
   @override
-  String get webClinicianGroupSessions => 'يقدم جلسات جماعية';
-
-  @override
-  String get webClinicianDocumentsTitle => 'تسجيل الأخصائي - المستندات';
-
-  @override
-  String get webClinicianIdentityFileName => 'اسم ملف الهوية';
-
-  @override
-  String get webClinicianCertificateFileName => 'اسم ملف الشهادة';
-
-  @override
-  String get webClinicianExtraFileNameOptional => 'اسم ملف إضافي (اختياري)';
-
-  @override
-  String get webClinicianRegistrationFailed => 'تعذر إنشاء حساب الأخصائي';
+  String get webClinicianRegistrationFailed => 'ØªØ¹Ø°Ø± Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ';
 
   @override
   String get webClinicianStartFromAccountStep =>
-      'يرجى بدء التسجيل من خطوة الحساب';
+      'ÙŠØ±Ø¬Ù‰ Ø¨Ø¯Ø¡ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ Ù…Ù† Ø®Ø·ÙˆØ© Ø§Ù„Ø­Ø³Ø§Ø¨';
 
   @override
   String get webClinicianAuthenticationSessionMissing =>
-      'جلسة تسجيل الدخول غير متاحة';
+      'Ø¬Ù„Ø³Ø© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ ØºÙŠØ± Ù…ØªØ§Ø­Ø©';
 
   @override
-  String get webClinicianSaveProfileFailed => 'تعذر حفظ الملف الشخصي';
+  String get webClinicianSaveProfileFailed => 'ØªØ¹Ø°Ø± Ø­ÙØ¸ Ø§Ù„Ù…Ù„Ù Ø§Ù„Ø´Ø®ØµÙŠ';
 
   @override
-  String get webClinicianSelectSessionMode => 'اختر طريقة جلسة واحدة على الأقل';
+  String get webClinicianSelectSessionMode => 'Ø§Ø®ØªØ± Ø·Ø±ÙŠÙ‚Ø© Ø¬Ù„Ø³Ø© ÙˆØ§Ø­Ø¯Ø© Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„';
 
   @override
-  String get webClinicianSaveSessionsFailed => 'تعذر حفظ بيانات الجلسات';
+  String get webClinicianSubmitDocumentsFailed => 'ØªØ¹Ø°Ø± Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª';
+
 
   @override
-  String get webClinicianSubmitDocumentsFailed => 'تعذر إرسال المستندات';
+  String get bookingEditAccommodation => 'ØªØ¹Ø¯ÙŠÙ„ Ù†ÙˆØ¹ Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©';
 
   @override
-  String get bookingRequestTitle => 'طلب حجز';
+  String get bookingCompleteInitialIntake => 'Ø§Ø³ØªÙƒÙ…Ø§Ù„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø£ÙˆÙ„ÙŠ';
 
   @override
-  String get bookingCenterRequestTitle => 'طلب حجز مركز';
+  String get bookingCurrent => 'Ø§Ù„Ø¬Ø§Ø±ÙŠØ©';
 
   @override
-  String get bookingMyRequestsTitle => 'طلباتي';
+  String get bookingActionNeeded => 'ØªØ­ØªØ§Ø¬ Ù…Ù†Ùƒ Ø¥Ø¬Ø±Ø§Ø¡';
 
   @override
-  String get bookingBookSpecialistTitle => 'حجز مع أخصائي';
+  String get bookingCompleted => 'Ø§Ù„Ù…ÙƒØªÙ…Ù„Ø©';
 
   @override
-  String get bookingNoSpecialistsYet => 'لا يوجد أخصائيون بعد.';
+  String get bookingClosed => 'Ø§Ù„Ù…ØºÙ„Ù‚Ø©';
 
   @override
-  String get bookingTrustedSpecialistHint =>
-      'اختر أخصائيًا موثوقًا وأرسل طلبك للإدارة.';
+  String get bookingEmptyCurrent => 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª Ø¬Ø§Ø±ÙŠØ© Ø§Ù„Ø¢Ù†';
 
   @override
-  String get bookingDevUiEnabled => 'واجهة التطوير مفعلة';
+  String get bookingEmptyActionNeeded => 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª ØªØ­ØªØ§Ø¬ Ù…Ù†Ùƒ Ø¥Ø¬Ø±Ø§Ø¡ Ø§Ù„Ø¢Ù†';
 
   @override
-  String get bookingAdditionalNotes => 'ملاحظات إضافية';
+  String get bookingEmptyCompleted => 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª Ù…ÙƒØªÙ…Ù„Ø© Ø¨Ø¹Ø¯';
 
   @override
-  String get bookingWriteNoteHint => 'اكتب ملاحظتك هنا...';
+  String get bookingEmptyClosed => 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª Ù…ØºÙ„Ù‚Ø©';
 
   @override
-  String get bookingSendRequest => 'إرسال الطلب';
-
-  @override
-  String get bookingSendRequestToAdmin => 'إرسال الطلب إلى الإدارة';
-
-  @override
-  String get bookingSending => 'جارٍ الإرسال...';
-
-  @override
-  String get bookingRequestSent => 'تم إرسال الطلب بنجاح';
-
-  @override
-  String get bookingRequestFailed => 'تعذّر إرسال الطلب';
-
-  @override
-  String get bookingRequestSentAdminChat =>
-      'تم إرسال الطلب وفتح محادثة المتابعة مع الإدارة';
-
-  @override
-  String get bookingCenterRequestSent =>
-      'تم إرسال طلب المركز إلى الإدارة بنجاح';
-
-  @override
-  String get bookingCenterRequestSentToAdmin =>
-      'تم إرسال طلب المركز إلى الإدارة';
-
-  @override
-  String get bookingUploadPaymentProof => 'رفع إثبات التحويل';
-
-  @override
-  String get bookingEditAccommodation => 'تعديل نوع الإقامة';
-
-  @override
-  String get bookingCompleteInitialIntake => 'استكمال بيانات التقييم الأولي';
-
-  @override
-  String get bookingCreateNewRequest => 'إنشاء طلب جديد';
-
-  @override
-  String get bookingCreateNewFromRequest => 'إنشاء طلب جديد من هذا الطلب';
-
-  @override
-  String get bookingNewCenterRequestCreated => 'تم إنشاء طلب مركز جديد';
-
-  @override
-  String get bookingCurrent => 'الجارية';
-
-  @override
-  String get bookingActionNeeded => 'تحتاج منك إجراء';
-
-  @override
-  String get bookingCompleted => 'المكتملة';
-
-  @override
-  String get bookingClosed => 'المغلقة';
-
-  @override
-  String get bookingEmptyCurrent => 'لا توجد طلبات جارية الآن';
-
-  @override
-  String get bookingEmptyActionNeeded => 'لا توجد طلبات تحتاج منك إجراء الآن';
-
-  @override
-  String get bookingEmptyCompleted => 'لا توجد طلبات مكتملة بعد';
-
-  @override
-  String get bookingEmptyClosed => 'لا توجد طلبات مغلقة';
-
-  @override
-  String get bookingSpecialistFallback => 'الأخصائي';
-
-  @override
-  String get bookingCenterRequestFallback => 'طلب مركز';
+  String get bookingSpecialistFallback => 'Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ';
 
   @override
   String clientDashboardWelcome(String name) {
-    return 'مرحبًا $name';
+    return 'Ù…Ø±Ø­Ø¨Ù‹Ø§ $name';
   }
 
   @override
-  String get clientDashboardSubtitle => 'كل خطواتك موجودة هنا بهدوء.';
+  String get clientDashboardSubtitle => 'ÙƒÙ„ Ø®Ø·ÙˆØ§ØªÙƒ Ù…ÙˆØ¬ÙˆØ¯Ø© Ù‡Ù†Ø§ Ø¨Ù‡Ø¯ÙˆØ¡.';
 
   @override
-  String get clientBookings => 'طلبات الحجز';
+  String get clientSupport => 'Ø§Ù„Ø¯Ø¹Ù…';
 
   @override
-  String get clientBookingRequests => 'طلبات الحجز';
+  String get clientSupportRequests => 'Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¯Ø¹Ù…';
+
+
 
   @override
-  String get clientSupport => 'الدعم';
+  String get clientLinksAndCodes => 'Ø§Ù„Ø±ÙˆØ§Ø¨Ø· ÙˆØ§Ù„Ø£ÙƒÙˆØ§Ø¯';
 
   @override
-  String get clientSupportRequests => 'طلبات الدعم';
+  String get clientFollowUp => 'Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø©';
 
   @override
-  String get clientPaymentProof => 'إثبات التحويل النقدي';
+  String get clientMessagePreferences => 'ØªÙØ¶ÙŠÙ„Ø§Øª Ø§Ù„Ø±Ø³Ø§Ø¦Ù„';
 
   @override
-  String get clientUploadPaymentProof => 'رفع إثبات التحويل';
+  String get clientRatingsCount => 'Ø¹Ø¯Ø¯ Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª';
 
   @override
-  String get clientMySessions => 'جلساتي';
+  String get clientAverageStars => 'Ù…ØªÙˆØ³Ø· Ø§Ù„Ù†Ø¬ÙˆÙ…';
 
   @override
-  String get clientLinksAndCodes => 'الروابط والأكواد';
+  String get clientOverallAverage => 'Ø§Ù„Ù…ØªÙˆØ³Ø· Ø§Ù„Ø¹Ø§Ù…';
 
   @override
-  String get clientFollowUp => 'المتابعة';
+  String get clinicianOperations => 'Ø§Ù„Ø¹Ù…Ù„ÙŠØ§Øª';
 
   @override
-  String get clientMessagePreferences => 'تفضيلات الرسائل';
+  String get clinicianDashboard => 'Ù„ÙˆØ­Ø© Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ';
 
   @override
-  String get clientRatingsCount => 'عدد التقييمات';
+  String get clinicianOpenCases => 'ÙØªØ­ Ø§Ù„Ø­Ø§Ù„Ø§Øª';
 
   @override
-  String get clientAverageStars => 'متوسط النجوم';
+  String get clinicianSendSupportRequest => 'Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ Ø¯Ø¹Ù…';
 
   @override
-  String get clientOverallAverage => 'المتوسط العام';
+  String get clinicianEditProfile => 'ØªØ¹Ø¯ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§ØªÙŠ';
 
   @override
-  String get clinicianOperations => 'العمليات';
+  String get clinicianSupportRequest => 'Ø·Ù„Ø¨ Ø¯Ø¹Ù…';
 
   @override
-  String get clinicianDashboard => 'لوحة الأخصائي';
+  String get clinicianCurrentSupportRequests => 'Ø¹Ø¯Ø¯ Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø¯Ø¹Ù… Ø§Ù„Ø­Ø§Ù„ÙŠØ©';
 
   @override
-  String get clinicianOpenCases => 'فتح الحالات';
+  String get clinicianReferredChatCases => 'Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø´Ø§Øª Ø§Ù„Ù…Ø­Ø§Ù„Ø©';
 
   @override
-  String get clinicianSendSupportRequest => 'إرسال طلب دعم';
+  String get clinicianReferredChatCasesCount => 'Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø´Ø§Øª Ø§Ù„Ù…Ø­Ø§Ù„Ø©';
 
   @override
-  String get clinicianEditProfile => 'تعديل بياناتي';
+  String get clinicianNewRequests => 'Ø·Ù„Ø¨Ø§Øª Ø¬Ø¯ÙŠØ¯Ø©';
 
   @override
-  String get clinicianMySessions => 'جلساتي';
+  String get clinicianActiveRequests => 'Ø·Ù„Ø¨Ø§Øª Ù†Ø´Ø·Ø©';
 
   @override
-  String get clinicianSupportRequest => 'طلب دعم';
+  String get clinicianCompleted => 'Ù…ÙƒØªÙ…Ù„Ø©';
 
   @override
-  String get clinicianCurrentSupportRequests => 'عدد طلبات الدعم الحالية';
+  String get clinicianClosed => 'Ù…Ø±ÙÙˆØ¶Ø©/Ù…ØºÙ„Ù‚Ø©';
 
   @override
-  String get clinicianReferredChatCases => 'حالات الشات المحالة';
+  String get clinicianAcceptRequest => 'Ù‚Ø¨ÙˆÙ„ Ø§Ù„Ø·Ù„Ø¨';
 
   @override
-  String get clinicianReferredChatCasesCount => 'حالات الشات المحالة';
+  String get clinicianRejectRequest => 'Ø±ÙØ¶ Ø§Ù„Ø·Ù„Ø¨';
 
   @override
-  String get clinicianNewRequests => 'طلبات جديدة';
+  String get clinicianAssignedRequest => 'Ø·Ù„Ø¨ Ù…Ø®ØµØµ Ù„Ùƒ';
 
   @override
-  String get clinicianActiveRequests => 'طلبات نشطة';
+  String get clinicianProfileChangeTitle => 'Ø·Ù„Ø¨ ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„ØµÙˆØ±Ø© Ø£Ùˆ Ø§Ù„Ù†Ø¨Ø°Ø©';
 
   @override
-  String get clinicianCompleted => 'مكتملة';
+  String get clinicianNewPhotoUrl => 'Ø±Ø§Ø¨Ø· Ø§Ù„ØµÙˆØ±Ø© Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©';
 
   @override
-  String get clinicianClosed => 'مرفوضة/مغلقة';
+  String get clinicianNewBio => 'Ø§Ù„Ù†Ø¨Ø°Ø© Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©';
 
   @override
-  String get clinicianAcceptRequest => 'قبول الطلب';
+  String get clinicianSendingRequest => 'Ø¬Ø§Ø±Ù Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨...';
 
   @override
-  String get clinicianRejectRequest => 'رفض الطلب';
+  String get clinicianSendChangeRequest => 'Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ Ø§Ù„ØªØ¹Ø¯ÙŠÙ„';
 
   @override
-  String get clinicianEndSession => 'إنهاء الجلسة';
+  String get clinicianLogout => 'Ø®Ø±ÙˆØ¬';
 
   @override
-  String get clinicianReviewSession => 'تقييم الجلسة';
+  String get clinicianPleaseSignIn => 'ÙŠØ¬Ø¨ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø£ÙˆÙ„Ù‹Ø§';
 
   @override
-  String get clinicianAssignedRequest => 'طلب مخصص لك';
+  String get clinicianInboxTitle => 'ÙˆØ§Ø±Ø¯ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ';
+
 
   @override
-  String get clinicianProfileChangeTitle => 'طلب تعديل الصورة أو النبذة';
+  String get clinicianReject => 'Ø±ÙØ¶';
 
   @override
-  String get clinicianNewPhotoUrl => 'رابط الصورة الجديدة';
+  String get clinicianAccept => 'Ù‚Ø¨ÙˆÙ„';
 
   @override
-  String get clinicianNewBio => 'النبذة الجديدة';
+  String get clinicianRejectRequestTitle => 'Ø±ÙØ¶ Ø§Ù„Ø·Ù„Ø¨';
 
   @override
-  String get clinicianSendingRequest => 'جارٍ إرسال الطلب...';
+  String get clinicianRejectReason => 'Ø³Ø¨Ø¨ Ø§Ù„Ø±ÙØ¶';
 
   @override
-  String get clinicianSendChangeRequest => 'إرسال طلب التعديل';
+  String get clinicianRejectReasonHint => 'Ø§ÙƒØªØ¨ Ø³Ø¨Ø¨ Ø§Ù„Ø±ÙØ¶ Ù‡Ù†Ø§...';
 
   @override
-  String get clinicianRatings => 'عدد التقييمات';
+  String get clinicianConfirmReject => 'ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø±ÙØ¶';
+
 
   @override
-  String get clinicianStars => 'متوسط النجوم';
+  String get clinicianRejectFailed => 'ÙØ´Ù„ Ø§Ù„Ø±ÙØ¶';
 
   @override
-  String get clinicianOverall => 'المتوسط العام';
+  String get clinicianAcceptFailed => 'ÙØ´Ù„ Ø§Ù„Ù‚Ø¨ÙˆÙ„';
 
   @override
-  String get clinicianLogout => 'خروج';
+  String get clinicianRequestRejected => 'ØªÙ… Ø±ÙØ¶ Ø§Ù„Ø·Ù„Ø¨';
 
   @override
-  String get clinicianPleaseSignIn => 'يجب تسجيل الدخول أولًا';
+  String get statusPendingReview => 'Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©';
 
   @override
-  String get clinicianInboxTitle => 'وارد الأخصائي';
+  String get statusRequestUnderReview => 'Ø·Ù„Ø¨Ùƒ Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©';
 
   @override
-  String get clinicianAwaitingPayment => 'بانتظار التحويل';
+  String get statusCenterFollowUp => 'Ø§Ù„Ø·Ù„Ø¨ Ù„Ø¯Ù‰ Ø§Ù„Ù…Ø±ÙƒØ² Ù„Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„ØªÙˆÙØ±';
 
   @override
-  String get clinicianReject => 'رفض';
-
-  @override
-  String get clinicianAccept => 'قبول';
-
-  @override
-  String get clinicianRejectRequestTitle => 'رفض الطلب';
-
-  @override
-  String get clinicianRejectReason => 'سبب الرفض';
-
-  @override
-  String get clinicianRejectReasonHint => 'اكتب سبب الرفض هنا...';
-
-  @override
-  String get clinicianConfirmReject => 'تأكيد الرفض';
-
-  @override
-  String get clinicianApprovalSent =>
-      'تمت موافقة الأخصائي وتحويل الطلب لانتظار الدفع';
-
-  @override
-  String get clinicianRejectFailed => 'فشل الرفض';
-
-  @override
-  String get clinicianAcceptFailed => 'فشل القبول';
-
-  @override
-  String get clinicianRequestRejected => 'تم رفض الطلب';
-
-  @override
-  String get statusPendingReview => 'قيد المراجعة';
-
-  @override
-  String get statusRequestUnderReview => 'طلبك قيد المراجعة';
-
-  @override
-  String get statusCenterFollowUp => 'الطلب لدى المركز للتحقق من التوفر';
-
-  @override
-  String get statusClientUpdateRequired => 'المركز طلب تعديل نوع الإقامة';
+  String get statusClientUpdateRequired => 'Ø§Ù„Ù…Ø±ÙƒØ² Ø·Ù„Ø¨ ØªØ¹Ø¯ÙŠÙ„ Ù†ÙˆØ¹ Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©';
 
   @override
   String get statusCenterIntakePending =>
-      'بانتظار استكمال بيانات التقييم الأولي';
+      'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ø³ØªÙƒÙ…Ø§Ù„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªÙ‚ÙŠÙŠÙ… Ø§Ù„Ø£ÙˆÙ„ÙŠ';
 
   @override
   String get statusCenterRecommendationPending =>
-      'بانتظار توصية المركز بعد مراجعة الحالة';
+      'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙˆØµÙŠØ© Ø§Ù„Ù…Ø±ÙƒØ² Ø¨Ø¹Ø¯ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø­Ø§Ù„Ø©';
 
   @override
-  String get statusApproved => 'تمت الموافقة';
+  String get statusApproved => 'ØªÙ…Øª Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø©';
 
   @override
-  String get statusRequestApproved => 'تمت الموافقة على طلبك';
+  String get statusRequestApproved => 'ØªÙ…Øª Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø© Ø¹Ù„Ù‰ Ø·Ù„Ø¨Ùƒ';
+
+
+
 
   @override
-  String get statusAwaitingPayment => 'بانتظار الدفع';
+  String get statusSessionSetupPending => 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ¬Ù‡ÙŠØ² Ø§Ù„Ø¬Ù„Ø³Ø©';
 
   @override
-  String get statusUploadPaymentProof => 'يرجى رفع إثبات التحويل';
+  String get statusResidencySetupPending => 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ¬Ù‡ÙŠØ² Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©';
 
   @override
-  String get statusPaymentReview => 'إثبات الدفع قيد المراجعة';
+  String get statusSessionScheduled => 'Ø¬Ù„Ø³Ø© Ù…Ø¬Ø¯ÙˆÙ„Ø©';
 
   @override
-  String get statusSessionSetupPending => 'بانتظار تجهيز الجلسة';
+  String get statusResidencyScheduled => 'Ø¥Ù‚Ø§Ù…Ø© Ù…Ø¬Ø¯ÙˆÙ„Ø©';
 
   @override
-  String get statusResidencySetupPending => 'بانتظار تجهيز الإقامة';
+  String get statusSessionInProgress => 'Ø§Ù„Ø¬Ù„Ø³Ø© Ø¬Ø§Ø±ÙŠØ©';
 
   @override
-  String get statusSessionScheduled => 'جلسة مجدولة';
+  String get statusResidencyInProgress => 'Ø§Ù„Ø¥Ù‚Ø§Ù…Ø© Ø¬Ø§Ø±ÙŠØ©';
 
   @override
-  String get statusResidencyScheduled => 'إقامة مجدولة';
+  String get statusPendingReviews => 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªÙ‚ÙŠÙŠÙ…Ø§Øª';
 
   @override
-  String get statusSessionInProgress => 'الجلسة جارية';
+  String get statusPendingDischargeReviews => 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªÙ‚Ø§Ø±ÙŠØ± Ø§Ù„Ø®Ø±ÙˆØ¬';
+
+
 
   @override
-  String get statusResidencyInProgress => 'الإقامة جارية';
+  String get statusCompleted => 'Ù…ÙƒØªÙ…Ù„';
 
   @override
-  String get statusPendingReviews => 'بانتظار التقييمات';
+  String get statusCompletedSuccessfully => 'Ù…ÙƒØªÙ…Ù„ Ø¨Ù†Ø¬Ø§Ø­';
 
   @override
-  String get statusPendingDischargeReviews => 'بانتظار تقارير الخروج';
+  String get statusRequestCompleted => 'Ø§ÙƒØªÙ…Ù„ Ø§Ù„Ø·Ù„Ø¨';
 
   @override
-  String get statusPayoutPending => 'بانتظار الإغلاق المالي';
+  String get statusReschedulePending => 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ø¬Ø¯ÙˆÙ„Ø©';
 
   @override
-  String get statusCenterAccountingReview =>
-      'بانتظار المراجعة المحاسبية للمركز';
+  String get statusAwaitingStartConfirmations => 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©';
 
   @override
-  String get statusCompleted => 'مكتمل';
+  String get statusRejected => 'ØªØ¹Ø°Ù‘Ø± Ù‚Ø¨ÙˆÙ„ Ø§Ù„Ø·Ù„Ø¨';
 
   @override
-  String get statusCompletedSuccessfully => 'مكتمل بنجاح';
+  String get statusClinicianRejected => 'ØªØ¹Ø°Ù‘Ø± ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ';
 
   @override
-  String get statusRequestCompleted => 'اكتمل الطلب';
+  String get statusCancelled => 'Ù…Ù„ØºÙŠ';
 
   @override
-  String get statusReschedulePending => 'بانتظار إعادة الجدولة';
+  String get statusCancellationPending => 'Ø·Ù„Ø¨ Ø§Ù„Ø¥Ù„ØºØ§Ø¡ Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©';
 
   @override
-  String get statusAwaitingStartConfirmations => 'بانتظار تأكيد البداية';
+  String get statusDisputeReceived => 'ØªÙ… Ø§Ø³ØªÙ„Ø§Ù… Ø§Ù„Ø´ÙƒÙˆÙ‰';
 
   @override
-  String get statusRejected => 'تعذّر قبول الطلب';
+  String get statusRequestCoordination => 'ÙŠØ¬Ø±ÙŠ ØªÙ†Ø³ÙŠÙ‚ Ø§Ù„Ø·Ù„Ø¨';
 
   @override
-  String get statusClinicianRejected => 'تعذّر تأكيد الأخصائي';
+  String get statusRequestUpdateInProgress => 'ÙŠØªÙ… ØªØ­Ø¯ÙŠØ« Ø­Ø§Ù„Ø© Ø§Ù„Ø·Ù„Ø¨';
 
   @override
-  String get statusCancelled => 'ملغي';
+  String get statusNewRequest => 'Ø·Ù„Ø¨ Ø¬Ø¯ÙŠØ¯';
 
   @override
-  String get statusCancellationPending => 'طلب الإلغاء قيد المراجعة';
+  String get statusCenterAvailableResponse => 'Ø±Ø¯ Ø§Ù„Ù…Ø±ÙƒØ²: Ù…ØªØ§Ø­';
 
   @override
-  String get statusDisputeReceived => 'تم استلام الشكوى';
+  String get statusCenterUnavailableResponse => 'Ø±Ø¯ Ø§Ù„Ù…Ø±ÙƒØ²: ØºÙŠØ± Ù…ØªØ§Ø­';
 
   @override
-  String get statusRequestCoordination => 'يجري تنسيق الطلب';
-
-  @override
-  String get statusRequestUpdateInProgress => 'يتم تحديث حالة الطلب';
-
-  @override
-  String get statusNewRequest => 'طلب جديد';
-
-  @override
-  String get statusCenterAvailableResponse => 'رد المركز: متاح';
-
-  @override
-  String get statusCenterUnavailableResponse => 'رد المركز: غير متاح';
-
-  @override
-  String get statusCenterNoResponse => 'رد المركز: لم يرد بعد';
+  String get statusCenterNoResponse => 'Ø±Ø¯ Ø§Ù„Ù…Ø±ÙƒØ²: Ù„Ù… ÙŠØ±Ø¯ Ø¨Ø¹Ø¯';
 
   @override
   String comingSoon(String title) {
-    return '$title — قريبًا';
+    return '$title â€” Ù‚Ø±ÙŠØ¨Ù‹Ø§';
   }
 
   @override
-  String get modulePlaceholderBody => 'المحتوى قريبًا.';
+  String get modulePlaceholderBody => 'Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ù‚Ø±ÙŠØ¨Ù‹Ø§.';
 }
+
+
+

@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -22,44 +22,44 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
   static const List<Map<String, String>> _centerCategories = [
     {
       'key': 'recovery',
-      'labelAr': 'مراكز التعافي',
+      'labelAr': 'Ù…Ø±Ø§ÙƒØ² Ø§Ù„ØªØ¹Ø§ÙÙŠ',
       'labelEn': 'Recovery Centers',
     },
     {
       'key': 'detox',
-      'labelAr': 'مراكز سحب السموم',
+      'labelAr': 'Ù…Ø±Ø§ÙƒØ² Ø³Ø­Ø¨ Ø§Ù„Ø³Ù…ÙˆÙ…',
       'labelEn': 'Detox Centers',
     },
     {
       'key': 'special_needs',
-      'labelAr': 'مراكز رعاية ذوي الاحتياجات الخاصة',
+      'labelAr': 'Ù…Ø±Ø§ÙƒØ² Ø±Ø¹Ø§ÙŠØ© Ø°ÙˆÙŠ Ø§Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„Ø®Ø§ØµØ©',
       'labelEn': 'Special Needs Centers',
     },
     {
       'key': 'hospital',
-      'labelAr': 'المستشفيات',
+      'labelAr': 'Ø§Ù„Ù…Ø³ØªØ´ÙÙŠØ§Øª',
       'labelEn': 'Hospitals',
     },
   ];
   static const List<Map<String, String>> _centerTypes = [
     {
       'key': 'halfway_house',
-      'labelAr': 'هاف واي',
+      'labelAr': 'Ù‡Ø§Ù ÙˆØ§ÙŠ',
       'labelEn': 'Halfway House',
     },
     {
       'key': 'detox',
-      'labelAr': 'ديتوكس / أعراض انسحاب',
+      'labelAr': 'Ø¯ÙŠØªÙˆÙƒØ³ / Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù†Ø³Ø­Ø§Ø¨',
       'labelEn': 'Detox / Withdrawal Unit',
     },
     {
       'key': 'hospital',
-      'labelAr': 'مستشفى',
+      'labelAr': 'Ù…Ø³ØªØ´ÙÙ‰',
       'labelEn': 'Hospital',
     },
     {
       'key': 'special_needs_care',
-      'labelAr': 'رعاية ذوي الاحتياجات الخاصة',
+      'labelAr': 'Ø±Ø¹Ø§ÙŠØ© Ø°ÙˆÙŠ Ø§Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„Ø®Ø§ØµØ©',
       'labelEn': 'Special Needs Care',
     },
   ];
@@ -200,7 +200,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
       final user = cred.user;
       if (user == null) {
         throw Exception(
-          _isArabic ? 'تعذر إنشاء الحساب' : 'Failed to create account',
+          _isArabic ? 'ØªØ¹Ø°Ø± Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø­Ø³Ø§Ø¨' : 'Failed to create account',
         );
       }
       createdUser = user;
@@ -257,7 +257,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
     } on FirebaseAuthException catch (e) {
       setState(() {
         _error =
-            e.message ?? (_isArabic ? 'فشل التسجيل' : 'Registration failed');
+            e.message ?? (_isArabic ? 'ÙØ´Ù„ Ø§Ù„ØªØ³Ø¬ÙŠÙ„' : 'Registration failed');
       });
     } on FirebaseException catch (e) {
       if (!centerDocCreated && createdUser != null) {
@@ -272,10 +272,10 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
       setState(() {
         _error = isPermissionDenied
             ? (_isArabic
-                ? 'تم إنشاء حساب Firebase Auth لكن تعذر حفظ ملف المركز في Firestore بسبب الصلاحيات. تحقق من قواعد Firestore لنقطة centers/{uid}.'
+                ? 'ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨ Firebase Auth Ù„ÙƒÙ† ØªØ¹Ø°Ø± Ø­ÙØ¸ Ù…Ù„Ù Ø§Ù„Ù…Ø±ÙƒØ² ÙÙŠ Firestore Ø¨Ø³Ø¨Ø¨ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª. ØªØ­Ù‚Ù‚ Ù…Ù† Ù‚ÙˆØ§Ø¹Ø¯ Firestore Ù„Ù†Ù‚Ø·Ø© centers/{uid}.'
                 : 'Firebase Auth account was created, but saving the center profile to Firestore was denied. Check Firestore rules for centers/{uid}.')
             : (_isArabic
-                ? 'فشل حفظ بيانات المركز: ${e.message ?? e.code}'
+                ? 'ÙØ´Ù„ Ø­ÙØ¸ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ²: ${e.message ?? e.code}'
                 : 'Failed to save center profile: ${e.message ?? e.code}');
       });
     } catch (e) {
@@ -288,7 +288,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
       }
 
       setState(() {
-        _error = _isArabic ? 'فشل التسجيل: $e' : 'Registration failed: $e';
+        _error = _isArabic ? 'ÙØ´Ù„ Ø§Ù„ØªØ³Ø¬ÙŠÙ„: $e' : 'Registration failed: $e';
       });
     } finally {
       if (mounted) {
@@ -309,7 +309,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
       if (!serviceEnabled) {
         throw Exception(
           _isArabic
-              ? 'خدمة الموقع غير مفعلة على الجهاز'
+              ? 'Ø®Ø¯Ù…Ø© Ø§Ù„Ù…ÙˆÙ‚Ø¹ ØºÙŠØ± Ù…ÙØ¹Ù„Ø© Ø¹Ù„Ù‰ Ø§Ù„Ø¬Ù‡Ø§Ø²'
               : 'Location services are disabled',
         );
       }
@@ -322,14 +322,14 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
 
       if (permission == LocationPermission.denied) {
         throw Exception(
-          _isArabic ? 'تم رفض إذن الموقع' : 'Location permission denied',
+          _isArabic ? 'ØªÙ… Ø±ÙØ¶ Ø¥Ø°Ù† Ø§Ù„Ù…ÙˆÙ‚Ø¹' : 'Location permission denied',
         );
       }
 
       if (permission == LocationPermission.deniedForever) {
         throw Exception(
           _isArabic
-              ? 'إذن الموقع مرفوض نهائيًا، فعّله من إعدادات المتصفح أو النظام'
+              ? 'Ø¥Ø°Ù† Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ù…Ø±ÙÙˆØ¶ Ù†Ù‡Ø§Ø¦ÙŠÙ‹Ø§ØŒ ÙØ¹Ù‘Ù„Ù‡ Ù…Ù† Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ù…ØªØµÙØ­ Ø£Ùˆ Ø§Ù„Ù†Ø¸Ø§Ù…'
               : 'Location permission permanently denied',
         );
       }
@@ -344,7 +344,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
           SnackBar(
             content: Text(
               _isArabic
-                  ? 'تم تحديد موقعك الحالي، لكن تعبئة العنوان التلقائية على الويب غير مفعلة الآن. أدخل المدينة والعنوان يدويًا.'
+                  ? 'ØªÙ… ØªØ­Ø¯ÙŠØ¯ Ù…ÙˆÙ‚Ø¹Ùƒ Ø§Ù„Ø­Ø§Ù„ÙŠØŒ Ù„ÙƒÙ† ØªØ¹Ø¨Ø¦Ø© Ø§Ù„Ø¹Ù†ÙˆØ§Ù† Ø§Ù„ØªÙ„Ù‚Ø§Ø¦ÙŠØ© Ø¹Ù„Ù‰ Ø§Ù„ÙˆÙŠØ¨ ØºÙŠØ± Ù…ÙØ¹Ù„Ø© Ø§Ù„Ø¢Ù†. Ø£Ø¯Ø®Ù„ Ø§Ù„Ù…Ø¯ÙŠÙ†Ø© ÙˆØ§Ù„Ø¹Ù†ÙˆØ§Ù† ÙŠØ¯ÙˆÙŠÙ‹Ø§.'
                   : 'Your location was detected, but automatic address filling is disabled on web for now. Please enter city and address manually.',
             ),
           ),
@@ -360,7 +360,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
       if (placemarks.isEmpty) {
         throw Exception(
           _isArabic
-              ? 'تعذر تحديد العنوان من الموقع الحالي'
+              ? 'ØªØ¹Ø°Ø± ØªØ­Ø¯ÙŠØ¯ Ø§Ù„Ø¹Ù†ÙˆØ§Ù† Ù…Ù† Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ø­Ø§Ù„ÙŠ'
               : 'No address found',
         );
       }
@@ -388,7 +388,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
           .toList();
 
       final resolvedCity = cityParts.isNotEmpty ? cityParts.first : '';
-      final resolvedAddress = addressParts.join('، ').trim();
+      final resolvedAddress = addressParts.join('ØŒ ').trim();
 
       if (resolvedCity.length >= 2) {
         _cityController.text = resolvedCity;
@@ -403,7 +403,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
         SnackBar(
           content: Text(
             _isArabic
-                ? 'تم تحميل الموقع الحالي'
+                ? 'ØªÙ… ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ø­Ø§Ù„ÙŠ'
                 : 'Current location loaded successfully',
           ),
         ),
@@ -416,7 +416,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
         SnackBar(
           content: Text(
             _isArabic
-                ? 'تعذر تحميل الموقع الحالي، يمكنك إدخال العنوان يدويًا'
+                ? 'ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ø­Ø§Ù„ÙŠØŒ ÙŠÙ…ÙƒÙ†Ùƒ Ø¥Ø¯Ø®Ø§Ù„ Ø§Ù„Ø¹Ù†ÙˆØ§Ù† ÙŠØ¯ÙˆÙŠÙ‹Ø§'
                 : 'Unable to load current location, you can enter it manually',
           ),
         ),
@@ -478,7 +478,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
             _isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
-            _isArabic ? 'قدرات المركز' : 'Center capabilities',
+            _isArabic ? 'Ù‚Ø¯Ø±Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ²' : 'Center capabilities',
             textAlign: TextAlign.start,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
@@ -488,7 +488,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
           _pricingToggleRow(
             context: context,
             title: _isArabic
-                ? 'يدعم حالات الإدمان المصاحبة لفيروس HIV'
+                ? 'ÙŠØ¯Ø¹Ù… Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø¥Ø¯Ù…Ø§Ù† Ø§Ù„Ù…ØµØ§Ø­Ø¨Ø© Ù„ÙÙŠØ±ÙˆØ³ HIV'
                 : 'Supports addiction cases with HIV',
             value: _capabilities.supportsAddictionCasesWithHiv,
             onChanged: (value) {
@@ -502,7 +502,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
           _pricingToggleRow(
             context: context,
             title:
-                _isArabic ? 'يستقبل حالات الإدمان' : 'Accepts addiction cases',
+                _isArabic ? 'ÙŠØ³ØªÙ‚Ø¨Ù„ Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø¥Ø¯Ù…Ø§Ù†' : 'Accepts addiction cases',
             value: _capabilities.acceptsAddictionCases,
             onChanged: (value) {
               setState(() {
@@ -515,7 +515,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
           _pricingToggleRow(
             context: context,
             title: _isArabic
-                ? 'يستقبل الحالات النفسية بدون إدمان'
+                ? 'ÙŠØ³ØªÙ‚Ø¨Ù„ Ø§Ù„Ø­Ø§Ù„Ø§Øª Ø§Ù„Ù†ÙØ³ÙŠØ© Ø¨Ø¯ÙˆÙ† Ø¥Ø¯Ù…Ø§Ù†'
                 : 'Accepts psychiatric cases without addiction',
             value: _capabilities.acceptsPsychiatricCasesWithoutAddiction,
             onChanged: (value) {
@@ -560,8 +560,8 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: appInputDecoration(
               context: context,
-              label: isArabic ? 'السعر' : 'Price',
-              icon: Icons.payments_outlined,
+              label: isArabic ? 'Ø§Ù„Ø³Ø¹Ø±' : 'Price',
+              icon: Icons.sell_outlined,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -569,17 +569,17 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
             initialValue: item.pricingUnit.isEmpty ? null : item.pricingUnit,
             decoration: appInputDecoration(
               context: context,
-              label: isArabic ? 'وحدة التسعير' : 'Pricing unit',
+              label: isArabic ? 'ÙˆØ­Ø¯Ø© Ø§Ù„ØªØ³Ø¹ÙŠØ±' : 'Pricing unit',
               icon: Icons.calendar_today_outlined,
             ),
             items: [
               DropdownMenuItem(
                 value: 'day',
-                child: Text(isArabic ? 'يومي' : 'Per day'),
+                child: Text(isArabic ? 'ÙŠÙˆÙ…ÙŠ' : 'Per day'),
               ),
               DropdownMenuItem(
                 value: 'month',
-                child: Text(isArabic ? 'شهري' : 'Per month'),
+                child: Text(isArabic ? 'Ø´Ù‡Ø±ÙŠ' : 'Per month'),
               ),
             ],
             onChanged: _loading
@@ -599,17 +599,17 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
             initialValue: item.acMode.isEmpty ? null : item.acMode,
             decoration: appInputDecoration(
               context: context,
-              label: isArabic ? 'نوع التكييف' : 'AC mode',
+              label: isArabic ? 'Ù†ÙˆØ¹ Ø§Ù„ØªÙƒÙŠÙŠÙ' : 'AC mode',
               icon: Icons.ac_unit_outlined,
             ),
             items: [
               DropdownMenuItem(
                 value: 'ac',
-                child: Text(isArabic ? 'مكيف' : 'AC'),
+                child: Text(isArabic ? 'Ù…ÙƒÙŠÙ' : 'AC'),
               ),
               DropdownMenuItem(
                 value: 'non_ac',
-                child: Text(isArabic ? 'غير مكيف' : 'Non-AC'),
+                child: Text(isArabic ? 'ØºÙŠØ± Ù…ÙƒÙŠÙ' : 'Non-AC'),
               ),
             ],
             onChanged: _loading
@@ -630,7 +630,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
             runSpacing: AppSpacing.sm,
             children: [
               FilterChip(
-                label: Text(isArabic ? 'يشمل الدواء' : 'Medication'),
+                label: Text(isArabic ? 'ÙŠØ´Ù…Ù„ Ø§Ù„Ø¯ÙˆØ§Ø¡' : 'Medication'),
                 selected: item.includesMedication,
                 onSelected: _loading
                     ? null
@@ -647,7 +647,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                       },
               ),
               FilterChip(
-                label: Text(isArabic ? 'يشمل الوجبات' : 'Meals'),
+                label: Text(isArabic ? 'ÙŠØ´Ù…Ù„ Ø§Ù„ÙˆØ¬Ø¨Ø§Øª' : 'Meals'),
                 selected: item.includesMeals,
                 onSelected: _loading
                     ? null
@@ -662,7 +662,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                       },
               ),
               FilterChip(
-                label: Text(isArabic ? 'أنشطة خارجية' : 'Outdoor activities'),
+                label: Text(isArabic ? 'Ø£Ù†Ø´Ø·Ø© Ø®Ø§Ø±Ø¬ÙŠØ©' : 'Outdoor activities'),
                 selected: item.includesOutdoorActivities,
                 onSelected: _loading
                     ? null
@@ -679,7 +679,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                       },
               ),
               FilterChip(
-                label: Text(isArabic ? 'الفحوصات المطلوبة' : 'Required tests'),
+                label: Text(isArabic ? 'Ø§Ù„ÙØ­ÙˆØµØ§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©' : 'Required tests'),
                 selected: item.includesRequiredTests,
                 onSelected: _loading
                     ? null
@@ -696,7 +696,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                       },
               ),
               FilterChip(
-                label: Text(isArabic ? 'استقبال المطار' : 'Airport pickup'),
+                label: Text(isArabic ? 'Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø§Ù„Ù…Ø·Ø§Ø±' : 'Airport pickup'),
                 selected: item.includesAirportPickup,
                 onSelected: _loading
                     ? null
@@ -713,7 +713,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                       },
               ),
               FilterChip(
-                label: Text(isArabic ? 'جولات خارجية' : 'Tourism/outings'),
+                label: Text(isArabic ? 'Ø¬ÙˆÙ„Ø§Øª Ø®Ø§Ø±Ø¬ÙŠØ©' : 'Tourism/outings'),
                 selected: item.includesTourismOrExternalOutings,
                 onSelected: _loading
                     ? null
@@ -730,7 +730,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                       },
               ),
               FilterChip(
-                label: Text(isArabic ? 'الضريبة شاملة' : 'Tax included'),
+                label: Text(isArabic ? 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© Ø´Ø§Ù…Ù„Ø©' : 'Tax included'),
                 selected: item.taxIncluded,
                 onSelected: _loading
                     ? null
@@ -777,8 +777,8 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: appInputDecoration(
               context: context,
-              label: isArabic ? 'السعر' : 'Price',
-              icon: Icons.payments_outlined,
+              label: isArabic ? 'Ø§Ù„Ø³Ø¹Ø±' : 'Price',
+              icon: Icons.sell_outlined,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -786,17 +786,17 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
             initialValue: item.pricingUnit.isEmpty ? null : item.pricingUnit,
             decoration: appInputDecoration(
               context: context,
-              label: isArabic ? 'وحدة التسعير' : 'Pricing unit',
+              label: isArabic ? 'ÙˆØ­Ø¯Ø© Ø§Ù„ØªØ³Ø¹ÙŠØ±' : 'Pricing unit',
               icon: Icons.calendar_today_outlined,
             ),
             items: [
               DropdownMenuItem(
                 value: 'day',
-                child: Text(isArabic ? 'يومي' : 'Per day'),
+                child: Text(isArabic ? 'ÙŠÙˆÙ…ÙŠ' : 'Per day'),
               ),
               DropdownMenuItem(
                 value: 'month',
-                child: Text(isArabic ? 'شهري' : 'Per month'),
+                child: Text(isArabic ? 'Ø´Ù‡Ø±ÙŠ' : 'Per month'),
               ),
             ],
             onChanged: _loading
@@ -813,7 +813,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
           ),
           const SizedBox(height: AppSpacing.sm),
           FilterChip(
-            label: Text(isArabic ? 'الضريبة شاملة' : 'Tax included'),
+            label: Text(isArabic ? 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© Ø´Ø§Ù…Ù„Ø©' : 'Tax included'),
             selected: item.taxIncluded,
             onSelected: _loading
                 ? null
@@ -842,7 +842,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
             isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
-            isArabic ? 'تكلفة الإقامة' : 'Cost of stay',
+            isArabic ? 'ØªÙƒÙ„ÙØ© Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©' : 'Cost of stay',
             textAlign: TextAlign.start,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
@@ -852,10 +852,10 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
           Text(
             _usesAutismPricing
                 ? (isArabic
-                    ? 'هذا النوع من المراكز يستخدم تسعير الاستضافة اليومية والزيارات المنزلية بدل فئات الغرف.'
+                    ? 'Ù‡Ø°Ø§ Ø§Ù„Ù†ÙˆØ¹ Ù…Ù† Ø§Ù„Ù…Ø±Ø§ÙƒØ² ÙŠØ³ØªØ®Ø¯Ù… ØªØ³Ø¹ÙŠØ± Ø§Ù„Ø§Ø³ØªØ¶Ø§ÙØ© Ø§Ù„ÙŠÙˆÙ…ÙŠØ© ÙˆØ§Ù„Ø²ÙŠØ§Ø±Ø§Øª Ø§Ù„Ù…Ù†Ø²Ù„ÙŠØ© Ø¨Ø¯Ù„ ÙØ¦Ø§Øª Ø§Ù„ØºØ±Ù.'
                     : 'This center type uses daily hosting and home-visit pricing instead of room categories.')
                 : (isArabic
-                    ? 'أدخل الفئات المتاحة فقط، واترك غير المتاح بدون تفعيل.'
+                    ? 'Ø£Ø¯Ø®Ù„ Ø§Ù„ÙØ¦Ø§Øª Ø§Ù„Ù…ØªØ§Ø­Ø© ÙÙ‚Ø·ØŒ ÙˆØ§ØªØ±Ùƒ ØºÙŠØ± Ø§Ù„Ù…ØªØ§Ø­ Ø¨Ø¯ÙˆÙ† ØªÙØ¹ÙŠÙ„.'
                     : 'Fill only the available accommodation categories and leave the unavailable ones disabled.'),
             textAlign: TextAlign.start,
           ),
@@ -884,19 +884,19 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
 
   String _stepTitle(int step) {
     if (step == 0) {
-      return _isArabic ? 'البيانات الأساسية' : 'Core details';
+      return _isArabic ? 'Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©' : 'Core details';
     }
-    return _isArabic ? 'الهوية والتسعير' : 'Brand and pricing';
+    return _isArabic ? 'Ø§Ù„Ù‡ÙˆÙŠØ© ÙˆØ§Ù„ØªØ³Ø¹ÙŠØ±' : 'Brand and pricing';
   }
 
   String _stepSubtitle(int step) {
     if (step == 0) {
       return _isArabic
-          ? 'الاسم، الحساب، التواصل، والعنوان الرئيسي للمركز'
+          ? 'Ø§Ù„Ø§Ø³Ù…ØŒ Ø§Ù„Ø­Ø³Ø§Ø¨ØŒ Ø§Ù„ØªÙˆØ§ØµÙ„ØŒ ÙˆØ§Ù„Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ Ù„Ù„Ù…Ø±ÙƒØ²'
           : 'Name, account, contact, and main address details';
     }
     return _isArabic
-        ? 'صورة كارت المركز، قدرات المركز، وفئات التسعير'
+        ? 'ØµÙˆØ±Ø© ÙƒØ§Ø±Øª Ø§Ù„Ù…Ø±ÙƒØ²ØŒ Ù‚Ø¯Ø±Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ²ØŒ ÙˆÙØ¦Ø§Øª Ø§Ù„ØªØ³Ø¹ÙŠØ±'
         : 'Center card image, capabilities, and pricing bands';
   }
 
@@ -906,8 +906,8 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
         Expanded(
           child: _StepBadge(
             index: 1,
-            title: _isArabic ? 'الخطوة الأولى' : 'Step 1',
-            subtitle: _isArabic ? 'البيانات الأساسية' : 'Core details',
+            title: _isArabic ? 'Ø§Ù„Ø®Ø·ÙˆØ© Ø§Ù„Ø£ÙˆÙ„Ù‰' : 'Step 1',
+            subtitle: _isArabic ? 'Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©' : 'Core details',
             active: _currentStep == 0,
             done: _currentStep > 0,
           ),
@@ -916,8 +916,8 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
         Expanded(
           child: _StepBadge(
             index: 2,
-            title: _isArabic ? 'الخطوة الثانية' : 'Step 2',
-            subtitle: _isArabic ? 'الهوية والتسعير' : 'Brand and pricing',
+            title: _isArabic ? 'Ø§Ù„Ø®Ø·ÙˆØ© Ø§Ù„Ø«Ø§Ù†ÙŠØ©' : 'Step 2',
+            subtitle: _isArabic ? 'Ø§Ù„Ù‡ÙˆÙŠØ© ÙˆØ§Ù„ØªØ³Ø¹ÙŠØ±' : 'Brand and pricing',
             active: _currentStep == 1,
             done: false,
           ),
@@ -974,7 +974,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
             _isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
-            _isArabic ? 'صورة كارت المركز' : 'Center card image',
+            _isArabic ? 'ØµÙˆØ±Ø© ÙƒØ§Ø±Øª Ø§Ù„Ù…Ø±ÙƒØ²' : 'Center card image',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -982,7 +982,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
           const SizedBox(height: AppSpacing.xs),
           Text(
             _isArabic
-                ? 'يمكنك ربط صورة غلاف أو لوجو يظهر في كارت المركز وصفحة التفاصيل. استخدم رابط صورة أو مسار أصل محلي داخل المشروع.'
+                ? 'ÙŠÙ…ÙƒÙ†Ùƒ Ø±Ø¨Ø· ØµÙˆØ±Ø© ØºÙ„Ø§Ù Ø£Ùˆ Ù„ÙˆØ¬Ùˆ ÙŠØ¸Ù‡Ø± ÙÙŠ ÙƒØ§Ø±Øª Ø§Ù„Ù…Ø±ÙƒØ² ÙˆØµÙØ­Ø© Ø§Ù„ØªÙØ§ØµÙŠÙ„. Ø§Ø³ØªØ®Ø¯Ù… Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© Ø£Ùˆ Ù…Ø³Ø§Ø± Ø£ØµÙ„ Ù…Ø­Ù„ÙŠ Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹.'
                 : 'Link a cover image or logo that appears on the center card and details page. Use an image URL or a local asset path.',
             textAlign: TextAlign.start,
           ),
@@ -1021,7 +1021,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                         borderRadius: BorderRadius.circular(AppRadii.pill),
                       ),
                       child: Text(
-                        _isArabic ? 'معاينة الكارت' : 'Card preview',
+                        _isArabic ? 'Ù…Ø¹Ø§ÙŠÙ†Ø© Ø§Ù„ÙƒØ§Ø±Øª' : 'Card preview',
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
@@ -1058,7 +1058,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
             onChanged: (_) => setState(() {}),
             decoration: appInputDecoration(
               context: context,
-              label: _isArabic ? 'رابط صورة الغلاف' : 'Cover image URL',
+              label: _isArabic ? 'Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© Ø§Ù„ØºÙ„Ø§Ù' : 'Cover image URL',
               icon: Icons.image_outlined,
             ),
           ),
@@ -1068,7 +1068,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
             onChanged: (_) => setState(() {}),
             decoration: appInputDecoration(
               context: context,
-              label: _isArabic ? 'مسار أصل محلي للصورة' : 'Local asset path',
+              label: _isArabic ? 'Ù…Ø³Ø§Ø± Ø£ØµÙ„ Ù…Ø­Ù„ÙŠ Ù„Ù„ØµÙˆØ±Ø©' : 'Local asset path',
               icon: Icons.photo_library_outlined,
               hintText: 'assets/images/centers/covers/center_1.jpg',
             ),
@@ -1084,14 +1084,14 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
           _isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         Text(
-          _isArabic ? 'بيانات المركز' : 'Center information',
+          _isArabic ? 'Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ²' : 'Center information',
           textAlign: TextAlign.start,
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
           _isArabic
-              ? 'أدخل بيانات المركز الأساسية لإعداد الصفحة الشخصية ولوحة التشغيل لاحقًا.'
+              ? 'Ø£Ø¯Ø®Ù„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ² Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ© Ù„Ø¥Ø¹Ø¯Ø§Ø¯ Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ø´Ø®ØµÙŠØ© ÙˆÙ„ÙˆØ­Ø© Ø§Ù„ØªØ´ØºÙŠÙ„ Ù„Ø§Ø­Ù‚Ù‹Ø§.'
               : 'Enter the core center information to prepare the profile and dashboard.',
           textAlign: TextAlign.start,
         ),
@@ -1105,14 +1105,14 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
           _isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         Text(
-          _isArabic ? 'هوية المركز وتسعيره' : 'Center identity and pricing',
+          _isArabic ? 'Ù‡ÙˆÙŠØ© Ø§Ù„Ù…Ø±ÙƒØ² ÙˆØªØ³Ø¹ÙŠØ±Ù‡' : 'Center identity and pricing',
           textAlign: TextAlign.start,
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
           _isArabic
-              ? 'هذه الخطوة تضبط صورة الكارت، قدرات المركز، وفئات التسعير التي ستظهر لاحقًا.'
+              ? 'Ù‡Ø°Ù‡ Ø§Ù„Ø®Ø·ÙˆØ© ØªØ¶Ø¨Ø· ØµÙˆØ±Ø© Ø§Ù„ÙƒØ§Ø±ØªØŒ Ù‚Ø¯Ø±Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ²ØŒ ÙˆÙØ¦Ø§Øª Ø§Ù„ØªØ³Ø¹ÙŠØ± Ø§Ù„ØªÙŠ Ø³ØªØ¸Ù‡Ø± Ù„Ø§Ø­Ù‚Ù‹Ø§.'
               : 'This step prepares the card image, capabilities, and pricing bands that will appear later.',
           textAlign: TextAlign.start,
         ),
@@ -1140,10 +1140,10 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                     const SizedBox(height: AppSpacing.lg),
                     AppHeroHeader(
                       title: _isArabic
-                          ? 'تسجيل مركز جديد'
+                          ? 'ØªØ³Ø¬ÙŠÙ„ Ù…Ø±ÙƒØ² Ø¬Ø¯ÙŠØ¯'
                           : 'Create center account',
                       subtitle: _isArabic
-                          ? 'تسجيل أوضح على خطوتين مع معاينة مبكرة لصورة كارت المركز.'
+                          ? 'ØªØ³Ø¬ÙŠÙ„ Ø£ÙˆØ¶Ø­ Ø¹Ù„Ù‰ Ø®Ø·ÙˆØªÙŠÙ† Ù…Ø¹ Ù…Ø¹Ø§ÙŠÙ†Ø© Ù…Ø¨ÙƒØ±Ø© Ù„ØµÙˆØ±Ø© ÙƒØ§Ø±Øª Ø§Ù„Ù…Ø±ÙƒØ².'
                           : 'A clearer two-step registration flow with an early center card preview.',
                     ),
                     const SizedBox(height: AppSpacing.lg),
@@ -1175,13 +1175,13 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 decoration: appInputDecoration(
                                   context: context,
                                   label:
-                                      _isArabic ? 'اسم المركز' : 'Center name',
+                                      _isArabic ? 'Ø§Ø³Ù… Ø§Ù„Ù…Ø±ÙƒØ²' : 'Center name',
                                   icon: Icons.business_outlined,
                                 ),
                                 validator: (v) =>
                                     (v == null || v.trim().isEmpty)
                                         ? (_isArabic
-                                            ? 'أدخل اسم المركز'
+                                            ? 'Ø£Ø¯Ø®Ù„ Ø§Ø³Ù… Ø§Ù„Ù…Ø±ÙƒØ²'
                                             : 'Enter center name')
                                         : null,
                               ),
@@ -1192,7 +1192,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 decoration: appInputDecoration(
                                   context: context,
                                   label: _isArabic
-                                      ? 'فئة / تخصص المركز'
+                                      ? 'ÙØ¦Ø© / ØªØ®ØµØµ Ø§Ù„Ù…Ø±ÙƒØ²'
                                       : 'Center category / specialty',
                                   icon: Icons.category_outlined,
                                 ),
@@ -1228,7 +1228,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 validator: (value) =>
                                     (value == null || value.trim().isEmpty)
                                         ? (_isArabic
-                                            ? 'اختر فئة المركز'
+                                            ? 'Ø§Ø®ØªØ± ÙØ¦Ø© Ø§Ù„Ù…Ø±ÙƒØ²'
                                             : 'Select the center category')
                                         : null,
                               ),
@@ -1239,7 +1239,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 decoration: appInputDecoration(
                                   context: context,
                                   label: _isArabic
-                                      ? 'نوع المركز التشغيلي'
+                                      ? 'Ù†ÙˆØ¹ Ø§Ù„Ù…Ø±ÙƒØ² Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠ'
                                       : 'Operational center type',
                                   icon: Icons.account_tree_outlined,
                                 ),
@@ -1269,7 +1269,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 validator: (value) =>
                                     (value == null || value.trim().isEmpty)
                                         ? (_isArabic
-                                            ? 'اختر نوع المركز'
+                                            ? 'Ø§Ø®ØªØ± Ù†ÙˆØ¹ Ø§Ù„Ù…Ø±ÙƒØ²'
                                             : 'Select the center type')
                                         : null,
                               ),
@@ -1290,17 +1290,17 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 contentPadding: EdgeInsets.zero,
                                 title: Text(
                                   _isArabic
-                                      ? 'يوجد قسم داخلي لأعراض الانسحاب'
+                                      ? 'ÙŠÙˆØ¬Ø¯ Ù‚Ø³Ù… Ø¯Ø§Ø®Ù„ÙŠ Ù„Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù„Ø§Ù†Ø³Ø­Ø§Ø¨'
                                       : 'Includes an internal withdrawal unit',
                                   textAlign: TextAlign.start,
                                 ),
                                 subtitle: Text(
                                   _selectedCenterTypeKey == 'detox'
                                       ? (_isArabic
-                                          ? 'مراكز الديتوكس تعتبر هذا القسم متاحًا تلقائيًا.'
+                                          ? 'Ù…Ø±Ø§ÙƒØ² Ø§Ù„Ø¯ÙŠØªÙˆÙƒØ³ ØªØ¹ØªØ¨Ø± Ù‡Ø°Ø§ Ø§Ù„Ù‚Ø³Ù… Ù…ØªØ§Ø­Ù‹Ø§ ØªÙ„Ù‚Ø§Ø¦ÙŠÙ‹Ø§.'
                                           : 'Detox centers always include this unit by default.')
                                       : (_isArabic
-                                          ? 'فعّل هذا الخيار إذا كان المركز يحتوي على وحدة ديتوكس داخلية بجانب خدمته الأساسية.'
+                                          ? 'ÙØ¹Ù‘Ù„ Ù‡Ø°Ø§ Ø§Ù„Ø®ÙŠØ§Ø± Ø¥Ø°Ø§ ÙƒØ§Ù† Ø§Ù„Ù…Ø±ÙƒØ² ÙŠØ­ØªÙˆÙŠ Ø¹Ù„Ù‰ ÙˆØ­Ø¯Ø© Ø¯ÙŠØªÙˆÙƒØ³ Ø¯Ø§Ø®Ù„ÙŠØ© Ø¨Ø¬Ø§Ù†Ø¨ Ø®Ø¯Ù…ØªÙ‡ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©.'
                                           : 'Enable this if the center includes an internal detox/withdrawal unit alongside its main service.'),
                                   textAlign: TextAlign.start,
                                 ),
@@ -1311,7 +1311,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 decoration: appInputDecoration(
                                   context: context,
                                   label: _isArabic
-                                      ? 'اسم المسؤول'
+                                      ? 'Ø§Ø³Ù… Ø§Ù„Ù…Ø³Ø¤ÙˆÙ„'
                                       : 'Manager name',
                                   icon: Icons.badge_outlined,
                                 ),
@@ -1323,13 +1323,13 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 decoration: appInputDecoration(
                                   context: context,
                                   label:
-                                      _isArabic ? 'البريد الإلكتروني' : 'Email',
+                                      _isArabic ? 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ' : 'Email',
                                   icon: Icons.alternate_email,
                                 ),
                                 validator: (v) =>
                                     (v == null || v.trim().isEmpty)
                                         ? (_isArabic
-                                            ? 'أدخل البريد الإلكتروني'
+                                            ? 'Ø£Ø¯Ø®Ù„ Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ'
                                             : 'Enter email')
                                         : null,
                               ),
@@ -1339,7 +1339,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 obscureText: _obscurePassword,
                                 decoration: appInputDecoration(
                                   context: context,
-                                  label: _isArabic ? 'كلمة المرور' : 'Password',
+                                  label: _isArabic ? 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±' : 'Password',
                                   icon: Icons.lock_outline,
                                   suffixIcon: IconButton(
                                     onPressed: _loading
@@ -1357,8 +1357,8 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                     ),
                                     tooltip: _isArabic
                                         ? (_obscurePassword
-                                            ? 'إظهار كلمة المرور'
-                                            : 'إخفاء كلمة المرور')
+                                            ? 'Ø¥Ø¸Ù‡Ø§Ø± ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±'
+                                            : 'Ø¥Ø®ÙØ§Ø¡ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±')
                                         : (_obscurePassword
                                             ? 'Show password'
                                             : 'Hide password'),
@@ -1367,12 +1367,12 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 validator: (v) {
                                   if (v == null || v.isEmpty) {
                                     return _isArabic
-                                        ? 'أدخل كلمة المرور'
+                                        ? 'Ø£Ø¯Ø®Ù„ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±'
                                         : 'Enter password';
                                   }
                                   if (v.length < 6) {
                                     return _isArabic
-                                        ? '6 أحرف على الأقل'
+                                        ? '6 Ø£Ø­Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„'
                                         : 'At least 6 characters';
                                   }
                                   return null;
@@ -1385,7 +1385,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 decoration: appInputDecoration(
                                   context: context,
                                   label: _isArabic
-                                      ? 'تأكيد كلمة المرور'
+                                      ? 'ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±'
                                       : 'Confirm password',
                                   icon: Icons.lock_reset_outlined,
                                   suffixIcon: IconButton(
@@ -1404,8 +1404,8 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                     ),
                                     tooltip: _isArabic
                                         ? (_obscureConfirmPassword
-                                            ? 'إظهار تأكيد كلمة المرور'
-                                            : 'إخفاء تأكيد كلمة المرور')
+                                            ? 'Ø¥Ø¸Ù‡Ø§Ø± ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±'
+                                            : 'Ø¥Ø®ÙØ§Ø¡ ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±')
                                         : (_obscureConfirmPassword
                                             ? 'Show confirm password'
                                             : 'Hide confirm password'),
@@ -1414,12 +1414,12 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 validator: (v) {
                                   if (v == null || v.isEmpty) {
                                     return _isArabic
-                                        ? 'أدخل تأكيد كلمة المرور'
+                                        ? 'Ø£Ø¯Ø®Ù„ ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±'
                                         : 'Enter confirm password';
                                   }
                                   if (v != _passwordController.text) {
                                     return _isArabic
-                                        ? 'كلمتا المرور غير متطابقتين'
+                                        ? 'ÙƒÙ„Ù…ØªØ§ Ø§Ù„Ù…Ø±ÙˆØ± ØºÙŠØ± Ù…ØªØ·Ø§Ø¨Ù‚ØªÙŠÙ†'
                                         : 'Passwords do not match';
                                   }
                                   return null;
@@ -1456,7 +1456,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                               SnackBar(
                                                 content: Text(
                                                   _isArabic
-                                                      ? 'ميزة تعبئة العنوان من اللوكيشن غير مفعلة على الويب حاليًا. اكتب المدينة والعنوان يدويًا.'
+                                                      ? 'Ù…ÙŠØ²Ø© ØªØ¹Ø¨Ø¦Ø© Ø§Ù„Ø¹Ù†ÙˆØ§Ù† Ù…Ù† Ø§Ù„Ù„ÙˆÙƒÙŠØ´Ù† ØºÙŠØ± Ù…ÙØ¹Ù„Ø© Ø¹Ù„Ù‰ Ø§Ù„ÙˆÙŠØ¨ Ø­Ø§Ù„ÙŠÙ‹Ø§. Ø§ÙƒØªØ¨ Ø§Ù„Ù…Ø¯ÙŠÙ†Ø© ÙˆØ§Ù„Ø¹Ù†ÙˆØ§Ù† ÙŠØ¯ÙˆÙŠÙ‹Ø§.'
                                                       : 'Automatic address filling is not enabled on web for now. Please enter city and address manually.',
                                                 ),
                                               ),
@@ -1478,14 +1478,14 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                   label: Text(
                                     kIsWeb
                                         ? (_isArabic
-                                            ? 'اكتب العنوان يدويًا'
+                                            ? 'Ø§ÙƒØªØ¨ Ø§Ù„Ø¹Ù†ÙˆØ§Ù† ÙŠØ¯ÙˆÙŠÙ‹Ø§'
                                             : 'Enter address manually')
                                         : (_resolvingLocation
                                             ? (_isArabic
-                                                ? 'جارٍ تحديد موقعك...'
+                                                ? 'Ø¬Ø§Ø±Ù ØªØ­Ø¯ÙŠØ¯ Ù…ÙˆÙ‚Ø¹Ùƒ...'
                                                 : 'Detecting location...')
                                             : (_isArabic
-                                                ? 'استخدم موقعي الحالي'
+                                                ? 'Ø§Ø³ØªØ®Ø¯Ù… Ù…ÙˆÙ‚Ø¹ÙŠ Ø§Ù„Ø­Ø§Ù„ÙŠ'
                                                 : 'Use current location')),
                                   ),
                                 ),
@@ -1506,7 +1506,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 decoration: appInputDecoration(
                                   context: context,
                                   label: _isArabic
-                                      ? 'وصف المركز'
+                                      ? 'ÙˆØµÙ Ø§Ù„Ù…Ø±ÙƒØ²'
                                       : 'Center description',
                                   icon: Icons.notes_outlined,
                                 ),
@@ -1527,7 +1527,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                     AppColors.deepTeal.withValues(alpha: 0.10),
                                 child: Text(
                                   _isArabic
-                                      ? 'بعد التسجيل سيتم إنشاء الصفحة الشخصية وغرفة العمليات للمركز، ثم لاحقًا نربط الصور والوثائق والاعتماد.'
+                                      ? 'Ø¨Ø¹Ø¯ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ Ø³ÙŠØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ø´Ø®ØµÙŠØ© ÙˆØºØ±ÙØ© Ø§Ù„Ø¹Ù…Ù„ÙŠØ§Øª Ù„Ù„Ù…Ø±ÙƒØ²ØŒ Ø«Ù… Ù„Ø§Ø­Ù‚Ù‹Ø§ Ù†Ø±Ø¨Ø· Ø§Ù„ØµÙˆØ± ÙˆØ§Ù„ÙˆØ«Ø§Ø¦Ù‚ ÙˆØ§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯.'
                                       : 'After registration, the center dashboard and operations room will be created. Images, documents, and approval will be connected next.',
                                   style: Theme.of(context).textTheme.bodyLarge,
                                 ),
@@ -1595,12 +1595,12 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                       label: Text(
                                         _loading
                                             ? (_isArabic
-                                                ? 'جارٍ الإنشاء...'
+                                                ? 'Ø¬Ø§Ø±Ù Ø§Ù„Ø¥Ù†Ø´Ø§Ø¡...'
                                                 : 'Creating...')
                                             : (_currentStep == 0
                                                 ? l10n.commonNext
                                                 : (_isArabic
-                                                    ? 'إنشاء حساب المركز'
+                                                    ? 'Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨ Ø§Ù„Ù…Ø±ÙƒØ²'
                                                     : 'Create center account')),
                                       ),
                                     ),
@@ -1615,7 +1615,7 @@ class _CenterRegisterPageState extends State<CenterRegisterPage> {
                                 onPressed: () => Navigator.of(context).pop(),
                                 child: Text(
                                   _isArabic
-                                      ? 'لديك حساب بالفعل؟ تسجيل الدخول'
+                                      ? 'Ù„Ø¯ÙŠÙƒ Ø­Ø³Ø§Ø¨ Ø¨Ø§Ù„ÙØ¹Ù„ØŸ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„'
                                       : 'Already have an account? Sign in',
                                 ),
                               ),
@@ -1709,3 +1709,4 @@ class _StepBadge extends StatelessWidget {
     );
   }
 }
+

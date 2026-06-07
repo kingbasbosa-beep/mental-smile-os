@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/features/signals/signals.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
@@ -19,6 +20,10 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
   static const _clientMutedText = Color(0xFFB8B8B8);
   static const _clientInputText = Color(0xFFFFE7B0);
   static const _clientDarkText = Color(0xFF101820);
+  // [S] Signal Native Asset
+  // Approved by Wave S-3 Classification Board.
+  // Must remain free from booking/session/payment/accounting coupling.
+  static const _signalSchemaVersion = 'client_signals_v1';
 
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -29,6 +34,16 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
   String? _error;
 
   String _selectedAvatar = 'images/avatar_client_fmale.png';
+  // [S] Client Signals
+  // First signal capture only; not diagnosis, booking, session, or payment data.
+  final Set<String> _selectedGoalSignals = {};
+  final Set<String> _selectedInterestSignals = {};
+  final Set<String> _selectedAccessibilitySignals = {};
+  final Set<String> _selectedCommunicationSignals = {};
+  // [S] Privacy Preferences
+  // Controls preference visibility and recommendation consent only.
+  bool _keepSupportPreferencesPrivate = true;
+  bool _usePreferencesForRecommendations = false;
 
   static const List<String> _avatarOptions = [
     'images/avatar_client_fmale.png',
@@ -37,11 +52,108 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
     'images/avatar_clinician_male.png',
   ];
 
+  static const List<_ClientSignalOption> _goalSignalOptions = [
+    _ClientSignalOption('need_specialist', 'أحتاج أخصائي', 'Find specialist'),
+    _ClientSignalOption('need_center', 'أحتاج مركز', 'Find center'),
+    _ClientSignalOption('recovery_support', 'دعم التعافي', 'Recovery support'),
+    _ClientSignalOption('family_guidance', 'إرشاد أسري', 'Family guidance'),
+    _ClientSignalOption('general_help', 'مساعدة عامة', 'General help'),
+  ];
+
+  static const List<_ClientSignalOption> _interestSignalOptions = [
+    _ClientSignalOption('addiction', 'الإدمان', 'Addiction'),
+    _ClientSignalOption('recovery', 'التعافي', 'Recovery'),
+    _ClientSignalOption('family_support', 'دعم الأسرة', 'Family support'),
+    _ClientSignalOption('special_needs', 'ذوي الاحتياجات', 'Special needs'),
+    _ClientSignalOption(
+      'prevention_awareness',
+      'التوعية الوقائية',
+      'Prevention awareness',
+    ),
+    _ClientSignalOption(
+      'family_awareness',
+      'التوعية الأسرية',
+      'Family awareness',
+    ),
+    _ClientSignalOption('coaching', 'الكوتشينج', 'Coaching'),
+    _ClientSignalOption('speech_support', 'دعم التخاطب', 'Speech support'),
+    _ClientSignalOption('children_support', 'دعم الأطفال', 'Children support'),
+    _ClientSignalOption('hearing_support', 'دعم السمع', 'Hearing support'),
+  ];
+
+  static const List<_ClientSignalOption> _accessibilitySignalOptions = [
+    _ClientSignalOption('speech_support', 'مساعدة التخاطب', 'Speech support'),
+    _ClientSignalOption('hearing_support', 'مساعدة السمع', 'Hearing support'),
+    _ClientSignalOption('visual_assistance', 'مساعدة بصرية', 'Visual help'),
+    _ClientSignalOption(
+      'simplified_content',
+      'محتوى مبسط',
+      'Simplified content',
+    ),
+  ];
+
+  static const List<_ClientSignalOption> _communicationSignalOptions = [
+    _ClientSignalOption('text', 'نص', 'Text'),
+    _ClientSignalOption('audio', 'صوت', 'Audio'),
+    _ClientSignalOption('video', 'فيديو', 'Video'),
+    _ClientSignalOption('visual', 'مرئي', 'Visual'),
+  ];
+
   String _backgroundAsset() {
     return 'assets/branding/web_registration/clients/mobile/client_register.png';
   }
 
   String _normalizeEmail(String value) => value.trim().toLowerCase();
+
+  List<String> _sortedSignals(Set<String> signals) {
+    final values = signals.toList()..sort();
+    return values;
+  }
+
+  Future<void> _emitRegistrationSignals() async {
+    const runtime = CleanSignalRuntime();
+    final goalSignals = _sortedSignals(_selectedGoalSignals);
+    final interestSignals = _sortedSignals(_selectedInterestSignals);
+    final accessibilitySignals = _sortedSignals(_selectedAccessibilitySignals);
+    final communicationSignals = _sortedSignals(_selectedCommunicationSignals);
+
+    if (goalSignals.isNotEmpty) {
+      await runtime.emit(
+        SignalPackageFactory.goalSelected(
+          actorRole: 'client',
+          targetId: goalSignals.first,
+          signalSource: 'client_registration',
+        ),
+      );
+    }
+    if (interestSignals.isNotEmpty) {
+      await runtime.emit(
+        SignalPackageFactory.interestSelected(
+          actorRole: 'client',
+          targetId: interestSignals.first,
+          signalSource: 'client_registration',
+        ),
+      );
+    }
+    if (accessibilitySignals.isNotEmpty) {
+      await runtime.emit(
+        SignalPackageFactory.accessibilityInterest(
+          actorRole: 'client',
+          targetId: accessibilitySignals.first,
+          signalSource: 'client_registration',
+        ),
+      );
+    }
+    if (communicationSignals.isNotEmpty) {
+      await runtime.emit(
+        SignalPackageFactory.communicationPreferenceSelected(
+          actorRole: 'client',
+          targetId: communicationSignals.first,
+          signalSource: 'client_registration',
+        ),
+      );
+    }
+  }
 
   InputDecoration _clientInputDecoration({
     required String label,
@@ -170,9 +282,28 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
         'displayName': name,
         'email': email,
         'avatarAsset': _selectedAvatar,
+        // [S] Client Signals
+        // Approved signal-native map. Do not couple to booking/session/payment.
+        'clientSignals': {
+          'goalSignals': _sortedSignals(_selectedGoalSignals),
+          'interestSignals': _sortedSignals(_selectedInterestSignals),
+          'accessibilitySignals': _sortedSignals(
+            _selectedAccessibilitySignals,
+          ),
+          'communicationSignals': _sortedSignals(_selectedCommunicationSignals),
+        },
+        // [S] Privacy Preferences
+        // Preference governance only; not a legacy workflow control.
+        'privacyPreferences': {
+          'keepSupportPreferencesPrivate': _keepSupportPreferencesPrivate,
+          'usePreferencesForRecommendations': _usePreferencesForRecommendations,
+        },
+        'signalSchemaVersion': _signalSchemaVersion,
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
+
+      await _emitRegistrationSignals();
 
       await user.reload();
 
@@ -219,9 +350,8 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context);
-    final textDirection = locale.languageCode.toLowerCase() == 'ar'
-        ? TextDirection.rtl
-        : TextDirection.ltr;
+    final isArabic = locale.languageCode.toLowerCase() == 'ar';
+    final textDirection = isArabic ? TextDirection.rtl : TextDirection.ltr;
 
     return Directionality(
       textDirection: textDirection,
@@ -341,6 +471,56 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
                                     icon: Icons.verified_user_outlined,
                                   ),
                                 ),
+                                const SizedBox(height: AppSpacing.md),
+                                _ClientSignalSection(
+                                  title: isArabic ? 'أهدافي' : 'My goals',
+                                  options: _goalSignalOptions,
+                                  selectedKeys: _selectedGoalSignals,
+                                  isArabic: isArabic,
+                                  onChanged: _toggleSignal,
+                                ),
+                                _ClientSignalSection(
+                                  title: isArabic ? 'اهتماماتي' : 'Interests',
+                                  options: _interestSignalOptions,
+                                  selectedKeys: _selectedInterestSignals,
+                                  isArabic: isArabic,
+                                  onChanged: _toggleSignal,
+                                ),
+                                _ClientSignalSection(
+                                  title: isArabic
+                                      ? 'تفضيلات الوصول'
+                                      : 'Accessibility',
+                                  options: _accessibilitySignalOptions,
+                                  selectedKeys: _selectedAccessibilitySignals,
+                                  isArabic: isArabic,
+                                  onChanged: _toggleSignal,
+                                ),
+                                _ClientSignalSection(
+                                  title: isArabic
+                                      ? 'طريقة التواصل'
+                                      : 'Communication',
+                                  options: _communicationSignalOptions,
+                                  selectedKeys: _selectedCommunicationSignals,
+                                  isArabic: isArabic,
+                                  onChanged: _toggleSignal,
+                                ),
+                                _ClientPrivacyPreferences(
+                                  isArabic: isArabic,
+                                  keepSupportPreferencesPrivate:
+                                      _keepSupportPreferencesPrivate,
+                                  usePreferencesForRecommendations:
+                                      _usePreferencesForRecommendations,
+                                  onPrivateChanged: (value) {
+                                    setState(() {
+                                      _keepSupportPreferencesPrivate = value;
+                                    });
+                                  },
+                                  onRecommendationsChanged: (value) {
+                                    setState(() {
+                                      _usePreferencesForRecommendations = value;
+                                    });
+                                  },
+                                ),
                                 if (_error != null) ...[
                                   const SizedBox(height: AppSpacing.sm),
                                   AppMessageBanner(message: _error!),
@@ -415,6 +595,16 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
       ),
     );
   }
+
+  void _toggleSignal(Set<String> selectedKeys, String key, bool selected) {
+    setState(() {
+      if (selected) {
+        selectedKeys.add(key);
+      } else {
+        selectedKeys.remove(key);
+      }
+    });
+  }
 }
 
 class _RegisterLogoutButton extends StatelessWidget {
@@ -437,6 +627,160 @@ class _RegisterLogoutButton extends StatelessWidget {
             color: _ClientRegisterPageState._clientGold,
           );
         },
+      ),
+    );
+  }
+}
+
+class _ClientSignalOption {
+  const _ClientSignalOption(this.key, this.labelAr, this.labelEn);
+
+  final String key;
+  final String labelAr;
+  final String labelEn;
+
+  String label(bool isArabic) => isArabic ? labelAr : labelEn;
+}
+
+class _ClientSignalSection extends StatelessWidget {
+  const _ClientSignalSection({
+    required this.title,
+    required this.options,
+    required this.selectedKeys,
+    required this.isArabic,
+    required this.onChanged,
+  });
+
+  final String title;
+  final List<_ClientSignalOption> options;
+  final Set<String> selectedKeys;
+  final bool isArabic;
+  final void Function(Set<String> selectedKeys, String key, bool selected)
+      onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: _ClientRegisterPageState._clientInputText,
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final option in options)
+                FilterChip(
+                  label: Text(option.label(isArabic)),
+                  selected: selectedKeys.contains(option.key),
+                  onSelected: (selected) {
+                    onChanged(selectedKeys, option.key, selected);
+                  },
+                  visualDensity: VisualDensity.compact,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  selectedColor:
+                      _ClientRegisterPageState._clientGold.withValues(
+                    alpha: 0.9,
+                  ),
+                  backgroundColor: Colors.black.withValues(alpha: 0.2),
+                  checkmarkColor: _ClientRegisterPageState._clientDarkText,
+                  side: BorderSide(
+                    color: _ClientRegisterPageState._clientGold.withValues(
+                      alpha: 0.45,
+                    ),
+                  ),
+                  labelStyle: TextStyle(
+                    color: selectedKeys.contains(option.key)
+                        ? _ClientRegisterPageState._clientDarkText
+                        : _ClientRegisterPageState._clientInputText,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ClientPrivacyPreferences extends StatelessWidget {
+  const _ClientPrivacyPreferences({
+    required this.isArabic,
+    required this.keepSupportPreferencesPrivate,
+    required this.usePreferencesForRecommendations,
+    required this.onPrivateChanged,
+    required this.onRecommendationsChanged,
+  });
+
+  final bool isArabic;
+  final bool keepSupportPreferencesPrivate;
+  final bool usePreferencesForRecommendations;
+  final ValueChanged<bool> onPrivateChanged;
+  final ValueChanged<bool> onRecommendationsChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Column(
+        children: [
+          _ClientPrivacySwitch(
+            value: keepSupportPreferencesPrivate,
+            label: isArabic
+                ? 'إبقاء تفضيلات الدعم خاصة'
+                : 'Keep support preferences private',
+            onChanged: onPrivateChanged,
+          ),
+          _ClientPrivacySwitch(
+            value: usePreferencesForRecommendations,
+            label: isArabic
+                ? 'استخدام التفضيلات للتوصيات'
+                : 'Use preferences for recommendations',
+            onChanged: onRecommendationsChanged,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ClientPrivacySwitch extends StatelessWidget {
+  const _ClientPrivacySwitch({
+    required this.value,
+    required this.label,
+    required this.onChanged,
+  });
+
+  final bool value;
+  final String label;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+      value: value,
+      onChanged: onChanged,
+      dense: true,
+      contentPadding: EdgeInsets.zero,
+      activeThumbColor: _ClientRegisterPageState._clientGold,
+      title: Text(
+        label,
+        style: const TextStyle(
+          color: _ClientRegisterPageState._clientInputText,
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }

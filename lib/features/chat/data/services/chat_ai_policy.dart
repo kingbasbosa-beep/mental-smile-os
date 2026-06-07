@@ -1,3 +1,6 @@
+// [S] AI Policy Asset
+// Approved by Wave S-3 Classification Board.
+// Defines AI policy boundaries only; AI may assist but must not decide.
 class ChatAiPolicy {
   final String policyVersion;
   final Map<String, String> responseTemplates;

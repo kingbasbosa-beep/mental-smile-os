@@ -147,7 +147,7 @@ class AdminEmployeeSystemPage extends StatelessWidget {
       canControlCoreFlows: 'No',
       canPublishOrApprove: 'No',
       notes:
-          'Prepares finance follow-through surfaces without payout or approval ownership.',
+          'Prepares scoped follow-through surfaces without lifecycle approval ownership.',
     ),
     _EmployeeRoleBoundaryItem(
       role: 'Operations Assistant',
@@ -655,7 +655,7 @@ class AdminEmployeeSystemPage extends StatelessWidget {
               context,
               title: 'Employee Directory',
               summary:
-                  'Future staff roster surface for content, support, QA, finance, and operations assistants.',
+                  'Future staff roster surface for content, support, QA, and operations assistants.',
             ),
             _buildSectionCard(
               context,
@@ -701,7 +701,7 @@ class AdminEmployeeSystemPage extends StatelessWidget {
                         context,
                         title: 'Finance Assistant Workspace',
                         summary:
-                            'Planned staff layer for payment review preparation and financial follow-through.',
+                            'Planned staff layer for operational readiness and support follow-through.',
                       ),
                     ),
                     SizedBox(

@@ -116,8 +116,6 @@ class AdminAlertsReviewPage extends StatelessWidget {
                       (data['centerFollowUpCount'] ?? 0).toString();
                   final clientUpdateRequiredCount =
                       (data['clientUpdateRequiredCount'] ?? 0).toString();
-                  final payoutPendingCount =
-                      (data['payoutPendingCount'] ?? 0).toString();
                   final summary = (data['summary'] ?? '').toString().trim();
                   final timestamp = _dateText(data['timestamp']);
 
@@ -147,10 +145,6 @@ class AdminAlertsReviewPage extends StatelessWidget {
                           _AlertsCountChip(
                             label: 'Client Update Required',
                             value: clientUpdateRequiredCount,
-                          ),
-                          _AlertsCountChip(
-                            label: 'Payout Pending',
-                            value: payoutPendingCount,
                           ),
                         ],
                       ),

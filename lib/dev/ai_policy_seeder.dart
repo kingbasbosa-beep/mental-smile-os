@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_ai_policy.dart';
 
+// [S] AI Policy Asset
+// Approved by Wave S-3 Classification Board.
+// Seeds AI policy documents only; not booking/session/payment logic.
 Map<String, dynamic> _serializeAiPolicy(ChatAiPolicy policy) {
   return {
     'policyVersion': policy.policyVersion,

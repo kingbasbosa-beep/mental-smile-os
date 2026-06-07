@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/features/specialists/data/clinician_specialty_catalog.dart';
@@ -43,12 +43,12 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
   static const List<Map<String, String>> _professionalTitles = [
     {
       'key': 'doctor',
-      'labelAr': 'د.',
+      'labelAr': 'Ø¯.',
       'labelEn': 'Dr.',
     },
     {
       'key': 'specialist',
-      'labelAr': 'أ.',
+      'labelAr': 'Ø£.',
       'labelEn': 'Spec.',
     },
   ];
@@ -86,10 +86,10 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
   List<String> _selectedSessionModes(bool isArabic) {
     final items = <String>[];
     if (_offersInPerson) {
-      items.add(isArabic ? 'حضوري' : 'In person');
+      items.add(isArabic ? 'Ø­Ø¶ÙˆØ±ÙŠ' : 'In person');
     }
     if (_offersOnline) {
-      items.add(isArabic ? 'أونلاين' : 'Online');
+      items.add(isArabic ? 'Ø£ÙˆÙ†Ù„Ø§ÙŠÙ†' : 'Online');
     }
     return items;
   }
@@ -101,17 +101,17 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
   String _translateAuthError(FirebaseAuthException e) {
     switch (e.code) {
       case 'email-already-in-use':
-        return 'هذا البريد مستخدم بالفعل';
+        return 'Ù‡Ø°Ø§ Ø§Ù„Ø¨Ø±ÙŠØ¯ Ù…Ø³ØªØ®Ø¯Ù… Ø¨Ø§Ù„ÙØ¹Ù„';
       case 'invalid-email':
-        return 'البريد الإلكتروني غير صالح';
+        return 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ØºÙŠØ± ØµØ§Ù„Ø­';
       case 'weak-password':
-        return 'كلمة المرور ضعيفة جدًا';
+        return 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø¶Ø¹ÙŠÙØ© Ø¬Ø¯Ù‹Ø§';
       case 'operation-not-allowed':
-        return 'تسجيل البريد/كلمة المرور غير مفعل في Firebase Auth';
+        return 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¨Ø±ÙŠØ¯/ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± ØºÙŠØ± Ù…ÙØ¹Ù„ ÙÙŠ Firebase Auth';
       case 'network-request-failed':
-        return 'فشل الاتصال بالشبكة، حاول مرة أخرى';
+        return 'ÙØ´Ù„ Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ø§Ù„Ø´Ø¨ÙƒØ©ØŒ Ø­Ø§ÙˆÙ„ Ù…Ø±Ø© Ø£Ø®Ø±Ù‰';
       default:
-        return e.message ?? 'فشل إنشاء حساب الأخصائي';
+        return e.message ?? 'ÙØ´Ù„ Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ';
     }
   }
 
@@ -134,47 +134,47 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
 
     if (_selectedProfessionalTitleKey == null ||
         _selectedProfessionalTitleKey!.isEmpty) {
-      setState(() => _error = 'اختر اللقب المهني');
+      setState(() => _error = 'Ø§Ø®ØªØ± Ø§Ù„Ù„Ù‚Ø¨ Ø§Ù„Ù…Ù‡Ù†ÙŠ');
       return;
     }
 
     if (name.isEmpty) {
-      setState(() => _error = 'اكتب اسم الأخصائي');
+      setState(() => _error = 'Ø§ÙƒØªØ¨ Ø§Ø³Ù… Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ');
       return;
     }
 
     if (_selectedSpecialtyKey == null || _selectedSpecialtyKey!.isEmpty) {
-      setState(() => _error = 'اختر التخصص');
+      setState(() => _error = 'Ø§Ø®ØªØ± Ø§Ù„ØªØ®ØµØµ');
       return;
     }
 
     if (email.isEmpty) {
-      setState(() => _error = 'اكتب البريد الإلكتروني');
+      setState(() => _error = 'Ø§ÙƒØªØ¨ Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ');
       return;
     }
 
     if (password.length < 6) {
-      setState(() => _error = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      setState(() => _error = 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± ÙŠØ¬Ø¨ Ø£Ù† ØªÙƒÙˆÙ† 6 Ø£Ø­Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„');
       return;
     }
 
     if (password != confirmPassword) {
-      setState(() => _error = 'تأكيد كلمة المرور غير مطابق');
+      setState(() => _error = 'ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± ØºÙŠØ± Ù…Ø·Ø§Ø¨Ù‚');
       return;
     }
 
     if (identityFileName.isEmpty) {
-      setState(() => _error = 'أدخل اسم أو مرجع ملف الهوية');
+      setState(() => _error = 'Ø£Ø¯Ø®Ù„ Ø§Ø³Ù… Ø£Ùˆ Ù…Ø±Ø¬Ø¹ Ù…Ù„Ù Ø§Ù„Ù‡ÙˆÙŠØ©');
       return;
     }
 
     if (certificateFileName.isEmpty) {
-      setState(() => _error = 'أدخل اسم أو مرجع ملف الشهادة');
+      setState(() => _error = 'Ø£Ø¯Ø®Ù„ Ø§Ø³Ù… Ø£Ùˆ Ù…Ø±Ø¬Ø¹ Ù…Ù„Ù Ø§Ù„Ø´Ù‡Ø§Ø¯Ø©');
       return;
     }
 
     if (!_offersInPerson && !_offersOnline) {
-      setState(() => _error = 'اختر وسيلة جلسة واحدة على الأقل');
+      setState(() => _error = 'Ø§Ø®ØªØ± ÙˆØ³ÙŠÙ„Ø© Ø¬Ù„Ø³Ø© ÙˆØ§Ø­Ø¯Ø© Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„');
       return;
     }
 
@@ -194,7 +194,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
 
       final user = cred.user;
       if (user == null) {
-        throw Exception('تعذر إنشاء المستخدم');
+        throw Exception('ØªØ¹Ø°Ø± Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…');
       }
 
       final uid = user.uid;
@@ -245,7 +245,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('تم إنشاء حساب الأخصائي بنجاح'),
+          content: Text('ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ Ø¨Ù†Ø¬Ø§Ø­'),
         ),
       );
 
@@ -259,7 +259,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
       });
     } catch (e) {
       setState(() {
-        _error = 'فشل إنشاء حساب الأخصائي: $e';
+        _error = 'ÙØ´Ù„ Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ: $e';
       });
     } finally {
       if (mounted) {
@@ -298,7 +298,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
               ),
               if (requiredFile) ...[
                 const SizedBox(width: AppSpacing.xs),
-                const AppStatusBadge(label: 'إلزامي'),
+                const AppStatusBadge(label: 'Ø¥Ù„Ø²Ø§Ù…ÙŠ'),
               ],
             ],
           ),
@@ -310,7 +310,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
             onChanged: (_) => setState(() {}),
             decoration: appInputDecoration(
               context: context,
-              label: 'اسم الملف / مرجع الملف',
+              label: 'Ø§Ø³Ù… Ø§Ù„Ù…Ù„Ù / Ù…Ø±Ø¬Ø¹ Ø§Ù„Ù…Ù„Ù',
               icon: Icons.description_outlined,
             ),
           ),
@@ -335,7 +335,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
             children: [
               Icon(Icons.person_outline, size: 34, color: AppColors.deepTeal),
               SizedBox(height: AppSpacing.xs),
-              Text('معاينة الصورة ستظهر هنا'),
+              Text('Ù…Ø¹Ø§ÙŠÙ†Ø© Ø§Ù„ØµÙˆØ±Ø© Ø³ØªØ¸Ù‡Ø± Ù‡Ù†Ø§'),
             ],
           ),
         ),
@@ -363,7 +363,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                   color: AppColors.deepTeal,
                 ),
                 SizedBox(height: AppSpacing.xs),
-                Text('تعذر تحميل الصورة من الرابط'),
+                Text('ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØµÙˆØ±Ø© Ù…Ù† Ø§Ù„Ø±Ø§Ø¨Ø·'),
               ],
             ),
           );
@@ -409,9 +409,9 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                   children: [
                     const SizedBox(height: AppSpacing.lg),
                     const AppHeroHeader(
-                      title: 'تسجيل أخصائي جديد',
+                      title: 'ØªØ³Ø¬ÙŠÙ„ Ø£Ø®ØµØ§Ø¦ÙŠ Ø¬Ø¯ÙŠØ¯',
                       subtitle:
-                          'ملف مهني أوضح وأهدأ بنفس الهوية الدافئة للمشروع، مع تقسيم بصري أنظف للبيانات والمستندات والمعاينة.',
+                          'Ù…Ù„Ù Ù…Ù‡Ù†ÙŠ Ø£ÙˆØ¶Ø­ ÙˆØ£Ù‡Ø¯Ø£ Ø¨Ù†ÙØ³ Ø§Ù„Ù‡ÙˆÙŠØ© Ø§Ù„Ø¯Ø§ÙØ¦Ø© Ù„Ù„Ù…Ø´Ø±ÙˆØ¹ØŒ Ù…Ø¹ ØªÙ‚Ø³ÙŠÙ… Ø¨ØµØ±ÙŠ Ø£Ù†Ø¸Ù Ù„Ù„Ø¨ÙŠØ§Ù†Ø§Øª ÙˆØ§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª ÙˆØ§Ù„Ù…Ø¹Ø§ÙŠÙ†Ø©.',
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     AppSurfaceCard(
@@ -419,12 +419,12 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'البيانات الأساسية',
+                            'Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©',
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
-                            'أدخل معلومات الحساب والملف المهني كما ستظهر للإدارة أثناء المراجعة.',
+                            'Ø£Ø¯Ø®Ù„ Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø­Ø³Ø§Ø¨ ÙˆØ§Ù„Ù…Ù„Ù Ø§Ù„Ù…Ù‡Ù†ÙŠ ÙƒÙ…Ø§ Ø³ØªØ¸Ù‡Ø± Ù„Ù„Ø¥Ø¯Ø§Ø±Ø© Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©.',
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           const SizedBox(height: AppSpacing.md),
@@ -432,7 +432,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                             initialValue: _selectedProfessionalTitleKey,
                             decoration: appInputDecoration(
                               context: context,
-                              label: 'اللقب المهني',
+                              label: 'Ø§Ù„Ù„Ù‚Ø¨ Ø§Ù„Ù…Ù‡Ù†ÙŠ',
                               icon: Icons.badge_outlined,
                             ),
                             items: _professionalTitles.map((item) {
@@ -455,7 +455,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                             controller: _nameController,
                             decoration: appInputDecoration(
                               context: context,
-                              label: 'الاسم بدون لقب',
+                              label: 'Ø§Ù„Ø§Ø³Ù… Ø¨Ø¯ÙˆÙ† Ù„Ù‚Ø¨',
                               icon: Icons.person_outline,
                             ),
                           ),
@@ -464,7 +464,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                             initialValue: _selectedSpecialtyKey,
                             decoration: appInputDecoration(
                               context: context,
-                              label: 'التخصص',
+                              label: 'Ø§Ù„ØªØ®ØµØµ',
                               icon: Icons.medical_services_outlined,
                             ),
                             items: _specialties.map((item) {
@@ -490,9 +490,9 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                               },
                               activeThumbColor: AppColors.deepTeal,
                               contentPadding: EdgeInsets.zero,
-                              title: const Text('يقدم جروبات جماعية'),
+                              title: const Text('ÙŠÙ‚Ø¯Ù… Ø¬Ø±ÙˆØ¨Ø§Øª Ø¬Ù…Ø§Ø¹ÙŠØ©'),
                               subtitle: const Text(
-                                'فعّل هذا الخيار إذا كنت تقدم جلسات جماعية تعليمية أو علاجية',
+                                'ÙØ¹Ù‘Ù„ Ù‡Ø°Ø§ Ø§Ù„Ø®ÙŠØ§Ø± Ø¥Ø°Ø§ ÙƒÙ†Øª ØªÙ‚Ø¯Ù… Ø¬Ù„Ø³Ø§Øª Ø¬Ù…Ø§Ø¹ÙŠØ© ØªØ¹Ù„ÙŠÙ…ÙŠØ© Ø£Ùˆ Ø¹Ù„Ø§Ø¬ÙŠØ©',
                               ),
                             ),
                           ),
@@ -502,7 +502,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                             keyboardType: TextInputType.emailAddress,
                             decoration: appInputDecoration(
                               context: context,
-                              label: 'البريد الإلكتروني',
+                              label: 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ',
                               icon: Icons.alternate_email,
                             ),
                           ),
@@ -512,7 +512,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                             obscureText: true,
                             decoration: appInputDecoration(
                               context: context,
-                              label: 'كلمة المرور',
+                              label: 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±',
                               icon: Icons.lock_outline,
                             ),
                           ),
@@ -522,7 +522,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                             obscureText: true,
                             decoration: appInputDecoration(
                               context: context,
-                              label: 'تأكيد كلمة المرور',
+                              label: 'ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±',
                               icon: Icons.verified_user_outlined,
                             ),
                           ),
@@ -532,7 +532,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                             onChanged: (_) => setState(() {}),
                             decoration: appInputDecoration(
                               context: context,
-                              label: 'رابط الصورة الشخصية (اختياري)',
+                              label: 'Ø±Ø§Ø¨Ø· Ø§Ù„ØµÙˆØ±Ø© Ø§Ù„Ø´Ø®ØµÙŠØ© (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)',
                               icon: Icons.image_outlined,
                               hintText: 'https://example.com/photo.jpg',
                             ),
@@ -545,7 +545,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                             maxLines: 4,
                             decoration: appInputDecoration(
                               context: context,
-                              label: 'نبذة مختصرة',
+                              label: 'Ù†Ø¨Ø°Ø© Ù…Ø®ØªØµØ±Ø©',
                               icon: Icons.notes_outlined,
                             ),
                           ),
@@ -554,9 +554,9 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                             controller: _sessionPriceController,
                             decoration: appInputDecoration(
                               context: context,
-                              label: 'سعر الجلسة',
-                              icon: Icons.payments_outlined,
-                              hintText: 'مثال: 300 جنيه',
+                              label: 'Ø³Ø¹Ø± Ø§Ù„Ø¬Ù„Ø³Ø©',
+                              icon: Icons.sell_outlined,
+                              hintText: 'Ù…Ø«Ø§Ù„: 300 Ø¬Ù†ÙŠÙ‡',
                             ),
                           ),
                           const SizedBox(height: AppSpacing.md),
@@ -564,9 +564,9 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                             controller: _sessionDurationController,
                             decoration: appInputDecoration(
                               context: context,
-                              label: 'مدة الجلسة',
+                              label: 'Ù…Ø¯Ø© Ø§Ù„Ø¬Ù„Ø³Ø©',
                               icon: Icons.schedule_outlined,
-                              hintText: 'مثال: 50 دقيقة',
+                              hintText: 'Ù…Ø«Ø§Ù„: 50 Ø¯Ù‚ÙŠÙ‚Ø©',
                             ),
                           ),
                           const SizedBox(height: AppSpacing.md),
@@ -575,7 +575,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'وسائل الجلسة',
+                                  'ÙˆØ³Ø§Ø¦Ù„ Ø§Ù„Ø¬Ù„Ø³Ø©',
                                   style: Theme.of(context).textTheme.titleSmall,
                                 ),
                                 const SizedBox(height: AppSpacing.xs),
@@ -585,7 +585,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                                     setState(
                                         () => _offersInPerson = value ?? false);
                                   },
-                                  title: const Text('حضوري'),
+                                  title: const Text('Ø­Ø¶ÙˆØ±ÙŠ'),
                                   activeColor: AppColors.deepTeal,
                                   contentPadding: EdgeInsets.zero,
                                   controlAffinity:
@@ -597,7 +597,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                                     setState(
                                         () => _offersOnline = value ?? false);
                                   },
-                                  title: const Text('أونلاين'),
+                                  title: const Text('Ø£ÙˆÙ†Ù„Ø§ÙŠÙ†'),
                                   activeColor: AppColors.deepTeal,
                                   contentPadding: EdgeInsets.zero,
                                   controlAffinity:
@@ -608,27 +608,27 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                           ),
                           const SizedBox(height: AppSpacing.lg),
                           Text(
-                            'المستندات',
+                            'Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           _manualFileTile(
-                            title: 'صورة الهوية',
-                            subtitle: 'أدخل اسم أو مرجع ملف الهوية',
+                            title: 'ØµÙˆØ±Ø© Ø§Ù„Ù‡ÙˆÙŠØ©',
+                            subtitle: 'Ø£Ø¯Ø®Ù„ Ø§Ø³Ù… Ø£Ùˆ Ù…Ø±Ø¬Ø¹ Ù…Ù„Ù Ø§Ù„Ù‡ÙˆÙŠØ©',
                             controller: _identityFileNameController,
                             requiredFile: true,
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           _manualFileTile(
-                            title: 'شهادة أو إثبات التخصص',
-                            subtitle: 'أدخل اسم أو مرجع ملف الشهادة',
+                            title: 'Ø´Ù‡Ø§Ø¯Ø© Ø£Ùˆ Ø¥Ø«Ø¨Ø§Øª Ø§Ù„ØªØ®ØµØµ',
+                            subtitle: 'Ø£Ø¯Ø®Ù„ Ø§Ø³Ù… Ø£Ùˆ Ù…Ø±Ø¬Ø¹ Ù…Ù„Ù Ø§Ù„Ø´Ù‡Ø§Ø¯Ø©',
                             controller: _certificateFileNameController,
                             requiredFile: true,
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           _manualFileTile(
-                            title: 'مستند إضافي',
-                            subtitle: 'اختياري: أي مرجع ملف داعم إضافي',
+                            title: 'Ù…Ø³ØªÙ†Ø¯ Ø¥Ø¶Ø§ÙÙŠ',
+                            subtitle: 'Ø§Ø®ØªÙŠØ§Ø±ÙŠ: Ø£ÙŠ Ù…Ø±Ø¬Ø¹ Ù…Ù„Ù Ø¯Ø§Ø¹Ù… Ø¥Ø¶Ø§ÙÙŠ',
                             controller: _extraFileNameController,
                             requiredFile: false,
                           ),
@@ -654,8 +654,8 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                                   : const Icon(Icons.person_add_alt_1),
                               label: Text(
                                 _loading
-                                    ? 'جارٍ إنشاء الحساب...'
-                                    : 'إنشاء حساب أخصائي',
+                                    ? 'Ø¬Ø§Ø±Ù Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø­Ø³Ø§Ø¨...'
+                                    : 'Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨ Ø£Ø®ØµØ§Ø¦ÙŠ',
                               ),
                             ),
                           ),
@@ -665,7 +665,7 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
                             child: TextButton(
                               onPressed: () => Navigator.of(context).pop(),
                               child:
-                                  const Text('لديك حساب بالفعل؟ تسجيل الدخول'),
+                                  const Text('Ù„Ø¯ÙŠÙƒ Ø­Ø³Ø§Ø¨ Ø¨Ø§Ù„ÙØ¹Ù„ØŸ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„'),
                             ),
                           ),
                         ],
@@ -682,3 +682,4 @@ class _ClinicianRegisterPageState extends State<ClinicianRegisterPage> {
     );
   }
 }
+

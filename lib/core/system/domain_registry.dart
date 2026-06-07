@@ -42,7 +42,7 @@ const List<DomainDefinition> domainRegistry = <DomainDefinition>[
     key: DomainKey.booking,
     id: 'booking',
     displayName: 'Booking',
-    description: 'Booking requests, payment states, and booking workflow data.',
+    description: 'Legacy booking records retained for historical isolation.',
     ownedCollections: <String>[
       'booking_requests',
       'bookingRequests',
@@ -87,7 +87,6 @@ const List<DomainDefinition> domainRegistry = <DomainDefinition>[
     displayName: 'Reports & Insights',
     description: 'Reports, analytics summaries, and operational insights.',
     ownedCollections: <String>[
-      'sessionRatings',
       'system_alerts',
     ],
   ),

@@ -318,7 +318,6 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
                         final preview = thread.lastMessagePreview.trim();
                         final handoffState = thread.handoffState;
                         final lifecycleState = thread.lifecycleState;
-                        final bookingRequestId = thread.bookingRequestId ?? '';
 
                         return InkWell(
                           borderRadius: BorderRadius.circular(AppRadii.lg),
@@ -429,13 +428,6 @@ class _AdminSupportChatPageState extends State<AdminSupportChatPage> {
                                             label: handoffState,
                                             color: AppColors.info,
                                           ),
-                                          if (bookingRequestId.isNotEmpty)
-                                            AppStatusBadge(
-                                              label: isArabic
-                                                  ? 'طلب: $bookingRequestId'
-                                                  : 'Request: $bookingRequestId',
-                                              color: AppColors.mist,
-                                            ),
                                         ],
                                       ),
                                     ],

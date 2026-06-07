@@ -374,11 +374,6 @@ class _ClinicianChatInboxPageState extends State<ClinicianChatInboxPage> {
                   label: 'Score: ${escalation.riskScore}',
                   color: AppColors.mist,
                 ),
-                if ((escalation.bookingRequestId ?? '').isNotEmpty)
-                  AppStatusBadge(
-                    label: 'Request: ${escalation.bookingRequestId}',
-                    color: AppColors.accentLavender,
-                  ),
               ],
             ),
             SizedBox(height: compact ? 8.0 : AppSpacing.md),

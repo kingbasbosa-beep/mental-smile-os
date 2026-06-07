@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
@@ -27,14 +27,22 @@ class _WebClinicianRegisterPortalPageState
   String? _error;
   String? _selectedProfessionalTitleKey;
   String? _selectedSpecialtyKey;
+  final Set<String> _selectedCapabilitySignals = {};
+  final Set<String> _selectedAccessibilitySignals = {};
+  final Set<String> _selectedCommunicationSignals = {};
+  final Set<String> _selectedLearningSignals = {};
 
   static const Color _fieldGold = Color(0xFFE8C878);
   static const Color _fieldSilver = Color(0xFFEDEDED);
   static const Color _inputCream = Color(0xFFFFF6DE);
+  // [S] Provider Signals
+  // Approved by Wave S-3 Classification Board.
+  // Must remain additive and free from booking/session/payment/accounting coupling.
+  static const String _signalSchemaVersion = 'provider_signals_v1';
 
   static const List<Map<String, String>> _professionalTitles = [
-    {'key': 'doctor', 'labelAr': 'د.', 'labelEn': 'Dr.'},
-    {'key': 'specialist', 'labelAr': 'أ.', 'labelEn': 'Spec.'},
+    {'key': 'doctor', 'labelAr': 'Ø¯.', 'labelEn': 'Dr.'},
+    {'key': 'specialist', 'labelAr': 'Ø£.', 'labelEn': 'Spec.'},
   ];
 
   static final List<Map<String, String>> _specialties =
@@ -44,6 +52,132 @@ class _WebClinicianRegisterPortalPageState
                 'label': specialty.labelAr,
               })
           .toList(growable: false);
+
+  // [S] Provider Signals
+  // Capability/accessibility/communication/learning signals only.
+  static const List<_ProviderSignalOption> _capabilitySignalOptions = [
+    _ProviderSignalOption('psychologist', 'Ø£Ø®ØµØ§Ø¦ÙŠ Ù†ÙØ³ÙŠ', 'Psychologist'),
+    _ProviderSignalOption(
+      'clinical_psychologist',
+      'Ø£Ø®ØµØ§Ø¦ÙŠ Ù†ÙØ³ÙŠ Ø¥ÙƒÙ„ÙŠÙ†ÙŠÙƒÙŠ',
+      'Clinical psychologist',
+    ),
+    _ProviderSignalOption(
+      'addiction_counselor',
+      'Ø¥Ø±Ø´Ø§Ø¯ Ù…Ø±ØªØ¨Ø· Ø¨Ø§Ù„Ø¥Ø¯Ù…Ø§Ù†',
+      'Addiction counseling',
+    ),
+    _ProviderSignalOption(
+      'speech_specialist',
+      'ÙŠØ¯Ø¹Ù… ØµØ¹ÙˆØ¨Ø§Øª Ø§Ù„Ù†Ø·Ù‚',
+      'Speech support',
+    ),
+    _ProviderSignalOption(
+      'family_counselor',
+      'Ù…Ù†Ø§Ø³Ø¨ Ù„Ù„Ø£Ø³Ø±',
+      'Family counselor',
+    ),
+    _ProviderSignalOption('coach', 'ÙƒÙˆØªØ´ÙŠÙ†Ø¬', 'Coaching'),
+    _ProviderSignalOption(
+      'recovery_support',
+      'Ø¯Ø¹Ù… Ù…Ø±ØªØ¨Ø· Ø¨Ø§Ù„ØªØ¹Ø§ÙÙŠ',
+      'Recovery support',
+    ),
+    _ProviderSignalOption(
+      'family_support',
+      'Ø¯Ø¹Ù… Ø£Ø³Ø±ÙŠ',
+      'Family support',
+    ),
+    _ProviderSignalOption(
+      'children_support',
+      'Ù…Ù†Ø§Ø³Ø¨ Ù„Ù„Ø£Ø·ÙØ§Ù„',
+      'Children support',
+    ),
+    _ProviderSignalOption(
+      'mental_health_support',
+      'Ø¯Ø¹Ù… Ø§Ù„ØµØ­Ø© Ø§Ù„Ù†ÙØ³ÙŠØ©',
+      'Mental health support',
+    ),
+    _ProviderSignalOption(
+      'psychiatric_without_addiction_awareness',
+      'ØªÙˆØ¹ÙŠØ© Ù†ÙØ³ÙŠØ© ØºÙŠØ± Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„Ø¥Ø¯Ù…Ø§Ù†',
+      'Non-addiction mental health awareness',
+    ),
+    _ProviderSignalOption(
+      'hiv_sensitive_support',
+      'Ø¯Ø¹Ù… Ø­Ø³Ø§Ø³ Ù„ÙÙŠØ±ÙˆØ³ Ù†Ù‚Øµ Ø§Ù„Ù…Ù†Ø§Ø¹Ø©',
+      'HIV-sensitive support',
+    ),
+  ];
+
+  static const List<_ProviderSignalOption> _accessibilitySignalOptions = [
+    _ProviderSignalOption(
+      'speech_support',
+      'ÙŠØ¯Ø¹Ù… ØµØ¹ÙˆØ¨Ø§Øª Ø§Ù„Ù†Ø·Ù‚',
+      'Speech support',
+    ),
+    _ProviderSignalOption(
+      'hearing_support',
+      'ÙŠØ¯Ø¹Ù… ØµØ¹ÙˆØ¨Ø§Øª Ø§Ù„Ø³Ù…Ø¹',
+      'Hearing support',
+    ),
+    _ProviderSignalOption(
+      'visual_assistance',
+      'ÙŠØ¯Ø¹Ù… Ù…Ø³Ø§Ø¹Ø¯Ø© Ø¨ØµØ±ÙŠØ©',
+      'Visual assistance',
+    ),
+    _ProviderSignalOption(
+      'simplified_communication',
+      'ÙŠØ¯Ø¹Ù… ØªÙˆØ§ØµÙ„ Ù…Ø¨Ø³Ø·',
+      'Simplified communication',
+    ),
+    _ProviderSignalOption(
+      'text_based_support',
+      'ÙŠØ¯Ø¹Ù… ØªÙˆØ§ØµÙ„ Ù†ØµÙŠ',
+      'Text-based support',
+    ),
+  ];
+
+  static const List<_ProviderSignalOption> _communicationSignalOptions = [
+    _ProviderSignalOption('in_person', 'Ø­Ø¶ÙˆØ±ÙŠ', 'In person'),
+    _ProviderSignalOption('online', 'Ø£ÙˆÙ†Ù„Ø§ÙŠÙ†', 'Online'),
+    _ProviderSignalOption('text', 'Ù†ØµÙŠ', 'Text'),
+    _ProviderSignalOption('audio', 'ØµÙˆØªÙŠ', 'Audio'),
+    _ProviderSignalOption('video', 'ÙÙŠØ¯ÙŠÙˆ', 'Video'),
+    _ProviderSignalOption(
+      'group_sessions',
+      'Ø¬Ù„Ø³Ø§Øª Ø¬Ù…Ø§Ø¹ÙŠØ©',
+      'Group sessions',
+    ),
+  ];
+
+  static const List<_ProviderSignalOption> _learningSignalOptions = [
+    _ProviderSignalOption(
+      'provider_learning',
+      'ØªØ·ÙˆÙŠØ± Ù…Ù‡Ù†ÙŠ',
+      'Provider learning',
+    ),
+    _ProviderSignalOption(
+      'family_support_learning',
+      'ØªØ¹Ù„Ù… Ø¯Ø¹Ù… Ø§Ù„Ø£Ø³Ø±Ø©',
+      'Family support learning',
+    ),
+    _ProviderSignalOption(
+      'recovery_learning',
+      'ØªØ¹Ù„Ù… Ø¯Ø¹Ù… Ø§Ù„ØªØ¹Ø§ÙÙŠ',
+      'Recovery learning',
+    ),
+    _ProviderSignalOption(
+      'accessibility_learning',
+      'ØªØ¹Ù„Ù… Ø§Ù„ÙˆØµÙˆÙ„ ÙˆØ§Ù„Ø¥ØªØ§Ø­Ø©',
+      'Accessibility learning',
+    ),
+    _ProviderSignalOption(
+      'content_contribution',
+      'Ù…Ø³Ø§Ù‡Ù…Ø© Ù…Ø¹Ø±ÙÙŠØ©',
+      'Content contribution',
+    ),
+  ];
 
   @override
   void dispose() {
@@ -75,6 +209,11 @@ class _WebClinicianRegisterPortalPageState
       if (specialty['key'] == _selectedSpecialtyKey) return specialty;
     }
     return null;
+  }
+
+  List<String> _sortedSignals(Set<String> signals) {
+    final values = signals.toList()..sort();
+    return values;
   }
 
   Future<void> _submit() async {
@@ -129,6 +268,15 @@ class _WebClinicianRegisterPortalPageState
         'sessionPriceText': '',
         'sessionDurationText': '',
         'sessionModes': <String>[],
+        // [S] Provider Signals
+        // Approved signal-native map. Do not replace specialty/session fields.
+        'providerSignals': {
+          'capabilitySignals': _sortedSignals(_selectedCapabilitySignals),
+          'accessibilitySignals': _sortedSignals(_selectedAccessibilitySignals),
+          'communicationSignals': _sortedSignals(_selectedCommunicationSignals),
+          'learningSignals': _sortedSignals(_selectedLearningSignals),
+        },
+        'signalSchemaVersion': _signalSchemaVersion,
         'role': 'clinician',
         'isActive': false,
         'isAdmin': false,
@@ -169,6 +317,8 @@ class _WebClinicianRegisterPortalPageState
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isArabic =
+        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -236,7 +386,7 @@ class _WebClinicianRegisterPortalPageState
                             children: [
                               const SizedBox(height: 16),
                               const Text(
-                                'Intake / Review Request: submitting this data or creating an account does not mean automatic approval, activation, payment, booking, or visibility. Licenses and documents remain the applicant responsibility.',
+                                'Intake / Review Request: submitting this data or creating an account does not mean automatic approval, activation, lifecycle ownership, or visibility. Licenses and documents remain the applicant responsibility.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white70,
@@ -254,7 +404,7 @@ class _WebClinicianRegisterPortalPageState
                                               .languageCode
                                               .toLowerCase() ==
                                           'ar'
-                                      ? 'العودة إلى بوابة Mental Smile'
+                                      ? 'Ø§Ù„Ø¹ÙˆØ¯Ø© Ø¥Ù„Ù‰ Ø¨ÙˆØ§Ø¨Ø© Mental Smile'
                                       : 'Back to Mental Smile Portal',
                                 ),
                               ),
@@ -352,6 +502,43 @@ class _WebClinicianRegisterPortalPageState
                                   }
                                   return null;
                                 },
+                              ),
+                              const SizedBox(height: 12),
+                              _ProviderSignalSection(
+                                title: isArabic
+                                    ? 'Ø¥Ø´Ø§Ø±Ø§Øª Ø§Ù„Ø®Ø¯Ù…Ø©'
+                                    : 'Service signals',
+                                options: _capabilitySignalOptions,
+                                selectedKeys: _selectedCapabilitySignals,
+                                isArabic: isArabic,
+                                onChanged: _toggleSignal,
+                              ),
+                              _ProviderSignalSection(
+                                title: isArabic
+                                    ? 'Ø¥Ø´Ø§Ø±Ø§Øª Ø§Ù„ÙˆØµÙˆÙ„'
+                                    : 'Accessibility signals',
+                                options: _accessibilitySignalOptions,
+                                selectedKeys: _selectedAccessibilitySignals,
+                                isArabic: isArabic,
+                                onChanged: _toggleSignal,
+                              ),
+                              _ProviderSignalSection(
+                                title: isArabic
+                                    ? 'Ø¥Ø´Ø§Ø±Ø§Øª Ø§Ù„ØªÙˆØ§ØµÙ„'
+                                    : 'Communication signals',
+                                options: _communicationSignalOptions,
+                                selectedKeys: _selectedCommunicationSignals,
+                                isArabic: isArabic,
+                                onChanged: _toggleSignal,
+                              ),
+                              _ProviderSignalSection(
+                                title: isArabic
+                                    ? 'Ø¥Ø´Ø§Ø±Ø§Øª Ø§Ù„ØªØ¹Ù„Ù… ÙˆØ§Ù„Ù…Ø³Ø§Ù‡Ù…Ø©'
+                                    : 'Learning signals',
+                                options: _learningSignalOptions,
+                                selectedKeys: _selectedLearningSignals,
+                                isArabic: isArabic,
+                                onChanged: _toggleSignal,
                               ),
                               if (_error != null) ...[
                                 const SizedBox(height: 10),
@@ -477,4 +664,94 @@ class _WebClinicianRegisterPortalPageState
       ),
     );
   }
+
+  void _toggleSignal(Set<String> selectedKeys, String key, bool selected) {
+    setState(() {
+      if (selected) {
+        selectedKeys.add(key);
+      } else {
+        selectedKeys.remove(key);
+      }
+    });
+  }
 }
+
+class _ProviderSignalOption {
+  const _ProviderSignalOption(this.key, this.labelAr, this.labelEn);
+
+  final String key;
+  final String labelAr;
+  final String labelEn;
+
+  String label(bool isArabic) => isArabic ? labelAr : labelEn;
+}
+
+class _ProviderSignalSection extends StatelessWidget {
+  const _ProviderSignalSection({
+    required this.title,
+    required this.options,
+    required this.selectedKeys,
+    required this.isArabic,
+    required this.onChanged,
+  });
+
+  final String title;
+  final List<_ProviderSignalOption> options;
+  final Set<String> selectedKeys;
+  final bool isArabic;
+  final void Function(Set<String> selectedKeys, String key, bool selected)
+      onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: _WebClinicianRegisterPortalPageState._inputCream,
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final option in options)
+                FilterChip(
+                  label: Text(option.label(isArabic)),
+                  selected: selectedKeys.contains(option.key),
+                  onSelected: (selected) {
+                    onChanged(selectedKeys, option.key, selected);
+                  },
+                  visualDensity: VisualDensity.compact,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  selectedColor: _WebClinicianRegisterPortalPageState._fieldGold
+                      .withValues(alpha: 0.9),
+                  backgroundColor: Colors.black.withValues(alpha: 0.22),
+                  checkmarkColor: const Color(0xFF17100A),
+                  side: BorderSide(
+                    color: _WebClinicianRegisterPortalPageState._fieldGold
+                        .withValues(alpha: 0.42),
+                  ),
+                  labelStyle: TextStyle(
+                    color: selectedKeys.contains(option.key)
+                        ? const Color(0xFF17100A)
+                        : _WebClinicianRegisterPortalPageState._inputCream,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+

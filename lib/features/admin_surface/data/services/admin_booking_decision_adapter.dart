@@ -19,12 +19,6 @@ typedef AdminBookingLogCallback = void Function({
   Object? error,
 });
 
-class AdminApprovePaymentResult {
-  const AdminApprovePaymentResult({required this.isCenterRequest});
-
-  final bool isCenterRequest;
-}
-
 class AdminAssignClinicianResult {
   const AdminAssignClinicianResult({
     required this.alreadyAssigned,
@@ -45,6 +39,48 @@ class AdminBookingDecisionAdapter {
   final FirebaseFirestore _firestore;
   final AdminBookingRefreshAuthCallback? refreshAuthContextForFirestore;
   final AdminBookingLogCallback? logFirestore;
+
+  static final DateTime _adminAuthorityFreezeCutoffUtc =
+      DateTime.utc(2026, 6, 5);
+
+  // LEGACY ONLY - NO NEW BOOKING AUTHORITY.
+  // Admin booking commands may only operate on pre-freeze compatibility records.
+  bool _isLegacyCompatible(Map<String, dynamic> data) {
+    if (data['legacyCompatibility'] == true ||
+        data['legacyCompatibilityMode'] == true) {
+      return true;
+    }
+
+    final createdAt = data['createdAt'];
+    DateTime? createdUtc;
+    if (createdAt is Timestamp) {
+      createdUtc = createdAt.toDate().toUtc();
+    } else if (createdAt is DateTime) {
+      createdUtc = createdAt.toUtc();
+    } else if (createdAt is String) {
+      createdUtc = DateTime.tryParse(createdAt)?.toUtc();
+    }
+
+    return createdUtc == null ||
+        createdUtc.isBefore(_adminAuthorityFreezeCutoffUtc);
+  }
+
+  Future<Map<String, dynamic>> _requireLegacyCompatibility({
+    required String requestId,
+    required String operation,
+  }) async {
+    final snap = await readPrimaryBookingRequest(requestId);
+    if (!snap.exists) {
+      throw Exception('Booking request not found');
+    }
+    final data = snap.data() ?? const <String, dynamic>{};
+    if (!_isLegacyCompatible(data)) {
+      throw StateError(
+        'Admin authority is frozen for new booking requests: $operation',
+      );
+    }
+    return data;
+  }
 
   Map<String, dynamic> _withCanonicalWorkflowStage(
     Map<String, dynamic> updates,
@@ -71,7 +107,7 @@ class AdminBookingDecisionAdapter {
     Object? error,
   }) {
     logFirestore?.call(
-      page: 'admin_booking_queue',
+      page: 'legacy_authority_removed',
       role: 'admin',
       operation: operation,
       collection: collection,
@@ -267,11 +303,8 @@ class AdminBookingDecisionAdapter {
       'adminDecisionAt': FieldValue.serverTimestamp(),
       'adminAssignedBy': adminUid,
       'adminAssignedAt': FieldValue.serverTimestamp(),
-      'paymentStatus': 'blocked',
-      'payment_confirmed': false,
       'sessionStatus': 'cancelled',
       'reviewStatus': 'blocked',
-      'payoutStatus': 'blocked',
     };
     if (isCenterRequest) {
       await updatePrimaryCenterRequest(requestId, payload);
@@ -300,11 +333,8 @@ class AdminBookingDecisionAdapter {
       'clinicianId': '',
       'clinicianName': '',
       'clinicianUid': '',
-      'paymentStatus': 'not_started',
-      'payment_confirmed': false,
       'sessionStatus': 'not_created',
       'reviewStatus': 'not_started',
-      'payoutStatus': 'blocked',
     });
   }
 
@@ -369,6 +399,10 @@ class AdminBookingDecisionAdapter {
     required String requestId,
     required String adminUid,
   }) async {
+    await _requireLegacyCompatibility(
+      requestId: requestId,
+      operation: 'approveCenterRequest',
+    );
     await updatePrimaryCenterRequest(requestId, {
       'status': 'session_setup_pending',
       'workflowStage': 'session_setup_pending',
@@ -380,10 +414,8 @@ class AdminBookingDecisionAdapter {
       'adminDecisionAt': FieldValue.serverTimestamp(),
       'adminAssignedBy': adminUid,
       'adminAssignedAt': FieldValue.serverTimestamp(),
-      'paymentStatus': 'pending_client_transfer',
       'sessionStatus': 'not_created',
       'reviewStatus': 'not_started',
-      'payoutStatus': 'blocked',
       'assignedClinicianId': '',
       'assignedClinicianName': '',
       'clinicianId': '',
@@ -419,91 +451,6 @@ class AdminBookingDecisionAdapter {
     });
   }
 
-  Future<void> confirmCenterAccountingReview({
-    required String requestId,
-    required double gross,
-    required double commissionPercent,
-    required String note,
-    required String adminUid,
-  }) async {
-    final commissionAmount = gross * (commissionPercent / 100);
-    final netAmount = gross - commissionAmount;
-    await updateRequestEverywhere(requestId, {
-      'status': 'payout_pending',
-      'accountingReviewStatus': 'confirmed',
-      'grossClientPaidAmount': gross,
-      'appCommissionPercent': commissionPercent,
-      'appCommissionAmount': commissionAmount,
-      'netAmountDueToCenter': netAmount,
-      'accountingReviewNotes': note,
-      'accountingConfirmedBy': adminUid,
-      'accountingConfirmedAt': FieldValue.serverTimestamp(),
-    });
-  }
-
-  Future<void> confirmCenterPayout({
-    required String requestId,
-  }) async {
-    await updateRequestEverywhere(requestId, {
-      'status': 'completed_success',
-      'workflowStage': 'completed_success',
-      'sessionStatus': 'completed',
-      'reviewStatus': 'completed',
-      'payoutStatus': 'paid_to_center',
-      'payoutTransferredAt': FieldValue.serverTimestamp(),
-    });
-  }
-
-  @Deprecated(
-      'Payment authority moved to AdminPaymentDecisionAdapter. Use that adapter for payment decisions.')
-  Future<AdminApprovePaymentResult> approvePayment({
-    required String requestId,
-  }) async {
-    final snap =
-        await _firestore.collection('booking_requests').doc(requestId).get();
-    final data = snap.data() ?? const <String, dynamic>{};
-    final isCenterRequest =
-        (data['requestKind'] ?? '').toString().trim() == 'center' ||
-            (data['centerId'] ?? '').toString().trim().isNotEmpty;
-    await updateRequestEverywhere(requestId, {
-      'status': isCenterRequest ? 'session_scheduled' : 'session_setup_pending',
-      'workflowStage':
-          isCenterRequest ? 'session_scheduled' : 'session_setup_pending',
-      'paymentStatus': 'approved',
-      'payment_confirmed': true,
-      'paymentApprovedAt': FieldValue.serverTimestamp(),
-      'sessionStatus': isCenterRequest ? 'scheduled' : 'not_created',
-    });
-    return AdminApprovePaymentResult(isCenterRequest: isCenterRequest);
-  }
-
-  @Deprecated(
-      'Payment authority moved to AdminPaymentDecisionAdapter. Use that adapter for payment decisions.')
-  Future<void> rejectPayment({
-    required String requestId,
-  }) async {
-    await updateRequestEverywhere(requestId, {
-      'status': 'awaiting_payment',
-      'workflowStage': 'awaiting_payment',
-      'paymentStatus': 'rejected',
-      'payment_confirmed': false,
-      'paymentRejectedAt': FieldValue.serverTimestamp(),
-    });
-  }
-
-  Future<void> confirmClinicianPayout({
-    required String requestId,
-  }) async {
-    await updateRequestEverywhere(requestId, {
-      'status': 'completed_success',
-      'workflowStage': 'completed_success',
-      'sessionStatus': 'completed',
-      'reviewStatus': 'completed',
-      'payoutStatus': 'paid_to_clinician',
-      'payoutTransferredAt': FieldValue.serverTimestamp(),
-    });
-  }
-
   Future<void> sendToSessionArchive({
     required String requestId,
   }) async {
@@ -511,17 +458,6 @@ class AdminBookingDecisionAdapter {
       'archived': true,
       'archivedAt': FieldValue.serverTimestamp(),
       'archiveSection': 'sessions',
-      'archiveReady': true,
-    });
-  }
-
-  Future<void> sendToFinancialArchive({
-    required String requestId,
-  }) async {
-    await updateRequestEverywhere(requestId, {
-      'archived': true,
-      'archivedAt': FieldValue.serverTimestamp(),
-      'archiveSection': 'payments',
       'archiveReady': true,
     });
   }
@@ -535,6 +471,11 @@ class AdminBookingDecisionAdapter {
       throw Exception('Booking request not found');
     }
     final resourceSnapshot = snap.data() ?? const <String, dynamic>{};
+    if (!_isLegacyCompatible(resourceSnapshot)) {
+      throw StateError(
+        'Admin authority is frozen for new booking requests: assignClinician',
+      );
+    }
     final currentStatus = (resourceSnapshot['status'] ?? '').toString().trim();
     final currentWorkflowStage =
         (resourceSnapshot['workflowStage'] ?? '').toString().trim();
@@ -601,11 +542,8 @@ class AdminBookingDecisionAdapter {
       'adminDecisionType': 'assigned',
       'adminDecisionBy': adminUid,
       'adminDecisionAt': FieldValue.serverTimestamp(),
-      'paymentStatus': 'not_started',
-      'payment_confirmed': false,
       'sessionStatus': 'not_created',
       'reviewStatus': 'not_started',
-      'payoutStatus': 'blocked',
     });
 
     return AdminAssignClinicianResult(

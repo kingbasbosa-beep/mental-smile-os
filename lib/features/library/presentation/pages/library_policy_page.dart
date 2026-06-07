@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 
+// [S] Knowledge Governance Asset
+// Approved by Wave S-3 Classification Board.
+// Must remain educational, non-diagnostic, and free from legacy workflow coupling.
 class LibraryPolicyPage extends StatelessWidget {
   const LibraryPolicyPage({super.key});
 

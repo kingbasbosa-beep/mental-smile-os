@@ -1,4 +1,4 @@
-// ignore: unused_import
+﻿// ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
@@ -19,7 +19,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String localeLabel(String code) {
-    return 'Locale: $code (tap or 🌐)';
+    return 'Locale: $code (tap or ðŸŒ)';
   }
 
   @override
@@ -418,25 +418,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webClinicianBio => 'Bio';
 
   @override
-  String get webClinicianNextSessions => 'Next: Sessions';
-
-  @override
-  String get webClinicianSessionsTitle => 'Clinician Registration - Sessions';
-
-  @override
   String get webClinicianSessionPrice => 'Session price';
 
   @override
   String get webClinicianSessionDuration => 'Session duration';
-
-  @override
-  String get webClinicianOnlineSessions => 'Online sessions';
-
-  @override
-  String get webClinicianInPersonSessions => 'In-person sessions';
-
-  @override
-  String get webClinicianGroupSessions => 'Offers group sessions';
 
   @override
   String get webClinicianDocumentsTitle => 'Clinician Registration - Documents';
@@ -470,83 +455,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Choose at least one session method';
 
   @override
-  String get webClinicianSaveSessionsFailed => 'Could not save sessions';
-
-  @override
   String get webClinicianSubmitDocumentsFailed => 'Could not submit documents';
 
-  @override
-  String get bookingRequestTitle => 'Booking request';
-
-  @override
-  String get bookingCenterRequestTitle => 'Center booking request';
-
-  @override
-  String get bookingMyRequestsTitle => 'My requests';
-
-  @override
-  String get bookingBookSpecialistTitle => 'Book a specialist';
-
-  @override
-  String get bookingNoSpecialistsYet => 'No specialists yet.';
-
-  @override
-  String get bookingTrustedSpecialistHint =>
-      'Choose a trusted specialist and send your request to admin.';
-
-  @override
-  String get bookingDevUiEnabled => 'Developer UI is enabled';
-
-  @override
-  String get bookingAdditionalNotes => 'Additional notes';
-
-  @override
-  String get bookingWriteNoteHint => 'Write your note here...';
-
-  @override
-  String get bookingSendRequest => 'Send request';
-
-  @override
-  String get bookingSendRequestToAdmin => 'Send request to admin';
-
-  @override
-  String get bookingSending => 'Sending...';
-
-  @override
-  String get bookingRequestSent => 'Request sent successfully';
-
-  @override
-  String get bookingRequestFailed => 'Could not send request';
-
-  @override
-  String get bookingRequestSentAdminChat =>
-      'Request sent and admin follow-up chat opened';
-
-  @override
-  String get bookingCenterRequestSent =>
-      'Center request sent to admin successfully';
-
-  @override
-  String get bookingCenterRequestSentToAdmin => 'Center request sent to admin';
-
-  @override
-  String get bookingUploadPaymentProof => 'Upload payment proof';
 
   @override
   String get bookingEditAccommodation => 'Edit accommodation type';
 
   @override
   String get bookingCompleteInitialIntake => 'Complete initial intake details';
-
-  @override
-  String get bookingCreateNewRequest => 'Create new request';
-
-  @override
-  String get bookingCreateNewFromRequest =>
-      'Create new request from this request';
-
-  @override
-  String get bookingNewCenterRequestCreated => 'New center request created';
 
   @override
   String get bookingCurrent => 'Current';
@@ -576,9 +492,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookingSpecialistFallback => 'Specialist';
 
   @override
-  String get bookingCenterRequestFallback => 'Center request';
-
-  @override
   String clientDashboardWelcome(String name) {
     return 'Welcome, $name';
   }
@@ -587,25 +500,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clientDashboardSubtitle => 'Your next steps are all here.';
 
   @override
-  String get clientBookings => 'Bookings';
-
-  @override
-  String get clientBookingRequests => 'Booking requests';
-
-  @override
   String get clientSupport => 'Support';
 
   @override
   String get clientSupportRequests => 'Support requests';
 
-  @override
-  String get clientPaymentProof => 'Payment proof';
 
-  @override
-  String get clientUploadPaymentProof => 'Upload transfer proof';
-
-  @override
-  String get clientMySessions => 'My sessions';
 
   @override
   String get clientLinksAndCodes => 'Links and codes';
@@ -641,9 +541,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clinicianEditProfile => 'Edit my profile';
 
   @override
-  String get clinicianMySessions => 'My sessions';
-
-  @override
   String get clinicianSupportRequest => 'Support request';
 
   @override
@@ -674,12 +571,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clinicianRejectRequest => 'Reject request';
 
   @override
-  String get clinicianEndSession => 'End session';
-
-  @override
-  String get clinicianReviewSession => 'Review session';
-
-  @override
   String get clinicianAssignedRequest => 'Request assigned to you';
 
   @override
@@ -698,15 +589,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clinicianSendChangeRequest => 'Send change request';
 
   @override
-  String get clinicianRatings => 'Ratings';
-
-  @override
-  String get clinicianStars => 'Stars';
-
-  @override
-  String get clinicianOverall => 'Overall';
-
-  @override
   String get clinicianLogout => 'Logout';
 
   @override
@@ -715,8 +597,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get clinicianInboxTitle => 'Clinician inbox';
 
-  @override
-  String get clinicianAwaitingPayment => 'Awaiting payment';
 
   @override
   String get clinicianReject => 'Reject';
@@ -736,9 +616,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get clinicianConfirmReject => 'Confirm rejection';
 
-  @override
-  String get clinicianApprovalSent =>
-      'Clinician approval sent and request moved to awaiting payment';
 
   @override
   String get clinicianRejectFailed => 'Reject failed';
@@ -775,14 +652,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get statusRequestApproved => 'Your request was approved';
 
-  @override
-  String get statusAwaitingPayment => 'Awaiting payment';
 
-  @override
-  String get statusUploadPaymentProof => 'Please upload payment proof';
 
-  @override
-  String get statusPaymentReview => 'Payment proof under review';
 
   @override
   String get statusSessionSetupPending => 'Session setup pending';
@@ -808,11 +679,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get statusPendingDischargeReviews => 'Pending discharge reviews';
 
-  @override
-  String get statusPayoutPending => 'Financial closing pending';
 
-  @override
-  String get statusCenterAccountingReview => 'Pending center accounting review';
 
   @override
   String get statusCompleted => 'Completed';
@@ -864,9 +731,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String comingSoon(String title) {
-    return '$title — Coming soon';
+    return '$title â€” Coming soon';
   }
 
   @override
   String get modulePlaceholderBody => 'Content coming soon.';
 }
+
+
+

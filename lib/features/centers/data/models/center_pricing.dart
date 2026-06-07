@@ -2,11 +2,27 @@ class CenterCapabilityFlags {
   final bool supportsAddictionCasesWithHiv;
   final bool acceptsAddictionCases;
   final bool acceptsPsychiatricCasesWithoutAddiction;
+  final bool supportsChildren;
+  final bool supportsFamilies;
+  final bool supportsRecovery;
+  final bool supportsHearingSupport;
+  final bool supportsSpeechSupport;
+  final bool supportsAccessibilitySupport;
+  final bool supportsCoachingPrograms;
+  final bool supportsEducationPrograms;
 
   const CenterCapabilityFlags({
     this.supportsAddictionCasesWithHiv = false,
     this.acceptsAddictionCases = false,
     this.acceptsPsychiatricCasesWithoutAddiction = false,
+    this.supportsChildren = false,
+    this.supportsFamilies = false,
+    this.supportsRecovery = false,
+    this.supportsHearingSupport = false,
+    this.supportsSpeechSupport = false,
+    this.supportsAccessibilitySupport = false,
+    this.supportsCoachingPrograms = false,
+    this.supportsEducationPrograms = false,
   });
 
   factory CenterCapabilityFlags.fromMap(Map<String, dynamic>? map) {
@@ -17,6 +33,17 @@ class CenterCapabilityFlags {
       acceptsAddictionCases: (data['acceptsAddictionCases'] ?? false) == true,
       acceptsPsychiatricCasesWithoutAddiction:
           (data['acceptsPsychiatricCasesWithoutAddiction'] ?? false) == true,
+      supportsChildren: (data['supportsChildren'] ?? false) == true,
+      supportsFamilies: (data['supportsFamilies'] ?? false) == true,
+      supportsRecovery: (data['supportsRecovery'] ?? false) == true,
+      supportsHearingSupport: (data['supportsHearingSupport'] ?? false) == true,
+      supportsSpeechSupport: (data['supportsSpeechSupport'] ?? false) == true,
+      supportsAccessibilitySupport:
+          (data['supportsAccessibilitySupport'] ?? false) == true,
+      supportsCoachingPrograms:
+          (data['supportsCoachingPrograms'] ?? false) == true,
+      supportsEducationPrograms:
+          (data['supportsEducationPrograms'] ?? false) == true,
     );
   }
 
@@ -25,12 +52,28 @@ class CenterCapabilityFlags {
         'acceptsAddictionCases': acceptsAddictionCases,
         'acceptsPsychiatricCasesWithoutAddiction':
             acceptsPsychiatricCasesWithoutAddiction,
+        'supportsChildren': supportsChildren,
+        'supportsFamilies': supportsFamilies,
+        'supportsRecovery': supportsRecovery,
+        'supportsHearingSupport': supportsHearingSupport,
+        'supportsSpeechSupport': supportsSpeechSupport,
+        'supportsAccessibilitySupport': supportsAccessibilitySupport,
+        'supportsCoachingPrograms': supportsCoachingPrograms,
+        'supportsEducationPrograms': supportsEducationPrograms,
       };
 
   CenterCapabilityFlags copyWith({
     bool? supportsAddictionCasesWithHiv,
     bool? acceptsAddictionCases,
     bool? acceptsPsychiatricCasesWithoutAddiction,
+    bool? supportsChildren,
+    bool? supportsFamilies,
+    bool? supportsRecovery,
+    bool? supportsHearingSupport,
+    bool? supportsSpeechSupport,
+    bool? supportsAccessibilitySupport,
+    bool? supportsCoachingPrograms,
+    bool? supportsEducationPrograms,
   }) {
     return CenterCapabilityFlags(
       supportsAddictionCasesWithHiv:
@@ -40,6 +83,19 @@ class CenterCapabilityFlags {
       acceptsPsychiatricCasesWithoutAddiction:
           acceptsPsychiatricCasesWithoutAddiction ??
               this.acceptsPsychiatricCasesWithoutAddiction,
+      supportsChildren: supportsChildren ?? this.supportsChildren,
+      supportsFamilies: supportsFamilies ?? this.supportsFamilies,
+      supportsRecovery: supportsRecovery ?? this.supportsRecovery,
+      supportsHearingSupport:
+          supportsHearingSupport ?? this.supportsHearingSupport,
+      supportsSpeechSupport:
+          supportsSpeechSupport ?? this.supportsSpeechSupport,
+      supportsAccessibilitySupport:
+          supportsAccessibilitySupport ?? this.supportsAccessibilitySupport,
+      supportsCoachingPrograms:
+          supportsCoachingPrograms ?? this.supportsCoachingPrograms,
+      supportsEducationPrograms:
+          supportsEducationPrograms ?? this.supportsEducationPrograms,
     );
   }
 }

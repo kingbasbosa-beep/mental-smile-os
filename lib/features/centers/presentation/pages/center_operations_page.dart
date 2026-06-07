@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
@@ -354,7 +354,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            _isArabic(context) ? 'تم حفظ صور المركز' : 'Center images saved',
+            _isArabic(context) ? 'ØªÙ… Ø­ÙØ¸ ØµÙˆØ± Ø§Ù„Ù…Ø±ÙƒØ²' : 'Center images saved',
           ),
         ),
       );
@@ -382,7 +382,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'أدخل نوع الوثيقة واسم الملف على الأقل'
+                ? 'Ø£Ø¯Ø®Ù„ Ù†ÙˆØ¹ Ø§Ù„ÙˆØ«ÙŠÙ‚Ø© ÙˆØ§Ø³Ù… Ø§Ù„Ù…Ù„Ù Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„'
                 : 'Enter document type and file name at minimum',
           ),
         ),
@@ -421,7 +421,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            _isArabic(context) ? 'تمت إضافة الوثيقة' : 'Document added',
+            _isArabic(context) ? 'ØªÙ…Øª Ø¥Ø¶Ø§ÙØ© Ø§Ù„ÙˆØ«ÙŠÙ‚Ø©' : 'Document added',
           ),
         ),
       );
@@ -458,7 +458,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            _isArabic(context) ? 'تم حذف الوثيقة' : 'Document removed',
+            _isArabic(context) ? 'ØªÙ… Ø­Ø°Ù Ø§Ù„ÙˆØ«ÙŠÙ‚Ø©' : 'Document removed',
           ),
         ),
       );
@@ -540,7 +540,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'تم إرسال طلب تعديل بيانات المركز للإدارة'
+                ? 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ ØªØ¹Ø¯ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ² Ù„Ù„Ø¥Ø¯Ø§Ø±Ø©'
                 : 'Center data change request sent to admin',
           ),
         ),
@@ -579,7 +579,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                   isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 Text(
-                  isArabic ? 'تعديل بياناتي' : 'Edit my data',
+                  isArabic ? 'ØªØ¹Ø¯ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§ØªÙŠ' : 'Edit my data',
                   style: Theme.of(context)
                       .textTheme
                       .titleMedium
@@ -589,7 +589,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                 const SizedBox(height: 6),
                 Text(
                   isArabic
-                      ? 'إرسال طلب تعديل الصورة أو النبذة'
+                      ? 'Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„ØµÙˆØ±Ø© Ø£Ùˆ Ø§Ù„Ù†Ø¨Ø°Ø©'
                       : 'Send a photo or profile change request',
                   style: Theme.of(context).textTheme.bodyMedium,
                   textAlign: isArabic ? TextAlign.right : TextAlign.left,
@@ -602,7 +602,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
             onPressed: () => Navigator.of(context).pushNamed(
               Routes.centerProfileEditRequest,
             ),
-            child: Text(isArabic ? 'فتح' : 'Open'),
+            child: Text(isArabic ? 'ÙØªØ­' : 'Open'),
           ),
         ],
       ),
@@ -612,15 +612,15 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
   String _docStatusLabel(String status, bool isArabic) {
     switch (status) {
       case 'approved':
-        return isArabic ? 'مقبول' : 'Approved';
+        return isArabic ? 'Ù…Ù‚Ø¨ÙˆÙ„' : 'Approved';
       case 'rejected':
-        return isArabic ? 'مرفوض' : 'Rejected';
+        return isArabic ? 'Ù…Ø±ÙÙˆØ¶' : 'Rejected';
       case 'needs_update':
-        return isArabic ? 'يحتاج تحديث' : 'Needs update';
+        return isArabic ? 'ÙŠØ­ØªØ§Ø¬ ØªØ­Ø¯ÙŠØ«' : 'Needs update';
       case 'uploaded':
       case 'pending':
       default:
-        return isArabic ? 'بانتظار المراجعة' : 'Pending review';
+        return isArabic ? 'Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©' : 'Pending review';
     }
   }
 
@@ -677,7 +677,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
             isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
-            isArabic ? 'قدرات المركز' : 'Center capabilities',
+            isArabic ? 'Ù‚Ø¯Ø±Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ²' : 'Center capabilities',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -686,7 +686,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
           _buildPricingToggle(
             context: context,
             title: isArabic
-                ? 'يدعم حالات الإدمان المصاحبة لفيروس HIV'
+                ? 'ÙŠØ¯Ø¹Ù… Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø¥Ø¯Ù…Ø§Ù† Ø§Ù„Ù…ØµØ§Ø­Ø¨Ø© Ù„ÙÙŠØ±ÙˆØ³ HIV'
                 : 'Supports addiction cases with HIV',
             value: _requestedCapabilities.supportsAddictionCasesWithHiv,
             onChanged: (value) {
@@ -700,7 +700,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
           _buildPricingToggle(
             context: context,
             title:
-                isArabic ? 'يستقبل حالات الإدمان' : 'Accepts addiction cases',
+                isArabic ? 'ÙŠØ³ØªÙ‚Ø¨Ù„ Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø¥Ø¯Ù…Ø§Ù†' : 'Accepts addiction cases',
             value: _requestedCapabilities.acceptsAddictionCases,
             onChanged: (value) {
               setState(() {
@@ -713,7 +713,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
           _buildPricingToggle(
             context: context,
             title: isArabic
-                ? 'يستقبل الحالات النفسية بدون إدمان'
+                ? 'ÙŠØ³ØªÙ‚Ø¨Ù„ Ø§Ù„Ø­Ø§Ù„Ø§Øª Ø§Ù„Ù†ÙØ³ÙŠØ© Ø¨Ø¯ÙˆÙ† Ø¥Ø¯Ù…Ø§Ù†'
                 : 'Accepts psychiatric cases without addiction',
             value:
                 _requestedCapabilities.acceptsPsychiatricCasesWithoutAddiction,
@@ -758,8 +758,8 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
             controller: _pricingControllers[item.key],
             decoration: appInputDecoration(
               context: context,
-              label: isArabic ? 'السعر' : 'Price',
-              icon: Icons.payments_outlined,
+              label: isArabic ? 'Ø§Ù„Ø³Ø¹Ø±' : 'Price',
+              icon: Icons.sell_outlined,
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
           ),
@@ -769,17 +769,17 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
             isExpanded: true,
             decoration: appInputDecoration(
               context: context,
-              label: isArabic ? 'وحدة التسعير' : 'Pricing unit',
+              label: isArabic ? 'ÙˆØ­Ø¯Ø© Ø§Ù„ØªØ³Ø¹ÙŠØ±' : 'Pricing unit',
               icon: Icons.calendar_today_outlined,
             ),
             items: [
               DropdownMenuItem(
                 value: 'day',
-                child: Text(isArabic ? 'يومي' : 'Per day'),
+                child: Text(isArabic ? 'ÙŠÙˆÙ…ÙŠ' : 'Per day'),
               ),
               DropdownMenuItem(
                 value: 'month',
-                child: Text(isArabic ? 'شهري' : 'Per month'),
+                child: Text(isArabic ? 'Ø´Ù‡Ø±ÙŠ' : 'Per month'),
               ),
             ],
             onChanged: _submittingChangeRequest
@@ -801,17 +801,17 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
             isExpanded: true,
             decoration: appInputDecoration(
               context: context,
-              label: isArabic ? 'نوع التكييف' : 'AC mode',
+              label: isArabic ? 'Ù†ÙˆØ¹ Ø§Ù„ØªÙƒÙŠÙŠÙ' : 'AC mode',
               icon: Icons.ac_unit_outlined,
             ),
             items: [
               DropdownMenuItem(
                 value: 'ac',
-                child: Text(isArabic ? 'مكيف' : 'AC'),
+                child: Text(isArabic ? 'Ù…ÙƒÙŠÙ' : 'AC'),
               ),
               DropdownMenuItem(
                 value: 'non_ac',
-                child: Text(isArabic ? 'غير مكيف' : 'Non-AC'),
+                child: Text(isArabic ? 'ØºÙŠØ± Ù…ÙƒÙŠÙ' : 'Non-AC'),
               ),
             ],
             onChanged: _submittingChangeRequest
@@ -833,7 +833,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
             runSpacing: AppSpacing.sm,
             children: [
               FilterChip(
-                label: Text(isArabic ? 'يشمل الدواء' : 'Medication'),
+                label: Text(isArabic ? 'ÙŠØ´Ù…Ù„ Ø§Ù„Ø¯ÙˆØ§Ø¡' : 'Medication'),
                 selected: item.includesMedication,
                 onSelected: _submittingChangeRequest
                     ? null
@@ -851,7 +851,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                       },
               ),
               FilterChip(
-                label: Text(isArabic ? 'يشمل الوجبات' : 'Meals'),
+                label: Text(isArabic ? 'ÙŠØ´Ù…Ù„ Ø§Ù„ÙˆØ¬Ø¨Ø§Øª' : 'Meals'),
                 selected: item.includesMeals,
                 onSelected: _submittingChangeRequest
                     ? null
@@ -867,7 +867,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                       },
               ),
               FilterChip(
-                label: Text(isArabic ? 'أنشطة خارجية' : 'Outdoor activities'),
+                label: Text(isArabic ? 'Ø£Ù†Ø´Ø·Ø© Ø®Ø§Ø±Ø¬ÙŠØ©' : 'Outdoor activities'),
                 selected: item.includesOutdoorActivities,
                 onSelected: _submittingChangeRequest
                     ? null
@@ -885,7 +885,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                       },
               ),
               FilterChip(
-                label: Text(isArabic ? 'الفحوصات المطلوبة' : 'Required tests'),
+                label: Text(isArabic ? 'Ø§Ù„ÙØ­ÙˆØµØ§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©' : 'Required tests'),
                 selected: item.includesRequiredTests,
                 onSelected: _submittingChangeRequest
                     ? null
@@ -903,7 +903,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                       },
               ),
               FilterChip(
-                label: Text(isArabic ? 'استقبال المطار' : 'Airport pickup'),
+                label: Text(isArabic ? 'Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø§Ù„Ù…Ø·Ø§Ø±' : 'Airport pickup'),
                 selected: item.includesAirportPickup,
                 onSelected: _submittingChangeRequest
                     ? null
@@ -921,7 +921,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                       },
               ),
               FilterChip(
-                label: Text(isArabic ? 'جولات خارجية' : 'Tourism/outings'),
+                label: Text(isArabic ? 'Ø¬ÙˆÙ„Ø§Øª Ø®Ø§Ø±Ø¬ÙŠØ©' : 'Tourism/outings'),
                 selected: item.includesTourismOrExternalOutings,
                 onSelected: _submittingChangeRequest
                     ? null
@@ -940,7 +940,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                       },
               ),
               FilterChip(
-                label: Text(isArabic ? 'الضريبة شاملة' : 'Tax included'),
+                label: Text(isArabic ? 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© Ø´Ø§Ù…Ù„Ø©' : 'Tax included'),
                 selected: item.taxIncluded,
                 onSelected: _submittingChangeRequest
                     ? null
@@ -990,8 +990,8 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
             controller: _autismPricingControllers[item.key],
             decoration: appInputDecoration(
               context: context,
-              label: isArabic ? 'السعر' : 'Price',
-              icon: Icons.payments_outlined,
+              label: isArabic ? 'Ø§Ù„Ø³Ø¹Ø±' : 'Price',
+              icon: Icons.sell_outlined,
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
           ),
@@ -1001,17 +1001,17 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
             isExpanded: true,
             decoration: appInputDecoration(
               context: context,
-              label: isArabic ? 'وحدة التسعير' : 'Pricing unit',
+              label: isArabic ? 'ÙˆØ­Ø¯Ø© Ø§Ù„ØªØ³Ø¹ÙŠØ±' : 'Pricing unit',
               icon: Icons.calendar_today_outlined,
             ),
             items: [
               DropdownMenuItem(
                 value: 'day',
-                child: Text(isArabic ? 'يومي' : 'Per day'),
+                child: Text(isArabic ? 'ÙŠÙˆÙ…ÙŠ' : 'Per day'),
               ),
               DropdownMenuItem(
                 value: 'month',
-                child: Text(isArabic ? 'شهري' : 'Per month'),
+                child: Text(isArabic ? 'Ø´Ù‡Ø±ÙŠ' : 'Per month'),
               ),
             ],
             onChanged: _submittingChangeRequest
@@ -1028,7 +1028,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
           ),
           const SizedBox(height: 12),
           FilterChip(
-            label: Text(isArabic ? 'الضريبة شاملة' : 'Tax included'),
+            label: Text(isArabic ? 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© Ø´Ø§Ù…Ù„Ø©' : 'Tax included'),
             selected: item.taxIncluded,
             onSelected: _submittingChangeRequest
                 ? null
@@ -1057,7 +1057,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
         resizeToAvoidBottomInset: true,
         appBar: AppShellActions.buildAppBar(
           context,
-          title: isArabic ? 'غرفة عمليات المركز' : 'Center Operations',
+          title: isArabic ? 'ØºØ±ÙØ© Ø¹Ù…Ù„ÙŠØ§Øª Ø§Ù„Ù…Ø±ÙƒØ²' : 'Center Operations',
         ),
         body: LayoutBuilder(
           builder: (context, backgroundConstraints) {
@@ -1118,7 +1118,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                               Text(
                                 centerName.isEmpty
                                     ? (isArabic
-                                        ? 'غرفة عمليات المركز'
+                                        ? 'ØºØ±ÙØ© Ø¹Ù…Ù„ÙŠØ§Øª Ø§Ù„Ù…Ø±ÙƒØ²'
                                         : 'Center Operations')
                                     : centerName,
                                 style: Theme.of(context)
@@ -1131,7 +1131,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                               const SizedBox(height: 8),
                               Text(
                                 isArabic
-                                    ? 'الوضع الحالي بدون Firebase Storage. الصور والوثائق تُسجل مؤقتًا كبيانات وروابط داخل Firestore لحين تفعيل التخزين.'
+                                    ? 'Ø§Ù„ÙˆØ¶Ø¹ Ø§Ù„Ø­Ø§Ù„ÙŠ Ø¨Ø¯ÙˆÙ† Firebase Storage. Ø§Ù„ØµÙˆØ± ÙˆØ§Ù„ÙˆØ«Ø§Ø¦Ù‚ ØªÙØ³Ø¬Ù„ Ù…Ø¤Ù‚ØªÙ‹Ø§ ÙƒØ¨ÙŠØ§Ù†Ø§Øª ÙˆØ±ÙˆØ§Ø¨Ø· Ø¯Ø§Ø®Ù„ Firestore Ù„Ø­ÙŠÙ† ØªÙØ¹ÙŠÙ„ Ø§Ù„ØªØ®Ø²ÙŠÙ†.'
                                     : 'Temporary mode without Firebase Storage. Images and documents are stored as metadata/links in Firestore until storage is enabled.',
                                 textAlign:
                                     isArabic ? TextAlign.right : TextAlign.left,
@@ -1158,7 +1158,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                             children: [
                               Text(
                                 isArabic
-                                    ? 'صور المركز الأساسية'
+                                    ? 'ØµÙˆØ± Ø§Ù„Ù…Ø±ÙƒØ² Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©'
                                     : 'Main Center Images',
                                 style: Theme.of(context)
                                     .textTheme
@@ -1170,7 +1170,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                               const SizedBox(height: 8),
                               Text(
                                 isArabic
-                                    ? 'أدخل روابط الصور الأربع الأساسية مؤقتًا. لاحقًا سنحوّلها لرفع مباشر.'
+                                    ? 'Ø£Ø¯Ø®Ù„ Ø±ÙˆØ§Ø¨Ø· Ø§Ù„ØµÙˆØ± Ø§Ù„Ø£Ø±Ø¨Ø¹ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ© Ù…Ø¤Ù‚ØªÙ‹Ø§. Ù„Ø§Ø­Ù‚Ù‹Ø§ Ø³Ù†Ø­ÙˆÙ‘Ù„Ù‡Ø§ Ù„Ø±ÙØ¹ Ù…Ø¨Ø§Ø´Ø±.'
                                     : 'Enter the 4 main image URLs temporarily. Later we will switch them to direct uploads.',
                                 textAlign:
                                     isArabic ? TextAlign.right : TextAlign.left,
@@ -1185,7 +1185,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                 decoration: appInputDecoration(
                                   context: context,
                                   label: isArabic
-                                      ? 'رابط صورة الواجهة'
+                                      ? 'Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© Ø§Ù„ÙˆØ§Ø¬Ù‡Ø©'
                                       : 'Front image URL',
                                   icon: Icons.storefront_outlined,
                                 ),
@@ -1195,7 +1195,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                 controller: _receptionImageController,
                                 decoration: InputDecoration(
                                   labelText: isArabic
-                                      ? 'رابط صورة الاستقبال'
+                                      ? 'Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© Ø§Ù„Ø§Ø³ØªÙ‚Ø¨Ø§Ù„'
                                       : 'Reception image URL',
                                   border: const OutlineInputBorder(),
                                 ),
@@ -1205,7 +1205,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                 controller: _inside1ImageController,
                                 decoration: InputDecoration(
                                   labelText: isArabic
-                                      ? 'رابط الصورة الداخلية 1'
+                                      ? 'Ø±Ø§Ø¨Ø· Ø§Ù„ØµÙˆØ±Ø© Ø§Ù„Ø¯Ø§Ø®Ù„ÙŠØ© 1'
                                       : 'Inside image 1 URL',
                                   border: const OutlineInputBorder(),
                                 ),
@@ -1215,7 +1215,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                 controller: _inside2ImageController,
                                 decoration: InputDecoration(
                                   labelText: isArabic
-                                      ? 'رابط الصورة الداخلية 2'
+                                      ? 'Ø±Ø§Ø¨Ø· Ø§Ù„ØµÙˆØ±Ø© Ø§Ù„Ø¯Ø§Ø®Ù„ÙŠØ© 2'
                                       : 'Inside image 2 URL',
                                   border: const OutlineInputBorder(),
                                 ),
@@ -1244,10 +1244,10 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                   label: Text(
                                     _savingImages
                                         ? (isArabic
-                                            ? 'جارٍ الحفظ...'
+                                            ? 'Ø¬Ø§Ø±Ù Ø§Ù„Ø­ÙØ¸...'
                                             : 'Saving...')
                                         : (isArabic
-                                            ? 'حفظ الصور الأربع'
+                                            ? 'Ø­ÙØ¸ Ø§Ù„ØµÙˆØ± Ø§Ù„Ø£Ø±Ø¨Ø¹'
                                             : 'Save 4 images'),
                                     maxLines: 2,
                                     softWrap: true,
@@ -1275,7 +1275,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                             children: [
                               Text(
                                 isArabic
-                                    ? 'رفع الوثائق المنظمة'
+                                    ? 'Ø±ÙØ¹ Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚ Ø§Ù„Ù…Ù†Ø¸Ù…Ø©'
                                     : 'Structured Documents',
                                 style: Theme.of(context)
                                     .textTheme
@@ -1287,7 +1287,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                               const SizedBox(height: 8),
                               Text(
                                 isArabic
-                                    ? 'أدخل بيانات الوثيقة يدويًا مؤقتًا: النوع، اسم الملف، والرابط إن وجد.'
+                                    ? 'Ø£Ø¯Ø®Ù„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ÙˆØ«ÙŠÙ‚Ø© ÙŠØ¯ÙˆÙŠÙ‹Ø§ Ù…Ø¤Ù‚ØªÙ‹Ø§: Ø§Ù„Ù†ÙˆØ¹ØŒ Ø§Ø³Ù… Ø§Ù„Ù…Ù„ÙØŒ ÙˆØ§Ù„Ø±Ø§Ø¨Ø· Ø¥Ù† ÙˆØ¬Ø¯.'
                                     : 'Temporarily enter document metadata manually: type, file name, and URL if available.',
                               ),
                               const SizedBox(height: 14),
@@ -1318,7 +1318,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                       },
                                 decoration: InputDecoration(
                                   labelText: isArabic
-                                      ? 'نوع الوثيقة *'
+                                      ? 'Ù†ÙˆØ¹ Ø§Ù„ÙˆØ«ÙŠÙ‚Ø© *'
                                       : 'Document type *',
                                   border: const OutlineInputBorder(),
                                 ),
@@ -1328,7 +1328,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                 controller: _docFileNameController,
                                 decoration: InputDecoration(
                                   labelText:
-                                      isArabic ? 'اسم الملف' : 'File name',
+                                      isArabic ? 'Ø§Ø³Ù… Ø§Ù„Ù…Ù„Ù' : 'File name',
                                   border: const OutlineInputBorder(),
                                 ),
                               ),
@@ -1337,7 +1337,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                 controller: _docUrlController,
                                 decoration: InputDecoration(
                                   labelText: isArabic
-                                      ? 'رابط الملف (اختياري)'
+                                      ? 'Ø±Ø§Ø¨Ø· Ø§Ù„Ù…Ù„Ù (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)'
                                       : 'File URL (optional)',
                                   border: const OutlineInputBorder(),
                                 ),
@@ -1350,7 +1350,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                     .withValues(alpha: 0.12),
                                 child: Text(
                                   isArabic
-                                      ? 'تُرسل كل وثيقة جديدة بحالة "بانتظار المراجعة"، وتقوم الإدارة فقط بتحديث حالة المراجعة لاحقًا.'
+                                      ? 'ØªÙØ±Ø³Ù„ ÙƒÙ„ ÙˆØ«ÙŠÙ‚Ø© Ø¬Ø¯ÙŠØ¯Ø© Ø¨Ø­Ø§Ù„Ø© "Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©"ØŒ ÙˆØªÙ‚ÙˆÙ… Ø§Ù„Ø¥Ø¯Ø§Ø±Ø© ÙÙ‚Ø· Ø¨ØªØ­Ø¯ÙŠØ« Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© Ù„Ø§Ø­Ù‚Ù‹Ø§.'
                                       : 'Each new document is sent as "Pending review", and only admin updates the review status later.',
                                   textAlign: isArabic
                                       ? TextAlign.right
@@ -1367,7 +1367,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                 maxLines: 3,
                                 decoration: InputDecoration(
                                   labelText: isArabic
-                                      ? 'ملاحظة إضافية'
+                                      ? 'Ù…Ù„Ø§Ø­Ø¸Ø© Ø¥Ø¶Ø§ÙÙŠØ©'
                                       : 'Additional note',
                                   border: const OutlineInputBorder(),
                                 ),
@@ -1395,10 +1395,10 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                   label: Text(
                                     _savingDocument
                                         ? (isArabic
-                                            ? 'جارٍ الإضافة...'
+                                            ? 'Ø¬Ø§Ø±Ù Ø§Ù„Ø¥Ø¶Ø§ÙØ©...'
                                             : 'Adding...')
                                         : (isArabic
-                                            ? 'إضافة وثيقة'
+                                            ? 'Ø¥Ø¶Ø§ÙØ© ÙˆØ«ÙŠÙ‚Ø©'
                                             : 'Add document'),
                                     maxLines: 2,
                                     softWrap: true,
@@ -1427,7 +1427,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                               children: [
                                 Text(
                                   isArabic
-                                      ? 'الوثائق الحالية'
+                                      ? 'Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚ Ø§Ù„Ø­Ø§Ù„ÙŠØ©'
                                       : 'Current Documents',
                                   style: Theme.of(context)
                                       .textTheme
@@ -1469,7 +1469,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                         Text(
                                           type.isEmpty
                                               ? (isArabic
-                                                  ? 'وثيقة'
+                                                  ? 'ÙˆØ«ÙŠÙ‚Ø©'
                                                   : 'Document')
                                               : type,
                                           style: const TextStyle(
@@ -1480,7 +1480,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                           const SizedBox(height: 4),
                                           Text(
                                             isArabic
-                                                ? 'الملف: $fileName'
+                                                ? 'Ø§Ù„Ù…Ù„Ù: $fileName'
                                                 : 'File: $fileName',
                                           ),
                                         ],
@@ -1508,7 +1508,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                           const SizedBox(height: 6),
                                           Text(
                                             isArabic
-                                                ? 'الملاحظة: $reviewNote'
+                                                ? 'Ø§Ù„Ù…Ù„Ø§Ø­Ø¸Ø©: $reviewNote'
                                                 : 'Note: $reviewNote',
                                           ),
                                         ],
@@ -1528,7 +1528,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                                             icon: const Icon(
                                                 Icons.delete_outline),
                                             label: Text(
-                                                isArabic ? 'حذف' : 'Delete'),
+                                                isArabic ? 'Ø­Ø°Ù' : 'Delete'),
                                           ),
                                         ),
                                       ],
@@ -1544,7 +1544,7 @@ class _CenterOperationsPageState extends State<CenterOperationsPage> {
                           child: OutlinedButton.icon(
                             onPressed: () => _logout(context),
                             icon: const Icon(Icons.logout),
-                            label: Text(isArabic ? 'تسجيل الخروج' : 'Logout'),
+                            label: Text(isArabic ? 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬' : 'Logout'),
                           ),
                         ),
                       ],
@@ -1754,7 +1754,7 @@ class _CenterProfileEditRequestPageState
         SnackBar(
           content: Text(
             _isArabic(context)
-                ? 'تم إرسال طلب تعديل بيانات المركز للإدارة'
+                ? 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ ØªØ¹Ø¯ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ² Ù„Ù„Ø¥Ø¯Ø§Ø±Ø©'
                 : 'Center data change request sent to admin',
           ),
         ),
@@ -1778,7 +1778,7 @@ class _CenterProfileEditRequestPageState
             isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
-            isArabic ? 'طلبات التعديل السابقة' : 'Previous change requests',
+            isArabic ? 'Ø·Ù„Ø¨Ø§Øª Ø§Ù„ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø³Ø§Ø¨Ù‚Ø©' : 'Previous change requests',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -1786,7 +1786,7 @@ class _CenterProfileEditRequestPageState
           const SizedBox(height: 12),
           if (docs.isEmpty)
             Text(isArabic
-                ? 'لا توجد طلبات تعديل حتى الآن'
+                ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª ØªØ¹Ø¯ÙŠÙ„ Ø­ØªÙ‰ Ø§Ù„Ø¢Ù†'
                 : 'No change requests yet')
           else
             ...docs.map((doc) {
@@ -1807,10 +1807,10 @@ class _CenterProfileEditRequestPageState
                   children: [
                     Text(
                       status == 'approved'
-                          ? (isArabic ? 'مقبول' : 'Approved')
+                          ? (isArabic ? 'Ù…Ù‚Ø¨ÙˆÙ„' : 'Approved')
                           : status == 'rejected'
-                              ? (isArabic ? 'مرفوض' : 'Rejected')
-                              : (isArabic ? 'قيد المراجعة' : 'Pending review'),
+                              ? (isArabic ? 'Ù…Ø±ÙÙˆØ¶' : 'Rejected')
+                              : (isArabic ? 'Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©' : 'Pending review'),
                       style: TextStyle(
                         color: scheme.primary,
                         fontWeight: FontWeight.w800,
@@ -1819,7 +1819,7 @@ class _CenterProfileEditRequestPageState
                     if (note.isNotEmpty) ...[
                       const SizedBox(height: 6),
                       Text(isArabic
-                          ? 'ملاحظة الإدارة: $note'
+                          ? 'Ù…Ù„Ø§Ø­Ø¸Ø© Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©: $note'
                           : 'Admin note: $note'),
                     ],
                   ],
@@ -1843,7 +1843,7 @@ class _CenterProfileEditRequestPageState
             isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
-            isArabic ? 'طلب تعديل بيانات المركز' : 'Center data change request',
+            isArabic ? 'Ø·Ù„Ø¨ ØªØ¹Ø¯ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ²' : 'Center data change request',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -1851,7 +1851,7 @@ class _CenterProfileEditRequestPageState
           const SizedBox(height: 8),
           Text(
             isArabic
-                ? 'عدّل البيانات هنا ثم أرسلها للإدارة. سيبقى الطلب قيد المراجعة حتى يعتمد.'
+                ? 'Ø¹Ø¯Ù‘Ù„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ù‡Ù†Ø§ Ø«Ù… Ø£Ø±Ø³Ù„Ù‡Ø§ Ù„Ù„Ø¥Ø¯Ø§Ø±Ø©. Ø³ÙŠØ¨Ù‚Ù‰ Ø§Ù„Ø·Ù„Ø¨ Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© Ø­ØªÙ‰ ÙŠØ¹ØªÙ…Ø¯.'
                 : 'Update the fields here, then send them to admin for review.',
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
             style:
@@ -1863,7 +1863,7 @@ class _CenterProfileEditRequestPageState
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
             decoration: appInputDecoration(
               context: context,
-              label: isArabic ? 'اسم المركز' : 'Center name',
+              label: isArabic ? 'Ø§Ø³Ù… Ø§Ù„Ù…Ø±ÙƒØ²' : 'Center name',
               icon: Icons.business_outlined,
             ),
           ),
@@ -1873,7 +1873,7 @@ class _CenterProfileEditRequestPageState
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
             decoration: appInputDecoration(
               context: context,
-              label: isArabic ? 'اسم المسؤول' : 'Manager name',
+              label: isArabic ? 'Ø§Ø³Ù… Ø§Ù„Ù…Ø³Ø¤ÙˆÙ„' : 'Manager name',
               icon: Icons.badge_outlined,
             ),
           ),
@@ -1883,7 +1883,7 @@ class _CenterProfileEditRequestPageState
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
             decoration: appInputDecoration(
               context: context,
-              label: isArabic ? 'المدينة' : 'City',
+              label: isArabic ? 'Ø§Ù„Ù…Ø¯ÙŠÙ†Ø©' : 'City',
               icon: Icons.location_city_outlined,
             ),
           ),
@@ -1893,7 +1893,7 @@ class _CenterProfileEditRequestPageState
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
             decoration: appInputDecoration(
               context: context,
-              label: isArabic ? 'العنوان' : 'Address',
+              label: isArabic ? 'Ø§Ù„Ø¹Ù†ÙˆØ§Ù†' : 'Address',
               icon: Icons.location_on_outlined,
             ),
           ),
@@ -1904,14 +1904,14 @@ class _CenterProfileEditRequestPageState
             textAlign: isArabic ? TextAlign.right : TextAlign.left,
             decoration: appInputDecoration(
               context: context,
-              label: isArabic ? 'وصف المركز' : 'Center description',
+              label: isArabic ? 'ÙˆØµÙ Ø§Ù„Ù…Ø±ÙƒØ²' : 'Center description',
               icon: Icons.notes_outlined,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             isArabic
-                ? 'طلب استبدال صور المركز'
+                ? 'Ø·Ù„Ø¨ Ø§Ø³ØªØ¨Ø¯Ø§Ù„ ØµÙˆØ± Ø§Ù„Ù…Ø±ÙƒØ²'
                 : 'Center image replacement request',
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w800,
@@ -1924,7 +1924,7 @@ class _CenterProfileEditRequestPageState
             decoration: appInputDecoration(
               context: context,
               label: isArabic
-                  ? 'رابط صورة واجهة بديلة'
+                  ? 'Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© ÙˆØ§Ø¬Ù‡Ø© Ø¨Ø¯ÙŠÙ„Ø©'
                   : 'Replacement front image URL',
               icon: Icons.storefront_outlined,
             ),
@@ -1936,7 +1936,7 @@ class _CenterProfileEditRequestPageState
             decoration: appInputDecoration(
               context: context,
               label: isArabic
-                  ? 'رابط صورة استقبال بديلة'
+                  ? 'Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø¨Ø¯ÙŠÙ„Ø©'
                   : 'Replacement reception image URL',
               icon: Icons.meeting_room_outlined,
             ),
@@ -1948,7 +1948,7 @@ class _CenterProfileEditRequestPageState
             decoration: appInputDecoration(
               context: context,
               label: isArabic
-                  ? 'رابط صورة داخلية بديلة 1'
+                  ? 'Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© Ø¯Ø§Ø®Ù„ÙŠØ© Ø¨Ø¯ÙŠÙ„Ø© 1'
                   : 'Replacement inside image 1 URL',
               icon: Icons.photo_outlined,
             ),
@@ -1960,7 +1960,7 @@ class _CenterProfileEditRequestPageState
             decoration: appInputDecoration(
               context: context,
               label: isArabic
-                  ? 'رابط صورة داخلية بديلة 2'
+                  ? 'Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© Ø¯Ø§Ø®Ù„ÙŠØ© Ø¨Ø¯ÙŠÙ„Ø© 2'
                   : 'Replacement inside image 2 URL',
               icon: Icons.photo_library_outlined,
             ),
@@ -1980,9 +1980,9 @@ class _CenterProfileEditRequestPageState
                   : const Icon(Icons.send_outlined),
               label: Text(
                 _submitting
-                    ? (isArabic ? 'جارٍ الإرسال...' : 'Sending...')
+                    ? (isArabic ? 'Ø¬Ø§Ø±Ù Ø§Ù„Ø¥Ø±Ø³Ø§Ù„...' : 'Sending...')
                     : (isArabic
-                        ? 'إرسال طلب تعديل البيانات'
+                        ? 'Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª'
                         : 'Send data change request'),
                 maxLines: 2,
                 softWrap: true,
@@ -2019,7 +2019,7 @@ class _CenterProfileEditRequestPageState
         resizeToAvoidBottomInset: true,
         appBar: AppShellActions.buildAppBar(
           context,
-          title: isArabic ? 'تعديل بياناتي' : 'Edit my data',
+          title: isArabic ? 'ØªØ¹Ø¯ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§ØªÙŠ' : 'Edit my data',
         ),
         body: SafeArea(
           child: AppPageBackground(
@@ -2050,7 +2050,7 @@ class _CenterProfileEditRequestPageState
                             padding: const EdgeInsets.all(18),
                             child: Text(
                               isArabic
-                                  ? 'يوجد طلب تعديل بيانات مركز قيد المراجعة. يمكنك متابعة حالته هنا.'
+                                  ? 'ÙŠÙˆØ¬Ø¯ Ø·Ù„Ø¨ ØªØ¹Ø¯ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§Øª Ù…Ø±ÙƒØ² Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©. ÙŠÙ…ÙƒÙ†Ùƒ Ù…ØªØ§Ø¨Ø¹Ø© Ø­Ø§Ù„ØªÙ‡ Ù‡Ù†Ø§.'
                                   : 'A center data change request is pending. You can track it here.',
                               textAlign:
                                   isArabic ? TextAlign.right : TextAlign.left,
@@ -2072,3 +2072,4 @@ class _CenterProfileEditRequestPageState
     );
   }
 }
+
