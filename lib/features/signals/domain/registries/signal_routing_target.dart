@@ -6,7 +6,6 @@ class SignalRoutingTarget {
   static const String supportMonitoring = 'support_monitoring';
   static const String technicalMonitoring = 'technical_monitoring';
   static const String ownerSummary = 'owner_summary';
-  static const String archive = 'archive';
 
   static const List<String> values = <String>[
     residentialMonitoring,
@@ -14,6 +13,5 @@ class SignalRoutingTarget {
     supportMonitoring,
     technicalMonitoring,
     ownerSummary,
-    archive,
   ];
 }

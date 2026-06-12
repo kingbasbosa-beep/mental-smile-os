@@ -29,8 +29,9 @@ class SavedDestinationRepository {
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
-    await const CleanSignalRuntime().emit(
+    await CleanSignalRuntime.firestore().emit(
       SignalPackageFactory.destinationSaved(
+        actorId: clientId,
         actorRole: 'client',
         targetType: destinationType.name,
         targetId: destinationId,

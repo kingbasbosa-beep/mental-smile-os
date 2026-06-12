@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/library/data/library_signal_metadata.dart';
+import 'package:flutterprojects/features/signals/signals.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
 
@@ -30,6 +33,23 @@ class _LibraryPageState extends State<LibraryPage> {
   void initState() {
     super.initState();
     _syncPageController(_viewportFraction);
+
+    // Emit Discovery Signal (Fail-soft)
+    if (widget.initialCategoryKey != null &&
+        widget.initialCategoryKey!.isNotEmpty) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null && !user.isAnonymous) {
+        unawaited(
+          CleanSignalRuntime.firestore().emit(
+            SignalPackageFactory.libraryCategoryOpened(
+              actorId: user.uid,
+              actorRole: 'client',
+              targetId: widget.initialCategoryKey!,
+            ),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -116,9 +136,9 @@ class _LibraryPageState extends State<LibraryPage> {
         keyName: 'videos',
         titleAr: 'فيديو',
         titleEn: 'Videos',
-        noteAr: 'موارد تعليمية مرئية، وأي روابط خارجية مستقبلًا ستحتاج مراجعة.',
+        noteAr: 'موارد تعليمية مرئية، وأي روابط خارجية مستقبلًا ستحتاج رصد سلامة.',
         noteEn:
-            'Educational video resources. Future external links will require review.',
+            'Educational video resources. Future external links will require safety observation.',
         asset: 'c6_library/categories/cat_videos.png',
       ),
       const _LibCat(

@@ -7,11 +7,14 @@ import 'package:flutterprojects/features/centers/data/services/centers_firestore
 import 'package:flutterprojects/features/contact_requests/data/contact_request_repository.dart';
 import 'package:flutterprojects/features/saved_destinations/data/saved_destination_repository.dart';
 import 'package:flutterprojects/features/saved_destinations/domain/models/saved_destination.dart';
+import 'package:flutterprojects/features/signals/signals.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CenterDetailsPage extends StatelessWidget {
+  static final Set<String> _emittedProfileViews = <String>{};
+
   final CenterModel? center;
   final String? centerId;
 
@@ -736,7 +739,8 @@ class CenterDetailsPage extends StatelessWidget {
   }
 
   Widget _heroMedia(BuildContext context, CenterModel c) {
-    final l10n = AppLocalizations.of(context)!;
+    final isArabic =
+        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
     final cover = _coverValue(c);
     final logo = _logoValue(c);
 
@@ -795,10 +799,12 @@ class CenterDetailsPage extends StatelessWidget {
             start: 18,
             top: 18,
             child: _GoldChip(
-              icon: c.isActive
+              icon: c.visibilityReadiness == 'ready'
                   ? Icons.verified_outlined
                   : Icons.hourglass_empty_rounded,
-              label: c.isActive ? l10n.centerAvailable : l10n.centerUnavailable,
+              label: c.visibilityReadiness == 'ready'
+                  ? (isArabic ? 'جاهز' : 'Ready')
+                  : (isArabic ? 'غير مكتمل' : 'Incomplete'),
             ),
           ),
         ],
@@ -1302,6 +1308,24 @@ class CenterDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final initial = center;
     final id = centerId?.trim();
+
+    final effectiveCenterId = initial?.id ?? id ?? '';
+    if (effectiveCenterId.isNotEmpty) {
+      final user = FirebaseAuth.instance.currentUser;
+      final eventKey = '${user?.uid}:$effectiveCenterId';
+      if (user != null &&
+          !user.isAnonymous &&
+          _emittedProfileViews.add(eventKey)) {
+        CleanSignalRuntime.firestore().emit(
+          SignalPackageFactory.centerProfileOpened(
+            actorId: user.uid,
+            actorRole: 'client',
+            targetId: effectiveCenterId,
+          ),
+        );
+      }
+    }
+
     final l10n = AppLocalizations.of(context)!;
     final isArabic =
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';

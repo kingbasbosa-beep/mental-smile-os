@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutterprojects/core/visibility/visibility_readiness.dart';
 import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
 
 class CenterDocument {
@@ -43,7 +44,7 @@ class CenterModel {
   final String address;
   final bool hasDetoxUnit;
   final List<String> services;
-  final bool isActive;
+  final String visibilityReadiness;
   final int sortOrder;
   final String imageUrl;
   final String coverImageUrl;
@@ -72,7 +73,7 @@ class CenterModel {
     required this.address,
     required this.hasDetoxUnit,
     required this.services,
-    required this.isActive,
+    this.visibilityReadiness = VisibilityReadiness.incomplete,
     required this.sortOrder,
     required this.imageUrl,
     required this.coverImageUrl,
@@ -225,7 +226,7 @@ class CenterModel {
       hasDetoxUnit: ((data['hasDetoxUnit'] ?? false) == true) ||
           inferCenterType() == 'detox',
       services: asStringList(data['services']),
-      isActive: (data['isActive'] ?? true) == true,
+      visibilityReadiness: VisibilityReadiness.resolve(data),
       sortOrder: asInt(data['sortOrder'], fallback: 0),
       imageUrl: primaryImage,
       coverImageUrl: coverImage,
@@ -261,7 +262,6 @@ class CenterModel {
       'address': address,
       'hasDetoxUnit': hasDetoxUnit,
       'services': services,
-      'isActive': isActive,
       'sortOrder': sortOrder,
       'imageUrl': imageUrl,
       'coverImageUrl': coverImageUrl,
@@ -296,7 +296,7 @@ class CenterModel {
     String? address,
     bool? hasDetoxUnit,
     List<String>? services,
-    bool? isActive,
+    String? visibilityReadiness,
     int? sortOrder,
     String? imageUrl,
     String? coverImageUrl,
@@ -325,7 +325,7 @@ class CenterModel {
       address: address ?? this.address,
       hasDetoxUnit: hasDetoxUnit ?? this.hasDetoxUnit,
       services: services ?? this.services,
-      isActive: isActive ?? this.isActive,
+      visibilityReadiness: visibilityReadiness ?? this.visibilityReadiness,
       sortOrder: sortOrder ?? this.sortOrder,
       imageUrl: imageUrl ?? this.imageUrl,
       coverImageUrl: coverImageUrl ?? this.coverImageUrl,

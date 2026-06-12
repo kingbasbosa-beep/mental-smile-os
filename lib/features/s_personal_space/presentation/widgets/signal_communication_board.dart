@@ -20,7 +20,7 @@ class SignalCommunicationBoard extends StatelessWidget {
           .limit(20)
           .snapshots(),
       builder: (context, snapshot) {
-        // Fallback to static if no data yet or error
+        // Fail soft: the board remains useful if observation is unavailable.
         final events = snapshot.hasData
             ? snapshot.data!.docs
                 .map((doc) => SignalPackage.fromMap(doc.data()))
@@ -47,7 +47,7 @@ class _BoardPresenter extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _LaneCard(
-          title: isArabic ? 'الرسائل' : 'Messages',
+          title: isArabic ? 'ملاحظات الإشارات' : 'Signal Notes',
           icon: Icons.chat_bubble_outline_rounded,
           accentColor: const Color(0xFFE7C766),
           content: _buildMessages(isArabic),
@@ -68,7 +68,7 @@ class _BoardPresenter extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         _LaneCard(
-          title: isArabic ? 'إعلانات المنصة' : 'Announcements',
+          title: isArabic ? 'تحديثات الموارد' : 'Resource Updates',
           icon: Icons.campaign_outlined,
           accentColor: const Color(0xFF8EDBFF),
           content: _buildAnnouncements(isArabic),
@@ -93,30 +93,30 @@ class _BoardPresenter extends StatelessWidget {
 
     if (latest.signalType == SignalTypeRegistry.destinationSaved) {
       text = isArabic
-          ? 'لقد قمت بحفظ وجهة جديدة مؤخرًا. رحلة الألف ميل تبدأ بخطوة.'
-          : 'You saved a new destination recently. A journey of a thousand miles begins with a single step.';
+          ? 'لقد حفظت وجهة جديدة مؤخرًا. يمكنك العودة إليها من مساحتك.'
+          : 'You saved a new destination recently. It remains available in your space.';
     } else if (latest.signalType == SignalTypeRegistry.goalSelected) {
       text = isArabic
-          ? 'تحديد أهدافك هو أول طريق النجاح. استمر في التركيز.'
-          : 'Defining your goals is the first step to success. Stay focused.';
+          ? 'تم حفظ إشارة هدف اخترتها.'
+          : 'A goal signal you selected has been saved.';
     }
 
     return _EntryText(text: text);
   }
 
   Widget _buildSafetyNotices(bool isArabic) {
-    // V1: Simple static guidance.
     return _EntryText(
       text: isArabic
-          ? 'تذكر أن الصحة النفسية رحلة مستمرة. يمكنك دائمًا طلب استشارة من مختص مؤهل عند الحاجة.'
-          : 'Remember that mental health is a continuous journey. You can always seek a consultation from a qualified specialist when needed.',
+          ? 'إرشادات السلامة وموارد الدعم المؤهل متاحة متى اخترت استكشافها.'
+          : 'Safety guidance and qualified support resources remain available whenever you choose to explore them.',
     );
   }
 
   Widget _buildRecommendations(bool isArabic) {
     final interests = events
-        .where((e) => e.signalType == SignalTypeRegistry.interestSelected)
-        .map((e) => e.targetId)
+        .where((event) =>
+            event.signalType == SignalTypeRegistry.interestSelected)
+        .map((event) => event.targetId)
         .toSet();
 
     if (interests.contains('recovery')) {
@@ -145,8 +145,8 @@ class _BoardPresenter extends StatelessWidget {
   Widget _buildAnnouncements(bool isArabic) {
     return _EntryText(
       text: isArabic
-          ? 'تم تحديث نظام [S] لضمان خصوصية بياناتك وتركيز التطبيق على دعمك.'
-          : 'The [S] system has been updated to ensure data privacy and keep the app focused on your support.',
+          ? 'تتوفر تحديثات الموارد داخل المكتبة ومسارات الاستكشاف.'
+          : 'Resource updates are available through the Library and discovery pathways.',
     );
   }
 }
@@ -182,13 +182,17 @@ class _LaneCard extends StatelessWidget {
             children: [
               Icon(icon, size: 20, color: accentColor),
               const SizedBox(width: 10),
-              Text(
-                title,
-                style: TextStyle(
-                  color: accentColor,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0.5,
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: accentColor,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0,
+                  ),
                 ),
               ),
             ],

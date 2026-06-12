@@ -90,11 +90,6 @@ class ClientDashboardPage extends StatelessWidget {
     return value;
   }
 
-  bool _readIsActive(Map<String, dynamic>? data) {
-    if (data == null) return true;
-    return (data['isActive'] ?? true) == true;
-  }
-
   String _initials(String name) {
     final parts = name.trim().split(' ').where((e) => e.isNotEmpty).toList();
     if (parts.isEmpty) return 'SC';
@@ -160,7 +155,6 @@ class ClientDashboardPage extends StatelessWidget {
                         name: name,
                         initials: _initials(name),
                         avatarAsset: _readAvatarAsset(data),
-                        isActive: _readIsActive(data),
                         signals: signals,
                       );
 
@@ -480,7 +474,6 @@ class _ClientFederationContent extends StatelessWidget {
     required this.name,
     required this.initials,
     required this.avatarAsset,
-    required this.isActive,
     required this.signals,
   });
 
@@ -489,7 +482,6 @@ class _ClientFederationContent extends StatelessWidget {
   final String name;
   final String initials;
   final String avatarAsset;
-  final bool isActive;
   final _ClientSignalSnapshot signals;
 
   @override
@@ -499,7 +491,6 @@ class _ClientFederationContent extends StatelessWidget {
       name: name,
       initials: initials,
       avatarAsset: avatarAsset,
-      isActive: isActive,
       compact: compact,
     );
 
@@ -541,7 +532,6 @@ class _HeaderBand extends StatelessWidget {
     required this.name,
     required this.initials,
     required this.avatarAsset,
-    required this.isActive,
     required this.compact,
   });
 
@@ -549,7 +539,6 @@ class _HeaderBand extends StatelessWidget {
   final String name;
   final String initials;
   final String avatarAsset;
-  final bool isActive;
   final bool compact;
 
   @override
@@ -561,7 +550,6 @@ class _HeaderBand extends StatelessWidget {
         _ClientAvatarBadge(
           avatarAsset: avatarAsset,
           initials: initials,
-          isActive: isActive,
           size: compact ? 78 : 90,
         ),
         const SizedBox(width: 16),
@@ -1303,7 +1291,7 @@ class _NextStepsCard extends StatelessWidget {
           _StepTile(
             isArabic: isArabic,
             icon: Icons.chat_bubble_outline_rounded,
-            title: isArabic ? 'تواصل أو اطلب دعم' : 'Contact or ask support',
+            title: isArabic ? 'تواصل أو شارك إشارة دعم' : 'Contact or share support',
             subtitle: isArabic
                 ? 'نحن هنا لمساعدتك.'
                 : 'Support is here when you need it.',
@@ -2023,13 +2011,11 @@ class _ClientAvatarBadge extends StatelessWidget {
   const _ClientAvatarBadge({
     required this.avatarAsset,
     required this.initials,
-    required this.isActive,
     required this.size,
   });
 
   final String avatarAsset;
   final String initials;
-  final bool isActive;
   final double size;
 
   @override
@@ -2070,19 +2056,6 @@ class _ClientAvatarBadge extends StatelessWidget {
                       fontWeight: FontWeight.w900,
                     ),
                   ),
-          ),
-        ),
-        PositionedDirectional(
-          start: 0,
-          bottom: 5,
-          child: Container(
-            width: 16,
-            height: 16,
-            decoration: BoxDecoration(
-              color: isActive ? const Color(0xFF54D742) : Colors.grey,
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 2),
-            ),
           ),
         ),
       ],

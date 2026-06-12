@@ -1,4 +1,3 @@
-import 'package:flutterprojects/features/signals/domain/guards/forbidden_signal_source_guard.dart';
 import 'package:flutterprojects/features/signals/domain/models/signal_aggregate.dart';
 import 'package:flutterprojects/features/signals/domain/registries/signal_aggregation_category_registry.dart';
 import 'package:flutterprojects/features/signals/domain/registries/signal_type_registry.dart';
@@ -27,8 +26,7 @@ class MonitoringAggregateValidator {
 
   static bool isReadable(SignalAggregate aggregate) {
     return readableSignalTypes.contains(aggregate.signalType) &&
-        readableCategories.contains(_categoryFromAggregateKey(aggregate)) &&
-        !_containsForbiddenResidue(aggregate.aggregateKey);
+        readableCategories.contains(_categoryFromAggregateKey(aggregate));
   }
 
   static String? categoryFromAggregateKey(SignalAggregate aggregate) {
@@ -38,12 +36,5 @@ class MonitoringAggregateValidator {
 
   static String _categoryFromAggregateKey(SignalAggregate aggregate) {
     return aggregate.aggregateKey.split(':').first;
-  }
-
-  static bool _containsForbiddenResidue(String value) {
-    final normalized = value.trim().toLowerCase();
-    return ForbiddenSignalSourceGuard.forbiddenSources.any(
-      (source) => normalized.contains(source.toLowerCase()),
-    );
   }
 }

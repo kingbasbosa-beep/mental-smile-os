@@ -1,4 +1,3 @@
-import '../guards/forbidden_signal_source_guard.dart';
 import '../models/signal_package.dart';
 import '../registries/signal_category_registry.dart';
 import '../registries/signal_privacy_level.dart';
@@ -10,6 +9,7 @@ class SignalPackageFactory {
   const SignalPackageFactory._();
 
   static SignalPackage goalSelected({
+    required String actorId,
     required String actorRole,
     String targetId = '',
     String signalSource = 'client_room',
@@ -19,6 +19,7 @@ class SignalPackageFactory {
       signalType: SignalTypeRegistry.goalSelected,
       signalCategory: SignalCategoryRegistry.goal,
       signalSource: signalSource,
+      actorId: actorId,
       actorRole: actorRole,
       targetType: 'client_signal',
       targetId: targetId,
@@ -27,6 +28,7 @@ class SignalPackageFactory {
   }
 
   static SignalPackage interestSelected({
+    required String actorId,
     required String actorRole,
     String targetId = '',
     String signalSource = 'client_room',
@@ -36,6 +38,7 @@ class SignalPackageFactory {
       signalType: SignalTypeRegistry.interestSelected,
       signalCategory: SignalCategoryRegistry.interest,
       signalSource: signalSource,
+      actorId: actorId,
       actorRole: actorRole,
       targetType: 'client_signal',
       targetId: targetId,
@@ -44,6 +47,7 @@ class SignalPackageFactory {
   }
 
   static SignalPackage accessibilityInterest({
+    required String actorId,
     required String actorRole,
     String targetId = '',
     String signalSource = 'client_room',
@@ -53,6 +57,7 @@ class SignalPackageFactory {
       signalType: SignalTypeRegistry.accessibilityInterest,
       signalCategory: SignalCategoryRegistry.accessibility,
       signalSource: signalSource,
+      actorId: actorId,
       actorRole: actorRole,
       targetType: 'client_signal',
       targetId: targetId,
@@ -61,6 +66,7 @@ class SignalPackageFactory {
   }
 
   static SignalPackage communicationPreferenceSelected({
+    required String actorId,
     required String actorRole,
     String targetId = '',
     String signalSource = 'client_room',
@@ -70,6 +76,7 @@ class SignalPackageFactory {
       signalType: SignalTypeRegistry.communicationPreferenceSelected,
       signalCategory: SignalCategoryRegistry.communication,
       signalSource: signalSource,
+      actorId: actorId,
       actorRole: actorRole,
       targetType: 'client_signal',
       targetId: targetId,
@@ -78,6 +85,7 @@ class SignalPackageFactory {
   }
 
   static SignalPackage destinationSaved({
+    required String actorId,
     required String actorRole,
     required String targetType,
     required String targetId,
@@ -89,6 +97,7 @@ class SignalPackageFactory {
       signalCategory: SignalCategoryRegistry.destination,
       signalDomain: 'residential',
       signalSource: signalSource,
+      actorId: actorId,
       actorRole: actorRole,
       targetType: targetType,
       targetId: targetId,
@@ -98,6 +107,7 @@ class SignalPackageFactory {
   }
 
   static SignalPackage providerContactStarted({
+    required String actorId,
     required String actorRole,
     required String targetId,
     String signalSource = 'provider_contact_requests',
@@ -106,6 +116,7 @@ class SignalPackageFactory {
     return _commercialContact(
       signalType: SignalTypeRegistry.providerContactStarted,
       signalSource: signalSource,
+      actorId: actorId,
       actorRole: actorRole,
       targetType: 'provider',
       targetId: targetId,
@@ -114,6 +125,7 @@ class SignalPackageFactory {
   }
 
   static SignalPackage centerContactStarted({
+    required String actorId,
     required String actorRole,
     required String targetId,
     String signalSource = 'center_contact_requests',
@@ -122,6 +134,7 @@ class SignalPackageFactory {
     return _commercialContact(
       signalType: SignalTypeRegistry.centerContactStarted,
       signalSource: signalSource,
+      actorId: actorId,
       actorRole: actorRole,
       targetType: 'center',
       targetId: targetId,
@@ -130,6 +143,7 @@ class SignalPackageFactory {
   }
 
   static SignalPackage supportStarted({
+    required String actorId,
     required String actorRole,
     String targetId = '',
     String signalSource = 'support_requests',
@@ -140,6 +154,7 @@ class SignalPackageFactory {
       signalCategory: SignalCategoryRegistry.support,
       signalDomain: 'support',
       signalSource: signalSource,
+      actorId: actorId,
       actorRole: actorRole,
       targetType: 'support',
       targetId: targetId,
@@ -149,6 +164,7 @@ class SignalPackageFactory {
   }
 
   static SignalPackage libraryCategoryOpened({
+    required String actorId,
     required String actorRole,
     required String targetId,
     String signalSource = 'library',
@@ -159,6 +175,7 @@ class SignalPackageFactory {
       signalCategory: SignalCategoryRegistry.library,
       signalDomain: 'residential',
       signalSource: signalSource,
+      actorId: actorId,
       actorRole: actorRole,
       targetType: 'library_category',
       targetId: targetId,
@@ -168,6 +185,7 @@ class SignalPackageFactory {
   }
 
   static SignalPackage providerProfileOpened({
+    required String actorId,
     required String actorRole,
     required String targetId,
     String signalSource = 'provider_discovery',
@@ -178,8 +196,30 @@ class SignalPackageFactory {
       signalCategory: SignalCategoryRegistry.capability,
       signalDomain: 'commercial',
       signalSource: signalSource,
+      actorId: actorId,
       actorRole: actorRole,
       targetType: 'provider',
+      targetId: targetId,
+      timestamp: timestamp,
+      routingTarget: SignalRoutingTarget.commercialMonitoring,
+    );
+  }
+
+  static SignalPackage centerProfileOpened({
+    required String actorId,
+    required String actorRole,
+    required String targetId,
+    String signalSource = 'center_discovery',
+    DateTime? timestamp,
+  }) {
+    return _package(
+      signalType: SignalTypeRegistry.centerProfileOpened,
+      signalCategory: SignalCategoryRegistry.capability,
+      signalDomain: 'commercial',
+      signalSource: signalSource,
+      actorId: actorId,
+      actorRole: actorRole,
+      targetType: 'center',
       targetId: targetId,
       timestamp: timestamp,
       routingTarget: SignalRoutingTarget.commercialMonitoring,
@@ -190,6 +230,7 @@ class SignalPackageFactory {
     required String signalType,
     required String signalCategory,
     required String signalSource,
+    required String actorId,
     required String actorRole,
     required String targetType,
     required String targetId,
@@ -200,6 +241,7 @@ class SignalPackageFactory {
       signalCategory: signalCategory,
       signalDomain: 'residential',
       signalSource: signalSource,
+      actorId: actorId,
       actorRole: actorRole,
       targetType: targetType,
       targetId: targetId,
@@ -211,6 +253,7 @@ class SignalPackageFactory {
   static SignalPackage _commercialContact({
     required String signalType,
     required String signalSource,
+    required String actorId,
     required String actorRole,
     required String targetType,
     required String targetId,
@@ -221,6 +264,7 @@ class SignalPackageFactory {
       signalCategory: SignalCategoryRegistry.contact,
       signalDomain: 'commercial',
       signalSource: signalSource,
+      actorId: actorId,
       actorRole: actorRole,
       targetType: targetType,
       targetId: targetId,
@@ -234,13 +278,13 @@ class SignalPackageFactory {
     required String signalCategory,
     required String signalDomain,
     required String signalSource,
+    required String actorId,
     required String actorRole,
     required String targetType,
     required String targetId,
     required String routingTarget,
     DateTime? timestamp,
   }) {
-    ForbiddenSignalSourceGuard.ensureAllowed(signalSource);
     final occurredAt = timestamp ?? DateTime.now().toUtc();
     return SignalPackage(
       signalId: _signalId(signalType, occurredAt),
@@ -248,6 +292,7 @@ class SignalPackageFactory {
       signalCategory: signalCategory,
       signalDomain: signalDomain,
       signalSource: signalSource,
+      actorId: actorId,
       actorRole: actorRole,
       targetType: targetType,
       targetId: targetId,

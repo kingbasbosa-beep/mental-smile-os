@@ -160,7 +160,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
                             children: [
                               const SizedBox(height: 16),
                               const Text(
-                                'Service disclosure step: prices and capabilities are provider-declared information for review. This is not a lifecycle or activation promise.',
+                                'Service disclosure step: prices and capabilities are center-declared readiness signals.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white70,
@@ -545,7 +545,7 @@ class _WebCenterPricingPageState extends State<WebCenterPricingPage> {
         _dropdown(
           value: item.pricingUnit.isEmpty ? null : item.pricingUnit,
           label: l10n.webCenterPricingUnit,
-          items: const ['session', 'day', 'month'],
+          items: const ['visit', 'day', 'month'],
           onChanged: (value) {
             setState(() {
               _autismCareCosts = _autismCareCosts

@@ -1,1 +1,1 @@
-export 'domain/signal_recommendation_foundation.dart';
+export 'domain/signal_magnet/signal_magnet_foundation.dart';

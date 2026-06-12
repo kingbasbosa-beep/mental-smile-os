@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
+import 'package:flutterprojects/features/web_registration/domain/declaration_readiness.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
 
@@ -57,10 +58,10 @@ class _WebClinicianDocumentsPageState extends State<WebClinicianDocumentsPage> {
     });
 
     try {
-      await FirebaseFirestore.instance
-          .collection('clinicians')
-          .doc(uid)
-          .update({
+      final docRef =
+          FirebaseFirestore.instance.collection('clinicians').doc(uid);
+      final snapshot = await docRef.get();
+      final changes = <String, dynamic>{
         'documentsSubmitted': true,
         'documentsUploadMode': 'web_registration',
         'identityFileName': _identityFileNameController.text.trim(),
@@ -69,10 +70,14 @@ class _WebClinicianDocumentsPageState extends State<WebClinicianDocumentsPage> {
         'identityDocumentUrl': '',
         'certificateDocumentUrl': '',
         'extraDocumentUrl': '',
-        'approvalStatus': 'pending_review',
-        'isActive': false,
         'updatedAt': FieldValue.serverTimestamp(),
-      });
+      };
+      await docRef.update(
+        DeclarationReadiness.clinicianPayload(
+          currentData: snapshot.data() ?? const <String, dynamic>{},
+          changes: changes,
+        ),
+      );
 
       WebRegistrationDraftStore.clearClinicianUid();
       if (!mounted) return;
@@ -151,7 +156,7 @@ class _WebClinicianDocumentsPageState extends State<WebClinicianDocumentsPage> {
                             children: [
                               const SizedBox(height: 16),
                               const Text(
-                                'Document review step: submitted licenses and documents remain the applicant responsibility. Submission does not mean official approval or platform guarantee.',
+                                'Document declaration step: submitted licenses and documents remain the applicant responsibility. Visibility depends on readiness completeness.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white70,

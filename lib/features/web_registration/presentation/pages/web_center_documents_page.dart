@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/centers/presentation/center_document_requirements.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
+import 'package:flutterprojects/features/web_registration/domain/declaration_readiness.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
 
@@ -18,7 +19,6 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
   final _formKey = GlobalKey<FormState>();
   final Map<String, TextEditingController> _fileNameControllers = {};
   final Map<String, TextEditingController> _fileUrlControllers = {};
-  final Map<String, TextEditingController> _reviewNoteControllers = {};
   bool _isSaving = false;
   String? _error;
 
@@ -29,7 +29,6 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
       final key = item['key'] ?? '';
       _fileNameControllers[key] = TextEditingController();
       _fileUrlControllers[key] = TextEditingController();
-      _reviewNoteControllers[key] = TextEditingController();
     }
   }
 
@@ -39,9 +38,6 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
       controller.dispose();
     }
     for (final controller in _fileUrlControllers.values) {
-      controller.dispose();
-    }
-    for (final controller in _reviewNoteControllers.values) {
       controller.dispose();
     }
     super.dispose();
@@ -57,8 +53,7 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
         'originalFileName': fileName,
         'fileUrl': _fileUrlControllers[type]?.text.trim() ?? '',
         'uploadedAt': DateTime.now().toIso8601String(),
-        'status': 'pending',
-        'reviewNote': _reviewNoteControllers[type]?.text.trim() ?? '',
+        'status': 'submitted',
         'storagePath': '',
       };
     }).toList();
@@ -98,13 +93,19 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
       final docs = _documentItems();
       final documentsReady = _hasRequiredDocuments(docs);
 
-      await FirebaseFirestore.instance.collection('centers').doc(uid).update({
+      final docRef = FirebaseFirestore.instance.collection('centers').doc(uid);
+      final snapshot = await docRef.get();
+      final changes = <String, dynamic>{
         'documentItems': docs,
         'documentsReady': documentsReady,
-        'approvalStatus': 'pending_admin',
-        'isActive': false,
         'updatedAt': FieldValue.serverTimestamp(),
-      });
+      };
+      await docRef.update(
+        DeclarationReadiness.centerPayload(
+          currentData: snapshot.data() ?? const <String, dynamic>{},
+          changes: changes,
+        ),
+      );
 
       WebRegistrationDraftStore.clearCenterUid();
       if (!mounted) return;
@@ -179,7 +180,7 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
                             children: [
                               const SizedBox(height: 16),
                               const Text(
-                                'Document review step: submitted licenses and documents remain the applicant responsibility. Submission does not mean official approval or platform guarantee.',
+                                'Document declaration step: submitted licenses and documents remain the applicant responsibility. Visibility depends on readiness completeness.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white70,
@@ -297,25 +298,6 @@ class _WebCenterDocumentsPageState extends State<WebCenterDocumentsPage> {
             ),
             decoration: InputDecoration(
               labelText: l10n.webCenterFileUrlOptional,
-              labelStyle: const TextStyle(color: Color(0xFFE8C878)),
-              enabledBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFFEDEDED), width: 1.2),
-              ),
-              focusedBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFFEDEDED), width: 1.8),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: _reviewNoteControllers[type],
-            maxLines: 2,
-            style: const TextStyle(
-              color: Color(0xFFFFF6DE),
-              fontWeight: FontWeight.w700,
-            ),
-            decoration: InputDecoration(
-              labelText: l10n.webCenterReviewNoteOptional,
               labelStyle: const TextStyle(color: Color(0xFFE8C878)),
               enabledBorder: const UnderlineInputBorder(
                 borderSide: BorderSide(color: Color(0xFFEDEDED), width: 1.2),

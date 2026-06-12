@@ -300,8 +300,8 @@ class _ChatEscalationReportPageState extends State<ChatEscalationReportPage> {
       );
     }
 
-    final sessionOverview = _get(report, 'sessionOverview');
-    if (sessionOverview is Map<String, dynamic>) {
+    final conversationOverview = _get(report, 'conversationOverview');
+    if (conversationOverview is Map<String, dynamic>) {
       section(
         'ملخص الجلسة',
         Column(
@@ -309,14 +309,14 @@ class _ChatEscalationReportPageState extends State<ChatEscalationReportPage> {
           children: [
             textRow(
               'بداية الجلسة',
-              _formatTimestamp(sessionOverview['startedAt']),
+              _formatTimestamp(conversationOverview['startedAt']),
             ),
             textRow(
               'آخر رسالة',
-              _formatTimestamp(sessionOverview['lastMessageAt']),
+              _formatTimestamp(conversationOverview['lastMessageAt']),
             ),
-            textRow('مدة (ثانية)', sessionOverview['durationSeconds']),
-            textRow('عدد الرسائل', sessionOverview['messageCount']),
+            textRow('مدة (ثانية)', conversationOverview['durationSeconds']),
+            textRow('عدد الرسائل', conversationOverview['messageCount']),
           ].whereType<Widget>().toList(),
         ),
       );

@@ -54,8 +54,8 @@ class WebRegistrationSuccessPage extends StatelessWidget {
                               ? 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ Ø¨Ù†Ø¬Ø§Ø­.'
                               : 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…Ø±ÙƒØ² Ø¨Ù†Ø¬Ø§Ø­.')
                           : (isClinician
-                              ? 'Your clinician intake/review request has been submitted successfully.'
-                              : 'Your center intake/review request has been submitted successfully.'),
+                              ? 'Your clinician declaration has been submitted successfully.'
+                              : 'Your center declaration has been submitted successfully.'),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Color(0xFFE8C878),
@@ -73,8 +73,8 @@ class WebRegistrationSuccessPage extends StatelessWidget {
                               ? 'Ø³ÙŠØªÙ… Ù…Ø±Ø§Ø¬Ø¹Ø© Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ Ù‚Ø¨Ù„ Ø§Ù„ØªÙØ¹ÙŠÙ„.'
                               : 'Ø³ÙŠØªÙ… Ù…Ø±Ø§Ø¬Ø¹Ø© Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ² Ù‚Ø¨Ù„ Ø§Ù„ØªÙØ¹ÙŠÙ„.')
                           : (isClinician
-                              ? 'Your clinician information will be reviewed before activation.'
-                              : 'Your center information will be reviewed before activation.'),
+                              ? 'Your clinician visibility depends on required readiness signals.'
+                              : 'Your center visibility depends on required readiness signals.'),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Colors.white,
@@ -87,7 +87,7 @@ class WebRegistrationSuccessPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     const Text(
-                      'This is an intake/review request only. Submission does not mean automatic approval, immediate activation, lifecycle ownership, or guaranteed visibility. Mental Smile will contact you after review.',
+                      'Submission records declaration signals. Visibility is derived from readiness completeness and safety status.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white70,

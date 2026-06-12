@@ -1,69 +1,59 @@
-# Owner Admin Bootstrap
+﻿# Owner Bootstrap
 
-This script assigns Firebase Auth custom claims to Mental Smile owner admin accounts and upserts their `admins/{uid}` Firestore documents.
+This document describes the temporary manual bootstrap process for Mental Smile owner access.
 
-It is intentionally safe to rerun. If an owner email does not exist in Firebase Auth yet, the script prints a warning and continues.
+## Doctrine
 
-## Owners
+Owner access is based only on:
 
-- `kingbasbosa@gmail.com`
-- `mentalsmile.platform@gmail.com`
+- Firebase Auth user
+- Firebase Auth custom claim: `{ "role": "owner" }`
 
-## Service Account
+Mental Smile does not use:
 
-Do not commit service account keys to git.
+- admin role
+- admins collection
+- owners collection
+- email fallback
+- Firestore role document authority
 
-Use one of these local-only options:
+## Service Account Safety
 
-1. Set an environment variable:
+Service account files are local-only secrets.
 
-```bash
-GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/to/serviceAccount.local.json node tools/firebase/bootstrap_owner_admins.js
-```
+Never commit:
 
-2. Or place the key locally at:
+- `tools/firebase/serviceAccountKey.json`
+- `tools/firebase/serviceAccount.local.json`
+- any `serviceAccount*.json`
+- any Firebase Admin SDK private key
 
-```text
-tools/firebase/serviceAccount.local.json
-```
+These files must remain ignored by git.
 
-The key must belong to this Firebase project:
+## Manual Owner Claim
 
-```text
-mental-smile-app-clean
-```
+Use a local-only script or Firebase Admin SDK environment to assign:
 
-The script refuses to run if the service account `project_id` does not match.
+```json
+{
+  "role": "owner"
+}
 
-## Manual Run
+to the intended Firebase Auth user.
 
-From the project root, after installing Firebase Admin SDK dependencies if needed:
+The user must sign out and sign in again after the claim is set.
 
-```bash
-node tools/firebase/bootstrap_owner_admins.js
-```
+Expected Result
 
-The script does not create missing Auth users automatically. For example, if `mentalsmile.platform@gmail.com` does not exist yet, it will print:
+After refresh, the app should route the owner account to:
 
-```text
-[OWNER_BOOTSTRAP][MISSING_AUTH_USER] mentalsmile.platform@gmail.com
-```
+/s/owner
 
-After the account is created later, rerun the script.
+No Firestore owner/admin document is required.
 
-## After Running
-
-Each owner must sign out and sign in again, or otherwise refresh their ID token, so the new custom claims are included in the client token.
-
-Expected result:
-
-- Firebase Auth custom claims include `{ "role": "admin" }`.
-- Firestore has `admins/{uid}` with `active`, `isActive`, `isAdmin`, and `isBlocked` fields aligned for admin access.
-
-## Safety Notes
-
-- This script does not delete users.
-- This script does not delete Firestore documents.
-- This script does not modify Firebase rules.
-- This script does not modify Flutter app code.
-- This script only updates existing Auth users that match the configured owner emails.
+Safety Notes
+This process does not create users.
+This process does not create Firestore authority documents.
+This process does not modify Firestore rules.
+This process does not modify Flutter app code.
+Service account credentials must never enter git.

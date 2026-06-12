@@ -125,3 +125,7 @@ SYSTEM_HQ_STATE_LATEST.md
 SAFEPOINT_HANDOFF_*.md
 serviceAccount*.json
 tools/firebase/*.json
+
+# Firebase Admin SDK private keys
+tools/firebase/serviceAccountKey.json
+tools/firebase/*.json

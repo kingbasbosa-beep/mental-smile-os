@@ -14,7 +14,7 @@ enum SOwnerDistrictFocus {
 }
 
 // [S] Owner District Package
-// Construction Era placeholder. No Firebase, secrets, workflow, or legacy data coupling.
+// Construction Era placeholder. No Firebase writes.
 class SOwnerDistrictPage extends StatelessWidget {
   const SOwnerDistrictPage({
     super.key,
@@ -148,7 +148,7 @@ class _OwnerHero extends StatelessWidget {
           Text(
             'The Owner District sees the whole map, protects sovereign memory, '
             'coordinates continuity, and prepares recovery paths. It is not '
-            'admin operations and it is not the control room.',
+            'governance operations and it is not a monitoring room.',
             style: TextStyle(
               color: Color(0xFF40506A),
               fontSize: 16,
@@ -168,7 +168,7 @@ class _OwnerNavigation extends StatelessWidget {
   static const _items = <_NavItem>[
     _NavItem('Overview', Routes.sOwnerHome),
     _NavItem('Owner Room', Routes.sOwnerRoom),
-    _NavItem('Strategic Archive', Routes.sStrategicArchive),
+    _NavItem('Strategic Memory', Routes.sStrategicMemory),
     _NavItem('Constitutional Memory', Routes.sConstitutionalMemory),
     _NavItem('Sovereign Vault', Routes.sSovereignVault),
     _NavItem('Survival Capsules', Routes.sOwnerCapsules),
@@ -266,7 +266,7 @@ class _StrategicArchiveHall extends StatelessWidget {
     return const _DistrictCard(
       title: '[S] Strategic Archive',
       subtitle:
-          'Strategic memory placeholders without administrative archive coupling.',
+          'Strategic memory placeholders for owner-level continuity.',
       groups: <_DistrictGroup>[
         _DistrictGroup('Strategic Reports', <String>[
           'Report index placeholder',
@@ -362,7 +362,7 @@ class _SurvivalCapsuleCenter extends StatelessWidget {
             children: <Widget>[
               _CapsuleCard(title: 'Commercial Capsule'),
               _CapsuleCard(title: 'Residential Capsule'),
-              _CapsuleCard(title: 'Control Room Capsule'),
+              _CapsuleCard(title: 'Monitoring Capsule'),
               _CapsuleCard(title: 'Archive Capsule'),
             ],
           ),

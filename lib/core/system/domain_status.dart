@@ -101,7 +101,7 @@ class DomainStatus {
   static String _statusSourceFromValue(dynamic value) {
     final text = (value ?? '').toString().trim();
     switch (text) {
-      case 'admin_set':
+      case 'review_set':
       case 'mixed':
       case 'observed':
         return text;
@@ -120,3 +120,4 @@ class DomainStatus {
     return const <String>[];
   }
 }
+

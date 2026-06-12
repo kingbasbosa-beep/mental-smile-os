@@ -1,9 +1,10 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/specialists/data/clinician_specialty_catalog.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
+import 'package:flutterprojects/features/web_registration/domain/declaration_readiness.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
 
@@ -36,13 +37,12 @@ class _WebClinicianRegisterPortalPageState
   static const Color _fieldSilver = Color(0xFFEDEDED);
   static const Color _inputCream = Color(0xFFFFF6DE);
   // [S] Provider Signals
-  // Approved by Wave S-3 Classification Board.
-  // Must remain additive and free from booking/session/payment/accounting coupling.
+  // Additive declaration signals only.
   static const String _signalSchemaVersion = 'provider_signals_v1';
 
   static const List<Map<String, String>> _professionalTitles = [
-    {'key': 'doctor', 'labelAr': 'Ø¯.', 'labelEn': 'Dr.'},
-    {'key': 'specialist', 'labelAr': 'Ø£.', 'labelEn': 'Spec.'},
+    {'key': 'doctor', 'labelAr': 'د.', 'labelEn': 'Dr.'},
+    {'key': 'specialist', 'labelAr': 'أ.', 'labelEn': 'Spec.'},
   ];
 
   static final List<Map<String, String>> _specialties =
@@ -56,56 +56,56 @@ class _WebClinicianRegisterPortalPageState
   // [S] Provider Signals
   // Capability/accessibility/communication/learning signals only.
   static const List<_ProviderSignalOption> _capabilitySignalOptions = [
-    _ProviderSignalOption('psychologist', 'Ø£Ø®ØµØ§Ø¦ÙŠ Ù†ÙØ³ÙŠ', 'Psychologist'),
+    _ProviderSignalOption('psychologist', 'أخصائي نفسي', 'Psychologist'),
     _ProviderSignalOption(
       'clinical_psychologist',
-      'Ø£Ø®ØµØ§Ø¦ÙŠ Ù†ÙØ³ÙŠ Ø¥ÙƒÙ„ÙŠÙ†ÙŠÙƒÙŠ',
+      'أخصائي نفسي إكلينيكي',
       'Clinical psychologist',
     ),
     _ProviderSignalOption(
       'addiction_counselor',
-      'Ø¥Ø±Ø´Ø§Ø¯ Ù…Ø±ØªØ¨Ø· Ø¨Ø§Ù„Ø¥Ø¯Ù…Ø§Ù†',
+      'إرشاد مرتبط بالإدمان',
       'Addiction counseling',
     ),
     _ProviderSignalOption(
       'speech_specialist',
-      'ÙŠØ¯Ø¹Ù… ØµØ¹ÙˆØ¨Ø§Øª Ø§Ù„Ù†Ø·Ù‚',
+      'يدعم صعوبات النطق',
       'Speech support',
     ),
     _ProviderSignalOption(
       'family_counselor',
-      'Ù…Ù†Ø§Ø³Ø¨ Ù„Ù„Ø£Ø³Ø±',
+      'مناسب للأسر',
       'Family counselor',
     ),
-    _ProviderSignalOption('coach', 'ÙƒÙˆØªØ´ÙŠÙ†Ø¬', 'Coaching'),
+    _ProviderSignalOption('coach', 'كوتشينج', 'Coaching'),
     _ProviderSignalOption(
       'recovery_support',
-      'Ø¯Ø¹Ù… Ù…Ø±ØªØ¨Ø· Ø¨Ø§Ù„ØªØ¹Ø§ÙÙŠ',
+      'دعم مرتبط بالتعافي',
       'Recovery support',
     ),
     _ProviderSignalOption(
       'family_support',
-      'Ø¯Ø¹Ù… Ø£Ø³Ø±ÙŠ',
+      'دعم أسري',
       'Family support',
     ),
     _ProviderSignalOption(
       'children_support',
-      'Ù…Ù†Ø§Ø³Ø¨ Ù„Ù„Ø£Ø·ÙØ§Ù„',
+      'مناسب للأطفال',
       'Children support',
     ),
     _ProviderSignalOption(
       'mental_health_support',
-      'Ø¯Ø¹Ù… Ø§Ù„ØµØ­Ø© Ø§Ù„Ù†ÙØ³ÙŠØ©',
+      'دعم الصحة النفسية',
       'Mental health support',
     ),
     _ProviderSignalOption(
       'psychiatric_without_addiction_awareness',
-      'ØªÙˆØ¹ÙŠØ© Ù†ÙØ³ÙŠØ© ØºÙŠØ± Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„Ø¥Ø¯Ù…Ø§Ù†',
+      'توعية نفسية غير مرتبطة بالإدمان',
       'Non-addiction mental health awareness',
     ),
     _ProviderSignalOption(
       'hiv_sensitive_support',
-      'Ø¯Ø¹Ù… Ø­Ø³Ø§Ø³ Ù„ÙÙŠØ±ÙˆØ³ Ù†Ù‚Øµ Ø§Ù„Ù…Ù†Ø§Ø¹Ø©',
+      'دعم حساس لفيروس نقص المناعة',
       'HIV-sensitive support',
     ),
   ];
@@ -113,68 +113,68 @@ class _WebClinicianRegisterPortalPageState
   static const List<_ProviderSignalOption> _accessibilitySignalOptions = [
     _ProviderSignalOption(
       'speech_support',
-      'ÙŠØ¯Ø¹Ù… ØµØ¹ÙˆØ¨Ø§Øª Ø§Ù„Ù†Ø·Ù‚',
+      'يدعم صعوبات النطق',
       'Speech support',
     ),
     _ProviderSignalOption(
       'hearing_support',
-      'ÙŠØ¯Ø¹Ù… ØµØ¹ÙˆØ¨Ø§Øª Ø§Ù„Ø³Ù…Ø¹',
+      'يدعم صعوبات السمع',
       'Hearing support',
     ),
     _ProviderSignalOption(
       'visual_assistance',
-      'ÙŠØ¯Ø¹Ù… Ù…Ø³Ø§Ø¹Ø¯Ø© Ø¨ØµØ±ÙŠØ©',
+      'يدعم مساعدة بصرية',
       'Visual assistance',
     ),
     _ProviderSignalOption(
       'simplified_communication',
-      'ÙŠØ¯Ø¹Ù… ØªÙˆØ§ØµÙ„ Ù…Ø¨Ø³Ø·',
+      'يدعم تواصل مبسط',
       'Simplified communication',
     ),
     _ProviderSignalOption(
       'text_based_support',
-      'ÙŠØ¯Ø¹Ù… ØªÙˆØ§ØµÙ„ Ù†ØµÙŠ',
+      'يدعم تواصل نصي',
       'Text-based support',
     ),
   ];
 
   static const List<_ProviderSignalOption> _communicationSignalOptions = [
-    _ProviderSignalOption('in_person', 'Ø­Ø¶ÙˆØ±ÙŠ', 'In person'),
-    _ProviderSignalOption('online', 'Ø£ÙˆÙ†Ù„Ø§ÙŠÙ†', 'Online'),
-    _ProviderSignalOption('text', 'Ù†ØµÙŠ', 'Text'),
-    _ProviderSignalOption('audio', 'ØµÙˆØªÙŠ', 'Audio'),
-    _ProviderSignalOption('video', 'ÙÙŠØ¯ÙŠÙˆ', 'Video'),
+    _ProviderSignalOption('in_person', 'حضوري', 'In person'),
+    _ProviderSignalOption('online', 'أونلاين', 'Online'),
+    _ProviderSignalOption('text', 'نصي', 'Text'),
+    _ProviderSignalOption('audio', 'صوتي', 'Audio'),
+    _ProviderSignalOption('video', 'فيديو', 'Video'),
     _ProviderSignalOption(
-      'group_sessions',
-      'Ø¬Ù„Ø³Ø§Øª Ø¬Ù…Ø§Ø¹ÙŠØ©',
-      'Group sessions',
+      'group_support',
+      'جلسات جماعية',
+      'Group support',
     ),
   ];
 
   static const List<_ProviderSignalOption> _learningSignalOptions = [
     _ProviderSignalOption(
       'provider_learning',
-      'ØªØ·ÙˆÙŠØ± Ù…Ù‡Ù†ÙŠ',
+      'تطوير مهني',
       'Provider learning',
     ),
     _ProviderSignalOption(
       'family_support_learning',
-      'ØªØ¹Ù„Ù… Ø¯Ø¹Ù… Ø§Ù„Ø£Ø³Ø±Ø©',
+      'تعلم دعم الأسرة',
       'Family support learning',
     ),
     _ProviderSignalOption(
       'recovery_learning',
-      'ØªØ¹Ù„Ù… Ø¯Ø¹Ù… Ø§Ù„ØªØ¹Ø§ÙÙŠ',
+      'تعلم دعم التعافي',
       'Recovery learning',
     ),
     _ProviderSignalOption(
       'accessibility_learning',
-      'ØªØ¹Ù„Ù… Ø§Ù„ÙˆØµÙˆÙ„ ÙˆØ§Ù„Ø¥ØªØ§Ø­Ø©',
+      'تعلم الوصول والإتاحة',
       'Accessibility learning',
     ),
     _ProviderSignalOption(
       'content_contribution',
-      'Ù…Ø³Ø§Ù‡Ù…Ø© Ù…Ø¹Ø±ÙÙŠØ©',
+      'مساهمة معرفية',
       'Content contribution',
     ),
   ];
@@ -250,7 +250,7 @@ class _WebClinicianRegisterPortalPageState
       WebRegistrationDraftStore.setClinicianUid(uid);
 
       final now = FieldValue.serverTimestamp();
-      await FirebaseFirestore.instance.collection('clinicians').doc(uid).set({
+      final registrationData = <String, dynamic>{
         'displayName': name,
         'fullDisplayNameAr':
             titleLabelAr.isEmpty ? name : '$titleLabelAr $name',
@@ -263,13 +263,8 @@ class _WebClinicianRegisterPortalPageState
         'specialty': specialtyLabel,
         'specialtyKey': _selectedSpecialtyKey,
         'specialtyLabel': specialtyLabel,
-        'offersGroupSessions': false,
         'bio': '',
-        'sessionPriceText': '',
-        'sessionDurationText': '',
-        'sessionModes': <String>[],
         // [S] Provider Signals
-        // Approved signal-native map. Do not replace specialty/session fields.
         'providerSignals': {
           'capabilitySignals': _sortedSignals(_selectedCapabilitySignals),
           'accessibilitySignals': _sortedSignals(_selectedAccessibilitySignals),
@@ -278,8 +273,6 @@ class _WebClinicianRegisterPortalPageState
         },
         'signalSchemaVersion': _signalSchemaVersion,
         'role': 'clinician',
-        'isActive': false,
-        'isAdmin': false,
         'isBlocked': false,
         'photoUrl': '',
         'photoAsset': '',
@@ -287,14 +280,19 @@ class _WebClinicianRegisterPortalPageState
         'updatedAt': now,
         'documentsSubmitted': false,
         'documentsUploadMode': 'web_registration',
-        'approvalStatus': 'pending_review',
         'identityFileName': '',
         'certificateFileName': '',
         'extraFileName': '',
         'identityDocumentUrl': '',
         'certificateDocumentUrl': '',
         'extraDocumentUrl': '',
-      });
+      };
+      await FirebaseFirestore.instance.collection('clinicians').doc(uid).set(
+            DeclarationReadiness.clinicianPayload(
+              currentData: const <String, dynamic>{},
+              changes: registrationData,
+            ),
+          );
 
       if (!mounted) return;
       Navigator.of(context).pushReplacementNamed(Routes.webClinicianProfile);
@@ -386,7 +384,7 @@ class _WebClinicianRegisterPortalPageState
                             children: [
                               const SizedBox(height: 16),
                               const Text(
-                                'Intake / Review Request: submitting this data or creating an account does not mean automatic approval, activation, lifecycle ownership, or visibility. Licenses and documents remain the applicant responsibility.',
+                                'Declaration step: submitting this data records readiness signals. Visibility depends on required signal completeness and safety status.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white70,
@@ -404,7 +402,7 @@ class _WebClinicianRegisterPortalPageState
                                               .languageCode
                                               .toLowerCase() ==
                                           'ar'
-                                      ? 'Ø§Ù„Ø¹ÙˆØ¯Ø© Ø¥Ù„Ù‰ Ø¨ÙˆØ§Ø¨Ø© Mental Smile'
+                                      ? 'العودة إلى بوابة Mental Smile'
                                       : 'Back to Mental Smile Portal',
                                 ),
                               ),
@@ -506,7 +504,7 @@ class _WebClinicianRegisterPortalPageState
                               const SizedBox(height: 12),
                               _ProviderSignalSection(
                                 title: isArabic
-                                    ? 'Ø¥Ø´Ø§Ø±Ø§Øª Ø§Ù„Ø®Ø¯Ù…Ø©'
+                                    ? 'إشارات الخدمة'
                                     : 'Service signals',
                                 options: _capabilitySignalOptions,
                                 selectedKeys: _selectedCapabilitySignals,
@@ -515,7 +513,7 @@ class _WebClinicianRegisterPortalPageState
                               ),
                               _ProviderSignalSection(
                                 title: isArabic
-                                    ? 'Ø¥Ø´Ø§Ø±Ø§Øª Ø§Ù„ÙˆØµÙˆÙ„'
+                                    ? 'إشارات الوصول'
                                     : 'Accessibility signals',
                                 options: _accessibilitySignalOptions,
                                 selectedKeys: _selectedAccessibilitySignals,
@@ -524,7 +522,7 @@ class _WebClinicianRegisterPortalPageState
                               ),
                               _ProviderSignalSection(
                                 title: isArabic
-                                    ? 'Ø¥Ø´Ø§Ø±Ø§Øª Ø§Ù„ØªÙˆØ§ØµÙ„'
+                                    ? 'إشارات التواصل'
                                     : 'Communication signals',
                                 options: _communicationSignalOptions,
                                 selectedKeys: _selectedCommunicationSignals,
@@ -533,7 +531,7 @@ class _WebClinicianRegisterPortalPageState
                               ),
                               _ProviderSignalSection(
                                 title: isArabic
-                                    ? 'Ø¥Ø´Ø§Ø±Ø§Øª Ø§Ù„ØªØ¹Ù„Ù… ÙˆØ§Ù„Ù…Ø³Ø§Ù‡Ù…Ø©'
+                                    ? 'إشارات التعلم والمساهمة'
                                     : 'Learning signals',
                                 options: _learningSignalOptions,
                                 selectedKeys: _selectedLearningSignals,
@@ -754,4 +752,3 @@ class _ProviderSignalSection extends StatelessWidget {
     );
   }
 }
-

@@ -32,8 +32,9 @@ class ContactRequestRepository {
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
-    await const CleanSignalRuntime().emit(
+    await CleanSignalRuntime.firestore().emit(
       SignalPackageFactory.providerContactStarted(
+        actorId: clientId,
         actorRole: 'client',
         targetId: providerId,
       ),
@@ -62,8 +63,9 @@ class ContactRequestRepository {
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
-    await const CleanSignalRuntime().emit(
+    await CleanSignalRuntime.firestore().emit(
       SignalPackageFactory.centerContactStarted(
+        actorId: clientId,
         actorRole: 'client',
         targetId: centerId,
       ),

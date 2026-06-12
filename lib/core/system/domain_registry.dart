@@ -1,14 +1,12 @@
 enum DomainKey {
   chat,
-  booking,
   specialistWorkspace,
   aiPolicy,
-  adminControl,
+  governance,
   library,
   reportsInsights,
   communication,
   marketing,
-  externalSessions,
 }
 
 class DomainDefinition {
@@ -39,21 +37,10 @@ const List<DomainDefinition> domainRegistry = <DomainDefinition>[
     ],
   ),
   DomainDefinition(
-    key: DomainKey.booking,
-    id: 'booking',
-    displayName: 'Booking',
-    description: 'Legacy booking records retained for historical isolation.',
-    ownedCollections: <String>[
-      'booking_requests',
-      'bookingRequests',
-    ],
-  ),
-  DomainDefinition(
     key: DomainKey.specialistWorkspace,
     id: 'specialistWorkspace',
-    displayName: 'Specialist Workspace',
-    description:
-        'Clinician-facing assignments, sessions, reviews, and chat-case surfaces.',
+    displayName: 'Clinician Room',
+    description: 'Clinician-facing visibility and support context surfaces.',
   ),
   DomainDefinition(
     key: DomainKey.aiPolicy,
@@ -66,12 +53,12 @@ const List<DomainDefinition> domainRegistry = <DomainDefinition>[
     ],
   ),
   DomainDefinition(
-    key: DomainKey.adminControl,
-    id: 'adminControl',
-    displayName: 'Admin Control',
-    description: 'Central governance, monitoring, and operational oversight.',
+    key: DomainKey.governance,
+    id: 'governance',
+    displayName: 'Federation Governance',
+    description:
+        'Owner, monitoring, registry, review, support, and domain stewardship.',
     ownedCollections: <String>[
-      'admins',
       'system_domains',
     ],
   ),
@@ -103,13 +90,6 @@ const List<DomainDefinition> domainRegistry = <DomainDefinition>[
     displayName: 'Marketing',
     description:
         'Campaigns, lead handling, channel performance, and growth operations.',
-  ),
-  DomainDefinition(
-    key: DomainKey.externalSessions,
-    id: 'externalSessions',
-    displayName: 'External Sessions',
-    description:
-        'Zoom and future external session providers or integration-backed meeting flows.',
   ),
 ];
 

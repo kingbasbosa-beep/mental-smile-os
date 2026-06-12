@@ -1,4 +1,3 @@
-import '../guards/forbidden_signal_source_guard.dart';
 import '../models/signal_package.dart';
 import '../registries/signal_category_registry.dart';
 import '../registries/signal_routing_target.dart';
@@ -11,7 +10,8 @@ class SignalPackageValidator {
     return SignalTypeRegistry.values.contains(signal.signalType) &&
         SignalCategoryRegistry.values.contains(signal.signalCategory) &&
         SignalRoutingTarget.values.contains(signal.routingTarget) &&
-        !ForbiddenSignalSourceGuard.isForbidden(signal.signalSource);
+        signal.signalSource.trim().isNotEmpty &&
+        signal.actorId.trim().isNotEmpty;
   }
 
   static String? failureReason(SignalPackage signal) {
@@ -24,8 +24,11 @@ class SignalPackageValidator {
     if (!SignalRoutingTarget.values.contains(signal.routingTarget)) {
       return 'invalid_routing_target';
     }
-    if (ForbiddenSignalSourceGuard.isForbidden(signal.signalSource)) {
-      return 'forbidden_signal_source';
+    if (signal.signalSource.trim().isEmpty) {
+      return 'missing_signal_source';
+    }
+    if (signal.actorId.trim().isEmpty) {
+      return 'missing_actor_id';
     }
     return null;
   }

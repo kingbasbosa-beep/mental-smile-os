@@ -147,7 +147,7 @@ class _WebClinicianProfilePageState extends State<WebClinicianProfilePage> {
                             children: [
                               const SizedBox(height: 16),
                               const Text(
-                                'Review request step: completing profile details does not mean activation or approval. The submitted information will be reviewed before any public visibility.',
+                                'Profile declaration step: visibility depends on required readiness signals and safety status.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white70,

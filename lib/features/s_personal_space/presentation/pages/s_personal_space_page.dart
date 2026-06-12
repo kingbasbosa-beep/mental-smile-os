@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../widgets/signal_communication_board.dart';
 
 // [S] Personal Space Package
-// Construction Era asset. Reads only approved Client Room fields:
+// Construction Era asset. Reads Client Room fields:
 // clientSignals, privacyPreferences, and roomPreferences.
 class SPersonalSpacePage extends StatelessWidget {
   const SPersonalSpacePage({super.key});
@@ -48,6 +49,8 @@ class SPersonalSpacePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               const _HeroBlock(),
+              const SizedBox(height: 18),
+              const SignalCommunicationBoard(),
               const SizedBox(height: 18),
               _PersonalSpaceOverviewCard(model: model),
               const SizedBox(height: 18),

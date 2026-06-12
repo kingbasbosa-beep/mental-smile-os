@@ -368,8 +368,16 @@ class _AccountRoleBanner extends StatelessWidget {
 
   String _roleLabel(bool isArabic, String? role) {
     switch (role) {
-      case 'admin':
-        return isArabic ? 'الإدارة' : 'Admin';
+      case 'owner':
+        return isArabic ? 'Owner' : 'Owner';
+      case 'monitoring_operator':
+        return isArabic ? 'Monitoring' : 'Monitoring';
+      case 'registry_steward':
+        return isArabic ? 'Registry' : 'Registry';
+      case 'declaration_reviewer':
+        return isArabic ? 'Review' : 'Review';
+      case 'support_observer':
+        return isArabic ? 'Support' : 'Support';
       case 'client':
         return isArabic ? 'عميل' : 'Client';
       case 'center':

@@ -2,8 +2,7 @@
 import 'package:flutterprojects/features/library/data/library_signal_metadata.dart';
 
 // [S] City Center Package
-// Construction Era asset. Reuses approved Library Signal Metadata only.
-// Must remain free from booking/session/payment/accounting coupling.
+// Construction Era asset. Reuses Library Signal Metadata only.
 class SCityDistrictPage extends StatelessWidget {
   const SCityDistrictPage({super.key});
 
@@ -115,8 +114,8 @@ class _CityHero extends StatelessWidget {
           SizedBox(height: 8),
           Text(
             'Explore providers, centers, knowledge, learning, tools, community, '
-            'and marketplace districts. Discovery first. No queues, requests, '
-            'sessions, or lifecycle ownership.',
+            'and marketplace districts. Discovery first. Signals, resources, '
+            'and voluntary next steps.',
             style: TextStyle(
               color: Color(0xFF40506A),
               fontSize: 16,
@@ -172,7 +171,7 @@ class _ProvidersDistrict extends StatelessWidget {
   Widget build(BuildContext context) {
     return const _DistrictCard(
       title: '[S] Providers',
-      subtitle: 'Provider discovery without requests or sessions.',
+      subtitle: 'Provider discovery through readiness and signals.',
       groups: <_DistrictGroup>[
         _DistrictGroup('Featured Providers', <String>[
           'Coming soon',
@@ -461,7 +460,7 @@ class _CitySafetyFooter extends StatelessWidget {
     return const _CityCard(
       child: Text(
         'The city discovers. The rooms personalize. Signals guide. '
-        'Booking stays contained as legacy operations.',
+        'Extinct transaction doctrine stays outside active city language.',
         style: TextStyle(
           color: Color(0xFF40506A),
           fontSize: 15,

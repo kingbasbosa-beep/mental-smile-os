@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/core/visibility/visibility_readiness.dart';
 import 'package:flutterprojects/features/contact_requests/data/contact_request_repository.dart';
 import 'package:flutterprojects/features/saved_destinations/data/saved_destination_repository.dart';
 import 'package:flutterprojects/features/saved_destinations/domain/models/saved_destination.dart';
+import 'package:flutterprojects/features/signals/signals.dart';
 import 'package:flutterprojects/features/specialists/data/clinician_specialty_catalog.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
@@ -16,6 +20,7 @@ class SpecialistDetailsPage extends StatelessWidget {
   });
 
   final Map<String, dynamic> args;
+  static final Set<String> _emittedProfileViews = <String>{};
 
   Map<String, dynamic> _mergedData(Map<String, dynamic>? firestoreData) {
     return {
@@ -27,10 +32,6 @@ class SpecialistDetailsPage extends StatelessWidget {
   String _text(dynamic value, String fallback) {
     final text = (value ?? '').toString().trim();
     return text.isEmpty ? fallback : text;
-  }
-
-  bool _boolValue(dynamic value) {
-    return value == true;
   }
 
   List<String> _stringList(dynamic value) {
@@ -190,7 +191,7 @@ class SpecialistDetailsPage extends StatelessWidget {
           return 'دعم حساس';
         case 'simplified_communication':
           return 'تواصل مبسط';
-        case 'group_sessions':
+        case 'group_support':
           return 'جلسات جماعية';
       }
     }
@@ -222,8 +223,8 @@ class SpecialistDetailsPage extends StatelessWidget {
         return 'Sensitive support';
       case 'simplified_communication':
         return 'Simplified communication';
-      case 'group_sessions':
-        return 'Group sessions';
+      case 'group_support':
+        return 'Group support';
     }
     return '';
   }
@@ -234,8 +235,7 @@ class SpecialistDetailsPage extends StatelessWidget {
     int max = 5,
   }) {
     // [S] Provider Signals
-    // Approved by Wave S-3 Classification Board.
-    // Display-only signal badges; do not couple to booking/session/payment.
+    // Display-only provider signal badges.
     final signals = data['providerSignals'];
     if (signals is! Map) return const [];
     final keys = <String>[
@@ -295,11 +295,7 @@ class SpecialistDetailsPage extends StatelessWidget {
 
   bool _canShowClinician(Map<String, dynamic> data) {
     final role = _text(data['role'], '');
-    final approvalStatus = _text(data['approvalStatus'], '');
-    final isActive = _boolValue(data['isActive']);
-    return role == 'clinician' &&
-        approvalStatus == 'approved' &&
-        isActive == true;
+    return role == 'clinician' && VisibilityReadiness.isVisible(data);
   }
 
   Widget _safeUnavailable(BuildContext context, bool isArabic) {
@@ -670,6 +666,25 @@ class SpecialistDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final providerId = _text(args['uid'], '');
+    if (providerId.isNotEmpty) {
+      final user = FirebaseAuth.instance.currentUser;
+      final eventKey = '${user?.uid}:$providerId';
+      if (user != null &&
+          !user.isAnonymous &&
+          _emittedProfileViews.add(eventKey)) {
+        unawaited(
+          CleanSignalRuntime.firestore().emit(
+            SignalPackageFactory.providerProfileOpened(
+              actorId: user.uid,
+              actorRole: 'client',
+              targetId: providerId,
+            ),
+          ),
+        );
+      }
+    }
+
     final isArabic =
         Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
     final uid = _text(args['uid'], '');

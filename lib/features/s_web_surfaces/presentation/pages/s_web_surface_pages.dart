@@ -347,7 +347,7 @@ class _BoundaryNotice extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE8D8A8)),
       ),
       child: const Text(
-        'Signal-first placeholder only. No booking foundation, legacy admin '
+        'Signal-first placeholder only. No authority '
         'workflow, Firebase write, auth claim change, automation, or production '
         'data operation is attached to this surface.',
         style: TextStyle(
@@ -359,3 +359,4 @@ class _BoundaryNotice extends StatelessWidget {
     );
   }
 }
+

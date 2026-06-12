@@ -2,7 +2,6 @@ export 'domain/aggregation/signal_aggregation_engine.dart';
 export 'domain/emitters/clean_signal_runtime.dart';
 export 'domain/emitters/signal_emitter.dart';
 export 'domain/factories/signal_package_factory.dart';
-export 'domain/guards/forbidden_signal_source_guard.dart';
 export 'domain/models/center_signals.dart';
 export 'domain/models/client_signals.dart';
 export 'domain/models/provider_signals.dart';

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/core/visibility/visibility_readiness.dart';
 import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
 import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
 
@@ -92,64 +93,36 @@ class CenterDashboardPage extends StatelessWidget {
 
   String _docStatusLabel(String status, bool isArabic) {
     switch (status) {
-      case 'approved':
-        return isArabic ? 'مقبول' : 'Approved';
-      case 'rejected':
-        return isArabic ? 'مرفوض' : 'Rejected';
       case 'needs_update':
-        return isArabic ? 'يحتاج تحديث' : 'Needs update';
+        return isArabic ? '????? ?????' : 'Needs update';
+      case 'blocked':
+        return isArabic ? '?????' : 'Blocked';
       case 'uploaded':
+        return isArabic ? '?????' : 'Uploaded';
       case 'pending':
       default:
-        return isArabic ? 'بانتظار المراجعة' : 'Pending review';
+        return isArabic ? '??????? ???????' : 'Pending completeness';
     }
   }
 
   Color _docStatusColor(String status) {
     switch (status) {
-      case 'approved':
+      case 'uploaded':
         return const Color(0xFF1F9D63);
-      case 'rejected':
+      case 'blocked':
         return const Color(0xFFD04B4B);
       case 'needs_update':
         return const Color(0xFFE39B2E);
-      case 'uploaded':
       case 'pending':
       default:
         return const Color(0xFF6C55B3);
     }
   }
 
-  String _approvalStatusLabel(String status, bool isArabic) {
-    switch (status) {
-      case 'approved':
-        return isArabic ? 'معتمد' : 'Approved';
-      case 'center_follow_up':
-        return isArabic ? 'قيد المراجعة' : 'Follow-up';
-      case 'rejected_admin':
-      case 'rejected':
-        return isArabic ? 'مرفوض' : 'Rejected';
-      case 'pending_review':
-      case 'pending_admin':
-      default:
-        return isArabic ? 'بانتظار المراجعة' : 'Pending review';
-    }
-  }
-
-  Color _approvalStatusColor(String status) {
-    switch (status) {
-      case 'approved':
-        return const Color(0xFF1F9D63);
-      case 'center_follow_up':
-        return const Color(0xFFE39B2E);
-      case 'rejected_admin':
-      case 'rejected':
-        return const Color(0xFFD04B4B);
-      case 'pending_review':
-      case 'pending_admin':
-      default:
-        return const Color(0xFF6C55B3);
-    }
+  String _visibilityReadinessLabel(String status, bool isArabic) {
+    return status == VisibilityReadiness.ready
+        ? (isArabic ? 'جاهز' : 'Ready')
+        : (isArabic ? 'غير مكتمل' : 'Incomplete');
   }
 
   String _centerTypeLabel(String type, bool isArabic) {
@@ -249,10 +222,8 @@ class CenterDashboardPage extends StatelessWidget {
                     final hasDetoxUnit =
                         ((data['hasDetoxUnit'] ?? false) == true) ||
                             centerType == 'detox';
-                    final approvalStatus =
-                        (data['approvalStatus'] ?? 'pending_admin')
-                            .toString()
-                            .trim();
+                    final visibilityReadiness =
+                        VisibilityReadiness.resolve(data);
                     final imagesReady = (data['imagesReady'] ?? false) == true;
                     final documentsReady =
                         (data['documentsReady'] ?? false) == true;
@@ -272,8 +243,10 @@ class CenterDashboardPage extends StatelessWidget {
                         .where((value) => value.isNotEmpty)
                         .take(4)
                         .toList();
-                    final statusLabel =
-                        _approvalStatusLabel(approvalStatus, isArabic);
+                    final statusLabel = _visibilityReadinessLabel(
+                      visibilityReadiness,
+                      isArabic,
+                    );
                     return ListView(
                       padding: EdgeInsets.fromLTRB(
                         width < 700 ? 14 : 72,
@@ -328,7 +301,7 @@ class CenterDashboardPage extends StatelessWidget {
                               imagePath:
                                   'assets/images/center_dashboard/actions/center_update_profile.png',
                               onTap: () => Navigator.of(context)
-                                  .pushNamed(Routes.centerOperations),
+                                  .pushNamed(Routes.centerRoom),
                             ),
                             _SectionCard(
                               title: isArabic
@@ -336,7 +309,7 @@ class CenterDashboardPage extends StatelessWidget {
                                   : 'Transferred chats',
                               subtitle: isArabic
                                   ? 'قناة الدعم والمتابعة مع الإدارة'
-                                  : 'Support and admin follow-up channel',
+                                  : 'Support follow-up channel',
                               icon: Icons.chat_bubble_outline_rounded,
                               accent: const Color(0xFF8EDBFF),
                               imagePath:
@@ -363,7 +336,6 @@ class CenterDashboardPage extends StatelessWidget {
     );
   }
 }
-
 class _CenterBrandMark extends StatelessWidget {
   const _CenterBrandMark();
 
@@ -400,7 +372,6 @@ class _CenterBrandMark extends StatelessWidget {
     );
   }
 }
-
 class _CenterFloatingProfile extends StatelessWidget {
   final bool isArabic;
   final String centerName;
@@ -478,7 +449,6 @@ class _CenterFloatingProfile extends StatelessWidget {
     );
   }
 }
-
 class _CenterProfileImage extends StatelessWidget {
   final String imageUrl;
   final String fallbackText;

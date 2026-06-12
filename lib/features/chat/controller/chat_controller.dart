@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_message_model.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
 import 'package:flutterprojects/features/chat/data/services/chat_ai_service.dart';
@@ -16,60 +15,8 @@ class ChatController {
   final ChatFirestoreService _firestoreService;
   final FirebaseAuth _auth;
   final ChatAiService _aiService = const ChatAiService();
-  static const bool _enableLegacyBookingFollowupFallback = false;
-
-  bool _hasExplicitThreadType(ChatThreadModel thread) {
-    return (thread.threadType?.trim().isNotEmpty ?? false);
-  }
-
-  bool _isMissingThreadType(ChatThreadModel thread) {
-    final threadType = thread.threadType?.trim() ?? '';
-    return threadType.isEmpty;
-  }
-
-  bool _isTypedBookingFollowupThread(ChatThreadModel thread) {
-    return thread.threadType == 'booking_followup';
-  }
-
-  bool _isLegacyBookingFollowupFallbackThread(ChatThreadModel thread) {
-    // Soft-cut disabled after repeated zero-usage measurement in real flows.
-    // Keep this rollback trivial until broader stability is confirmed.
-    if (!_enableLegacyBookingFollowupFallback) return false;
-    if (!_isMissingThreadType(thread)) return false;
-    return thread.sourceType == 'booking_flow' || thread.bookingLinked;
-  }
-
-  bool _isBookingFollowupThread(ChatThreadModel thread) {
-    if (_isTypedBookingFollowupThread(thread)) return true;
-    return _isLegacyBookingFollowupFallbackThread(thread);
-  }
-
-  void _debugMeasureLegacyBookingFollowupThreads(
-    String ownerUid,
-    List<ChatThreadModel> threads,
-  ) {
-    if (!kDebugMode) return;
-
-    final legacyFallbackThreads =
-        threads.where(_isLegacyBookingFollowupFallbackThread).toList();
-
-    if (legacyFallbackThreads.isEmpty) return;
-
-    debugPrint(
-      'CHAT_BOOKING_FALLBACK_MEASURE '
-      'ownerUid=$ownerUid '
-      'legacyBookingFallbackCount=${legacyFallbackThreads.length} '
-      'totalActiveThreads=${threads.length} '
-      'sampleThreadIds=${legacyFallbackThreads.take(5).map((t) => t.id).join(",")}',
-    );
-  }
-
-  bool _isAdminSupportThread(ChatThreadModel thread) {
-    if (_hasExplicitThreadType(thread)) {
-      return thread.threadType == 'admin_support';
-    }
-
-    return thread.sourceType == 'admin_support';
+  bool _isSupportRoomThread(ChatThreadModel thread) {
+    return thread.threadType == 'support_room';
   }
 
   Future<void> _maybeCreateEscalation({
@@ -81,7 +28,7 @@ class ChatController {
     final thread = await _firestoreService.getThread(threadId);
     if (thread == null) return;
 
-    if (_isAdminSupportThread(thread) || thread.assignedAdminUid != null) {
+    if (_isSupportRoomThread(thread)) {
       return;
     }
 
@@ -92,8 +39,8 @@ class ChatController {
 
     await _firestoreService.createEscalation(
       threadId: threadId,
-      ownerUid: thread.ownerUid,
-      ownerDisplayName: thread.displayName,
+      participantUid: thread.participantUid,
+      participantDisplayName: thread.displayName,
       riskScore: aiResult.riskScore,
       riskLevel: aiResult.riskLevel,
       reasonCodes: reasonCodes,
@@ -107,18 +54,14 @@ class ChatController {
       throw Exception('لا يوجد مستخدم مسجل حاليًا');
     }
 
-    final existingThreads =
-        await _firestoreService.getThreadsForOwner(user.uid);
-    _debugMeasureLegacyBookingFollowupThreads(user.uid, existingThreads);
-
     final activeAiThread =
-        await _firestoreService.getActiveAiSupportThreadForUser(user.uid);
+        await _firestoreService.getAiSupportThreadForParticipant(user.uid);
     if (activeAiThread != null) return activeAiThread;
 
     final isAnonymous = user.isAnonymous;
     return _firestoreService.createThread(
-      ownerUid: user.uid,
-      ownerType: isAnonymous ? 'anonymous_client' : 'registered_client',
+      participantUid: user.uid,
+      participantType: isAnonymous ? 'anonymous_client' : 'registered_client',
       threadType: 'ai_support',
       displayName: user.email ?? 'مستخدم',
       sourceType: isAnonymous ? 'guest' : 'client',
@@ -127,16 +70,17 @@ class ChatController {
     );
   }
 
-  Future<ChatThreadModel> getOrCreateAdminSupportThread() async {
+  Future<ChatThreadModel> getOrCreateSupportRoomThread() async {
     final user = _auth.currentUser;
     if (user == null) {
       throw Exception('لا يوجد مستخدم مسجل حاليًا');
     }
 
-    final query = await _firestoreService.getThreadsForOwner(user.uid);
+    final query =
+        await _firestoreService.getThreadsForParticipant(user.uid);
 
     for (final thread in query) {
-      if (_isAdminSupportThread(thread)) {
+      if (_isSupportRoomThread(thread)) {
         return thread;
       }
     }
@@ -144,11 +88,11 @@ class ChatController {
     final isCenter = await RoleAccessGateway().isCenter();
 
     final thread = await _firestoreService.createThread(
-      ownerUid: user.uid,
-      ownerType: isCenter ? 'registered_center' : 'registered_client',
-      threadType: 'admin_support',
+      participantUid: user.uid,
+      participantType: isCenter ? 'registered_center' : 'registered_client',
+      threadType: 'support_room',
       displayName: user.email ?? 'مستخدم',
-      sourceType: 'admin_support',
+      sourceType: 'support_room',
       isTemporary: false,
       identityState: isCenter ? 'registered_center' : 'registered_client',
     );
@@ -157,10 +101,8 @@ class ChatController {
       threadId: thread.id,
       updates: {
         'needsHumanSupport': true,
-        'handoffState': 'admin_review',
-        'lifecycleState': 'assigned_admin',
         'escalationLevel': 'recommended',
-        'strategyMode': 'human_handoff',
+        'strategyMode': 'safety_guidance',
         'safetyState': 'monitor',
       },
     );
@@ -173,20 +115,16 @@ class ChatController {
     return _firestoreService.getThread(threadId);
   }
 
-  Future<ChatThreadModel> startFreshAiThread({String? archiveThreadId}) async {
+  Future<ChatThreadModel> startFreshAiThread() async {
     final user = _auth.currentUser;
     if (user == null) {
       throw Exception('لا يوجد مستخدم مسجل حاليًا');
     }
 
-    if (archiveThreadId != null && archiveThreadId.isNotEmpty) {
-      await _firestoreService.archiveThread(archiveThreadId);
-    }
-
     final isAnonymous = user.isAnonymous;
     return _firestoreService.createThread(
-      ownerUid: user.uid,
-      ownerType: isAnonymous ? 'anonymous_client' : 'registered_client',
+      participantUid: user.uid,
+      participantType: isAnonymous ? 'anonymous_client' : 'registered_client',
       threadType: 'ai_support',
       displayName: user.email ?? 'مستخدم',
       sourceType: isAnonymous ? 'guest' : 'client',
@@ -251,9 +189,6 @@ class ChatController {
       threadId: threadId,
       updates: {
         'needsHumanSupport': aiResult.needsHumanSupport,
-        'handoffState': aiResult.needsHumanSupport ? 'admin_review' : 'ai_only',
-        'lifecycleState':
-            aiResult.needsHumanSupport ? 'assigned_admin' : 'active_ai',
         'escalationLevel': aiResult.safetyTriggered
             ? 'urgent'
             : (aiResult.containsEscalationSignal ? 'recommended' : 'none'),
@@ -286,26 +221,24 @@ class ChatController {
       senderUid: user.uid,
       text: text,
       visibleToUser: true,
-      messageKind: 'admin_waiting',
+      messageKind: 'support_request',
       roleDetected: null,
       statesDetected: const [],
       riskScore: 0,
       riskLevel: 'low',
-      strategyMode: 'human_handoff',
+      strategyMode: 'safety_guidance',
       safetyTriggered: false,
       containsEscalationSignal: true,
       aiModelVersion: null,
-      systemVersion: 'admin_waiting_v1',
+      systemVersion: 'support_request_v1',
     );
 
     await _firestoreService.updateThreadState(
       threadId: threadId,
       updates: {
         'needsHumanSupport': true,
-        'handoffState': 'admin_review',
-        'lifecycleState': 'assigned_admin',
         'escalationLevel': 'recommended',
-        'strategyMode': 'human_handoff',
+        'strategyMode': 'safety_guidance',
         'safetyState': 'monitor',
       },
     );

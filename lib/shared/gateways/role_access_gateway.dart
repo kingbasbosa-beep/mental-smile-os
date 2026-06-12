@@ -8,11 +8,39 @@ class RoleAccessGateway {
 
   final AccountAccessService _accessService;
 
-  Future<bool> isAdmin() async {
+  Future<bool> isOwner() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return false;
     final access = await _accessService.resolve(user);
-    return access.isAdmin;
+    return access.role == RoleNames.owner;
+  }
+
+  Future<bool> isMonitoringOperator() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return false;
+    final access = await _accessService.resolve(user);
+    return access.role == RoleNames.monitoringOperator;
+  }
+
+  Future<bool> isRegistrySteward() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return false;
+    final access = await _accessService.resolve(user);
+    return access.role == RoleNames.registrySteward;
+  }
+
+  Future<bool> isDeclarationReviewer() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return false;
+    final access = await _accessService.resolve(user);
+    return access.role == RoleNames.declarationReviewer;
+  }
+
+  Future<bool> isSupportObserver() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return false;
+    final access = await _accessService.resolve(user);
+    return access.role == RoleNames.supportObserver;
   }
 
   Future<bool> isClient() async {

@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -55,23 +55,21 @@ class _GoldBackIcon extends StatelessWidget {
     );
   }
 }
-
 class ChatPage extends StatefulWidget {
   const ChatPage({
     super.key,
     this.initialThreadId,
-    this.adminSupportMode = false,
+    this.supportRoomMode = false,
     this.entryContext,
   });
 
   final String? initialThreadId;
-  final bool adminSupportMode;
+  final bool supportRoomMode;
   final String? entryContext;
 
   @override
   State<ChatPage> createState() => _ChatPageState();
 }
-
 class _ChatPageState extends State<ChatPage> {
   final ChatController _controller = ChatController();
   final TextEditingController _textController = TextEditingController();
@@ -86,15 +84,15 @@ class _ChatPageState extends State<ChatPage> {
   })? _selectedStructuredRequest;
   bool _loading = true;
   bool _sending = false;
-  bool? _viewerIsAdmin;
+  bool? _viewerIsSupportObserver;
   String? _error;
 
   bool _isArabic() =>
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
   String get _avatarAsset {
-    final value = widget.adminSupportMode
-        ? 'assets/c5/avatars/avatar_admin_support.png'
+    final value = widget.supportRoomMode
+        ? 'assets/c5/avatars/avatar_client.png'
         : 'assets/c5/avatars/avatar_client.png';
     if (value.startsWith('assets/assets/')) {
       return value.replaceFirst('assets/assets/', 'assets/');
@@ -132,27 +130,27 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   String _pageSubtitle(bool isArabic) {
-    if (widget.adminSupportMode) {
+    if (widget.supportRoomMode) {
       return isArabic
-          ? 'Ù…Ø­Ø§Ø¯Ø«Ø© Ø¯Ø§Ø®Ù„ÙŠØ© Ù…Ø¹ Ø§Ù„Ø¥Ø¯Ø§Ø±Ø© Ù„Ù„Ù…ØªØ§Ø¨Ø¹Ø© ÙˆØ§Ù„Ø±Ø¯'
-          : 'Internal admin support conversation';
+          ? 'محادثة داخلية مع الإدارة للمتابعة والرد'
+          : 'Internal support room conversation';
     }
     return isArabic
-        ? 'Ø¯Ø¹Ù… Ø£ÙˆÙ„ÙŠ Ø¢Ù…Ù† Ù…Ø¹ ØªØµØ¹ÙŠØ¯ Ø¨Ø´Ø±ÙŠ Ø¹Ù†Ø¯ Ø§Ø±ØªÙØ§Ø¹ Ù…Ø³ØªÙˆÙ‰ Ø§Ù„Ø®Ø·Ø±'
+        ? 'دعم أولي آمن مع تصعيد بشري عند ارتفاع مستوى الخطر'
         : 'Safe first-line support with human escalation when risk rises';
   }
 
   String? _entryContextHelper(bool isArabic) {
-    if (widget.adminSupportMode || widget.initialThreadId != null) return null;
+    if (widget.supportRoomMode || widget.initialThreadId != null) return null;
 
     switch (widget.entryContext) {
       case 'family_support':
         return isArabic
-            ? 'ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ù„ØªØ­Ø¯Ø« Ù‡Ù†Ø§ Ù„Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ø¯Ø¹Ù… Ø¹Ø§Ù… ÙˆØ¥Ø±Ø´Ø§Ø¯ Ù…Ù†Ø§Ø³Ø¨ Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„Ø£Ø³Ø±Ø©.'
+            ? 'يمكنك التحدث هنا للحصول على دعم عام وإرشاد مناسب لاحتياجات الأسرة.'
             : 'You can talk here for general support and guidance for family needs.';
       case 'recovery_support':
         return isArabic
-            ? 'ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ù„ØªØ­Ø¯Ø« Ù‡Ù†Ø§ Ù„Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ø¯Ø¹Ù… Ø¹Ø§Ù… ÙˆØ¥Ø±Ø´Ø§Ø¯ Ù…Ø±ØªØ¨Ø· Ø¨Ø§Ù„ØªØ¹Ø§ÙÙŠ.'
+            ? 'يمكنك التحدث هنا للحصول على دعم عام وإرشاد مرتبط بالتعافي.'
             : 'You can talk here for general support and guidance related to recovery.';
       default:
         return null;
@@ -161,40 +159,34 @@ class _ChatPageState extends State<ChatPage> {
 
   String _friendlyChatError(bool isArabic) {
     return isArabic
-        ? 'ØªØ¹Ø°Ø± ÙØªØ­ Ø§Ù„Ø´Ø§Øª Ø§Ù„Ø¢Ù†. Ø­Ø§ÙˆÙ„ Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ø¨Ø¹Ø¯ Ù„Ø­Ø¸Ø§Øª.'
+        ? 'تعذر فتح الشات الآن. حاول إعادة المحاولة بعد لحظات.'
         : 'Unable to open chat right now. Please try again shortly.';
-  }
-
-  bool get _isRequestLinkedThread {
-    final thread = _thread;
-    if (thread == null) return false;
-    return thread.threadType == 'booking_followup' || thread.bookingLinked;
   }
 
   List<({String english, String arabic})> get _structuredRequestOptions => [
         (
           english: 'Support / Contact Issue',
-          arabic: 'Ù…Ø´ÙƒÙ„Ø© Ø¯Ø¹Ù… Ø£Ùˆ ØªÙˆØ§ØµÙ„',
+          arabic: 'مشكلة دعم أو تواصل',
         ),
         (
           english: 'Clinician Issue',
-          arabic: 'Ù…Ø´ÙƒÙ„Ø© Ù…Ø¹ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ',
+          arabic: 'مشكلة مع الأخصائي',
         ),
         (
           english: 'Center Issue',
-          arabic: 'Ù…Ø´ÙƒÙ„Ø© Ù…Ø¹ Ø§Ù„Ù…Ø±ÙƒØ²',
+          arabic: 'مشكلة مع المركز',
         ),
         (
-          english: 'Follow-up Request',
-          arabic: 'Ø·Ù„Ø¨ Ù…ØªØ§Ø¨Ø¹Ø©',
+          english: 'Continuity Support',
+          arabic: 'دعم الاستمرارية',
         ),
         (
-          english: 'Account / Payment Question',
-          arabic: 'Ø³Ø¤Ø§Ù„ Ø­Ø³Ø§Ø¨ Ø£Ùˆ Ø¯ÙØ¹',
+          english: 'Account / Service Cost Question',
+          arabic: 'سؤال حساب أو تكلفة خدمة',
         ),
         (
-          english: 'Other Admin Support',
-          arabic: 'Ø¯Ø¹Ù… Ø¥Ø¯Ø§Ø±ÙŠ Ø¢Ø®Ø±',
+          english: 'Other Support Room',
+          arabic: 'دعم إداري آخر',
         ),
       ];
 
@@ -204,15 +196,15 @@ class _ChatPageState extends State<ChatPage> {
     String arabicType,
   ) {
     if (isArabic) {
-      return '[Ø·Ù„Ø¨ Ø¥Ø¯Ø§Ø±ÙŠ Ù…Ù†Ø¸Ù…]\n'
-          'Ø§Ù„Ù†ÙˆØ¹: $arabicType\n'
-          'Ø§Ù„Ù…ØµØ¯Ø±: Ø´Ø§Øª Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©\n'
-          'Ø§Ù„ØªÙØ§ØµÙŠÙ„: ';
+      return '[إشارة دعم منظمة]\n'
+          'النوع: $arabicType\n'
+          'المصدر: شات الدعم\n'
+          'التفاصيل: ';
     }
 
-    return '[Structured Admin Request]\n'
+    return '[Structured Support Request]\n'
         'Type: $englishType\n'
-        'Source: Admin Support Chat\n'
+        'Source: Support Room Chat\n'
         'Details: ';
   }
 
@@ -220,28 +212,26 @@ class _ChatPageState extends State<ChatPage> {
     String englishType,
   ) {
     switch (englishType) {
-      case 'Booking / Session Issue':
-        return ('Customer Follow-up', 'Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© ÙˆØ®Ø¯Ù…Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡');
       case 'Clinician Issue':
         return (
-          'Customer Follow-up / Admin Review',
-          'Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© ÙˆØ®Ø¯Ù…Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ / Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©',
+          'Support / Specialist Guidance',
+          'الدعم / إرشاد الأخصائيين',
         );
       case 'Center Issue':
         return (
-          'Customer Follow-up / Admin Review',
-          'Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© ÙˆØ®Ø¯Ù…Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ / Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©',
+          'Support / Center Guidance',
+          'الدعم / إرشاد المراكز',
         );
-      case 'Follow-up Request':
-        return ('Customer Follow-up', 'Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© ÙˆØ®Ø¯Ù…Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡');
-      case 'Account / Payment Question':
+      case 'Continuity Support':
+        return ('Support', 'الدعم');
+      case 'Account / Service Cost Question':
         return (
-          'Customer Follow-up / Finance Review',
-          'Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© ÙˆØ®Ø¯Ù…Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡ / Ù…Ø±Ø§Ø¬Ø¹Ø© Ù…Ø§Ù„ÙŠØ©',
+          'Support / Account Guidance',
+          'الدعم / إرشاد الحساب',
         );
-      case 'Other Admin Support':
+      case 'Other Support Room':
       default:
-        return ('Customer Follow-up', 'Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© ÙˆØ®Ø¯Ù…Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡');
+        return ('Support', 'الدعم');
     }
   }
 
@@ -257,13 +247,13 @@ class _ChatPageState extends State<ChatPage> {
       ..text = template
       ..selection = TextSelection.collapsed(offset: template.length);
 
-    if (widget.adminSupportMode && mounted) {
+    if (widget.supportRoomMode && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             isArabic
-                ? 'ØªÙ… ØªØ¬Ù‡ÙŠØ² Ø§Ù„Ø·Ù„Ø¨ Ø§Ù„Ù…Ù†Ø¸Ù….'
-                : 'Structured request prepared.',
+                ? 'تم تجهيز إشارة الدعم.'
+                : 'Support signal prepared.',
           ),
         ),
       );
@@ -272,9 +262,9 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _buildStructuredRequestMenu(
       bool isArabic, TextDirection textDirection) {
-    if (!widget.adminSupportMode ||
-        _viewerIsAdmin == true ||
-        _viewerIsAdmin == null) {
+    if (!widget.supportRoomMode ||
+        _viewerIsSupportObserver == true ||
+        _viewerIsSupportObserver == null) {
       return const SizedBox.shrink();
     }
 
@@ -304,7 +294,7 @@ class _ChatPageState extends State<ChatPage> {
                     : CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isArabic ? 'Ø·Ù„Ø¨ Ù…Ù†Ø¸Ù…' : 'Structured Request',
+                    isArabic ? 'إشارة دعم منظمة' : 'Structured Support Signal',
                     textAlign: isArabic ? TextAlign.right : TextAlign.left,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           color: const Color(0xFFE7C766),
@@ -314,8 +304,8 @@ class _ChatPageState extends State<ChatPage> {
                   const SizedBox(height: AppSpacing.xxs),
                   Text(
                     isArabic
-                        ? 'Ø§Ø³ØªØ®Ø¯Ù… Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ù…Ù†Ø¸Ù…Ø© Ù„Ù…Ø´Ø§ÙƒÙ„ Ø§Ù„Ø­Ø¬Ø² Ø£Ùˆ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ Ø£Ùˆ Ø§Ù„Ù…Ø±ÙƒØ² Ø£Ùˆ Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© Ø£Ùˆ Ø§Ù„Ø­Ø³Ø§Ø¨. Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø®Ø·Ø± ÙŠØªÙ… Ø§Ù„ØªØ¹Ø§Ù…Ù„ Ù…Ø¹Ù‡Ø§ Ø¹Ø¨Ø± Ø§Ù„Ø´Ø§Øª Ø§Ù„Ø¹Ø§Ù….'
-                        : 'Use structured requests for booking, clinician, center, follow-up, or account issues. Safety concerns should use the general support chat.',
+                        ? 'استخدم إشارات الدعم المنظمة للتواصل أو الوصول إلى الموارد أو مساعدة الحساب. إشارات الأمان تستخدم محادثة الأمان.'
+                        : 'Use structured support signals for communication, resource access, or account help. Safety signals use the safety chat.',
                     textAlign: isArabic ? TextAlign.right : TextAlign.left,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color:
@@ -407,7 +397,7 @@ class _ChatPageState extends State<ChatPage> {
                         : CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isArabic ? 'Ù…Ø¹Ø§ÙŠÙ†Ø© Ø§Ù„Ø·Ù„Ø¨' : 'Request Preview',
+                        isArabic ? 'معاينة إشارة الدعم' : 'Support Signal Preview',
                         textAlign: isArabic ? TextAlign.right : TextAlign.left,
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                               color: const Color(0xFFE7C766),
@@ -430,8 +420,8 @@ class _ChatPageState extends State<ChatPage> {
                       const SizedBox(height: AppSpacing.sm),
                       AppStatusBadge(
                         label: isArabic
-                            ? 'Ø§Ù„Ø¬Ù‡Ø© Ø§Ù„Ù…Ø³Ø¤ÙˆÙ„Ø©: ${_selectedStructuredRequest!.ownerArabic}'
-                            : 'Ownership: ${_selectedStructuredRequest!.ownerEnglish}',
+                            ? 'جهة الإرشاد: ${_selectedStructuredRequest!.ownerArabic}'
+                            : 'Guidance: ${_selectedStructuredRequest!.ownerEnglish}',
                         color: AppColors.deepTeal,
                       ),
                       const SizedBox(height: AppSpacing.sm),
@@ -452,15 +442,15 @@ class _ChatPageState extends State<ChatPage> {
                                     SnackBar(
                                       content: Text(
                                         isArabic
-                                            ? 'ØªÙ… ØªØ³Ø¬ÙŠÙ„ Ø·Ù„Ø¨Ùƒ ÙˆÙ‡Ùˆ ØªØ­Øª Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©.'
-                                            : 'Your request has been submitted and is under review.',
+                                            ? 'تمت مشاركة إشارة الدعم للرصد.'
+                                            : 'Your support signal was shared for observation.',
                                       ),
                                     ),
                                   );
                                 },
                           icon: const Icon(Icons.send_rounded),
                           label: Text(
-                            isArabic ? 'Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨' : 'Submit Request',
+                            isArabic ? 'مشاركة إشارة الدعم' : 'Share Support Signal',
                           ),
                         ),
                       ),
@@ -501,7 +491,7 @@ class _ChatPageState extends State<ChatPage> {
                 Expanded(
                   child: Text(
                     isArabic
-                        ? 'Ù‡Ø°Ù‡ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø© Ù…Ø®ØµØµØ© Ù„Ù„Ø¯Ø¹Ù… ÙˆØ§Ù„Ø¥Ø±Ø´Ø§Ø¯ ÙÙ‚Ø·ØŒ ÙˆÙ„Ø§ ÙŠØªÙ… Ù…Ù† Ø®Ù„Ø§Ù„Ù‡Ø§ ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø£Ùˆ Ø§Ù„Ø£Ø³Ø¹Ø§Ø± Ø£Ùˆ Ø§Ù„Ø¹Ù‚ÙˆØ¯ Ø£Ùˆ Ø§Ù„Ø¯ÙØ¹.'
+                        ? 'هذه المحادثة مخصصة للدعم والإرشاد فقط، ولا يتم من خلالها تعديل إشارات الدعم أو معلومات التكلفة أو العقود.'
                         : 'This chat is for support and guidance only. Requests, pricing, contracts, and external arrangements cannot be changed through chat.',
                     textAlign: isArabic ? TextAlign.right : TextAlign.left,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -512,15 +502,6 @@ class _ChatPageState extends State<ChatPage> {
                 ),
               ],
             ),
-            if (_isRequestLinkedThread) ...[
-              const SizedBox(height: AppSpacing.xs),
-              AppStatusBadge(
-                label: isArabic
-                    ? 'Ù…Ø­Ø§Ø¯Ø«Ø© Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„Ø·Ù„Ø¨ (Ù„Ù„Ø¹Ø±Ø¶ ÙÙ‚Ø·)'
-                    : 'Request-linked thread (informational only)',
-                color: const Color(0xFF8A5A1F),
-              ),
-            ],
           ],
         ),
       ),
@@ -532,8 +513,8 @@ class _ChatPageState extends State<ChatPage> {
       padding: const EdgeInsets.only(bottom: AppSpacing.xs),
       child: Text(
         isArabic
-            ? 'Ù„ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø·Ù„Ø¨ Ø£Ùˆ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§ØªØŒ ÙŠØ±Ø¬Ù‰ Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø§Ù„Ø®Ø·ÙˆØ§Øª Ø§Ù„Ù…ØªØ§Ø­Ø© Ø¯Ø§Ø®Ù„ Ø§Ù„Ù†Ø¸Ø§Ù….'
-            : 'To modify your request or details, please use the available actions in the system.',
+            ? 'لتحديث إشارة الدعم أو البيانات، يرجى استخدام الخطوات المتاحة داخل النظام.'
+            : 'To update your support signal or details, please use the available actions in the system.',
         textAlign: isArabic ? TextAlign.right : TextAlign.left,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: const Color(0xFFFFF4D4).withValues(alpha: 0.72),
@@ -543,8 +524,8 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Future<bool> _isAdminUser() async {
-    return RoleAccessGateway().isAdmin();
+  Future<bool> _isSupportObserverUser() async {
+    return RoleAccessGateway().isSupportObserver();
   }
 
   @override
@@ -555,10 +536,10 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<void> _resolveViewerRole() async {
-    final isAdmin = await _isAdminUser();
+    final isSupportObserver = await _isSupportObserverUser();
     if (!mounted) return;
     setState(() {
-      _viewerIsAdmin = isAdmin;
+      _viewerIsSupportObserver = isSupportObserver;
     });
   }
 
@@ -576,11 +557,11 @@ class _ChatPageState extends State<ChatPage> {
           widget.initialThreadId!.isNotEmpty) {
         final loaded = await _controller.getThreadById(widget.initialThreadId!);
         if (loaded == null) {
-          throw Exception('Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø© Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©');
+          throw Exception('لم يتم العثور على المحادثة المطلوبة');
         }
         thread = loaded;
-      } else if (widget.adminSupportMode) {
-        thread = await _controller.getOrCreateAdminSupportThread();
+      } else if (widget.supportRoomMode) {
+        thread = await _controller.getOrCreateSupportRoomThread();
       } else {
         thread = await _controller.getOrCreateThread();
       }
@@ -615,9 +596,9 @@ class _ChatPageState extends State<ChatPage> {
     setState(() => _sending = true);
 
     try {
-      final isAdmin = await _isAdminUser();
+      final isSupportObserver = await _isSupportObserverUser();
 
-      if (isAdmin) {
+      if (isSupportObserver) {
         final threadRef = FirebaseFirestore.instance
             .collection('chat_threads')
             .doc(_thread!.id);
@@ -638,13 +619,13 @@ class _ChatPageState extends State<ChatPage> {
 
         await threadRef.collection('messages').add({
           'threadId': _thread!.id,
-          'senderType': 'admin',
+          'senderType': 'support',
           'senderUid': user.uid,
           'text': text,
           'createdAt': FieldValue.serverTimestamp(),
           'sequenceNumber': nextSeq,
           'visibleToUser': true,
-          'messageKind': 'admin_reply',
+          'messageKind': 'support_reply',
           'roleDetected': null,
           'statesDetected': const [],
           'riskScore': 0,
@@ -653,7 +634,7 @@ class _ChatPageState extends State<ChatPage> {
           'safetyTriggered': false,
           'containsEscalationSignal': false,
           'aiModelVersion': null,
-          'systemVersion': 'admin_chat_v1',
+          'systemVersion': 'support_chat_v1',
           'metadata': const {},
         });
 
@@ -663,11 +644,9 @@ class _ChatPageState extends State<ChatPage> {
           'lastMessagePreview':
               text.length > 120 ? text.substring(0, 120) : text,
           'messageCount': FieldValue.increment(1),
-          'handoffState': 'admin_replying',
-          'lifecycleState': 'assigned_admin',
         });
       } else {
-        if (widget.adminSupportMode) {
+        if (widget.supportRoomMode) {
           await _controller.sendSupportMessage(
             threadId: _thread!.id,
             text: text,
@@ -697,7 +676,7 @@ class _ChatPageState extends State<ChatPage> {
         SnackBar(
           content: Text(
             isArabic
-                ? 'ØªØ¹Ø°Ø± Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø±Ø³Ø§Ù„Ø© Ø§Ù„Ø¢Ù†. Ø­Ø§ÙˆÙ„ Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.'
+                ? 'تعذر إرسال الرسالة الآن. حاول مرة أخرى.'
                 : 'Unable to send the message right now. Please try again.',
           ),
         ),
@@ -710,7 +689,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<void> _startFreshConversation() async {
-    if (widget.adminSupportMode || _thread == null || _sending) return;
+    if (widget.supportRoomMode || _thread == null || _sending) return;
 
     setState(() {
       _loading = true;
@@ -718,9 +697,7 @@ class _ChatPageState extends State<ChatPage> {
     });
 
     try {
-      final fresh = await _controller.startFreshAiThread(
-        archiveThreadId: _thread!.id,
-      );
+      final fresh = await _controller.startFreshAiThread();
 
       if (!mounted) return;
       setState(() {
@@ -742,12 +719,12 @@ class _ChatPageState extends State<ChatPage> {
   Widget _bubble(ChatMessageModel msg, bool isArabic) {
     final sender = msg.senderType;
     final isUser = sender == 'user';
-    final isAdmin = sender == 'admin';
+    final isSupport = sender == 'support';
     final isAi = sender == 'ai';
 
     final bubbleColor = isUser
         ? const Color(0xFFE7C766).withValues(alpha: 0.16)
-        : (isAdmin
+        : (isSupport
             ? const Color(0xFF1C4E54).withValues(alpha: 0.28)
             : Colors.black.withValues(alpha: 0.42));
 
@@ -775,14 +752,14 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             Text(
               isUser
-                  ? (isArabic ? 'Ø£Ù†Øª' : 'You')
-                  : (isAdmin
-                      ? (isArabic ? 'Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©' : 'Admin')
+                  ? (isArabic ? 'أنت' : 'You')
+                  : (isSupport
+                      ? (isArabic ? 'الدعم' : 'Support')
                       : (isAi
                           ? (isArabic
-                              ? 'Ù…Ø³Ø§Ø¹Ø¯ Mental Smile'
+                              ? 'مساعد Mental Smile'
                               : 'Mental Smile Assistant')
-                          : (isArabic ? 'Ø§Ù„Ø¯Ø¹Ù…' : 'Support'))),
+                          : (isArabic ? 'الدعم' : 'Support'))),
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     color: const Color(0xFFE7C766),
@@ -819,7 +796,7 @@ class _ChatPageState extends State<ChatPage> {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                _error ?? (isArabic ? 'ØªØ¹Ø°Ø± ÙØªØ­ Ø§Ù„Ø´Ø§Øª' : 'Unable to open chat'),
+                _error ?? (isArabic ? 'تعذر فتح الشات' : 'Unable to open chat'),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: const Color(0xFFFFF4D4),
@@ -829,7 +806,7 @@ class _ChatPageState extends State<ChatPage> {
               FilledButton.icon(
                 onPressed: _initThread,
                 icon: const Icon(Icons.refresh),
-                label: Text(isArabic ? 'Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø©' : 'Retry'),
+                label: Text(isArabic ? 'إعادة المحاولة' : 'Retry'),
               ),
             ],
           ),
@@ -841,7 +818,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildEmptyState(bool isArabic) {
     return Center(
       child: Text(
-        isArabic ? 'Ø§Ø¨Ø¯Ø£ Ø£ÙˆÙ„ Ø±Ø³Ø§Ù„Ø© Ø§Ù„Ø¢Ù†' : 'Start your first message now',
+        isArabic ? 'ابدأ أول رسالة الآن' : 'Start your first message now',
         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               color: const Color(0xFFFFF4D4),
             ),
@@ -861,7 +838,7 @@ class _ChatPageState extends State<ChatPage> {
     final isArabic = _isArabic();
     final textDirection = isArabic ? TextDirection.rtl : TextDirection.ltr;
     final entryContextHelper = _entryContextHelper(isArabic);
-    final isViewerAdmin = _viewerIsAdmin == true;
+    final isViewerSupportObserver = _viewerIsSupportObserver == true;
 
     return Directionality(
       textDirection: textDirection,
@@ -882,11 +859,11 @@ class _ChatPageState extends State<ChatPage> {
             },
             icon: const _GoldBackIcon(compact: true),
           ),
-          title: Text(isArabic ? 'Ø´Ø§Øª Mental Smile' : 'Mental Smile Chat'),
+          title: Text(isArabic ? 'شات Mental Smile' : 'Mental Smile Chat'),
           actions: [
-            if (!widget.adminSupportMode)
+            if (!widget.supportRoomMode)
               IconButton(
-                tooltip: isArabic ? 'Ù…Ø­Ø§Ø¯Ø«Ø© Ø¬Ø¯ÙŠØ¯Ø©' : 'New conversation',
+                tooltip: isArabic ? 'محادثة جديدة' : 'New conversation',
                 onPressed:
                     _loading || _sending ? null : _startFreshConversation,
                 icon: const Icon(
@@ -934,7 +911,7 @@ class _ChatPageState extends State<ChatPage> {
                               ? Center(
                                   child: Text(
                                     isArabic
-                                        ? 'ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ø­Ø§Ø¯Ø«Ø©'
+                                        ? 'تعذر تحميل المحادثة'
                                         : 'Unable to load conversation',
                                     style: Theme.of(context)
                                         .textTheme
@@ -970,12 +947,12 @@ class _ChatPageState extends State<ChatPage> {
                                                     : CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    widget.adminSupportMode
+                                                    widget.supportRoomMode
                                                         ? (isArabic
-                                                            ? 'Ø¯Ø¹Ù… Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©'
-                                                            : 'Admin Support')
+                                                            ? 'دعم الإدارة'
+                                                            : 'Support Room')
                                                         : (isArabic
-                                                            ? 'Ù…Ø³Ø§Ø¹Ø¯ Mental Smile'
+                                                            ? 'مساعد Mental Smile'
                                                             : 'Mental Smile Assistant'),
                                                     textAlign: isArabic
                                                         ? TextAlign.right
@@ -1060,7 +1037,7 @@ class _ChatPageState extends State<ChatPage> {
                                                       alignment:
                                                           Alignment.center,
                                                       child: Icon(
-                                                        widget.adminSupportMode
+                                                        widget.supportRoomMode
                                                             ? Icons
                                                                 .support_agent_rounded
                                                             : Icons
@@ -1090,7 +1067,7 @@ class _ChatPageState extends State<ChatPage> {
                                             return Center(
                                               child: Text(
                                                 isArabic
-                                                    ? 'Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø±Ø³Ø§Ø¦Ù„'
+                                                    ? 'حدث خطأ أثناء تحميل الرسائل'
                                                     : 'Failed to load messages',
                                                 style: Theme.of(context)
                                                     .textTheme
@@ -1149,8 +1126,8 @@ class _ChatPageState extends State<ChatPage> {
                                         },
                                       ),
                                     ),
-                                    if (!widget.adminSupportMode ||
-                                        isViewerAdmin)
+                                    if (!widget.supportRoomMode ||
+                                        isViewerSupportObserver)
                                       Padding(
                                         padding: const EdgeInsets.fromLTRB(
                                           AppSpacing.sm,
@@ -1193,7 +1170,7 @@ class _ChatPageState extends State<ChatPage> {
                                                       decoration:
                                                           InputDecoration(
                                                         hintText: isArabic
-                                                            ? 'Ø§ÙƒØªØ¨ Ø±Ø³Ø§Ù„ØªÙƒ Ù‡Ù†Ø§...'
+                                                            ? 'اكتب رسالتك هنا...'
                                                             : 'Type your message here...',
                                                         hintStyle: TextStyle(
                                                           color: const Color(
@@ -1276,7 +1253,7 @@ class _ChatPageState extends State<ChatPage> {
                                                             )
                                                           : Text(
                                                               isArabic
-                                                                  ? 'Ø¥Ø±Ø³Ø§Ù„'
+                                                                  ? 'إرسال'
                                                                   : 'Send',
                                                             ),
                                                     ),
@@ -1298,4 +1275,3 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 }
-

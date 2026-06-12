@@ -5,6 +5,7 @@ class SignalPackage {
     required this.signalCategory,
     required this.signalDomain,
     required this.signalSource,
+    required this.actorId,
     required this.actorRole,
     required this.targetType,
     required this.targetId,
@@ -20,6 +21,7 @@ class SignalPackage {
   final String signalCategory;
   final String signalDomain;
   final String signalSource;
+  final String actorId;
   final String actorRole;
   final String targetType;
   final String targetId;
@@ -38,6 +40,7 @@ class SignalPackage {
       'signalCategory': signalCategory,
       'signalDomain': signalDomain,
       'signalSource': signalSource,
+      'actorId': actorId,
       'actorRole': actorRole,
       'targetType': targetType,
       'targetId': targetId,
@@ -56,6 +59,7 @@ class SignalPackage {
       signalCategory: (map['signalCategory'] ?? '').toString(),
       signalDomain: (map['signalDomain'] ?? '').toString(),
       signalSource: (map['signalSource'] ?? '').toString(),
+      actorId: (map['actorId'] ?? '').toString(),
       actorRole: (map['actorRole'] ?? '').toString(),
       targetType: (map['targetType'] ?? '').toString(),
       targetId: (map['targetId'] ?? '').toString(),

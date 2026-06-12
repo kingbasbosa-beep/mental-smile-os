@@ -1,9 +1,10 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
+import 'package:flutterprojects/features/web_registration/domain/declaration_readiness.dart';
 import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
 
@@ -35,44 +36,44 @@ class _WebCenterRegisterPortalPageState
   static const _categories = [
     {
       'key': 'recovery',
-      'labelAr': 'Ù…Ø±Ø§ÙƒØ² Ø§Ù„ØªØ¹Ø§ÙÙŠ',
+      'labelAr': 'مراكز التعافي',
       'labelEn': 'Recovery Centers'
     },
     {
       'key': 'detox',
-      'labelAr': 'Ù…Ø±Ø§ÙƒØ² Ø³Ø­Ø¨ Ø§Ù„Ø³Ù…ÙˆÙ…',
+      'labelAr': 'مراكز سحب السموم',
       'labelEn': 'Detox Centers',
     },
     {
       'key': 'special_needs',
-      'labelAr': 'Ù…Ø±Ø§ÙƒØ² Ø±Ø¹Ø§ÙŠØ© Ø°ÙˆÙŠ Ø§Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„Ø®Ø§ØµØ©',
+      'labelAr': 'مراكز رعاية ذوي الاحتياجات الخاصة',
       'labelEn': 'Special Needs Centers',
     },
     {
       'key': 'hospital',
-      'labelAr': 'Ø§Ù„Ù…Ø³ØªØ´ÙÙŠØ§Øª',
+      'labelAr': 'المستشفيات',
       'labelEn': 'Hospitals',
     },
   ];
   static const _centerTypes = [
     {
       'key': 'halfway_house',
-      'labelAr': 'Ù‡Ø§Ù ÙˆØ§ÙŠ',
+      'labelAr': 'هاف واي',
       'labelEn': 'Halfway House',
     },
     {
       'key': 'detox',
-      'labelAr': 'Ø¯ÙŠØªÙˆÙƒØ³ / Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù†Ø³Ø­Ø§Ø¨',
+      'labelAr': 'ديتوكس / أعراض انسحاب',
       'labelEn': 'Detox',
     },
     {
       'key': 'hospital',
-      'labelAr': 'Ù…Ø³ØªØ´ÙÙ‰',
+      'labelAr': 'مستشفى',
       'labelEn': 'Hospital',
     },
     {
       'key': 'special_needs_care',
-      'labelAr': 'Ø±Ø¹Ø§ÙŠØ© Ø°ÙˆÙŠ Ø§Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„Ø®Ø§ØµØ©',
+      'labelAr': 'رعاية ذوي الاحتياجات الخاصة',
       'labelEn': 'Special Needs Care',
     },
   ];
@@ -133,7 +134,7 @@ class _WebCenterRegisterPortalPageState
       final categoryLabels = _labels(_categories, _category);
       final centerTypeLabels = _labels(_centerTypes, _centerType);
 
-      await FirebaseFirestore.instance.collection('centers').doc(uid).set({
+      final registrationData = <String, dynamic>{
         'role': 'center',
         'name': _centerNameController.text.trim(),
         'centerName': _centerNameController.text.trim(),
@@ -145,14 +146,16 @@ class _WebCenterRegisterPortalPageState
         'centerType': _centerType,
         'centerTypeLabelAr': centerTypeLabels['labelAr'],
         'centerTypeLabelEn': centerTypeLabels['labelEn'],
-        'approvalStatus': 'pending_admin',
-        'isAdmin': false,
-        'active': false,
-        'isActive': false,
         'isBlocked': false,
         'createdAt': now,
         'updatedAt': now,
-      });
+      };
+      await FirebaseFirestore.instance.collection('centers').doc(uid).set(
+            DeclarationReadiness.centerPayload(
+              currentData: const <String, dynamic>{},
+              changes: registrationData,
+            ),
+          );
 
       if (!mounted) return;
       Navigator.of(context).pushReplacementNamed(
@@ -256,7 +259,7 @@ class _WebCenterRegisterPortalPageState
                             children: [
                               SizedBox(height: isLandscapeCompact ? 8 : 14),
                               const Text(
-                                'Intake / Review Request: submitting this data or creating an account does not mean automatic approval, activation, lifecycle ownership, or visibility. Licenses and documents remain the applicant responsibility.',
+                                'Declaration step: submitting this data records readiness signals. Visibility depends on required signal completeness and safety status.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white70,
@@ -271,7 +274,7 @@ class _WebCenterRegisterPortalPageState
                                     .pushNamed(Routes.portalHome),
                                 child: Text(
                                   isArabic
-                                      ? 'Ø§Ù„Ø¹ÙˆØ¯Ø© Ø¥Ù„Ù‰ Ø¨ÙˆØ§Ø¨Ø© Mental Smile'
+                                      ? 'العودة إلى بوابة Mental Smile'
                                       : 'Back to Mental Smile Portal',
                                 ),
                               ),
@@ -527,4 +530,3 @@ class _WebCenterRegisterPortalPageState
     );
   }
 }
-

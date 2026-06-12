@@ -21,8 +21,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
   static const _clientInputText = Color(0xFFFFE7B0);
   static const _clientDarkText = Color(0xFF101820);
   // [S] Signal Native Asset
-  // Approved by Wave S-3 Classification Board.
-  // Must remain free from booking/session/payment/accounting coupling.
+  // Client self-expression signals.
   static const _signalSchemaVersion = 'client_signals_v1';
 
   final _nameController = TextEditingController();
@@ -35,7 +34,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
 
   String _selectedAvatar = 'images/avatar_client_fmale.png';
   // [S] Client Signals
-  // First signal capture only; not diagnosis, booking, session, or payment data.
+  // First signal capture only; not diagnosis or transaction data.
   final Set<String> _selectedGoalSignals = {};
   final Set<String> _selectedInterestSignals = {};
   final Set<String> _selectedAccessibilitySignals = {};
@@ -110,8 +109,8 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
     return values;
   }
 
-  Future<void> _emitRegistrationSignals() async {
-    const runtime = CleanSignalRuntime();
+  Future<void> _emitRegistrationSignals(String actorId) async {
+    final runtime = CleanSignalRuntime.firestore();
     final goalSignals = _sortedSignals(_selectedGoalSignals);
     final interestSignals = _sortedSignals(_selectedInterestSignals);
     final accessibilitySignals = _sortedSignals(_selectedAccessibilitySignals);
@@ -120,6 +119,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
     if (goalSignals.isNotEmpty) {
       await runtime.emit(
         SignalPackageFactory.goalSelected(
+          actorId: actorId,
           actorRole: 'client',
           targetId: goalSignals.first,
           signalSource: 'client_registration',
@@ -129,6 +129,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
     if (interestSignals.isNotEmpty) {
       await runtime.emit(
         SignalPackageFactory.interestSelected(
+          actorId: actorId,
           actorRole: 'client',
           targetId: interestSignals.first,
           signalSource: 'client_registration',
@@ -138,6 +139,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
     if (accessibilitySignals.isNotEmpty) {
       await runtime.emit(
         SignalPackageFactory.accessibilityInterest(
+          actorId: actorId,
           actorRole: 'client',
           targetId: accessibilitySignals.first,
           signalSource: 'client_registration',
@@ -147,6 +149,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
     if (communicationSignals.isNotEmpty) {
       await runtime.emit(
         SignalPackageFactory.communicationPreferenceSelected(
+          actorId: actorId,
           actorRole: 'client',
           targetId: communicationSignals.first,
           signalSource: 'client_registration',
@@ -283,7 +286,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
         'email': email,
         'avatarAsset': _selectedAvatar,
         // [S] Client Signals
-        // Approved signal-native map. Do not couple to booking/session/payment.
+        // Signal-native map for the client room.
         'clientSignals': {
           'goalSignals': _sortedSignals(_selectedGoalSignals),
           'interestSignals': _sortedSignals(_selectedInterestSignals),
@@ -303,7 +306,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
 
-      await _emitRegistrationSignals();
+      await _emitRegistrationSignals(user.uid);
 
       await user.reload();
 

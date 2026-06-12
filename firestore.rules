@@ -4,7 +4,7 @@ rules_version = '2';
 // Firestore authorization depends on custom claims, not UI role documents.
 // AccountAccessService and role documents are app-side UI/UX gates only.
 // Opening a screen in the app does not guarantee Firestore read/write access.
-// Admin SDK tooling is a privileged ops layer.
+// Server SDK tooling is a privileged ops layer.
 // QA bot writes are privileged ops behavior, not client/app behavior.
 // Do not broaden rules to hide a custom-claims mismatch.
 service cloud.firestore {
@@ -17,18 +17,6 @@ service cloud.firestore {
       return request.auth.uid;
     }
 
-    function isAdmin() {
-      return signedIn() && request.auth.token.role == 'admin';
-    }
-
-    // TRANSITIONAL AUTHORITY SPLIT
-    // New constitutional roles are introduced before admin is removed.
-    // During transition, legacy admin remains a temporary compatibility
-    // fallback only for roles that have not reached independence yet.
-    // Owner never inherits admin authority.
-    // C-2: monitoring_operator and registry_steward no longer inherit admin.
-    // C-3: declaration_reviewer no longer inherits admin.
-    // C-4: support_observer no longer inherits admin.
     function hasRole(roleName) {
       return signedIn() && request.auth.token.role == roleName;
     }
@@ -53,6 +41,10 @@ service cloud.firestore {
       return hasRole('support_observer');
     }
 
+    function isMonitoringOperator() {
+      return hasRole('monitoring_operator');
+    }
+
     function isClient() {
       return signedIn() && request.auth.token.role == 'client';
     }
@@ -68,20 +60,10 @@ service cloud.firestore {
     function protectedAccountFields() {
       return [
         'role',
-        'isAdmin',
-        'approvalStatus',
-        'isActive',
-        'active',
         'isBlocked',
         'blockedAt',
         'blockedBy',
-        'blockReason',
-        'adminNotes',
-        'verifiedAt',
-        'verifiedBy',
-        'featured',
-        'ranking',
-        'subscriptionStatus'
+        'blockReason'
       ];
     }
 
@@ -95,31 +77,28 @@ service cloud.firestore {
       return signedIn() && docId == uid();
     }
 
-    function approvedActive() {
+    function visibilityReady() {
       return resource != null
-        && resource.data.approvalStatus == 'approved'
-        && (
-          resource.data.isActive == true
-          || resource.data.active == true
-        )
+        && resource.data.visibilityReadiness == 'ready'
         && resource.data.isBlocked != true;
+    }
+
+    function notVisibilityReady() {
+      return resource != null
+        && (
+          !resource.data.keys().hasAny(['visibilityReadiness'])
+          || resource.data.visibilityReadiness != 'ready'
+        );
     }
 
     function clientCreateValid(docId) {
       return ownDoc(docId)
         && request.resource.data.role == 'client'
         && !request.resource.data.keys().hasAny([
-          'isAdmin',
-          'approvalStatus',
-          'isActive',
-          'active',
           'isBlocked',
           'blockedAt',
           'blockedBy',
-          'blockReason',
-          'adminNotes',
-          'verifiedAt',
-          'verifiedBy'
+          'blockReason'
         ]);
     }
 
@@ -143,10 +122,8 @@ service cloud.firestore {
     function clinicianCreateValid(docId) {
       return ownDoc(docId)
         && request.resource.data.role == 'clinician'
-        && request.resource.data.isAdmin != true
-        && request.resource.data.isActive == false
         && request.resource.data.isBlocked != true
-        && request.resource.data.approvalStatus == 'pending_review';
+        && request.resource.data.visibilityReadiness == 'incomplete';
     }
 
     function clinicianSelfRegistrationFields() {
@@ -168,10 +145,6 @@ service cloud.firestore {
         'photoUrl',
         'photoAsset',
         'bio',
-        'sessionPriceText',
-        'sessionDurationText',
-        'sessionModes',
-        'offersGroupSessions',
         'identityFileName',
         'certificateFileName',
         'extraFileName',
@@ -180,6 +153,12 @@ service cloud.firestore {
         'identityDocumentUrl',
         'certificateDocumentUrl',
         'extraDocumentUrl',
+        'declarationSignals',
+        'visibilityReadiness',
+        'missingSignals',
+        'completedSignals',
+        'readinessUpdatedAt',
+        'readinessSource',
         'updatedAt',
         'createdAt'
       ];
@@ -188,7 +167,7 @@ service cloud.firestore {
     function clinicianSelfUpdateValid(docId) {
       return ownDoc(docId)
         && noProtectedAccountFieldChange()
-        && resource.data.approvalStatus != 'approved'
+        && notVisibilityReady()
         && request.resource.data.diff(resource.data)
           .affectedKeys()
           .hasOnly(clinicianSelfRegistrationFields());
@@ -197,14 +176,8 @@ service cloud.firestore {
     function centerCreateValid(docId) {
       return ownDoc(docId)
         && request.resource.data.role == 'center'
-        && request.resource.data.isAdmin != true
-        && request.resource.data.isActive == false
-        && (
-          !request.resource.data.keys().hasAny(['active'])
-          || request.resource.data.active == false
-        )
         && request.resource.data.isBlocked != true
-        && request.resource.data.approvalStatus == 'pending_admin';
+        && request.resource.data.visibilityReadiness == 'incomplete';
     }
 
     function centerSelfRegistrationFields() {
@@ -253,6 +226,12 @@ service cloud.firestore {
         'commercialFileName',
         'taxFileName',
         'documentsUploadMode',
+        'declarationSignals',
+        'visibilityReadiness',
+        'missingSignals',
+        'completedSignals',
+        'readinessUpdatedAt',
+        'readinessSource',
         'updatedAt',
         'createdAt'
       ];
@@ -261,182 +240,118 @@ service cloud.firestore {
     function centerSelfUpdateValid(docId) {
       return ownDoc(docId)
         && noProtectedAccountFieldChange()
-        && resource.data.approvalStatus != 'approved'
+        && notVisibilityReady()
         && request.resource.data.diff(resource.data)
           .affectedKeys()
           .hasOnly(centerSelfRegistrationFields());
     }
 
-    function isOwnBooking() {
-      return resource != null
-        && (
-          resource.data.clientId == uid()
-          || resource.data.clinicianId == uid()
-          || resource.data.clinicianUid == uid()
-          || resource.data.assignedClinicianId == uid()
-          || resource.data.assignedClinicianUid == uid()
-          || resource.data.centerId == uid()
-        );
-    }
-
-    function bookingCreateValid() {
-      return signedIn()
-        && (
-          request.resource.data.clientId == uid()
-          || request.resource.data.clinicianId == uid()
-          || request.resource.data.clinicianUid == uid()
-          || request.resource.data.centerId == uid()
-        );
-    }
-
-    function bookingUserUpdateValid() {
-      return isOwnBooking()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'note',
-          'threadId',
-          'contract',
-          'centerAvailabilityStatus',
-          'centerAvailabilityNote',
-          'centerAvailabilityUpdatedAt',
-          'arrivalConfirmed',
-          'arrivalConfirmedAt',
-          'clientReviewSubmitted',
-          'clientReviewSubmittedAt',
-          'clientReviewTotalScore',
-          'clientReviewPercentage',
-          'clientReviewDerivedStars',
-          'clinicianReviewSubmitted',
-          'clinicianReviewSubmittedAt',
-          'clinicianReviewTotalScore',
-          'clinicianReviewPercentage',
-          'clinicianReviewDerivedStars',
-          'centerReviewSubmitted',
-          'centerReviewSubmittedAt',
-          'centerReviewTotalScore',
-          'centerReviewPercentage',
-          'centerReviewDerivedStars',
-          'reviewStatus',
-          'sessionStatus',
-          'finalReviewPercentage',
-          'updatedAt'
-        ]);
-    }
-
     function ownClinicianProfileRequest() {
-      return signedIn()
-        && (
-          resource.data.clinicianId == uid()
-          || resource.data.ownerId == uid()
-        );
+      return signedIn() && resource.data.clinicianId == uid();
     }
 
     function ownCenterProfileRequest() {
-      return signedIn()
-        && (
-          resource.data.centerId == uid()
-          || resource.data.ownerId == uid()
-        );
+      return signedIn() && resource.data.centerId == uid();
     }
 
     function profileRequestCreateValid(ownerField) {
       return signedIn()
         && request.resource.data[ownerField] == uid()
-        && request.resource.data.status == 'pending'
-        && (
-          !request.resource.data.keys().hasAny(['ownerId'])
-          || request.resource.data.ownerId == uid()
-        )
+        && request.resource.data.status == 'submitted'
+        && request.resource.data.submittedBy == uid()
+        && request.resource.data.keys().hasAll([
+          'declarationSignals',
+          'profileSignals',
+          'changeSummary',
+          'submittedAt',
+          'submittedBy'
+        ])
+        && !request.resource.data.keys().hasAny(['ownerId'])
         && !request.resource.data.keys().hasAny(protectedAccountFields());
     }
 
-    function profileRequestAdminUpdateValid() {
-      return isDeclarationReviewer()
-        && (
-          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['status'])
-          || request.resource.data.status in ['approved', 'rejected', 'applied']
-        );
+    function safetyEscalationResolveValid() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status',
+          'resolvedByUid',
+          'resolvedAt',
+          'updatedAt'
+        ])
+        && request.resource.data.status == 'resolved'
+        && request.resource.data.resolvedByUid == uid();
     }
 
-    function canReadRating() {
-      return isAdmin()
-        || (
-          signedIn()
-          && resource != null
-          && (
-            resource.data.clientId == uid()
-            || resource.data.clinicianId == uid()
-            || resource.data.centerId == uid()
-            || resource.data.reviewerUid == uid()
-          )
-        );
+    function recommendedClinicianForEscalation() {
+      return isClinician()
+        && resource.data.keys().hasAny(['recommendedProviders'])
+        && uid() in resource.data.recommendedProviders;
     }
 
-    function ratingWriteValid() {
-      return signedIn()
-        && request.resource.data.reviewerUid == uid()
-        && request.resource.data.reviewerType in ['client', 'clinician', 'center']
-        && request.resource.data.requestId is string;
+    function supportSafetyThreadUpdateValid() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'needsHumanSupport',
+          'escalationLevel',
+          'safetyState',
+          'strategyMode',
+          'riskScore',
+          'riskLevel',
+          'lastEmotionalStates',
+          'lastDetectedRole',
+          'lastMessageAt',
+          'lastMessagePreview',
+          'messageCount',
+          'updatedAt'
+        ]);
+    }
+
+    function safetyEscalationCreateValid() {
+      return request.resource.data.status == 'open'
+        && request.resource.data.keys().hasAll([
+          'recommendedProviders',
+          'recommendedSignals',
+          'recommendedActions',
+          'routingSignals',
+          'safetyEscalationLevel'
+        ]);
     }
 
     match /clients/{clientId} {
-      allow get: if isAdmin() || ownDoc(clientId);
-      allow list: if isAdmin() || (signedIn() && resource.data.email == request.auth.token.email);
-      allow create: if clientCreateValid(clientId) || isAdmin();
-      allow update: if isAdmin() || clientUpdateValid(clientId);
+      allow get: if ownDoc(clientId);
+      allow list: if signedIn() && resource.data.email == request.auth.token.email;
+      allow create: if clientCreateValid(clientId);
+      allow update: if clientUpdateValid(clientId);
       allow delete: if false;
     }
 
     match /clinicians/{clinicianId} {
       allow read: if isDeclarationReviewer()
         || (signedIn() && clinicianId == uid())
-        || approvedActive();
-      allow create: if clinicianCreateValid(clinicianId) || isDeclarationReviewer();
-      allow update: if isDeclarationReviewer() || clinicianSelfUpdateValid(clinicianId);
+        || visibilityReady();
+      allow create: if clinicianCreateValid(clinicianId);
+      allow update: if clinicianSelfUpdateValid(clinicianId);
       allow delete: if false;
     }
 
     match /centers/{centerId} {
       allow read: if isDeclarationReviewer()
         || (signedIn() && centerId == uid())
-        || approvedActive();
-      allow create: if centerCreateValid(centerId) || isDeclarationReviewer();
-      allow update: if isDeclarationReviewer() || centerSelfUpdateValid(centerId);
-      allow delete: if false;
-    }
-
-    // LEGACY READ/UPDATE ONLY - NO NEW BOOKING AUTHORITY
-    // booking_requests is retained for historical compatibility only.
-    // New booking lifecycle creation is constitutionally frozen.
-    match /booking_requests/{requestId} {
-      allow get, list: if isAdmin() || isOwnBooking();
-      allow create: if false;
-      allow update: if isAdmin() || bookingUserUpdateValid();
-      allow delete: if false;
-    }
-
-    // ARCHIVE-DEAD LEGACY MIRROR - NO READS, WRITES, OR CREATION.
-    match /bookingRequests/{requestId} {
-      allow read, write: if false;
-    }
-
-    // L-B REMOVED - LEGACY READ ONLY, NO NEW SESSION RATING AUTHORITY.
-    match /sessionRatings/{ratingId} {
-      allow get, list: if canReadRating();
-      allow create, update: if false;
+        || visibilityReady();
+      allow create: if centerCreateValid(centerId);
+      allow update: if centerSelfUpdateValid(centerId);
       allow delete: if false;
     }
 
     match /clinician_profile_change_requests/{requestId} {
       allow read: if isDeclarationReviewer() || ownClinicianProfileRequest();
       allow create: if profileRequestCreateValid('clinicianId');
-      allow update: if profileRequestAdminUpdateValid();
+      allow update: if false;
       allow delete: if false;
     }
 
     match /center_profile_change_requests/{requestId} {
       allow read: if isDeclarationReviewer() || ownCenterProfileRequest();
       allow create: if profileRequestCreateValid('centerId');
-      allow update: if profileRequestAdminUpdateValid();
+      allow update: if false;
       allow delete: if false;
     }
 
@@ -447,7 +362,7 @@ service cloud.firestore {
         && request.resource.data.createdByUid == uid()
         && request.resource.data.status == 'new'
         && request.resource.data.source == 'structured_support';
-      allow update: if isSupportObserver();
+      allow update: if false;
       allow delete: if false;
     }
 
@@ -490,20 +405,16 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    match /tool_registry/{toolId} {
-      allow read: if signedIn();
-      allow write: if isRegistrySteward();
-      allow delete: if false;
-    }
-
     match /chat_threads/{threadId} {
       allow read: if isSupportObserver()
-        || (signedIn() && resource.data.ownerUid == uid())
-        || (signedIn() && resource.data.assignedClinicianUid == uid());
+        || (signedIn() && resource.data.participantUid == uid());
       allow create: if signedIn()
-        && request.resource.data.ownerUid == uid();
-      allow update: if isSupportObserver()
-        || (signedIn() && resource.data.ownerUid == uid());
+        && request.resource.data.participantUid == uid();
+      allow update: if (isSupportObserver() && supportSafetyThreadUpdateValid())
+        || (
+          signedIn()
+          && resource.data.participantUid == uid()
+        );
       allow delete: if false;
 
       match /messages/{messageId} {
@@ -512,8 +423,7 @@ service cloud.firestore {
             signedIn()
             && exists(/databases/$(database)/documents/chat_threads/$(threadId))
             && (
-              get(/databases/$(database)/documents/chat_threads/$(threadId)).data.ownerUid == uid()
-              || get(/databases/$(database)/documents/chat_threads/$(threadId)).data.assignedClinicianUid == uid()
+              get(/databases/$(database)/documents/chat_threads/$(threadId)).data.participantUid == uid()
             )
           );
         allow create: if signedIn()
@@ -524,13 +434,13 @@ service cloud.firestore {
 
     match /chat_escalations/{escalationId} {
       allow read: if isSupportObserver()
-        || (
-          isClinician()
-          && resource.data.assignedToType == 'clinician'
-          && resource.data.assignedToUid == uid()
-        );
-      allow create: if signedIn();
-      allow update: if isSupportObserver();
+        || recommendedClinicianForEscalation();
+      allow create: if signedIn() && safetyEscalationCreateValid();
+      allow update: if (
+          isSupportObserver()
+          || recommendedClinicianForEscalation()
+        )
+        && safetyEscalationResolveValid();
       allow delete: if false;
 
       match /reports/{reportId} {
@@ -538,71 +448,55 @@ service cloud.firestore {
           || (
             isClinician()
             && exists(/databases/$(database)/documents/chat_escalations/$(escalationId))
-            && get(/databases/$(database)/documents/chat_escalations/$(escalationId)).data.assignedToUid == uid()
+            && get(/databases/$(database)/documents/chat_escalations/$(escalationId)).data.keys().hasAny(['recommendedProviders'])
+            && uid() in get(/databases/$(database)/documents/chat_escalations/$(escalationId)).data.recommendedProviders
           );
         allow create: if signedIn();
         allow update, delete: if false;
       }
     }
 
-    // LEGACY ADMIN AUTHORITY - TO BE PURGED
-    // The admins collection is retained only for transition compatibility.
-    match /admins/{adminId} {
-      allow read, write: if isAdmin();
-      allow delete: if false;
-    }
-
-    match /system_health/{docId} {
-      allow read: if isMonitoringOperator();
-      allow write: if false;
-    }
-
-    // Ops-owned alert snapshots.
-    // Written only by trusted Admin SDK tooling.
-    // Client/app writes remain denied.
-    match /system_alerts/{docId} {
-      allow read: if isMonitoringOperator();
-      allow write: if false;
-    }
-
-    match /analytics_summaries/{docId} {
-      allow read: if isMonitoringOperator();
-      allow write: if false;
-    }
-
     match /system_domains/{docId} {
-      allow read, write: if isRegistrySteward();
+      allow read: if isOwner() || isRegistrySteward();
+      allow write: if false;
       allow delete: if false;
     }
 
-    match /ai_policies/{docId} {
-      allow read, write: if isRegistrySteward();
-      allow delete: if false;
+    match /signal_events/{signalId} {
+      allow get: if signedIn() && (resource.data.actorId == uid() || isOwner() || isMonitoringOperator() || isSupportObserver());
+      allow list: if signedIn()
+        && (
+          resource.data.actorId == uid()
+          || isOwner()
+          || isMonitoringOperator()
+          || isSupportObserver()
+        );
+      allow create: if signedIn()
+        && request.resource.data.actorId == uid()
+        && request.resource.data.signalId == signalId
+        && request.resource.data.keys().hasOnly([
+          'signalId',
+          'signalType',
+          'signalCategory',
+          'signalDomain',
+          'signalSource',
+          'actorId',
+          'actorRole',
+          'targetType',
+          'targetId',
+          'timestamp',
+          'routingTarget',
+          'retentionClass',
+          'privacyLevel',
+          'signalVersion',
+          'createdAt'
+        ]);
+      allow update, delete: if false;
     }
 
-    match /resources/{docId} {
-      allow read: if signedIn();
-      allow write: if isRegistrySteward();
-      allow delete: if false;
-    }
-
-    match /external_follow_up_registry/{docId} {
-      allow read, write: if isRegistrySteward();
-      allow delete: if false;
-    }
-
-    match /external_follow_up_message_templates/{docId} {
-      allow read, write: if isRegistrySteward();
-      allow delete: if false;
-    }
-
-    match /external_follow_up_campaigns/{docId} {
-      allow read, write: if isRegistrySteward();
-      allow delete: if false;
-    }
-
-    match /debug/{docId} {
-      allow read, write: if false;
+    match /signal_aggregates/{aggregateId} {
+      allow read: if isOwner() || isMonitoringOperator();
+      allow write: if false; // Client-side aggregate writes disabled for now.
     }
 
     match /{document=**} {

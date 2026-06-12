@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
+import 'package:flutterprojects/core/visibility/visibility_readiness.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
 import 'package:flutterprojects/shared/contracts/role_names.dart';
 
@@ -55,32 +56,33 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<String> _resolve(User u, SignedInAccessState a) async {
     // Blocked users
-    if (a.isBlocked && !a.isAdmin) {
+    if (a.isBlocked) {
       return Routes.blockedAccount;
     }
 
-    // Approval gate for center & clinician
-    final needsApproval =
+    // Visibility readiness gate for centers and clinicians.
+    final needsReadiness =
         a.role == RoleNames.clinician || a.role == RoleNames.center;
 
-    if (needsApproval) {
-      final status = a.approvalStatus.trim().toLowerCase();
-
-      if (status == 'rejected' || status == 'rejected_admin') {
-        return Routes.blockedAccount;
-      }
-
-      if (status != 'approved' || !a.isActive) {
-        return Routes.blockedAccount;
-      }
+    if (needsReadiness &&
+        a.visibilityReadiness != VisibilityReadiness.ready) {
+      return Routes.blockedAccount;
     }
 
     // Normal routing
     switch (a.role) {
-      case RoleNames.admin:
-        return Routes.adminHub;
+      case RoleNames.owner:
+        return Routes.sOwnerHome;
+      case RoleNames.monitoringOperator:
+        return Routes.sSignalMonitoringRoom;
+      case RoleNames.registrySteward:
+        return Routes.sRegistryRoom;
+      case RoleNames.declarationReviewer:
+        return Routes.sDeclarationReviewRoom;
+      case RoleNames.supportObserver:
+        return Routes.sSupportRoom;
       case RoleNames.clinician:
-        return Routes.clinicianOperations;
+        return Routes.clinicianRoom;
       case RoleNames.center:
         return Routes.centerDashboard;
       case RoleNames.client:

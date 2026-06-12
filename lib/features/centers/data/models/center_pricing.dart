@@ -346,7 +346,7 @@ List<AutismCareCostItem> defaultAutismCareCostItems() {
     AutismCareCostItem(
       key: 'home_visit_sessions',
       labelAr: 'جلسات الزيارة المنزلية',
-      labelEn: 'Home visit sessions',
+      labelEn: 'Home visit support information',
     ),
   ];
 }

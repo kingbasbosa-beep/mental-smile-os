@@ -1,4 +1,4 @@
-﻿// ignore: unused_import
+// ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
@@ -16,11 +16,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get changeLanguage => 'Change language';
-
-  @override
-  String localeLabel(String code) {
-    return 'Locale: $code (tap or ðŸŒ)';
-  }
 
   @override
   String get splashTitle => 'Splash';
@@ -42,9 +37,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get moduleSpecialNeedsFamilies => 'Special Needs Families';
-
-  @override
-  String get moduleFamilyStress => 'Family Stress';
 
   @override
   String get commonBack => 'Back';
@@ -247,16 +239,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get centerAbout => 'About the center';
 
   @override
-  String get centerRequestViaAdmin => 'Request this center through admin';
+  String get centerRequestViaAdmin => 'Contact this center';
 
   @override
-  String get centerInboxTitle => 'Center inbox';
+  String get centerInboxTitle => 'Center messages';
 
   @override
   String get commonAll => 'All';
 
   @override
-  String get statusPending => 'Pending';
+  String get statusPending => 'Incomplete';
 
   @override
   String get centerSaveResponse => 'Save response';
@@ -266,7 +258,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get webCenterRegistrationPortalSubtitle =>
-      'Create your center account for admin review.';
+      'Create your center account for declaration readiness.';
 
   @override
   String get webCenterRegistrationBasicInfoTitle =>
@@ -322,20 +314,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webCenterInsideImage2Url => 'Inside image 2 URL';
 
   @override
-  String get webCenterNextPricingCapabilities => 'Next: Pricing & Capabilities';
+  String get webCenterNextPricingCapabilities =>
+      'Next: Service Costs & Capabilities';
 
   @override
   String get webCenterPricingCapabilitiesTitle =>
-      'Center Registration - Pricing & Capabilities';
+      'Center Registration - Service Costs & Capabilities';
 
   @override
   String get webCenterEnabled => 'Enabled';
 
   @override
-  String get webCenterPrice => 'Price';
+  String get webCenterPrice => 'Service cost';
 
   @override
-  String get webCenterPricingUnit => 'Pricing unit';
+  String get webCenterPricingUnit => 'Cost unit';
 
   @override
   String get webCenterAcMode => 'AC mode';
@@ -356,14 +349,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webCenterFileUrlOptional => 'File URL (optional)';
 
   @override
-  String get webCenterReviewNoteOptional => 'Review note (optional)';
+  String get webCenterReviewNoteOptional => 'Declaration note (optional)';
 
   @override
-  String get webCenterSubmitForReview => 'Submit for review';
+  String get webCenterSubmitForReview => 'Submit declaration';
 
   @override
   String get webRegistrationBrowseLibraryDuringReview =>
-      'Browse the guidance library while your account is reviewed';
+      'Browse the guidance library while readiness is checked';
 
   @override
   String get webCenterCenterNameRequired => 'Enter the center name';
@@ -377,7 +370,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Please register or sign in before saving.';
 
   @override
-  String get webCenterMissingSession => 'Missing center session';
+  String get webCenterMissingSession => 'Registration step unavailable';
 
   @override
   String get webCenterSaveProfileFailed => 'Could not save profile';
@@ -386,7 +379,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webCenterSaveMediaFailed => 'Could not save media';
 
   @override
-  String get webCenterSavePricingFailed => 'Could not save pricing';
+  String get webCenterSavePricingFailed =>
+      'Could not save service cost information';
 
   @override
   String get webCenterSubmitDocumentsFailed => 'Could not submit documents';
@@ -418,10 +412,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webClinicianBio => 'Bio';
 
   @override
-  String get webClinicianSessionPrice => 'Session price';
+  String get webClinicianSessionPrice => 'Service cost information';
 
   @override
-  String get webClinicianSessionDuration => 'Session duration';
+  String get webClinicianSessionDuration => 'Service time information';
 
   @override
   String get webClinicianDocumentsTitle => 'Clinician Registration - Documents';
@@ -445,56 +439,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get webClinicianAuthenticationSessionMissing =>
-      'Authentication session missing';
+      'Registration step unavailable';
 
   @override
   String get webClinicianSaveProfileFailed => 'Could not save profile';
 
   @override
-  String get webClinicianSelectSessionMode =>
-      'Choose at least one session method';
-
-  @override
   String get webClinicianSubmitDocumentsFailed => 'Could not submit documents';
-
-
-  @override
-  String get bookingEditAccommodation => 'Edit accommodation type';
-
-  @override
-  String get bookingCompleteInitialIntake => 'Complete initial intake details';
-
-  @override
-  String get bookingCurrent => 'Current';
-
-  @override
-  String get bookingActionNeeded => 'Action needed';
-
-  @override
-  String get bookingCompleted => 'Completed';
-
-  @override
-  String get bookingClosed => 'Closed';
-
-  @override
-  String get bookingEmptyCurrent => 'No current requests right now';
-
-  @override
-  String get bookingEmptyActionNeeded => 'No requests need action right now';
-
-  @override
-  String get bookingEmptyCompleted => 'No completed requests yet';
-
-  @override
-  String get bookingEmptyClosed => 'No closed requests';
-
-  @override
-  String get bookingSpecialistFallback => 'Specialist';
-
-  @override
-  String clientDashboardWelcome(String name) {
-    return 'Welcome, $name';
-  }
 
   @override
   String get clientDashboardSubtitle => 'Your next steps are all here.';
@@ -503,15 +454,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clientSupport => 'Support';
 
   @override
-  String get clientSupportRequests => 'Support requests';
-
-
+  String get clientSupportRequests => 'Support signals';
 
   @override
   String get clientLinksAndCodes => 'Links and codes';
-
-  @override
-  String get clientFollowUp => 'Follow-up';
 
   @override
   String get clientMessagePreferences => 'Message preferences';
@@ -526,34 +472,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clientOverallAverage => 'Overall average';
 
   @override
-  String get clinicianOperations => 'Operations';
-
-  @override
   String get clinicianDashboard => 'Clinician dashboard';
 
   @override
-  String get clinicianOpenCases => 'Open cases';
+  String get clinicianOpenCases => 'Open conversations';
 
   @override
-  String get clinicianSendSupportRequest => 'Send support request';
+  String get clinicianSendSupportRequest => 'Share support signal';
 
   @override
   String get clinicianEditProfile => 'Edit my profile';
 
   @override
-  String get clinicianSupportRequest => 'Support request';
+  String get clinicianSupportRequest => 'Support signal';
 
   @override
-  String get clinicianCurrentSupportRequests => 'Current support requests';
+  String get clinicianCurrentSupportRequests => 'Current support signals';
 
   @override
-  String get clinicianReferredChatCases => 'Referred chat cases';
+  String get clinicianReferredChatCases => 'Shared chat conversations';
 
   @override
-  String get clinicianReferredChatCasesCount => 'Referred chat cases';
+  String get clinicianReferredChatCasesCount => 'Shared chat conversations';
 
   @override
-  String get clinicianNewRequests => 'New';
+  String get clinicianNewRequests => 'New signals';
 
   @override
   String get clinicianActiveRequests => 'In progress';
@@ -565,16 +508,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clinicianClosed => 'Closed';
 
   @override
-  String get clinicianAcceptRequest => 'Accept request';
+  String get clinicianAcceptRequest => 'Confirm readiness';
 
   @override
-  String get clinicianRejectRequest => 'Reject request';
+  String get clinicianRejectRequest => 'Mark incomplete';
 
   @override
-  String get clinicianAssignedRequest => 'Request assigned to you';
-
-  @override
-  String get clinicianProfileChangeTitle => 'Request photo or bio update';
+  String get clinicianProfileChangeTitle => 'Declare photo or bio update';
 
   @override
   String get clinicianNewPhotoUrl => 'New photo URL';
@@ -583,10 +523,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clinicianNewBio => 'New bio';
 
   @override
-  String get clinicianSendingRequest => 'Sending request...';
+  String get clinicianSendingRequest => 'Sharing signal...';
 
   @override
-  String get clinicianSendChangeRequest => 'Send change request';
+  String get clinicianSendChangeRequest => 'Share update declaration';
 
   @override
   String get clinicianLogout => 'Logout';
@@ -595,91 +535,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clinicianPleaseSignIn => 'Please sign in first';
 
   @override
-  String get clinicianInboxTitle => 'Clinician inbox';
-
-
-  @override
-  String get clinicianReject => 'Reject';
+  String get clinicianInboxTitle => 'Clinician messages';
 
   @override
-  String get clinicianAccept => 'Accept';
+  String get clinicianReject => 'Mark incomplete';
 
   @override
-  String get clinicianRejectRequestTitle => 'Reject request';
+  String get clinicianAccept => 'Confirm readiness';
 
   @override
-  String get clinicianRejectReason => 'Rejection reason';
+  String get clinicianRejectRequestTitle => 'Mark incomplete';
 
   @override
-  String get clinicianRejectReasonHint => 'Write the rejection reason here...';
+  String get clinicianRejectReason => 'Incomplete reason';
 
   @override
-  String get clinicianConfirmReject => 'Confirm rejection';
-
-
-  @override
-  String get clinicianRejectFailed => 'Reject failed';
+  String get clinicianRejectReasonHint => 'Write the incomplete reason here...';
 
   @override
-  String get clinicianAcceptFailed => 'Accept failed';
+  String get clinicianConfirmReject => 'Confirm incomplete status';
 
   @override
-  String get clinicianRequestRejected => 'Request rejected';
+  String get clinicianRejectFailed => 'Could not mark incomplete';
 
   @override
-  String get statusPendingReview => 'Pending review';
+  String get clinicianAcceptFailed => 'Could not confirm readiness';
 
   @override
-  String get statusRequestUnderReview => 'Your request is under review';
+  String get statusCenterFollowUp => 'Center availability signal incomplete';
 
   @override
-  String get statusCenterFollowUp => 'The center is checking availability';
+  String get statusClientUpdateRequired => 'Center information update needed';
 
   @override
-  String get statusClientUpdateRequired =>
-      'The center requested an accommodation update';
-
-  @override
-  String get statusCenterIntakePending => 'Waiting for initial intake details';
+  String get statusCenterIntakePending => 'Initial information incomplete';
 
   @override
   String get statusCenterRecommendationPending =>
-      'Waiting for the center recommendation';
+      'Center guidance not available yet';
 
   @override
-  String get statusApproved => 'Approved';
+  String get statusResidencySetupPending =>
+      'Residential support details incomplete';
 
   @override
-  String get statusRequestApproved => 'Your request was approved';
-
-
-
+  String get statusResidencyScheduled => 'Residential support timing saved';
 
   @override
-  String get statusSessionSetupPending => 'Session setup pending';
+  String get statusResidencyInProgress => 'Residential support in progress';
 
   @override
-  String get statusResidencySetupPending => 'Residency setup pending';
-
-  @override
-  String get statusSessionScheduled => 'Session scheduled';
-
-  @override
-  String get statusResidencyScheduled => 'Residency scheduled';
-
-  @override
-  String get statusSessionInProgress => 'Session in progress';
-
-  @override
-  String get statusResidencyInProgress => 'Residency in progress';
-
-  @override
-  String get statusPendingReviews => 'Pending reviews';
-
-  @override
-  String get statusPendingDischargeReviews => 'Pending discharge reviews';
-
-
+  String get statusPendingDischargeReviews => 'Continuity notes incomplete';
 
   @override
   String get statusCompleted => 'Completed';
@@ -688,37 +594,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statusCompletedSuccessfully => 'Completed successfully';
 
   @override
-  String get statusRequestCompleted => 'Request completed';
+  String get statusRequestCompleted => 'Support signal processed';
 
   @override
-  String get statusReschedulePending => 'Reschedule pending';
+  String get statusReschedulePending => 'Timing update incomplete';
 
   @override
   String get statusAwaitingStartConfirmations => 'Awaiting start confirmations';
 
   @override
-  String get statusRejected => 'Request could not be accepted';
+  String get statusRejected => 'Unavailable';
 
   @override
-  String get statusClinicianRejected => 'Clinician could not confirm';
+  String get statusClinicianRejected => 'Clinician confirmation unavailable';
 
   @override
   String get statusCancelled => 'Cancelled';
 
   @override
-  String get statusCancellationPending => 'Cancellation request under review';
-
-  @override
   String get statusDisputeReceived => 'Complaint received';
 
   @override
-  String get statusRequestCoordination => 'Request is being coordinated';
+  String get statusRequestCoordination => 'Support signal is being prepared';
 
   @override
-  String get statusRequestUpdateInProgress => 'Request status is being updated';
+  String get statusRequestUpdateInProgress => 'Signal status is being updated';
 
   @override
-  String get statusNewRequest => 'New request';
+  String get statusNewRequest => 'New support signal';
 
   @override
   String get statusCenterAvailableResponse => 'Center response: available';
@@ -730,13 +633,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statusCenterNoResponse => 'Center response: no reply yet';
 
   @override
-  String comingSoon(String title) {
-    return '$title â€” Coming soon';
+  String localeLabel(String code) {
+    return 'Locale: $code (tap or 🌐)';
   }
 
   @override
-  String get modulePlaceholderBody => 'Content coming soon.';
+  String clientDashboardWelcome(String name) {
+    return 'Welcome, $name';
+  }
+
+  @override
+  String comingSoon(String title) {
+    return '$title — Coming soon';
+  }
 }
-
-
-

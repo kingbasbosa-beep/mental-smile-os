@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojects/app/router/routes.dart';
+import 'package:flutterprojects/core/visibility/visibility_readiness.dart';
 import 'package:flutterprojects/features/specialists/data/clinician_specialty_catalog.dart';
 import 'package:flutterprojects/shared/analytics/app_analytics.dart';
 import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
@@ -152,7 +153,7 @@ class SpecialistsListPage extends StatelessWidget {
   }) {
     // [S] Provider Signals
     // Approved by Wave S-3 Classification Board.
-    // Display-only signal badges; do not couple to booking/session/payment.
+    // Display-only provider signal badges.
     final signals = data['providerSignals'];
     if (signals is! Map) return const [];
     final keys = <String>[
@@ -229,12 +230,11 @@ class SpecialistsListPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: FirebaseFirestore.instance
-                      .collection('clinicians')
-                      .where('isActive', isEqualTo: true)
-                      .where('approvalStatus', isEqualTo: 'approved')
-                      .snapshots(),
+                StreamBuilder<
+                    List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
+                  stream: VisibilityReadinessStreams.watchVisibleDocuments(
+                    FirebaseFirestore.instance.collection('clinicians'),
+                  ),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       return Center(
@@ -250,10 +250,11 @@ class SpecialistsListPage extends StatelessWidget {
                       return const Center(child: CircularProgressIndicator());
                     }
 
-                    final docs = snapshot.data!.docs.where((doc) {
+                    final docs = snapshot.data!.where((doc) {
                       final data = doc.data();
                       final role = (data['role'] ?? '').toString().trim();
                       if (role != 'clinician') return false;
+                      if (!VisibilityReadiness.isVisible(data)) return false;
                       return _matchesCategory(data);
                     }).toList();
 

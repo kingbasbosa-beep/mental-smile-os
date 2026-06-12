@@ -24,58 +24,7 @@ class PortalAboutPage extends StatelessWidget {
         title: 'About Mental Smile',
         subtitle: 'Mental Smile Service Marketplace + Operational Federation',
         body:
-            'Mental Smile is not a centralized session booking platform. It is a service marketplace and operational federation for access, support, transparency, education, and professional services.',
-      ),
-    );
-  }
-}
-
-class PortalLibraryPage extends StatelessWidget {
-  const PortalLibraryPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _PortalScaffold(
-      currentRoute: '/library',
-      child: _PortalTextPage(
-        title: 'Library Project',
-        subtitle: 'Coming Soon',
-        body:
-            'The Mental Smile Library will host education, prevention, support content, exercises, guides, and future accessibility-aware resources.',
-      ),
-    );
-  }
-}
-
-class PortalProviderRegistrationPage extends StatelessWidget {
-  const PortalProviderRegistrationPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _PortalScaffold(
-      currentRoute: '/register/provider',
-      child: _PortalTextPage(
-        title: 'Provider Registration',
-        subtitle: 'Phase 1 Intake Form',
-        body:
-            'Coming Next Phase. This page will become the first intake point for providers without approval automation, Firebase writes, or runtime registration logic.',
-      ),
-    );
-  }
-}
-
-class PortalCenterRegistrationPage extends StatelessWidget {
-  const PortalCenterRegistrationPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _PortalScaffold(
-      currentRoute: '/register/center',
-      child: _PortalTextPage(
-        title: 'Center Registration',
-        subtitle: 'Phase 1 Intake Form',
-        body:
-            'Coming Next Phase. This page will become the first intake point for centers without approval automation, Firebase writes, or runtime registration logic.',
+            'Mental Smile is a signal-aware service marketplace for access, support, transparency, education, and professional services.',
       ),
     );
   }
@@ -93,7 +42,7 @@ class PortalServiceRequestPage extends StatelessWidget {
         title: 'Service Request',
         subtitle: 'Commerce Intake + Service Request',
         disclaimer:
-            'This is an intake request only. Mental Smile will review the request and contact you manually. No quote, approval, lifecycle ownership, or execution is guaranteed by submitting this form.',
+            'This captures interest signals for future service contact. It does not create authority over people or journeys.',
         submitLabel: 'Open Gmail Draft / ÙØªØ­ Ù…Ø³ÙˆØ¯Ø© Gmail',
         fields: [
           _PortalTextFieldSpec(key: 'requester', label: 'Requester name'),
@@ -140,10 +89,10 @@ class PortalPackageRequestPage extends StatelessWidget {
       currentRoute: '/request/package',
       child: _PortalIntakePage(
         intakeType: _PortalIntakeType.package,
-        title: 'Package Request',
+        title: 'Package Information',
         subtitle: 'Package + Subscription Intake',
         disclaimer:
-            'Package requests are reviewed manually. Payment instructions and receipts are issued only after review by Mental Smile.',
+            'Package information is handled as external service cost information. Mental Smile does not process financial decisions through this portal.',
         submitLabel: 'Open Gmail Draft / ÙØªØ­ Ù…Ø³ÙˆØ¯Ø© Gmail',
         fields: [
           _PortalTextFieldSpec(key: 'requester', label: 'Requester name'),
@@ -160,7 +109,7 @@ class PortalPackageRequestPage extends StatelessWidget {
             options: [
               'Subscription',
               'Verification',
-              'Visibility Package',
+              'Visibility Information',
               'Tool / AI Package',
               'Optional Module Rental',
             ],
@@ -203,7 +152,7 @@ class PortalContactPage extends StatelessWidget {
               'General inquiry',
               'Provider question',
               'Center question',
-              'Business request',
+              'Business inquiry',
               'Support program',
               'Other',
             ],

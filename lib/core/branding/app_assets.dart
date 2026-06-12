@@ -8,6 +8,4 @@ class AppAssets {
   static const logoLight = 'assets/branding/logo_light.png';
   static const logoMarketingGlow = 'assets/branding/logo_marketing_glow.png';
   static const logoIconLight = 'assets/branding/logo_icon_light.png';
-  static const adminControlRoomBackground =
-      'assets/branding/admin_control_room_bg.png';
 }

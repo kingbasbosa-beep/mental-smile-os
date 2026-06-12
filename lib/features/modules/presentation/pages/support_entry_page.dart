@@ -13,7 +13,7 @@ class SupportEntryPage extends StatelessWidget {
         _subtitleAr =
             'نقطة بداية هادئة لاختيار الدعم المناسب: مختص، مركز، مواد مفيدة، أو طلب دعم منظم عند الحاجة.',
         _subtitleEn =
-            'A calm starting point to choose support: specialist, center, helpful materials, or a structured support request when needed.',
+            'A calm starting point to choose support: specialist, center, helpful materials, or a structured support signal when needed.',
         _chatEntryContext = 'recovery_support',
         _accent = const Color(0xFFE58667),
         _heroAsset = 'c7_branding/home/hero_art.png',
@@ -61,7 +61,7 @@ class SupportEntryPage extends StatelessWidget {
             titleEn: 'Talk to support when needed',
             bodyAr: 'ابدأ طلب دعم منظم إذا احتجت إلى توجيه أو مساندة.',
             bodyEn:
-                'Start a structured support request if you need guidance or help.',
+                'Share a structured support signal if you need guidance or help.',
             icon: Icons.chat_bubble_outline_rounded,
             route: Routes.supportIssueSelector,
             analyticsPath: 'issue_selector',
@@ -75,7 +75,7 @@ class SupportEntryPage extends StatelessWidget {
         _subtitleAr =
             'نقطة بداية للأسرة لاختيار الدعم المناسب: مختص، مركز، مواد مفيدة، أو طلب دعم منظم عند الحاجة.',
         _subtitleEn =
-            'A starting point for families to choose support: specialist, center, helpful materials, or a structured support request when needed.',
+            'A starting point for families to choose support: specialist, center, helpful materials, or a structured support signal when needed.',
         _chatEntryContext = 'family_support',
         _accent = const Color(0xFF37B8B0),
         _heroAsset = 'c7_branding/home/hero_art.png',
@@ -120,7 +120,7 @@ class SupportEntryPage extends StatelessWidget {
             bodyAr:
                 'اختر نوع طلب الدعم لفهم الخطوة التالية أو طلب مساندة بسيطة.',
             bodyEn:
-                'Choose a support request type to clarify your next step or ask for simple help.',
+                'Choose a support signal type to clarify your next step or ask for simple help.',
             icon: Icons.support_agent_outlined,
             route: Routes.supportIssueSelector,
             analyticsPath: 'issue_selector',
@@ -236,7 +236,7 @@ class SupportEntryPage extends StatelessWidget {
                       Text(
                         isArabic
                             ? 'اختر المسار الأنسب الآن: طلب دعم، مختص، مركز، أو مواد مفيدة.'
-                            : 'Choose the most helpful path now: support request, specialist, center, or helpful materials.',
+                            : 'Choose the most helpful path now: support signal, specialist, center, or helpful materials.',
                         textAlign: isArabic ? TextAlign.right : TextAlign.left,
                       ),
                     ],

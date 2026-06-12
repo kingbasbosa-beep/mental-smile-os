@@ -64,7 +64,7 @@ class AccountBlockedPage extends StatelessWidget {
                               Text(
                                 isArabic
                                     ? 'تم تسجيل الدخول بنجاح، لكن لا يمكن متابعة استخدام الحساب حاليًا. يرجى التواصل مع الإدارة.'
-                                    : 'You signed in successfully, but this account cannot continue into the app right now. Please contact support or admin.',
+                                    : 'You signed in successfully, but this account cannot continue into the app right now. Please contact support.',
                                 textAlign: TextAlign.center,
                               ),
                               if (trimmedReason.isNotEmpty) ...[

@@ -12,6 +12,7 @@ class SignalTypeRegistry {
   static const String supportStarted = 'support_started';
   static const String libraryCategoryOpened = 'library_category_opened';
   static const String providerProfileOpened = 'provider_profile_opened';
+  static const String centerProfileOpened = 'center_profile_opened';
 
   static const List<String> values = <String>[
     goalSelected,
@@ -24,5 +25,6 @@ class SignalTypeRegistry {
     supportStarted,
     libraryCategoryOpened,
     providerProfileOpened,
+    centerProfileOpened,
   ];
 }

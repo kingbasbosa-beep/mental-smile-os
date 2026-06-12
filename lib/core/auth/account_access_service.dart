@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutterprojects/core/visibility/visibility_readiness.dart';
 import 'package:flutterprojects/shared/contracts/role_names.dart';
 
 class SignedInAccessState {
@@ -8,8 +9,7 @@ class SignedInAccessState {
     this.role,
     this.isBlocked = false,
     this.blockReason = '',
-    this.approvalStatus = '',
-    this.isActive = false,
+    this.visibilityReadiness = '',
     this.collection,
     this.docId,
   });
@@ -17,12 +17,9 @@ class SignedInAccessState {
   final String? role;
   final bool isBlocked;
   final String blockReason;
-  final String approvalStatus;
-  final bool isActive;
+  final String visibilityReadiness;
   final String? collection;
   final String? docId;
-
-  bool get isAdmin => role == RoleNames.admin;
 }
 
 class AccountAccessService {
@@ -34,59 +31,10 @@ class AccountAccessService {
   Future<SignedInAccessState> resolve(User user) async {
     final uid = user.uid;
     final email = (user.email ?? '').trim().toLowerCase();
+    final claimedRole = await _roleFromClaims(user);
 
-    _accessTrace('admin_check_start currentAuthUid=$uid');
-    final adminDoc = await _safeGet('admins', uid);
-    final adminExists = adminDoc?.exists == true;
-    final adminActive =
-        adminExists && ((adminDoc?.data()?['active'] ?? false) == true);
-    _accessTrace(
-      'admin_check_result '
-      'currentAuthUid=$uid '
-      'adminDocExists=$adminExists '
-      'adminActive=$adminActive',
-    );
-    if (adminDoc?.exists == true) {
-      final data = adminDoc?.data() ?? const <String, dynamic>{};
-      if ((data['active'] ?? false) == true) {
-        _accessTrace(
-          'admin_check_decision '
-          'currentAuthUid=$uid '
-          'reason=admins_doc_active_true',
-        );
-        return const SignedInAccessState(role: 'admin');
-      }
-      _accessTrace(
-        'admin_check_decision '
-        'currentAuthUid=$uid '
-        'reason=admins_doc_found_but_active_false',
-      );
-    } else {
-      _accessTrace(
-        'admin_check_decision '
-        'currentAuthUid=$uid '
-        'reason=no_admins_doc_for_uid',
-      );
-    }
-
-    if (email.isNotEmpty) {
-      final adminByEmail = await _safeQueryByEmail('admins', email);
-      if (adminByEmail != null) {
-        final data = adminByEmail.data();
-        if ((data['active'] ?? false) == true) {
-          _accessTrace(
-            'admin_check_decision '
-            'currentAuthUid=$uid '
-            'reason=admins_email_doc_active_true',
-          );
-          return const SignedInAccessState(role: RoleNames.admin);
-        }
-        _accessTrace(
-          'admin_check_decision '
-          'currentAuthUid=$uid '
-          'reason=admins_email_doc_found_but_active_false',
-        );
-      }
+    if (_isConstitutionalRole(claimedRole)) {
+      return SignedInAccessState(role: claimedRole);
     }
 
     final clinicianDoc = await _safeGet('clinicians', uid);
@@ -170,6 +118,27 @@ class AccountAccessService {
     return const SignedInAccessState();
   }
 
+  Future<String?> _roleFromClaims(User user) async {
+    try {
+      final token = await user.getIdTokenResult();
+      final role = _normalizedRole(token.claims?['role']);
+      if (role.isNotEmpty) return role;
+    } on FirebaseException {
+      return null;
+    } catch (_) {
+      return null;
+    }
+    return null;
+  }
+
+  bool _isConstitutionalRole(String? role) {
+    return role == RoleNames.owner ||
+        role == RoleNames.monitoringOperator ||
+        role == RoleNames.registrySteward ||
+        role == RoleNames.declarationReviewer ||
+        role == RoleNames.supportObserver;
+  }
+
   SignedInAccessState _stateForDoc({
     required String role,
     required Map<String, dynamic> data,
@@ -180,8 +149,7 @@ class AccountAccessService {
       role: role,
       isBlocked: (data['isBlocked'] ?? false) == true,
       blockReason: (data['blockReason'] ?? '').toString().trim(),
-      approvalStatus: (data['approvalStatus'] ?? '').toString().trim(),
-      isActive: (data['isActive'] ?? false) == true,
+      visibilityReadiness: VisibilityReadiness.resolve(data),
       collection: collection,
       docId: docId,
     );
@@ -233,40 +201,5 @@ class AccountAccessService {
     } catch (_) {
       return null;
     }
-  }
-}
-
-class AccountBlockingService {
-  AccountBlockingService({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
-
-  final FirebaseFirestore _firestore;
-
-  Future<void> blockAccount({
-    required String collection,
-    required String docId,
-    required String adminUid,
-    required String reason,
-  }) async {
-    await _firestore.collection(collection).doc(docId).update({
-      'isBlocked': true,
-      'blockedAt': FieldValue.serverTimestamp(),
-      'blockedBy': adminUid,
-      'blockReason': reason.trim(),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
-  }
-
-  Future<void> unblockAccount({
-    required String collection,
-    required String docId,
-  }) async {
-    await _firestore.collection(collection).doc(docId).update({
-      'isBlocked': false,
-      'blockedAt': null,
-      'blockedBy': '',
-      'blockReason': '',
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
   }
 }

@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
 import 'package:flutterprojects/core/auth/presentation/pages/account_blocked_page.dart';
+import 'package:flutterprojects/core/visibility/visibility_readiness.dart';
 import 'package:flutterprojects/l10n/app_localizations.dart';
 
 import 'routes.dart';
@@ -16,21 +17,20 @@ import 'package:flutterprojects/features/web_registration/presentation/pages/web
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_clinician_documents_page.dart';
 import 'package:flutterprojects/features/web_registration/presentation/pages/web_registration_success_page.dart';
 import 'package:flutterprojects/features/web_portal/presentation/pages/portal_skeleton_pages.dart';
-import 'package:flutterprojects/features/s_capital/presentation/pages/s_admin_operations_office_page.dart';
-import 'package:flutterprojects/features/s_capital/presentation/pages/s_signal_control_room_page.dart';
+import 'package:flutterprojects/features/s_capital/presentation/pages/s_capital_operations_office_page.dart';
+import 'package:flutterprojects/features/s_capital/presentation/pages/s_signal_monitoring_room_page.dart';
 import 'package:flutterprojects/features/s_city/presentation/pages/s_city_district_page.dart';
 import 'package:flutterprojects/features/s_owner/presentation/pages/s_owner_district_page.dart';
 import 'package:flutterprojects/features/s_web_surfaces/presentation/pages/s_web_surface_pages.dart';
 import 'package:flutterprojects/features/s_personal_space/presentation/pages/s_personal_space_page.dart';
-
-import 'package:flutterprojects/features/booking/presentation/pages/clinician_inbox_page.dart';
-import 'package:flutterprojects/features/booking/presentation/pages/center_inbox_page.dart';
+import 'package:flutterprojects/features/s_support_room/presentation/pages/s_support_room_page.dart';
+import 'package:flutterprojects/features/s_registry_room/presentation/pages/s_registry_room_page.dart';
+import 'package:flutterprojects/features/s_declaration_review_room/presentation/pages/s_declaration_review_room_page.dart';
 
 import 'package:flutterprojects/features/library/presentation/pages/library_page.dart';
 import 'package:flutterprojects/features/library/presentation/pages/library_policy_page.dart';
 import 'package:flutterprojects/features/splash/presentation/pages/splash_page.dart';
 import 'package:flutterprojects/features/language/presentation/pages/language_page.dart';
-import 'package:flutterprojects/features/modules/presentation/pages/module_placeholder_page.dart';
 import 'package:flutterprojects/features/modules/presentation/pages/support_entry_page.dart';
 import 'package:flutterprojects/features/modules/presentation/pages/support_issue_selector_page.dart';
 import 'package:flutterprojects/features/home/presentation/pages/menu_page.dart';
@@ -39,144 +39,74 @@ import 'package:flutterprojects/features/specialists/presentation/specialists_li
 import 'package:flutterprojects/features/specialists/presentation/specialist_details_page.dart';
 import 'package:flutterprojects/features/auth/presentation/pages/login_page.dart';
 import 'package:flutterprojects/features/auth/presentation/pages/client_register_page.dart';
-import 'package:flutterprojects/features/external_follow_up/presentation/pages/follow_up_registration_page.dart';
-import 'package:flutterprojects/features/external_follow_up/presentation/pages/external_follow_up_workspace_page.dart';
-import 'package:flutterprojects/features/external_follow_up/presentation/pages/follow_up_templates_page.dart';
-import 'package:flutterprojects/features/external_follow_up/presentation/pages/follow_up_campaigns_page.dart';
-import 'package:flutterprojects/features/external_follow_up/presentation/pages/follow_up_campaign_details_page.dart';
-import 'package:flutterprojects/features/external_follow_up/data/models/follow_up_campaign.dart';
 import 'package:flutterprojects/features/chat/presentation/pages/chat_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/chat_escalations_page.dart';
+import 'package:flutterprojects/features/safety/presentation/pages/chat_escalations_page.dart';
 import 'package:flutterprojects/features/chat/presentation/pages/chat_escalation_report_page.dart';
 import 'package:flutterprojects/features/chat/presentation/pages/clinician_chat_inbox_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/centers_landing_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/centers_list_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_details_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_center_details_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_centers_page.dart';
 import 'package:flutterprojects/features/centers/data/models/center_model.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_hub_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_control_room_placeholder_pages.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_blueprint_handoff_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_clients_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_registration_maintenance_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_workspace_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_content_care_programs_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_ai_followup_boundaries_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_ai_devops_center_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_ai_policy_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_compliance_checkpoints_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_domain_status_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_domain_availability_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_employee_system_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_functional_workspaces_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_maintenance_system_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/customer_follow_up_workspace_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_library_governance_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/marketing_workspace_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_exposure_rules_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_gateway_layer_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_growth_layer_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/technical_support_workspace_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_workspace_command_center_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/content_workspace_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_support_messaging_governance_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_communication_gateway_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_engineering_gateway_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_device_storage_gateway_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_followup_care_governance_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_activation_readiness_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_system_activation_pack_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_operations_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_communications_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_archive_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_alerts_review_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_centers_page.dart';
-import 'package:flutterprojects/features/admin/presentation/pages/admin_archive_clinicians_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_archive_support_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_archive_reports_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_profile_requests_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_clinician_requests_page.dart';
-import 'package:flutterprojects/features/admin_surface/pages/admin_support_chat_page.dart';
-import 'package:flutterprojects/features/clinician/presentation/pages/clinician_operations_page.dart';
+import 'package:flutterprojects/features/clinician/presentation/pages/clinician_room_page.dart';
 import 'package:flutterprojects/features/client/presentation/pages/client_dashboard_page.dart';
 import 'package:flutterprojects/features/centers/presentation/pages/center_dashboard_page.dart';
-import 'package:flutterprojects/features/centers/presentation/pages/center_operations_page.dart';
+import 'package:flutterprojects/features/centers/presentation/pages/center_room_page.dart';
 
-const String _roleAdmin = 'admin';
+const String _roleOwner = 'owner';
+const String _roleMonitoringOperator = 'monitoring_operator';
+const String _roleRegistrySteward = 'registry_steward';
+const String _roleDeclarationReviewer = 'declaration_reviewer';
+const String _roleSupportObserver = 'support_observer';
 const String _roleClinician = 'clinician';
 const String _roleCenter = 'center';
 const String _roleClient = 'client';
 
 class AppRouter {
-  static const Set<String> _adminOnlyRoutes = {
-    Routes.adminHub,
-    Routes.adminOperations,
-    Routes.adminCommunications,
-    Routes.adminClinicianRequests,
-    Routes.adminClinicianWorkspace,
-    Routes.adminClinicianProfileRequests,
-    Routes.adminClients,
-    Routes.adminRegistrationMaintenance,
-    Routes.adminSupportChats,
-    Routes.adminAlertsReview,
-    Routes.adminAiPolicies,
-    Routes.adminDomainStatus,
-    Routes.adminDomainAvailability,
-    Routes.adminFunctionalWorkspaces,
-    Routes.externalFollowUpWorkspace,
-    Routes.followUpTemplates,
-    Routes.followUpCampaigns,
-    Routes.followUpCampaignDetails,
-    Routes.customerFollowUpWorkspace,
-    Routes.technicalSupportWorkspace,
-    Routes.marketingWorkspace,
-    Routes.adminContentCarePrograms,
-    Routes.adminLibraryGovernance,
-    Routes.adminSupportMessagingGovernance,
-    Routes.adminFollowupCareGovernance,
-    Routes.adminAiFollowupBoundaries,
-    Routes.adminGrowthLayer,
-    Routes.adminAiDevOpsCenter,
-    Routes.adminWorkspaceCommandCenter,
-    Routes.contentWorkspace,
-    Routes.adminGuidedWorkflows,
-    Routes.adminReferences,
-    Routes.adminDetailedMonitoring,
-    Routes.adminAnalyticsDetails,
-    Routes.adminBlueprintHandoff,
-    Routes.adminComplianceCheckpoints,
-    Routes.adminExposureRules,
-    Routes.adminActivationReadiness,
-    Routes.adminSystemActivationPack,
-    Routes.adminGatewayLayer,
-    Routes.adminCommunicationGateway,
-    Routes.adminEngineeringGateway,
-    Routes.adminDeviceStorageGateway,
-    Routes.adminArchive,
-    Routes.adminArchiveReports,
-    Routes.adminArchiveClinicians,
-    Routes.adminArchiveCenters,
-    Routes.adminArchiveSupport,
-    Routes.adminCenters,
-    Routes.adminCenterDetails,
+  static const Set<String> _ownerOnlyRoutes = {
+    Routes.sOwnerHome,
+    Routes.sOwnerRoom,
+    Routes.sSovereignIntelligence,
+    Routes.sStrategicMemory,
+    Routes.sSovereignVault,
+    Routes.sConstitutionalMemory,
+    Routes.sRecoveryConsole,
+    Routes.sOwnerCapsules,
+    Routes.sOwnerRegeneration,
+  };
+
+  static const Set<String> _monitoringOperatorRoutes = {
+    Routes.sSignalMonitoringRoom,
+    Routes.sCapitalReports,
+  };
+
+  static const Set<String> _supportObserverRoutes = {
+    Routes.sTrustSafety,
     Routes.chatEscalations,
     Routes.chatEscalationReport,
   };
 
+  static const Set<String> _ownerAndSupportObserverRoutes = {
+    Routes.sSupportRoom,
+  };
+
+  static const Set<String> _ownerAndRegistryStewardRoutes = {
+    Routes.sRegistryRoom,
+  };
+
+  static const Set<String> _ownerAndDeclarationReviewerRoutes = {
+    Routes.sDeclarationReviewRoom,
+  };
+
   static const Set<String> _clinicianOnlyRoutes = {
-    Routes.clinicianOperations,
+    Routes.clinicianRoom,
     Routes.clinicianProfileEditRequest,
-    Routes.clinicianInbox,
     Routes.clinicianChatInbox,
-    Routes.clinicianChatInboxLegacy,
   };
 
   static const Set<String> _centerOnlyRoutes = {
     Routes.centerDashboard,
-    Routes.centerOperations,
+    Routes.centerRoom,
     Routes.centerProfileEditRequest,
-    Routes.centerInbox,
   };
 
   static const Set<String> _clientOnlyRoutes = {
@@ -184,26 +114,28 @@ class AppRouter {
     Routes.clientDashboard,
   };
 
-  static bool _isAdminRoute(String? routeName) {
+  static bool _isScopedProtectedRoute(String? routeName) {
     if (routeName == null) return false;
-    return _adminOnlyRoutes.contains(routeName);
+    return _ownerOnlyRoutes.contains(routeName) ||
+        _monitoringOperatorRoutes.contains(routeName) ||
+        _supportObserverRoutes.contains(routeName) ||
+        _ownerAndSupportObserverRoutes.contains(routeName) ||
+        _ownerAndRegistryStewardRoutes.contains(routeName) ||
+        _ownerAndDeclarationReviewerRoutes.contains(routeName);
   }
 
   static bool _requiresSignedInNonAnonymous(RouteSettings settings) {
-    if (_isAdminRoute(settings.name)) {
+    if (_isScopedProtectedRoute(settings.name)) {
       return true;
     }
 
     switch (settings.name) {
       case Routes.centerDashboard:
-      case Routes.centerOperations:
+      case Routes.centerRoom:
       case Routes.centerProfileEditRequest:
-      case Routes.centerInbox:
-      case Routes.clinicianOperations:
+      case Routes.clinicianRoom:
       case Routes.clinicianProfileEditRequest:
-      case Routes.clinicianInbox:
       case Routes.clinicianChatInbox:
-      case Routes.clinicianChatInboxLegacy:
       case Routes.blockedAccount:
       case Routes.clientDashboard:
       case Routes.sPersonalSpace:
@@ -215,7 +147,20 @@ class AppRouter {
 
   static Set<String>? _requiredRoles(String? routeName) {
     if (routeName == null) return null;
-    if (_isAdminRoute(routeName)) return {_roleAdmin};
+    if (_ownerOnlyRoutes.contains(routeName)) return {_roleOwner};
+    if (_monitoringOperatorRoutes.contains(routeName)) {
+      return {_roleMonitoringOperator};
+    }
+    if (_supportObserverRoutes.contains(routeName)) return {_roleSupportObserver};
+    if (_ownerAndSupportObserverRoutes.contains(routeName)) {
+      return {_roleOwner, _roleSupportObserver};
+    }
+    if (_ownerAndRegistryStewardRoutes.contains(routeName)) {
+      return {_roleOwner, _roleRegistrySteward};
+    }
+    if (_ownerAndDeclarationReviewerRoutes.contains(routeName)) {
+      return {_roleOwner, _roleDeclarationReviewer};
+    }
     if (_clinicianOnlyRoutes.contains(routeName)) return {_roleClinician};
     if (_centerOnlyRoutes.contains(routeName)) return {_roleCenter};
     if (_clientOnlyRoutes.contains(routeName)) return {_roleClient};
@@ -254,336 +199,18 @@ class AppRouter {
     );
   }
 
-  static Route<dynamic> _adminProtectedRoute({
+  static Route<dynamic> _scopedProtectedRoute({
     required Widget child,
     required RouteSettings settings,
   }) {
     return MaterialPageRoute(
       builder: (_) => _RouteAccessGate(
         routeName: settings.name,
-        allowedRoles: const {_roleAdmin},
+        allowedRoles: _requiredRoles(settings.name) ?? const {_roleOwner},
         child: child,
       ),
       settings: settings,
     );
-  }
-
-  static Route<dynamic>? adminSurfaceRoutes(RouteSettings settings) {
-    switch (settings.name) {
-      case Routes.adminHub:
-        return _adminProtectedRoute(
-          child: const AdminHubPage(),
-          settings: settings,
-        );
-
-      case Routes.adminClinicianRequests:
-        return _adminProtectedRoute(
-          child: const AdminClinicianRequestsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminClinicianWorkspace:
-        return _adminProtectedRoute(
-          child: const AdminClinicianWorkspacePage(),
-          settings: settings,
-        );
-
-      case Routes.adminOperations:
-        return _adminProtectedRoute(
-          child: const AdminOperationsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminCommunications:
-        return _adminProtectedRoute(
-          child: const AdminCommunicationsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminClinicianProfileRequests:
-        return _adminProtectedRoute(
-          child: const AdminClinicianProfileRequestsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminClients:
-        return _adminProtectedRoute(
-          child: const AdminClientsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminRegistrationMaintenance:
-        return _adminProtectedRoute(
-          child: const AdminRegistrationMaintenancePage(),
-          settings: settings,
-        );
-
-      case Routes.adminSupportChats:
-        return _adminProtectedRoute(
-          child: const AdminSupportChatPage(),
-          settings: settings,
-        );
-
-      case Routes.adminAiPolicies:
-        return _adminProtectedRoute(
-          child: const AdminAiPolicyPage(),
-          settings: settings,
-        );
-
-      case Routes.adminDomainStatus:
-        return _adminProtectedRoute(
-          child: const AdminDomainStatusPage(),
-          settings: settings,
-        );
-
-      case Routes.adminDomainAvailability:
-        return _adminProtectedRoute(
-          child: const AdminDomainAvailabilityPage(),
-          settings: settings,
-        );
-
-      case Routes.adminFunctionalWorkspaces:
-        return _adminProtectedRoute(
-          child: const AdminFunctionalWorkspacesPage(),
-          settings: settings,
-        );
-
-      case Routes.externalFollowUpWorkspace:
-        return _adminProtectedRoute(
-          child: const ExternalFollowUpWorkspacePage(),
-          settings: settings,
-        );
-
-      case Routes.followUpTemplates:
-        return _adminProtectedRoute(
-          child: const FollowUpTemplatesPage(),
-          settings: settings,
-        );
-
-      case Routes.followUpCampaigns:
-        return _adminProtectedRoute(
-          child: const FollowUpCampaignsPage(),
-          settings: settings,
-        );
-
-      case Routes.followUpCampaignDetails:
-        final args = settings.arguments;
-        if (args is! FollowUpCampaign) {
-          return MaterialPageRoute(
-            builder: (ctx) => Scaffold(
-              body: Center(
-                child: Text(AppLocalizations.of(ctx)!.routeNotFound),
-              ),
-            ),
-            settings: settings,
-          );
-        }
-        return _adminProtectedRoute(
-          child: FollowUpCampaignDetailsPage(campaign: args),
-          settings: settings,
-        );
-
-      case Routes.customerFollowUpWorkspace:
-        return _adminProtectedRoute(
-          child: const CustomerFollowUpWorkspacePage(),
-          settings: settings,
-        );
-
-      case Routes.technicalSupportWorkspace:
-        return _adminProtectedRoute(
-          child: const TechnicalSupportWorkspacePage(),
-          settings: settings,
-        );
-
-      case Routes.marketingWorkspace:
-        return _adminProtectedRoute(
-          child: const MarketingWorkspacePage(),
-          settings: settings,
-        );
-
-      case Routes.adminContentCarePrograms:
-        return _adminProtectedRoute(
-          child: const AdminContentCareProgramsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminLibraryGovernance:
-        return _adminProtectedRoute(
-          child: const AdminLibraryGovernancePage(),
-          settings: settings,
-        );
-
-      case Routes.adminSupportMessagingGovernance:
-        return _adminProtectedRoute(
-          child: const AdminSupportMessagingGovernancePage(),
-          settings: settings,
-        );
-
-      case Routes.adminFollowupCareGovernance:
-        return _adminProtectedRoute(
-          child: const AdminFollowupCareGovernancePage(),
-          settings: settings,
-        );
-
-      case Routes.adminAiFollowupBoundaries:
-        return _adminProtectedRoute(
-          child: const AdminAiFollowupBoundariesPage(),
-          settings: settings,
-        );
-
-      case Routes.adminGrowthLayer:
-        return _adminProtectedRoute(
-          child: const AdminGrowthLayerPage(),
-          settings: settings,
-        );
-
-      case Routes.adminEmployeeSystem:
-        return _adminProtectedRoute(
-          child: const AdminEmployeeSystemPage(),
-          settings: settings,
-        );
-
-      case Routes.adminMaintenanceSystem:
-        return _adminProtectedRoute(
-          child: const AdminMaintenanceSystemPage(),
-          settings: settings,
-        );
-
-      case Routes.adminAiDevOpsCenter:
-        return _adminProtectedRoute(
-          child: const AdminAiDevOpsCenterPage(),
-          settings: settings,
-        );
-
-      case Routes.adminWorkspaceCommandCenter:
-        return _adminProtectedRoute(
-          child: const AdminWorkspaceCommandCenterPage(),
-          settings: settings,
-        );
-
-      case Routes.contentWorkspace:
-        return _adminProtectedRoute(
-          child: const ContentWorkspacePage(),
-          settings: settings,
-        );
-
-      case Routes.adminGuidedWorkflows:
-        return _adminProtectedRoute(
-          child: const AdminGuidedWorkflowsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminReferences:
-        return _adminProtectedRoute(
-          child: const AdminReferencesPage(),
-          settings: settings,
-        );
-
-      case Routes.adminDetailedMonitoring:
-        return _adminProtectedRoute(
-          child: const AdminDetailedMonitoringPage(),
-          settings: settings,
-        );
-
-      case Routes.adminAnalyticsDetails:
-        return _adminProtectedRoute(
-          child: const AdminAnalyticsDetailsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminBlueprintHandoff:
-        return _adminProtectedRoute(
-          child: const AdminBlueprintHandoffPage(),
-          settings: settings,
-        );
-
-      case Routes.adminComplianceCheckpoints:
-        return _adminProtectedRoute(
-          child: const AdminComplianceCheckpointsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminExposureRules:
-        return _adminProtectedRoute(
-          child: const AdminExposureRulesPage(),
-          settings: settings,
-        );
-
-      case Routes.adminActivationReadiness:
-        return _adminProtectedRoute(
-          child: const AdminActivationReadinessPage(),
-          settings: settings,
-        );
-
-      case Routes.adminSystemActivationPack:
-        return _adminProtectedRoute(
-          child: const AdminSystemActivationPackPage(),
-          settings: settings,
-        );
-
-      case Routes.adminGatewayLayer:
-        return _adminProtectedRoute(
-          child: const AdminGatewayLayerPage(),
-          settings: settings,
-        );
-
-      case Routes.adminCommunicationGateway:
-        return _adminProtectedRoute(
-          child: const AdminCommunicationGatewayPage(),
-          settings: settings,
-        );
-
-      case Routes.adminEngineeringGateway:
-        return _adminProtectedRoute(
-          child: const AdminEngineeringGatewayPage(),
-          settings: settings,
-        );
-
-      case Routes.adminDeviceStorageGateway:
-        return _adminProtectedRoute(
-          child: const AdminDeviceStorageGatewayPage(),
-          settings: settings,
-        );
-
-      case Routes.adminAlertsReview:
-        return _adminProtectedRoute(
-          child: const AdminAlertsReviewPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveClinicians:
-        return _adminProtectedRoute(
-          child: const AdminArchiveCliniciansPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveCenters:
-        return _adminProtectedRoute(
-          child: const AdminArchiveCentersPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveSupport:
-        return _adminProtectedRoute(
-          child: const AdminArchiveSupportPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchiveReports:
-        return _adminProtectedRoute(
-          child: const AdminArchiveReportsPage(),
-          settings: settings,
-        );
-
-      case Routes.adminArchive:
-        return _adminProtectedRoute(
-          child: const AdminArchivePage(),
-          settings: settings,
-        );
-
-      default:
-        return null;
-    }
   }
 
   static Route<dynamic> _sWebSurfaceRoute({
@@ -593,14 +220,23 @@ class AppRouter {
     required String description,
     required List<String> items,
   }) {
+    final page = SWebSurfacePage(
+      surfaceName: surfaceName,
+      surfaceType: surfaceType,
+      routeName: settings.name ?? '',
+      description: description,
+      items: items,
+    );
     return MaterialPageRoute(
-      builder: (_) => SWebSurfacePage(
-        surfaceName: surfaceName,
-        surfaceType: surfaceType,
-        routeName: settings.name ?? '',
-        description: description,
-        items: items,
-      ),
+      builder: (_) {
+        final allowedRoles = _requiredRoles(settings.name);
+        if (allowedRoles == null) return page;
+        return _RouteAccessGate(
+          routeName: settings.name,
+          allowedRoles: allowedRoles,
+          child: page,
+        );
+      },
       settings: settings,
     );
   }
@@ -610,11 +246,6 @@ class AppRouter {
     final needsNonAnonymous = _requiresSignedInNonAnonymous(settings);
     if (needsNonAnonymous && (currentUser == null || currentUser.isAnonymous)) {
       return _redirectToLogin(settings);
-    }
-
-    final adminSurfaceRoute = adminSurfaceRoutes(settings);
-    if (adminSurfaceRoute != null) {
-      return adminSurfaceRoute;
     }
 
     switch (settings.name) {
@@ -630,6 +261,24 @@ class AppRouter {
           settings: settings,
         );
 
+      case Routes.sSupportRoom:
+        return _scopedProtectedRoute(
+          child: const SSupportRoomPage(),
+          settings: settings,
+        );
+
+      case Routes.sRegistryRoom:
+        return _scopedProtectedRoute(
+          child: const SRegistryRoomPage(),
+          settings: settings,
+        );
+
+      case Routes.sDeclarationReviewRoom:
+        return _scopedProtectedRoute(
+          child: const SDeclarationReviewRoomPage(),
+          settings: settings,
+        );
+
       case Routes.sCityHome:
         return MaterialPageRoute(
           builder: (_) => const SCityDistrictPage(),
@@ -642,7 +291,7 @@ class AppRouter {
           surfaceName: 'City Services',
           surfaceType: 'Public City Web [S]',
           description:
-              'Future public service catalog surface. This is not booking and does not submit operational requests.',
+              'Future public service catalog surface for discovery signals and resource cards.',
           items: const <String>[
             'Professional Services',
             'Education Services',
@@ -705,7 +354,7 @@ class AppRouter {
           surfaceName: 'Center Directory',
           surfaceType: 'Public City Web [S]',
           description:
-              'Future center and institution discovery surface without legacy booking movement.',
+              'Future center and institution discovery surface for readiness-visible center cards.',
           items: const <String>[
             'Center Profiles',
             'Programs',
@@ -752,7 +401,7 @@ class AppRouter {
           surfaceName: 'Marketplace',
           surfaceType: 'Public City Web [S]',
           description:
-              'Future marketplace surface for catalogs and service discovery. This placeholder does not create purchases, payments, or subscriptions.',
+              'Future marketplace surface for catalogs and service discovery.',
           items: const <String>[
             'Service Catalog',
             'Tool Catalog',
@@ -763,21 +412,21 @@ class AppRouter {
 
       case Routes.sCapitalHome:
         return MaterialPageRoute(
-          builder: (_) => const SAdminOperationsOfficePage(),
+          builder: (_) => const SCapitalOperationsOfficePage(),
           settings: settings,
         );
 
-      case Routes.sCapitalAdminOffice:
+      case Routes.sCapitalOperationsOffice:
         return MaterialPageRoute(
-          builder: (_) => const SAdminOperationsOfficePage(
-            focus: SCapitalOfficeFocus.adminOffice,
+          builder: (_) => const SCapitalOperationsOfficePage(
+            focus: SCapitalOfficeFocus.operationsOffice,
           ),
           settings: settings,
         );
 
       case Routes.sCapitalIncidents:
         return MaterialPageRoute(
-          builder: (_) => const SAdminOperationsOfficePage(
+          builder: (_) => const SCapitalOperationsOfficePage(
             focus: SCapitalOfficeFocus.incidents,
           ),
           settings: settings,
@@ -785,7 +434,7 @@ class AppRouter {
 
       case Routes.sCapitalMaintenance:
         return MaterialPageRoute(
-          builder: (_) => const SAdminOperationsOfficePage(
+          builder: (_) => const SCapitalOperationsOfficePage(
             focus: SCapitalOfficeFocus.maintenance,
           ),
           settings: settings,
@@ -793,7 +442,7 @@ class AppRouter {
 
       case Routes.sCapitalBroadcasts:
         return MaterialPageRoute(
-          builder: (_) => const SAdminOperationsOfficePage(
+          builder: (_) => const SCapitalOperationsOfficePage(
             focus: SCapitalOfficeFocus.broadcasts,
           ),
           settings: settings,
@@ -801,15 +450,15 @@ class AppRouter {
 
       case Routes.sCapitalEmergencyBrief:
         return MaterialPageRoute(
-          builder: (_) => const SAdminOperationsOfficePage(
+          builder: (_) => const SCapitalOperationsOfficePage(
             focus: SCapitalOfficeFocus.emergencyBrief,
           ),
           settings: settings,
         );
 
-      case Routes.sSignalControlRoom:
-        return MaterialPageRoute(
-          builder: (_) => const SSignalControlRoomPage(),
+      case Routes.sSignalMonitoringRoom:
+        return _protectedRoute(
+          child: const SSignalMonitoringRoomPage(),
           settings: settings,
         );
 
@@ -817,7 +466,7 @@ class AppRouter {
         return _sWebSurfaceRoute(
           settings: settings,
           surfaceName: 'Departments',
-          surfaceType: 'Administrative Capital Web [S]',
+          surfaceType: 'Federation Capital Web [S]',
           description:
               'Future department operating surface for non-sovereign execution units.',
           items: const <String>[
@@ -834,9 +483,9 @@ class AppRouter {
         return _sWebSurfaceRoute(
           settings: settings,
           surfaceName: 'Trust & Safety',
-          surfaceType: 'Administrative Capital Web [S]',
+          surfaceType: 'Federation Capital Web [S]',
           description:
-              'Future trust, safety, complaints, and escalation monitoring surface. Not a legacy admin queue.',
+              'Future trust, safety, complaints, and escalation signal surface.',
           items: const <String>[
             'Safety Signals',
             'Complaint Patterns',
@@ -845,26 +494,11 @@ class AppRouter {
           ],
         );
 
-      case Routes.sFollowUpContinuity:
-        return _sWebSurfaceRoute(
-          settings: settings,
-          surfaceName: 'Follow-up Continuity',
-          surfaceType: 'Administrative Capital Web [S]',
-          description:
-              'Future continuity surface for non-diagnostic support follow-up signals and outreach visibility.',
-          items: const <String>[
-            'Continuity Signals',
-            'Check-in Visibility',
-            'Support Handoffs',
-            'Human Review Notes',
-          ],
-        );
-
       case Routes.sCapitalReports:
         return _sWebSurfaceRoute(
           settings: settings,
           surfaceName: 'Reports',
-          surfaceType: 'Administrative Capital Web [S]',
+          surfaceType: 'Federation Capital Web [S]',
           description:
               'Future reporting surface for department, signal, content, and operational reports.',
           items: const <String>[
@@ -875,86 +509,71 @@ class AppRouter {
           ],
         );
 
-      case Routes.sAdministrativeArchive:
-        return _sWebSurfaceRoute(
-          settings: settings,
-          surfaceName: 'Administrative Archive',
-          surfaceType: 'Administrative Capital Web [S]',
-          description:
-              'Administrative memory surface for non-sovereign operational records and references.',
-          items: const <String>[
-            'Operational Records',
-            'Reports Archive',
-            'Incident References',
-            'Department Memory',
-          ],
-        );
-
       case Routes.sOwnerHome:
-        return MaterialPageRoute(
-          builder: (_) => const SOwnerDistrictPage(),
+        return _protectedRoute(
+          child: const SOwnerDistrictPage(),
           settings: settings,
         );
 
       case Routes.sOwnerRoom:
-        return MaterialPageRoute(
-          builder: (_) => const SOwnerDistrictPage(
+        return _protectedRoute(
+          child: const SOwnerDistrictPage(
             focus: SOwnerDistrictFocus.ownerRoom,
           ),
           settings: settings,
         );
 
       case Routes.sSovereignIntelligence:
-        return MaterialPageRoute(
-          builder: (_) => const SOwnerDistrictPage(
+        return _protectedRoute(
+          child: const SOwnerDistrictPage(
             focus: SOwnerDistrictFocus.executiveIntelligence,
           ),
           settings: settings,
         );
 
-      case Routes.sStrategicArchive:
-        return MaterialPageRoute(
-          builder: (_) => const SOwnerDistrictPage(
+      case Routes.sStrategicMemory:
+        return _protectedRoute(
+          child: const SOwnerDistrictPage(
             focus: SOwnerDistrictFocus.strategicArchive,
           ),
           settings: settings,
         );
 
       case Routes.sSovereignVault:
-        return MaterialPageRoute(
-          builder: (_) => const SOwnerDistrictPage(
+        return _protectedRoute(
+          child: const SOwnerDistrictPage(
             focus: SOwnerDistrictFocus.sovereignVault,
           ),
           settings: settings,
         );
 
       case Routes.sConstitutionalMemory:
-        return MaterialPageRoute(
-          builder: (_) => const SOwnerDistrictPage(
+        return _protectedRoute(
+          child: const SOwnerDistrictPage(
             focus: SOwnerDistrictFocus.constitutionalMemory,
           ),
           settings: settings,
         );
 
       case Routes.sRecoveryConsole:
-        return MaterialPageRoute(
-          builder: (_) => const SOwnerDistrictPage(
+        return _protectedRoute(
+          child: const SOwnerDistrictPage(
             focus: SOwnerDistrictFocus.recoveryConsole,
           ),
           settings: settings,
         );
 
       case Routes.sOwnerCapsules:
-        return MaterialPageRoute(
-          builder: (_) => const SOwnerDistrictPage(
+        return _protectedRoute(
+          child: const SOwnerDistrictPage(
             focus: SOwnerDistrictFocus.survivalCapsules,
           ),
           settings: settings,
         );
 
       case Routes.sOwnerRegeneration:
-        return MaterialPageRoute(
-          builder: (_) => const SOwnerDistrictPage(
+        return _protectedRoute(
+          child: const SOwnerDistrictPage(
             focus: SOwnerDistrictFocus.regenerationBoard,
           ),
           settings: settings,
@@ -1011,9 +630,9 @@ class AppRouter {
           settings: settings,
         );
 
-      case Routes.clinicianOperations:
+      case Routes.clinicianRoom:
         return _protectedRoute(
-          child: const ClinicianOperationsPage(),
+          child: const ClinicianRoomPage(),
           settings: settings,
         );
 
@@ -1123,9 +742,9 @@ class AppRouter {
           settings: settings,
         );
 
-      case Routes.centerOperations:
+      case Routes.centerRoom:
         return _protectedRoute(
-          child: const CenterOperationsPage(),
+          child: const CenterRoomPage(),
           settings: settings,
         );
 
@@ -1135,21 +754,9 @@ class AppRouter {
           settings: settings,
         );
 
-      case Routes.centerInbox:
-        return _protectedRoute(
-          child: const CenterInboxPage(),
-          settings: settings,
-        );
-
       case Routes.clientRegister:
         return MaterialPageRoute(
           builder: (_) => const ClientRegisterPage(),
-          settings: settings,
-        );
-
-      case Routes.followUpRegistration:
-        return MaterialPageRoute(
-          builder: (_) => const FollowUpRegistrationPage(),
           settings: settings,
         );
 
@@ -1160,23 +767,22 @@ class AppRouter {
         );
 
       case Routes.chat:
-        // Current doctrine: /chat remains a public/support entry route. Admin
-        // support mode is argument-driven; role hardening needs a separate
-        // MASTER CORE decision.
+        // Current doctrine: /chat remains a public/support entry route.
+        // Support room mode is argument-driven and scoped by support authority.
         final args = settings.arguments;
         String? threadId;
         String? entryContext;
-        bool adminSupportMode = false;
+        bool supportRoomMode = false;
         if (args is Map && args['threadId'] != null) {
           threadId = args['threadId'].toString();
         }
-        if (args is Map && args['mode']?.toString() == 'admin_support') {
-          adminSupportMode = true;
+        if (args is Map && args['mode']?.toString() == 'support_room') {
+          supportRoomMode = true;
         }
-        if (args is Map && args['adminSupport'] == true) {
-          adminSupportMode = true;
+        if (args is Map && args['supportRoom'] == true) {
+          supportRoomMode = true;
         }
-        if (!adminSupportMode && threadId == null && args is Map) {
+        if (!supportRoomMode && threadId == null && args is Map) {
           final value = args['entryContext']?.toString();
           if (value == 'family_support' || value == 'recovery_support') {
             entryContext = value;
@@ -1186,7 +792,7 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => ChatPage(
             initialThreadId: threadId,
-            adminSupportMode: adminSupportMode,
+            supportRoomMode: supportRoomMode,
             entryContext: entryContext,
           ),
           settings: settings,
@@ -1222,7 +828,6 @@ class AppRouter {
         );
 
       case Routes.clinicianChatInbox:
-      case Routes.clinicianChatInboxLegacy:
         return MaterialPageRoute(
           builder: (_) => _RouteAccessGate(
             routeName: settings.name,
@@ -1237,33 +842,6 @@ class AppRouter {
           settings: settings,
         );
 
-      case Routes.clinicianInbox:
-        final authUid = FirebaseAuth.instance.currentUser?.uid;
-        String clinicianId =
-            (authUid != null && authUid.isNotEmpty) ? authUid : '';
-        String clinicianName = 'DEV Clinician';
-
-        final a = settings.arguments;
-        if (a is Map) {
-          final cid = a['clinicianId'];
-          final cname = a['clinicianName'];
-          if (cid != null && cid.toString().trim().isNotEmpty) {
-            clinicianId = cid.toString();
-          }
-          if (cname != null) clinicianName = cname.toString();
-        }
-
-        if (clinicianId.isEmpty) {
-          return _redirectToLogin(settings);
-        }
-
-        return _protectedRoute(
-          child: ClinicianInboxPage(
-            clinicianId: clinicianId,
-            clinicianName: clinicianName,
-          ),
-          settings: settings,
-        );
       case Routes.splash:
         return MaterialPageRoute(
           builder: (_) => const SplashPage(),
@@ -1314,14 +892,6 @@ class AppRouter {
         }
         return MaterialPageRoute(
           builder: (_) => SupportIssueSelectorPage(supportType: supportType!),
-          settings: settings,
-        );
-
-      case Routes.familyStress:
-        return MaterialPageRoute(
-          builder: (context) => ModulePlaceholderPage(
-            title: AppLocalizations.of(context)!.moduleFamilyStress,
-          ),
           settings: settings,
         );
 
@@ -1431,43 +1001,6 @@ class AppRouter {
           settings: settings,
         );
 
-      case Routes.adminCenters:
-        final uid = FirebaseAuth.instance.currentUser?.uid;
-        if (uid == null || uid.isEmpty) {
-          return MaterialPageRoute(
-            builder: (ctx) => Scaffold(
-              body: Center(
-                child: Text(AppLocalizations.of(ctx)!.routeNotFound),
-              ),
-            ),
-            settings: settings,
-          );
-        }
-        return _adminProtectedRoute(
-          child: const AdminCentersPage(),
-          settings: settings,
-        );
-
-      case Routes.adminCenterDetails:
-        final args = settings.arguments;
-        final centerId = args is String
-            ? args
-            : args is Map
-                ? args['centerId']?.toString()
-                : null;
-        if (centerId == null || centerId.isEmpty) {
-          return MaterialPageRoute(
-            builder: (ctx) => const Scaffold(
-              body: Center(child: Text('Missing center id')),
-            ),
-            settings: settings,
-          );
-        }
-        return _adminProtectedRoute(
-          child: AdminCenterDetailsPage(centerId: centerId),
-          settings: settings,
-        );
-
       case Routes.library:
         final args = settings.arguments;
         final returnRoute =
@@ -1520,11 +1053,10 @@ class _RouteAccessGate extends StatelessWidget {
         }
 
         final decision = snapshot.data!;
-        _adminGuardTrace(
+        _roleGuardTrace(
           'route=$routeName '
-          'isAdminRoute=${AppRouter._isAdminRoute(routeName)} '
           'signedIn=${FirebaseAuth.instance.currentUser != null && !FirebaseAuth.instance.currentUser!.isAnonymous} '
-          'isAdmin=${decision.isAdmin} '
+          'role=${decision.role ?? 'none'} '
           'allowed=${decision.allowed} '
           'redirect=${decision.redirectTarget}',
         );
@@ -1542,7 +1074,7 @@ class _RouteAccessGate extends StatelessWidget {
                   'ar';
           return Scaffold(
             appBar: AppBar(
-              title: Text(isArabic ? 'الوصول غير متاح' : 'Access unavailable'),
+              title: Text(isArabic ? 'Ø§Ù„ÙˆØµÙˆÙ„ ØºÙŠØ± Ù…ØªØ§Ø­' : 'Access unavailable'),
             ),
             body: Center(
               child: Padding(
@@ -1554,7 +1086,7 @@ class _RouteAccessGate extends StatelessWidget {
                     const SizedBox(height: 12),
                     Text(
                       isArabic
-                          ? 'هذه الصفحة غير متاحة لهذا الحساب.'
+                          ? 'Ù‡Ø°Ù‡ Ø§Ù„ØµÙØ­Ø© ØºÙŠØ± Ù…ØªØ§Ø­Ø© Ù„Ù‡Ø°Ø§ Ø§Ù„Ø­Ø³Ø§Ø¨.'
                           : 'This page is not available for this account.',
                       textAlign: TextAlign.center,
                     ),
@@ -1566,7 +1098,7 @@ class _RouteAccessGate extends StatelessWidget {
                           (route) => false,
                         );
                       },
-                      child: Text(isArabic ? 'العودة للقائمة' : 'Back to menu'),
+                      child: Text(isArabic ? 'Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„Ù‚Ø§Ø¦Ù…Ø©' : 'Back to menu'),
                     ),
                   ],
                 ),
@@ -1582,13 +1114,10 @@ class _RouteAccessGate extends StatelessWidget {
 
   Future<_RouteAccessDecision> _resolveRouteAccess() async {
     final user = FirebaseAuth.instance.currentUser;
-    final isAdminRoute = AppRouter._isAdminRoute(routeName);
     if (user == null || user.isAnonymous) {
-      _adminGuardTrace(
+      _roleGuardTrace(
         'route=$routeName '
-        'isAdminRoute=$isAdminRoute '
         'signedIn=false '
-        'isAdmin=false '
         'allowed=false '
         'redirect=${Routes.login}',
       );
@@ -1600,13 +1129,12 @@ class _RouteAccessGate extends StatelessWidget {
     }
 
     final access = await AccountAccessService().resolve(user);
-    final isAdmin = access.isAdmin;
-    if (access.isBlocked && !access.isAdmin) {
-      _adminGuardTrace(
+    final role = access.role;
+    if (access.isBlocked) {
+      _roleGuardTrace(
         'route=$routeName '
-        'isAdminRoute=$isAdminRoute '
         'signedIn=true '
-        'isAdmin=$isAdmin '
+        'role=${role ?? 'none'} '
         'allowed=false '
         'redirect=blocked_account',
       );
@@ -1614,69 +1142,58 @@ class _RouteAccessGate extends StatelessWidget {
         allowed: false,
         isBlocked: true,
         blockReason: access.blockReason,
-        isAdmin: isAdmin,
+        role: role,
         redirectTarget: 'blocked_account',
       );
     }
 
-    final normalizedApprovalStatus = access.approvalStatus.trim().toLowerCase();
     final protectsCenterOrClinician =
         allowedRoles?.contains(_roleClinician) == true ||
             allowedRoles?.contains(_roleCenter) == true;
-    final needsApproval = protectsCenterOrClinician &&
+    final needsReadiness = protectsCenterOrClinician &&
         (access.role == _roleClinician || access.role == _roleCenter);
-    if (needsApproval &&
-        (normalizedApprovalStatus != 'approved' || !access.isActive)) {
-      final rejectedStates = {
-        'rejected',
-        'rejected_admin',
-        'denied',
-        'declined',
-      };
-      final isRejected = rejectedStates.contains(normalizedApprovalStatus);
-      _adminGuardTrace(
+    if (needsReadiness &&
+        access.visibilityReadiness != VisibilityReadiness.ready) {
+      _roleGuardTrace(
         'route=$routeName '
-        'isAdminRoute=$isAdminRoute '
         'signedIn=true '
-        'isAdmin=$isAdmin '
+        'role=${role ?? 'none'} '
         'allowed=false '
-        'redirect=${isRejected ? 'approval_rejected' : 'approval_required'} '
+        'redirect=visibility_incomplete '
         'role=${access.role} '
-        'approvalStatus=${access.approvalStatus} '
-        'isActive=${access.isActive}',
+        'visibilityReadiness=${access.visibilityReadiness} '
+        'readiness=${access.visibilityReadiness}',
       );
       return _RouteAccessDecision(
         allowed: false,
         isBlocked: true,
-        blockReason: isRejected
-            ? 'Account approval was rejected. Please contact support.'
-            : 'Account is pending admin approval or inactive.',
-        isAdmin: isAdmin,
-        redirectTarget: isRejected ? 'approval_rejected' : 'approval_required',
+        blockReason:
+            'Required declaration signals are incomplete. Visibility is not ready.',
+        role: role,
+        redirectTarget: 'visibility_incomplete',
       );
     }
 
     if (allowedRoles == null || allowedRoles!.isEmpty) {
       return _RouteAccessDecision(
         allowed: true,
-        isAdmin: isAdmin,
+        role: role,
         redirectTarget: 'none',
       );
     }
 
-    final role = access.role;
     final isAllowed = role != null && allowedRoles!.contains(role);
     return _RouteAccessDecision(
       allowed: isAllowed,
-      isAdmin: isAdmin,
+      role: role,
       redirectTarget: isAllowed ? 'none' : Routes.menu,
     );
   }
 }
 
-void _adminGuardTrace(String message) {
+void _roleGuardTrace(String message) {
   if (!kDebugMode) return;
-  debugPrint('ADMIN_GUARD $message');
+  debugPrint('ROLE_GUARD $message');
 }
 
 class _RouteAccessDecision {
@@ -1685,7 +1202,7 @@ class _RouteAccessDecision {
     this.redirectToLogin = false,
     this.isBlocked = false,
     this.blockReason = '',
-    this.isAdmin = false,
+    this.role,
     this.redirectTarget = 'none',
   });
 
@@ -1693,6 +1210,6 @@ class _RouteAccessDecision {
   final bool redirectToLogin;
   final bool isBlocked;
   final String blockReason;
-  final bool isAdmin;
+  final String? role;
   final String redirectTarget;
 }

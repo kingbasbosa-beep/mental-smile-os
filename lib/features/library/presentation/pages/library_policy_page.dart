@@ -101,23 +101,23 @@ class LibraryPolicyPage extends StatelessWidget {
                                   ? 'المحتوى المهني'
                                   : 'Professional Content',
                               body: isAr
-                                  ? 'بعض الموارد المهنية أو أدوات VR مستقبلًا ستكون للأخصائيين فقط، ولن يتم إتاحتها مباشرة للعملاء بدون إشراف مناسب. أي أدوات عالية الحساسية تحتاج مراجعة وموافقة بشرية.'
-                                  : 'Some professional resources or future VR tools will be available only to clinicians and will not be exposed directly to clients without proper supervision. High-sensitivity tools require human review and approval.',
+                                  ? 'بعض الموارد المهنية أو أدوات VR مستقبلًا ستكون للأخصائيين فقط، ولن يتم إتاحتها مباشرة للعملاء بدون إشراف مناسب. أي أدوات عالية الحساسية تحتاج رصد سلامة بشري.'
+                                  : 'Some professional resources or future VR tools will be available only to clinicians and will not be exposed directly to clients without proper supervision. High-sensitivity tools require safety observation.',
                             ),
                             _PolicySection(
                               title: isAr
                                   ? 'الذكاء الاصطناعي'
                                   : 'Artificial Intelligence',
                               body: isAr
-                                  ? 'قد يساعد الذكاء الاصطناعي مستقبلًا في إعداد أو تصنيف المحتوى، لكن لا يتم نشر أي محتوى حساس بدون مراجعة بشرية. الذكاء الاصطناعي ليس بديلًا عن المختصين.'
-                                  : 'AI may help in the future with preparing or classifying content, but sensitive content is not published without human review. AI is not a replacement for qualified specialists.',
+                                  ? 'قد يساعد الذكاء الاصطناعي مستقبلًا في إعداد أو تصنيف المحتوى، لكن لا يتم نشر أي محتوى حساس بدون رصد بشري. الذكاء الاصطناعي ليس بديلًا عن المختصين.'
+                                  : 'AI may help in the future with preparing or classifying content, but sensitive content is not published without human safety observation. AI is not a replacement for qualified specialists.',
                             ),
                             _PolicySection(
                               title: isAr
-                                  ? 'الموافقة وتتبع السياسات'
+                                  ? 'تأكيد القراءة وتتبع السياسات'
                                   : 'Policy Confirmation',
                               body: isAr
-                                  ? 'هذه الصفحة تعريفية فقط في المرحلة الحالية. نظام تتبع الموافقات وإصدارات السياسة سيتم تفعيله لاحقًا، ولا يتم الآن تخزين أي موافقة داخل Firebase أو الجهاز.'
+                                  ? 'هذه الصفحة تعريفية فقط في المرحلة الحالية. نظام تتبع تأكيدات القراءة وإصدارات السياسة سيتم تفعيله لاحقًا، ولا يتم الآن تخزين أي تأكيد داخل Firebase أو الجهاز.'
                                   : 'This page is informational only in the current phase. Policy acceptance tracking and policy versions will be activated later. No confirmation is currently stored in Firebase or on the device.',
                             ),
                             const SizedBox(height: 6),

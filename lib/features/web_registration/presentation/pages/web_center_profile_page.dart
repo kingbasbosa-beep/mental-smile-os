@@ -140,7 +140,7 @@ class _WebCenterProfilePageState extends State<WebCenterProfilePage> {
                             children: [
                               const SizedBox(height: 16),
                               const Text(
-                                'Review request step: completing center profile details does not mean activation or approval. The submitted information will be reviewed before any public visibility.',
+                                'Center declaration step: visibility depends on required readiness signals and safety status.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white70,

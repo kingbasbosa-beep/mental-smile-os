@@ -1,141 +1,6 @@
 {
   "indexes": [
     {
-      "collectionGroup": "booking_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "clientId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "booking_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "clientId", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "booking_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "clinicianId", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "booking_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "clinicianUid", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "booking_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "assignedClinicianId", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "booking_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "centerId", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "booking_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "centerId", "order": "ASCENDING" },
-        { "fieldPath": "requestKind", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "booking_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "archived", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "sessionRatings",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "clinicianId", "order": "ASCENDING" },
-        { "fieldPath": "reviewerType", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "sessionRatings",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "clientId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "sessionRatings",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "centerId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "clinicians",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "approvalStatus", "order": "ASCENDING" },
-        { "fieldPath": "isActive", "order": "ASCENDING" },
-        { "fieldPath": "specialtyKey", "order": "ASCENDING" },
-        { "fieldPath": "sortOrder", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "clinicians",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "approvalStatus", "order": "ASCENDING" },
-        { "fieldPath": "isActive", "order": "ASCENDING" },
-        { "fieldPath": "specialty", "order": "ASCENDING" },
-        { "fieldPath": "sortOrder", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "centers",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "approvalStatus", "order": "ASCENDING" },
-        { "fieldPath": "isActive", "order": "ASCENDING" },
-        { "fieldPath": "category", "order": "ASCENDING" },
-        { "fieldPath": "sortOrder", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "centers",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "approvalStatus", "order": "ASCENDING" },
-        { "fieldPath": "isActive", "order": "ASCENDING" },
-        { "fieldPath": "city", "order": "ASCENDING" },
-        { "fieldPath": "sortOrder", "order": "ASCENDING" }
-      ]
-    },
-    {
       "collectionGroup": "center_profile_change_requests",
       "queryScope": "COLLECTION",
       "fields": [
@@ -174,18 +39,8 @@
       "collectionGroup": "chat_threads",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "ownerUid", "order": "ASCENDING" },
-        { "fieldPath": "archived", "order": "ASCENDING" },
+        { "fieldPath": "participantUid", "order": "ASCENDING" },
         { "fieldPath": "updatedAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "chat_escalations",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "assignedToType", "order": "ASCENDING" },
-        { "fieldPath": "assignedToUid", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
     {
@@ -196,10 +51,11 @@
       ]
     },
     {
-      "collectionGroup": "reports",
-      "queryScope": "COLLECTION_GROUP",
+      "collectionGroup": "signal_events",
+      "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "generatedAt", "order": "DESCENDING" }
+        { "fieldPath": "actorId", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
       ]
     }
   ],

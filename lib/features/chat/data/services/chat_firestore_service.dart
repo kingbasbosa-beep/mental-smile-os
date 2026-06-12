@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_escalation_model.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_message_model.dart';
+import 'package:flutterprojects/features/chat/data/models/chat_signal_routing_model.dart';
 import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
-import 'package:flutterprojects/features/chat/data/models/clinician_option_model.dart';
 
 class ChatFirestoreService {
   ChatFirestoreService({
@@ -18,14 +17,11 @@ class ChatFirestoreService {
   CollectionReference<Map<String, dynamic>> get _escalations =>
       _firestore.collection('chat_escalations');
 
-  CollectionReference<Map<String, dynamic>> get _clinicians =>
-      _firestore.collection('clinicians');
-
   Future<ChatThreadModel> createThread({
-    required String ownerUid,
-    required String ownerType,
+    required String participantUid,
+    required String participantType,
     required String displayName,
-    String? threadType,
+    required String threadType,
     String sourceType = 'guest',
     String language = 'ar',
     bool isTemporary = true,
@@ -35,11 +31,10 @@ class ChatFirestoreService {
 
     final model = ChatThreadModel(
       id: doc.id,
-      ownerUid: ownerUid,
-      ownerType: ownerType,
+      participantUid: participantUid,
+      participantType: participantType,
       threadType: threadType,
       displayName: displayName,
-      status: 'active',
       sourceType: sourceType,
       createdAt: null,
       updatedAt: null,
@@ -47,24 +42,14 @@ class ChatFirestoreService {
       lastMessagePreview: '',
       messageCount: 0,
       isTemporary: isTemporary,
-      convertedToOfficialClient: false,
-      officialClientUid: null,
-      bookingLinked: false,
-      bookingRequestId: null,
-      assignedClinicianUid: null,
-      assignedAdminUid: null,
       needsHumanSupport: false,
       escalationLevel: 'none',
-      archived: false,
-      closedAt: null,
       language: language,
-      lifecycleState: 'new',
       identityState: identityState,
       safetyState: 'safe',
-      handoffState: 'ai_only',
       riskScore: 0,
       riskLevel: 'low',
-      strategyMode: 'containment',
+      strategyMode: 'support_guidance',
       lastEmotionalStates: const [],
       lastDetectedRole: null,
     );
@@ -80,53 +65,18 @@ class ChatFirestoreService {
     return ChatThreadModel.fromFirestore(doc);
   }
 
-  Future<ChatThreadModel?> getActiveThreadForUser(String ownerUid) async {
-    final query = await _threads
-        .where('ownerUid', isEqualTo: ownerUid)
-        .where('archived', isEqualTo: false)
-        .get();
-
-    final threads = query.docs.map(ChatThreadModel.fromFirestore).toList()
-      ..sort(_compareNewestThreadFirst);
-
-    if (threads.isEmpty) return null;
-    return threads.first;
-  }
-
-  /// AI-support-safe lookup.
-  ///
-  /// This helper preserves [getActiveThreadForUser] as a generic latest-thread
-  /// lookup, while giving AI entry flows an explicit way to avoid opening
-  /// non-AI conversations such as:
-  /// - admin_support
-  /// - booking_followup
-  /// - clinician_case
-  ///
-  /// Canonical rule:
-  /// - Prefer explicit `threadType == 'ai_support'`
-  /// Legacy fallback:
-  /// - Only when `threadType` is missing, accept `sourceType == 'client'`
-  ///   or `sourceType == 'guest'`
-  Future<ChatThreadModel?> getActiveAiSupportThreadForUser(
-    String ownerUid,
+  Future<ChatThreadModel?> getAiSupportThreadForParticipant(
+    String participantUid,
   ) async {
     final query = await _threads
-        .where('ownerUid', isEqualTo: ownerUid)
-        .where('archived', isEqualTo: false)
+        .where('participantUid', isEqualTo: participantUid)
         .get();
 
     final threads = query.docs.map(ChatThreadModel.fromFirestore).toList()
       ..sort(_compareNewestThreadFirst);
 
     for (final thread in threads) {
-      final threadType = thread.threadType?.trim() ?? '';
-
-      if (threadType == 'ai_support') {
-        return thread;
-      }
-
-      if (threadType.isEmpty &&
-          (thread.sourceType == 'client' || thread.sourceType == 'guest')) {
+      if (thread.threadType == 'ai_support') {
         return thread;
       }
     }
@@ -144,10 +94,11 @@ class ChatFirestoreService {
     return bTime.compareTo(aTime);
   }
 
-  Future<List<ChatThreadModel>> getThreadsForOwner(String ownerUid) async {
+  Future<List<ChatThreadModel>> getThreadsForParticipant(
+    String participantUid,
+  ) async {
     final query = await _threads
-        .where('ownerUid', isEqualTo: ownerUid)
-        .where('archived', isEqualTo: false)
+        .where('participantUid', isEqualTo: participantUid)
         .get();
 
     return query.docs.map(ChatThreadModel.fromFirestore).toList();
@@ -195,150 +146,28 @@ class ChatFirestoreService {
     });
   }
 
-  bool _isLegacyAiSupportThread(ChatThreadModel thread) {
-    final threadType = thread.threadType?.trim() ?? '';
-    if (threadType.isNotEmpty) return false;
-    return thread.sourceType == 'client' || thread.sourceType == 'guest';
-  }
-
   bool _isEscalationSourceThread(ChatThreadModel thread) {
-    if (thread.threadType == 'ai_support') return true;
-    return _isLegacyAiSupportThread(thread);
+    return thread.threadType == 'ai_support';
   }
 
-  bool _isLegacyAdminSupportThread(ChatThreadModel thread) {
-    final threadType = thread.threadType?.trim() ?? '';
-    if (threadType.isNotEmpty) return false;
-    return thread.sourceType == 'admin_support';
-  }
-
-  bool _isMissingThreadType(ChatThreadModel thread) {
-    final threadType = thread.threadType?.trim() ?? '';
-    return threadType.isEmpty;
-  }
-
-  bool _isLegacyClinicianCaseFallbackThread(ChatThreadModel thread) {
-    if (!_isMissingThreadType(thread)) return false;
-    return thread.handoffState == 'clinician_review' ||
-        thread.lifecycleState == 'assigned_clinician';
-  }
-
-  bool _isTypedClinicianCaseThread(ChatThreadModel thread) {
-    return thread.threadType == 'clinician_case';
-  }
-
-  /// Clinician inbox source-of-truth:
-  /// - Prefer explicit threadType == 'clinician_case'
-  /// - Use legacy fallback only when threadType is missing
-  bool _matchesClinicianInboxThread(ChatThreadModel thread) {
-    if (_isTypedClinicianCaseThread(thread)) return true;
-    return _isLegacyClinicianCaseFallbackThread(thread);
-  }
-
-  void _debugMeasureLegacyClinicianFallbackThreads(
-    String clinicianUid,
-    List<ChatThreadModel> threads,
-  ) {
-    if (!kDebugMode) return;
-
-    final legacyFallbackThreads =
-        threads.where(_isLegacyClinicianCaseFallbackThread).toList();
-
-    if (legacyFallbackThreads.isEmpty) return;
-
-    debugPrint(
-      'CHAT_CLINICIAN_FALLBACK_MEASURE '
-      'clinicianUid=$clinicianUid '
-      'legacyClinicianFallbackCount=${legacyFallbackThreads.length} '
-      'sampleThreadIds=${legacyFallbackThreads.take(5).map((t) => t.id).join(",")}',
-    );
-  }
-
-  Stream<List<ChatThreadModel>> streamAdminSupportInboxThreads() {
-    return _threads.orderBy('updatedAt', descending: true).snapshots().map(
-      (snapshot) {
-        final typed = <ChatThreadModel>[];
-        final legacyFallback = <ChatThreadModel>[];
-
-        for (final doc in snapshot.docs) {
-          final thread = ChatThreadModel.fromFirestore(doc);
-          if (thread.archived) continue;
-
-          if (thread.threadType == 'admin_support') {
-            typed.add(thread);
-            continue;
-          }
-
-          if (_isLegacyAdminSupportThread(thread)) {
-            legacyFallback.add(thread);
-          }
-        }
-
-        return [...typed, ...legacyFallback];
-      },
-    );
-  }
-
-  /// Streams escalated chat cases assigned to a specific clinician.
-  /// Filters by assignedToType == 'clinician' and assignedToUid == [clinicianUid].
-  Stream<List<ChatEscalationModel>> streamClinicianEscalations(
+  /// Streams safety escalations where the clinician is a recommendation.
+  Stream<List<ChatEscalationModel>> streamRecommendedEscalations(
     String clinicianUid,
   ) {
     return _escalations
-        .where('assignedToType', isEqualTo: 'clinician')
-        .where('assignedToUid', isEqualTo: clinicianUid)
-        .orderBy('createdAt', descending: true)
+        .where('recommendedProviders', arrayContains: clinicianUid)
         .snapshots()
-        .asyncMap((snapshot) async {
-      final items = <ChatEscalationModel>[];
-      final matchedThreads = <ChatThreadModel>[];
-
-      for (final doc in snapshot.docs) {
-        final escalation = ChatEscalationModel.fromFirestore(doc);
-        ChatThreadModel? thread;
-        try {
-          thread = await getThread(escalation.threadId);
-        } catch (e) {
-          if (kDebugMode) {
-            debugPrint(
-              'CHAT_CLINICIAN_THREAD_READ_SKIP '
-              'clinicianUid=$clinicianUid '
-              'escalationId=${escalation.id} '
-              'threadId=${escalation.threadId} '
-              'error=$e',
-            );
-          }
-          continue;
-        }
-        if (thread == null) continue;
-        if (_matchesClinicianInboxThread(thread)) {
-          matchedThreads.add(thread);
-          items.add(escalation);
-        }
-      }
-
-      _debugMeasureLegacyClinicianFallbackThreads(
-        clinicianUid,
-        matchedThreads,
-      );
-
+        .map((snapshot) {
+      final items = snapshot.docs
+          .map(ChatEscalationModel.fromFirestore)
+          .toList();
+      items.sort((a, b) {
+        final aDate = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final bDate = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return bDate.compareTo(aDate);
+      });
       return items;
     });
-  }
-
-  Stream<List<ClinicianOptionModel>> streamClinicians() {
-    return _clinicians.snapshots().map(
-          (snapshot) => snapshot.docs
-              .map((doc) => ClinicianOptionModel.fromFirestore(doc))
-              .where((c) => c.isActive)
-              .toList(),
-        );
-  }
-
-  Stream<Map<String, ClinicianOptionModel>> streamCliniciansMap() {
-    return streamClinicians().map(
-      (items) => {for (final c in items) c.id: c},
-    );
   }
 
   Future<int> _nextSequence(String threadId) async {
@@ -418,11 +247,6 @@ class ChatFirestoreService {
         'escalationLevel': safetyTriggered
             ? 'urgent'
             : (containsEscalationSignal ? 'recommended' : 'none'),
-        'lifecycleState': safetyTriggered
-            ? 'escalated'
-            : (riskLevel == 'medium' || riskLevel == 'high'
-                ? 'watching'
-                : 'active_ai'),
         'safetyState': safetyTriggered
             ? 'critical'
             : (riskLevel == 'high'
@@ -442,64 +266,8 @@ class ChatFirestoreService {
     });
   }
 
-  Future<void> archiveThread(String threadId) async {
-    await _threads.doc(threadId).update({
-      'archived': true,
-      'closedAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
-  }
-
-  Future<void> assignEscalationToAdmin({
-    required String escalationId,
-    required String threadId,
-    required String adminUid,
-  }) async {
-    await _firestore.runTransaction((tx) async {
-      tx.update(_escalations.doc(escalationId), {
-        'assignedToType': 'admin',
-        'assignedToUid': adminUid,
-        'status': 'assigned',
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-
-      tx.update(_threads.doc(threadId), {
-        'assignedAdminUid': adminUid,
-        'handoffState': 'admin_review',
-        'lifecycleState': 'assigned_admin',
-        'needsHumanSupport': true,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-    });
-  }
-
-  Future<void> forwardEscalationToClinician({
-    required String escalationId,
-    required String threadId,
-    required String clinicianUid,
-  }) async {
-    await _firestore.runTransaction((tx) async {
-      tx.update(_escalations.doc(escalationId), {
-        'assignedToType': 'clinician',
-        'assignedToUid': clinicianUid,
-        'status': 'forwarded_to_clinician',
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-
-      tx.update(_threads.doc(threadId), {
-        'assignedClinicianUid': clinicianUid,
-        'threadType': 'clinician_case',
-        'handoffState': 'clinician_review',
-        'lifecycleState': 'assigned_clinician',
-        'needsHumanSupport': true,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-    });
-  }
-
   Future<void> resolveEscalation({
     required String escalationId,
-    required String threadId,
     required String resolverUid,
   }) async {
     await _firestore.runTransaction((tx) async {
@@ -509,29 +277,37 @@ class ChatFirestoreService {
         'resolvedAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
-
-      tx.update(_threads.doc(threadId), {
-        'handoffState': 'resolved',
-        'lifecycleState': 'resolved',
-        'needsHumanSupport': false,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
     });
   }
 
   Future<String> createEscalation({
     required String threadId,
-    required String ownerUid,
-    required String ownerDisplayName,
+    required String participantUid,
+    required String participantDisplayName,
     required int riskScore,
     required String riskLevel,
     required List<String> reasonCodes,
     required String summaryText,
+    ChatSignalRoutingModel? signalRouting,
   }) async {
+    final routing = signalRouting ??
+        ChatSignalRoutingModel(
+          recommendedProviders: const <String>[],
+          recommendedSignals: reasonCodes,
+          recommendedActions: const <String>[
+            'observe_safety_signals',
+            'offer_support_choices',
+          ],
+          routingSignals: <String>[
+            'risk_level:$riskLevel',
+            ...reasonCodes,
+          ],
+          safetyEscalationLevel: riskLevel,
+        );
     final doc = await _escalations.add({
       'threadId': threadId,
-      'ownerUid': ownerUid,
-      'ownerDisplayName': ownerDisplayName,
+      'participantUid': participantUid,
+      'participantDisplayName': participantDisplayName,
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
       'riskLevel': riskLevel,
@@ -539,11 +315,9 @@ class ChatFirestoreService {
       'reasonCodes': reasonCodes,
       'summaryText': summaryText,
       'status': 'open',
-      'assignedToType': null,
-      'assignedToUid': null,
+      ...routing.toFirestore(),
       'resolvedAt': null,
       'resolvedByUid': null,
-      'bookingRequestId': null,
     });
     return doc.id;
   }
@@ -570,8 +344,8 @@ class ChatFirestoreService {
   Future<void> createSafetyReport({
     required String escalationId,
     required String threadId,
-    required String ownerUid,
-    required String ownerDisplayName,
+    required String participantUid,
+    required String participantDisplayName,
     required String roleDetected,
     required String roleConfidence,
     required DateTime? startedAt,
@@ -601,11 +375,11 @@ class ChatFirestoreService {
       'generatedAt': FieldValue.serverTimestamp(),
       'threadId': threadId,
       'escalationId': escalationId,
-      'ownerUid': ownerUid,
-      'ownerDisplayName': ownerDisplayName,
+      'participantUid': participantUid,
+      'participantDisplayName': participantDisplayName,
       'roleDetected': roleDetected,
       'roleConfidence': roleConfidence,
-      'sessionOverview': {
+      'conversationOverview': {
         'startedAt': startedAt == null ? null : Timestamp.fromDate(startedAt),
         'lastMessageAt':
             lastMessageAt == null ? null : Timestamp.fromDate(lastMessageAt),
@@ -637,8 +411,8 @@ class ChatFirestoreService {
       'recommendedSafetyRouting': recommendedSafetyRouting,
       'confidentialityOverrideBasis': confidentialityOverrideBasis,
       'policyMode': 'exception_limited_disclosure',
-      'visibleToAdmin': true,
-      'visibleToAssignedClinician': true,
+      'visibleToSupport': true,
+      'visibleToRecommendedProviders': true,
     });
   }
 }

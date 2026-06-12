@@ -25,13 +25,6 @@ const Map<DomainKey, DomainGovernanceCapability> domainGovernanceMatrix =
     entryPointHide: false,
     protectedRawWrites: true,
   ),
-  DomainKey.booking: DomainGovernanceCapability(
-    advisoryOnly: true,
-    maintenanceNotice: true,
-    editorDisable: false,
-    entryPointHide: false,
-    protectedRawWrites: true,
-  ),
   DomainKey.specialistWorkspace: DomainGovernanceCapability(
     advisoryOnly: true,
     maintenanceNotice: true,
@@ -46,7 +39,7 @@ const Map<DomainKey, DomainGovernanceCapability> domainGovernanceMatrix =
     entryPointHide: true,
     protectedRawWrites: false,
   ),
-  DomainKey.adminControl: DomainGovernanceCapability(
+  DomainKey.governance: DomainGovernanceCapability(
     advisoryOnly: true,
     maintenanceNotice: true,
     editorDisable: false,
@@ -80,13 +73,6 @@ const Map<DomainKey, DomainGovernanceCapability> domainGovernanceMatrix =
     editorDisable: true,
     entryPointHide: true,
     protectedRawWrites: false,
-  ),
-  DomainKey.externalSessions: DomainGovernanceCapability(
-    advisoryOnly: true,
-    maintenanceNotice: true,
-    editorDisable: false,
-    entryPointHide: false,
-    protectedRawWrites: true,
   ),
 };
 

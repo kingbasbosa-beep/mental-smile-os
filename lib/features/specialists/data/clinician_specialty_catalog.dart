@@ -62,7 +62,7 @@ class ClinicianSpecialtyCatalog {
       labelAr: 'أخصائيون تخاطب',
       labelEn: 'Speech Specialists',
       descriptionAr: 'جلسات تخاطب وتواصل',
-      descriptionEn: 'Speech and communication sessions',
+      descriptionEn: 'Speech and communication support',
     ),
     ClinicianSpecialtyCategory(
       key: coaching,

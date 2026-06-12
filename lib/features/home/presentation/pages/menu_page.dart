@@ -31,17 +31,41 @@ class MenuPage extends StatelessWidget {
     // Unknown signed-in users do not get a dashboard shortcut.
     final access = await _resolveSignedInAccess();
     switch (access?.role) {
-      case 'admin':
+      case 'owner':
         return (
-          label: isArabic ? 'لوحة الإدارة' : 'Admin Hub',
-          icon: Icons.admin_panel_settings_outlined,
-          route: Routes.adminHub,
+          label: isArabic ? 'Owner Room' : 'Owner Room',
+          icon: Icons.account_balance_outlined,
+          route: Routes.sOwnerHome,
+        );
+      case 'monitoring_operator':
+        return (
+          label: isArabic ? 'Monitoring Room' : 'Monitoring Room',
+          icon: Icons.monitor_heart_outlined,
+          route: Routes.sSignalMonitoringRoom,
+        );
+      case 'registry_steward':
+        return (
+          label: isArabic ? 'Registry Room' : 'Registry Room',
+          icon: Icons.inventory_2_outlined,
+          route: Routes.sRegistryRoom,
+        );
+      case 'declaration_reviewer':
+        return (
+          label: isArabic ? 'Declaration Review' : 'Declaration Review',
+          icon: Icons.fact_check_outlined,
+          route: Routes.sDeclarationReviewRoom,
+        );
+      case 'support_observer':
+        return (
+          label: isArabic ? 'Support Room' : 'Support Room',
+          icon: Icons.support_agent_outlined,
+          route: Routes.sSupportRoom,
         );
       case 'clinician':
         return (
           label: isArabic ? 'غرفة العمليات' : 'Operations Room',
           icon: Icons.medical_services_outlined,
-          route: Routes.clinicianOperations,
+          route: Routes.clinicianRoom,
         );
       case 'center':
         return (

@@ -10,6 +10,11 @@ class CleanSignalRuntime {
     SignalEmitter emitter = const NoopSignalEmitter(),
   }) : _emitter = emitter;
 
+  /// Default runtime with Firestore persistence.
+  factory CleanSignalRuntime.firestore() {
+    return CleanSignalRuntime(emitter: FirestoreSignalEmitter());
+  }
+
   final SignalEmitter _emitter;
 
   Future<void> emit(SignalPackage signal) async {

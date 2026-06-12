@@ -158,7 +158,7 @@ class _WebCenterMediaPageState extends State<WebCenterMediaPage> {
                             children: [
                               const SizedBox(height: 16),
                               const Text(
-                                'Media review step: images and links are submitted for review only. Submission does not mean automatic approval, activation, booking, or visibility.',
+                                'Media declaration step: images and links become readiness signals for future visibility.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white70,

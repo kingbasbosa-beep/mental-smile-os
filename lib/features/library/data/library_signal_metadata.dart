@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 // [S] Signal Native Asset
-// Approved by Wave S-3 Classification Board.
-// Must remain free from booking/session/payment/accounting coupling.
+// Library signal metadata for resource discovery.
 class LibrarySignalMetadata {
   const LibrarySignalMetadata({
     this.audienceSignals = const <String>[],

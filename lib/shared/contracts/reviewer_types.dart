@@ -1,5 +1,5 @@
 class ReviewerTypes {
   static const family = 'family';
   static const client = 'client';
-  static const admin = 'admin';
+  static const declarationReviewer = 'declaration_reviewer';
 }
