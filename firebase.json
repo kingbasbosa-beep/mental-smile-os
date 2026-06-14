@@ -1,4 +1,4 @@
-{
+﻿{
   "functions": {
     "source": "functions"
   },
@@ -10,7 +10,7 @@
     "rules": "storage.rules"
   },
   "hosting": {
-    "public": "build/web_os_deploy",
+    "public": "build/web",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -44,3 +44,4 @@
     }
   }
 }
+
