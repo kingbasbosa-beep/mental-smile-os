@@ -62,7 +62,7 @@ const osMemorySummary = {
     "Firebase",
     "Google Play Console",
     "Local Project",
-    "Mental Smile Core",
+    "Mental Smile Core Source Repository",
   ],
   currentPendingPackage: "App Surface Splash preview, then Home / Menu later",
 };
