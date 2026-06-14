@@ -1,1 +1,46 @@
-{"functions":{"source":"functions"},"firestore":{"rules":"firestore.rules","indexes":"firestore.indexes.json"},"storage":{"rules":"storage.rules"},"flutter":{"platforms":{"android":{"default":{"projectId":"mental-smile-app-clean","appId":"1:643226562725:android:889e4f18923f415b44dd4c","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"mental-smile-app-clean","configurations":{"android":"1:643226562725:android:889e4f18923f415b44dd4c","web":"1:643226562725:web:1ae813db68acb6c444dd4c"}}}}}}
+{
+  "functions": {
+    "source": "functions"
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "hosting": {
+    "public": "build/web_os_deploy",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "mental-smile-app-clean",
+          "appId": "1:643226562725:android:889e4f18923f415b44dd4c",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "mental-smile-app-clean",
+          "configurations": {
+            "android": "1:643226562725:android:889e4f18923f415b44dd4c",
+            "web": "1:643226562725:web:1ae813db68acb6c444dd4c"
+          }
+        }
+      }
+    }
+  }
+}
