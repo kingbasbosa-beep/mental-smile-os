@@ -1,0 +1,51 @@
+# App Room Internal Network Snapshot V1
+
+Status: ACTIVE_NETWORK_SNAPSHOT
+Zone ID: APP_ROOM_ZONE
+Gateway ID: APP_ROOM_ZONE_GATEWAY
+Prompt Asset: PROMPT_ASSET_032
+
+## Constitutional Topology
+
+APP_SPLASH_SCREEN
+
+↓
+
+APP_ROOM_ZONE_GATEWAY
+
+APP_HOME_SCREEN
+
+↓
+
+APP_ROOM_ZONE_GATEWAY
+
+APP_CLIENT_REGISTRATION_SCREEN
+
+↓
+
+APP_ROOM_ZONE_GATEWAY
+
+APP_CLIENT_ROOM_SCREEN
+
+↓
+
+APP_ROOM_ZONE_GATEWAY
+
+APP_PROVIDER_ROOM_SCREEN
+
+↓
+
+APP_ROOM_ZONE_GATEWAY
+
+APP_CENTER_ROOM_SCREEN
+
+↓
+
+APP_ROOM_ZONE_GATEWAY
+
+## Summary
+
+Every App Room Zone surface terminates signal packages at APP_ROOM_ZONE_GATEWAY.
+
+No direct cross-zone communication exists in this network.
+

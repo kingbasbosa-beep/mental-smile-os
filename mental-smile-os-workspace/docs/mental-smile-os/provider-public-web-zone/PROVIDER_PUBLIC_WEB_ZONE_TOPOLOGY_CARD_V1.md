@@ -1,0 +1,27 @@
+# Provider Public Web Zone Topology Card V1
+
+Status: ACTIVE_TOPOLOGY_CARD
+Zone ID: PROVIDER_PUBLIC_WEB_ZONE
+Gateway ID: PROVIDER_PUBLIC_WEB_ZONE_GATEWAY
+Prompt Asset: PROMPT_ASSET_040
+
+## Topology
+
+PROVIDER_PUBLIC_WEB_ZONE
+
+↓ owns
+
+PROVIDER_PUBLIC_WEB_ZONE_GATEWAY
+
+↓ owns districts
+
+- PROVIDER_PROFILE_DISPLAY_DISTRICT.
+- PROVIDER_DISCOVERY_DISTRICT.
+- PROVIDER_TRUST_DISPLAY_DISTRICT.
+- PROVIDER_CONTACT_PATHWAY_DISTRICT.
+- PROVIDER_PUBLIC_RESOURCE_DISTRICT.
+
+## Federation Rule
+
+Provider Public Web Zone consumes only approved public packages through gateways.
+

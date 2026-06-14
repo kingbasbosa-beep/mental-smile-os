@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutterprojects/core/auth/account_access_service.dart';
@@ -19,6 +19,7 @@ import 'package:flutterprojects/features/web_registration/presentation/pages/web
 import 'package:flutterprojects/features/web_portal/presentation/pages/portal_skeleton_pages.dart';
 import 'package:flutterprojects/features/s_capital/presentation/pages/s_capital_operations_office_page.dart';
 import 'package:flutterprojects/features/s_capital/presentation/pages/s_signal_monitoring_room_page.dart';
+import 'package:flutterprojects/features/sovereign_construction/presentation/pages/sovereign_construction_workbench_page.dart';
 import 'package:flutterprojects/features/s_city/presentation/pages/s_city_district_page.dart';
 import 'package:flutterprojects/features/s_owner/presentation/pages/s_owner_district_page.dart';
 import 'package:flutterprojects/features/s_web_surfaces/presentation/pages/s_web_surface_pages.dart';
@@ -72,6 +73,7 @@ class AppRouter {
     Routes.sRecoveryConsole,
     Routes.sOwnerCapsules,
     Routes.sOwnerRegeneration,
+    Routes.ownerConstructionWorkbench,
   };
 
   static const Set<String> _monitoringOperatorRoutes = {
@@ -151,7 +153,8 @@ class AppRouter {
     if (_monitoringOperatorRoutes.contains(routeName)) {
       return {_roleMonitoringOperator};
     }
-    if (_supportObserverRoutes.contains(routeName)) return {_roleSupportObserver};
+    if (_supportObserverRoutes.contains(routeName))
+      return {_roleSupportObserver};
     if (_ownerAndSupportObserverRoutes.contains(routeName)) {
       return {_roleOwner, _roleSupportObserver};
     }
@@ -576,6 +579,12 @@ class AppRouter {
           child: const SOwnerDistrictPage(
             focus: SOwnerDistrictFocus.regenerationBoard,
           ),
+          settings: settings,
+        );
+
+      case Routes.ownerConstructionWorkbench:
+        return _protectedRoute(
+          child: const SovereignConstructionWorkbenchPage(),
           settings: settings,
         );
 
@@ -1074,7 +1083,9 @@ class _RouteAccessGate extends StatelessWidget {
                   'ar';
           return Scaffold(
             appBar: AppBar(
-              title: Text(isArabic ? 'Ø§Ù„ÙˆØµÙˆÙ„ ØºÙŠØ± Ù…ØªØ§Ø­' : 'Access unavailable'),
+              title: Text(isArabic
+                  ? 'Ø§Ù„ÙˆØµÙˆÙ„ ØºÙŠØ± Ù…ØªØ§Ø­'
+                  : 'Access unavailable'),
             ),
             body: Center(
               child: Padding(
@@ -1098,7 +1109,9 @@ class _RouteAccessGate extends StatelessWidget {
                           (route) => false,
                         );
                       },
-                      child: Text(isArabic ? 'Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„Ù‚Ø§Ø¦Ù…Ø©' : 'Back to menu'),
+                      child: Text(isArabic
+                          ? 'Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„Ù‚Ø§Ø¦Ù…Ø©'
+                          : 'Back to menu'),
                     ),
                   ],
                 ),

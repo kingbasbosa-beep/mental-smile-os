@@ -175,6 +175,7 @@ class _OwnerNavigation extends StatelessWidget {
     _NavItem('Regeneration Board', Routes.sOwnerRegeneration),
     _NavItem('Executive Intelligence', Routes.sSovereignIntelligence),
     _NavItem('Recovery Console', Routes.sRecoveryConsole),
+    _NavItem('Construction Workbench', Routes.ownerConstructionWorkbench),
   ];
 
   @override
@@ -265,8 +266,7 @@ class _StrategicArchiveHall extends StatelessWidget {
   Widget build(BuildContext context) {
     return const _DistrictCard(
       title: '[S] Strategic Archive',
-      subtitle:
-          'Strategic memory placeholders for owner-level continuity.',
+      subtitle: 'Strategic memory placeholders for owner-level continuity.',
       groups: <_DistrictGroup>[
         _DistrictGroup('Strategic Reports', <String>[
           'Report index placeholder',

@@ -1,0 +1,48 @@
+# Prompt Asset 037 Record
+
+Prompt ID: PROMPT_ASSET_037
+Prompt Name: Library District Gateway Mapping
+Prompt Type: LIBRARY_DISTRICT_GATEWAY_MAPPING_PROMPT
+Prompt Version: V1
+Parent Prompt: PROMPT_ASSET_036
+Creation Date: 2026-06-14
+Status: VALIDATED
+Lineage Status: LINEAGE_ESTABLISHED
+Validation Status: MEMORY_VALIDATED
+
+## Purpose
+
+PROMPT_ASSET_037 maps all Library Districts to LIBRARY_WEB_ZONE_GATEWAY and defines district signal routing, entry rules, exit rules, gateway policy, communication model, and signal summaries.
+
+## Generated Documents
+
+- LIBRARY_DISTRICT_GATEWAY_MAPPING_V1.
+- LIBRARY_DISTRICT_SIGNAL_ROUTING_V1.
+- LIBRARY_DISTRICT_ENTRY_RULES_V1.
+- LIBRARY_DISTRICT_EXIT_RULES_V1.
+- LIBRARY_DISTRICT_GATEWAY_POLICY_V1.
+- LIBRARY_DISTRICT_COMMUNICATION_MODEL_V1.
+- LIBRARY_DISTRICT_SIGNAL_SUMMARY_MODEL_V1.
+- LIBRARY_DISTRICT_GATEWAY_REPORT_V1.
+
+## Updated Documents
+
+- LIBRARY_WEB_ZONE_GATEWAY_MASTER_CARD_V1.
+- LIBRARY_WEB_ZONE_SIGNAL_MODEL_V1.
+- LIBRARY_DISTRICT_REGISTRY_V1.
+- ZONE_GATEWAY_REGISTRY_V1.
+- PROMPT_MEMORY_REGISTRY_V1.
+
+## Boundaries Preserved
+
+- No Runtime.
+- No Firebase.
+- No UI.
+- Documentation Only.
+
+## Memory Signals
+
+MEMORY_SIGNAL_001 LINEAGE_ESTABLISHED.
+
+MEMORY_SIGNAL_005 MEMORY_VALIDATED.
+

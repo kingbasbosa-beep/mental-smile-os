@@ -1,4 +1,4 @@
-﻿class Routes {
+class Routes {
   // Web Portal Phase 1 Skeleton
   static const portalHome = '/';
   static const portalAbout = '/about';
@@ -49,6 +49,7 @@
   static const sRecoveryConsole = '/s/owner/recovery-console';
   static const sOwnerCapsules = '/s/owner/capsules';
   static const sOwnerRegeneration = '/s/owner/regeneration';
+  static const ownerConstructionWorkbench = '/owner/os/construction-workbench';
 
   // Web Registration Portal
   static const webCenterRegister = '/web/center/register';
@@ -102,5 +103,4 @@
 
   // Alias: webLibrary opens the same LibraryPage as this in-app library route.
   static const library = '/module/library';
-
 }
