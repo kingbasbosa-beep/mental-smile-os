@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A styled public chapter from the Mental Smile OS Generation 1 story."
+    />
+    <title>Mental Smile OS Chapter</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html#top" aria-label="Mental Smile OS home">
+        <span class="brand-spark" aria-hidden="true">✦</span>
+        <span class="brand-mark">
+          <img
+            src="../assets/branding/shared/logo/logo_primary_dark.png"
+            alt="Mental Smile logo"
+            class="brand-logo"
+          />
+        </span>
+        <span data-lang="ar">منتال سمايل OS</span>
+        <span data-lang="en" hidden>Mental Smile OS</span>
+      </a>
+      <div class="header-actions">
+        <nav aria-label="Primary navigation">
+          <a href="index.html#why" data-i18n-ar="لماذا" data-i18n-en="Why">لماذا</a>
+          <a href="showcase.html" data-i18n-ar="العرض" data-i18n-en="Showcase">العرض</a>
+          <a href="index.html#safety" data-i18n-ar="حدود السلامة" data-i18n-en="Safety Position">حدود السلامة</a>
+          <a href="index.html#foundation" data-i18n-ar="أساس" data-i18n-en="Foundation">أساس</a>
+          <a href="contact.html" data-i18n-ar="تواصل" data-i18n-en="Contact">تواصل</a>
+        </nav>
+        <div class="language-switch" aria-label="Language switch">
+          <button
+            type="button"
+            class="lang-button is-active"
+            data-lang-button="ar"
+            aria-pressed="true"
+          >
+            عربي
+          </button>
+          <span aria-hidden="true">|</span>
+          <button
+            type="button"
+            class="lang-button"
+            data-lang-button="en"
+            aria-pressed="false"
+          >
+            English
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+      <div class="sun-disc" aria-hidden="true"></div>
+      <article class="chapter-page temple-panel">
+        <p class="breadcrumb">
+          <a href="index.html" data-lang="ar">الرئيسية</a>
+          <a href="index.html" data-lang="en" hidden>Home</a>
+          <span>/</span>
+          <a href="showcase.html" data-lang="ar">العرض</a>
+          <a href="showcase.html" data-lang="en" hidden>Showcase</a>
+          <span>/</span>
+          <span id="chapterCrumb">قصة الجيل الأول</span>
+        </p>
+
+        <header class="chapter-header">
+          <span class="story-number" id="chapterNumber">01</span>
+          <p class="eyebrow" data-lang="ar">قصة الجيل الأول</p>
+          <p class="eyebrow" data-lang="en" hidden>Generation 1 Story</p>
+          <h1 id="chapterTitle">Mental Smile OS</h1>
+          <p class="intro" id="chapterIntro"></p>
+        </header>
+
+        <div class="chapter-content" id="chapterContent"></div>
+
+        <div class="chapter-actions">
+          <a class="button secondary" href="showcase.html" data-lang="ar">العودة إلى العرض</a>
+          <a class="button secondary" href="showcase.html" data-lang="en" hidden>Back to Showcase</a>
+        </div>
+      </article>
+    </main>
+
+    <footer>
+      <span data-lang="ar">منتال سمايل OS</span>
+      <span data-lang="en" hidden>Mental Smile OS</span>
+      <span data-lang="ar">صفحة نصية منسقة</span>
+      <span data-lang="en" hidden>Styled Text Chapter</span>
+    </footer>
+
+    <script>
+      const chapters = {
+        "01": {
+          ar: {
+            title: "مرحبًا بمنتال سمايل OS",
+            intro: "مدخل عام يشرح لماذا وُجدت منظومة منتال سمايل OS وكيف تنظّم التجربة كمدينة واضحة بدل تطبيق قديم مختلط.",
+            sections: [
+              ["الفكرة", ["منتال سمايل منصة رفاه نفسي مبنية حول الهدوء، الاكتشاف، التعلم، ومسارات الدعم الإنسانية الموثوقة.", "منتال سمايل OS هو الأساس الجديد الذي ينظم المنصة كمدينة نظيفة تفصل بين تجربة التطبيق، المعرفة، العرض العام، والحوكمة."]],
+              ["لماذا وُجدت؟", ["كثير من المنتجات تصبح مزدحمة بمرور الوقت: شاشات، حجز، اختصارات إدارية، محتوى، أدوات، وقواعد بيانات متداخلة.", "المنظومة تبدأ من مبادئ واضحة: كل سطح له غرض، كل أصل له مالك، كل إشارة لها مسار، وكل منطقة لها حدود."]],
+              ["الفكرة الإنسانية", ["المنصة ليست لوحة تحكم باردة. هي مدينة من مساحات شخصية، مكتبة للتعلم، مساحات عامة لمقدمي الخدمات والمراكز، وطبقات حوكمة تحمي الاستمرارية."]]
+            ]
+          },
+          en: {
+            title: "Welcome To Mental Smile OS",
+            intro: "A public introduction to why Mental Smile OS exists and how it organizes the platform as a clean city instead of a mixed legacy app.",
+            sections: [
+              ["The Idea", ["Mental Smile is a mental wellbeing platform designed around calm support, discovery, learning, and trusted human pathways.", "Mental Smile OS is the new foundation that organizes the platform as a clean city instead of a mixed legacy app."]],
+              ["Why It Exists", ["Many wellbeing products become crowded over time with features, screens, dashboards, booking residues, admin shortcuts, content, tools, and data rules.", "Mental Smile OS starts from first principles: every surface has purpose, every asset has ownership, every signal has a route, and every zone has a boundary."]],
+              ["The Human Idea", ["The platform is not built as a cold dashboard. It is built as a city of spaces that can expand without losing its identity."]]
+            ]
+          }
+        },
+        "02": {
+          ar: {
+            title: "نظرة عامة على المدينة",
+            intro: "الجيل الأول من مدينة منتال سمايل منظم في أربع طبقات بسيطة: التطبيق، المعرفة، التجاري، والحوكمة.",
+            sections: [
+              ["طبقة التطبيق", ["تشمل تجربة الدخول الأولى: Splash، Login، Home، Client Registration، Client Room، Provider Room، وCenter Room.", "هنا يدخل الناس، يختارون أدوات، يستقبلون إشارات، ويتحركون بين غرف شخصية أو مهنية."]],
+              ["طبقة المعرفة", ["هي Library Web Zone: مساحة مستقلة للتعلم، الأدوات، البحث، الإتاحة، التعافي، دعم الأسرة، والموارد."]],
+              ["الطبقة التجارية", ["تفصل تسجيل مقدمي الخدمات والمراكز عن العرض العام والاكتشاف العام، حتى لا تكشف ملفات خاصة أو تخلط onboarding بالواجهة العامة."]],
+              ["طبقة الحوكمة", ["تحمي المدينة عبر Owner Zone وMonitoring Zone وStrategic Intelligence Zone وSmart Archive Zone."]]
+            ]
+          },
+          en: {
+            title: "City Overview",
+            intro: "Mental Smile City Generation 1 is organized into four simple layers: residential, knowledge, commercial, and governance.",
+            sections: [
+              ["Residential Layer", ["The app-side experience includes Splash, Home, Client Registration, Client Room, Provider Room, and Center Room.", "This is where people enter, choose tools, receive signals, and move through personal or professional rooms."]],
+              ["Knowledge Layer", ["The Library Web Zone contains learning, tools, research, accessibility, recovery, family support, and resources."]],
+              ["Commercial Layer", ["Provider and center registration are separated from public display so private onboarding and public discovery can evolve independently."]],
+              ["Governance Layer", ["Owner, Monitoring, Strategic Intelligence, and Smart Archive zones observe, audit, archive, and strategize without operating the user experience."]]
+            ]
+          }
+        },
+        "03": {
+          ar: {
+            title: "العقيدة الدستورية",
+            intro: "قواعد تنظّم نمو منتال سمايل OS بدون تلوث قديم أو عناصر ميتة أو مسارات غير مفهومة.",
+            sections: [
+              ["لا إرث مباشر", ["المواد القديمة يمكن استخدامها كدليل مصدر، لكنها لا تُنسخ مباشرة داخل النظام الجديد.", "القاعدة هي: استخراج، تنقية، إعادة تصنيف، إعادة بناء، ثم تسجيل."]],
+              ["لا عناصر ميتة", ["لا يبقى أي حقل أو مسار أو أصل أو قاعدة أو placeholder نشط فقط لأنه كان موجودًا قبل ذلك.", "كل شيء نشط يجب أن يكون له غرض، مالك، حالة، ودورة حياة."]],
+              ["لا كروت يتيمة", ["الكروت تصف الشاشات، الأصول، الأدوات، الإشارات، المناطق، والحزم. لا كارت بدون نسب وملكية ومكان في السجل."]],
+              ["سيادة المناطق", ["كل منطقة تملك عملها الداخلي. المناطق الأخرى قد تتواصل معها، لكنها لا تعدّلها مباشرة."]],
+              ["اتحاد الإشارات", ["الإشارات تتحرك عبر البوابات والأنابيب المعتمدة بدل الاعتماد المباشر بين الغرف والمناطق."]]
+            ]
+          },
+          en: {
+            title: "Constitutional Doctrine",
+            intro: "Mental Smile OS uses constitutional rules so the platform can grow cleanly.",
+            sections: [
+              ["No Legacy", ["Old material can be used as source evidence, but it cannot be copied directly into the new OS.", "The rule is: Extract -> Purify -> Reclassify -> Rebuild -> Register."]],
+              ["No Dead Placeholders", ["No unused field, route, asset path, rule, or placeholder should remain active just because it existed before.", "Anything active must have a purpose, owner, status, and lifecycle."]],
+              ["No Orphan Cards", ["Cards describe screens, assets, tools, signals, zones, and packages. No card may exist without lineage, ownership, and registry placement."]],
+              ["Zone Sovereignty", ["Each zone owns its internal work. Other zones may communicate with it, but they may not mutate it directly."]],
+              ["Federation Doctrine", ["The city is a federation, not one giant app. Signals replaced direct dependencies through gateways and approved pipes."]]
+            ]
+          }
+        },
+        "04": {
+          ar: {
+            title: "منطقة التطبيق",
+            intro: "منطقة التطبيق هي التجربة الأساسية للمستخدمين، لكنها ليست متاهة Dashboard؛ إنها تسلسل مساحات ذات معنى.",
+            sections: [
+              ["Splash وLogin", ["Splash يقدم منتال سمايل بدخول هادئ عربي أولًا. Login هو مدخل الهوية النظيف بين Splash وHome."]],
+              ["Home والتسجيل", ["Home هو بوابة التنقل الأولى. تسجيل العميل ينشئ الهوية فقط ولا يجمع اهتمامات أو توصيات أو تسميات سريرية."]],
+              ["Client Room", ["غرفة العميل مساحة شخصية تحتوي Tool Board، Notification Panel، Picture Frame، Motivation Note، Exit Cup، ومبدلات يمين/يسار.", "المستخدم يختار الأدوات، والأدوات تقود إشارات الاكتشاف بدون مطابقة أو تشخيص."]],
+              ["Provider وCenter Room", ["غرف مهنية لمقدمي الخدمات والمراكز، مع أدوات، إشعارات، مساحات عمل، وخروج واضح."]],
+              ["App Gateway", ["كل إشارات منطقة التطبيق تنتهي أولًا عند App Room Zone Gateway. لا شاشة تطبيق تتحدث مباشرة مع منطقة أخرى."]]
+            ]
+          },
+          en: {
+            title: "App Zone",
+            intro: "The App Zone is the primary app-side experience: a sequence of meaningful spaces, not a dashboard maze.",
+            sections: [
+              ["Splash and Login", ["Splash introduces Mental Smile with a calm Arabic-first entry. Login is the clean identity entry screen between Splash and Home."]],
+              ["Home and Registration", ["Home is the first navigation gateway. Client Registration creates identity only and does not collect interests, recommendations, profile data, tool preferences, avatars, or clinical labels."]],
+              ["Client Room", ["The Client Room is a personal space with Tool Board, Notification Panel, Picture Frame, Motivation Note, Exit Cup, and switchers.", "Users choose tools. Tools drive discovery signals. The room does not perform matching or diagnosis."]],
+              ["Provider and Center Rooms", ["Professional spaces for specialists and organizations with tool boards, notifications, work areas, profile shortcuts, and exit actions."]],
+              ["App Gateway", ["All App Zone signals terminate at the App Room Zone Gateway before leaving the zone."]]
+            ]
+          }
+        },
+        "05": {
+          ar: {
+            title: "منطقة المكتبة المعرفية",
+            intro: "المكتبة هي منطقة المعرفة والأدوات داخل منتال سمايل OS، مستقلة عن منطقة التطبيق.",
+            sections: [
+              ["المهمة", ["المكتبة موجودة للمعرفة، التعليم، الاكتشاف، البحث، الأدوات، المراجع، الأدلة، الموارد، الإتاحة، التعافي، دعم الأسرة، والتعلم المهني."]],
+              ["المناطق الداخلية", ["تنقسم إلى Knowledge وTools وResearch وAssessment وVR وRecovery وFamily وAccessibility وResource Districts."]],
+              ["البوابة", ["Library Gateway يستقبل إشارات المناطق، يلخص النشاط، ويتواصل مع بقية المدينة عبر signal pipes معتمدة."]],
+              ["الأهمية", ["يمكن للمكتبة أن تكبر بدون تحويل التطبيق إلى نظام محتوى ثقيل. التطبيق يطلب الاكتشاف، والمكتبة ترد بإشارات محتوى مؤهل."]]
+            ]
+          },
+          en: {
+            title: "Library Web Zone",
+            intro: "The Library Web Zone is the knowledge and tools ecosystem of Mental Smile OS, independent from the App Zone.",
+            sections: [
+              ["Mission", ["The Library exists for knowledge, education, discovery, research, tools, references, guides, resources, accessibility, recovery, family support, and professional learning."]],
+              ["Districts", ["The Library is divided into Knowledge, Tools, Research, Assessment, VR, Recovery, Family, Accessibility, and Resource districts."]],
+              ["Gateway", ["The Library Gateway receives district signals, summarizes activity, and communicates through approved signal pipes."]],
+              ["Why This Matters", ["The Library can evolve into a large ecosystem without turning the app into a heavy content system."]]
+            ]
+          }
+        },
+        "06": {
+          ar: {
+            title: "الطبقة التجارية",
+            intro: "الطبقة التجارية تفصل التسجيل الخاص عن العرض العام حتى تبقى المسارات آمنة وقابلة للتطور.",
+            sections: [
+              ["Provider Registration Zone", ["يتعامل مع onboarding، الاعتمادات، الوثائق، مسودة الملف، التحضير للمراجعة، وتتبع الحالة. لا يعرض مقدمي الخدمات للعامة."]],
+              ["Provider Public Zone", ["يتعامل مع الاكتشاف العام، الملفات العامة، ظهور الخدمات، مسارات التواصل، وعرض الثقة. لا يقرأ وثائق التسجيل الخاصة."]],
+              ["Center Registration Zone", ["يتعامل مع تسجيل المراكز، الوثائق، إعلان الخدمات، طلبات الشراكة، العقود، ومسودات الملفات."]],
+              ["Center Public Zone", ["يتعامل مع اكتشاف المراكز، الملفات العامة، ظهور الخدمات، الثقة، التواصل، والموارد العامة."]],
+              ["لماذا الفصل؟", ["التسجيل والعرض العام يتغيران بسرعات مختلفة. فشل التسجيل لا يجب أن يكسر الملفات العامة، وإعادة تصميم الملفات العامة لا يجب أن تمس onboarding."]]
+            ]
+          },
+          en: {
+            title: "Commercial Layer",
+            intro: "The Commercial Layer separates onboarding from public display.",
+            sections: [
+              ["Provider Registration Zone", ["Handles provider onboarding, credentials, documents, profile drafts, review preparation, and status tracking. It does not publicly display providers."]],
+              ["Provider Public Zone", ["Handles provider discovery, public profiles, service visibility, contact pathways, and trust display."]],
+              ["Center Registration Zone", ["Handles center onboarding, document submission, service declaration, partnership requests, contract preparation, profile drafts, and status tracking."]],
+              ["Center Public Zone", ["Handles center discovery, public profiles, service visibility, trust visibility, contact pathways, and public resources."]],
+              ["Why The Split Exists", ["Registration and public presentation change at different speeds. The split makes the commercial layer safer and cleaner."]]
+            ]
+          }
+        },
+        "07": {
+          ar: {
+            title: "طبقة الحوكمة",
+            intro: "طبقة الحوكمة تحمي منتال سمايل OS بدون أن تشغل المنصة مباشرة.",
+            sections: [
+              ["Owner Zone", ["يمتلك الموافقة الدستورية وسلطة تطور الاتحاد ويحمي الاتجاه والقرارات الكبرى."]],
+              ["Monitoring Zone", ["يراقب صحة الإشارات، البوابات، الاستمرارية، ومسارات التصعيد. يراقب ويبلغ ولا يصرح أو ينفذ."]],
+              ["Strategic Intelligence Zone", ["يحلل الملخصات والاتجاهات ويقترح، لكنه لا يحكم ولا ينفذ."]],
+              ["Smart Archive Zone", ["يحفظ اللقطات، حزم الاستنساخ، التقارير التاريخية، أصول التعافي، وأصول الاستمرارية."]],
+              ["فصل السلطة", ["المالك ليس المراقبة، والمراقبة ليست الذكاء الاستراتيجي، والأرشيف لا يشغل المناطق المصدر."]]
+            ]
+          },
+          en: {
+            title: "Governance Layer",
+            intro: "The Governance Layer protects Mental Smile OS without operating the platform directly.",
+            sections: [
+              ["Owner Zone", ["Holds constitutional approval and federation evolution authority."]],
+              ["Monitoring Zone", ["Observes signal health, gateway health, continuity status, and escalation visibility. It may observe and report, not authorize or execute."]],
+              ["Strategic Intelligence Zone", ["Analyzes summaries and trends. It may recommend, but not govern or execute."]],
+              ["Smart Archive Zone", ["Stores snapshots, clone packages, historical reports, recovery assets, and continuity assets."]],
+              ["Authority Separation", ["Owner is not Monitoring. Monitoring is not Strategic. Strategic is not Archive. Archive is not Owner."]]
+            ]
+          }
+        },
+        "08": {
+          ar: {
+            title: "اتحاد الإشارات",
+            intro: "منتال سمايل OS يتجنب الاعتماد المباشر بين المناطق ويستخدم اتحاد الإشارات بدلًا من ذلك.",
+            sections: [
+              ["Signal Packages", ["حزمة الإشارة رسالة منظمة تصف نشاطًا أو نية أو حالة أو طلب نقل."]],
+              ["Gateways", ["كل منطقة لها بوابة أساسية تستقبل، تعد، تصنف، تلخص، ترسل، وتخزن مؤقتًا. لكنها لا تحكم ولا تصرح ولا تنفذ."]],
+              ["Signal Pipes", ["الإشارات تتحرك عبر: Zone Gateway -> Signal Pipe -> Target Zone Gateway. لا اتصال مباشر من غرفة إلى مكتبة أو من أداة إلى مقدم خدمة."]],
+              ["Continuity", ["إذا أصبحت منطقة غير متاحة مؤقتًا، يمكن لكبسولة الاستمرارية حفظ الإشارات لإعادة تشغيل قصيرة المدى. فشل منطقة لا يعني فشل المدينة."]]
+            ]
+          },
+          en: {
+            title: "Signal Federation",
+            intro: "Mental Smile OS avoids direct dependencies between zones. Instead, it uses signal federation.",
+            sections: [
+              ["Signal Packages", ["A signal package is a structured message that describes activity, intent, status, or a transfer request."]],
+              ["Gateways", ["Every zone has one primary gateway that can receive, count, classify, summarize, forward, and buffer. It cannot govern, authorize, execute, or mutate another zone."]],
+              ["Signal Pipes", ["Signals move through approved pipes: Zone Gateway -> Signal Pipe -> Target Zone Gateway."]],
+              ["Continuity", ["If a zone is temporarily unavailable, its continuity capsule can preserve signal packages for short-term replay. Zone failure does not equal city failure."]]
+            ]
+          }
+        },
+        "09": {
+          ar: {
+            title: "مدينة الجيل الأول",
+            intro: "الجيل الأول هو أول snapshot دستوري كامل لمدينة منتال سمايل: ما يوجد، ما استقر، وما يمكن استنساخه.",
+            sections: [
+              ["ما اكتمل", ["يشمل حزم شاشات التطبيق، غرفة العميل، تعريفات غرف المقدم والمركز، المكتبة، الطبقات التجارية، الحوكمة، البوابات، الأنابيب، السلطة، الاستمرارية، وقواعد النقاء."]],
+              ["ما استقر", ["استقرت الحدود الخاصة بالمناطق، البوابات، الإشارات، السلطة، الذاكرة، حزم الاستنساخ، العرض العام، ونقاء التنفيذ القادم."]],
+              ["القابلية للاستنساخ", ["المدينة مصممة لإنتاج مناطق وبوابات مستقبلية من حزم مسجلة بدل الارتجال. الجيل الأول ليس المنتج النهائي، بل أول أساس نظيف."]]
+            ]
+          },
+          en: {
+            title: "City Generation 1",
+            intro: "Generation 1 is the first complete constitutional snapshot of Mental Smile City.",
+            sections: [
+              ["Completed", ["Generation 1 includes app screen packages, Client Room doctrine, Provider and Center room definitions, Library Web Zone, Commercial Web Zones, Governance Federation Layer, gateway doctrine, signal pipe doctrine, authority doctrine, continuity capsule doctrine, city purity rules, Firebase doctrine, and YAML doctrine."]],
+              ["Stable", ["The city now has stable boundaries for zones, gateways, signals, authority, memory, clone packages, public presentation, and future implementation purity."]],
+              ["Cloneable", ["The city is designed to produce future zones and gateways from registered packages instead of improvising new structures."]]
+            ]
+          }
+        },
+        "10": {
+          ar: {
+            title: "الجيل القادم",
+            intro: "يمكن للجيل القادم أن يبني على الجيل الأول بدون انهيار المعمارية أو العودة للفوضى القديمة.",
+            sections: [
+              ["الأدوات", ["يمكن تطوير الأدوات ككروت وحزم وعلاقات اكتشاف مسجلة، مع بقاء التجربة سهلة ومبنية على الإشارات لا الملفات الثقيلة."]],
+              ["الذكاء", ["يمكن للذكاء دعم البحث، الملخصات، الإتاحة، والتحليل الاستراتيجي، بشرط ألا يتجاوز السلطة أو الملكية أو المراجعة."]],
+              ["البحث والإتاحة", ["يمكن للبحث أن ينمو داخل Library Web Zone، ويمكن للإتاحة أن تصبح منطقة وأصول وتجربة دعم من الدرجة الأولى."]],
+              ["اتحاد التطبيقات والشركاء", ["يمكن للتطبيقات والشركاء في المستقبل الاتصال كأعضاء اتحاد بدل دمجهم داخل النواة."]],
+              ["مبدأ التوسع", ["لا تنسخ الماضي. استخرج، نقّ، أعد التصنيف، أعد البناء، وسجل."]]
+            ]
+          },
+          en: {
+            title: "Next Generation",
+            intro: "The next generation of Mental Smile OS can build on Generation 1 without collapsing the architecture.",
+            sections: [
+              ["Tools", ["Tool systems can be developed as registered cards, packages, and discovery relationships."]],
+              ["AI", ["AI can support research, summaries, accessibility, and strategic analysis while staying inside clear zones and audit boundaries."]],
+              ["Research and Accessibility", ["Research can grow inside the Library Web Zone. Accessibility can become a first-class district, asset family, and support layer."]],
+              ["External Apps and Partners", ["Future apps and partners can connect as federation members instead of being merged into the core platform."]],
+              ["Future Expansion", ["Do not copy the past. Extract, purify, reclassify, rebuild, and register."]]
+            ]
+          }
+        }
+      };
+
+      const languageButtons = document.querySelectorAll("[data-lang-button]");
+      const languageBlocks = document.querySelectorAll("[data-lang]");
+      const translatedNav = document.querySelectorAll("[data-i18n-ar]");
+      const params = new URLSearchParams(window.location.search);
+      const chapterId = chapters[params.get("chapter")] ? params.get("chapter") : "01";
+      let activeLanguage = "ar";
+
+      function renderChapter() {
+        const chapter = chapters[chapterId];
+        const content = chapter[activeLanguage];
+        document.title = `${content.title} | Mental Smile OS`;
+        document.getElementById("chapterNumber").textContent = chapterId;
+        document.getElementById("chapterCrumb").textContent = content.title;
+        document.getElementById("chapterTitle").textContent = content.title;
+        document.getElementById("chapterIntro").textContent = content.intro;
+        document.getElementById("chapterContent").innerHTML = content.sections
+          .map(([heading, paragraphs]) => `
+            <section class="chapter-section">
+              <h2>${heading}</h2>
+              ${paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("")}
+            </section>
+          `)
+          .join("");
+      }
+
+      function setLanguage(language) {
+        activeLanguage = language;
+        const isArabic = language === "ar";
+        document.documentElement.lang = language;
+        document.documentElement.dir = isArabic ? "rtl" : "ltr";
+
+        languageBlocks.forEach((block) => {
+          block.hidden = block.dataset.lang !== language;
+        });
+
+        translatedNav.forEach((item) => {
+          item.textContent = isArabic ? item.dataset.i18nAr : item.dataset.i18nEn;
+        });
+
+        languageButtons.forEach((button) => {
+          const active = button.dataset.langButton === language;
+          button.classList.toggle("is-active", active);
+          button.setAttribute("aria-pressed", String(active));
+        });
+
+        renderChapter();
+      }
+
+      languageButtons.forEach((button) => {
+        button.addEventListener("click", () => setLanguage(button.dataset.langButton));
+      });
+
+      renderChapter();
+    </script>
+  </body>
+</html>
