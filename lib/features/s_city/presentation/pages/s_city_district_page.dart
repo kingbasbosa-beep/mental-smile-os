@@ -1,5 +1,5 @@
-﻿import 'package:flutter/material.dart';
-import 'package:flutterprojects/features/library/data/library_signal_metadata.dart';
+import 'package:flutter/material.dart';
+import 'package:mental_smile_os/features/library/data/library_signal_metadata.dart';
 
 // [S] City Center Package
 // Construction Era asset. Reuses Library Signal Metadata only.

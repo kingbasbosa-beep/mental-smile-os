@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterprojects/app/locale_provider.dart';
-import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/storage/locale_storage.dart';
+import 'package:mental_smile_os/app/locale_provider.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
+import 'package:mental_smile_os/core/storage/locale_storage.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});

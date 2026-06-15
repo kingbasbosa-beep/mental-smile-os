@@ -1,4 +1,4 @@
-package com.mentalkey.app.flutterprojects
+package com.mentalsmile.os
 
 import io.flutter.embedding.android.FlutterActivity
 

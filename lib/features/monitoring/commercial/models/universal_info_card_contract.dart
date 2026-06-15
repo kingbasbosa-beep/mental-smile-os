@@ -1,4 +1,4 @@
-import 'package:flutterprojects/features/localization/federation/models/federation_localized_text.dart';
+import 'package:mental_smile_os/features/localization/federation/models/federation_localized_text.dart';
 
 class UniversalInfoCardContract {
   const UniversalInfoCardContract({

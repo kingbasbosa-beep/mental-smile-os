@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutterprojects/features/signals/signals.dart';
+import 'package:mental_smile_os/features/signals/signals.dart';
 
 import '../domain/models/saved_destination.dart';
 

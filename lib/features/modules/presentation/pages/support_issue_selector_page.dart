@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/features/signals/signals.dart';
-import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
-import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
+import 'package:mental_smile_os/features/signals/signals.dart';
+import 'package:mental_smile_os/shared/ui_kit/app_design_system.dart';
+import 'package:mental_smile_os/shared/ui_kit/app_shell_actions.dart';
 
 class SupportIssueSelectorPage extends StatefulWidget {
   const SupportIssueSelectorPage({

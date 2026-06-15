@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:mental_smile_os/shared/ui_kit/app_design_system.dart';
 
 class BoundedAssistantCommand {
   const BoundedAssistantCommand({

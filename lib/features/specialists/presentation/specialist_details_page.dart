@@ -3,15 +3,15 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/visibility/visibility_readiness.dart';
-import 'package:flutterprojects/features/contact_requests/data/contact_request_repository.dart';
-import 'package:flutterprojects/features/saved_destinations/data/saved_destination_repository.dart';
-import 'package:flutterprojects/features/saved_destinations/domain/models/saved_destination.dart';
-import 'package:flutterprojects/features/signals/signals.dart';
-import 'package:flutterprojects/features/specialists/data/clinician_specialty_catalog.dart';
-import 'package:flutterprojects/shared/analytics/app_analytics.dart';
-import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
+import 'package:mental_smile_os/core/visibility/visibility_readiness.dart';
+import 'package:mental_smile_os/features/contact_requests/data/contact_request_repository.dart';
+import 'package:mental_smile_os/features/saved_destinations/data/saved_destination_repository.dart';
+import 'package:mental_smile_os/features/saved_destinations/domain/models/saved_destination.dart';
+import 'package:mental_smile_os/features/signals/signals.dart';
+import 'package:mental_smile_os/features/specialists/data/clinician_specialty_catalog.dart';
+import 'package:mental_smile_os/shared/analytics/app_analytics.dart';
+import 'package:mental_smile_os/shared/utils/asset_path_utils.dart';
 
 class SpecialistDetailsPage extends StatelessWidget {
   const SpecialistDetailsPage({

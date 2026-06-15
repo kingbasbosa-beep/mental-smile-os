@@ -30,7 +30,7 @@ gradle.taskGraph.whenReady {
 }
 
 android {
-    namespace = "com.mentalkey.app.flutterprojects"
+    namespace = "com.mentalsmile.os"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/l10n/app_localizations.dart';
-import 'package:flutterprojects/shared/analytics/app_analytics.dart';
-import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
-import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
-import 'package:flutterprojects/features/centers/data/models/center_model.dart';
-import 'package:flutterprojects/features/centers/data/services/centers_firestore_service.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
+import 'package:mental_smile_os/l10n/app_localizations.dart';
+import 'package:mental_smile_os/shared/analytics/app_analytics.dart';
+import 'package:mental_smile_os/shared/ui_kit/app_design_system.dart';
+import 'package:mental_smile_os/shared/utils/asset_path_utils.dart';
+import 'package:mental_smile_os/features/centers/data/models/center_model.dart';
+import 'package:mental_smile_os/features/centers/data/services/centers_firestore_service.dart';
 
 const String _centerLogoMarkAsset = 'assets/c7_branding/logo/logo_mark.png';
 

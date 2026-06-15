@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/app/router/routes.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
 
 enum SCapitalOfficeFocus {
   overview,

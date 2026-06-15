@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutterprojects/core/system/domain_registry.dart';
+import 'package:mental_smile_os/core/system/domain_registry.dart';
 
 Map<String, dynamic> _domainSeedPayload() {
   return <String, dynamic>{

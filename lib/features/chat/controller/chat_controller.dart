@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutterprojects/features/chat/data/models/chat_message_model.dart';
-import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
-import 'package:flutterprojects/features/chat/data/services/chat_ai_service.dart';
-import 'package:flutterprojects/features/chat/data/services/chat_firestore_service.dart';
-import 'package:flutterprojects/shared/gateways/role_access_gateway.dart';
+import 'package:mental_smile_os/features/chat/data/models/chat_message_model.dart';
+import 'package:mental_smile_os/features/chat/data/models/chat_thread_model.dart';
+import 'package:mental_smile_os/features/chat/data/services/chat_ai_service.dart';
+import 'package:mental_smile_os/features/chat/data/services/chat_firestore_service.dart';
+import 'package:mental_smile_os/shared/gateways/role_access_gateway.dart';
 
 class ChatController {
   ChatController({

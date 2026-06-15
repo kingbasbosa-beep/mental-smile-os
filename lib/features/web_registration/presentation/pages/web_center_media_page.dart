@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/features/web_registration/data/web_registration_draft_store.dart';
-import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
-import 'package:flutterprojects/l10n/app_localizations.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
+import 'package:mental_smile_os/features/web_registration/data/web_registration_draft_store.dart';
+import 'package:mental_smile_os/features/web_registration/presentation/web_registration_background.dart';
+import 'package:mental_smile_os/l10n/app_localizations.dart';
 
 class WebCenterMediaPage extends StatefulWidget {
   const WebCenterMediaPage({super.key});

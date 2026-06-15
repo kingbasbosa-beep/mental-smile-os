@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
+import 'package:mental_smile_os/shared/utils/asset_path_utils.dart';
 
 import 'app_theme.dart';
 

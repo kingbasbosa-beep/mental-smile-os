@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/features/chat/data/services/chat_firestore_service.dart';
+import 'package:mental_smile_os/features/chat/data/services/chat_firestore_service.dart';
 
 class ChatEscalationReportPage extends StatefulWidget {
   const ChatEscalationReportPage({

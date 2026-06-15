@@ -1,7 +1,7 @@
-﻿import 'package:flutter/material.dart';
-import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/features/web_registration/presentation/web_registration_background.dart';
-import 'package:flutterprojects/l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
+import 'package:mental_smile_os/features/web_registration/presentation/web_registration_background.dart';
+import 'package:mental_smile_os/l10n/app_localizations.dart';
 
 class WebRegistrationSuccessPage extends StatelessWidget {
   const WebRegistrationSuccessPage({super.key});
@@ -51,8 +51,8 @@ class WebRegistrationSuccessPage extends StatelessWidget {
                     Text(
                       isArabic
                           ? (isClinician
-                              ? 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ Ø¨Ù†Ø¬Ø§Ø­.'
-                              : 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ù…Ø±ÙƒØ² Ø¨Ù†Ø¬Ø§Ø­.')
+                              ? 'تم إرسال طلب تسجيل الأخصائي بنجاح.'
+                              : 'تم إرسال طلب تسجيل المركز بنجاح.')
                           : (isClinician
                               ? 'Your clinician declaration has been submitted successfully.'
                               : 'Your center declaration has been submitted successfully.'),
@@ -70,8 +70,8 @@ class WebRegistrationSuccessPage extends StatelessWidget {
                     Text(
                       isArabic
                           ? (isClinician
-                              ? 'Ø³ÙŠØªÙ… Ù…Ø±Ø§Ø¬Ø¹Ø© Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø£Ø®ØµØ§Ø¦ÙŠ Ù‚Ø¨Ù„ Ø§Ù„ØªÙØ¹ÙŠÙ„.'
-                              : 'Ø³ÙŠØªÙ… Ù…Ø±Ø§Ø¬Ø¹Ø© Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙƒØ² Ù‚Ø¨Ù„ Ø§Ù„ØªÙØ¹ÙŠÙ„.')
+                              ? 'سيتم مراجعة بيانات الأخصائي قبل التفعيل.'
+                              : 'سيتم مراجعة بيانات المركز قبل التفعيل.')
                           : (isClinician
                               ? 'Your clinician visibility depends on required readiness signals.'
                               : 'Your center visibility depends on required readiness signals.'),
@@ -110,7 +110,7 @@ class WebRegistrationSuccessPage extends StatelessWidget {
                               .pushNamed(Routes.portalHome),
                           child: Text(
                             isArabic
-                                ? 'Ø§Ù„Ø¹ÙˆØ¯Ø© Ø¥Ù„Ù‰ Ø¨ÙˆØ§Ø¨Ø© Ø§Ù„ÙˆÙŠØ¨'
+                                ? 'العودة إلى بوابة الويب'
                                 : 'Back to Web Portal',
                           ),
                         ),
@@ -119,7 +119,7 @@ class WebRegistrationSuccessPage extends StatelessWidget {
                               Navigator.of(context).pushNamed(Routes.splash),
                           child: Text(
                             isArabic
-                                ? 'Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¥Ù„Ù‰ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚'
+                                ? 'الدخول إلى التطبيق'
                                 : 'Open Mental Smile App',
                           ),
                         ),

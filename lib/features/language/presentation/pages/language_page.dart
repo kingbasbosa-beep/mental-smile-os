@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterprojects/app/router/routes.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
 
 class MkLanguagePage extends ConsumerWidget {
   const MkLanguagePage({super.key});

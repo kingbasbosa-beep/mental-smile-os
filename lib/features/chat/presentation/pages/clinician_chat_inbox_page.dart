@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/features/chat/data/models/chat_escalation_model.dart';
-import 'package:flutterprojects/features/chat/data/services/chat_firestore_service.dart';
+import 'package:mental_smile_os/features/chat/data/models/chat_escalation_model.dart';
+import 'package:mental_smile_os/features/chat/data/services/chat_firestore_service.dart';
 
 /// Shows safety recommendations that include this clinician.
 class ClinicianChatInboxPage extends StatefulWidget {

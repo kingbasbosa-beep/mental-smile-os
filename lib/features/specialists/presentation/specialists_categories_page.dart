@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/features/specialists/data/clinician_specialty_catalog.dart';
-import 'package:flutterprojects/shared/analytics/app_analytics.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
+import 'package:mental_smile_os/features/specialists/data/clinician_specialty_catalog.dart';
+import 'package:mental_smile_os/shared/analytics/app_analytics.dart';
 
 class SpecialistsCategoriesPage extends StatefulWidget {
   const SpecialistsCategoriesPage({

@@ -1,6 +1,6 @@
-import 'package:flutterprojects/features/signals/domain/models/signal_aggregate.dart';
-import 'package:flutterprojects/features/signals/domain/registries/signal_aggregation_category_registry.dart';
-import 'package:flutterprojects/features/signals/domain/registries/signal_type_registry.dart';
+import 'package:mental_smile_os/features/signals/domain/models/signal_aggregate.dart';
+import 'package:mental_smile_os/features/signals/domain/registries/signal_aggregation_category_registry.dart';
+import 'package:mental_smile_os/features/signals/domain/registries/signal_type_registry.dart';
 
 class MonitoringAggregateValidator {
   const MonitoringAggregateValidator._();

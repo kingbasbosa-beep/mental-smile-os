@@ -1,4 +1,4 @@
-import 'package:flutterprojects/features/signals/domain/registries/signal_type_registry.dart';
+import 'package:mental_smile_os/features/signals/domain/registries/signal_type_registry.dart';
 
 import '../aggregates/residential_signal_aggregate.dart';
 

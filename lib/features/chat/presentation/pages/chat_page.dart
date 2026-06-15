@@ -2,13 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
-import 'package:flutterprojects/shared/gateways/role_access_gateway.dart';
-import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
-import 'package:flutterprojects/features/chat/controller/chat_controller.dart';
-import 'package:flutterprojects/features/chat/data/models/chat_message_model.dart';
-import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
+import 'package:mental_smile_os/shared/ui_kit/app_design_system.dart';
+import 'package:mental_smile_os/shared/gateways/role_access_gateway.dart';
+import 'package:mental_smile_os/shared/utils/asset_path_utils.dart';
+import 'package:mental_smile_os/features/chat/controller/chat_controller.dart';
+import 'package:mental_smile_os/features/chat/data/models/chat_message_model.dart';
+import 'package:mental_smile_os/features/chat/data/models/chat_thread_model.dart';
 
 class _GoldBackIcon extends StatelessWidget {
   const _GoldBackIcon({required this.compact});

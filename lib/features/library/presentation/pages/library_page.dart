@@ -3,11 +3,11 @@ import 'dart:math' as math;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/features/library/data/library_signal_metadata.dart';
-import 'package:flutterprojects/features/signals/signals.dart';
-import 'package:flutterprojects/shared/analytics/app_analytics.dart';
-import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
+import 'package:mental_smile_os/features/library/data/library_signal_metadata.dart';
+import 'package:mental_smile_os/features/signals/signals.dart';
+import 'package:mental_smile_os/shared/analytics/app_analytics.dart';
+import 'package:mental_smile_os/shared/utils/asset_path_utils.dart';
 
 /// C6 Library UI.
 class LibraryPage extends StatefulWidget {

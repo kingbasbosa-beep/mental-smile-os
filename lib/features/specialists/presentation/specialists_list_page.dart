@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/visibility/visibility_readiness.dart';
-import 'package:flutterprojects/features/specialists/data/clinician_specialty_catalog.dart';
-import 'package:flutterprojects/shared/analytics/app_analytics.dart';
-import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
+import 'package:mental_smile_os/core/visibility/visibility_readiness.dart';
+import 'package:mental_smile_os/features/specialists/data/clinician_specialty_catalog.dart';
+import 'package:mental_smile_os/shared/analytics/app_analytics.dart';
+import 'package:mental_smile_os/shared/ui_kit/asset_fallback_widgets.dart';
 
 class SpecialistsListPage extends StatelessWidget {
   const SpecialistsListPage({

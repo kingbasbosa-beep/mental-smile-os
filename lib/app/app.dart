@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/l10n/app_localizations.dart';
+import 'package:mental_smile_os/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterprojects/app/locale_provider.dart';
+import 'package:mental_smile_os/app/locale_provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutterprojects/app/router/app_router.dart';
-import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:mental_smile_os/app/router/app_router.dart';
+import 'package:mental_smile_os/shared/ui_kit/app_design_system.dart';
 
 class MentalKeyApp extends ConsumerWidget {
   const MentalKeyApp({super.key});

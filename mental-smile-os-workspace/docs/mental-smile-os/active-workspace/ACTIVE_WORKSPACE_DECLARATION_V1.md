@@ -79,3 +79,39 @@ GENERATION_1_EXECUTION_BACKLOG_V1 activates the Execution Era as a managed progr
 Execution Era: ACTIVE.
 
 Constitution Era: COMPLETED.
+
+## Final Constitutional Freeze
+
+GENERATION_1_FINAL_CONSTITUTIONAL_FREEZE_V1 closes the Constitution Era.
+
+Constitution Era: CLOSED.
+
+Execution Era: ACTIVE.
+
+Generation 1 Constitutional Layer: FROZEN.
+
+New constitutional artifacts require Generation 2 authorization.
+
+Future Generation 1 work belongs only to Firebase, YAML, Runtime, Android, Web, GitHub, Testing, Activation, and Deployment.
+
+CITY_SIGNAL_013 GENERATION_1_CONSTITUTION_FROZEN emitted.
+
+EXECUTION_SIGNAL_010 EXECUTION_ONLY_ERA_AUTHORIZED emitted.
+
+## Active Workspace Migration V1
+
+ACTIVE_WORKSPACE_MIGRATION_PLAN_V1 declares Mental Smile OS as the single active workspace identity.
+
+ACTIVE_CITY: Mental Smile OS.
+
+ACTIVE_REPOSITORY: `C:/mental_smile_workspace/app/mental-smile-app-clean2` as current host repository.
+
+ACTIVE_RUNTIME: Flutter runtime inside `mental-smile-app-clean2`.
+
+ACTIVE_DOCUMENTATION_ROOT: `mental-smile-os-workspace`.
+
+Pure Runtime Status: NOT_YET_INDEPENDENTLY_EXTRACTED.
+
+Everything else is archive candidate, source reference, generated output, or historical evidence until classified otherwise.
+
+PROMPT_ASSET_073 ACTIVE_WORKSPACE_MIGRATION_PROMPT registered.

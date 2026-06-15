@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutterprojects/features/chat/data/models/chat_escalation_model.dart';
-import 'package:flutterprojects/features/chat/data/models/chat_message_model.dart';
-import 'package:flutterprojects/features/chat/data/models/chat_signal_routing_model.dart';
-import 'package:flutterprojects/features/chat/data/models/chat_thread_model.dart';
+import 'package:mental_smile_os/features/chat/data/models/chat_escalation_model.dart';
+import 'package:mental_smile_os/features/chat/data/models/chat_message_model.dart';
+import 'package:mental_smile_os/features/chat/data/models/chat_signal_routing_model.dart';
+import 'package:mental_smile_os/features/chat/data/models/chat_thread_model.dart';
 
 class ChatFirestoreService {
   ChatFirestoreService({

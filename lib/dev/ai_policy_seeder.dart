@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutterprojects/features/chat/data/services/chat_ai_policy.dart';
+import 'package:mental_smile_os/features/chat/data/services/chat_ai_policy.dart';
 
 // [S] AI Policy Asset
 // Approved by Wave S-3 Classification Board.

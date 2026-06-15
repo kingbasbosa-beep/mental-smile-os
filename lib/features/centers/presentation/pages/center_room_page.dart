@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
-import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
-import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
-import 'package:flutterprojects/features/centers/presentation/center_document_requirements.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
+import 'package:mental_smile_os/shared/ui_kit/app_design_system.dart';
+import 'package:mental_smile_os/shared/ui_kit/app_shell_actions.dart';
+import 'package:mental_smile_os/features/centers/data/models/center_pricing.dart';
+import 'package:mental_smile_os/features/centers/presentation/center_document_requirements.dart';
 
 class CenterRoomPage extends StatefulWidget {
   const CenterRoomPage({super.key});

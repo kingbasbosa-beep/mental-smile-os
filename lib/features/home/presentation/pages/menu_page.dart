@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/auth/account_access_service.dart';
-import 'package:flutterprojects/l10n/app_localizations.dart';
-import 'package:flutterprojects/shared/analytics/app_analytics.dart';
-import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
-import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
+import 'package:mental_smile_os/core/auth/account_access_service.dart';
+import 'package:mental_smile_os/l10n/app_localizations.dart';
+import 'package:mental_smile_os/shared/analytics/app_analytics.dart';
+import 'package:mental_smile_os/shared/ui_kit/app_design_system.dart';
+import 'package:mental_smile_os/shared/utils/asset_path_utils.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});

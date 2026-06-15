@@ -1,4 +1,4 @@
-import 'package:flutterprojects/features/chat/data/services/chat_ai_policy.dart';
+import 'package:mental_smile_os/features/chat/data/services/chat_ai_policy.dart';
 
 class ChatAiResult {
   final String responseText;

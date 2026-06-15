@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/core/system/domain_governance_capability.dart';
-import 'package:flutterprojects/core/system/domain_registry.dart';
-import 'package:flutterprojects/core/system/domain_status.dart';
-import 'package:flutterprojects/core/system/domain_status_service.dart';
+import 'package:mental_smile_os/core/system/domain_governance_capability.dart';
+import 'package:mental_smile_os/core/system/domain_registry.dart';
+import 'package:mental_smile_os/core/system/domain_status.dart';
+import 'package:mental_smile_os/core/system/domain_status_service.dart';
 
 // [S] Registry Room runtime.
 // Registry visibility only; no writes or lifecycle changes.

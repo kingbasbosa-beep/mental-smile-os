@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutterprojects/core/system/domain_registry.dart';
-import 'package:flutterprojects/core/system/domain_status.dart';
+import 'package:mental_smile_os/core/system/domain_registry.dart';
+import 'package:mental_smile_os/core/system/domain_status.dart';
 
 class DomainStatusService {
   const DomainStatusService({

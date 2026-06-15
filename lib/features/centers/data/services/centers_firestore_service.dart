@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutterprojects/core/visibility/visibility_readiness.dart';
-import 'package:flutterprojects/features/centers/data/models/center_model.dart';
+import 'package:mental_smile_os/core/visibility/visibility_readiness.dart';
+import 'package:mental_smile_os/features/centers/data/models/center_model.dart';
 
 class CentersFirestoreService {
   CentersFirestoreService({

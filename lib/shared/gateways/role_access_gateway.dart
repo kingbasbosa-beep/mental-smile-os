@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutterprojects/core/auth/account_access_service.dart';
-import 'package:flutterprojects/shared/contracts/role_names.dart';
+import 'package:mental_smile_os/core/auth/account_access_service.dart';
+import 'package:mental_smile_os/shared/contracts/role_names.dart';
 
 class RoleAccessGateway {
   RoleAccessGateway({AccountAccessService? accessService})

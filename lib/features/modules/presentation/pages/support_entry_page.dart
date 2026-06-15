@@ -1,10 +1,10 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/shared/analytics/app_analytics.dart';
-import 'package:flutterprojects/shared/ui_kit/app_shell_actions.dart';
-import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
+import 'package:mental_smile_os/shared/analytics/app_analytics.dart';
+import 'package:mental_smile_os/shared/ui_kit/app_shell_actions.dart';
+import 'package:mental_smile_os/shared/utils/asset_path_utils.dart';
 
 class SupportEntryPage extends StatelessWidget {
   const SupportEntryPage.addiction({super.key})

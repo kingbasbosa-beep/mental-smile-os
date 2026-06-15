@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
-import 'package:flutterprojects/features/centers/presentation/center_document_requirements.dart';
+import 'package:mental_smile_os/features/centers/data/models/center_pricing.dart';
+import 'package:mental_smile_os/features/centers/presentation/center_document_requirements.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // [S] Readiness Observatory runtime.

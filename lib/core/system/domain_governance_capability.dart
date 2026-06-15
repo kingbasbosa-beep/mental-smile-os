@@ -1,4 +1,4 @@
-import 'package:flutterprojects/core/system/domain_registry.dart';
+import 'package:mental_smile_os/core/system/domain_registry.dart';
 
 class DomainGovernanceCapability {
   const DomainGovernanceCapability({

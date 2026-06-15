@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutterprojects/core/visibility/visibility_readiness.dart';
-import 'package:flutterprojects/shared/contracts/role_names.dart';
+import 'package:mental_smile_os/core/visibility/visibility_readiness.dart';
+import 'package:mental_smile_os/shared/contracts/role_names.dart';
 
 class SignedInAccessState {
   const SignedInAccessState({

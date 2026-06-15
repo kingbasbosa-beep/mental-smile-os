@@ -41,10 +41,6 @@ service cloud.firestore {
       return hasRole('support_observer');
     }
 
-    function isMonitoringOperator() {
-      return hasRole('monitoring_operator');
-    }
-
     function isClient() {
       return signedIn() && request.auth.token.role == 'client';
     }

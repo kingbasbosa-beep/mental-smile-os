@@ -2,12 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterprojects/app/locale_provider.dart';
-import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/storage/locale_storage.dart';
-import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
-import 'package:flutterprojects/shared/ui_kit/asset_fallback_widgets.dart';
-import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
+import 'package:mental_smile_os/app/locale_provider.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
+import 'package:mental_smile_os/core/storage/locale_storage.dart';
+import 'package:mental_smile_os/shared/ui_kit/app_design_system.dart';
+import 'package:mental_smile_os/shared/ui_kit/asset_fallback_widgets.dart';
+import 'package:mental_smile_os/shared/utils/asset_path_utils.dart';
 
 class ClientDashboardPage extends StatelessWidget {
   const ClientDashboardPage({super.key});

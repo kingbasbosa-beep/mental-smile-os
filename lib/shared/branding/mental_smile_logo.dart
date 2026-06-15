@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/core/branding/app_assets.dart';
-import 'package:flutterprojects/shared/utils/asset_path_utils.dart';
+import 'package:mental_smile_os/core/branding/app_assets.dart';
+import 'package:mental_smile_os/shared/utils/asset_path_utils.dart';
 
 enum MentalSmileLogoVariant {
   iconOnly,

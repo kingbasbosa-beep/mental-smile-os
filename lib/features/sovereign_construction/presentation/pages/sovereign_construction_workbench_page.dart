@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutterprojects/features/sovereign_construction/domain/construction_tool_registry.dart';
+import 'package:mental_smile_os/features/sovereign_construction/domain/construction_tool_registry.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SovereignConstructionWorkbenchPage extends StatelessWidget {

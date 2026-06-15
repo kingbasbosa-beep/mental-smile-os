@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/core/auth/account_access_service.dart';
-import 'package:flutterprojects/shared/ui_kit/app_design_system.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
+import 'package:mental_smile_os/core/auth/account_access_service.dart';
+import 'package:mental_smile_os/shared/ui_kit/app_design_system.dart';
 
 class AppShellActions {
   static void goBackOrMenu(BuildContext context) {

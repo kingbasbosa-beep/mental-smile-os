@@ -1,5 +1,5 @@
-import 'package:flutterprojects/features/signals/domain/models/signal_aggregate.dart';
-import 'package:flutterprojects/features/signals/domain/registries/signal_type_registry.dart';
+import 'package:mental_smile_os/features/signals/domain/models/signal_aggregate.dart';
+import 'package:mental_smile_os/features/signals/domain/registries/signal_type_registry.dart';
 
 import '../models/monitoring_aggregate_item.dart';
 import '../models/monitoring_feeds.dart';

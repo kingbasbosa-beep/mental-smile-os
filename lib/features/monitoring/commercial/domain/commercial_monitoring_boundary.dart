@@ -1,4 +1,4 @@
-import 'package:flutterprojects/features/signals/domain/models/signal_package.dart';
+import 'package:mental_smile_os/features/signals/domain/models/signal_package.dart';
 
 class CommercialMonitoringBoundary {
   const CommercialMonitoringBoundary._();

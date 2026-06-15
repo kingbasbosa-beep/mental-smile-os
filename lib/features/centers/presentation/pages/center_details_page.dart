@@ -1,15 +1,15 @@
-﻿import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojects/app/router/routes.dart';
-import 'package:flutterprojects/features/centers/data/models/center_model.dart';
-import 'package:flutterprojects/features/centers/data/models/center_pricing.dart';
-import 'package:flutterprojects/features/centers/data/services/centers_firestore_service.dart';
-import 'package:flutterprojects/features/contact_requests/data/contact_request_repository.dart';
-import 'package:flutterprojects/features/saved_destinations/data/saved_destination_repository.dart';
-import 'package:flutterprojects/features/saved_destinations/domain/models/saved_destination.dart';
-import 'package:flutterprojects/features/signals/signals.dart';
-import 'package:flutterprojects/l10n/app_localizations.dart';
-import 'package:flutterprojects/shared/analytics/app_analytics.dart';
+import 'package:mental_smile_os/app/router/routes.dart';
+import 'package:mental_smile_os/features/centers/data/models/center_model.dart';
+import 'package:mental_smile_os/features/centers/data/models/center_pricing.dart';
+import 'package:mental_smile_os/features/centers/data/services/centers_firestore_service.dart';
+import 'package:mental_smile_os/features/contact_requests/data/contact_request_repository.dart';
+import 'package:mental_smile_os/features/saved_destinations/data/saved_destination_repository.dart';
+import 'package:mental_smile_os/features/saved_destinations/domain/models/saved_destination.dart';
+import 'package:mental_smile_os/features/signals/signals.dart';
+import 'package:mental_smile_os/l10n/app_localizations.dart';
+import 'package:mental_smile_os/shared/analytics/app_analytics.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CenterDetailsPage extends StatelessWidget {
@@ -56,7 +56,7 @@ class CenterDetailsPage extends StatelessWidget {
         SnackBar(
           content: Text(
             isArabic
-                ? 'ÙŠØ±Ø¬Ù‰ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ù„Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ Ø§Ù„ØªÙˆØ§ØµÙ„.'
+                ? 'يرجى تسجيل الدخول لإرسال طلب التواصل.'
                 : 'Please sign in to send a contact request.',
           ),
         ),
@@ -69,7 +69,7 @@ class CenterDetailsPage extends StatelessWidget {
         clientId: clientId,
         centerId: centerId,
         message: isArabic
-            ? 'Ø£Ø±ØºØ¨ ÙÙŠ Ø§Ù„ØªÙˆØ§ØµÙ„ Ù…Ø¹ Ø§Ù„Ù…Ø±ÙƒØ² Ù„Ù…Ø¹Ø±ÙØ© Ø§Ù„Ø®ÙŠØ§Ø±Ø§Øª Ø§Ù„Ù…Ù†Ø§Ø³Ø¨Ø©.'
+            ? 'أرغب في التواصل مع المركز لمعرفة الخيارات المناسبة.'
             : 'I would like this center to contact me about suitable options.',
       );
       if (!context.mounted) return;
@@ -78,7 +78,7 @@ class CenterDetailsPage extends StatelessWidget {
         SnackBar(
           content: Text(
             isArabic
-                ? 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ Ø§Ù„ØªÙˆØ§ØµÙ„. ÙŠÙ…ÙƒÙ†Ùƒ Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø¯Ø¹Ù… Ø£Ùˆ Ø­ÙØ¸ Ø§Ù„Ù…Ø±ÙƒØ² Ù„Ù„Ø±Ø¬ÙˆØ¹ Ù„Ø§Ø­Ù‚Ù‹Ø§.'
+                ? 'تم إرسال طلب التواصل. يمكنك متابعة الدعم أو حفظ المركز للرجوع لاحقًا.'
                 : 'Contact request sent. You can continue with support or save this center for later.',
           ),
         ),
@@ -89,7 +89,7 @@ class CenterDetailsPage extends StatelessWidget {
         SnackBar(
           content: Text(
             isArabic
-                ? 'ØªØ¹Ø°Ø± Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ Ø§Ù„ØªÙˆØ§ØµÙ„: $e'
+                ? 'تعذر إرسال طلب التواصل: $e'
                 : 'Could not send contact request: $e',
           ),
         ),
@@ -109,7 +109,7 @@ class CenterDetailsPage extends StatelessWidget {
         SnackBar(
           content: Text(
             isArabic
-                ? 'ÙŠØ±Ø¬Ù‰ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ù„Ø­ÙØ¸ Ø§Ù„Ù…Ø±ÙƒØ².'
+                ? 'يرجى تسجيل الدخول لحفظ المركز.'
                 : 'Please sign in to save this center.',
           ),
         ),
@@ -131,7 +131,7 @@ class CenterDetailsPage extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isArabic ? 'ØªÙ… Ø­ÙØ¸ Ø§Ù„Ù…Ø±ÙƒØ² Ù„Ù„Ø±Ø¬ÙˆØ¹ Ù„Ø§Ø­Ù‚Ù‹Ø§.' : 'Center saved for later.',
+            isArabic ? 'تم حفظ المركز للرجوع لاحقًا.' : 'Center saved for later.',
           ),
         ),
       );
@@ -140,7 +140,7 @@ class CenterDetailsPage extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isArabic ? 'ØªØ¹Ø°Ø± Ø­ÙØ¸ Ø§Ù„Ù…Ø±ÙƒØ²: $e' : 'Could not save center: $e',
+            isArabic ? 'تعذر حفظ المركز: $e' : 'Could not save center: $e',
           ),
         ),
       );
@@ -153,30 +153,30 @@ class CenterDetailsPage extends StatelessWidget {
 
     switch (c.category.trim()) {
       case 'recovery':
-        return 'Ù…Ø±Ø§ÙƒØ² Ø§Ù„ØªØ¹Ø§ÙÙŠ';
+        return 'مراكز التعافي';
       case 'detox':
-        return 'Ù…Ø±Ø§ÙƒØ² Ø³Ø­Ø¨ Ø§Ù„Ø³Ù…ÙˆÙ…';
+        return 'مراكز سحب السموم';
       case 'hospital':
       case 'hospitals':
-        return 'Ø§Ù„Ù…Ø³ØªØ´ÙÙŠØ§Øª';
+        return 'المستشفيات';
       case 'special_needs':
-        return 'Ù…Ø±Ø§ÙƒØ² Ø±Ø¹Ø§ÙŠØ© Ø°ÙˆÙŠ Ø§Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„Ø®Ø§ØµØ©';
+        return 'مراكز رعاية ذوي الاحتياجات الخاصة';
       default:
-        return 'Ù…Ø±ÙƒØ²';
+        return 'مركز';
     }
   }
 
   String _centerTypeLabelAr(CenterModel c) {
     switch (c.centerType.trim()) {
       case 'detox':
-        return 'Ø¯ÙŠØªÙˆÙƒØ³ / Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù†Ø³Ø­Ø§Ø¨';
+        return 'ديتوكس / أعراض انسحاب';
       case 'hospital':
-        return 'Ù…Ø³ØªØ´ÙÙ‰';
+        return 'مستشفى';
       case 'special_needs_care':
-        return 'Ø±Ø¹Ø§ÙŠØ© Ø°ÙˆÙŠ Ø§Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„Ø®Ø§ØµØ©';
+        return 'رعاية ذوي الاحتياجات الخاصة';
       case 'halfway_house':
       default:
-        return 'Ù‡Ø§Ù ÙˆØ§ÙŠ';
+        return 'هاف واي';
     }
   }
 
@@ -394,10 +394,10 @@ class CenterDetailsPage extends StatelessWidget {
   Widget _gallerySection(BuildContext context, List<String> values) {
     final l10n = AppLocalizations.of(context)!;
     const frameLabels = [
-      'Ø§Ù„ÙˆØ§Ø¬Ù‡Ø©',
-      'Ø§Ù„Ø§Ø³ØªÙ‚Ø¨Ø§Ù„',
-      'Ø¯Ø§Ø®Ù„ÙŠ 1',
-      'Ø¯Ø§Ø®Ù„ÙŠ 2',
+      'الواجهة',
+      'الاستقبال',
+      'داخلي 1',
+      'داخلي 2',
     ];
     final padded = List<String>.from(
       values.map((e) => e.trim()).where((e) => e.isNotEmpty).take(4),
@@ -440,9 +440,9 @@ class CenterDetailsPage extends StatelessWidget {
     String unitLabel(String unit) {
       switch (unit) {
         case 'day':
-          return 'ÙŠÙˆÙ…ÙŠ';
+          return 'يومي';
         case 'month':
-          return 'Ø´Ù‡Ø±ÙŠ';
+          return 'شهري';
         default:
           return '';
       }
@@ -470,11 +470,11 @@ class CenterDetailsPage extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     [
-                      'Ø§Ù„Ø³Ø¹Ø±: ${item.price}',
+                      'السعر: ${item.price}',
                       if (item.pricingUnit.isNotEmpty)
-                        'Ø§Ù„ÙˆØ­Ø¯Ø©: ${unitLabel(item.pricingUnit)}',
-                      item.taxIncluded ? 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© Ø´Ø§Ù…Ù„Ø©' : 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© ØºÙŠØ± Ø´Ø§Ù…Ù„Ø©',
-                    ].join(' â€¢ '),
+                        'الوحدة: ${unitLabel(item.pricingUnit)}',
+                      item.taxIncluded ? 'الضريبة شاملة' : 'الضريبة غير شاملة',
+                    ].join(' • '),
                     textAlign: TextAlign.start,
                   ),
                   const SizedBox(height: 10),
@@ -491,19 +491,19 @@ class CenterDetailsPage extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     [
-                      'Ø§Ù„Ø³Ø¹Ø±: ${item.price}',
+                      'السعر: ${item.price}',
                       if (item.pricingUnit.isNotEmpty)
-                        'Ø§Ù„ÙˆØ­Ø¯Ø©: ${unitLabel(item.pricingUnit)}',
-                      if (item.acMode == 'ac') 'Ù…ÙƒÙŠÙ',
-                      if (item.acMode == 'non_ac') 'ØºÙŠØ± Ù…ÙƒÙŠÙ',
-                      if (item.includesMedication) 'ÙŠØ´Ù…Ù„ Ø§Ù„Ø¯ÙˆØ§Ø¡',
-                      if (item.includesMeals) 'ÙŠØ´Ù…Ù„ Ø§Ù„ÙˆØ¬Ø¨Ø§Øª',
-                      if (item.includesOutdoorActivities) 'Ø£Ù†Ø´Ø·Ø© Ø®Ø§Ø±Ø¬ÙŠØ©',
-                      if (item.includesRequiredTests) 'ÙŠØ´Ù…Ù„ Ø§Ù„ÙØ­ÙˆØµØ§Øª',
-                      if (item.includesAirportPickup) 'Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ù…Ø·Ø§Ø±',
-                      if (item.includesTourismOrExternalOutings) 'Ø¬ÙˆÙ„Ø§Øª Ø®Ø§Ø±Ø¬ÙŠØ©',
-                      item.taxIncluded ? 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© Ø´Ø§Ù…Ù„Ø©' : 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© ØºÙŠØ± Ø´Ø§Ù…Ù„Ø©',
-                    ].join(' â€¢ '),
+                        'الوحدة: ${unitLabel(item.pricingUnit)}',
+                      if (item.acMode == 'ac') 'مكيف',
+                      if (item.acMode == 'non_ac') 'غير مكيف',
+                      if (item.includesMedication) 'يشمل الدواء',
+                      if (item.includesMeals) 'يشمل الوجبات',
+                      if (item.includesOutdoorActivities) 'أنشطة خارجية',
+                      if (item.includesRequiredTests) 'يشمل الفحوصات',
+                      if (item.includesAirportPickup) 'استقبال مطار',
+                      if (item.includesTourismOrExternalOutings) 'جولات خارجية',
+                      item.taxIncluded ? 'الضريبة شاملة' : 'الضريبة غير شاملة',
+                    ].join(' • '),
                     textAlign: TextAlign.start,
                   ),
                   const SizedBox(height: 10),
@@ -529,14 +529,14 @@ class CenterDetailsPage extends StatelessWidget {
               _sectionTitle(context, l10n.centerTypeAndService),
               const SizedBox(height: 10),
               Text(
-                'Ø§Ù„Ù†ÙˆØ¹ Ø§Ù„ØªØ´ØºÙŠÙ„ÙŠ: ${_centerTypeLabelAr(c)}',
+                'النوع التشغيلي: ${_centerTypeLabelAr(c)}',
                 textAlign: TextAlign.start,
               ),
               const SizedBox(height: 6),
               Text(
                 c.hasDetoxUnit
-                    ? 'ÙŠÙˆØ¬Ø¯ Ù‚Ø³Ù… Ø¯Ø§Ø®Ù„ÙŠ Ù„Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù„Ø§Ù†Ø³Ø­Ø§Ø¨.'
-                    : 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù‚Ø³Ù… Ø¯Ø§Ø®Ù„ÙŠ Ù…Ø³ØªÙ‚Ù„ Ù„Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù„Ø§Ù†Ø³Ø­Ø§Ø¨.',
+                    ? 'يوجد قسم داخلي لأعراض الانسحاب.'
+                    : 'لا يوجد قسم داخلي مستقل لأعراض الانسحاب.',
                 textAlign: TextAlign.start,
               ),
             ],
@@ -551,40 +551,40 @@ class CenterDetailsPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final items = <String>[];
     if (c.capabilities.supportsAddictionCasesWithHiv) {
-      items.add('ÙŠØ¯Ø¹Ù… Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„Ø¥Ø¯Ù…Ø§Ù† Ù…Ø¹ Ø­Ø³Ø§Ø³ÙŠØ© Ù„ÙÙŠØ±ÙˆØ³ HIV');
+      items.add('يدعم احتياجات مرتبطة بالإدمان مع حساسية لفيروس HIV');
     }
     if (c.capabilities.acceptsAddictionCases) {
-      items.add('ÙŠØ¯Ø¹Ù… Ø®Ø¯Ù…Ø§Øª Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„Ø¥Ø¯Ù…Ø§Ù† ÙˆØ§Ù„ØªØ¹Ø§ÙÙŠ');
+      items.add('يدعم خدمات مرتبطة بالإدمان والتعافي');
     }
     if (c.capabilities.acceptsPsychiatricCasesWithoutAddiction) {
-      items.add('ÙŠØ¯Ø¹Ù… Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ù†ÙØ³ÙŠØ© ØºÙŠØ± Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„Ø¥Ø¯Ù…Ø§Ù†');
+      items.add('يدعم احتياجات نفسية غير مرتبطة بالإدمان');
     }
     if (c.hasDetoxUnit) {
-      items.add('ÙŠÙˆÙØ± ÙˆØ­Ø¯Ø© Ø¯Ø§Ø®Ù„ÙŠØ© Ù„Ø³Ø­Ø¨ Ø§Ù„Ø³Ù…ÙˆÙ…');
+      items.add('يوفر وحدة داخلية لسحب السموم');
     }
     if (c.capabilities.supportsChildren) {
-      items.add('Ù…Ù†Ø§Ø³Ø¨ Ù„Ù„Ø£Ø·ÙØ§Ù„');
+      items.add('مناسب للأطفال');
     }
     if (c.capabilities.supportsFamilies) {
-      items.add('Ù…Ù†Ø§Ø³Ø¨ Ù„Ù„Ø£Ø³Ø±');
+      items.add('مناسب للأسر');
     }
     if (c.capabilities.supportsRecovery) {
-      items.add('ÙŠØ¯Ø¹Ù… Ø®Ø¯Ù…Ø§Øª Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„ØªØ¹Ø§ÙÙŠ');
+      items.add('يدعم خدمات مرتبطة بالتعافي');
     }
     if (c.capabilities.supportsHearingSupport) {
-      items.add('ÙŠØ¯Ø¹Ù… ØµØ¹ÙˆØ¨Ø§Øª Ø§Ù„Ø³Ù…Ø¹');
+      items.add('يدعم صعوبات السمع');
     }
     if (c.capabilities.supportsSpeechSupport) {
-      items.add('ÙŠØ¯Ø¹Ù… ØµØ¹ÙˆØ¨Ø§Øª Ø§Ù„Ù†Ø·Ù‚');
+      items.add('يدعم صعوبات النطق');
     }
     if (c.capabilities.supportsAccessibilitySupport) {
-      items.add('ÙŠØ¯Ø¹Ù… Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„ÙˆØµÙˆÙ„ ÙˆØ§Ù„Ø¥ØªØ§Ø­Ø©');
+      items.add('يدعم احتياجات الوصول والإتاحة');
     }
     if (c.capabilities.supportsCoachingPrograms) {
-      items.add('ÙŠØ¯Ø¹Ù… Ø¨Ø±Ø§Ù…Ø¬ Ø§Ù„ÙƒÙˆØªØ´ÙŠÙ†Ø¬');
+      items.add('يدعم برامج الكوتشينج');
     }
     if (c.capabilities.supportsEducationPrograms) {
-      items.add('ÙŠØ¯Ø¹Ù… Ø§Ù„Ø¨Ø±Ø§Ù…Ø¬ Ø§Ù„ØªØ¹Ù„ÙŠÙ…ÙŠØ©');
+      items.add('يدعم البرامج التعليمية');
     }
     if (items.isEmpty) return const SizedBox.shrink();
 
@@ -694,7 +694,7 @@ class CenterDetailsPage extends StatelessWidget {
               const SizedBox(height: 10),
               if (false)
                 Text(
-                  'Ù†Ø¨Ø°Ø©',
+                  'نبذة',
                   textAlign: TextAlign.start,
                   style: Theme.of(context)
                       .textTheme
@@ -803,8 +803,8 @@ class CenterDetailsPage extends StatelessWidget {
                   ? Icons.verified_outlined
                   : Icons.hourglass_empty_rounded,
               label: c.visibilityReadiness == 'ready'
-                  ? (isArabic ? 'جاهز' : 'Ready')
-                  : (isArabic ? 'غير مكتمل' : 'Incomplete'),
+                  ? (isArabic ? '????' : 'Ready')
+                  : (isArabic ? '??? ?????' : 'Incomplete'),
             ),
           ),
         ],
@@ -897,9 +897,9 @@ class CenterDetailsPage extends StatelessWidget {
     String unitLabel(String unit) {
       switch (unit) {
         case 'day':
-          return 'ÙŠÙˆÙ…ÙŠ';
+          return 'يومي';
         case 'month':
-          return 'Ø´Ù‡Ø±ÙŠ';
+          return 'شهري';
         default:
           return '';
       }
@@ -910,30 +910,30 @@ class CenterDetailsPage extends StatelessWidget {
           in c.autismCareCosts.where((e) => e.enabled && e.price > 0)) {
         lines.add([
           item.labelAr,
-          'Ø§Ù„Ø³Ø¹Ø±: ${item.price}',
+          'السعر: ${item.price}',
           if (item.pricingUnit.isNotEmpty)
-            'Ø§Ù„ÙˆØ­Ø¯Ø©: ${unitLabel(item.pricingUnit)}',
-          item.taxIncluded ? 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© Ø´Ø§Ù…Ù„Ø©' : 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© ØºÙŠØ± Ø´Ø§Ù…Ù„Ø©',
-        ].join(' â€¢ '));
+            'الوحدة: ${unitLabel(item.pricingUnit)}',
+          item.taxIncluded ? 'الضريبة شاملة' : 'الضريبة غير شاملة',
+        ].join(' • '));
       }
     } else {
       for (final item
           in c.accommodationCosts.where((e) => e.enabled && e.price > 0)) {
         lines.add([
           item.labelAr,
-          'Ø§Ù„Ø³Ø¹Ø±: ${item.price}',
+          'السعر: ${item.price}',
           if (item.pricingUnit.isNotEmpty)
-            'Ø§Ù„ÙˆØ­Ø¯Ø©: ${unitLabel(item.pricingUnit)}',
-          if (item.acMode == 'ac') 'Ù…ÙƒÙŠÙ',
-          if (item.acMode == 'non_ac') 'ØºÙŠØ± Ù…ÙƒÙŠÙ',
-          if (item.includesMedication) 'ÙŠØ´Ù…Ù„ Ø§Ù„Ø¯ÙˆØ§Ø¡',
-          if (item.includesMeals) 'ÙŠØ´Ù…Ù„ Ø§Ù„ÙˆØ¬Ø¨Ø§Øª',
-          if (item.includesOutdoorActivities) 'Ø£Ù†Ø´Ø·Ø© Ø®Ø§Ø±Ø¬ÙŠØ©',
-          if (item.includesRequiredTests) 'ÙŠØ´Ù…Ù„ Ø§Ù„ÙØ­ÙˆØµØ§Øª',
-          if (item.includesAirportPickup) 'Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ù…Ø·Ø§Ø±',
-          if (item.includesTourismOrExternalOutings) 'Ø¬ÙˆÙ„Ø§Øª Ø®Ø§Ø±Ø¬ÙŠØ©',
-          item.taxIncluded ? 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© Ø´Ø§Ù…Ù„Ø©' : 'Ø§Ù„Ø¶Ø±ÙŠØ¨Ø© ØºÙŠØ± Ø´Ø§Ù…Ù„Ø©',
-        ].join(' â€¢ '));
+            'الوحدة: ${unitLabel(item.pricingUnit)}',
+          if (item.acMode == 'ac') 'مكيف',
+          if (item.acMode == 'non_ac') 'غير مكيف',
+          if (item.includesMedication) 'يشمل الدواء',
+          if (item.includesMeals) 'يشمل الوجبات',
+          if (item.includesOutdoorActivities) 'أنشطة خارجية',
+          if (item.includesRequiredTests) 'يشمل الفحوصات',
+          if (item.includesAirportPickup) 'استقبال مطار',
+          if (item.includesTourismOrExternalOutings) 'جولات خارجية',
+          item.taxIncluded ? 'الضريبة شاملة' : 'الضريبة غير شاملة',
+        ].join(' • '));
       }
     }
     return lines;
@@ -942,13 +942,13 @@ class CenterDetailsPage extends StatelessWidget {
   List<String> _capabilityLines(CenterModel c) {
     final items = <String>[];
     if (c.capabilities.supportsAddictionCasesWithHiv) {
-      items.add('ÙŠØ¯Ø¹Ù… Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø¥Ø¯Ù…Ø§Ù† Ø§Ù„Ù…ØµØ§Ø­Ø¨Ø© Ù„ÙÙŠØ±ÙˆØ³ HIV');
+      items.add('يدعم حالات الإدمان المصاحبة لفيروس HIV');
     }
     if (c.capabilities.acceptsAddictionCases) {
-      items.add('ÙŠØ³ØªÙ‚Ø¨Ù„ Ø­Ø§Ù„Ø§Øª Ø§Ù„Ø¥Ø¯Ù…Ø§Ù†');
+      items.add('يستقبل حالات الإدمان');
     }
     if (c.capabilities.acceptsPsychiatricCasesWithoutAddiction) {
-      items.add('ÙŠØ³ØªÙ‚Ø¨Ù„ Ø§Ù„Ø­Ø§Ù„Ø§Øª Ø§Ù„Ù†ÙØ³ÙŠØ© Ø¨Ø¯ÙˆÙ† Ø¥Ø¯Ù…Ø§Ù†');
+      items.add('يستقبل الحالات النفسية بدون إدمان');
     }
     return items;
   }
@@ -966,21 +966,21 @@ class CenterDetailsPage extends StatelessWidget {
         lines: [
           _centerTypeLabelAr(c),
           c.hasDetoxUnit
-              ? 'ÙŠÙˆØ¬Ø¯ Ù‚Ø³Ù… Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù†Ø³Ø­Ø§Ø¨'
-              : 'Ø¨Ø¯ÙˆÙ† Ù‚Ø³Ù… Ø£Ø¹Ø±Ø§Ø¶ Ø§Ù†Ø³Ø­Ø§Ø¨ Ù…Ø³ØªÙ‚Ù„',
+              ? 'يوجد قسم أعراض انسحاب'
+              : 'بدون قسم أعراض انسحاب مستقل',
         ],
       ),
       _GridInfoCard(
         icon: Icons.sell_outlined,
         title: l10n.centerPricing,
         lines:
-            _pricingLines(c).isEmpty ? const ['ØºÙŠØ± Ù…Ø­Ø¯Ø¯Ø©'] : _pricingLines(c),
+            _pricingLines(c).isEmpty ? const ['غير محددة'] : _pricingLines(c),
       ),
       _GridInfoCard(
         icon: Icons.verified_user_outlined,
         title: l10n.centerCapabilities,
         lines: _capabilityLines(c).isEmpty
-            ? const ['ØºÙŠØ± Ù…Ø­Ø¯Ø¯Ø©']
+            ? const ['غير محددة']
             : _capabilityLines(c),
       ),
       if (services.isNotEmpty)
@@ -1112,7 +1112,7 @@ class CenterDetailsPage extends StatelessWidget {
                                   .languageCode
                                   .toLowerCase() ==
                               'ar'
-                          ? 'Ø·Ù„Ø¨ ØªÙˆØ§ØµÙ„ Ù…Ø¹ Ø§Ù„Ù…Ø±ÙƒØ²'
+                          ? 'طلب تواصل مع المركز'
                           : 'Contact center',
                     ),
                   ),
@@ -1239,7 +1239,7 @@ class CenterDetailsPage extends StatelessWidget {
             icon: const Icon(Icons.support_agent_outlined),
             label: Text(
               Localizations.localeOf(context).languageCode.toLowerCase() == 'ar'
-                  ? 'Ø·Ù„Ø¨ Ø¯Ø¹Ù… Ù„Ù„Ù…Ø³Ø§Ø¹Ø¯Ø© ÙÙŠ Ø§Ù„Ø§Ø®ØªÙŠØ§Ø±'
+                  ? 'طلب دعم للمساعدة في الاختيار'
                   : 'Get help choosing a center',
             ),
           ),
@@ -1271,7 +1271,7 @@ class CenterDetailsPage extends StatelessWidget {
             icon: const Icon(Icons.contact_page_outlined),
             label: Text(
               Localizations.localeOf(context).languageCode.toLowerCase() == 'ar'
-                  ? 'Ø§Ù„ØªÙˆØ§ØµÙ„ Ù…Ø¹ Ø§Ù„Ù…Ø±ÙƒØ²'
+                  ? 'التواصل مع المركز'
                   : 'Contact center',
             ),
           ),
@@ -1291,7 +1291,7 @@ class CenterDetailsPage extends StatelessWidget {
             icon: const Icon(Icons.bookmark_add_outlined),
             label: Text(
               Localizations.localeOf(context).languageCode.toLowerCase() == 'ar'
-                  ? 'Ø­ÙØ¸ Ø§Ù„Ù…Ø±ÙƒØ²'
+                  ? 'حفظ المركز'
                   : 'Save center',
             ),
             style: TextButton.styleFrom(
@@ -1769,7 +1769,7 @@ class _CenterGalleryCarouselState extends State<_CenterGalleryCarousel> {
                       final value = slides[index];
                       final label = index < widget.labels.length
                           ? widget.labels[index]
-                          : 'ØµÙˆØ±Ø© Ø§Ù„Ù…Ø±ÙƒØ²';
+                          : 'صورة المركز';
 
                       return Padding(
                         padding: const EdgeInsetsDirectional.only(end: 12),
