@@ -1402,6 +1402,43 @@ Memory Impact: Preserves final pre-push operations sync lineage.
 Related Findings: Wave 1.11 pre-push status check.
 Next Action: Stage only the two operations files, commit them, then report push readiness.
 
+### OP-WAVE-1-12-FIRST-CONSTITUTIONAL-PUSH-V1
+
+Operation ID: OP-WAVE-1-12-FIRST-CONSTITUTIONAL-PUSH-V1
+Operation Date/Time: 2026-06-17
+Chronological Order Number: 041
+Operation Title: Wave 1.12 First Constitutional Push
+Prompt / Block Name: WAVE 1.12 - FIRST CONSTITUTIONAL PUSH
+Phase: Wave 1.12
+Execution Type: GIT_ACTION
+Purpose: Push only branch `post-separation-pure-dna-v1` to `origin` for the first constitutional baseline remote publication.
+Scope: Push branch only; no main push, no force push, no tag, no Firebase deploy, no `.github/workflows` staging.
+Files Created: none
+Files Modified:
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created: none
+Cards Created: none
+Guides Created: none
+Registries Updated:
+- Executed Operations Registry
+- Executed Operations Index
+Snapshots Created: none
+Runtime Effect: none
+Git Effect:
+- Pushed `post-separation-pure-dna-v1` to `origin`
+- Remote head verified at `edc13b3a2511e1a5dfb9fc1a4bdec5947a6830f1`
+- Local branch tracks `origin/post-separation-pure-dna-v1`
+- No main push, no force push, no tag
+Firebase Effect: none
+Result: COMPLETED
+Evidence: `git ls-remote --heads origin post-separation-pure-dna-v1` returned remote hash `edc13b3a2511e1a5dfb9fc1a4bdec5947a6830f1`; `git branch -vv` shows upstream tracking.
+Short Summary: First constitutional branch push completed; operation log sync remains local after push by Owner rule.
+Memory Impact: Preserves first remote constitutional publication lineage.
+Related Findings: Wave 1.11 final operations sync commit.
+Next Action: Commit this operation log sync locally and await Owner approval before pushing the sync commit.
+
 ### OP-PHASE-7E-MONITORING-DEEP-AUDIT-V1
 
 Operation ID: OP-PHASE-7E-MONITORING-DEEP-AUDIT-V1
