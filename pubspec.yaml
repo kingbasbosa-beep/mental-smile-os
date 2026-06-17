@@ -1,0 +1,87 @@
+name: mental_smile_os
+description: Mental Smile OS active runtime and Arabic-first mental health discovery ecosystem.
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^2.6.1
+
+  firebase_core: ^3.15.2
+  cloud_firestore: ^5.6.12
+  firebase_auth: ^5.7.0
+
+  shared_preferences: ^2.3.2
+  url_launcher: ^6.3.1
+  uuid: ^4.5.1
+  geolocator: ^14.0.2
+  geocoding: ^4.0.0
+  firebase_analytics: ^11.6.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  generate: true
+  uses-material-design: true
+
+  assets:
+    - assets/branding/logo_icon.png
+    - assets/branding/logo_icon_light.png
+    - assets/branding/logo_light.png
+    - assets/branding/logo_marketing_glow.png
+    - assets/branding/logo_primary.png
+    - assets/branding/logo_primary_dark.png
+    - assets/branding/logo_transparent.png
+    - assets/branding/web/library/hodn_amen/
+    - assets/branding/web/library/bedaya_amena/
+    - assets/branding/web/library/backgrounds/desktop/
+    - assets/branding/web/library/backgrounds/tablet/
+    - assets/branding/web/library/backgrounds/mobile/
+    - assets/branding/web/registration/centers/desktop/
+    - assets/branding/web/registration/centers/tablet/
+    - assets/branding/web/registration/centers/mobile/
+    - assets/branding/web/registration/clinicians/desktop/
+    - assets/branding/web/registration/clinicians/tablet/
+    - assets/branding/web/registration/clinicians/mobile/
+    - assets/branding/shared/logo/
+    - assets/branding/shared/navigation/back/
+    - assets/branding/shared/navigation/logout/
+    - assets/branding/navigation/logout/
+    - assets/branding/navigation/back/
+    - assets/branding/language/
+    - assets/branding/client_dashboard/
+    - assets/branding/client_dashboard/desktop/
+    - assets/branding/client_dashboard/tablet/
+    - assets/branding/client_dashboard/mobile/
+    - assets/branding/menu/
+    - assets/branding/menu/desktop/
+    - assets/branding/menu/tablet/
+    - assets/branding/menu/mobile/
+    - assets/branding/web_registration/clients/mobile/client_register.png
+    - assets/branding/splash/
+    - assets/branding/login/
+    - assets/c7_branding/buttons/
+    - assets/c7_branding/home/
+    - assets/c7_branding/logo/
+    - assets/images/
+    - assets/images/addiction/
+    - assets/images/backgrounds/
+    - assets/images/centers/
+    - assets/images/center_dashboard/actions/
+    - assets/images/client_dashboard/actions/
+    - assets/images/clinicians_dashboard/
+    - assets/images/clinicians_dashboard/actions/
+    - assets/images/family_support/
+    - assets/images/specialists/

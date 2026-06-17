@@ -1,0 +1,58 @@
+# GUIDES_AND_CARDS_INVENTORY_V1
+
+Status: ACTIVE_INVENTORY
+Phase: 6
+Runtime effect: none
+
+## Guides
+
+| Item | Status |
+| --- | --- |
+| `ARCHIVE_PHILOSOPHY_GUIDE_V1.md` | ACTIVE |
+| `CARD_GOVERNANCE_GUIDE_V1.md` | ACTIVE |
+| `REGISTRY_GOVERNANCE_GUIDE_V1.md` | ACTIVE |
+| `FINDING_GOVERNANCE_GUIDE_V1.md` | ACTIVE |
+| `MEMORY_GOVERNANCE_GUIDE_V1.md` | ACTIVE |
+| `DNA_GOVERNANCE_GUIDE_V1.md` | ACTIVE |
+
+## Cards
+
+| Item | Status |
+| --- | --- |
+| `ARCHIVE_CARD_C5_BOOKING_ERA_V1.md` | ACTIVE |
+| `ARCHIVE_CARD_C6_LIBRARY_ERA_V1.md` | ACTIVE |
+| `ARCHIVE_CARD_ADMIN_ZERO_TRANSITION_V1.md` | ACTIVE |
+| `ARCHIVE_CARD_BOOKING_EXTRACTION_V1.md` | ACTIVE |
+| `ARCHIVE_CARD_PROVIDER_VS_CLINICIAN_V1.md` | ACTIVE |
+| `ARCHIVE_CARD_OLD_REPOSITORY_LINEAGE_V1.md` | ACTIVE |
+
+## Registries
+
+| Item | Status |
+| --- | --- |
+| `ASSET_REGISTRY_V1.md` | ACTIVE |
+| `ROUTE_REGISTRY_V1.md` | ACTIVE |
+| `COLLECTION_REGISTRY_V1.md` | ACTIVE |
+| `FINDING_REGISTRY_V1.md` | ACTIVE |
+| `ARCHIVE_REGISTRY_V1.md` | ACTIVE |
+| `MEMORY_REGISTRY_V1.md` | ACTIVE |
+| `DOMAIN_REGISTRY_V1.md` | ACTIVE |
+| `EXECUTED_OPERATIONS_REGISTRY_V1.md` | ACTIVE |
+| `EXECUTED_OPERATIONS_INDEX_V1.md` | ACTIVE |
+
+## Snapshots
+
+| Item | Status |
+| --- | --- |
+| `PURE_DNA_BASELINE_SNAPSHOT_V1.md` | ACTIVE |
+| `PURE_DNA_SEAL_READINESS_REPORT_V1.md` | ACTIVE |
+| `PURE_DNA_VALIDATION_EVIDENCE_V1.md` | ACTIVE |
+| `TOPOLOGY_SNAPSHOT_V1.md` | ACTIVE |
+
+## Counts
+
+- Guides: 6
+- Cards: 6
+- Registries and indexes: 9
+- Snapshots/reports used as snapshots: 4
+- Unknown items: 0

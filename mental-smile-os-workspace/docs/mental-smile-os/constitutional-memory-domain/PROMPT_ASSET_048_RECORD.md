@@ -1,0 +1,38 @@
+# PROMPT_ASSET_048_RECORD
+
+Prompt ID: PROMPT_ASSET_048
+Prompt Name: City Snapshot Patch Login and Exit Integration
+Classification: CITY_SNAPSHOT_LOGIN_EXIT_PATCH_PROMPT
+Parent Prompt: PROMPT_ASSET_047
+Status: VALIDATED
+Lineage Status: LINEAGE_ESTABLISHED
+Validation Status: MEMORY_VALIDATED
+
+## Birth Authority
+
+Generation 1 Snapshot maintenance after APP_LOGIN_SCREEN and APP_EXIT_SOCIAL_LINKS_SCREEN registration.
+
+## Generated Patch
+
+CITY_SNAPSHOT_PATCH_001_LOGIN_EXIT_REPORT.
+
+## Updated Documents
+
+- MENTAL_SMILE_CITY_SNAPSHOT_V1.
+- MENTAL_SMILE_CITY_TOPOLOGY_V1.
+- MENTAL_SMILE_CITY_ZONE_REGISTRY_SNAPSHOT_V1.
+- CITY_GENERATION_1_VALIDATION_REPORT_V1.
+- GENERATION_1_SHOWCASE / 04_APP_ZONE.
+
+## Signals Emitted
+
+- MEMORY_SIGNAL_001 LINEAGE_ESTABLISHED.
+- MEMORY_SIGNAL_005 MEMORY_VALIDATED.
+- CITY_SIGNAL_002 CITY_SNAPSHOT_PATCH_APPLIED.
+
+## Boundary
+
+No new generation, runtime, Firebase, or UI was created.
+
+Documentation only.
+

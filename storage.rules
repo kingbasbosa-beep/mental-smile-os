@@ -1,0 +1,138 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwnerAuthority() {
+      return isSignedIn()
+        && request.auth.token.role == 'owner';
+    }
+
+    function isClinician() {
+      return isSignedIn()
+        && (
+          request.auth.token.role == 'clinician'
+          || (
+            firestore.exists(/databases/(default)/documents/clinicians/$(request.auth.uid))
+            && firestore.get(/databases/(default)/documents/clinicians/$(request.auth.uid)).data.role == 'clinician'
+          )
+        );
+    }
+
+    function isCenter() {
+      return isSignedIn()
+        && (
+          request.auth.token.role == 'center'
+          || (
+            firestore.exists(/databases/(default)/documents/centers/$(request.auth.uid))
+            && firestore.get(/databases/(default)/documents/centers/$(request.auth.uid)).data.role == 'center'
+          )
+        );
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isSafeUpload() {
+      return request.resource != null
+        && request.resource.size <= 25 * 1024 * 1024
+        && !request.resource.contentType.matches('text/javascript')
+        && !request.resource.contentType.matches('application/javascript')
+        && !request.resource.contentType.matches('application/x-javascript')
+        && !request.resource.contentType.matches('application/x-msdownload')
+        && !request.resource.contentType.matches('application/x-msdos-program')
+        && !request.resource.contentType.matches('application/x-sh')
+        && !request.resource.contentType.matches('application/x-bat')
+        && !request.resource.contentType.matches('application/x-msi');
+    }
+
+    function canReadPrivateOwnerFile(uid) {
+      return isOwnerAuthority() || isOwner(uid);
+    }
+
+    match /centers/{uid}/{allPaths=**} {
+      allow read: if canReadPrivateOwnerFile(uid);
+      allow create, update: if isCenter() && isOwner(uid) && isSafeUpload();
+      allow delete: if false;
+    }
+
+    match /clinicians/{uid}/{allPaths=**} {
+      allow read: if canReadPrivateOwnerFile(uid);
+      allow create, update: if isClinician() && isOwner(uid) && isSafeUpload();
+      allow delete: if false;
+    }
+
+    match /clients/{uid}/{allPaths=**} {
+      allow read: if canReadPrivateOwnerFile(uid);
+      allow create, update: if isOwner(uid) && isSafeUpload();
+      allow delete: if false;
+    }
+
+    match /identity/{uid}/{allPaths=**} {
+      allow read: if canReadPrivateOwnerFile(uid);
+      allow create, update: if isOwner(uid) && isSafeUpload();
+      allow delete: if false;
+    }
+
+    match /certificates/{uid}/{allPaths=**} {
+      allow read: if canReadPrivateOwnerFile(uid);
+      allow create, update: if isOwner(uid) && isSafeUpload();
+      allow delete: if false;
+    }
+
+    match /licenses/{uid}/{allPaths=**} {
+      allow read: if canReadPrivateOwnerFile(uid);
+      allow create, update: if isOwner(uid) && isSafeUpload();
+      allow delete: if false;
+    }
+
+    match /national_ids/{uid}/{allPaths=**} {
+      allow read: if canReadPrivateOwnerFile(uid);
+      allow create, update: if isOwner(uid) && isSafeUpload();
+      allow delete: if false;
+    }
+
+    match /verification_docs/{uid}/{allPaths=**} {
+      allow read: if canReadPrivateOwnerFile(uid);
+      allow create, update: if isOwner(uid) && isSafeUpload();
+      allow delete: if false;
+    }
+
+    match /medical_docs/{uid}/{allPaths=**} {
+      allow read: if canReadPrivateOwnerFile(uid);
+      allow create, update: if isOwner(uid) && isSafeUpload();
+      allow delete: if false;
+    }
+
+    match /branding/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if isOwnerAuthority() && isSafeUpload();
+      allow delete: if false;
+    }
+
+    match /public_gallery/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if isOwnerAuthority() && isSafeUpload();
+      allow delete: if false;
+    }
+
+    match /public_images/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if isOwnerAuthority() && isSafeUpload();
+      allow delete: if false;
+    }
+
+    match /marketing_assets/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if isOwnerAuthority() && isSafeUpload();
+      allow delete: if false;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

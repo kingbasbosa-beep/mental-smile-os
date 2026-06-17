@@ -1,0 +1,134 @@
+# -----------------------------
+# OS / general junk
+# -----------------------------
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+*.pyc
+*.class
+
+# -----------------------------
+# IDE / editors
+# -----------------------------
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# -----------------------------
+# Flutter / Dart / Pub
+# -----------------------------
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub/
+.pub-cache/
+build/
+coverage/
+**/doc/api/
+**/ios/Flutter/.last_build_id
+
+# -----------------------------
+# Android build outputs
+# -----------------------------
+/android/app/debug/
+/android/app/profile/
+/android/app/release/
+
+# -----------------------------
+# Apple / symbol / obfuscation
+# -----------------------------
+app.*.symbols
+app.*.map.json
+
+# -----------------------------
+# Local backups / archives / handoff
+# -----------------------------
+_archive/
+_backups/
+_dev_scripts_archive/
+_handoff_*/
+handoff_latest/
+READY_TO_USB/
+_logs/
+logs/
+_support/
+_run/
+_web_profiles/
+_chrome_profiles/
+.chrome_profile_mk/
+.mk_chrome_profiles/
+_snapshot_center_flow_*/
+_tools/
+
+# -----------------------------
+# Local generated files / backups
+# -----------------------------
+*.zip
+*.bundle
+*.bak
+*.bak2
+*.bak_*
+mental_key_backup.bundle
+
+# -----------------------------
+# Local logs
+# -----------------------------
+*.log
+flutter_*.log
+
+# -----------------------------
+# Local scripts (ignore only if truly local)
+# -----------------------------
+# *.ps1
+
+# -----------------------------
+# Secrets / local config
+# -----------------------------
+android/app/google-services.json
+**/GoogleService-Info.plist
+tools/qa_bot/.env
+tools/qa_bot/.venv/
+tools/qa_bot/reports/
+tools/qa_bot/*.json
+functions/.env
+functions/.env.*
+functions/node_modules/
+
+# Production secrets and generated files
+*.jks
+*.keystore
+key.properties
+.env
+.env.*
+serviceAccount*.json
+credentials*.json
+*-firebase-adminsdk-*.json
+google-services.json
+GoogleService-Info.plist
+node_modules/
+test/node_modules/
+
+# -----------------------------
+# Local generated reports / manifests
+# -----------------------------
+ROOT_VS_ARCHIVE.csv
+INDEX_ARCHIVED_PS1.md
+INDEX_ROOT_PS1.md
+BACKUP_LATEST.md
+CHECKLIST_LATEST.md
+HANDOFF_LATEST.md
+LATEST_STATUS.md
+SYSTEM_HQ_STATE_LATEST.md
+SAFEPOINT_HANDOFF_*.md
+serviceAccount*.json
+tools/firebase/*.json
+
+# Firebase Admin SDK private keys
+tools/firebase/serviceAccountKey.json
+tools/firebase/*.json
+
+android/app/google-services.json*
+**/google-services.json*

@@ -1,0 +1,198 @@
+{
+  "osName": "Mental Smile OS",
+  "currentStatus": "RUNTIME_MEMORY_AWARENESS_ACTIVE",
+  "latestCompletedStep": {
+    "id": "STEP_008",
+    "name": "App Splash Rebirth",
+    "promptAsset": "PROMPT_ASSET_015"
+  },
+  "currentWorkingArea": "App Surface Splash Preview",
+  "nextWorkingArea": "Home / Menu later",
+  "activeStructure": [
+    {
+      "name": "Owner Domain",
+      "status": "ACTIVE",
+      "purpose": "Holds DNA Vault as constitutional source authority."
+    },
+    {
+      "name": "Constitutional Memory Domain",
+      "status": "ACTIVE",
+      "purpose": "Preserves continuity, lineage, registries, and validated memory."
+    },
+    {
+      "name": "Strategic Planning Room",
+      "status": "ACTIVE",
+      "purpose": "Turns Owner vision into build strategy and source classification."
+    },
+    {
+      "name": "Sovereign Construction Studio",
+      "status": "ACTIVE",
+      "purpose": "Coordinates approved construction tools and build packages."
+    }
+  ],
+  "sourceAuthority": {
+    "name": "DNA Vault",
+    "domain": "Owner Domain",
+    "status": "ACTIVE_SOURCE_AUTHORITY",
+    "foundationStatus": "FOUNDATION_VALIDATED",
+    "boundary": "DNA determines constitutional necessity. Memory preserves continuity. Runtime only displays state."
+  },
+  "latestSignals": [
+    {
+      "id": "MEMORY_SIGNAL_001",
+      "name": "LINEAGE_ESTABLISHED",
+      "summary": "Prompt lineage is traceable through PROMPT_ASSET_011."
+    },
+    {
+      "id": "MEMORY_SIGNAL_005",
+      "name": "MEMORY_VALIDATED",
+      "summary": "Runtime Birth records are validated in Constitutional Memory."
+    }
+  ],
+  "availableMemoryAreas": [
+    "Prompt Memory",
+    "Guide Memory",
+    "Card Memory",
+    "Signal Memory",
+    "UI Memory",
+    "Localization Memory",
+    "Ownership Memory",
+    "Asset Recreation Memory",
+    "Master Guide Cards",
+    "Source Extraction Queue"
+  ],
+  "promptAssets": [
+    {
+      "id": "PROMPT_ASSET_001",
+      "name": "Mental Smile OS Foundation Reset",
+      "classification": "FOUNDATIONAL_PROMPT",
+      "parentPrompt": "NONE",
+      "status": "VALIDATED",
+      "lineage": "LINEAGE_ESTABLISHED"
+    },
+    {
+      "id": "PROMPT_ASSET_002",
+      "name": "Constitutional Memory Domain Genesis",
+      "classification": "FOUNDATIONAL_PROMPT",
+      "parentPrompt": "PROMPT_ASSET_001",
+      "status": "VALIDATED",
+      "lineage": "LINEAGE_ESTABLISHED"
+    },
+    {
+      "id": "PROMPT_ASSET_003",
+      "name": "DNA Card and Signal Doctrine Genesis",
+      "classification": "FOUNDATIONAL_PROMPT",
+      "parentPrompt": "PROMPT_ASSET_002",
+      "status": "VALIDATED",
+      "lineage": "LINEAGE_ESTABLISHED"
+    },
+    {
+      "id": "PROMPT_ASSET_004",
+      "name": "Constitutional Guide Asset Doctrine Genesis",
+      "classification": "FOUNDATIONAL_PROMPT",
+      "parentPrompt": "PROMPT_ASSET_003",
+      "status": "VALIDATED",
+      "lineage": "LINEAGE_ESTABLISHED"
+    },
+    {
+      "id": "PROMPT_ASSET_005",
+      "name": "Strategic Planning Room Genesis",
+      "classification": "FOUNDATIONAL_PROMPT",
+      "parentPrompt": "PROMPT_ASSET_004",
+      "status": "VALIDATED",
+      "lineage": "LINEAGE_ESTABLISHED"
+    },
+    {
+      "id": "PROMPT_ASSET_006",
+      "name": "Sovereign Construction Studio Genesis",
+      "classification": "FOUNDATIONAL_PROMPT",
+      "parentPrompt": "PROMPT_ASSET_005",
+      "status": "VALIDATED",
+      "lineage": "LINEAGE_ESTABLISHED"
+    },
+    {
+      "id": "PROMPT_ASSET_007",
+      "name": "Construction Workbench Runtime Surface",
+      "classification": "FOUNDATIONAL_PROMPT",
+      "parentPrompt": "PROMPT_ASSET_006",
+      "status": "VALIDATED",
+      "lineage": "LINEAGE_ESTABLISHED"
+    },
+    {
+      "id": "PROMPT_ASSET_008",
+      "name": "Sovereign Asset Memory Structure Genesis",
+      "classification": "FOUNDATIONAL_PROMPT",
+      "parentPrompt": "PROMPT_ASSET_007",
+      "status": "VALIDATED",
+      "lineage": "LINEAGE_ESTABLISHED"
+    },
+    {
+      "id": "PROMPT_ASSET_009",
+      "name": "Client Room Visual System Extraction",
+      "classification": "FOUNDATIONAL_EXTRACTION_PROMPT",
+      "parentPrompt": "PROMPT_ASSET_008",
+      "status": "VALIDATED",
+      "lineage": "LINEAGE_ESTABLISHED"
+    },
+    {
+      "id": "PROMPT_ASSET_010",
+      "name": "Mental Smile OS Workspace Separation",
+      "classification": "FOUNDATIONAL_SEPARATION_PROMPT",
+      "parentPrompt": "PROMPT_ASSET_009",
+      "status": "VALIDATED",
+      "lineage": "LINEAGE_ESTABLISHED"
+    },
+    {
+      "id": "PROMPT_ASSET_011",
+      "name": "Mental Smile OS Runtime Birth",
+      "classification": "FOUNDATIONAL_RUNTIME_PROMPT",
+      "parentPrompt": "PROMPT_ASSET_010",
+      "status": "VALIDATED",
+      "lineage": "LINEAGE_ESTABLISHED"
+    },
+    {
+      "id": "PROMPT_ASSET_012",
+      "name": "Runtime Memory Awareness Upgrade",
+      "classification": "RUNTIME_AWARENESS_PROMPT",
+      "parentPrompt": "PROMPT_ASSET_011",
+      "status": "VALIDATED",
+      "lineage": "LINEAGE_ESTABLISHED"
+    },
+    {
+      "id": "PROMPT_ASSET_013",
+      "name": "Surface Topology and Separation Map",
+      "classification": "SURFACE_ARCHITECTURE_PROMPT",
+      "parentPrompt": "PROMPT_ASSET_012",
+      "status": "VALIDATED",
+      "lineage": "LINEAGE_ESTABLISHED"
+    },
+    {
+      "id": "PROMPT_ASSET_014",
+      "name": "Surface Registration Package",
+      "classification": "SURFACE_REGISTRATION_PROMPT",
+      "parentPrompt": "PROMPT_ASSET_013",
+      "status": "VALIDATED",
+      "lineage": "LINEAGE_ESTABLISHED"
+    },
+    {
+      "id": "PROMPT_ASSET_015",
+      "name": "App Surface Splash Rebirth",
+      "classification": "APP_SURFACE_SCREEN_REBIRTH_PROMPT",
+      "parentPrompt": "PROMPT_ASSET_014",
+      "status": "VALIDATED",
+      "lineage": "LINEAGE_ESTABLISHED"
+    }
+  ],
+  "latestPromptAsset": "PROMPT_ASSET_015",
+  "constructionStudioTools": [
+    "ChatGPT",
+    "Codex",
+    "Android Studio",
+    "GitHub",
+    "Firebase",
+    "Google Play Console",
+    "Local Project",
+    "Mental Smile Core Source Repository"
+  ],
+  "currentPendingPackage": "App Surface Splash preview, then Home / Menu later"
+}

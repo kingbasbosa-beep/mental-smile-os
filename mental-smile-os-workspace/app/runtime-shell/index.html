@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mental Smile OS Runtime Shell</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="stamp">Mental Smile OS</span>
+          <h1>Runtime Shell</h1>
+          <p>واجهة مستقلة وواعية بذاكرة النظام، تعمل بدون Firebase أو backend أو runtime قديم.</p>
+        </div>
+        <nav class="nav" aria-label="Mental Smile OS routes">
+          <a href="#/os" data-route="/os">OS Home</a>
+          <a href="#/os/app/splash" data-route="/os/app/splash">App Splash</a>
+          <a href="#/os/owner" data-route="/os/owner">Owner Domain</a>
+          <a href="#/os/owner/dna-vault" data-route="/os/owner/dna-vault">DNA Vault</a>
+          <a href="#/os/memory" data-route="/os/memory">Memory Domain</a>
+          <a href="#/os/strategic-planning" data-route="/os/strategic-planning">Strategic Planning</a>
+          <a href="#/os/construction-studio" data-route="/os/construction-studio">Construction Studio</a>
+        </nav>
+      </aside>
+      <section class="content" id="app" aria-live="polite"></section>
+    </main>
+    <script src="./runtime-shell.js"></script>
+  </body>
+</html>

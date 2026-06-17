@@ -1,0 +1,55 @@
+# Prompt Asset 031 Record
+
+Prompt ID: PROMPT_ASSET_031
+Prompt Name: App Room Zone Gateway Birth
+Prompt Type: FOUNDATIONAL_GATEWAY_BIRTH_PROMPT
+Prompt Version: V1
+Parent Prompt: PROMPT_ASSET_030
+Creation Date: 2026-06-14
+Status: VALIDATED
+Lineage Status: LINEAGE_ESTABLISHED
+Validation Status: MEMORY_VALIDATED
+
+## 1. Purpose
+
+PROMPT_ASSET_031 creates APP_ROOM_ZONE_GATEWAY as the first cloneable Zone Gateway Package and parent template for all future gateways.
+
+## 2. Generated Gateway
+
+- APP_ROOM_ZONE_GATEWAY.
+
+## 3. Generated Documents
+
+- APP_ROOM_ZONE_GATEWAY_GUIDE_V1.
+- APP_ROOM_ZONE_GATEWAY_MASTER_CARD_V1.
+- APP_ROOM_ZONE_GATEWAY_SIGNAL_REGISTRY_V1.
+- APP_ROOM_ZONE_GATEWAY_PIPE_MAP_V1.
+- APP_ROOM_ZONE_GATEWAY_BUFFER_MODEL_V1.
+- APP_ROOM_ZONE_GATEWAY_REPORTING_MODEL_V1.
+- APP_ROOM_ZONE_GATEWAY_CLONE_TEMPLATE_V1.
+- APP_ROOM_ZONE_GATEWAY_SNAPSHOT_V1.
+- APP_ROOM_ZONE_GATEWAY_BIRTH_REPORT_V1.
+
+## 4. Updated Documents
+
+- ZONE_GATEWAY_REGISTRY_V1.
+- SIGNAL_PIPE_GOVERNANCE_V1.
+- CITY_ZONE_REGISTRY_V1.
+- SURFACE_TOPOLOGY_MAP_V1.
+- PROMPT_MEMORY_REGISTRY_V1.
+
+## 5. Boundaries Preserved
+
+- No Runtime.
+- No Firebase.
+- No Signal Execution.
+- No Queue Implementation.
+- No AI Analysis.
+- Documentation Only.
+
+## 6. Memory Signals
+
+MEMORY_SIGNAL_001 LINEAGE_ESTABLISHED.
+
+MEMORY_SIGNAL_005 MEMORY_VALIDATED.
+

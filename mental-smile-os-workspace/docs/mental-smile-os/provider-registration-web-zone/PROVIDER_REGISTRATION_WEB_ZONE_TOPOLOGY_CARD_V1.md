@@ -1,0 +1,27 @@
+# Provider Registration Web Zone Topology Card V1
+
+Status: ACTIVE_TOPOLOGY_CARD
+Zone ID: PROVIDER_REGISTRATION_WEB_ZONE
+Gateway ID: PROVIDER_REGISTRATION_WEB_ZONE_GATEWAY
+Prompt Asset: PROMPT_ASSET_040
+
+## Topology
+
+PROVIDER_REGISTRATION_WEB_ZONE
+
+↓ owns
+
+PROVIDER_REGISTRATION_WEB_ZONE_GATEWAY
+
+↓ owns districts
+
+- PROVIDER_ONBOARDING_DISTRICT.
+- PROVIDER_DOCUMENTS_DISTRICT.
+- PROVIDER_PROFILE_DRAFT_DISTRICT.
+- PROVIDER_STATUS_TRACKING_DISTRICT.
+- PROVIDER_REVIEW_PREPARATION_DISTRICT.
+
+## Federation Rule
+
+All transfer to Provider Public Web Zone must pass through zone gateways and approved card packages.
+

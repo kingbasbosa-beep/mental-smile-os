@@ -1,0 +1,502 @@
+rules_version = '2';
+
+// MASTER CORE role doctrine:
+// Firestore authorization depends on custom claims, not UI role documents.
+// AccountAccessService and role documents are app-side UI/UX gates only.
+// Opening a screen in the app does not guarantee Firestore read/write access.
+// Server SDK tooling is a privileged ops layer.
+// QA bot writes are privileged ops behavior, not client/app behavior.
+// Do not broaden rules to hide a custom-claims mismatch.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function uid() {
+      return request.auth.uid;
+    }
+
+    function hasRole(roleName) {
+      return signedIn() && request.auth.token.role == roleName;
+    }
+
+    function isOwner() {
+      return hasRole('owner');
+    }
+
+    function isMonitoringOperator() {
+      return hasRole('monitoring_operator');
+    }
+
+    function isRegistrySteward() {
+      return hasRole('registry_steward');
+    }
+
+    function isDeclarationReviewer() {
+      return hasRole('declaration_reviewer');
+    }
+
+    function isSupportObserver() {
+      return hasRole('support_observer');
+    }
+
+    function isClient() {
+      return signedIn() && request.auth.token.role == 'client';
+    }
+
+    function isClinician() {
+      return signedIn() && request.auth.token.role == 'clinician';
+    }
+
+    function isCenter() {
+      return signedIn() && request.auth.token.role == 'center';
+    }
+
+    function protectedAccountFields() {
+      return [
+        'role',
+        'isBlocked',
+        'blockedAt',
+        'blockedBy',
+        'blockReason'
+      ];
+    }
+
+    function noProtectedAccountFieldChange() {
+      return !request.resource.data.diff(resource.data)
+        .affectedKeys()
+        .hasAny(protectedAccountFields());
+    }
+
+    function ownDoc(docId) {
+      return signedIn() && docId == uid();
+    }
+
+    function visibilityReady() {
+      return resource != null
+        && resource.data.visibilityReadiness == 'ready'
+        && resource.data.isBlocked != true;
+    }
+
+    function notVisibilityReady() {
+      return resource != null
+        && (
+          !resource.data.keys().hasAny(['visibilityReadiness'])
+          || resource.data.visibilityReadiness != 'ready'
+        );
+    }
+
+    function clientCreateValid(docId) {
+      return ownDoc(docId)
+        && request.resource.data.role == 'client'
+        && !request.resource.data.keys().hasAny([
+          'isBlocked',
+          'blockedAt',
+          'blockedBy',
+          'blockReason'
+        ]);
+    }
+
+    function clientUpdateValid(docId) {
+      return ownDoc(docId)
+        && noProtectedAccountFieldChange()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'displayName',
+          'avatarAsset',
+          'photoUrl',
+          'clientSignals',
+          'privacyPreferences',
+          'roomPreferences',
+          'enabledToolKeys',
+          'roomSchemaVersion',
+          'signalSchemaVersion',
+          'updatedAt'
+        ]);
+    }
+
+    function clinicianCreateValid(docId) {
+      return ownDoc(docId)
+        && request.resource.data.role == 'clinician'
+        && request.resource.data.isBlocked != true
+        && request.resource.data.visibilityReadiness == 'incomplete';
+    }
+
+    function clinicianSelfRegistrationFields() {
+      return [
+        'displayName',
+        'fullName',
+        'fullDisplayNameAr',
+        'fullDisplayNameEn',
+        'email',
+        'professionalTitle',
+        'professionalTitleKey',
+        'professionalTitleLabelAr',
+        'professionalTitleLabelEn',
+        'specialty',
+        'specialtyKey',
+        'specialtyLabel',
+        'phoneNumber',
+        'countryCode',
+        'photoUrl',
+        'photoAsset',
+        'bio',
+        'identityFileName',
+        'certificateFileName',
+        'extraFileName',
+        'documentsSubmitted',
+        'documentsUploadMode',
+        'identityDocumentUrl',
+        'certificateDocumentUrl',
+        'extraDocumentUrl',
+        'declarationSignals',
+        'visibilityReadiness',
+        'missingSignals',
+        'completedSignals',
+        'readinessUpdatedAt',
+        'readinessSource',
+        'updatedAt',
+        'createdAt'
+      ];
+    }
+
+    function clinicianSelfUpdateValid(docId) {
+      return ownDoc(docId)
+        && noProtectedAccountFieldChange()
+        && notVisibilityReady()
+        && request.resource.data.diff(resource.data)
+          .affectedKeys()
+          .hasOnly(clinicianSelfRegistrationFields());
+    }
+
+    function centerCreateValid(docId) {
+      return ownDoc(docId)
+        && request.resource.data.role == 'center'
+        && request.resource.data.isBlocked != true
+        && request.resource.data.visibilityReadiness == 'incomplete';
+    }
+
+    function centerSelfRegistrationFields() {
+      return [
+        'name',
+        'centerName',
+        'displayName',
+        'email',
+        'category',
+        'categoryLabelAr',
+        'categoryLabelEn',
+        'centerType',
+        'centerTypeLabelAr',
+        'centerTypeLabelEn',
+        'sortOrder',
+        'managerName',
+        'phone',
+        'phoneNumber',
+        'whatsapp',
+        'whatsappNumber',
+        'countryCode',
+        'city',
+        'area',
+        'address',
+        'description',
+        'hasDetoxUnit',
+        'galleryItems',
+        'galleryImages',
+        'imageUrl',
+        'coverImageUrl',
+        'imagesReady',
+        'accommodationCosts',
+        'autismCareCosts',
+        'centerCapabilities',
+        'signalSchemaVersion',
+        'services',
+        'pricingReady',
+        'documentItems',
+        'documentsReady',
+        'identityDocumentUrl',
+        'licenseDocumentUrl',
+        'commercialDocumentUrl',
+        'taxDocumentUrl',
+        'identityFileName',
+        'licenseFileName',
+        'commercialFileName',
+        'taxFileName',
+        'documentsUploadMode',
+        'declarationSignals',
+        'visibilityReadiness',
+        'missingSignals',
+        'completedSignals',
+        'readinessUpdatedAt',
+        'readinessSource',
+        'updatedAt',
+        'createdAt'
+      ];
+    }
+
+    function centerSelfUpdateValid(docId) {
+      return ownDoc(docId)
+        && noProtectedAccountFieldChange()
+        && notVisibilityReady()
+        && request.resource.data.diff(resource.data)
+          .affectedKeys()
+          .hasOnly(centerSelfRegistrationFields());
+    }
+
+    function ownClinicianProfileRequest() {
+      return signedIn() && resource.data.clinicianId == uid();
+    }
+
+    function ownCenterProfileRequest() {
+      return signedIn() && resource.data.centerId == uid();
+    }
+
+    function profileRequestCreateValid(ownerField) {
+      return signedIn()
+        && request.resource.data[ownerField] == uid()
+        && request.resource.data.status == 'submitted'
+        && request.resource.data.submittedBy == uid()
+        && request.resource.data.keys().hasAll([
+          'declarationSignals',
+          'profileSignals',
+          'changeSummary',
+          'submittedAt',
+          'submittedBy'
+        ])
+        && !request.resource.data.keys().hasAny(['ownerId'])
+        && !request.resource.data.keys().hasAny(protectedAccountFields());
+    }
+
+    function safetyEscalationResolveValid() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status',
+          'resolvedByUid',
+          'resolvedAt',
+          'updatedAt'
+        ])
+        && request.resource.data.status == 'resolved'
+        && request.resource.data.resolvedByUid == uid();
+    }
+
+    function recommendedClinicianForEscalation() {
+      return isClinician()
+        && resource.data.keys().hasAny(['recommendedProviders'])
+        && uid() in resource.data.recommendedProviders;
+    }
+
+    function supportSafetyThreadUpdateValid() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'needsHumanSupport',
+          'escalationLevel',
+          'safetyState',
+          'strategyMode',
+          'riskScore',
+          'riskLevel',
+          'lastEmotionalStates',
+          'lastDetectedRole',
+          'lastMessageAt',
+          'lastMessagePreview',
+          'messageCount',
+          'updatedAt'
+        ]);
+    }
+
+    function safetyEscalationCreateValid() {
+      return request.resource.data.status == 'open'
+        && request.resource.data.keys().hasAll([
+          'recommendedProviders',
+          'recommendedSignals',
+          'recommendedActions',
+          'routingSignals',
+          'safetyEscalationLevel'
+        ]);
+    }
+
+    match /clients/{clientId} {
+      allow get: if ownDoc(clientId);
+      allow list: if signedIn() && resource.data.email == request.auth.token.email;
+      allow create: if clientCreateValid(clientId);
+      allow update: if clientUpdateValid(clientId);
+      allow delete: if false;
+    }
+
+    match /clinicians/{clinicianId} {
+      allow read: if isDeclarationReviewer()
+        || (signedIn() && clinicianId == uid())
+        || visibilityReady();
+      allow create: if clinicianCreateValid(clinicianId);
+      allow update: if clinicianSelfUpdateValid(clinicianId);
+      allow delete: if false;
+    }
+
+    match /centers/{centerId} {
+      allow read: if isDeclarationReviewer()
+        || (signedIn() && centerId == uid())
+        || visibilityReady();
+      allow create: if centerCreateValid(centerId);
+      allow update: if centerSelfUpdateValid(centerId);
+      allow delete: if false;
+    }
+
+    match /clinician_profile_change_requests/{requestId} {
+      allow read: if isDeclarationReviewer() || ownClinicianProfileRequest();
+      allow create: if profileRequestCreateValid('clinicianId');
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    match /center_profile_change_requests/{requestId} {
+      allow read: if isDeclarationReviewer() || ownCenterProfileRequest();
+      allow create: if profileRequestCreateValid('centerId');
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    match /support_requests/{requestId} {
+      allow get, list: if isSupportObserver()
+        || (signedIn() && resource.data.createdByUid == uid());
+      allow create: if signedIn()
+        && request.resource.data.createdByUid == uid()
+        && request.resource.data.status == 'new'
+        && request.resource.data.source == 'structured_support';
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    match /provider_contact_requests/{requestId} {
+      allow get, list: if isSupportObserver()
+        || (
+          signedIn()
+          && (
+            resource.data.clientId == uid()
+            || resource.data.providerId == uid()
+          )
+        );
+      allow create: if signedIn()
+        && request.resource.data.clientId == uid();
+      allow update, delete: if false;
+    }
+
+    match /center_contact_requests/{requestId} {
+      allow get, list: if isSupportObserver()
+        || (
+          signedIn()
+          && (
+            resource.data.clientId == uid()
+            || resource.data.centerId == uid()
+          )
+        );
+      allow create: if signedIn()
+        && request.resource.data.clientId == uid();
+      allow update, delete: if false;
+    }
+
+    match /saved_destinations/{savedId} {
+      allow get, list: if isSupportObserver()
+        || (signedIn() && resource.data.clientId == uid());
+      allow create: if signedIn()
+        && request.resource.data.clientId == uid();
+      allow update: if signedIn()
+        && resource.data.clientId == uid()
+        && request.resource.data.clientId == resource.data.clientId;
+      allow delete: if false;
+    }
+
+    match /chat_threads/{threadId} {
+      allow read: if isSupportObserver()
+        || (signedIn() && resource.data.participantUid == uid());
+      allow create: if signedIn()
+        && request.resource.data.participantUid == uid();
+      allow update: if (isSupportObserver() && supportSafetyThreadUpdateValid())
+        || (
+          signedIn()
+          && resource.data.participantUid == uid()
+        );
+      allow delete: if false;
+
+      match /messages/{messageId} {
+        allow read: if isSupportObserver()
+          || (
+            signedIn()
+            && exists(/databases/$(database)/documents/chat_threads/$(threadId))
+            && (
+              get(/databases/$(database)/documents/chat_threads/$(threadId)).data.participantUid == uid()
+            )
+          );
+        allow create: if signedIn()
+          && exists(/databases/$(database)/documents/chat_threads/$(threadId));
+        allow update, delete: if false;
+      }
+    }
+
+    match /chat_escalations/{escalationId} {
+      allow read: if isSupportObserver()
+        || recommendedClinicianForEscalation();
+      allow create: if signedIn() && safetyEscalationCreateValid();
+      allow update: if (
+          isSupportObserver()
+          || recommendedClinicianForEscalation()
+        )
+        && safetyEscalationResolveValid();
+      allow delete: if false;
+
+      match /reports/{reportId} {
+        allow read: if isSupportObserver()
+          || (
+            isClinician()
+            && exists(/databases/$(database)/documents/chat_escalations/$(escalationId))
+            && get(/databases/$(database)/documents/chat_escalations/$(escalationId)).data.keys().hasAny(['recommendedProviders'])
+            && uid() in get(/databases/$(database)/documents/chat_escalations/$(escalationId)).data.recommendedProviders
+          );
+        allow create: if signedIn();
+        allow update, delete: if false;
+      }
+    }
+
+    match /system_domains/{docId} {
+      allow read: if isOwner() || isRegistrySteward();
+      allow write: if false;
+      allow delete: if false;
+    }
+
+    match /signal_events/{signalId} {
+      allow get: if signedIn() && (resource.data.actorId == uid() || isOwner() || isMonitoringOperator() || isSupportObserver());
+      allow list: if signedIn()
+        && (
+          resource.data.actorId == uid()
+          || isOwner()
+          || isMonitoringOperator()
+          || isSupportObserver()
+        );
+      allow create: if signedIn()
+        && request.resource.data.actorId == uid()
+        && request.resource.data.signalId == signalId
+        && request.resource.data.keys().hasOnly([
+          'signalId',
+          'signalType',
+          'signalCategory',
+          'signalDomain',
+          'signalSource',
+          'actorId',
+          'actorRole',
+          'targetType',
+          'targetId',
+          'timestamp',
+          'routingTarget',
+          'retentionClass',
+          'privacyLevel',
+          'signalVersion',
+          'createdAt'
+        ]);
+      allow update, delete: if false;
+    }
+
+    match /signal_aggregates/{aggregateId} {
+      allow read: if isOwner() || isMonitoringOperator();
+      allow write: if false; // Client-side aggregate writes disabled for now.
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

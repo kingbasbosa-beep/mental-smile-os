@@ -1,0 +1,789 @@
+﻿import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+class PortalHomePage extends StatelessWidget {
+  const PortalHomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const _PortalScaffold(
+      currentRoute: '/',
+      child: _PortalHeroHome(),
+    );
+  }
+}
+
+class PortalAboutPage extends StatelessWidget {
+  const PortalAboutPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const _PortalScaffold(
+      currentRoute: '/about',
+      child: _PortalTextPage(
+        title: 'About Mental Smile',
+        subtitle: 'Mental Smile Service Marketplace + Operational Federation',
+        body:
+            'Mental Smile is a signal-aware service marketplace for access, support, transparency, education, and professional services.',
+      ),
+    );
+  }
+}
+
+class PortalServiceRequestPage extends StatelessWidget {
+  const PortalServiceRequestPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return _PortalScaffold(
+      currentRoute: '/request/service',
+      child: _PortalIntakePage(
+        intakeType: _PortalIntakeType.service,
+        title: 'Service Request',
+        subtitle: 'Commerce Intake + Service Request',
+        disclaimer:
+            'This captures interest signals for future service contact. It does not create authority over people or journeys.',
+        submitLabel: 'Open Gmail Draft / ÙØªØ­ Ù…Ø³ÙˆØ¯Ø© Gmail',
+        fields: [
+          _PortalTextFieldSpec(key: 'requester', label: 'Requester name'),
+          _PortalTextFieldSpec(key: 'email', label: 'Email'),
+          _PortalTextFieldSpec(key: 'phone', label: 'Phone'),
+          _PortalTextFieldSpec(key: 'organization', label: 'Organization name'),
+          _PortalSelectFieldSpec(
+            key: 'serviceType',
+            label: 'Service type',
+            value: 'Marketing Campaign',
+            options: [
+              'Marketing Campaign',
+              'Content Creation',
+              'Technical Service',
+              'AI Service',
+              'White Label / Tenant',
+              'Partnership',
+            ],
+          ),
+          _PortalTextFieldSpec(
+            key: 'summary',
+            label: 'Request summary',
+            maxLines: 4,
+          ),
+          _PortalTextFieldSpec(key: 'budget', label: 'Budget range'),
+          _PortalTextFieldSpec(key: 'timeline', label: 'Timeline'),
+          _PortalBooleanFieldSpec(
+            key: 'discoveryCall',
+            label: 'Needs discovery call',
+          ),
+          _PortalTextFieldSpec(key: 'notes', label: 'Notes', maxLines: 3),
+        ],
+      ),
+    );
+  }
+}
+
+class PortalPackageRequestPage extends StatelessWidget {
+  const PortalPackageRequestPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return _PortalScaffold(
+      currentRoute: '/request/package',
+      child: _PortalIntakePage(
+        intakeType: _PortalIntakeType.package,
+        title: 'Package Information',
+        subtitle: 'Package + Subscription Intake',
+        disclaimer:
+            'Package information is handled as external service cost information. Mental Smile does not process financial decisions through this portal.',
+        submitLabel: 'Open Gmail Draft / ÙØªØ­ Ù…Ø³ÙˆØ¯Ø© Gmail',
+        fields: [
+          _PortalTextFieldSpec(key: 'requester', label: 'Requester name'),
+          _PortalTextFieldSpec(key: 'email', label: 'Email'),
+          _PortalTextFieldSpec(key: 'phone', label: 'Phone'),
+          _PortalTextFieldSpec(
+            key: 'providerCenter',
+            label: 'Provider / center name',
+          ),
+          _PortalSelectFieldSpec(
+            key: 'packageType',
+            label: 'Package type',
+            value: 'Subscription',
+            options: [
+              'Subscription',
+              'Verification',
+              'Visibility Information',
+              'Tool / AI Package',
+              'Optional Module Rental',
+            ],
+          ),
+          _PortalTextFieldSpec(
+            key: 'billingPreference',
+            label: 'Billing preference',
+          ),
+          _PortalBooleanFieldSpec(key: 'needsQuote', label: 'Needs quote'),
+          _PortalTextFieldSpec(key: 'notes', label: 'Notes', maxLines: 3),
+        ],
+      ),
+    );
+  }
+}
+
+class PortalContactPage extends StatelessWidget {
+  const PortalContactPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return _PortalScaffold(
+      currentRoute: '/contact',
+      child: _PortalIntakePage(
+        intakeType: _PortalIntakeType.contact,
+        title: 'Contact',
+        subtitle: 'General Contact Gateway',
+        disclaimer:
+            'This contact form is for general intake only. Urgent or emergency support is not handled through this portal.',
+        submitLabel: 'Open Gmail Draft / ÙØªØ­ Ù…Ø³ÙˆØ¯Ø© Gmail',
+        fields: [
+          _PortalTextFieldSpec(key: 'name', label: 'Name'),
+          _PortalTextFieldSpec(key: 'email', label: 'Email'),
+          _PortalTextFieldSpec(key: 'phone', label: 'Phone'),
+          _PortalSelectFieldSpec(
+            key: 'topic',
+            label: 'Topic',
+            value: 'General inquiry',
+            options: [
+              'General inquiry',
+              'Provider question',
+              'Center question',
+              'Business inquiry',
+              'Support program',
+              'Other',
+            ],
+          ),
+          _PortalTextFieldSpec(key: 'message', label: 'Message', maxLines: 4),
+          _PortalTextFieldSpec(
+            key: 'preferredContact',
+            label: 'Preferred contact method',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PortalScaffold extends StatelessWidget {
+  const _PortalScaffold({
+    required this.currentRoute,
+    required this.child,
+  });
+
+  final String currentRoute;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF6F7FB),
+      body: SafeArea(
+        child: Column(
+          children: <Widget>[
+            _PortalNavbar(currentRoute: currentRoute),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1100),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 42,
+                      ),
+                      child: child,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const _PortalFooter(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PortalNavbar extends StatelessWidget {
+  const _PortalNavbar({required this.currentRoute});
+
+  final String currentRoute;
+
+  static const List<_PortalNavItem> _items = <_PortalNavItem>[
+    _PortalNavItem('Home', '/'),
+    _PortalNavItem('About', '/about'),
+    _PortalNavItem('Library', '/library'),
+    _PortalNavItem('Providers', '/register/provider'),
+    _PortalNavItem('Centers', '/register/center'),
+    _PortalNavItem('Services', '/request/service'),
+    _PortalNavItem('Packages', '/request/package'),
+    _PortalNavItem('Contact', '/contact'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: Color(0xFFE1E5EE))),
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1100),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 10,
+              runSpacing: 8,
+              children: <Widget>[
+                const Padding(
+                  padding: EdgeInsetsDirectional.only(end: 20),
+                  child: Text(
+                    'Mental Smile',
+                    style: TextStyle(
+                      color: Color(0xFF172033),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                for (final item in _items)
+                  _PortalNavButton(
+                    label: item.label,
+                    route: item.route,
+                    selected: currentRoute == item.route,
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PortalNavButton extends StatelessWidget {
+  const _PortalNavButton({
+    required this.label,
+    required this.route,
+    required this.selected,
+  });
+
+  final String label;
+  final String route;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: selected ? null : () => Navigator.of(context).pushNamed(route),
+      style: TextButton.styleFrom(
+        foregroundColor:
+            selected ? const Color(0xFF4A6CF7) : const Color(0xFF33415C),
+        disabledForegroundColor: const Color(0xFF4A6CF7),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      ),
+      child: Text(label),
+    );
+  }
+}
+
+class _PortalHeroHome extends StatelessWidget {
+  const _PortalHeroHome();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        const Text(
+          'Mental Smile',
+          style: TextStyle(
+            color: Color(0xFF172033),
+            fontSize: 48,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 12),
+        const Text(
+          'Constitutional Operational Federation',
+          style: TextStyle(
+            color: Color(0xFF4A6CF7),
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 28),
+        const Text(
+          'Marketplace\n+\nSupport Ecosystem\n+\nProfessional Services',
+          style: TextStyle(
+            color: Color(0xFF26324A),
+            fontSize: 30,
+            fontWeight: FontWeight.w700,
+            height: 1.25,
+          ),
+        ),
+        const SizedBox(height: 32),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: const <Widget>[
+            _PortalActionButton(
+              label: 'Register as Provider',
+              route: '/register/provider',
+            ),
+            _PortalActionButton(
+              label: 'Register as Center',
+              route: '/register/center',
+            ),
+            _PortalActionButton(
+              label: 'Request Service',
+              route: '/request/service',
+            ),
+            _PortalActionButton(label: 'Library', route: '/library'),
+            _PortalActionButton(label: 'Contact', route: '/contact'),
+            _PortalActionButton(
+              label: 'Open Mental Smile App / Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¥Ù„Ù‰ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚',
+              route: '/splash',
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _PortalTextPage extends StatelessWidget {
+  const _PortalTextPage({
+    required this.title,
+    required this.subtitle,
+    required this.body,
+  });
+
+  final String title;
+  final String subtitle;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          title,
+          style: const TextStyle(
+            color: Color(0xFF172033),
+            fontSize: 40,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          subtitle,
+          style: const TextStyle(
+            color: Color(0xFF4A6CF7),
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 24),
+        Text(
+          body,
+          style: const TextStyle(
+            color: Color(0xFF33415C),
+            fontSize: 18,
+            height: 1.6,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+enum _PortalIntakeType { service, package, contact }
+
+class _PortalIntakePage extends StatefulWidget {
+  const _PortalIntakePage({
+    required this.intakeType,
+    required this.title,
+    required this.subtitle,
+    required this.disclaimer,
+    required this.submitLabel,
+    required this.fields,
+  });
+
+  final _PortalIntakeType intakeType;
+  final String title;
+  final String subtitle;
+  final String disclaimer;
+  final String submitLabel;
+  final List<_PortalFieldSpec> fields;
+
+  @override
+  State<_PortalIntakePage> createState() => _PortalIntakePageState();
+}
+
+class _PortalIntakePageState extends State<_PortalIntakePage> {
+  static const String _primaryInbox = 'mentalsmile.platform@gmail.com';
+
+  late final Map<String, TextEditingController> _controllers;
+  late final Map<String, String> _selectValues;
+  late final Map<String, bool> _boolValues;
+
+  @override
+  void initState() {
+    super.initState();
+    _controllers = <String, TextEditingController>{};
+    _selectValues = <String, String>{};
+    _boolValues = <String, bool>{};
+
+    for (final field in widget.fields) {
+      if (field is _PortalTextFieldSpec) {
+        _controllers[field.key] = TextEditingController();
+      } else if (field is _PortalSelectFieldSpec) {
+        _selectValues[field.key] = field.value;
+      } else if (field is _PortalBooleanFieldSpec) {
+        _boolValues[field.key] = false;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final controller in _controllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  String _textValue(String key) => _controllers[key]?.text.trim() ?? '';
+
+  String _selectValue(String key) => _selectValues[key] ?? '';
+
+  String _boolValue(String key) => (_boolValues[key] ?? false) ? 'Yes' : 'No';
+
+  Future<void> _openGmailDraft() async {
+    final nameKey =
+        widget.intakeType == _PortalIntakeType.contact ? 'name' : 'requester';
+    final name = _textValue(nameKey);
+    final email = _textValue('email');
+
+    if (name.isEmpty || email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter name and email before opening Gmail.'),
+        ),
+      );
+      return;
+    }
+
+    final subject = _subject();
+    final body = _body();
+    final uri = Uri.https(
+      'mail.google.com',
+      '/mail/',
+      <String, String>{
+        'view': 'cm',
+        'fs': '1',
+        'to': _primaryInbox,
+        'su': subject,
+        'body': body,
+      },
+    );
+
+    final opened = await launchUrl(uri);
+    if (!opened && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Gmail could not be opened for this request.'),
+        ),
+      );
+    }
+  }
+
+  String _subject() {
+    switch (widget.intakeType) {
+      case _PortalIntakeType.service:
+        return '[Mental Smile Service Request] ${_selectValue('serviceType')}';
+      case _PortalIntakeType.package:
+        return '[Mental Smile Package Request]';
+      case _PortalIntakeType.contact:
+        return '[Mental Smile Contact Request]';
+    }
+  }
+
+  String _body() {
+    switch (widget.intakeType) {
+      case _PortalIntakeType.service:
+        return '''
+Mental Smile Service Request
+
+Requester name: ${_textValue('requester')}
+Email: ${_textValue('email')}
+Phone: ${_textValue('phone')}
+Organization: ${_textValue('organization')}
+Service type: ${_selectValue('serviceType')}
+Budget: ${_textValue('budget')}
+Timeline: ${_textValue('timeline')}
+Discovery call: ${_boolValue('discoveryCall')}
+Notes: ${_textValue('notes')}
+
+Request summary:
+${_textValue('summary')}
+''';
+      case _PortalIntakeType.package:
+        return '''
+Mental Smile Package Request
+
+Requester: ${_textValue('requester')}
+Email: ${_textValue('email')}
+Phone: ${_textValue('phone')}
+Provider / center: ${_textValue('providerCenter')}
+Package type: ${_selectValue('packageType')}
+Billing preference: ${_textValue('billingPreference')}
+Quote request: ${_boolValue('needsQuote')}
+Notes: ${_textValue('notes')}
+''';
+      case _PortalIntakeType.contact:
+        return '''
+Mental Smile Contact Request
+
+Name: ${_textValue('name')}
+Email: ${_textValue('email')}
+Phone: ${_textValue('phone')}
+Topic: ${_selectValue('topic')}
+Preferred contact method: ${_textValue('preferredContact')}
+
+Message:
+${_textValue('message')}
+''';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          widget.title,
+          style: const TextStyle(
+            color: Color(0xFF172033),
+            fontSize: 40,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          widget.subtitle,
+          style: const TextStyle(
+            color: Color(0xFF4A6CF7),
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 18),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF8E6),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFE8D8A8)),
+          ),
+          child: Text(
+            widget.disclaimer,
+            style: const TextStyle(
+              color: Color(0xFF5E4B1B),
+              fontSize: 15,
+              height: 1.45,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        const SizedBox(height: 22),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 760),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE1E5EE)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  const Text(
+                    'Phase 1 UI only',
+                    style: TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  for (final field in widget.fields) ...[
+                    _buildField(field),
+                    const SizedBox(height: 14),
+                  ],
+                  FilledButton(
+                    onPressed: _openGmailDraft,
+                    child: Text(widget.submitLabel),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildField(_PortalFieldSpec field) {
+    if (field is _PortalTextFieldSpec) {
+      return TextFormField(
+        controller: _controllers[field.key],
+        maxLines: field.maxLines,
+        decoration: InputDecoration(
+          labelText: field.label,
+          border: const OutlineInputBorder(),
+        ),
+      );
+    }
+    if (field is _PortalSelectFieldSpec) {
+      return DropdownButtonFormField<String>(
+        value: _selectValues[field.key],
+        decoration: InputDecoration(
+          labelText: field.label,
+          border: const OutlineInputBorder(),
+        ),
+        items: field.options
+            .map(
+              (option) => DropdownMenuItem<String>(
+                value: option,
+                child: Text(option),
+              ),
+            )
+            .toList(),
+        onChanged: (value) {
+          if (value == null) return;
+          setState(() => _selectValues[field.key] = value);
+        },
+      );
+    }
+    if (field is _PortalBooleanFieldSpec) {
+      return CheckboxListTile(
+        value: _boolValues[field.key] ?? false,
+        onChanged: (value) {
+          setState(() => _boolValues[field.key] = value ?? false);
+        },
+        contentPadding: EdgeInsets.zero,
+        title: Text(field.label),
+        controlAffinity: ListTileControlAffinity.leading,
+      );
+    }
+    return const SizedBox.shrink();
+  }
+}
+
+abstract class _PortalFieldSpec {
+  const _PortalFieldSpec({
+    required this.label,
+  });
+
+  final String label;
+}
+
+class _PortalTextFieldSpec extends _PortalFieldSpec {
+  const _PortalTextFieldSpec({
+    required this.key,
+    required super.label,
+    this.maxLines = 1,
+  });
+
+  final String key;
+  final int maxLines;
+}
+
+class _PortalSelectFieldSpec extends _PortalFieldSpec {
+  const _PortalSelectFieldSpec({
+    required this.key,
+    required super.label,
+    required this.value,
+    required this.options,
+  });
+
+  final String key;
+  final String value;
+  final List<String> options;
+}
+
+class _PortalBooleanFieldSpec extends _PortalFieldSpec {
+  const _PortalBooleanFieldSpec({
+    required this.key,
+    required super.label,
+  });
+
+  final String key;
+}
+
+class _PortalActionButton extends StatelessWidget {
+  const _PortalActionButton({
+    required this.label,
+    required this.route,
+  });
+
+  final String label;
+  final String route;
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton(
+      onPressed: () => Navigator.of(context).pushNamed(route),
+      style: FilledButton.styleFrom(
+        backgroundColor: const Color(0xFF4A6CF7),
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      ),
+      child: Text(label),
+    );
+  }
+}
+
+class _PortalFooter extends StatelessWidget {
+  const _PortalFooter();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Color(0xFFE1E5EE))),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      child: const Text(
+        'Mental Smile  |  Owner Operated Portal  |  Phase 1 Skeleton',
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Color(0xFF5C667A)),
+      ),
+    );
+  }
+}
+
+class _PortalNavItem {
+  const _PortalNavItem(this.label, this.route);
+
+  final String label;
+  final String route;
+}
+
