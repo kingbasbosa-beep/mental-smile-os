@@ -838,6 +838,182 @@ Memory Impact: Establishes Residential Domain health baseline after Pure DNA V1.
 Related Findings: `RESIDENTIAL_FINDINGS_REPORT_V1.md`
 Next Action: Owner may approve archive cards and registry updates recommended by the scorecard.
 
+### OP-PHASE-7B-COMMERCIAL-DEEP-AUDIT-V1
+
+Operation ID: OP-PHASE-7B-COMMERCIAL-DEEP-AUDIT-V1
+Operation Date/Time: 2026-06-17
+Chronological Order Number: 023
+Operation Title: Phase 7B Commercial Domain Deep Audit
+Prompt / Block Name: PHASE 7B - COMMERCIAL DOMAIN DEEP AUDIT
+Phase: 7B
+Execution Type: AUDIT
+Purpose: Deep audit Commercial Domain including specialists, centers, tools, commercial discovery, provider contact requests, and center contact requests.
+Scope: Commercial audit reports only; no runtime mutation.
+Files Created:
+- `docs/constitutional-baseline/domain-audits/commercial/COMMERCIAL_ARCHITECTURE_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/commercial/COMMERCIAL_ROUTE_HEALTH_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/commercial/COMMERCIAL_COLLECTION_HEALTH_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/commercial/COMMERCIAL_SIGNAL_FLOW_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/commercial/COMMERCIAL_ASSET_USAGE_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/commercial/COMMERCIAL_FINDINGS_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/commercial/COMMERCIAL_HEALTH_SCORECARD_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created:
+- `COMMERCIAL_ARCHITECTURE_REPORT_V1.md`
+- `COMMERCIAL_ROUTE_HEALTH_REPORT_V1.md`
+- `COMMERCIAL_COLLECTION_HEALTH_REPORT_V1.md`
+- `COMMERCIAL_SIGNAL_FLOW_REPORT_V1.md`
+- `COMMERCIAL_ASSET_USAGE_REPORT_V1.md`
+- `COMMERCIAL_FINDINGS_REPORT_V1.md`
+- `COMMERCIAL_HEALTH_SCORECARD_V1.md`
+Cards Created: none
+Guides Created: none
+Registries Updated:
+- Executed Operations Registry
+- Executed Operations Index
+Snapshots Created: none
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED
+Evidence: Commercial audit folder contains 7 required reports; code/docs inspection covered specialists, centers, tools/city surfaces, commercial discovery, provider contact requests, center contact requests, routes, collections, signals, and assets.
+Short Summary: Completed Commercial Domain deep audit and produced architecture, route, collection, signal, asset, findings, and scorecard reports.
+Memory Impact: Establishes Commercial Domain health baseline after Pure DNA V1.
+Related Findings: `COMMERCIAL_FINDINGS_REPORT_V1.md`
+Next Action: Owner may approve archive cards and registry updates recommended by the scorecard.
+
+### OP-PHASE-7C-ADMINISTRATIVE-DEEP-AUDIT-V1
+
+Operation ID: OP-PHASE-7C-ADMINISTRATIVE-DEEP-AUDIT-V1
+Operation Date/Time: 2026-06-17
+Chronological Order Number: 024
+Operation Title: Phase 7C Administrative Domain Deep Audit
+Prompt / Block Name: PHASE 7C - ADMINISTRATIVE DOMAIN DEEP AUDIT
+Phase: 7C
+Execution Type: AUDIT
+Purpose: Deep audit Administrative Domain including web registration, clinician registration, center registration, declaration review, and profile change requests.
+Scope: Administrative audit reports only; no runtime mutation.
+Files Created:
+- `docs/constitutional-baseline/domain-audits/administrative/ADMINISTRATIVE_ARCHITECTURE_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/administrative/ADMINISTRATIVE_ROUTE_HEALTH_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/administrative/ADMINISTRATIVE_COLLECTION_HEALTH_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/administrative/ADMINISTRATIVE_SIGNAL_FLOW_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/administrative/ADMINISTRATIVE_FINDINGS_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/administrative/ADMINISTRATIVE_HEALTH_SCORECARD_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created:
+- `ADMINISTRATIVE_ARCHITECTURE_REPORT_V1.md`
+- `ADMINISTRATIVE_ROUTE_HEALTH_REPORT_V1.md`
+- `ADMINISTRATIVE_COLLECTION_HEALTH_REPORT_V1.md`
+- `ADMINISTRATIVE_SIGNAL_FLOW_REPORT_V1.md`
+- `ADMINISTRATIVE_FINDINGS_REPORT_V1.md`
+- `ADMINISTRATIVE_HEALTH_SCORECARD_V1.md`
+Cards Created: none
+Guides Created: none
+Registries Updated:
+- Executed Operations Registry
+- Executed Operations Index
+Snapshots Created: none
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED
+Evidence: Administrative audit folder contains 6 required reports; code/docs inspection covered web registration, clinician registration, center registration, declaration review, profile change requests, routes, collections, and signal flow.
+Short Summary: Completed Administrative Domain deep audit and produced architecture, route, collection, signal, findings, and scorecard reports.
+Memory Impact: Establishes Administrative Domain health baseline after Pure DNA V1.
+Related Findings: `ADMINISTRATIVE_FINDINGS_REPORT_V1.md`
+Next Action: Owner may approve archive cards and registry updates recommended by the scorecard.
+
+### OP-PHASE-7D-LIBRARY-DEEP-AUDIT-V1
+
+Operation ID: OP-PHASE-7D-LIBRARY-DEEP-AUDIT-V1
+Operation Date/Time: 2026-06-17
+Chronological Order Number: 025
+Operation Title: Phase 7D Library Domain Deep Audit
+Prompt / Block Name: PHASE 7D - LIBRARY DOMAIN DEEP AUDIT
+Phase: 7D
+Execution Type: AUDIT
+Purpose: Deep audit Library Domain including Library, Knowledge, Categories, Web Library, Library Assets, and Library Routes.
+Scope: Library audit reports only; no runtime mutation.
+Files Created:
+- `docs/constitutional-baseline/domain-audits/library/LIBRARY_ARCHITECTURE_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/library/LIBRARY_CONTENT_STRUCTURE_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/library/LIBRARY_ASSET_USAGE_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/library/LIBRARY_FINDINGS_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/library/LIBRARY_HEALTH_SCORECARD_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created:
+- `LIBRARY_ARCHITECTURE_REPORT_V1.md`
+- `LIBRARY_CONTENT_STRUCTURE_REPORT_V1.md`
+- `LIBRARY_ASSET_USAGE_REPORT_V1.md`
+- `LIBRARY_FINDINGS_REPORT_V1.md`
+- `LIBRARY_HEALTH_SCORECARD_V1.md`
+Cards Created: none
+Guides Created: none
+Registries Updated:
+- Executed Operations Registry
+- Executed Operations Index
+Snapshots Created: none
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED
+Evidence: Library audit folder contains 5 required reports; code/docs/assets inspection covered LibraryPage, LibraryPolicyPage, LibrarySignalMetadata, app/web/portal/city routes, category assets, web library assets, and C6 lineage.
+Short Summary: Completed Library Domain deep audit and produced architecture, content structure, asset usage, findings, and scorecard reports.
+Memory Impact: Establishes Library Domain health baseline after Pure DNA V1.
+Related Findings: `LIBRARY_FINDINGS_REPORT_V1.md`
+Next Action: Owner may approve archive cards and registry updates recommended by the scorecard.
+
+### OP-PHASE-7E-MONITORING-DEEP-AUDIT-V1
+
+Operation ID: OP-PHASE-7E-MONITORING-DEEP-AUDIT-V1
+Operation Date/Time: 2026-06-17
+Chronological Order Number: 026
+Operation Title: Phase 7E Monitoring Domain Deep Audit
+Prompt / Block Name: PHASE 7E - MONITORING DOMAIN DEEP AUDIT
+Phase: 7E
+Execution Type: AUDIT
+Purpose: Deep audit Monitoring Domain including Monitoring Room, Signal Monitoring, Escalations, Aggregates, and Observability.
+Scope: Monitoring audit reports only; no runtime mutation.
+Files Created:
+- `docs/constitutional-baseline/domain-audits/monitoring/MONITORING_ARCHITECTURE_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/monitoring/MONITORING_SIGNAL_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/monitoring/MONITORING_FINDINGS_REPORT_V1.md`
+- `docs/constitutional-baseline/domain-audits/monitoring/MONITORING_HEALTH_SCORECARD_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created:
+- `MONITORING_ARCHITECTURE_REPORT_V1.md`
+- `MONITORING_SIGNAL_REPORT_V1.md`
+- `MONITORING_FINDINGS_REPORT_V1.md`
+- `MONITORING_HEALTH_SCORECARD_V1.md`
+Cards Created: none
+Guides Created: none
+Registries Updated:
+- Executed Operations Registry
+- Executed Operations Index
+Snapshots Created: none
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED
+Evidence: Monitoring audit folder contains 4 required reports; code/docs inspection covered monitoring rooms, signal monitoring, escalations, aggregates, observability, routes, collections, and signal registries.
+Short Summary: Completed Monitoring Domain deep audit and produced architecture, signal, findings, and scorecard reports.
+Memory Impact: Establishes Monitoring Domain health baseline after Pure DNA V1.
+Related Findings: `MONITORING_FINDINGS_REPORT_V1.md`
+Next Action: Owner may approve archive cards and registry updates recommended by the scorecard.
+
 ### OP-PHASE-7F-OWNER-GOVERNANCE-DEEP-AUDIT-V1
 
 Operation ID: OP-PHASE-7F-OWNER-GOVERNANCE-DEEP-AUDIT-V1
@@ -1439,31 +1615,25 @@ Memory Impact: Preserves first remote constitutional publication lineage.
 Related Findings: Wave 1.11 final operations sync commit.
 Next Action: Commit this operation log sync locally and await Owner approval before pushing the sync commit.
 
-### OP-PHASE-7E-MONITORING-DEEP-AUDIT-V1
+### OP-POST-PUSH-OPERATIONS-REGISTRY-INTEGRITY-AUDIT-V1
 
-Operation ID: OP-PHASE-7E-MONITORING-DEEP-AUDIT-V1
+Operation ID: OP-POST-PUSH-OPERATIONS-REGISTRY-INTEGRITY-AUDIT-V1
 Operation Date/Time: 2026-06-17
-Chronological Order Number: 026
-Operation Title: Phase 7E Monitoring Domain Deep Audit
-Prompt / Block Name: PHASE 7E - MONITORING DOMAIN DEEP AUDIT
-Phase: 7E
+Chronological Order Number: 042
+Operation Title: Post-Push Operations Registry Integrity Audit
+Prompt / Block Name: POST-PUSH OPERATIONS REGISTRY VERIFICATION
+Phase: Post-push
 Execution Type: AUDIT
-Purpose: Deep audit Monitoring Domain including Monitoring Room, Signal Monitoring, Escalations, Aggregates, and Observability.
-Scope: Monitoring audit reports only; no runtime mutation.
+Purpose: Verify registry/index integrity from Phase 1 Constitutional Baseline Materialization through OP-WAVE-1-12-FIRST-CONSTITUTIONAL-PUSH-V1.
+Scope: Verification report only; no commit, no push, no tag, no Firebase action, no runtime change.
 Files Created:
-- `docs/constitutional-baseline/domain-audits/monitoring/MONITORING_ARCHITECTURE_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/monitoring/MONITORING_SIGNAL_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/monitoring/MONITORING_FINDINGS_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/monitoring/MONITORING_HEALTH_SCORECARD_V1.md`
+- `docs/constitutional-baseline/operations/OPERATIONS_REGISTRY_INTEGRITY_AUDIT_V1.md`
 Files Modified:
 - `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
 - `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
 Files Deleted: none
 Reports Created:
-- `MONITORING_ARCHITECTURE_REPORT_V1.md`
-- `MONITORING_SIGNAL_REPORT_V1.md`
-- `MONITORING_FINDINGS_REPORT_V1.md`
-- `MONITORING_HEALTH_SCORECARD_V1.md`
+- `docs/constitutional-baseline/operations/OPERATIONS_REGISTRY_INTEGRITY_AUDIT_V1.md`
 Cards Created: none
 Guides Created: none
 Registries Updated:
@@ -1474,39 +1644,32 @@ Runtime Effect: none
 Git Effect: none
 Firebase Effect: none
 Result: COMPLETED
-Evidence: Monitoring audit folder contains 4 required reports; code/docs inspection covered monitoring rooms, signal monitoring, escalations, aggregates, observability, routes, collections, and signal registries.
-Short Summary: Completed Monitoring Domain deep audit and produced architecture, signal, findings, and scorecard reports.
-Memory Impact: Establishes Monitoring Domain health baseline after Pure DNA V1.
-Related Findings: `MONITORING_FINDINGS_REPORT_V1.md`
-Next Action: Owner may approve archive cards and registry updates recommended by the scorecard.
+Evidence: `OPERATIONS_REGISTRY_INTEGRITY_AUDIT_V1.md` created; audit found complete unique coverage with duplicate/out-of-order registry bodies for Phase 7B-7E.
+Short Summary: Post-push registry integrity audit completed. Verdict: OPERATIONS_REGISTRY_GAPS_FOUND.
+Memory Impact: Preserves audit lineage for operations registry completeness.
+Related Findings: Wave 1.12 first constitutional push.
+Next Action: Owner may approve a separate cleanup operation to remove duplicate registry bodies if desired.
 
-### OP-PHASE-7D-LIBRARY-DEEP-AUDIT-V1
+### OP-OPERATIONS-REGISTRY-DEDUPLICATION-V1
 
-Operation ID: OP-PHASE-7D-LIBRARY-DEEP-AUDIT-V1
+Operation ID: OP-OPERATIONS-REGISTRY-DEDUPLICATION-V1
 Operation Date/Time: 2026-06-17
-Chronological Order Number: 025
-Operation Title: Phase 7D Library Domain Deep Audit
-Prompt / Block Name: PHASE 7D - LIBRARY DOMAIN DEEP AUDIT
-Phase: 7D
-Execution Type: AUDIT
-Purpose: Deep audit Library Domain including Library, Knowledge, Categories, Web Library, Library Assets, and Library Routes.
-Scope: Library audit reports only; no runtime mutation.
+Chronological Order Number: 043
+Operation Title: Operations Registry Deduplication
+Prompt / Block Name: OPERATIONS REGISTRY DEDUPLICATION
+Phase: Post-push
+Execution Type: CLEANUP
+Purpose: Remove or normalize duplicate/out-of-order operation registry bodies detected by OPERATIONS_REGISTRY_INTEGRITY_AUDIT_V1.
+Scope: Documentation registry cleanup only inside docs/constitutional-baseline/operations; no runtime, Firebase, tag, or GitHub workflow staging.
 Files Created:
-- `docs/constitutional-baseline/domain-audits/library/LIBRARY_ARCHITECTURE_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/library/LIBRARY_CONTENT_STRUCTURE_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/library/LIBRARY_ASSET_USAGE_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/library/LIBRARY_FINDINGS_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/library/LIBRARY_HEALTH_SCORECARD_V1.md`
+- `docs/constitutional-baseline/operations/OPERATIONS_REGISTRY_DEDUPLICATION_REPORT_V1.md`
 Files Modified:
 - `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
 - `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+- `docs/constitutional-baseline/operations/OPERATIONS_REGISTRY_INTEGRITY_AUDIT_V1.md`
 Files Deleted: none
 Reports Created:
-- `LIBRARY_ARCHITECTURE_REPORT_V1.md`
-- `LIBRARY_CONTENT_STRUCTURE_REPORT_V1.md`
-- `LIBRARY_ASSET_USAGE_REPORT_V1.md`
-- `LIBRARY_FINDINGS_REPORT_V1.md`
-- `LIBRARY_HEALTH_SCORECARD_V1.md`
+- `docs/constitutional-baseline/operations/OPERATIONS_REGISTRY_DEDUPLICATION_REPORT_V1.md`
 Cards Created: none
 Guides Created: none
 Registries Updated:
@@ -1514,103 +1677,11 @@ Registries Updated:
 - Executed Operations Index
 Snapshots Created: none
 Runtime Effect: none
-Git Effect: none
+Git Effect: documentation-only commit and push requested for current branch
 Firebase Effect: none
 Result: COMPLETED
-Evidence: Library audit folder contains 5 required reports; code/docs/assets inspection covered LibraryPage, LibraryPolicyPage, LibrarySignalMetadata, app/web/portal/city routes, category assets, web library assets, and C6 lineage.
-Short Summary: Completed Library Domain deep audit and produced architecture, content structure, asset usage, findings, and scorecard reports.
-Memory Impact: Establishes Library Domain health baseline after Pure DNA V1.
-Related Findings: `LIBRARY_FINDINGS_REPORT_V1.md`
-Next Action: Owner may approve archive cards and registry updates recommended by the scorecard.
-
-### OP-PHASE-7C-ADMINISTRATIVE-DEEP-AUDIT-V1
-
-Operation ID: OP-PHASE-7C-ADMINISTRATIVE-DEEP-AUDIT-V1
-Operation Date/Time: 2026-06-17
-Chronological Order Number: 024
-Operation Title: Phase 7C Administrative Domain Deep Audit
-Prompt / Block Name: PHASE 7C - ADMINISTRATIVE DOMAIN DEEP AUDIT
-Phase: 7C
-Execution Type: AUDIT
-Purpose: Deep audit Administrative Domain including web registration, clinician registration, center registration, declaration review, and profile change requests.
-Scope: Administrative audit reports only; no runtime mutation.
-Files Created:
-- `docs/constitutional-baseline/domain-audits/administrative/ADMINISTRATIVE_ARCHITECTURE_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/administrative/ADMINISTRATIVE_ROUTE_HEALTH_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/administrative/ADMINISTRATIVE_COLLECTION_HEALTH_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/administrative/ADMINISTRATIVE_SIGNAL_FLOW_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/administrative/ADMINISTRATIVE_FINDINGS_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/administrative/ADMINISTRATIVE_HEALTH_SCORECARD_V1.md`
-Files Modified:
-- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
-- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
-Files Deleted: none
-Reports Created:
-- `ADMINISTRATIVE_ARCHITECTURE_REPORT_V1.md`
-- `ADMINISTRATIVE_ROUTE_HEALTH_REPORT_V1.md`
-- `ADMINISTRATIVE_COLLECTION_HEALTH_REPORT_V1.md`
-- `ADMINISTRATIVE_SIGNAL_FLOW_REPORT_V1.md`
-- `ADMINISTRATIVE_FINDINGS_REPORT_V1.md`
-- `ADMINISTRATIVE_HEALTH_SCORECARD_V1.md`
-Cards Created: none
-Guides Created: none
-Registries Updated:
-- Executed Operations Registry
-- Executed Operations Index
-Snapshots Created: none
-Runtime Effect: none
-Git Effect: none
-Firebase Effect: none
-Result: COMPLETED
-Evidence: Administrative audit folder contains 6 required reports; code/docs inspection covered web registration, clinician registration, center registration, declaration review, profile change requests, routes, collections, and signal flow.
-Short Summary: Completed Administrative Domain deep audit and produced architecture, route, collection, signal, findings, and scorecard reports.
-Memory Impact: Establishes Administrative Domain health baseline after Pure DNA V1.
-Related Findings: `ADMINISTRATIVE_FINDINGS_REPORT_V1.md`
-Next Action: Owner may approve archive cards and registry updates recommended by the scorecard.
-
-### OP-PHASE-7B-COMMERCIAL-DEEP-AUDIT-V1
-
-Operation ID: OP-PHASE-7B-COMMERCIAL-DEEP-AUDIT-V1
-Operation Date/Time: 2026-06-17
-Chronological Order Number: 023
-Operation Title: Phase 7B Commercial Domain Deep Audit
-Prompt / Block Name: PHASE 7B - COMMERCIAL DOMAIN DEEP AUDIT
-Phase: 7B
-Execution Type: AUDIT
-Purpose: Deep audit Commercial Domain including specialists, centers, tools, commercial discovery, provider contact requests, and center contact requests.
-Scope: Commercial audit reports only; no runtime mutation.
-Files Created:
-- `docs/constitutional-baseline/domain-audits/commercial/COMMERCIAL_ARCHITECTURE_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/commercial/COMMERCIAL_ROUTE_HEALTH_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/commercial/COMMERCIAL_COLLECTION_HEALTH_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/commercial/COMMERCIAL_SIGNAL_FLOW_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/commercial/COMMERCIAL_ASSET_USAGE_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/commercial/COMMERCIAL_FINDINGS_REPORT_V1.md`
-- `docs/constitutional-baseline/domain-audits/commercial/COMMERCIAL_HEALTH_SCORECARD_V1.md`
-Files Modified:
-- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
-- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
-Files Deleted: none
-Reports Created:
-- `COMMERCIAL_ARCHITECTURE_REPORT_V1.md`
-- `COMMERCIAL_ROUTE_HEALTH_REPORT_V1.md`
-- `COMMERCIAL_COLLECTION_HEALTH_REPORT_V1.md`
-- `COMMERCIAL_SIGNAL_FLOW_REPORT_V1.md`
-- `COMMERCIAL_ASSET_USAGE_REPORT_V1.md`
-- `COMMERCIAL_FINDINGS_REPORT_V1.md`
-- `COMMERCIAL_HEALTH_SCORECARD_V1.md`
-Cards Created: none
-Guides Created: none
-Registries Updated:
-- Executed Operations Registry
-- Executed Operations Index
-Snapshots Created: none
-Runtime Effect: none
-Git Effect: none
-Firebase Effect: none
-Result: COMPLETED
-Evidence: Commercial audit folder contains 7 required reports; code/docs inspection covered specialists, centers, tools/city surfaces, commercial discovery, provider contact requests, center contact requests, routes, collections, signals, and assets.
-Short Summary: Completed Commercial Domain deep audit and produced architecture, route, collection, signal, asset, findings, and scorecard reports.
-Memory Impact: Establishes Commercial Domain health baseline after Pure DNA V1.
-Related Findings: `COMMERCIAL_FINDINGS_REPORT_V1.md`
-Next Action: Owner may approve archive cards and registry updates recommended by the scorecard.
+Evidence: Duplicate/out-of-order registry bodies for Phase 7B-7E normalized into chronological order; integrity verification now reports missing count 0, duplicate count 0, registry/index mismatches 0, and coverage 100%.
+Short Summary: Operations registry deduplication completed and scoped to operation documentation only.
+Memory Impact: Restores operation registry body uniqueness and chronological readability.
+Related Findings: `OPERATIONS_REGISTRY_INTEGRITY_AUDIT_V1.md`
+Next Action: Stage approved operation files, commit, and push current branch only.
