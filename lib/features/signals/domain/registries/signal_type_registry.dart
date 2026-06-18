@@ -1,7 +1,6 @@
 class SignalTypeRegistry {
   const SignalTypeRegistry._();
 
-  static const String destinationSaved = 'destination_saved';
   static const String providerContactStarted = 'provider_contact_started';
   static const String centerContactStarted = 'center_contact_started';
   static const String accessibleContactRequested =
@@ -26,7 +25,6 @@ class SignalTypeRegistry {
       'accessibility_resource_broken_link_reported';
 
   static const List<String> values = <String>[
-    destinationSaved,
     providerContactStarted,
     centerContactStarted,
     accessibleContactRequested,

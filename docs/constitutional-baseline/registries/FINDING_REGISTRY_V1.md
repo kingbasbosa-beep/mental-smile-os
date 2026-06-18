@@ -36,6 +36,7 @@ Runtime effect: none
 | FINDING-GHOST-ASSETS-REMOVED-FROM-DISK-V1 | Archived unbundled client dashboard, client registration, and client dashboard action asset folders were removed from disk after confirming no active refs or pubspec bundle entries. | ACTIVE_FINDING |
 | FINDING-GHOST-ROUTE-VISIBILITY-PURGED-V1 | Archived ghost placeholder routes were removed from normal navigation, route constants, and router cases while Owner-decision and active identity/accessibility routes were preserved. | ACTIVE_FINDING |
 | FINDING-FIREBASE-YAML-FINAL-WARNINGS-FOUND-V1 | Final Firebase/YAML compatibility sweep found no blockers, but retained Owner decisions around hosting target, GitHub Firebase workflows, saved destination lifecycle, signal aggregate lifecycle, Windows Firebase options, and Android backup config history. | ACTIVE_FINDING |
+| FINDING-SAVED-DESTINATIONS-CONFLICTS-WITH-FRESH-SIGNALS-V1 | Saved destinations preserve stale recall memory and conflict with Fresh Signals doctrine; repeated profile openings, contact requests, accessible contact requests, and accessibility resource openings are fresher current intent signals. | ACTIVE_FINDING |
 
 ## Finding Bindings
 
@@ -49,6 +50,7 @@ Runtime effect: none
 | FINDING-GHOST-ASSETS-REMOVED-FROM-DISK-V1 | `GHOST_ASSET_YAML_PURGE_REPORT_V1.md` | REMOVAL_REPORT_BOUND | OP-PACKAGE-B-GHOST-ASSET-YAML-PURGE-V1 |
 | FINDING-GHOST-ROUTE-VISIBILITY-PURGED-V1 | `GHOST_ROUTE_VISIBILITY_PURGE_REPORT_V1.md` | REMOVAL_REPORT_BOUND | OP-PACKAGE-C-GHOST-ROUTE-VISIBILITY-PURGE-V1 |
 | FINDING-FIREBASE-YAML-FINAL-WARNINGS-FOUND-V1 | `FIREBASE_YAML_FINAL_COMPATIBILITY_SWEEP_V1.md` | COMPATIBILITY_SWEEP_BOUND | OP-FIREBASE-YAML-FINAL-COMPATIBILITY-SWEEP-V1 |
+| FINDING-SAVED-DESTINATIONS-CONFLICTS-WITH-FRESH-SIGNALS-V1 | `SAVED_DESTINATIONS_EXTRACTION_REPORT_V1.md` | REMOVAL_REPORT_BOUND | OP-SAVED-DESTINATIONS-EXTRACTION-V1 |
 
 ## Rule
 

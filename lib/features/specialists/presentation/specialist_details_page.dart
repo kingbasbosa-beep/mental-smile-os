@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:mental_smile_os/app/router/routes.dart';
 import 'package:mental_smile_os/core/visibility/visibility_readiness.dart';
 import 'package:mental_smile_os/features/contact_requests/data/contact_request_repository.dart';
-import 'package:mental_smile_os/features/saved_destinations/data/saved_destination_repository.dart';
-import 'package:mental_smile_os/features/saved_destinations/domain/models/saved_destination.dart';
 import 'package:mental_smile_os/features/signals/signals.dart';
 import 'package:mental_smile_os/features/specialists/data/clinician_specialty_catalog.dart';
 import 'package:mental_smile_os/shared/analytics/app_analytics.dart';
@@ -62,14 +60,6 @@ class SpecialistDetailsPage extends StatelessWidget {
       labels.add('Easy Language Friendly');
     }
     return labels;
-  }
-
-  List<String> _providerSignalTags(Map<String, dynamic> data) {
-    return <String>[
-      _text(data['specialtyKey'], ''),
-      _text(data['specialty'], ''),
-      _text(data['professionalTitleKey'], ''),
-    ].where((value) => value.trim().isNotEmpty).toSet().toList();
   }
 
   String _sessionActorId() {
@@ -140,8 +130,8 @@ class SpecialistDetailsPage extends StatelessWidget {
         SnackBar(
           content: Text(
             isArabic
-                ? 'تم إرسال طلب التواصل. يمكنك متابعة الدعم أو حفظ مقدم الخدمة للرجوع لاحقًا.'
-                : 'Contact request sent. You can continue with support or save this provider for later.',
+                ? 'تم إرسال طلب التواصل. يمكنك متابعة الدعم عند الحاجة.'
+                : 'Contact request sent. You can continue with support if needed.',
           ),
         ),
       );
@@ -153,61 +143,6 @@ class SpecialistDetailsPage extends StatelessWidget {
             isArabic
                 ? 'تعذر إرسال طلب التواصل: $e'
                 : 'Could not send contact request: $e',
-          ),
-        ),
-      );
-    }
-  }
-
-  Future<void> _saveProviderDestination({
-    required BuildContext context,
-    required Map<String, dynamic> data,
-    required String providerId,
-    required String providerName,
-    required bool isArabic,
-  }) async {
-    final sessionId = _sessionActorId();
-    if (sessionId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isArabic
-                ? 'يرجى تسجيل الدخول لحفظ مقدم الخدمة.'
-                : 'Please sign in to save this provider.',
-          ),
-        ),
-      );
-      return;
-    }
-
-    try {
-      await SavedDestinationRepository().saveDestination(
-        sessionId: sessionId,
-        destinationType: SavedDestinationType.provider,
-        destinationId: providerId,
-        title: providerName,
-        route: Routes.specialistDetails,
-        signalTags: _providerSignalTags(data),
-      );
-      if (!context.mounted) return;
-      AppAnalytics.logPathSelected('specialists', 'save_provider_destination');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isArabic
-                ? 'تم حفظ مقدم الخدمة للرجوع لاحقًا.'
-                : 'Provider saved for later.',
-          ),
-        ),
-      );
-    } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isArabic
-                ? 'تعذر حفظ مقدم الخدمة: $e'
-                : 'Could not save provider: $e',
           ),
         ),
       );
@@ -727,26 +662,6 @@ class SpecialistDetailsPage extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
               ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
-        SizedBox(
-          width: double.infinity,
-          child: TextButton.icon(
-            onPressed: uid.isEmpty
-                ? null
-                : () => _saveProviderDestination(
-                      context: context,
-                      data: data,
-                      providerId: uid,
-                      providerName: name,
-                      isArabic: isArabic,
-                    ),
-            icon: const Icon(Icons.bookmark_add_outlined),
-            label: Text(isArabic ? 'حفظ مقدم الخدمة' : 'Save provider'),
-            style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFFFFE7B2),
             ),
           ),
         ),

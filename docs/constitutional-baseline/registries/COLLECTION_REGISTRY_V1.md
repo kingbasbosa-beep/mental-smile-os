@@ -18,7 +18,7 @@ Runtime effect: none
 | `centers` | ACTIVE |
 | `provider_contact_requests` | ACTIVE_SESSION_SCOPED |
 | `center_contact_requests` | ACTIVE_SESSION_SCOPED |
-| `saved_destinations` | ACTIVE_SESSION_SCOPED |
+| `saved_destinations` | ARCHIVED_REMOVED_FROM_RUNTIME |
 | `support_requests` | ACTIVE |
 | `chat_threads` | ACTIVE |
 | `chat_threads/{threadId}/messages` | ACTIVE |
@@ -36,7 +36,7 @@ Runtime effect: none
 
 | Collection / Collection Name | Status | Related Guide | Related Operation | Note |
 | --- | --- | --- | --- | --- |
-| `saved_destinations` | OWNER_DECISION_REQUIRED | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` | OP-GHOST-INFRASTRUCTURE-ARCHIVAL-GUIDE-V1 | Session-scoped writes exist, but user-visible readback journey was not found in the Purpose Null Audit. |
+| `saved_destinations` | REMOVED_FROM_RUNTIME | `ARCHIVE_CARD_SAVED_DESTINATIONS_V1.md` | OP-SAVED-DESTINATIONS-EXTRACTION-V1 | Owner decided to remove stored destination memory; Firestore rules, repository/model, save UI, and runtime signal producer were removed pending manual verification. |
 | `signal_aggregates` | OWNER_DECISION_REQUIRED | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` | OP-GHOST-INFRASTRUCTURE-ARCHIVAL-GUIDE-V1 | Read rules/models exist, but aggregate write lifecycle requires focused audit before activation or removal. |
 | `accessibility_resources` | ARCHIVAL_CARD_CREATED_PENDING_OWNER_DECISION | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` | OP-GHOST-INFRASTRUCTURE-ARCHIVAL-GUIDE-V1 | Model collection name exists while current accessibility resources are static sample data. |
 | `ai_policies` | OWNER_DECISION_REQUIRED | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` | OP-GHOST-INFRASTRUCTURE-ARCHIVAL-GUIDE-V1 | Registry/seeder references exist without a confirmed Firestore rule path in the Purpose Null Audit. |

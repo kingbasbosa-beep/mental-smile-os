@@ -334,7 +334,6 @@ class AppRouter {
             'Exercises',
             'Videos',
             'Audio',
-            'Saved destination targets',
           ],
         );
 

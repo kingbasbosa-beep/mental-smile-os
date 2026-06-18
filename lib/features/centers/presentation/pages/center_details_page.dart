@@ -4,8 +4,6 @@ import 'package:mental_smile_os/features/centers/data/models/center_model.dart';
 import 'package:mental_smile_os/features/centers/data/models/center_pricing.dart';
 import 'package:mental_smile_os/features/centers/data/services/centers_firestore_service.dart';
 import 'package:mental_smile_os/features/contact_requests/data/contact_request_repository.dart';
-import 'package:mental_smile_os/features/saved_destinations/data/saved_destination_repository.dart';
-import 'package:mental_smile_os/features/saved_destinations/domain/models/saved_destination.dart';
 import 'package:mental_smile_os/features/signals/signals.dart';
 import 'package:mental_smile_os/l10n/app_localizations.dart';
 import 'package:mental_smile_os/shared/analytics/app_analytics.dart';
@@ -22,29 +20,6 @@ class CenterDetailsPage extends StatelessWidget {
     this.center,
     this.centerId,
   });
-
-  List<String> _centerSignalTags(CenterModel center) {
-    final capabilities = center.capabilities;
-    return <String>[
-      center.category,
-      center.centerType,
-      ...center.services,
-      if (center.hasDetoxUnit) 'detox_unit',
-      if (capabilities.acceptsAddictionCases) 'addiction_cases',
-      if (capabilities.acceptsPsychiatricCasesWithoutAddiction)
-        'psychiatric_without_addiction',
-      if (capabilities.supportsChildren) 'children',
-      if (capabilities.supportsFamilies) 'families',
-      if (capabilities.supportsRecovery) 'recovery',
-      if (capabilities.supportsHearingSupport) 'hearing_support',
-      if (capabilities.supportsSpeechSupport) 'speech_support',
-      if (capabilities.supportsAccessibilitySupport) 'accessibility_support',
-      if (capabilities.supportsCoachingPrograms) 'coaching',
-      if (capabilities.supportsEducationPrograms) 'education',
-      if (center.accessibleCommunicationReady) 'accessible_contact_ready',
-      ...center.accessibleCommunicationCapabilities,
-    ].where((value) => value.trim().isNotEmpty).toSet().toList();
-  }
 
   String _sessionActorId() {
     return 'session_${DateTime.now().toUtc().microsecondsSinceEpoch}';
@@ -111,8 +86,8 @@ class CenterDetailsPage extends StatelessWidget {
         SnackBar(
           content: Text(
             isArabic
-                ? 'تم إرسال طلب التواصل. يمكنك متابعة الدعم أو حفظ المركز للرجوع لاحقًا.'
-                : 'Contact request sent. You can continue with support or save this center for later.',
+                ? 'تم إرسال طلب التواصل. يمكنك متابعة الدعم عند الحاجة.'
+                : 'Contact request sent. You can continue with support if needed.',
           ),
         ),
       );
@@ -124,58 +99,6 @@ class CenterDetailsPage extends StatelessWidget {
             isArabic
                 ? 'تعذر إرسال طلب التواصل: $e'
                 : 'Could not send contact request: $e',
-          ),
-        ),
-      );
-    }
-  }
-
-  Future<void> _saveCenterDestination({
-    required BuildContext context,
-    required CenterModel center,
-    required String title,
-    required bool isArabic,
-  }) async {
-    final sessionId = _sessionActorId();
-    if (sessionId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isArabic
-                ? 'يرجى تسجيل الدخول لحفظ المركز.'
-                : 'Please sign in to save this center.',
-          ),
-        ),
-      );
-      return;
-    }
-
-    try {
-      await SavedDestinationRepository().saveDestination(
-        sessionId: sessionId,
-        destinationType: SavedDestinationType.center,
-        destinationId: center.id,
-        title: title,
-        route: Routes.centerDetails,
-        signalTags: _centerSignalTags(center),
-      );
-      if (!context.mounted) return;
-      AppAnalytics.logPathSelected('centers', 'save_center_destination');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isArabic
-                ? 'تم حفظ المركز للرجوع لاحقًا.'
-                : 'Center saved for later.',
-          ),
-        ),
-      );
-    } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isArabic ? 'تعذر حفظ المركز: $e' : 'Could not save center: $e',
           ),
         ),
       );
@@ -1371,29 +1294,6 @@ class CenterDetailsPage extends StatelessWidget {
             icon: const Icon(Icons.sign_language_outlined),
             label: Text(
               isArabic ? '🤟 تواصل ميسر' : '🤟 Accessible Contact',
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
-        SizedBox(
-          width: double.infinity,
-          child: TextButton.icon(
-            onPressed: () => _saveCenterDestination(
-              context: context,
-              center: c,
-              title: name,
-              isArabic:
-                  Localizations.localeOf(context).languageCode.toLowerCase() ==
-                      'ar',
-            ),
-            icon: const Icon(Icons.bookmark_add_outlined),
-            label: Text(
-              Localizations.localeOf(context).languageCode.toLowerCase() == 'ar'
-                  ? 'حفظ المركز'
-                  : 'Save center',
-            ),
-            style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFFFFE7B2),
             ),
           ),
         ),

@@ -17,10 +17,6 @@ class ResidentialMonitoringRegistry {
     SignalTypeRegistry.libraryCategoryOpened,
   };
 
-  static const Set<String> savedDestinationSignals = <String>{
-    SignalTypeRegistry.destinationSaved,
-  };
-
   static const Set<String> toolSignals = <String>{
     toolAdded,
     toolRemoved,
@@ -30,7 +26,6 @@ class ResidentialMonitoringRegistry {
   static const Set<String> allResidentialSignals = <String>{
     ...supportSignals,
     ...librarySignals,
-    ...savedDestinationSignals,
     ...toolSignals,
   };
 
@@ -40,9 +35,6 @@ class ResidentialMonitoringRegistry {
     }
     if (librarySignals.contains(signalType)) {
       return ResidentialAggregateKind.library;
-    }
-    if (savedDestinationSignals.contains(signalType)) {
-      return ResidentialAggregateKind.savedDestination;
     }
     if (toolSignals.contains(signalType)) return ResidentialAggregateKind.tool;
     return null;

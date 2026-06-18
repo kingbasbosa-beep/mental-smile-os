@@ -350,15 +350,6 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    match /saved_destinations/{savedId} {
-      allow get, list: if isSupportObserver();
-      allow create: if isNonEmptyString(request.resource.data.sessionId)
-        && isNonEmptyString(request.resource.data.destinationId)
-        && isNonEmptyString(request.resource.data.destinationType);
-      allow update: if false;
-      allow delete: if false;
-    }
-
     match /chat_threads/{threadId} {
       allow read: if isSupportObserver()
         || (signedIn() && resource.data.participantUid == uid());

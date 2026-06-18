@@ -85,17 +85,6 @@ class SupportAggregate extends ResidentialSignalAggregate {
   });
 }
 
-class SavedDestinationAggregate extends ResidentialSignalAggregate {
-  const SavedDestinationAggregate({
-    required super.aggregateKey,
-    required super.signalType,
-    required super.count,
-    required super.firstSeen,
-    required super.lastSeen,
-    required super.aggregationWindow,
-  });
-}
-
 class ToolAggregate extends ResidentialSignalAggregate {
   const ToolAggregate({
     required super.aggregateKey,
@@ -160,15 +149,6 @@ ResidentialSignalAggregate residentialAggregateSeed({
         lastSeen: timestamp,
         aggregationWindow: aggregationWindow,
       );
-    case ResidentialAggregateKind.savedDestination:
-      return SavedDestinationAggregate(
-        aggregateKey: aggregateKey,
-        signalType: signal.signalType,
-        count: 1,
-        firstSeen: timestamp,
-        lastSeen: timestamp,
-        aggregationWindow: aggregationWindow,
-      );
     case ResidentialAggregateKind.tool:
       return ToolAggregate(
         aggregateKey: aggregateKey,
@@ -187,6 +167,5 @@ enum ResidentialAggregateKind {
   accessibility,
   library,
   support,
-  savedDestination,
   tool,
 }

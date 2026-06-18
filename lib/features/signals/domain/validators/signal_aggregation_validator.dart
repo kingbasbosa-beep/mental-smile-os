@@ -6,7 +6,6 @@ class SignalAggregationValidator {
   const SignalAggregationValidator._();
 
   static const Set<String> eligibleSignalTypes = <String>{
-    SignalTypeRegistry.destinationSaved,
     SignalTypeRegistry.providerContactStarted,
     SignalTypeRegistry.centerContactStarted,
     SignalTypeRegistry.accessibleContactRequested,

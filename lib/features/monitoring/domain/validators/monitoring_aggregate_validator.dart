@@ -13,7 +13,6 @@ class MonitoringAggregateValidator {
   };
 
   static const Set<String> readableSignalTypes = <String>{
-    SignalTypeRegistry.destinationSaved,
     SignalTypeRegistry.providerContactStarted,
     SignalTypeRegistry.centerContactStarted,
     SignalTypeRegistry.libraryCategoryOpened,

@@ -19,10 +19,6 @@ class ResidentialMonitoringSnapshotBuilder {
       ),
       librarySummary: _summary(items, ResidentialAggregateKind.library),
       supportSummary: _summary(items, ResidentialAggregateKind.support),
-      savedDestinationsSummary: _summary(
-        items,
-        ResidentialAggregateKind.savedDestination,
-      ),
       toolsSummary: _summary(items, ResidentialAggregateKind.tool),
     );
   }
@@ -49,9 +45,6 @@ class ResidentialMonitoringSnapshotBuilder {
     }
     if (aggregate is LibraryAggregate) return ResidentialAggregateKind.library;
     if (aggregate is SupportAggregate) return ResidentialAggregateKind.support;
-    if (aggregate is SavedDestinationAggregate) {
-      return ResidentialAggregateKind.savedDestination;
-    }
     if (aggregate is ToolAggregate) return ResidentialAggregateKind.tool;
     return null;
   }

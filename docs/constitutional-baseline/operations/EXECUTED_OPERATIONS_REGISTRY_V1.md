@@ -2115,6 +2115,7 @@ Files Modified:
 - `lib/features/specialists/presentation/specialist_details_page.dart`
 - `docs/accessibility/ACCESSIBILITY_GATEWAY_CARD_REGISTRY_V1.md`
 - `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_MEMORY_REGISTRY_V1.md`
 - `docs/constitutional-baseline/registries/GOVERNANCE_DECISION_REGISTRY_V1.md`
 - `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
 - `docs/constitutional-baseline/registries/SIGNAL_GOVERNANCE_REGISTRY_V1.md`
@@ -3090,3 +3091,77 @@ Summary:
 - Git actions performed: 0
 Final Verdict: FIREBASE_YAML_WARNINGS_FOUND
 Next Action: Owner decision before deploy on hosting target/workflows and future focused audit for saved destinations/signal aggregates if needed.
+
+---
+
+### OP-SAVED-DESTINATIONS-EXTRACTION-V1
+
+Operation ID: OP-SAVED-DESTINATIONS-EXTRACTION-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 068
+Operation Title: Saved Destinations Extraction
+Prompt / Block Name: SAVED DESTINATIONS EXTRACTION V1
+Phase: Fresh signals doctrine extraction
+Execution Type: SURGICAL_REMOVAL / DOC_CREATION / REGISTRY_UPDATE
+Classification:
+- SAVED_DESTINATIONS_EXTRACTION
+- FRESH_SIGNALS_DOCTRINE
+- NO_NEW_FEATURES
+Domain: RESIDENTIAL / SIGNALS / FIRESTORE_RULES / GOVERNANCE
+Purpose: Remove `saved_destinations` from active runtime because stored destinations conflict with Fresh Signals doctrine and session-first client access.
+Scope: No commit, push, tag, Firebase deploy, new features, or redesign. Provider/center/owner/monitoring/registry/declaration/support roles and accessibility gateway must remain preserved.
+Files Created:
+- `docs/constitutional-baseline/cards/decision/SAVED_DESTINATIONS_EXTRACTION_DECISION_V1.md`
+- `docs/constitutional-baseline/cards/archive/ARCHIVE_CARD_SAVED_DESTINATIONS_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_SAVED_DESTINATIONS_CONFLICTS_WITH_FRESH_SIGNALS_V1.md`
+- `docs/constitutional-baseline/operations/SAVED_DESTINATIONS_EXTRACTION_REPORT_V1.md`
+Files Modified:
+- `firestore.rules`
+- `lib/app/router/app_router.dart`
+- `lib/features/centers/presentation/pages/center_details_page.dart`
+- `lib/features/specialists/presentation/specialist_details_page.dart`
+- `lib/features/library/data/library_signal_metadata.dart`
+- `lib/features/signals/domain/factories/signal_package_factory.dart`
+- `lib/features/signals/domain/registries/signal_type_registry.dart`
+- `lib/features/signals/domain/validators/signal_aggregation_validator.dart`
+- `lib/features/signals/domain/models/signal_aggregate_read_models.dart`
+- `lib/features/monitoring/domain/adapters/monitoring_aggregation_adapter.dart`
+- `lib/features/monitoring/domain/validators/monitoring_aggregate_validator.dart`
+- `lib/features/monitoring/domain/registries/residential_monitoring_category_registry.dart`
+- `lib/features/monitoring/residential/aggregates/residential_signal_aggregate.dart`
+- `lib/features/monitoring/residential/application/residential_monitoring_snapshot_builder.dart`
+- `lib/features/monitoring/residential/domain/residential_monitoring_registry.dart`
+- `lib/features/monitoring/residential/models/residential_monitoring_snapshot.dart`
+- `docs/constitutional-baseline/registries/ARCHIVE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/COLLECTION_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/COMMERCIAL_COLLECTION_OWNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/COMMERCIAL_ROUTE_OWNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/GOVERNANCE_DECISION_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/RESIDENTIAL_COLLECTION_OWNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/RESIDENTIAL_SIGNAL_OWNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/SIGNAL_GOVERNANCE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/SIGNAL_OWNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted:
+- `lib/features/saved_destinations/data/saved_destination_repository.dart`
+- `lib/features/saved_destinations/domain/models/saved_destination.dart`
+- `lib/features/saved_destinations/saved_destinations.dart`
+Runtime Effect: Removed saved destination Firestore rule, repository/model/barrel, provider and center save buttons, `destination_saved` signal producer/registry references, and saved destination monitoring mappings. Preserved provider/center identity, contact flows, accessible contact flows, accessibility gateway, and support/owner/monitoring/registry/declaration roles.
+Git Effect: none
+Firebase Effect: none
+Result: SAVED_DESTINATIONS_REMOVED_PENDING_OWNER_VERIFICATION
+Evidence: Active code search for `saved_destinations`, `SavedDestination`, `destination_saved`, `saveDestination`, and `watchSessionDestinations` found no active references in `lib`, `firestore.rules`, `firestore.indexes.json`, `pubspec.yaml`, or `lib/l10n` after extraction. Historical docs and registries preserve archive references intentionally.
+Summary:
+- Decision card created: `SAVED_DESTINATIONS_EXTRACTION_DECISION_V1.md`
+- Archive card created: `ARCHIVE_CARD_SAVED_DESTINATIONS_V1.md`
+- Finding created: `FINDING_SAVED_DESTINATIONS_CONFLICTS_WITH_FRESH_SIGNALS_V1.md`
+- Collection rule removed: `/saved_destinations/{savedId}`
+- Signal removed: `destination_saved`
+- Runtime storage removed: `SavedDestinationRepository`, `SavedDestination`, and saved destination barrel export
+- UI save actions removed from provider and center details pages
+- Manual verification still required: `dart format`, `flutter analyze`, `flutter build apk --debug`, `flutter build web`
+Final Verdict: SAVED_DESTINATIONS_REMOVED_PENDING_OWNER_VERIFICATION
+Next Action: Owner runs manual verification commands and reviews scope before commit, push, tag, or deploy.

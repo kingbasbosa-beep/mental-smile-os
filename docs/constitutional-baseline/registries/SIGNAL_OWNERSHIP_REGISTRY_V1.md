@@ -14,7 +14,7 @@ Provide a cross-domain ownership view for signal families. Domain-specific owner
 | Signal Family | Owner | Consumers | Dependencies | Signals | Collections | Status | Lifecycle | Classification |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Client profile and goal signals | Archive | Archived client room/personal space | Pure client identity hard removal | client goals, interests, accessibility | none | ARCHIVED_HARD_REMOVED | Runtime archive | PURE_CLIENT_IDENTITY_REMOVED |
-| Saved destination signals | Residential | Session discovery, Monitoring | Residential collection ownership | saved destination | `saved_destinations`, `signal_events` | ACTIVE_SESSION_SCOPED | Runtime | SESSION_SIGNAL |
+| Saved destination signals | Archive/System | none active | OP-SAVED-DESTINATIONS-EXTRACTION-V1 | none | none | REMOVED_FROM_RUNTIME | Runtime archive | FRESH_SIGNALS_DOCTRINE_REMOVAL |
 | Support request signals | Residential with Monitoring observation | Support Room, Monitoring | Support boundary governance | support issue, risk support | `support_requests` | ACTIVE_CROSS_DOMAIN | Runtime | CROSS_DOMAIN_SIGNAL |
 | Chat escalation signals | Residential with Monitoring observation | Chat, Monitoring, Owner | Escalation ownership registry recommended | chat escalation, report, resolution | `chat_threads`, `chat_escalations` | ACTIVE_CROSS_DOMAIN | Runtime | CROSS_DOMAIN_SIGNAL |
 | Provider/clinician contact signals | Commercial | Specialists, Discovery, Administrative | Commercial ownership registry, terminology map | provider contact, clinician interest | `provider_contact_requests`, `clinicians` | ACTIVE_SESSION_SCOPED_WITH_TERMINOLOGY_RISK | Runtime | COMMERCIAL_SIGNAL |
@@ -41,7 +41,7 @@ Provide a cross-domain ownership view for signal families. Domain-specific owner
 | `interest_selected` | Archive/System | none verified | REMOVED_FROM_RUNTIME | CLIENT_ERA_GHOST_SIGNAL | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` |
 | `accessibility_interest` | Archive/System | none verified | REMOVED_FROM_RUNTIME | SUPERSEDED_SIGNAL | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` |
 | `accessibility_mode_selected` | Archive/System | none verified | REMOVED_FROM_RUNTIME | ACCESSIBILITY_GHOST_SIGNAL | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` |
-| `destination_saved` | Residential/Owner decision | Monitoring / saved destination workflow | OWNER_DECISION_REQUIRED | WRITEBACK_PURPOSE_UNCLEAR | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` |
+| `destination_saved` | Archive/System | none active | REMOVED_FROM_RUNTIME | STALE_STORED_MEMORY_SIGNAL | `ARCHIVE_CARD_SAVED_DESTINATIONS_V1.md` |
 
 ## Coverage
 

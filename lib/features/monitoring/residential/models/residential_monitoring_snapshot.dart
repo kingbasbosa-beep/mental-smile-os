@@ -8,7 +8,6 @@ class ResidentialMonitoringSnapshot {
     required this.accessibilitySummary,
     required this.librarySummary,
     required this.supportSummary,
-    required this.savedDestinationsSummary,
     required this.toolsSummary,
   });
 
@@ -18,7 +17,6 @@ class ResidentialMonitoringSnapshot {
   final ResidentialAggregateSummary accessibilitySummary;
   final ResidentialAggregateSummary librarySummary;
   final ResidentialAggregateSummary supportSummary;
-  final ResidentialAggregateSummary savedDestinationsSummary;
   final ResidentialAggregateSummary toolsSummary;
 }
 

@@ -6,12 +6,6 @@ class MostRequestedGoals {
   final List<SignalAggregate> items;
 }
 
-class MostSavedDestinations {
-  const MostSavedDestinations({required this.items});
-
-  final List<SignalAggregate> items;
-}
-
 class MostContactedProviderCategories {
   const MostContactedProviderCategories({required this.items});
 

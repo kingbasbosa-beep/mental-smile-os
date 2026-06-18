@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 // [S] Signal Native Asset
 // Library signal metadata for resource discovery.
 class LibrarySignalMetadata {
@@ -149,11 +147,6 @@ class LibrarySignalCatalog {
       accessibilitySignals: <String>['simplified_content'],
       difficultySignals: <String>['basic'],
     ),
-    'saved': LibrarySignalMetadata(
-      audienceSignals: <String>['general_public'],
-      formatSignals: <String>['checklist'],
-      difficultySignals: <String>['basic'],
-    ),
   };
 
   static const Map<String, LibrarySignalMetadata> featured =
@@ -177,31 +170,4 @@ class LibrarySignalCatalog {
   static LibrarySignalMetadata? forKey(String key) {
     return featured[key] ?? categories[key];
   }
-}
-
-class SavedDestinationDraft {
-  const SavedDestinationDraft({
-    required this.destinationType,
-    required this.destinationId,
-    required this.title,
-    required this.route,
-    required this.savedAt,
-    this.signals = const <String>[],
-  });
-
-  final String destinationType;
-  final String destinationId;
-  final String title;
-  final String route;
-  final Timestamp savedAt;
-  final List<String> signals;
-
-  Map<String, dynamic> toMap() => <String, dynamic>{
-        'destinationType': destinationType,
-        'destinationId': destinationId,
-        'title': title,
-        'route': route,
-        'savedAt': savedAt,
-        'signals': signals,
-      };
 }

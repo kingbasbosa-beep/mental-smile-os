@@ -8,28 +8,6 @@ import '../registries/signal_type_registry.dart';
 class SignalPackageFactory {
   const SignalPackageFactory._();
 
-  static SignalPackage destinationSaved({
-    required String actorId,
-    required String actorRole,
-    required String targetType,
-    required String targetId,
-    String signalSource = 'saved_destinations',
-    DateTime? timestamp,
-  }) {
-    return _package(
-      signalType: SignalTypeRegistry.destinationSaved,
-      signalCategory: SignalCategoryRegistry.destination,
-      signalDomain: 'residential',
-      signalSource: signalSource,
-      actorId: actorId,
-      actorRole: actorRole,
-      targetType: targetType,
-      targetId: targetId,
-      timestamp: timestamp,
-      routingTarget: SignalRoutingTarget.residentialMonitoring,
-    );
-  }
-
   static SignalPackage providerContactStarted({
     required String actorId,
     required String actorRole,

@@ -4,7 +4,6 @@ import 'package:mental_smile_os/features/signals/domain/registries/signal_type_r
 import '../models/monitoring_aggregate_item.dart';
 import '../models/monitoring_feeds.dart';
 import '../registries/commercial_monitoring_category_registry.dart';
-import '../registries/residential_monitoring_category_registry.dart';
 import '../validators/monitoring_aggregate_validator.dart';
 
 class MonitoringAggregationAdapter {
@@ -19,11 +18,7 @@ class MonitoringAggregationAdapter {
       goalAggregates: const <MonitoringAggregateItem>[],
       interestAggregates: const <MonitoringAggregateItem>[],
       accessibilityAggregates: const <MonitoringAggregateItem>[],
-      destinationAggregates: _itemsFor(
-        readable,
-        SignalTypeRegistry.destinationSaved,
-        ResidentialMonitoringCategoryRegistry.savedDestinations,
-      ),
+      destinationAggregates: const <MonitoringAggregateItem>[],
       libraryAggregates: _itemsFor(
         readable,
         SignalTypeRegistry.libraryCategoryOpened,
