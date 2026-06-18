@@ -75,9 +75,9 @@ class MenuPage extends StatelessWidget {
         );
       case 'client':
         return (
-          label: isArabic ? 'لوحتي' : 'My Dashboard',
+          label: isArabic ? 'دخول سريع' : 'Quick Access',
           icon: Icons.person_outline_rounded,
-          route: Routes.clientDashboard,
+          route: Routes.clientSessionRoom,
         );
     }
 

@@ -26,7 +26,12 @@ Provide a cross-domain ownership view for signal families. Domain-specific owner
 | Monitoring aggregate signals | Monitoring | Monitoring Room, Owner | Monitoring Authority Registry, aggregate lifecycle registry | aggregate, status, observability | `signal_events`, `system_domains` | ACTIVE_WITH_LIFECYCLE_GAP | Runtime | MONITORING_SIGNAL |
 | Governance memory signals | Owner | Operations, Archive, Memory, Registries | Executed Operations Registry, Finding Memory Registry | operation, finding, owner decision | governance docs | ACTIVE | Constitutional memory | GOVERNANCE_SIGNAL |
 
+## Phase 9 Accessibility Signal Entries
+
+| Signal Family | Owner | Consumers | Dependencies | Signals | Collections | Status | Lifecycle | Classification |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Accessible communication contact signals | Accessibility / Commercial | Provider pages, Center pages, Monitoring | Accessibility Gateway cards, Commercial signal ownership registry | accessible_contact_requested, accessible_contact_completed, accessible_provider_selected, accessible_center_selected | `signal_events`, `provider_contact_requests`, `center_contact_requests` | ACTIVE_PENDING_OWNER_MANUAL_VERIFICATION | Runtime | ACCESSIBILITY_COMMERCIAL_SIGNAL |
+
 ## Coverage
 
 Signal ownership coverage: 90%. Known runtime signal families have owners; unknown/future tool, recommendation, and aggregate lifecycle areas require Owner decisions before expansion.
-

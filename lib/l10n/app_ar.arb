@@ -33,7 +33,6 @@
   "authRequiredField": "هذا الحقل مطلوب",
   "authForgotPassword": "نسيت كلمة المرور؟",
   "authCreateAccount": "للتسجيل اضغط هنا",
-  "authClientRegister": "إنشاء حساب عميل",
   "authBackToHome": "العودة للرئيسية",
   "authLogoutConfirm": "تأكيد تسجيل الخروج",
   "authLogoutQuestion": "هل تريد تسجيل الخروج؟",
@@ -141,11 +140,9 @@
   "webClinicianAuthenticationSessionMissing": "خطوة التسجيل غير متاحة",
   "webClinicianSaveProfileFailed": "تعذر حفظ الملف الشخصي",
   "webClinicianSubmitDocumentsFailed": "تعذر إرسال المستندات",
-  "clientDashboardSubtitle": "كل خطواتك موجودة هنا بهدوء.",
   "clientSupport": "الدعم",
   "clientSupportRequests": "إشارات الدعم",
   "clientLinksAndCodes": "الروابط والأكواد",
-  "clientMessagePreferences": "تفضيلات الرسائل",
   "clientRatingsCount": "عدد التقييمات",
   "clientAverageStars": "متوسط النجوم",
   "clientOverallAverage": "المتوسط العام",
@@ -206,14 +203,6 @@
   "@localeLabel": {
     "placeholders": {
       "code": {
-        "type": "String"
-      }
-    }
-  },
-  "clientDashboardWelcome": "مرحبًا {name}",
-  "@clientDashboardWelcome": {
-    "placeholders": {
-      "name": {
         "type": "String"
       }
     }

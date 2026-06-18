@@ -31,7 +31,12 @@ Govern signal creation, ownership, routing, aggregation, visibility, retention, 
 | Monitoring signals | Phase 7E, Phase 8A | Monitoring Owner | Monitoring Room, Owner | Monitoring Authority Registry | escalation, aggregate, observability | `signal_events`, `chat_escalations`, `system_domains` | ACTIVE | Runtime | OBSERVABILITY_SIGNAL |
 | Governance signals | Phase 7F, Phase 8A-8C | Owner | All domains | Operations, findings, archive, memory registries | owner decisions, operations, findings | governance docs | ACTIVE | Constitutional memory | GOVERNANCE_SIGNAL |
 
+## Phase 9 Accessibility Signal Governance
+
+| Area | Source | Owner | Consumers | Dependencies | Signals | Collections | Status | Lifecycle | Classification |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Accessible communication signals | Phase 9 | Accessibility / Commercial Owner | Provider pages, Center pages, Monitoring | Accessibility communication card, Commercial Signal Ownership Registry | accessible_contact_requested, accessible_contact_completed, accessible_provider_selected, accessible_center_selected | `signal_events`, `provider_contact_requests`, `center_contact_requests` | ACTIVE_PENDING_OWNER_MANUAL_VERIFICATION | Runtime | ACCESSIBILITY_COMMERCIAL_SIGNAL |
+
 ## Coverage
 
 Signal governance coverage: 92%. Domain signal families are governed; aggregate lifecycle and future content/recommendation signals still require future dedicated registries before activation.
-

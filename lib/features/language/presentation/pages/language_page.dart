@@ -126,7 +126,7 @@ class MkLanguagePage extends ConsumerWidget {
                   _registrationItem(
                     context: context,
                     label: isArabic ? 'تسجيل عميل' : 'Register as client',
-                    route: Routes.clientRegister,
+                    route: Routes.clientSessionRoom,
                   ),
                   const SizedBox(height: 14),
                   _registrationItem(

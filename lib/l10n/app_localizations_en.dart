@@ -108,9 +108,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authCreateAccount => 'Tap here to register';
 
   @override
-  String get authClientRegister => 'Create client account';
-
-  @override
   String get authBackToHome => 'Back to home';
 
   @override
@@ -448,9 +445,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webClinicianSubmitDocumentsFailed => 'Could not submit documents';
 
   @override
-  String get clientDashboardSubtitle => 'Your next steps are all here.';
-
-  @override
   String get clientSupport => 'Support';
 
   @override
@@ -458,9 +452,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get clientLinksAndCodes => 'Links and codes';
-
-  @override
-  String get clientMessagePreferences => 'Message preferences';
 
   @override
   String get clientRatingsCount => 'Ratings count';
@@ -635,11 +626,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String localeLabel(String code) {
     return 'Locale: $code (tap or 🌐)';
-  }
-
-  @override
-  String clientDashboardWelcome(String name) {
-    return 'Welcome, $name';
   }
 
   @override

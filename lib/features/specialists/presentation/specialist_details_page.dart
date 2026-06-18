@@ -44,6 +44,27 @@ class SpecialistDetailsPage extends StatelessWidget {
     return const [];
   }
 
+  bool _boolValue(dynamic value) {
+    if (value is bool) return value;
+    final text = (value ?? '').toString().trim().toLowerCase();
+    return text == 'true' || text == 'yes' || text == '1';
+  }
+
+  List<String> _accessibleCommunicationCapabilities(Map<String, dynamic> data) {
+    final direct = _stringList(data['accessible_communication_capabilities']);
+    if (direct.isNotEmpty) return direct.toSet().toList();
+
+    final labels = <String>[];
+    if (_boolValue(data['text_friendly'])) labels.add('Text Friendly');
+    if (_boolValue(data['whatsapp_friendly'])) labels.add('WhatsApp Friendly');
+    if (_boolValue(data['video_friendly'])) labels.add('Video Friendly');
+    if (_boolValue(data['sign_friendly'])) labels.add('Sign Friendly');
+    if (_boolValue(data['easy_language_friendly'])) {
+      labels.add('Easy Language Friendly');
+    }
+    return labels;
+  }
+
   List<String> _providerSignalTags(Map<String, dynamic> data) {
     return <String>[
       _text(data['specialtyKey'], ''),
@@ -56,6 +77,7 @@ class SpecialistDetailsPage extends StatelessWidget {
     required BuildContext context,
     required String providerId,
     required bool isArabic,
+    bool accessibleContact = false,
   }) async {
     final clientId = FirebaseAuth.instance.currentUser?.uid ?? '';
     if (clientId.isEmpty) {
@@ -72,6 +94,23 @@ class SpecialistDetailsPage extends StatelessWidget {
     }
 
     try {
+      if (accessibleContact) {
+        await CleanSignalRuntime.firestore().emit(
+          SignalPackageFactory.accessibleProviderSelected(
+            actorId: clientId,
+            actorRole: 'client',
+            targetId: providerId,
+          ),
+        );
+        await CleanSignalRuntime.firestore().emit(
+          SignalPackageFactory.accessibleContactRequested(
+            actorId: clientId,
+            actorRole: 'client',
+            targetType: 'provider',
+            targetId: providerId,
+          ),
+        );
+      }
       await ContactRequestRepository().createProviderContactRequest(
         clientId: clientId,
         providerId: providerId,
@@ -84,6 +123,16 @@ class SpecialistDetailsPage extends StatelessWidget {
         'specialists',
         'provider_contact_request_created',
       );
+      if (accessibleContact) {
+        await CleanSignalRuntime.firestore().emit(
+          SignalPackageFactory.accessibleContactCompleted(
+            actorId: clientId,
+            actorRole: 'client',
+            targetType: 'provider',
+            targetId: providerId,
+          ),
+        );
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -418,6 +467,7 @@ class SpecialistDetailsPage extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildContent(
     BuildContext context, {
     required bool isArabic,
@@ -439,6 +489,8 @@ class SpecialistDetailsPage extends StatelessWidget {
     );
     final asset = _text(data['photoAsset'], '');
     final network = _text(data['photoUrl'], '');
+    final accessibleReady = _boolValue(data['accessible_communication_ready']);
+    final accessibleCapabilities = _accessibleCommunicationCapabilities(data);
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -539,7 +591,12 @@ class SpecialistDetailsPage extends StatelessWidget {
                 ),
               ),
               _ProviderSignalBadges(
-                labels: _providerSignalBadges(data, isArabic),
+                labels: <String>[
+                  ..._providerSignalBadges(data, isArabic),
+                  if (accessibleReady)
+                    isArabic ? 'تواصل ميسر' : 'Accessible contact ready',
+                  ...accessibleCapabilities,
+                ].toSet().toList(),
               ),
             ],
           ),
@@ -633,6 +690,36 @@ class SpecialistDetailsPage extends StatelessWidget {
               foregroundColor: const Color(0xFFFFE7B2),
               side: BorderSide(
                 color: const Color(0xFFE7C766).withValues(alpha: 0.28),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: uid.isEmpty
+                ? null
+                : () {
+                    _sendProviderContactRequest(
+                      context: context,
+                      providerId: uid,
+                      isArabic: isArabic,
+                      accessibleContact: true,
+                    );
+                  },
+            icon: const Icon(Icons.sign_language_outlined),
+            label: Text(
+              isArabic ? '🤟 تواصل ميسر' : '🤟 Accessible Contact',
+            ),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+              foregroundColor: const Color(0xFFFFE7B2),
+              side: BorderSide(
+                color: const Color(0xFF8EDBFF).withValues(alpha: 0.38),
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
@@ -911,4 +998,3 @@ class _InfoMiniCard extends StatelessWidget {
     );
   }
 }
-

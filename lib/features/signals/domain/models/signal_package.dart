@@ -63,7 +63,8 @@ class SignalPackage {
       actorRole: (map['actorRole'] ?? '').toString(),
       targetType: (map['targetType'] ?? '').toString(),
       targetId: (map['targetId'] ?? '').toString(),
-      timestamp: _dateTime(map['timestamp']) ?? DateTime.fromMillisecondsSinceEpoch(0),
+      timestamp:
+          _dateTime(map['timestamp']) ?? DateTime.fromMillisecondsSinceEpoch(0),
       routingTarget: (map['routingTarget'] ?? '').toString(),
       retentionClass: (map['retentionClass'] ?? '').toString(),
       privacyLevel: (map['privacyLevel'] ?? '').toString(),

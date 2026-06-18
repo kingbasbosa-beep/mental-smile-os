@@ -296,12 +296,6 @@ abstract class AppLocalizations {
   /// **'للتسجيل اضغط هنا'**
   String get authCreateAccount;
 
-  /// No description provided for @authClientRegister.
-  ///
-  /// In ar, this message translates to:
-  /// **'إنشاء حساب عميل'**
-  String get authClientRegister;
-
   /// No description provided for @authBackToHome.
   ///
   /// In ar, this message translates to:
@@ -944,12 +938,6 @@ abstract class AppLocalizations {
   /// **'تعذر إرسال المستندات'**
   String get webClinicianSubmitDocumentsFailed;
 
-  /// No description provided for @clientDashboardSubtitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'كل خطواتك موجودة هنا بهدوء.'**
-  String get clientDashboardSubtitle;
-
   /// No description provided for @clientSupport.
   ///
   /// In ar, this message translates to:
@@ -967,12 +955,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الروابط والأكواد'**
   String get clientLinksAndCodes;
-
-  /// No description provided for @clientMessagePreferences.
-  ///
-  /// In ar, this message translates to:
-  /// **'تفضيلات الرسائل'**
-  String get clientMessagePreferences;
 
   /// No description provided for @clientRatingsCount.
   ///
@@ -1315,12 +1297,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'اللغة: {code} (اضغط أو 🌐)'**
   String localeLabel(String code);
-
-  /// No description provided for @clientDashboardWelcome.
-  ///
-  /// In ar, this message translates to:
-  /// **'مرحبًا {name}'**
-  String clientDashboardWelcome(String name);
 
   /// No description provided for @comingSoon.
   ///

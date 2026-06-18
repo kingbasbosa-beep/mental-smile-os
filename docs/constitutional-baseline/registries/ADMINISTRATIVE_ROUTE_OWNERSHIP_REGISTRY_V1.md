@@ -6,8 +6,8 @@ Runtime effect: none
 
 | Entry | Owner | Consumers | Dependencies | Signals | Collections | Status | Lifecycle | Classification |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `/login` | Public/System | all roles | Firebase Auth, account access | auth state | role/account docs | ACTIVE | Runtime | ACTIVE |
-| `/register/client` | Client/System | public clients | Firebase Auth, Firestore | client registration | `clients` | ACTIVE | Runtime | ACTIVE |
+| `/login` | Public/System | all roles | Firebase Auth, account access | auth state | role/account docs | ACTIVE | Runtime | LEGACY_CANDIDATE |
+| `/register/client` | Client/System | public clients | Firebase Auth, Firestore | client registration | `clients` | ARCHIVED_PENDING_MANUAL_VERIFICATION | Runtime archive | CLIENT_LEGACY_REMOVED |
 | `/web/clinician/register` | Clinician/System | clinicians | Firebase Auth, readiness | declaration signals | `clinicians` | ACTIVE | Runtime | ACTIVE |
 | `/web/clinician/profile` | Clinician/System | clinicians | Firestore | profile declaration | `clinicians` | ACTIVE | Runtime | ACTIVE |
 | `/web/clinician/documents` | Clinician/System | clinicians | Firestore, readiness | document declaration | `clinicians` | ACTIVE | Runtime | ACTIVE |

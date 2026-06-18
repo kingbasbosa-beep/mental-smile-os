@@ -71,8 +71,10 @@ class Routes {
   static const exitSocialLinks = '/app/exit-social-links';
   static const blockedAccount = '/account-blocked';
   static const menu = '/menu';
+  static const accessibility = '/accessibility';
+  static const accessibilityOrganizations = '/accessibility/organizations';
 
-  static const clientRegister = '/register/client';
+  static const clientSessionRoom = '/client/session-room';
   // Alias: app registration entry; same destination as webClinicianRegister.
   static const clinicianRegister = '/register/clinician';
   // Alias: app registration entry; same destination as webCenterRegister.
@@ -80,8 +82,6 @@ class Routes {
   static const clinicianRoom = '/clinician/room';
   static const clinicianProfileEditRequest = '/clinician/profile-edit-request';
   static const clinicianChatInbox = '/clinician/chat-inbox';
-
-  static const clientDashboard = '/client/dashboard';
 
   static const centerDashboard = '/center/dashboard';
   static const centerRoom = '/center/room';

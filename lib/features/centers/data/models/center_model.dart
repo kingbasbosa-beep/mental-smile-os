@@ -55,6 +55,8 @@ class CenterModel {
   final List<AccommodationCostItem> accommodationCosts;
   final List<AutismCareCostItem> autismCareCosts;
   final CenterCapabilityFlags capabilities;
+  final bool accessibleCommunicationReady;
+  final List<String> accessibleCommunicationCapabilities;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -84,6 +86,8 @@ class CenterModel {
     required this.accommodationCosts,
     required this.autismCareCosts,
     required this.capabilities,
+    this.accessibleCommunicationReady = false,
+    this.accessibleCommunicationCapabilities = const <String>[],
     required this.createdAt,
     required this.updatedAt,
   });
@@ -129,6 +133,32 @@ class CenterModel {
         return value.map((e) => e.toString()).toList();
       }
       return const <String>[];
+    }
+
+    bool asBool(dynamic value) {
+      if (value is bool) return value;
+      final text = (value ?? '').toString().trim().toLowerCase();
+      return text == 'true' || text == 'yes' || text == '1';
+    }
+
+    List<String> accessibleCapabilities() {
+      final direct = asStringList(data['accessible_communication_capabilities'])
+          .where((value) => value.trim().isNotEmpty)
+          .toSet()
+          .toList();
+      if (direct.isNotEmpty) return direct;
+
+      final capabilities = <String>[];
+      if (asBool(data['text_friendly'])) capabilities.add('Text Friendly');
+      if (asBool(data['whatsapp_friendly'])) {
+        capabilities.add('WhatsApp Friendly');
+      }
+      if (asBool(data['video_friendly'])) capabilities.add('Video Friendly');
+      if (asBool(data['sign_friendly'])) capabilities.add('Sign Friendly');
+      if (asBool(data['easy_language_friendly'])) {
+        capabilities.add('Easy Language Friendly');
+      }
+      return capabilities;
     }
 
     List<CenterDocument> asDocuments(dynamic value) {
@@ -242,6 +272,9 @@ class CenterModel {
             ? Map<String, dynamic>.from(data['centerCapabilities'])
             : const <String, dynamic>{},
       ),
+      accessibleCommunicationReady:
+          asBool(data['accessible_communication_ready']),
+      accessibleCommunicationCapabilities: accessibleCapabilities(),
       createdAt: asDate(data['createdAt']),
       updatedAt: asDate(data['updatedAt']),
     );
@@ -272,6 +305,9 @@ class CenterModel {
       'accommodationCosts': accommodationCosts.map((e) => e.toMap()).toList(),
       'autismCareCosts': autismCareCosts.map((e) => e.toMap()).toList(),
       'centerCapabilities': capabilities.toMap(),
+      'accessible_communication_ready': accessibleCommunicationReady,
+      'accessible_communication_capabilities':
+          accessibleCommunicationCapabilities,
       'createdAt': createdAt == null
           ? FieldValue.serverTimestamp()
           : Timestamp.fromDate(createdAt!),
@@ -307,6 +343,8 @@ class CenterModel {
     List<AccommodationCostItem>? accommodationCosts,
     List<AutismCareCostItem>? autismCareCosts,
     CenterCapabilityFlags? capabilities,
+    bool? accessibleCommunicationReady,
+    List<String>? accessibleCommunicationCapabilities,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -336,6 +374,11 @@ class CenterModel {
       accommodationCosts: accommodationCosts ?? this.accommodationCosts,
       autismCareCosts: autismCareCosts ?? this.autismCareCosts,
       capabilities: capabilities ?? this.capabilities,
+      accessibleCommunicationReady:
+          accessibleCommunicationReady ?? this.accessibleCommunicationReady,
+      accessibleCommunicationCapabilities:
+          accessibleCommunicationCapabilities ??
+              this.accessibleCommunicationCapabilities,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

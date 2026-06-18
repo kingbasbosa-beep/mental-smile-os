@@ -108,9 +108,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authCreateAccount => 'للتسجيل اضغط هنا';
 
   @override
-  String get authClientRegister => 'إنشاء حساب عميل';
-
-  @override
   String get authBackToHome => 'العودة للرئيسية';
 
   @override
@@ -442,9 +439,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get webClinicianSubmitDocumentsFailed => 'تعذر إرسال المستندات';
 
   @override
-  String get clientDashboardSubtitle => 'كل خطواتك موجودة هنا بهدوء.';
-
-  @override
   String get clientSupport => 'الدعم';
 
   @override
@@ -452,9 +446,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get clientLinksAndCodes => 'الروابط والأكواد';
-
-  @override
-  String get clientMessagePreferences => 'تفضيلات الرسائل';
 
   @override
   String get clientRatingsCount => 'عدد التقييمات';
@@ -627,11 +618,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String localeLabel(String code) {
     return 'اللغة: $code (اضغط أو 🌐)';
-  }
-
-  @override
-  String clientDashboardWelcome(String name) {
-    return 'مرحبًا $name';
   }
 
   @override

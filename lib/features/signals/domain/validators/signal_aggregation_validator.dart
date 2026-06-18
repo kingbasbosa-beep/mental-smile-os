@@ -12,6 +12,10 @@ class SignalAggregationValidator {
     SignalTypeRegistry.destinationSaved,
     SignalTypeRegistry.providerContactStarted,
     SignalTypeRegistry.centerContactStarted,
+    SignalTypeRegistry.accessibleContactRequested,
+    SignalTypeRegistry.accessibleContactCompleted,
+    SignalTypeRegistry.accessibleProviderSelected,
+    SignalTypeRegistry.accessibleCenterSelected,
     SignalTypeRegistry.libraryCategoryOpened,
   };
 

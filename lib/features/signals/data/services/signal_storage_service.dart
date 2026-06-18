@@ -13,7 +13,8 @@ class SignalStorageService {
 
   Future<void> saveSignal(SignalPackage signal) async {
     try {
-      final eventRef = _firestore.collection(eventsCollection).doc(signal.signalId);
+      final eventRef =
+          _firestore.collection(eventsCollection).doc(signal.signalId);
       await eventRef.set({
         ...signal.toMap(),
         'createdAt': FieldValue.serverTimestamp(),

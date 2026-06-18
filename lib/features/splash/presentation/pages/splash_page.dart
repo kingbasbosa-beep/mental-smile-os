@@ -34,6 +34,53 @@ class _SplashPageState extends ConsumerState<SplashPage> {
     ref.read(localeProvider.notifier).state = Locale(nextCode);
   }
 
+  void _showProviderCenterAccessSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      backgroundColor: const Color(0xFFF7F4EF),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Provider / Center Access',
+                  style: TextStyle(
+                    color: Color(0xFF17201B),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _SplashSheetAction(
+                  icon: Icons.psychology_alt_outlined,
+                  label: 'Providers',
+                  onPressed: () {
+                    Navigator.of(sheetContext).pop();
+                    Navigator.of(context).pushNamed(Routes.sCityProviders);
+                  },
+                ),
+                const SizedBox(height: 10),
+                _SplashSheetAction(
+                  icon: Icons.apartment_outlined,
+                  label: 'Centers',
+                  onPressed: () {
+                    Navigator.of(sheetContext).pop();
+                    Navigator.of(context).pushNamed(Routes.sCityCenters);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bg = _backgroundAsset(context);
@@ -42,6 +89,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
     final locale = ref.watch(localeProvider);
     final activeLocale = locale ?? Localizations.localeOf(context);
     final isArabic = activeLocale.languageCode.toLowerCase() == 'ar';
+    final isMobile = MediaQuery.sizeOf(context).width < 700;
 
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
@@ -61,9 +109,9 @@ class _SplashPageState extends ConsumerState<SplashPage> {
             ),
             Positioned(
               top: 20,
-              right: 96,
+              right: isMobile ? 24 : 96,
               child: Tooltip(
-                message: isArabic ? 'English' : 'العربية',
+                message: isArabic ? 'English' : 'Arabic',
                 child: GestureDetector(
                   onTapDown: (_) => setState(() => _languagePressed = true),
                   onTapCancel: () => setState(() => _languagePressed = false),
@@ -122,103 +170,56 @@ class _SplashPageState extends ConsumerState<SplashPage> {
             Align(
               alignment: Alignment.centerRight,
               child: Padding(
-                padding: const EdgeInsets.only(right: 92),
+                padding: EdgeInsets.only(
+                  right: isMobile ? 24 : 92,
+                  left: 24,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    GestureDetector(
+                    _SplashPrimaryAction(
+                      label: 'Quick Access',
+                      icon: Icons.flash_on_rounded,
                       onTap: () {
-                        Navigator.of(context).pushReplacementNamed(Routes.login);
+                        Navigator.of(context).pushNamed(
+                          Routes.clientSessionRoom,
+                        );
                       },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 22,
-                          vertical: 14,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(999),
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color(0xFFFFF4C2),
-                              Color(0xFFD4AF37),
-                              Color(0xFF7A4E12),
-                            ],
-                          ),
-                          border: Border.all(
-                            color: const Color(0xFFFFE8A3),
-                            width: 1.3,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFFD4AF37)
-                                  .withValues(alpha: 0.65),
-                              blurRadius: 24,
-                              spreadRadius: 3,
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              isArabic ? 'ابدأ الرحلة' : 'Start Journey',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                color: Color(0xFFF4F1E8),
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.3,
-                                shadows: [
-                                  Shadow(
-                                    color: Colors.black54,
-                                    blurRadius: 6,
-                                    offset: Offset(0, 1),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
-                    const SizedBox(height: 12),
-                    TextButton(
+                    const SizedBox(height: 10),
+                    _SplashSecondaryAction(
+                      label: 'Accessibility Access',
+                      icon: Icons.accessibility_new_rounded,
                       onPressed: () {
-                        Navigator.of(context)
-                            .pushReplacementNamed(Routes.portalHome);
+                        Navigator.of(context).pushNamed(Routes.accessibility);
                       },
-                      style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFFFFE8A3),
-                        backgroundColor: Colors.black.withValues(alpha: 0.18),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(999),
-                          side: BorderSide(
-                            color: const Color(0xFFFFE8A3)
-                                .withValues(alpha: 0.34),
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        isArabic
-                            ? 'العودة إلى بوابة الويب'
-                            : 'Back to Web Portal',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black54,
-                              blurRadius: 4,
-                              offset: Offset(0, 1),
-                            ),
-                          ],
-                        ),
-                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _SplashSecondaryAction(
+                      label: 'Provider / Center Access',
+                      icon: Icons.business_center_outlined,
+                      onPressed: () => _showProviderCenterAccessSheet(context),
+                    ),
+                    const SizedBox(height: 10),
+                    _SplashSecondaryAction(
+                      label: 'Legacy Login',
+                      icon: Icons.login_rounded,
+                      onPressed: () {
+                        Navigator.of(context).pushReplacementNamed(
+                          Routes.login,
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    _SplashSecondaryAction(
+                      label: 'Web Portal',
+                      icon: Icons.public_rounded,
+                      onPressed: () {
+                        Navigator.of(context).pushReplacementNamed(
+                          Routes.portalHome,
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -226,6 +227,151 @@ class _SplashPageState extends ConsumerState<SplashPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SplashPrimaryAction extends StatelessWidget {
+  const _SplashPrimaryAction({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        constraints: const BoxConstraints(minWidth: 220),
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(999),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFFFF4C2),
+              Color(0xFFD4AF37),
+              Color(0xFF7A4E12),
+            ],
+          ),
+          border: Border.all(
+            color: const Color(0xFFFFE8A3),
+            width: 1.3,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFD4AF37).withValues(alpha: 0.65),
+              blurRadius: 24,
+              spreadRadius: 3,
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: const Color(0xFFF4F1E8), size: 20),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Color(0xFFF4F1E8),
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black54,
+                      blurRadius: 6,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SplashSecondaryAction extends StatelessWidget {
+  const _SplashSecondaryAction({
+    required this.label,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 18),
+      style: TextButton.styleFrom(
+        foregroundColor: const Color(0xFFFFE8A3),
+        backgroundColor: Colors.black.withValues(alpha: 0.18),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(999),
+          side: BorderSide(
+            color: const Color(0xFFFFE8A3).withValues(alpha: 0.34),
+          ),
+        ),
+      ),
+      label: Text(
+        label,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0,
+          shadows: [
+            Shadow(
+              color: Colors.black54,
+              blurRadius: 4,
+              offset: Offset(0, 1),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SplashSheetAction extends StatelessWidget {
+  const _SplashSheetAction({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon),
+      label: Text(label),
+      style: FilledButton.styleFrom(
+        backgroundColor: const Color(0xFF116A5B),
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }

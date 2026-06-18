@@ -1685,3 +1685,929 @@ Short Summary: Operations registry deduplication completed and scoped to operati
 Memory Impact: Restores operation registry body uniqueness and chronological readability.
 Related Findings: `OPERATIONS_REGISTRY_INTEGRITY_AUDIT_V1.md`
 Next Action: Stage approved operation files, commit, and push current branch only.
+
+### OP-ACCESSIBILITY-DIRECTORY-LAYER-V1-FOUNDATION
+
+Operation ID: OP-ACCESSIBILITY-DIRECTORY-LAYER-V1-FOUNDATION
+Operation Date/Time: 2026-06-17
+Chronological Order Number: 044
+Operation Title: Accessibility Directory Layer V1 Foundation
+Prompt / Block Name: ACCESSIBILITY OPERATION REGISTRATION
+Phase: Parallel over-executed scaffold
+Execution Type: PLAN_REQUESTED / SCAFFOLD_EXECUTED / OWNER_REVIEW_REQUIRED
+Classification:
+- PLAN_REQUESTED
+- SCAFFOLD_EXECUTED
+- OWNER_REVIEW_REQUIRED
+Domain: ACCESSIBILITY
+Purpose: Register that the Owner requested an Accessibility Directory Layer V1 plan, but Codex over-executed by creating scaffold, route integration, signal integration, and documentation before Owner approval.
+Scope: Hold the accessibility scaffold for Owner review; no commit, no push, no tag, no Firebase action, no runtime change.
+Files Created:
+- `lib/features/accessibility/data/accessibility_sample_resources.dart`
+- `lib/features/accessibility/domain/factories/accessibility_signal_factory.dart`
+- `lib/features/accessibility/domain/models/accessibility_category.dart`
+- `lib/features/accessibility/domain/models/accessibility_communication_mode.dart`
+- `lib/features/accessibility/domain/models/accessibility_disability_type.dart`
+- `lib/features/accessibility/domain/models/accessibility_resource.dart`
+- `lib/features/accessibility/domain/models/accessibility_resource_type.dart`
+- `lib/features/accessibility/domain/models/accessibility_signal_type.dart`
+- `lib/features/accessibility/domain/registries/accessibility_category_registry.dart`
+- `lib/features/accessibility/domain/registries/accessibility_icon_registry.dart`
+- `lib/features/accessibility/domain/registries/accessibility_resource_type_registry.dart`
+- `lib/features/accessibility/domain/registries/accessibility_signal_registry.dart`
+- `lib/features/accessibility/presentation/pages/accessibility_hub_page.dart`
+- `lib/features/accessibility/presentation/pages/accessibility_resource_list_page.dart`
+- `docs/accessibility/ACCESSIBILITY_DIRECTORY_LAYER_V1_PLAN.md`
+- `docs/accessibility/ACCESSIBILITY_OPERATION_REGISTRATION_REPORT_V1.md`
+Files Modified:
+- `lib/app/router/routes.dart`
+- `lib/app/router/app_router.dart`
+- `lib/features/signals/domain/registries/signal_type_registry.dart`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created:
+- `docs/accessibility/ACCESSIBILITY_DIRECTORY_LAYER_V1_PLAN.md`
+- `docs/accessibility/ACCESSIBILITY_OPERATION_REGISTRATION_REPORT_V1.md`
+Cards Created: none
+Guides Created: none
+Models Added:
+- `AccessibilityResource`
+- `AccessibilityCategory`
+- `AccessibilityDisabilityType`
+- `AccessibilityResourceType`
+- `AccessibilitySignalType`
+- `AccessibilityCommunicationMode`
+Registries Added:
+- `AccessibilityCategoryRegistry`
+- `AccessibilityResourceTypeRegistry`
+- `AccessibilitySignalRegistry`
+- `AccessibilityIconRegistry`
+Registries Updated:
+- Executed Operations Registry
+- Executed Operations Index
+- Signal Type Registry
+Routes Added:
+- `/accessibility`
+Signal Integrations:
+- `AccessibilitySignalFactory`
+- `accessibility_hub_opened`
+- `accessibility_category_opened`
+- `accessibility_resource_opened`
+- `accessibility_resource_saved`
+- `accessibility_resource_broken_link_reported`
+- `accessibility_mode_selected`
+Collections Prepared:
+- `accessibility_resources`
+Snapshots Created: none
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: HELD_FOR_OWNER_REVIEW
+Evidence: Owner request asked for a plan; `ACCESSIBILITY_DIRECTORY_LAYER_V1_PLAN.md` was created, and additional scaffold under `lib/features/accessibility/`, `/accessibility` route integration, and accessibility signal constants were over-executed.
+Short Summary: Accessibility work registered as a parallel over-executed scaffold operation, not as approved feature completion.
+Memory Impact: Preserves the accessibility scaffold lineage and review hold before any commit or governed feature foundation approval.
+Related Findings: Mental Smile doctrine: different access paths into the same city; no diagnosis, no treatment promise, no booking/session/payment/admin authority.
+Commit Hold:
+- Must not be committed until formatting passes.
+- Must not be committed until analyze passes.
+- Must not be committed until Owner reviews scope.
+- Must not be committed until the operation is approved as a governed feature foundation.
+Next Action: Owner reviews scope and decides whether to approve, revise, or remove the scaffold before any commit.
+
+### OP-PHASE-7A-CLIENT-IDENTITY-EXTRACTION-DOCUMENTATION-V1
+
+Operation ID: OP-PHASE-7A-CLIENT-IDENTITY-EXTRACTION-DOCUMENTATION-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 045
+Operation Title: Client Identity Extraction Era Documentation
+Prompt / Block Name: PHASE 7A CLIENT IDENTITY EXTRACTION ERA DOCUMENTATION
+Phase: 7A
+Execution Type: DOC_CREATION
+Classification:
+- DECISION_CARD_CREATED
+- FINDING_CARD_CREATED
+- ARCHIVE_CARD_CREATED
+- REGISTRIES_UPDATED
+Domain: RESIDENTIAL / SIGNALS / GOVERNANCE
+Purpose: Create and register Client Identity Extraction Era doctrine before any implementation.
+Scope: Documentation only. Record why client login/profile/preference persistence became simplification candidates and why repeated session-room intent signals are fresher than stored preferences.
+Files Created:
+- `docs/constitutional-baseline/cards/decision/CLIENT_IDENTITY_EXTRACTION_DECISION_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_FRESH_SIGNALS_OVER_STORED_PREFERENCES_V1.md`
+- `docs/constitutional-baseline/cards/archive/ARCHIVE_CARD_CLIENT_PROFILE_COMPLEXITY_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/ARCHIVE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/GOVERNANCE_DECISION_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created: none
+Cards Created:
+- `CLIENT_IDENTITY_EXTRACTION_DECISION_V1`
+- `FINDING_FRESH_SIGNALS_OVER_STORED_PREFERENCES_V1`
+- `ARCHIVE_CARD_CLIENT_PROFILE_COMPLEXITY_V1`
+Guides Created: none
+Registries Updated:
+- Memory Registry
+- Finding Registry
+- Finding Memory Registry
+- Archive Registry
+- Governance Decision Registry
+- Executed Operations Registry
+- Executed Operations Index
+Snapshots Created: none
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED
+Evidence: Decision, finding, and archive cards created; memory entries added for Client Identity Extraction Era, Fresh Signal Preference Doctrine, and Stateless Client Room Doctrine; findings and operation registered.
+Short Summary: Phase 7A Client Identity Extraction Era doctrine documented before implementation.
+Memory Impact: Preserves the distinction between saved preferences and repeated intent signals before any client identity runtime extraction.
+Related Findings:
+- `FINDING-FRESH-SIGNALS-OVER-STORED-PREFERENCES-V1`
+- `FINDING-CLIENT-PROFILE-COMPLEXITY-V1`
+Related Cards:
+- `CLIENT_IDENTITY_EXTRACTION_DECISION_V1.md`
+- `FINDING_FRESH_SIGNALS_OVER_STORED_PREFERENCES_V1.md`
+- `ARCHIVE_CARD_CLIENT_PROFILE_COMPLEXITY_V1.md`
+Owner Approval Required: before any runtime implementation.
+Owner Approval Status: DOCUMENTATION_REQUEST_APPROVED_BY_PROMPT
+Next Action: None for implementation. Any future runtime change requires separate Owner-approved operation.
+
+### OP-PHASE-7B-ACCESSIBILITY-GATEWAY-FOUNDATION-V1
+
+Operation ID: OP-PHASE-7B-ACCESSIBILITY-GATEWAY-FOUNDATION-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 046
+Operation Title: Accessibility Gateway Foundation
+Prompt / Block Name: PHASE 7B ACCESSIBILITY GATEWAY FOUNDATION
+Phase: 7B
+Execution Type: DOC_CREATION
+Classification:
+- ACCESSIBILITY_GOVERNANCE_LAYER
+- GUIDE_CREATED
+- CARDS_CREATED
+- CARD_REGISTRY_CREATED
+Domain: ACCESSIBILITY
+Purpose: Create Accessibility Gateway Foundation governance layer before any runtime implementation.
+Scope: Documentation only. Record accessibility as access and barrier removal, not user classification or segregation.
+Files Created:
+- `docs/accessibility/ACCESSIBILITY_GATEWAY_GUIDE_V1.md`
+- `docs/accessibility/ACCESSIBILITY_ROOM_CARD_V1.md`
+- `docs/accessibility/ACCESSIBILITY_COMMUNICATION_CARD_V1.md`
+- `docs/accessibility/ACCESSIBILITY_ORGANIZATION_DIRECTORY_CARD_V1.md`
+- `docs/accessibility/ACCESSIBILITY_TV_CARD_V1.md`
+- `docs/accessibility/ACCESSIBILITY_GATEWAY_CARD_REGISTRY_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created: none
+Cards Created:
+- `ACCESSIBILITY_ROOM_CARD_V1`
+- `ACCESSIBILITY_COMMUNICATION_CARD_V1`
+- `ACCESSIBILITY_ORGANIZATION_DIRECTORY_CARD_V1`
+- `ACCESSIBILITY_TV_CARD_V1`
+Guides Created:
+- `ACCESSIBILITY_GATEWAY_GUIDE_V1`
+Registries Created:
+- `ACCESSIBILITY_GATEWAY_CARD_REGISTRY_V1`
+Registries Updated:
+- Executed Operations Registry
+- Executed Operations Index
+Snapshots Created: none
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED
+Evidence: Accessibility Gateway guide, room card, communication card, organization directory card, TV card, and card registry created under `docs/accessibility/`.
+Short Summary: Accessibility Gateway Foundation documented as governance-only layer.
+Memory Impact: Preserves doctrine that Mental Smile removes barriers, does not classify users, and treats accessibility as access rather than segregation.
+Related Cards:
+- `ACCESSIBILITY_GATEWAY_GUIDE_V1.md`
+- `ACCESSIBILITY_ROOM_CARD_V1.md`
+- `ACCESSIBILITY_COMMUNICATION_CARD_V1.md`
+- `ACCESSIBILITY_ORGANIZATION_DIRECTORY_CARD_V1.md`
+- `ACCESSIBILITY_TV_CARD_V1.md`
+Owner Approval Required: before any runtime implementation.
+Owner Approval Status: DOCUMENTATION_REQUEST_APPROVED_BY_PROMPT
+Next Action: None for runtime. Any future accessibility implementation requires separate Owner-approved operation.
+
+### OP-PHASE-7C-ACCESSIBILITY-IMPLEMENTATION-PLAN-V1
+
+Operation ID: OP-PHASE-7C-ACCESSIBILITY-IMPLEMENTATION-PLAN-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 047
+Operation Title: Accessibility Implementation Plan
+Prompt / Block Name: PHASE 7C ACCESSIBILITY IMPLEMENTATION PLAN
+Phase: 7C
+Execution Type: DOC_CREATION
+Classification:
+- IMPLEMENTATION_ROADMAP
+- NO_RUNTIME_CHANGE
+Domain: ACCESSIBILITY
+Purpose: Create an implementation roadmap for accessibility waves before any code changes.
+Scope: Documentation only. Define waves, complexity estimates, dependencies, risks, and signal impact.
+Files Created:
+- `docs/accessibility/ACCESSIBILITY_IMPLEMENTATION_PLAN_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created: none
+Cards Created: none
+Guides Created: none
+Registries Updated:
+- Executed Operations Registry
+- Executed Operations Index
+Snapshots Created: none
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED
+Evidence: `ACCESSIBILITY_IMPLEMENTATION_PLAN_V1.md` created with Waves 1 through 8, complexity estimates, dependencies, risks, and signal impact.
+Short Summary: Accessibility implementation roadmap documented without code modification.
+Memory Impact: Preserves implementation sequence before any accessibility runtime work.
+Related Cards:
+- `ACCESSIBILITY_GATEWAY_GUIDE_V1.md`
+- `ACCESSIBILITY_ROOM_CARD_V1.md`
+- `ACCESSIBILITY_COMMUNICATION_CARD_V1.md`
+- `ACCESSIBILITY_ORGANIZATION_DIRECTORY_CARD_V1.md`
+- `ACCESSIBILITY_TV_CARD_V1.md`
+Owner Approval Required: before any implementation wave.
+Owner Approval Status: DOCUMENTATION_REQUEST_APPROVED_BY_PROMPT
+Next Action: None for runtime. Each wave requires separate Owner-approved operation.
+
+### OP-CONSTITUTIONAL-OPERATION-LOGGING-DIRECTIVE-V1
+
+Operation ID: OP-CONSTITUTIONAL-OPERATION-LOGGING-DIRECTIVE-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 048
+Operation Title: Constitutional Operation Logging Directive
+Prompt / Block Name: CONSTITUTIONAL OPERATION LOGGING DIRECTIVE
+Phase: Governance Directive
+Execution Type: DOC_CREATION / OWNER_DECISION
+Classification:
+- CONSTITUTIONAL_DIRECTIVE
+- OPERATION_LOGGING_REQUIRED
+- REPOSITORY_MEMORY_MANDATORY
+Domain: GOVERNANCE
+Purpose: Register the Owner directive that every repository action must be operation-logged unless explicitly exempted by `DO NOT LOG THIS OPERATION`.
+Scope: Governance documentation only. No runtime, Firebase, route, signal, collection, UI, Git, or code changes.
+Files Created:
+- `docs/constitutional-baseline/cards/decision/CONSTITUTIONAL_OPERATION_LOGGING_DIRECTIVE_V1.md`
+- `docs/constitutional-baseline/operations/CONSTITUTIONAL_OPERATION_LOGGING_DIRECTIVE_INTEGRITY_VERIFICATION_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/GOVERNANCE_DECISION_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created:
+- `docs/constitutional-baseline/operations/CONSTITUTIONAL_OPERATION_LOGGING_DIRECTIVE_INTEGRITY_VERIFICATION_V1.md`
+Cards Created:
+- `CONSTITUTIONAL_OPERATION_LOGGING_DIRECTIVE_V1`
+Guides Created: none
+Registries Updated:
+- Memory Registry
+- Governance Decision Registry
+- Executed Operations Registry
+- Executed Operations Index
+Snapshots Created: none
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED
+Evidence: Owner issued Constitutional Operation Logging Directive; decision card created; memory and governance decision registries updated; operation registered; integrity verification report created.
+Short Summary: Repository-wide mandatory operation logging directive registered.
+Memory Impact: Establishes mandatory repository memory for every future action.
+Related Findings: none
+Related Cards:
+- `CONSTITUTIONAL_OPERATION_LOGGING_DIRECTIVE_V1.md`
+Related Guides: none
+Related Registries:
+- `MEMORY_REGISTRY_V1.md`
+- `GOVERNANCE_DECISION_REGISTRY_V1.md`
+- `EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `EXECUTED_OPERATIONS_INDEX_V1.md`
+Owner Approval Required: no, directive issued by Owner.
+Owner Approval Status: APPROVED_BY_OWNER_DIRECTIVE
+Next Action: Apply this directive to every future repository action unless Owner explicitly says `DO NOT LOG THIS OPERATION`.
+
+### OP-PHASE-8-CLIENT-ACCESS-EXECUTION-V1
+
+Operation ID: OP-PHASE-8-CLIENT-ACCESS-EXECUTION-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 049
+Operation Title: Phase 8 Client Access Execution
+Prompt / Block Name: PHASE 8 CLIENT ACCESS EXECUTION
+Phase: 8
+Execution Type: RUNTIME_CHANGE / DOC_CREATION
+Classification:
+- SPLASH_SIMPLIFICATION
+- CLIENT_IDENTITY_EXTRACTION_STEP
+- CLIENT_SESSION_ROOM_INTRODUCTION
+- LEGACY_CANDIDATE_MARKING
+Domain: RESIDENTIAL / ACCESSIBILITY / RUNTIME
+Purpose: Add account-free client access paths, introduce Client Session Room, and mark client login/registration/profile surfaces as LEGACY_CANDIDATE while keeping legacy routes temporarily.
+Scope: Runtime route/UI addition plus governance registration. No Firebase change, no route removal, no collection change, no legacy auth deletion.
+Files Created:
+- `lib/features/client/presentation/pages/client_session_room_page.dart`
+- `docs/constitutional-baseline/cards/decision/CLIENT_ACCESS_EXECUTION_DECISION_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_CLIENT_ACCESS_ACCOUNT_FIRST_BARRIER_V1.md`
+- `docs/constitutional-baseline/cards/archive/ARCHIVE_CARD_CLIENT_LOGIN_REGISTRATION_PROFILE_LEGACY_V1.md`
+- `docs/constitutional-baseline/operations/OP_PHASE_8_CLIENT_ACCESS_EXECUTION_CARD_V1.md`
+- `docs/constitutional-baseline/operations/PHASE_8_CLIENT_ACCESS_EXECUTION_INTEGRITY_VERIFICATION_V1.md`
+Files Modified:
+- `lib/features/splash/presentation/pages/splash_page.dart`
+- `lib/app/router/routes.dart`
+- `lib/app/router/app_router.dart`
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/ARCHIVE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/GOVERNANCE_DECISION_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/ROUTE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/ADMINISTRATIVE_ROUTE_OWNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/RESIDENTIAL_ROUTE_OWNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created:
+- `docs/constitutional-baseline/operations/PHASE_8_CLIENT_ACCESS_EXECUTION_INTEGRITY_VERIFICATION_V1.md`
+Cards Created:
+- `CLIENT_ACCESS_EXECUTION_DECISION_V1`
+- `FINDING_CLIENT_ACCESS_ACCOUNT_FIRST_BARRIER_V1`
+- `ARCHIVE_CARD_CLIENT_LOGIN_REGISTRATION_PROFILE_LEGACY_V1`
+Guides Created: none
+Registries Updated:
+- Finding Registry
+- Archive Registry
+- Memory Registry
+- Governance Decision Registry
+- Route Registry
+- Administrative Route Ownership Registry
+- Residential Route Ownership Registry
+- Executed Operations Registry
+- Executed Operations Index
+Routes Added:
+- `/client/session-room`
+Routes Kept Temporarily:
+- `/login`
+- `/register/client`
+- `/client/dashboard`
+Runtime Effect: Splash now exposes Quick Access, Accessibility Access, and Provider / Center Access; Client Session Room is available without account requirement.
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED
+Evidence: Runtime files updated; governance cards and registries updated; operation registered. Technical command validation is OWNER_MANUAL_PENDING because Owner instructed Codex not to run commands.
+Short Summary: Client access moved from login-first splash entry toward account-free session access while retaining legacy account routes.
+Memory Impact: Records Phase 8 as the first client access execution step after Client Identity Extraction Era documentation.
+Related Findings:
+- `FINDING_CLIENT_ACCESS_ACCOUNT_FIRST_BARRIER_V1.md`
+- `FINDING_FRESH_SIGNALS_OVER_STORED_PREFERENCES_V1.md`
+Related Cards:
+- `CLIENT_ACCESS_EXECUTION_DECISION_V1.md`
+- `ARCHIVE_CARD_CLIENT_LOGIN_REGISTRATION_PROFILE_LEGACY_V1.md`
+- `CLIENT_IDENTITY_EXTRACTION_DECISION_V1.md`
+Related Guides:
+- `ACCESSIBILITY_GATEWAY_GUIDE_V1.md`
+Related Registries:
+- `ROUTE_REGISTRY_V1.md`
+- `RESIDENTIAL_ROUTE_OWNERSHIP_REGISTRY_V1.md`
+- `ADMINISTRATIVE_ROUTE_OWNERSHIP_REGISTRY_V1.md`
+Owner Approval Required: no further approval for this documented execution; future removals require separate Owner approval.
+Owner Approval Status: APPROVED_BY_PROMPT
+Next Action: Owner runs manual formatting/analyze/runtime checks and reports any blockers in a follow-up operation if needed.
+
+### OP-PHASE-9-ACCESSIBLE-COMMUNICATION-V1
+
+Operation ID: OP-PHASE-9-ACCESSIBLE-COMMUNICATION-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 050
+Operation Title: Phase 9 Accessible Communication Execution
+Prompt / Block Name: PHASE 9 ACCESSIBLE COMMUNICATION EXECUTION
+Phase: 9
+Execution Type: RUNTIME_CHANGE / DOC_CREATION / REGISTRY_UPDATE
+Classification:
+- ACCESSIBILITY_COMMUNICATION_FOUNDATION
+- PROVIDER_CONTACT_ACCESS
+- CENTER_CONTACT_ACCESS
+- SIGNAL_INTEGRATION
+Domain: ACCESSIBILITY / COMMERCIAL / SIGNALS
+Purpose: Add accessible communication readiness and accessible contact actions to provider and center contact surfaces using Mental Smile barrier-removal doctrine.
+Scope: Runtime provider/center page additions, signal registry/factory integration, center model field support, accessibility/governance card creation, and registry updates.
+Files Created:
+- `docs/constitutional-baseline/cards/decision/ACCESSIBLE_COMMUNICATION_EXECUTION_DECISION_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_ACCESSIBLE_CONTACT_PATH_MISSING_V1.md`
+- `docs/accessibility/ACCESSIBLE_COMMUNICATION_EXECUTION_CARD_V1.md`
+- `docs/constitutional-baseline/operations/OP_PHASE_9_ACCESSIBLE_COMMUNICATION_CARD_V1.md`
+- `docs/constitutional-baseline/operations/PHASE_9_ACCESSIBLE_COMMUNICATION_INTEGRITY_VERIFICATION_V1.md`
+Files Modified:
+- `lib/features/signals/domain/registries/signal_type_registry.dart`
+- `lib/features/signals/domain/factories/signal_package_factory.dart`
+- `lib/features/signals/domain/validators/signal_aggregation_validator.dart`
+- `lib/features/centers/data/models/center_model.dart`
+- `lib/features/centers/presentation/pages/center_details_page.dart`
+- `lib/features/specialists/presentation/specialist_details_page.dart`
+- `docs/accessibility/ACCESSIBILITY_GATEWAY_CARD_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/GOVERNANCE_DECISION_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/SIGNAL_GOVERNANCE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/SIGNAL_OWNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/COMMERCIAL_SIGNAL_OWNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created:
+- `docs/constitutional-baseline/operations/PHASE_9_ACCESSIBLE_COMMUNICATION_INTEGRITY_VERIFICATION_V1.md`
+Cards Created:
+- `ACCESSIBLE_COMMUNICATION_EXECUTION_DECISION_V1`
+- `FINDING_ACCESSIBLE_CONTACT_PATH_MISSING_V1`
+- `ACCESSIBLE_COMMUNICATION_EXECUTION_CARD_V1`
+Guides Created: none
+Registries Updated:
+- Accessibility Gateway Card Registry
+- Finding Registry
+- Governance Decision Registry
+- Memory Registry
+- Signal Governance Registry
+- Signal Ownership Registry
+- Commercial Signal Ownership Registry
+- Executed Operations Registry
+- Executed Operations Index
+Provider Fields Added:
+- `accessible_communication_ready`
+- `accessible_communication_capabilities`
+Provider Capabilities Added:
+- Text Friendly
+- WhatsApp Friendly
+- Video Friendly
+- Sign Friendly
+- Easy Language Friendly
+Signals Added:
+- `accessible_contact_requested`
+- `accessible_contact_completed`
+- `accessible_provider_selected`
+- `accessible_center_selected`
+Runtime Effect: Provider and center pages now expose normal contact and accessible contact actions. Accessible contact emits accessibility/commercial signals and reuses the existing contact request flow.
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED_PENDING_OWNER_MANUAL_VERIFICATION
+Evidence: Runtime files updated; governance cards created; registries updated; operation registered chronologically as 050.
+Technical Validation: OWNER_MANUAL_PENDING. Owner requested command execution manually after aborting the attempted format command.
+Short Summary: Phase 9 creates the accessible communication runtime foundation without classifying users or removing the normal contact path.
+Memory Impact: Records the first runtime accessible contact path for commercial discovery.
+Related Findings:
+- `FINDING_ACCESSIBLE_CONTACT_PATH_MISSING_V1.md`
+Related Cards:
+- `ACCESSIBLE_COMMUNICATION_EXECUTION_DECISION_V1.md`
+- `ACCESSIBLE_COMMUNICATION_EXECUTION_CARD_V1.md`
+- `ACCESSIBILITY_COMMUNICATION_CARD_V1.md`
+Related Guides:
+- `ACCESSIBILITY_GATEWAY_GUIDE_V1.md`
+Related Registries:
+- `SIGNAL_GOVERNANCE_REGISTRY_V1.md`
+- `SIGNAL_OWNERSHIP_REGISTRY_V1.md`
+- `COMMERCIAL_SIGNAL_OWNERSHIP_REGISTRY_V1.md`
+Owner Approval Required: Owner manual technical verification required before commit.
+Owner Approval Status: APPROVED_BY_PROMPT / MANUAL_VERIFICATION_PENDING
+Next Action: Owner runs manual formatting, analyze, provider smoke check, center smoke check, and signal emission smoke check.
+
+### OP-PHASE-10-ACCESSIBILITY-TV-V1
+
+Operation ID: OP-PHASE-10-ACCESSIBILITY-TV-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 051
+Operation Title: Phase 10 Accessibility TV Execution
+Prompt / Block Name: PHASE 10 ACCESSIBILITY TV EXECUTION
+Phase: 10
+Execution Type: RUNTIME_CHANGE / DOC_CREATION / REGISTRY_UPDATE
+Classification:
+- ACCESSIBILITY_TV_GATEWAY_FOUNDATION
+- YOUTUBE_GATEWAY_ONLY
+- NO_CMS
+- NO_VIDEO_RUNTIME
+Domain: ACCESSIBILITY / CONTENT
+Purpose: Add Accessibility TV as a YouTube Gateway only, exposing Mental Smile Accessibility Channel topics without CMS or video runtime.
+Scope: Runtime Accessibility Hub card plus governance registration. No CMS, no embedded video player, no video collection, no Firebase action, no route change.
+Files Created:
+- `docs/constitutional-baseline/cards/decision/ACCESSIBILITY_TV_EXECUTION_DECISION_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_ACCESSIBILITY_TV_GATEWAY_MISSING_V1.md`
+- `docs/accessibility/ACCESSIBILITY_TV_EXECUTION_CARD_V1.md`
+- `docs/constitutional-baseline/operations/OP_PHASE_10_ACCESSIBILITY_TV_CARD_V1.md`
+- `docs/constitutional-baseline/operations/PHASE_10_ACCESSIBILITY_TV_INTEGRITY_VERIFICATION_V1.md`
+Files Modified:
+- `lib/features/accessibility/presentation/pages/accessibility_hub_page.dart`
+- `docs/accessibility/ACCESSIBILITY_GATEWAY_CARD_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/GOVERNANCE_DECISION_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created:
+- `docs/constitutional-baseline/operations/PHASE_10_ACCESSIBILITY_TV_INTEGRITY_VERIFICATION_V1.md`
+Cards Created:
+- `ACCESSIBILITY_TV_EXECUTION_DECISION_V1`
+- `FINDING_ACCESSIBILITY_TV_GATEWAY_MISSING_V1`
+- `ACCESSIBILITY_TV_EXECUTION_CARD_V1`
+Guides Created: none
+Registries Updated:
+- Accessibility Gateway Card Registry
+- Finding Registry
+- Governance Decision Registry
+- Memory Registry
+- Executed Operations Registry
+- Executed Operations Index
+Topics Supported:
+- Sign Language
+- Rights
+- Complaints
+- Platform Usage
+- Family Support
+- Autism
+- Learning Difficulties
+- Literacy Support
+Runtime Effect: Accessibility Hub now exposes an Accessibility TV gateway card that opens YouTube externally for Mental Smile Accessibility Channel.
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED_PENDING_OWNER_MANUAL_VERIFICATION
+Evidence: Runtime hub file updated; governance cards created; registries updated; operation registered chronologically as 051.
+Technical Validation: OWNER_MANUAL_PENDING because Owner requested manual command execution in the active workstream.
+Short Summary: Accessibility TV moved from doctrine-only to a YouTube Gateway runtime access point without CMS or video runtime.
+Memory Impact: Records the first video-first accessibility access point.
+Related Findings:
+- `FINDING_ACCESSIBILITY_TV_GATEWAY_MISSING_V1.md`
+Related Cards:
+- `ACCESSIBILITY_TV_CARD_V1.md`
+- `ACCESSIBILITY_TV_EXECUTION_CARD_V1.md`
+- `ACCESSIBILITY_TV_EXECUTION_DECISION_V1.md`
+Related Guides:
+- `ACCESSIBILITY_GATEWAY_GUIDE_V1.md`
+Related Registries:
+- `ACCESSIBILITY_GATEWAY_CARD_REGISTRY_V1.md`
+- `FINDING_REGISTRY_V1.md`
+- `GOVERNANCE_DECISION_REGISTRY_V1.md`
+- `MEMORY_REGISTRY_V1.md`
+Owner Approval Required: Owner manual technical verification required before commit.
+Owner Approval Status: APPROVED_BY_PROMPT / MANUAL_VERIFICATION_PENDING
+Next Action: Owner runs manual formatting, analyze, and Accessibility Hub smoke check.
+
+### OP-PHASE-11-PARTNERSHIP-FOUNDATION-V1
+
+Operation ID: OP-PHASE-11-PARTNERSHIP-FOUNDATION-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 052
+Operation Title: Phase 11 Organizations And Partnerships Foundation
+Prompt / Block Name: PHASE 11 ORGANIZATIONS AND PARTNERSHIPS FOUNDATION
+Phase: 11
+Execution Type: RUNTIME_CHANGE / DOC_CREATION / REGISTRY_UPDATE
+Classification:
+- ACCESSIBILITY_PARTNERSHIP_FOUNDATION
+- ORGANIZATIONS_DIRECTORY_FOUNDATION
+- PARTNERSHIP_REQUEST_FLOW
+- EMPTY_GOVERNED_REGISTRY
+Domain: ACCESSIBILITY / PARTNERSHIPS
+Purpose: Add an organizations directory foundation and partnership request preparation flow with governed fields and categories.
+Scope: Runtime directory surface, non-persistent partnership request form, empty organization registry, route addition, hub entry point, and governance registration.
+Files Created:
+- `lib/features/accessibility/domain/models/accessibility_organization_category.dart`
+- `lib/features/accessibility/domain/models/accessibility_organization.dart`
+- `lib/features/accessibility/domain/registries/accessibility_organization_registry.dart`
+- `lib/features/accessibility/presentation/pages/accessibility_organizations_page.dart`
+- `docs/accessibility/ACCESSIBILITY_PARTNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/cards/decision/PARTNERSHIP_FOUNDATION_DECISION_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_PARTNERSHIP_DIRECTORY_FOUNDATION_MISSING_V1.md`
+- `docs/accessibility/ORGANIZATIONS_AND_PARTNERSHIPS_FOUNDATION_CARD_V1.md`
+- `docs/constitutional-baseline/operations/OP_PHASE_11_PARTNERSHIP_FOUNDATION_CARD_V1.md`
+- `docs/constitutional-baseline/operations/PHASE_11_PARTNERSHIP_FOUNDATION_INTEGRITY_VERIFICATION_V1.md`
+Files Modified:
+- `lib/app/router/routes.dart`
+- `lib/app/router/app_router.dart`
+- `lib/features/accessibility/presentation/pages/accessibility_hub_page.dart`
+- `docs/accessibility/ACCESSIBILITY_GATEWAY_CARD_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/GOVERNANCE_DECISION_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/ROUTE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created:
+- `docs/constitutional-baseline/operations/PHASE_11_PARTNERSHIP_FOUNDATION_INTEGRITY_VERIFICATION_V1.md`
+Cards Created:
+- `PARTNERSHIP_FOUNDATION_DECISION_V1`
+- `FINDING_PARTNERSHIP_DIRECTORY_FOUNDATION_MISSING_V1`
+- `ORGANIZATIONS_AND_PARTNERSHIPS_FOUNDATION_CARD_V1`
+Registry Created:
+- `ACCESSIBILITY_PARTNERSHIP_REGISTRY_V1.md`
+Route Added:
+- `/accessibility/organizations`
+Organization Fields Added:
+- Name
+- Country
+- Category
+- Website
+- Email
+- WhatsApp
+Categories Added:
+- Deaf
+- Blind
+- Autism
+- Learning Difficulties
+- Literacy
+- Family Support
+- Recovery
+- Mental Health
+Runtime Effect: Accessibility Hub now opens an Organizations & Partnerships surface with category filters and a partnership request preparation form. The organization registry starts empty until reviewed entries are approved.
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED_PENDING_OWNER_MANUAL_VERIFICATION
+Evidence: Runtime files created/updated; partnership registry created; governance cards and registries updated; operation registered chronologically as 052.
+Technical Validation: OWNER_MANUAL_PENDING because command execution remains Owner-manual in this active workstream.
+Short Summary: Phase 11 creates the partnership foundation without publishing unreviewed organizations or storing partnership requests.
+Memory Impact: Records first accessibility partnership and organization directory runtime foundation.
+Related Findings:
+- `FINDING_PARTNERSHIP_DIRECTORY_FOUNDATION_MISSING_V1.md`
+Related Cards:
+- `ACCESSIBILITY_ORGANIZATION_DIRECTORY_CARD_V1.md`
+- `ORGANIZATIONS_AND_PARTNERSHIPS_FOUNDATION_CARD_V1.md`
+- `PARTNERSHIP_FOUNDATION_DECISION_V1.md`
+Related Guides:
+- `ACCESSIBILITY_GATEWAY_GUIDE_V1.md`
+Related Registries:
+- `ACCESSIBILITY_PARTNERSHIP_REGISTRY_V1.md`
+- `ACCESSIBILITY_GATEWAY_CARD_REGISTRY_V1.md`
+- `ROUTE_REGISTRY_V1.md`
+Owner Approval Required: Owner manual technical verification required before commit.
+Owner Approval Status: APPROVED_BY_PROMPT / MANUAL_VERIFICATION_PENDING
+Next Action: Owner runs manual formatting, analyze, Accessibility Hub smoke check, Organizations Directory smoke check, and Partnership Request smoke check.
+
+### OP-PHASE-12-SIGNAL-PURIFICATION-AUDIT-V1
+
+Operation ID: OP-PHASE-12-SIGNAL-PURIFICATION-AUDIT-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 053
+Operation Title: Phase 12 Signal Purification Audit
+Prompt / Block Name: PHASE 12 SIGNAL PURIFICATION AUDIT
+Phase: 12
+Execution Type: AUDIT / DOC_CREATION / REGISTRY_UPDATE
+Classification:
+- SIGNAL_PURIFICATION_AUDIT
+- ARCHITECTURAL_FINDINGS
+- MEMORY_UPDATE
+Domain: SIGNALS / ACCESSIBILITY / RESIDENTIAL / RUNTIME GOVERNANCE
+Purpose: Audit client identity removal impact, accessibility impact, signal quality impact, noise reduction, route reduction, page reduction, and technical debt reduction.
+Scope: Documentation audit only. No runtime code change, no route change, no Firebase action, no commit, no push, no tag.
+Files Created:
+- `docs/audits/SIGNAL_PURIFICATION_AUDIT_REPORT_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_SIGNAL_PURIFICATION_PARTIAL_NOT_COMPLETE_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_ACCESSIBILITY_SIGNALS_IMPROVE_INTENT_SPECIFICITY_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_ROUTE_PAGE_REDUCTION_REQUIRES_SEPARATE_EXTRACTION_V1.md`
+- `docs/constitutional-baseline/operations/OP_PHASE_12_SIGNAL_PURIFICATION_AUDIT_CARD_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created:
+- `docs/audits/SIGNAL_PURIFICATION_AUDIT_REPORT_V1.md`
+Findings Created:
+- `FINDING_SIGNAL_PURIFICATION_PARTIAL_NOT_COMPLETE_V1`
+- `FINDING_ACCESSIBILITY_SIGNALS_IMPROVE_INTENT_SPECIFICITY_V1`
+- `FINDING_ROUTE_PAGE_REDUCTION_REQUIRES_SEPARATE_EXTRACTION_V1`
+Registries Updated:
+- Finding Registry
+- Memory Registry
+- Executed Operations Registry
+- Executed Operations Index
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED
+Evidence: Audit report created; architectural findings generated; findings and memory registered; operation registered chronologically as 053.
+Short Summary: Signal purification is a partial success pending runtime verification. Accessibility signal specificity improved, while client identity removal and route/page reduction are not complete.
+Memory Impact: Preserves the distinction between signal purification direction and actual removal/reduction completion.
+Related Findings:
+- `FINDING_SIGNAL_PURIFICATION_PARTIAL_NOT_COMPLETE_V1.md`
+- `FINDING_ACCESSIBILITY_SIGNALS_IMPROVE_INTENT_SPECIFICITY_V1.md`
+- `FINDING_ROUTE_PAGE_REDUCTION_REQUIRES_SEPARATE_EXTRACTION_V1.md`
+Related Reports:
+- `SIGNAL_PURIFICATION_AUDIT_REPORT_V1.md`
+Owner Approval Required: no runtime approval; future extraction/removal requires separate Owner approval.
+Owner Approval Status: APPROVED_BY_PROMPT
+Next Action: Run focused audits for client legacy route extraction readiness and accessibility signal runtime verification.
+
+### OP-PHASE-OPERATION-GOVERNANCE-REINFORCEMENT-V1
+
+Operation ID: OP-PHASE-OPERATION-GOVERNANCE-REINFORCEMENT-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 054
+Operation Title: Phase Operation Governance Reinforcement
+Prompt / Block Name: Before every phase / After every phase governance directive
+Phase: Governance Directive
+Execution Type: OWNER_DIRECTIVE / DOC_CREATION / REGISTRY_UPDATE
+Classification:
+- GOVERNANCE_DIRECTIVE_REINFORCEMENT
+- OPERATION_MEMORY_REQUIREMENT
+- PHASE_INTEGRITY_REQUIREMENT
+Domain: GOVERNANCE / OPERATIONS MEMORY
+Purpose: Reinforce mandatory operation records before phases, registry updates after phases, card requirements, integrity verification, chronological order, and causality preservation.
+Scope: Governance documentation and registry updates only. No runtime code change.
+Files Created:
+- `docs/constitutional-baseline/cards/decision/PHASE_OPERATION_GOVERNANCE_REINFORCEMENT_DECISION_V1.md`
+- `docs/constitutional-baseline/operations/OP_PHASE_OPERATION_GOVERNANCE_REINFORCEMENT_CARD_V1.md`
+- `docs/constitutional-baseline/operations/PHASE_OPERATION_GOVERNANCE_REINFORCEMENT_INTEGRITY_VERIFICATION_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/registries/GOVERNANCE_DECISION_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted: none
+Reports Created:
+- `docs/constitutional-baseline/operations/PHASE_OPERATION_GOVERNANCE_REINFORCEMENT_INTEGRITY_VERIFICATION_V1.md`
+Decision Cards Created:
+- `PHASE_OPERATION_GOVERNANCE_REINFORCEMENT_DECISION_V1`
+Archive Registry Updated: not applicable
+Finding Registry Updated: not applicable
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED
+Evidence: Decision card and integrity verification created; decision and memory registries updated; operation registered chronologically as 054.
+Short Summary: Owner reinforced that no phase or action may remain undocumented and that every phase must preserve chronological causality.
+Memory Impact: Strengthens mandatory repository memory and phase integrity requirements.
+Related Cards:
+- `CONSTITUTIONAL_OPERATION_LOGGING_DIRECTIVE_V1.md`
+- `PHASE_OPERATION_GOVERNANCE_REINFORCEMENT_DECISION_V1.md`
+Owner Approval Required: no, Owner issued directive.
+Owner Approval Status: APPROVED_BY_OWNER_DIRECTIVE
+Next Action: Apply this reinforced sequencing to every future phase.
+
+### OP-PHASE-13-CLIENT-LEGACY-DEPENDENCY-CUT-MAP-V1
+
+Operation ID: OP-PHASE-13-CLIENT-LEGACY-DEPENDENCY-CUT-MAP-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 055
+Operation Title: Phase 13 Client Legacy Dependency Cut Map
+Prompt / Block Name: PHASE 13 — CLIENT LEGACY DEPENDENCY CUT MAP
+Phase: 13
+Execution Type: AUDIT / REMOVAL_MAP_ONLY / REGISTRY_UPDATE
+Classification:
+- SURGICAL_REMOVAL_MAP_ONLY
+- CLIENT_LEGACY_DEPENDENCY_AUDIT
+- NO_RUNTIME_CHANGE
+Domain: RESIDENTIAL / ROUTES / CLIENT_IDENTITY_EXTRACTION
+Purpose: Create a minimal surgical dependency cut map for removing old client login/register/dashboard/profile room surfaces.
+Scope: Audit only. No runtime changes, no deletion, no refactor, no Firebase action, no commit, no push, no tag.
+Files Created:
+- `docs/constitutional-baseline/removal/CLIENT_LEGACY_DEPENDENCY_CUT_MAP_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+Files Deleted: none
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED
+Evidence: Operation pre-registered before inspection; cut map created; Operations Index, Memory Registry, and Finding Registry updated after completion.
+Cut Map Created:
+- `docs/constitutional-baseline/removal/CLIENT_LEGACY_DEPENDENCY_CUT_MAP_V1.md`
+Final Verdict: BLOCKED_UNKNOWN_DEPENDENCIES
+Archive Registry Updated: not applicable because no removal occurred.
+Integrity Verification:
+- Operation pre-registration: COMPLETE
+- Cut map file created: COMPLETE
+- Operations Registry updated after phase: COMPLETE
+- Operations Index updated after phase: COMPLETE
+- Memory Registry updated after phase: COMPLETE
+- Finding Registry updated after phase: COMPLETE
+- Archive Registry update: NOT_APPLICABLE
+- Runtime changes: NONE
+- Firebase action: NONE
+- Git action: NONE
+Short Summary: Client legacy removal has a surgical map, but actual removal is blocked by shared login infrastructure, signed-in saved destination/contact/support/chat dependencies, and unresolved asset/localization checks.
+Next Action: Resolve unknown blockers before any client legacy removal execution.
+
+### OP-PHASE-14-CLIENT-LEGACY-REMOVAL-EXECUTION-V1
+
+Operation ID: OP-PHASE-14-CLIENT-LEGACY-REMOVAL-EXECUTION-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 056
+Operation Title: Phase 14 Client Legacy Removal Execution
+Prompt / Block Name: PHASE 14 — CLIENT LEGACY REMOVAL EXECUTION
+Phase: 14
+Execution Type: SURGICAL_REMOVAL / RUNTIME_CHANGE / REGISTRY_UPDATE
+Classification:
+- CLIENT_LEGACY_REMOVAL
+- CLIENT_IDENTITY_EXTRACTION
+- ARCHIVE_PRESERVED_EVIDENCE
+Domain: RESIDENTIAL / CLIENT_IDENTITY_EXTRACTION / ROUTES
+Purpose: Remove old client registration/dashboard runtime surfaces and rewire client journey links to Client Session Room while preserving provider/center/owner/monitoring identity.
+Scope: Remove only Phase 13 `REMOVE_NOW` and `REWIRE_TO_SESSION_ROOM` items. No Firebase deploy, no commit, no push, no tag.
+Files Created:
+- `docs/constitutional-baseline/cards/archive/ARCHIVE_CARD_CLIENT_LOGIN_REGISTER_DASHBOARD_EXTRACTION_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_CLIENT_IDENTITY_RUNTIME_CONTAMINATION_REMOVED_V1.md`
+- `docs/constitutional-baseline/operations/CLIENT_LEGACY_REMOVAL_EXECUTION_SUMMARY_V1.md`
+Files Modified:
+- `lib/app/router/routes.dart`
+- `lib/app/router/app_router.dart`
+- `lib/features/auth/presentation/pages/login_page.dart`
+- `lib/features/home/presentation/pages/menu_page.dart`
+- `lib/features/language/presentation/pages/language_page.dart`
+- `lib/l10n/app_en.arb`
+- `lib/l10n/app_ar.arb`
+- `lib/l10n/app_localizations_en.dart`
+- `lib/l10n/app_localizations_ar.dart`
+- `docs/constitutional-baseline/registries/ROUTE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/RESIDENTIAL_ROUTE_OWNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/ADMINISTRATIVE_ROUTE_OWNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/ARCHIVE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted:
+- `lib/features/auth/presentation/pages/client_register_page.dart`
+- `lib/features/client/presentation/pages/client_dashboard_page.dart`
+Routes Removed:
+- `/register/client`
+- `/client/dashboard`
+Routes Rewired:
+- client login role branch -> `/client/session-room`
+- menu client role shortcut -> `/client/session-room`
+- language page client route -> `/client/session-room`
+Runtime Effect: client register/dashboard runtime removed pending manual verification
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED_PENDING_MANUAL_VERIFICATION
+Evidence: Operation pre-registered before surgical removal; client register/dashboard runtime removed; archive card, finding, summary, and registries updated.
+Registries Updated:
+- Route Registry
+- Residential Route Ownership Registry
+- Administrative Route Ownership Registry
+- Archive Registry
+- Finding Registry
+- Memory Registry
+- Executed Operations Registry
+- Executed Operations Index
+Manual Verification Required:
+- `dart format <changed files>`
+- `flutter analyze`
+- `flutter build apk --debug`
+- `flutter build web`
+Short Summary: Client legacy register/dashboard runtime was removed and client navigation was rewired to Client Session Room while preserving provider/center/owner/monitoring identity and accessibility runtime.
+Final Verdict: CLIENT_LEGACY_REMOVED_PENDING_MANUAL_VERIFICATION
+Next Action: Owner runs manual verification commands and reports blockers.
+
+### OP-PHASE-15-CLIENT-LEGACY-RESIDUE-SWEEP-V1
+
+Operation ID: OP-PHASE-15-CLIENT-LEGACY-RESIDUE-SWEEP-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 057
+Operation Title: Phase 15 Client Legacy Residue Sweep And Verification
+Prompt / Block Name: PHASE 15 — CLIENT LEGACY RESIDUE SWEEP AND VERIFICATION
+Phase: 15
+Execution Type: POST_REMOVAL_VERIFICATION / AUDIT / REGISTRY_UPDATE
+Classification:
+- CLIENT_LEGACY_RESIDUE_SWEEP
+- POST_REMOVAL_VERIFICATION
+- NO_RUNTIME_FEATURE_CHANGE
+Domain: RESIDENTIAL / CLIENT_IDENTITY_EXTRACTION / VERIFICATION
+Purpose: Verify no active references remain to removed client legacy routes/pages and classify any remaining residue after Phase 14 removal.
+Scope: Verification/report only. No new feature, redesign, Firebase deploy, commit, push, or tag.
+Files Created:
+- `docs/constitutional-baseline/operations/CLIENT_LEGACY_RESIDUE_SWEEP_REPORT_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: COMPLETED
+Evidence: Operation pre-registered before residue sweep; active code/test sweep found no removed client legacy route/page references; report created; memory and operations registries updated.
+Residue Classification Summary:
+- SAFE_ARCHIVE_TEXT: archive/cut-map/registry references preserving evidence.
+- DOC_HISTORY: historical audits/inventories describing pre-removal state.
+- LOCALIZATION_RESIDUE: cleared from active localization files.
+- TEST_RESIDUE: none found.
+- ACTIVE_BLOCKER: none found in active runtime sweep.
+Integrity Verification:
+- Operation pre-registration: COMPLETE
+- Active reference sweep: COMPLETE
+- Quick Access static confirmation: COMPLETE
+- Accessibility Access static confirmation: COMPLETE
+- Provider/center identity static confirmation: COMPLETE
+- No staged secrets/build artifacts observed: COMPLETE
+- Owner command results: OWNER_PENDING
+Final Verdict: CLIENT_LEGACY_EXTRACTION_COMPLETE_WITH_DOC_RESIDUE
+Next Action: Owner provides manual command results for format, analyze, APK debug build, and web build.

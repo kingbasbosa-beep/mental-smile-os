@@ -4,6 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mental_smile_os/core/auth/account_access_service.dart';
 import 'package:mental_smile_os/core/auth/presentation/pages/account_blocked_page.dart';
 import 'package:mental_smile_os/core/visibility/visibility_readiness.dart';
+import 'package:mental_smile_os/features/accessibility/domain/models/accessibility_category.dart';
+import 'package:mental_smile_os/features/accessibility/presentation/pages/accessibility_hub_page.dart';
+import 'package:mental_smile_os/features/accessibility/presentation/pages/accessibility_organizations_page.dart';
+import 'package:mental_smile_os/features/accessibility/presentation/pages/accessibility_resource_list_page.dart';
 import 'package:mental_smile_os/l10n/app_localizations.dart';
 
 import 'routes.dart';
@@ -39,7 +43,6 @@ import 'package:mental_smile_os/features/specialists/presentation/specialists_ca
 import 'package:mental_smile_os/features/specialists/presentation/specialists_list_page.dart';
 import 'package:mental_smile_os/features/specialists/presentation/specialist_details_page.dart';
 import 'package:mental_smile_os/features/auth/presentation/pages/login_page.dart';
-import 'package:mental_smile_os/features/auth/presentation/pages/client_register_page.dart';
 import 'package:mental_smile_os/features/app_exit/presentation/pages/app_exit_social_links_page.dart';
 import 'package:mental_smile_os/features/chat/presentation/pages/chat_page.dart';
 import 'package:mental_smile_os/features/safety/presentation/pages/chat_escalations_page.dart';
@@ -50,7 +53,7 @@ import 'package:mental_smile_os/features/centers/presentation/pages/centers_list
 import 'package:mental_smile_os/features/centers/presentation/pages/center_details_page.dart';
 import 'package:mental_smile_os/features/centers/data/models/center_model.dart';
 import 'package:mental_smile_os/features/clinician/presentation/pages/clinician_room_page.dart';
-import 'package:mental_smile_os/features/client/presentation/pages/client_dashboard_page.dart';
+import 'package:mental_smile_os/features/client/presentation/pages/client_session_room_page.dart';
 import 'package:mental_smile_os/features/centers/presentation/pages/center_dashboard_page.dart';
 import 'package:mental_smile_os/features/centers/presentation/pages/center_room_page.dart';
 
@@ -114,7 +117,6 @@ class AppRouter {
 
   static const Set<String> _clientOnlyRoutes = {
     Routes.sPersonalSpace,
-    Routes.clientDashboard,
   };
 
   static bool _isScopedProtectedRoute(String? routeName) {
@@ -140,7 +142,6 @@ class AppRouter {
       case Routes.clinicianProfileEditRequest:
       case Routes.clinicianChatInbox:
       case Routes.blockedAccount:
-      case Routes.clientDashboard:
       case Routes.sPersonalSpace:
         return true;
       default:
@@ -185,6 +186,19 @@ class AppRouter {
       final value = args['categoryKey'];
       if (value is String && value.trim().isNotEmpty) {
         return value.trim();
+      }
+    }
+    return null;
+  }
+
+  static AccessibilityCategory? _accessibilityCategory(
+    RouteSettings settings,
+  ) {
+    final args = settings.arguments;
+    if (args is Map) {
+      final value = args['category'];
+      if (value is String && value.trim().isNotEmpty) {
+        return AccessibilityCategory.fromValue(value.trim());
       }
     }
     return null;
@@ -653,9 +667,9 @@ class AppRouter {
           settings: settings,
         );
 
-      case Routes.clientDashboard:
-        return _protectedRoute(
-          child: const ClientDashboardPage(),
+      case Routes.clientSessionRoom:
+        return MaterialPageRoute(
+          builder: (_) => const ClientSessionRoomPage(),
           settings: settings,
         );
 
@@ -771,12 +785,6 @@ class AppRouter {
           settings: settings,
         );
 
-      case Routes.clientRegister:
-        return MaterialPageRoute(
-          builder: (_) => const ClientRegisterPage(),
-          settings: settings,
-        );
-
       case Routes.clinicianRegister:
         return MaterialPageRoute(
           builder: (_) => const WebClinicianRegisterPortalPage(),
@@ -886,6 +894,21 @@ class AppRouter {
       case Routes.specialNeeds:
         return MaterialPageRoute(
           builder: (_) => const SupportEntryPage.specialNeeds(),
+          settings: settings,
+        );
+
+      case Routes.accessibility:
+        final category = _accessibilityCategory(settings);
+        return MaterialPageRoute(
+          builder: (_) => category == null
+              ? const AccessibilityHubPage()
+              : AccessibilityResourceListPage(category: category),
+          settings: settings,
+        );
+
+      case Routes.accessibilityOrganizations:
+        return MaterialPageRoute(
+          builder: (_) => const AccessibilityOrganizationsPage(),
           settings: settings,
         );
 

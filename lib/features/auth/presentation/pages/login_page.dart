@@ -83,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
       case RoleNames.center:
         return Routes.centerDashboard;
       case RoleNames.client:
-        return Routes.clientDashboard;
+        return Routes.clientSessionRoom;
       default:
         return Routes.menu;
     }

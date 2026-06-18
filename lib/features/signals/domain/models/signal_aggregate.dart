@@ -24,12 +24,10 @@ class SignalAggregate {
       signalType: signalType,
       signalCategory: signalCategory,
       count: count + 1,
-      firstSeen: firstSeen.isBefore(normalizedSeenAt)
-          ? firstSeen
-          : normalizedSeenAt,
-      lastSeen: lastSeen.isAfter(normalizedSeenAt)
-          ? lastSeen
-          : normalizedSeenAt,
+      firstSeen:
+          firstSeen.isBefore(normalizedSeenAt) ? firstSeen : normalizedSeenAt,
+      lastSeen:
+          lastSeen.isAfter(normalizedSeenAt) ? lastSeen : normalizedSeenAt,
       aggregationWindow: aggregationWindow,
     );
   }

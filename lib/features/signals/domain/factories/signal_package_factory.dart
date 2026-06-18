@@ -142,6 +142,80 @@ class SignalPackageFactory {
     );
   }
 
+  static SignalPackage accessibleContactRequested({
+    required String actorId,
+    required String actorRole,
+    required String targetType,
+    required String targetId,
+    String signalSource = 'accessible_contact',
+    DateTime? timestamp,
+  }) {
+    return _accessibleContact(
+      signalType: SignalTypeRegistry.accessibleContactRequested,
+      signalSource: signalSource,
+      actorId: actorId,
+      actorRole: actorRole,
+      targetType: targetType,
+      targetId: targetId,
+      timestamp: timestamp,
+    );
+  }
+
+  static SignalPackage accessibleContactCompleted({
+    required String actorId,
+    required String actorRole,
+    required String targetType,
+    required String targetId,
+    String signalSource = 'accessible_contact',
+    DateTime? timestamp,
+  }) {
+    return _accessibleContact(
+      signalType: SignalTypeRegistry.accessibleContactCompleted,
+      signalSource: signalSource,
+      actorId: actorId,
+      actorRole: actorRole,
+      targetType: targetType,
+      targetId: targetId,
+      timestamp: timestamp,
+    );
+  }
+
+  static SignalPackage accessibleProviderSelected({
+    required String actorId,
+    required String actorRole,
+    required String targetId,
+    String signalSource = 'accessible_provider_contact',
+    DateTime? timestamp,
+  }) {
+    return _accessibleContact(
+      signalType: SignalTypeRegistry.accessibleProviderSelected,
+      signalSource: signalSource,
+      actorId: actorId,
+      actorRole: actorRole,
+      targetType: 'provider',
+      targetId: targetId,
+      timestamp: timestamp,
+    );
+  }
+
+  static SignalPackage accessibleCenterSelected({
+    required String actorId,
+    required String actorRole,
+    required String targetId,
+    String signalSource = 'accessible_center_contact',
+    DateTime? timestamp,
+  }) {
+    return _accessibleContact(
+      signalType: SignalTypeRegistry.accessibleCenterSelected,
+      signalSource: signalSource,
+      actorId: actorId,
+      actorRole: actorRole,
+      targetType: 'center',
+      targetId: targetId,
+      timestamp: timestamp,
+    );
+  }
+
   static SignalPackage supportStarted({
     required String actorId,
     required String actorRole,
@@ -263,6 +337,29 @@ class SignalPackageFactory {
       signalType: signalType,
       signalCategory: SignalCategoryRegistry.contact,
       signalDomain: 'commercial',
+      signalSource: signalSource,
+      actorId: actorId,
+      actorRole: actorRole,
+      targetType: targetType,
+      targetId: targetId,
+      timestamp: timestamp,
+      routingTarget: SignalRoutingTarget.commercialMonitoring,
+    );
+  }
+
+  static SignalPackage _accessibleContact({
+    required String signalType,
+    required String signalSource,
+    required String actorId,
+    required String actorRole,
+    required String targetType,
+    required String targetId,
+    DateTime? timestamp,
+  }) {
+    return _package(
+      signalType: signalType,
+      signalCategory: SignalCategoryRegistry.accessibility,
+      signalDomain: 'accessibility',
       signalSource: signalSource,
       actorId: actorId,
       actorRole: actorRole,

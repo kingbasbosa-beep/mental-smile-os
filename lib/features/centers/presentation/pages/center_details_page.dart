@@ -42,6 +42,8 @@ class CenterDetailsPage extends StatelessWidget {
       if (capabilities.supportsAccessibilitySupport) 'accessibility_support',
       if (capabilities.supportsCoachingPrograms) 'coaching',
       if (capabilities.supportsEducationPrograms) 'education',
+      if (center.accessibleCommunicationReady) 'accessible_contact_ready',
+      ...center.accessibleCommunicationCapabilities,
     ].where((value) => value.trim().isNotEmpty).toSet().toList();
   }
 
@@ -49,6 +51,7 @@ class CenterDetailsPage extends StatelessWidget {
     required BuildContext context,
     required String centerId,
     required bool isArabic,
+    bool accessibleContact = false,
   }) async {
     final clientId = FirebaseAuth.instance.currentUser?.uid ?? '';
     if (clientId.isEmpty) {
@@ -65,6 +68,23 @@ class CenterDetailsPage extends StatelessWidget {
     }
 
     try {
+      if (accessibleContact) {
+        await CleanSignalRuntime.firestore().emit(
+          SignalPackageFactory.accessibleCenterSelected(
+            actorId: clientId,
+            actorRole: 'client',
+            targetId: centerId,
+          ),
+        );
+        await CleanSignalRuntime.firestore().emit(
+          SignalPackageFactory.accessibleContactRequested(
+            actorId: clientId,
+            actorRole: 'client',
+            targetType: 'center',
+            targetId: centerId,
+          ),
+        );
+      }
       await ContactRequestRepository().createCenterContactRequest(
         clientId: clientId,
         centerId: centerId,
@@ -74,6 +94,16 @@ class CenterDetailsPage extends StatelessWidget {
       );
       if (!context.mounted) return;
       AppAnalytics.logPathSelected('centers', 'center_contact_request_created');
+      if (accessibleContact) {
+        await CleanSignalRuntime.firestore().emit(
+          SignalPackageFactory.accessibleContactCompleted(
+            actorId: clientId,
+            actorRole: 'client',
+            targetType: 'center',
+            targetId: centerId,
+          ),
+        );
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -131,7 +161,9 @@ class CenterDetailsPage extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isArabic ? 'تم حفظ المركز للرجوع لاحقًا.' : 'Center saved for later.',
+            isArabic
+                ? 'تم حفظ المركز للرجوع لاحقًا.'
+                : 'Center saved for later.',
           ),
         ),
       );
@@ -1019,6 +1051,8 @@ class CenterDetailsPage extends StatelessWidget {
 
   Widget _buildContent(BuildContext context, CenterModel c) {
     final l10n = AppLocalizations.of(context)!;
+    final isArabic =
+        Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
     final name = c.name.trim().isEmpty ? l10n.centerDefaultName : c.name.trim();
     final categoryLabel = _categoryLabelAr(c);
     final loc = _locationLine(c);
@@ -1078,6 +1112,39 @@ class CenterDetailsPage extends StatelessWidget {
                     Chip(
                       label: Text(
                         loc,
+                        textAlign: TextAlign.start,
+                      ),
+                      visualDensity: VisualDensity.compact,
+                      backgroundColor: Colors.black.withValues(alpha: 0.24),
+                      side: BorderSide(
+                        color: const Color(0xFF8EDBFF).withValues(alpha: 0.24),
+                      ),
+                      labelStyle: const TextStyle(
+                        color: Color(0xFFFFF4D4),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  if (c.accessibleCommunicationReady)
+                    Chip(
+                      label: Text(
+                        isArabic ? 'تواصل ميسر' : 'Accessible contact ready',
+                        textAlign: TextAlign.start,
+                      ),
+                      visualDensity: VisualDensity.compact,
+                      backgroundColor: Colors.black.withValues(alpha: 0.24),
+                      side: BorderSide(
+                        color: const Color(0xFF8EDBFF).withValues(alpha: 0.30),
+                      ),
+                      labelStyle: const TextStyle(
+                        color: Color(0xFFFFF4D4),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  for (final capability
+                      in c.accessibleCommunicationCapabilities.take(3))
+                    Chip(
+                      label: Text(
+                        capability,
                         textAlign: TextAlign.start,
                       ),
                       visualDensity: VisualDensity.compact,
@@ -1273,6 +1340,34 @@ class CenterDetailsPage extends StatelessWidget {
               Localizations.localeOf(context).languageCode.toLowerCase() == 'ar'
                   ? 'التواصل مع المركز'
                   : 'Contact center',
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFFFFE7B2),
+              side: BorderSide(
+                color: const Color(0xFF8EDBFF).withValues(alpha: 0.38),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+            ),
+            onPressed: () {
+              _sendCenterContactRequest(
+                context: context,
+                centerId: c.id,
+                isArabic: isArabic,
+                accessibleContact: true,
+              );
+            },
+            icon: const Icon(Icons.sign_language_outlined),
+            label: Text(
+              isArabic ? '🤟 تواصل ميسر' : '🤟 Accessible Contact',
             ),
           ),
         ),
@@ -1985,4 +2080,3 @@ class _CarouselArrow extends StatelessWidget {
     );
   }
 }
-

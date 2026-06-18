@@ -12,3 +12,10 @@ Runtime effect: none
 | Center discovery signals | Center/System | Centers list/details | center profiles | center capability/readiness | `centers` | ACTIVE | Runtime | ACTIVE |
 | Tool usage signals | Owner/System | Future tools/monitoring | Tool Registry | tool usage | `tool_registry` | UNKNOWN | Future | UNKNOWN |
 | Marketplace signals | Owner/System | Future marketplace/monitoring | Domain Boundary Registry | marketplace intent | unknown | UNKNOWN | Future | UNKNOWN |
+
+## Phase 9 Accessibility Signal Entries
+
+| Entry | Owner | Consumers | Dependencies | Signals | Collections | Status | Lifecycle | Classification |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Accessible provider contact selected | Accessibility/Commercial/System | Provider details, Contact requests, Monitoring | Accessible communication card, ContactRequestRepository | accessibleProviderSelected, accessibleContactRequested, accessibleContactCompleted | `signal_events`, `provider_contact_requests` | ACTIVE_PENDING_OWNER_MANUAL_VERIFICATION | Runtime | ACTIVE |
+| Accessible center contact selected | Accessibility/Commercial/System | Center details, Contact requests, Monitoring | Accessible communication card, ContactRequestRepository | accessibleCenterSelected, accessibleContactRequested, accessibleContactCompleted | `signal_events`, `center_contact_requests` | ACTIVE_PENDING_OWNER_MANUAL_VERIFICATION | Runtime | ACTIVE |

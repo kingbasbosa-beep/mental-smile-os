@@ -24,8 +24,8 @@ Preserve findings as memory material, not bugs. Findings become constitutional i
 | Monitoring authority and escalation ownership | `MS-MON-FINDING-001..002` | HIGH | Monitoring must remain observability-governed | Owner | Monitoring, Residential | Monitoring Authority Registry, escalation ownership | monitoring, escalation | `signal_events`, `chat_escalations` | ACTIVE_MEMORY | Open | AUTHORITY_MEMORY |
 | Monitoring aggregate lifecycle and Control-era residue | `MS-MON-FINDING-003..006` | MEDIUM/LOW | Aggregates, support observation, and language need boundaries | Owner | Monitoring, Owner | aggregate lifecycle, support observer, observability route registries | aggregate signals | `system_domains`, `support_requests` | ACTIVE_MEMORY | Open | OBSERVABILITY_MEMORY |
 | Owner governance memory gaps | Phase 7F scorecard | HIGH/MEDIUM | Owner approval, runtime memory surfaces, and recommendations need registries | Owner | All domains | Phase 8A, 8B, 8C registries | governance signals | governance docs | ACTIVE_MEMORY | Closing through Phase 8C | GOVERNANCE_MEMORY |
+| Client identity extraction and fresh signal doctrine | `FINDING-FRESH-SIGNALS-OVER-STORED-PREFERENCES-V1`, `FINDING-CLIENT-PROFILE-COMPLEXITY-V1` | HIGH/MEDIUM | Client identity simplification needs memory before runtime removal; fresh repeated intent signals should not be overwritten by stale saved preferences | Owner | Residential, Signals, Runtime | Client Identity Extraction Decision, Client Profile Complexity Archive Card | room, tool, mode, content signals | `clients`, `signal_events` | ACTIVE_MEMORY | Open until Owner-approved runtime extraction | SIGNAL_DOCTRINE_MEMORY |
 
 ## Coverage
 
 Finding memory coverage: 100% of Phase 7A-7F finding groups are represented as memory entries.
-
