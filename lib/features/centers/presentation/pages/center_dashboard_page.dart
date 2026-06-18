@@ -140,13 +140,7 @@ class CenterDashboardPage extends StatelessWidget {
   }
 
   String _dashboardBackgroundAsset(double width) {
-    if (width < 700) {
-      return 'assets/branding/client_dashboard/mobile/client_dashboard_mobile_bg.png';
-    }
-    if (width <= 1100) {
-      return 'assets/branding/client_dashboard/tablet/client_dashboard_tablet_bg.png';
-    }
-    return 'assets/branding/client_dashboard/desktop/client_dashboard_desktop_bg.png';
+    return 'assets/c7_branding/home/home_bg.png';
   }
 
   Alignment _dashboardBackgroundAlignment(double width) {
@@ -336,6 +330,7 @@ class CenterDashboardPage extends StatelessWidget {
     );
   }
 }
+
 class _CenterBrandMark extends StatelessWidget {
   const _CenterBrandMark();
 
@@ -372,6 +367,7 @@ class _CenterBrandMark extends StatelessWidget {
     );
   }
 }
+
 class _CenterFloatingProfile extends StatelessWidget {
   final bool isArabic;
   final String centerName;
@@ -449,6 +445,7 @@ class _CenterFloatingProfile extends StatelessWidget {
     );
   }
 }
+
 class _CenterProfileImage extends StatelessWidget {
   final String imageUrl;
   final String fallbackText;

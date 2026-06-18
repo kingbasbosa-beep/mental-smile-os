@@ -6,8 +6,6 @@ class MonitoringAggregateValidator {
   const MonitoringAggregateValidator._();
 
   static const Set<String> readableCategories = <String>{
-    SignalAggregationCategoryRegistry.goalAggregates,
-    SignalAggregationCategoryRegistry.interestAggregates,
     SignalAggregationCategoryRegistry.accessibilityAggregates,
     SignalAggregationCategoryRegistry.destinationAggregates,
     SignalAggregationCategoryRegistry.contactAggregates,
@@ -15,9 +13,6 @@ class MonitoringAggregateValidator {
   };
 
   static const Set<String> readableSignalTypes = <String>{
-    SignalTypeRegistry.goalSelected,
-    SignalTypeRegistry.interestSelected,
-    SignalTypeRegistry.accessibilityInterest,
     SignalTypeRegistry.destinationSaved,
     SignalTypeRegistry.providerContactStarted,
     SignalTypeRegistry.centerContactStarted,

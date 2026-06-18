@@ -71,3 +71,13 @@ Monitoring is observability-first. Any write, resolution, intervention, authorit
 | Create reports | LIMITED_EXISTING_FLOW | NO | Required for expansion |
 | Resolve/intervene | NO_BY_DEFAULT | NO | REQUIRED |
 | Mutate domain status | NO_BY_DEFAULT | NO | REQUIRED |
+
+## Package C Monitoring Visibility Notes
+
+| Surface | Status | Related Operation | Authority Impact |
+| --- | --- | --- | --- |
+| `/s/capital/incidents` | REMOVED_FROM_ROUTER_AND_NAVIGATION | OP-PACKAGE-C-GHOST-ROUTE-VISIBILITY-PURGE-V1 | Removed placeholder visibility only; no monitoring role or authority change. |
+| `/s/capital/maintenance` | REMOVED_FROM_ROUTER_AND_NAVIGATION | OP-PACKAGE-C-GHOST-ROUTE-VISIBILITY-PURGE-V1 | Removed placeholder visibility only; no monitoring role or authority change. |
+| `/s/capital/broadcasts` | REMOVED_FROM_ROUTER_AND_NAVIGATION | OP-PACKAGE-C-GHOST-ROUTE-VISIBILITY-PURGE-V1 | Removed placeholder visibility only; no monitoring role or authority change. |
+| `/s/capital/emergency-brief` | REMOVED_FROM_ROUTER_AND_NAVIGATION | OP-PACKAGE-C-GHOST-ROUTE-VISIBILITY-PURGE-V1 | Removed high-trust placeholder visibility; no Owner/monitoring identity change. |
+| `/s/capital/signal-monitoring-room` | ACTIVE_UNCHANGED | OP-PACKAGE-C-GHOST-ROUTE-VISIBILITY-PURGE-V1 | Active monitoring route preserved. |

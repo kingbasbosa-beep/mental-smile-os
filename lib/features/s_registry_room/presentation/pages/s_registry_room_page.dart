@@ -152,7 +152,8 @@ class _RegistryDomainCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  _StatusBadge(label: statusText, color: _statusColor(statusText)),
+                  _StatusBadge(
+                      label: statusText, color: _statusColor(statusText)),
                 ],
               ),
               const SizedBox(height: 14),
@@ -183,7 +184,8 @@ class _RegistryDomainCard extends StatelessWidget {
                           ? '-'
                           : _formatDate(status.statusSetAt!),
                     ),
-                    _MetadataItem('sourceReason', _stringText(status.statusReason)),
+                    _MetadataItem(
+                        'sourceReason', _stringText(status.statusReason)),
                   ],
                 ),
               ],
@@ -271,10 +273,12 @@ class _CapabilitySection extends StatelessWidget {
       title: 'Capability Matrix',
       items: <_MetadataItem>[
         _MetadataItem('advisoryOnly', _yesNo(capability.advisoryOnly)),
-        _MetadataItem('maintenanceNotice', _yesNo(capability.maintenanceNotice)),
+        _MetadataItem(
+            'maintenanceNotice', _yesNo(capability.maintenanceNotice)),
         _MetadataItem('editorDisable', _yesNo(capability.editorDisable)),
         _MetadataItem('entryPointHide', _yesNo(capability.entryPointHide)),
-        _MetadataItem('protectedRawWrites', _yesNo(capability.protectedRawWrites)),
+        _MetadataItem(
+            'protectedRawWrites', _yesNo(capability.protectedRawWrites)),
       ],
     );
   }

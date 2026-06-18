@@ -79,8 +79,6 @@ class AccessibilitySignalFactory {
       case AccessibilitySignalType.resourceSaved:
       case AccessibilitySignalType.resourceBrokenLinkReported:
         return AccessibilitySignalRegistry.targetResource;
-      case AccessibilitySignalType.modeSelected:
-        return AccessibilitySignalRegistry.targetMode;
     }
   }
 

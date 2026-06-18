@@ -3,7 +3,6 @@ export 'domain/emitters/clean_signal_runtime.dart';
 export 'domain/emitters/signal_emitter.dart';
 export 'domain/factories/signal_package_factory.dart';
 export 'domain/models/center_signals.dart';
-export 'domain/models/client_signals.dart';
 export 'domain/models/provider_signals.dart';
 export 'domain/models/signal_aggregate.dart';
 export 'domain/models/signal_aggregate_read_models.dart';

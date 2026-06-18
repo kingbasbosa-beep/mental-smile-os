@@ -65,12 +65,6 @@ service firebase.storage {
       allow delete: if false;
     }
 
-    match /clients/{uid}/{allPaths=**} {
-      allow read: if canReadPrivateOwnerFile(uid);
-      allow create, update: if isOwner(uid) && isSafeUpload();
-      allow delete: if false;
-    }
-
     match /identity/{uid}/{allPaths=**} {
       allow read: if canReadPrivateOwnerFile(uid);
       allow create, update: if isOwner(uid) && isSafeUpload();

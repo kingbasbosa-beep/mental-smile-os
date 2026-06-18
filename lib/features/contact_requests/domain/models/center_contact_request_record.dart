@@ -1,7 +1,7 @@
 class CenterContactRequestRecord {
   const CenterContactRequestRecord({
     required this.requestId,
-    required this.clientId,
+    required this.requesterSessionId,
     required this.centerId,
     required this.message,
     required this.goalSignals,
@@ -14,7 +14,7 @@ class CenterContactRequestRecord {
   static const String collectionName = 'center_contact_requests';
 
   final String requestId;
-  final String clientId;
+  final String requesterSessionId;
   final String centerId;
   final String message;
   final List<String> goalSignals;
@@ -26,7 +26,7 @@ class CenterContactRequestRecord {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'requestId': requestId,
-      'clientId': clientId,
+      'requesterSessionId': requesterSessionId,
       'centerId': centerId,
       'message': message,
       'goalSignals': goalSignals,
@@ -40,7 +40,7 @@ class CenterContactRequestRecord {
   factory CenterContactRequestRecord.fromMap(Map<String, dynamic> map) {
     return CenterContactRequestRecord(
       requestId: (map['requestId'] ?? '').toString(),
-      clientId: (map['clientId'] ?? '').toString(),
+      requesterSessionId: (map['requesterSessionId'] ?? '').toString(),
       centerId: (map['centerId'] ?? '').toString(),
       message: (map['message'] ?? '').toString(),
       goalSignals: _stringList(map['goalSignals']),

@@ -8,7 +8,6 @@ class AccessibilitySignalRegistry {
   static const String targetHub = 'accessibility_hub';
   static const String targetCategory = 'accessibility_category';
   static const String targetResource = 'accessibility_resource';
-  static const String targetMode = 'accessibility_mode';
 
   static const List<AccessibilitySignalType> values =
       AccessibilitySignalType.values;

@@ -23,9 +23,8 @@ class MonitoringAggregateItem {
       signalType: signalType,
       signalCategory: signalCategory,
       count: count + other.count,
-      firstSeen: firstSeen.isBefore(other.firstSeen)
-          ? firstSeen
-          : other.firstSeen,
+      firstSeen:
+          firstSeen.isBefore(other.firstSeen) ? firstSeen : other.firstSeen,
       lastSeen: lastSeen.isAfter(other.lastSeen) ? lastSeen : other.lastSeen,
       aggregationWindow: aggregationWindow,
     );

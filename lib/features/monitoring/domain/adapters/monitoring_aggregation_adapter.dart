@@ -16,21 +16,9 @@ class MonitoringAggregationAdapter {
   }) {
     final readable = aggregates.where(MonitoringAggregateValidator.isReadable);
     return ResidentialMonitoringFeed(
-      goalAggregates: _itemsFor(
-        readable,
-        SignalTypeRegistry.goalSelected,
-        ResidentialMonitoringCategoryRegistry.goals,
-      ),
-      interestAggregates: _itemsFor(
-        readable,
-        SignalTypeRegistry.interestSelected,
-        ResidentialMonitoringCategoryRegistry.interests,
-      ),
-      accessibilityAggregates: _itemsFor(
-        readable,
-        SignalTypeRegistry.accessibilityInterest,
-        ResidentialMonitoringCategoryRegistry.accessibility,
-      ),
+      goalAggregates: const <MonitoringAggregateItem>[],
+      interestAggregates: const <MonitoringAggregateItem>[],
+      accessibilityAggregates: const <MonitoringAggregateItem>[],
       destinationAggregates: _itemsFor(
         readable,
         SignalTypeRegistry.destinationSaved,

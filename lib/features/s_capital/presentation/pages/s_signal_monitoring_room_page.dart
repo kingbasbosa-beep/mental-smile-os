@@ -219,7 +219,8 @@ class _GapDetectionPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return const _SectionCard(
       title: 'Trend & Gap Detection',
-      subtitle: 'Detection visibility only. No decision or execution authority.',
+      subtitle:
+          'Detection visibility only. No decision or execution authority.',
       groups: <_ControlGroup>[
         _ControlGroup('Detection Families', <String>[
           'Human impact gaps',
@@ -462,4 +463,3 @@ class _ControlTextStyles {
     fontWeight: FontWeight.w800,
   );
 }
-

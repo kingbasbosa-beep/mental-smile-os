@@ -68,9 +68,8 @@ class ChatFirestoreService {
   Future<ChatThreadModel?> getAiSupportThreadForParticipant(
     String participantUid,
   ) async {
-    final query = await _threads
-        .where('participantUid', isEqualTo: participantUid)
-        .get();
+    final query =
+        await _threads.where('participantUid', isEqualTo: participantUid).get();
 
     final threads = query.docs.map(ChatThreadModel.fromFirestore).toList()
       ..sort(_compareNewestThreadFirst);
@@ -97,9 +96,8 @@ class ChatFirestoreService {
   Future<List<ChatThreadModel>> getThreadsForParticipant(
     String participantUid,
   ) async {
-    final query = await _threads
-        .where('participantUid', isEqualTo: participantUid)
-        .get();
+    final query =
+        await _threads.where('participantUid', isEqualTo: participantUid).get();
 
     return query.docs.map(ChatThreadModel.fromFirestore).toList();
   }
@@ -158,9 +156,8 @@ class ChatFirestoreService {
         .where('recommendedProviders', arrayContains: clinicianUid)
         .snapshots()
         .map((snapshot) {
-      final items = snapshot.docs
-          .map(ChatEscalationModel.fromFirestore)
-          .toList();
+      final items =
+          snapshot.docs.map(ChatEscalationModel.fromFirestore).toList();
       items.sort((a, b) {
         final aDate = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
         final bDate = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);

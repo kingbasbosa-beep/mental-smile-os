@@ -4,10 +4,6 @@ import 'package:mental_smile_os/app/router/routes.dart';
 enum SCapitalOfficeFocus {
   overview,
   operationsOffice,
-  incidents,
-  maintenance,
-  broadcasts,
-  emergencyBrief,
 }
 
 // [S] Operations Office Package
@@ -91,21 +87,9 @@ class SCapitalOperationsOfficePage extends StatelessWidget {
     switch (focus) {
       case SCapitalOfficeFocus.operationsOffice:
         return const <Widget>[_OperationsOffice()];
-      case SCapitalOfficeFocus.incidents:
-        return const <Widget>[_IncidentCenter()];
-      case SCapitalOfficeFocus.maintenance:
-        return const <Widget>[_MaintenanceCenter()];
-      case SCapitalOfficeFocus.broadcasts:
-        return const <Widget>[_BroadcastCenter()];
-      case SCapitalOfficeFocus.emergencyBrief:
-        return const <Widget>[_EmergencyOwnerBrief()];
       case SCapitalOfficeFocus.overview:
         return const <Widget>[
           _OperationsOffice(),
-          _IncidentCenter(),
-          _MaintenanceCenter(),
-          _BroadcastCenter(),
-          _EmergencyOwnerBrief(),
         ];
     }
   }
@@ -133,8 +117,8 @@ class _CapitalHero extends StatelessWidget {
           SizedBox(height: 8),
           Text(
             'Operations headquarters for coordination, incident awareness, '
-            'maintenance visibility, broadcasts, and emergency owner brief. '
-            'It operates; it does not decide.',
+            'manual observation, and department handoff. It operates; '
+            'it does not decide.',
             style: TextStyle(
               color: Color(0xFF40506A),
               fontSize: 16,
@@ -154,10 +138,6 @@ class _CapitalNavigation extends StatelessWidget {
   static const _items = <_NavItem>[
     _NavItem('Operations Office', Routes.sCapitalOperationsOffice),
     _NavItem('Signal Monitoring Room', Routes.sSignalMonitoringRoom),
-    _NavItem('Incidents', Routes.sCapitalIncidents),
-    _NavItem('Maintenance', Routes.sCapitalMaintenance),
-    _NavItem('Broadcasts', Routes.sCapitalBroadcasts),
-    _NavItem('Emergency Brief', Routes.sCapitalEmergencyBrief),
   ];
 
   @override
@@ -197,9 +177,6 @@ class _CapitalOverviewCard extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: <Widget>[
-              _CounterPill(label: 'Incidents', count: 0),
-              _CounterPill(label: 'Maintenance', count: 0),
-              _CounterPill(label: 'Broadcasts', count: 0),
               _CounterPill(label: 'Active departments', count: 0),
             ],
           ),
@@ -229,104 +206,6 @@ class _OperationsOffice extends StatelessWidget {
         _DistrictGroup('Coordination Board', <String>[
           'Department coordination placeholder',
           'Handoff placeholder',
-        ]),
-      ],
-    );
-  }
-}
-
-class _IncidentCenter extends StatelessWidget {
-  const _IncidentCenter();
-
-  @override
-  Widget build(BuildContext context) {
-    return const _DistrictCard(
-      title: '[S] Incident Center',
-      subtitle: 'Incident visibility only. No control workflow is attached.',
-      groups: <_DistrictGroup>[
-        _DistrictGroup('Open Incidents', <String>[
-          'No open incident data connected',
-        ]),
-        _DistrictGroup('Resolved Incidents', <String>[
-          'No resolved incident data connected',
-        ]),
-        _DistrictGroup('Incident Timeline', <String>[
-          'Timeline placeholder',
-        ]),
-      ],
-    );
-  }
-}
-
-class _MaintenanceCenter extends StatelessWidget {
-  const _MaintenanceCenter();
-
-  @override
-  Widget build(BuildContext context) {
-    return const _DistrictCard(
-      title: '[S] Maintenance Center',
-      subtitle: 'Maintenance visibility for planned and current work.',
-      groups: <_DistrictGroup>[
-        _DistrictGroup('Planned Maintenance', <String>[
-          'Planned window placeholder',
-        ]),
-        _DistrictGroup('Current Maintenance', <String>[
-          'No current maintenance connected',
-        ]),
-        _DistrictGroup('Maintenance History', <String>[
-          'History placeholder',
-        ]),
-      ],
-    );
-  }
-}
-
-class _BroadcastCenter extends StatelessWidget {
-  const _BroadcastCenter();
-
-  @override
-  Widget build(BuildContext context) {
-    return const _DistrictCard(
-      title: '[S] Broadcast Center',
-      subtitle: 'Announcements and broadcasts without messaging automation.',
-      groups: <_DistrictGroup>[
-        _DistrictGroup('Internal Announcements', <String>[
-          'Announcement placeholder',
-        ]),
-        _DistrictGroup('Operations Broadcasts', <String>[
-          'Operations broadcast placeholder',
-        ]),
-        _DistrictGroup('Emergency Broadcasts', <String>[
-          'Emergency broadcast placeholder',
-        ]),
-      ],
-    );
-  }
-}
-
-class _EmergencyOwnerBrief extends StatelessWidget {
-  const _EmergencyOwnerBrief();
-
-  @override
-  Widget build(BuildContext context) {
-    return const _DistrictCard(
-      title: '[S] Emergency Owner Brief',
-      subtitle: 'Emergency survival cabin only. This is not the Owner Room.',
-      groups: <_DistrictGroup>[
-        _DistrictGroup('System Status', <String>[
-          'Status placeholder',
-        ]),
-        _DistrictGroup('Last Strategic Snapshot', <String>[
-          'Snapshot placeholder',
-        ]),
-        _DistrictGroup('Emergency Contacts Placeholder', <String>[
-          'Contacts not connected',
-        ]),
-        _DistrictGroup('Recovery Instructions Placeholder', <String>[
-          'Recovery instructions not connected',
-        ]),
-        _DistrictGroup('Last Known Constitution Version Placeholder', <String>[
-          'Constitution version not connected',
         ]),
       ],
     );
@@ -576,5 +455,3 @@ class _CapitalTextStyles {
     fontWeight: FontWeight.w800,
   );
 }
-
-

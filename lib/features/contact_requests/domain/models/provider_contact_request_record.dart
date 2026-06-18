@@ -1,7 +1,7 @@
 class ProviderContactRequestRecord {
   const ProviderContactRequestRecord({
     required this.requestId,
-    required this.clientId,
+    required this.requesterSessionId,
     required this.providerId,
     required this.message,
     required this.goalSignals,
@@ -14,7 +14,7 @@ class ProviderContactRequestRecord {
   static const String collectionName = 'provider_contact_requests';
 
   final String requestId;
-  final String clientId;
+  final String requesterSessionId;
   final String providerId;
   final String message;
   final List<String> goalSignals;
@@ -26,7 +26,7 @@ class ProviderContactRequestRecord {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'requestId': requestId,
-      'clientId': clientId,
+      'requesterSessionId': requesterSessionId,
       'providerId': providerId,
       'message': message,
       'goalSignals': goalSignals,
@@ -40,7 +40,7 @@ class ProviderContactRequestRecord {
   factory ProviderContactRequestRecord.fromMap(Map<String, dynamic> map) {
     return ProviderContactRequestRecord(
       requestId: (map['requestId'] ?? '').toString(),
-      clientId: (map['clientId'] ?? '').toString(),
+      requesterSessionId: (map['requesterSessionId'] ?? '').toString(),
       providerId: (map['providerId'] ?? '').toString(),
       message: (map['message'] ?? '').toString(),
       goalSignals: _stringList(map['goalSignals']),

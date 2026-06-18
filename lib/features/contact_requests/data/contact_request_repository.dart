@@ -11,7 +11,7 @@ class ContactRequestRepository {
   final FirebaseFirestore _firestore;
 
   Future<String> createProviderContactRequest({
-    required String clientId,
+    required String requesterSessionId,
     required String providerId,
     required String message,
     List<String> goalSignals = const <String>[],
@@ -23,7 +23,8 @@ class ContactRequestRepository {
         .doc();
     await ref.set(<String, dynamic>{
       'requestId': ref.id,
-      'clientId': clientId,
+      'requesterSessionId': requesterSessionId,
+      'requesterRole': 'session',
       'providerId': providerId,
       'message': message,
       'goalSignals': goalSignals,
@@ -34,8 +35,8 @@ class ContactRequestRepository {
     });
     await CleanSignalRuntime.firestore().emit(
       SignalPackageFactory.providerContactStarted(
-        actorId: clientId,
-        actorRole: 'client',
+        actorId: requesterSessionId,
+        actorRole: 'session',
         targetId: providerId,
       ),
     );
@@ -43,7 +44,7 @@ class ContactRequestRepository {
   }
 
   Future<String> createCenterContactRequest({
-    required String clientId,
+    required String requesterSessionId,
     required String centerId,
     required String message,
     List<String> goalSignals = const <String>[],
@@ -54,7 +55,8 @@ class ContactRequestRepository {
         _firestore.collection(CenterContactRequestRecord.collectionName).doc();
     await ref.set(<String, dynamic>{
       'requestId': ref.id,
-      'clientId': clientId,
+      'requesterSessionId': requesterSessionId,
+      'requesterRole': 'session',
       'centerId': centerId,
       'message': message,
       'goalSignals': goalSignals,
@@ -65,8 +67,8 @@ class ContactRequestRepository {
     });
     await CleanSignalRuntime.firestore().emit(
       SignalPackageFactory.centerContactStarted(
-        actorId: clientId,
-        actorRole: 'client',
+        actorId: requesterSessionId,
+        actorRole: 'session',
         targetId: centerId,
       ),
     );

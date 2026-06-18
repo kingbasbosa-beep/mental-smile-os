@@ -93,28 +93,6 @@ class AccountAccessService {
       }
     }
 
-    final clientDoc = await _safeGet('clients', uid);
-    if (clientDoc?.exists == true) {
-      return _stateForDoc(
-        role: 'client',
-        data: clientDoc?.data() ?? const <String, dynamic>{},
-        collection: 'clients',
-        docId: clientDoc!.id,
-      );
-    }
-
-    if (email.isNotEmpty) {
-      final clientByEmail = await _safeQueryByEmail('clients', email);
-      if (clientByEmail != null) {
-        return _stateForDoc(
-          role: 'client',
-          data: clientByEmail.data(),
-          collection: 'clients',
-          docId: clientByEmail.id,
-        );
-      }
-    }
-
     return const SignedInAccessState();
   }
 

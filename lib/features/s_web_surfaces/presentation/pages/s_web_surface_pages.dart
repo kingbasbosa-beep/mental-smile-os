@@ -17,7 +17,8 @@ class SSurfaceIndexPage extends StatelessWidget {
         children: <Widget>[
           _SurfaceNavigationCard(
             title: '[S] City',
-            subtitle: 'Discovery city center for providers, knowledge, tools, and programs',
+            subtitle:
+                'Discovery city center for providers, knowledge, tools, and programs',
             route: '/s/city',
           ),
           _SurfaceNavigationCard(
@@ -27,13 +28,9 @@ class SSurfaceIndexPage extends StatelessWidget {
           ),
           _SurfaceNavigationCard(
             title: '[S] Owner',
-            subtitle: 'Sovereign oversight, memory, strategy, and archive access',
+            subtitle:
+                'Sovereign oversight, memory, strategy, and archive access',
             route: '/s/owner',
-          ),
-          _SurfaceNavigationCard(
-            title: '[S] Personal Space',
-            subtitle: 'The app is the room: signals, privacy, tools, and saved destinations',
-            route: '/s/personal-space',
           ),
         ],
       ),
@@ -359,4 +356,3 @@ class _BoundaryNotice extends StatelessWidget {
     );
   }
 }
-

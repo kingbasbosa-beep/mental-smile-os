@@ -10,7 +10,7 @@ class SavedDestinationRepository {
   final FirebaseFirestore _firestore;
 
   Future<String> saveDestination({
-    required String clientId,
+    required String sessionId,
     required SavedDestinationType destinationType,
     required String destinationId,
     required String title,
@@ -20,7 +20,7 @@ class SavedDestinationRepository {
     final ref = _firestore.collection(SavedDestination.collectionName).doc();
     await ref.set(<String, dynamic>{
       'savedId': ref.id,
-      'clientId': clientId,
+      'sessionId': sessionId,
       'destinationType': destinationType.name,
       'destinationId': destinationId,
       'title': title,
@@ -31,8 +31,8 @@ class SavedDestinationRepository {
     });
     await CleanSignalRuntime.firestore().emit(
       SignalPackageFactory.destinationSaved(
-        actorId: clientId,
-        actorRole: 'client',
+        actorId: sessionId,
+        actorRole: 'session',
         targetType: destinationType.name,
         targetId: destinationId,
       ),
@@ -40,10 +40,10 @@ class SavedDestinationRepository {
     return ref.id;
   }
 
-  Stream<List<SavedDestination>> watchClientDestinations(String clientId) {
+  Stream<List<SavedDestination>> watchSessionDestinations(String sessionId) {
     return _firestore
         .collection(SavedDestination.collectionName)
-        .where('clientId', isEqualTo: clientId)
+        .where('sessionId', isEqualTo: sessionId)
         .snapshots()
         .map(
           (snapshot) => snapshot.docs

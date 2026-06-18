@@ -7,4 +7,3 @@ export 'domain/registries/residential_monitoring_category_registry.dart';
 export 'domain/validators/monitoring_aggregate_validator.dart';
 export 'commercial/commercial_monitoring.dart';
 export 'residential/residential_monitoring.dart';
-

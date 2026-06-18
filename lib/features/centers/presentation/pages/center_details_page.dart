@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mental_smile_os/app/router/routes.dart';
 import 'package:mental_smile_os/features/centers/data/models/center_model.dart';
@@ -47,14 +46,18 @@ class CenterDetailsPage extends StatelessWidget {
     ].where((value) => value.trim().isNotEmpty).toSet().toList();
   }
 
+  String _sessionActorId() {
+    return 'session_${DateTime.now().toUtc().microsecondsSinceEpoch}';
+  }
+
   Future<void> _sendCenterContactRequest({
     required BuildContext context,
     required String centerId,
     required bool isArabic,
     bool accessibleContact = false,
   }) async {
-    final clientId = FirebaseAuth.instance.currentUser?.uid ?? '';
-    if (clientId.isEmpty) {
+    final sessionId = _sessionActorId();
+    if (sessionId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -71,22 +74,22 @@ class CenterDetailsPage extends StatelessWidget {
       if (accessibleContact) {
         await CleanSignalRuntime.firestore().emit(
           SignalPackageFactory.accessibleCenterSelected(
-            actorId: clientId,
-            actorRole: 'client',
+            actorId: sessionId,
+            actorRole: 'session',
             targetId: centerId,
           ),
         );
         await CleanSignalRuntime.firestore().emit(
           SignalPackageFactory.accessibleContactRequested(
-            actorId: clientId,
-            actorRole: 'client',
+            actorId: sessionId,
+            actorRole: 'session',
             targetType: 'center',
             targetId: centerId,
           ),
         );
       }
       await ContactRequestRepository().createCenterContactRequest(
-        clientId: clientId,
+        requesterSessionId: sessionId,
         centerId: centerId,
         message: isArabic
             ? 'أرغب في التواصل مع المركز لمعرفة الخيارات المناسبة.'
@@ -97,8 +100,8 @@ class CenterDetailsPage extends StatelessWidget {
       if (accessibleContact) {
         await CleanSignalRuntime.firestore().emit(
           SignalPackageFactory.accessibleContactCompleted(
-            actorId: clientId,
-            actorRole: 'client',
+            actorId: sessionId,
+            actorRole: 'session',
             targetType: 'center',
             targetId: centerId,
           ),
@@ -133,8 +136,8 @@ class CenterDetailsPage extends StatelessWidget {
     required String title,
     required bool isArabic,
   }) async {
-    final clientId = FirebaseAuth.instance.currentUser?.uid ?? '';
-    if (clientId.isEmpty) {
+    final sessionId = _sessionActorId();
+    if (sessionId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -149,7 +152,7 @@ class CenterDetailsPage extends StatelessWidget {
 
     try {
       await SavedDestinationRepository().saveDestination(
-        clientId: clientId,
+        sessionId: sessionId,
         destinationType: SavedDestinationType.center,
         destinationId: center.id,
         title: title,
@@ -1406,15 +1409,12 @@ class CenterDetailsPage extends StatelessWidget {
 
     final effectiveCenterId = initial?.id ?? id ?? '';
     if (effectiveCenterId.isNotEmpty) {
-      final user = FirebaseAuth.instance.currentUser;
-      final eventKey = '${user?.uid}:$effectiveCenterId';
-      if (user != null &&
-          !user.isAnonymous &&
-          _emittedProfileViews.add(eventKey)) {
+      final eventKey = 'session:$effectiveCenterId';
+      if (_emittedProfileViews.add(eventKey)) {
         CleanSignalRuntime.firestore().emit(
           SignalPackageFactory.centerProfileOpened(
-            actorId: user.uid,
-            actorRole: 'client',
+            actorId: _sessionActorId(),
+            actorRole: 'session',
             targetId: effectiveCenterId,
           ),
         );

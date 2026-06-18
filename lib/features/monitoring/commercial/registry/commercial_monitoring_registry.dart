@@ -24,8 +24,7 @@ class CommercialMonitoringRegistry {
   static const String marketingServiceRequested = 'marketing_service_requested';
   static const String technicalServiceViewed = 'technical_service_viewed';
   static const String technicalServiceRequested = 'technical_service_requested';
-  static const String verificationServiceViewed =
-      'verification_service_viewed';
+  static const String verificationServiceViewed = 'verification_service_viewed';
   static const String verificationServiceRequested =
       'verification_service_requested';
 

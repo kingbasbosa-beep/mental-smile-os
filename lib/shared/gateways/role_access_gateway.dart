@@ -43,13 +43,6 @@ class RoleAccessGateway {
     return access.role == RoleNames.supportObserver;
   }
 
-  Future<bool> isClient() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return false;
-    final access = await _accessService.resolve(user);
-    return access.role == RoleNames.client;
-  }
-
   Future<bool> isCenter() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return false;

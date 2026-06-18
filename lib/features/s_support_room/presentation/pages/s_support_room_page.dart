@@ -73,7 +73,8 @@ class SSupportRoomPage extends StatelessWidget {
                 ),
                 _SupportRequestList(
                   title: 'Technical Requests',
-                  subtitle: 'Access and technical-use requests for observation.',
+                  subtitle:
+                      'Access and technical-use requests for observation.',
                   requests: _technicalRequests(requests),
                   emptyMessage: 'No technical requests detected yet.',
                 ),
@@ -267,9 +268,13 @@ class _SupportRequestCard extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: <Widget>[
-              _MetaChip(label: 'Signal', value: _supportTypeLabel(request.supportType)),
-              _MetaChip(label: 'Type', value: _issueTypeLabel(request.issueType)),
-              _MetaChip(label: 'Priority', value: _priorityLabel(request.priority)),
+              _MetaChip(
+                  label: 'Signal',
+                  value: _supportTypeLabel(request.supportType)),
+              _MetaChip(
+                  label: 'Type', value: _issueTypeLabel(request.issueType)),
+              _MetaChip(
+                  label: 'Priority', value: _priorityLabel(request.priority)),
               _MetaChip(label: 'State', value: _statusLabel(request.status)),
             ],
           ),

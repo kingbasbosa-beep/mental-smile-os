@@ -95,25 +95,6 @@ class ClientSessionRoomPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 22),
-                  Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: const Color(0xFF17201B).withValues(alpha: 0.08),
-                      ),
-                    ),
-                    child: Text(
-                      'Legacy login and registration routes remain available temporarily as LEGACY_CANDIDATE surfaces while session-room access is introduced.',
-                      style: TextStyle(
-                        color: const Color(0xFF17201B).withValues(alpha: 0.72),
-                        height: 1.45,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
                 ],
               );
             },

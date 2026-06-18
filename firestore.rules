@@ -13,6 +13,10 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isNonEmptyString(value) {
+      return value is string && value.size() > 0;
+    }
+
     function uid() {
       return request.auth.uid;
     }
@@ -39,10 +43,6 @@ service cloud.firestore {
 
     function isSupportObserver() {
       return hasRole('support_observer');
-    }
-
-    function isClient() {
-      return signedIn() && request.auth.token.role == 'client';
     }
 
     function isClinician() {
@@ -85,34 +85,6 @@ service cloud.firestore {
           !resource.data.keys().hasAny(['visibilityReadiness'])
           || resource.data.visibilityReadiness != 'ready'
         );
-    }
-
-    function clientCreateValid(docId) {
-      return ownDoc(docId)
-        && request.resource.data.role == 'client'
-        && !request.resource.data.keys().hasAny([
-          'isBlocked',
-          'blockedAt',
-          'blockedBy',
-          'blockReason'
-        ]);
-    }
-
-    function clientUpdateValid(docId) {
-      return ownDoc(docId)
-        && noProtectedAccountFieldChange()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'displayName',
-          'avatarAsset',
-          'photoUrl',
-          'clientSignals',
-          'privacyPreferences',
-          'roomPreferences',
-          'enabledToolKeys',
-          'roomSchemaVersion',
-          'signalSchemaVersion',
-          'updatedAt'
-        ]);
     }
 
     function clinicianCreateValid(docId) {
@@ -311,14 +283,6 @@ service cloud.firestore {
         ]);
     }
 
-    match /clients/{clientId} {
-      allow get: if ownDoc(clientId);
-      allow list: if signedIn() && resource.data.email == request.auth.token.email;
-      allow create: if clientCreateValid(clientId);
-      allow update: if clientUpdateValid(clientId);
-      allow delete: if false;
-    }
-
     match /clinicians/{clinicianId} {
       allow read: if isDeclarationReviewer()
         || (signedIn() && clinicianId == uid())
@@ -366,13 +330,11 @@ service cloud.firestore {
       allow get, list: if isSupportObserver()
         || (
           signedIn()
-          && (
-            resource.data.clientId == uid()
-            || resource.data.providerId == uid()
-          )
+          && resource.data.providerId == uid()
         );
-      allow create: if signedIn()
-        && request.resource.data.clientId == uid();
+      allow create: if isNonEmptyString(request.resource.data.requesterSessionId)
+        && request.resource.data.requesterRole == 'session'
+        && isNonEmptyString(request.resource.data.providerId);
       allow update, delete: if false;
     }
 
@@ -380,24 +342,20 @@ service cloud.firestore {
       allow get, list: if isSupportObserver()
         || (
           signedIn()
-          && (
-            resource.data.clientId == uid()
-            || resource.data.centerId == uid()
-          )
+          && resource.data.centerId == uid()
         );
-      allow create: if signedIn()
-        && request.resource.data.clientId == uid();
+      allow create: if isNonEmptyString(request.resource.data.requesterSessionId)
+        && request.resource.data.requesterRole == 'session'
+        && isNonEmptyString(request.resource.data.centerId);
       allow update, delete: if false;
     }
 
     match /saved_destinations/{savedId} {
-      allow get, list: if isSupportObserver()
-        || (signedIn() && resource.data.clientId == uid());
-      allow create: if signedIn()
-        && request.resource.data.clientId == uid();
-      allow update: if signedIn()
-        && resource.data.clientId == uid()
-        && request.resource.data.clientId == resource.data.clientId;
+      allow get, list: if isSupportObserver();
+      allow create: if isNonEmptyString(request.resource.data.sessionId)
+        && isNonEmptyString(request.resource.data.destinationId)
+        && isNonEmptyString(request.resource.data.destinationType);
+      allow update: if false;
       allow delete: if false;
     }
 
@@ -467,8 +425,14 @@ service cloud.firestore {
           || isMonitoringOperator()
           || isSupportObserver()
         );
-      allow create: if signedIn()
-        && request.resource.data.actorId == uid()
+      allow create: if ((
+            signedIn()
+            && request.resource.data.actorId == uid()
+          )
+          || (
+            request.resource.data.actorRole in ['session', 'visitor']
+            && isNonEmptyString(request.resource.data.actorId)
+          ))
         && request.resource.data.signalId == signalId
         && request.resource.data.keys().hasOnly([
           'signalId',

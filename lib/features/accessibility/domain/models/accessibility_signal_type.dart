@@ -3,8 +3,7 @@ enum AccessibilitySignalType {
   categoryOpened('accessibility_category_opened'),
   resourceOpened('accessibility_resource_opened'),
   resourceSaved('accessibility_resource_saved'),
-  resourceBrokenLinkReported('accessibility_resource_broken_link_reported'),
-  modeSelected('accessibility_mode_selected');
+  resourceBrokenLinkReported('accessibility_resource_broken_link_reported');
 
   const AccessibilitySignalType(this.value);
 

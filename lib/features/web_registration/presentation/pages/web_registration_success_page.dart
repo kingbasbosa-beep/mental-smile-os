@@ -135,4 +135,3 @@ class WebRegistrationSuccessPage extends StatelessWidget {
     );
   }
 }
-

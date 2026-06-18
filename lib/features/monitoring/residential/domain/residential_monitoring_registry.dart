@@ -9,18 +9,6 @@ class ResidentialMonitoringRegistry {
   static const String toolRemoved = 'tool_removed';
   static const String toolOpened = 'tool_opened';
 
-  static const Set<String> goalSignals = <String>{
-    SignalTypeRegistry.goalSelected,
-  };
-
-  static const Set<String> interestSignals = <String>{
-    SignalTypeRegistry.interestSelected,
-  };
-
-  static const Set<String> accessibilitySignals = <String>{
-    SignalTypeRegistry.accessibilityInterest,
-  };
-
   static const Set<String> supportSignals = <String>{
     SignalTypeRegistry.supportStarted,
   };
@@ -40,9 +28,6 @@ class ResidentialMonitoringRegistry {
   };
 
   static const Set<String> allResidentialSignals = <String>{
-    ...goalSignals,
-    ...interestSignals,
-    ...accessibilitySignals,
     ...supportSignals,
     ...librarySignals,
     ...savedDestinationSignals,
@@ -50,13 +35,6 @@ class ResidentialMonitoringRegistry {
   };
 
   static ResidentialAggregateKind? aggregateKindFor(String signalType) {
-    if (goalSignals.contains(signalType)) return ResidentialAggregateKind.goal;
-    if (interestSignals.contains(signalType)) {
-      return ResidentialAggregateKind.interest;
-    }
-    if (accessibilitySignals.contains(signalType)) {
-      return ResidentialAggregateKind.accessibility;
-    }
     if (supportSignals.contains(signalType)) {
       return ResidentialAggregateKind.support;
     }

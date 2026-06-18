@@ -44,5 +44,4 @@ class CentersFirestoreService {
       return CenterModel.fromFirestore(doc);
     });
   }
-
 }

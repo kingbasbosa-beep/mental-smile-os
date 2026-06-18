@@ -1,11 +1,6 @@
 class SignalTypeRegistry {
   const SignalTypeRegistry._();
 
-  static const String goalSelected = 'goal_selected';
-  static const String interestSelected = 'interest_selected';
-  static const String accessibilityInterest = 'accessibility_interest';
-  static const String communicationPreferenceSelected =
-      'communication_preference_selected';
   static const String destinationSaved = 'destination_saved';
   static const String providerContactStarted = 'provider_contact_started';
   static const String centerContactStarted = 'center_contact_started';
@@ -29,13 +24,8 @@ class SignalTypeRegistry {
       'accessibility_resource_saved';
   static const String accessibilityResourceBrokenLinkReported =
       'accessibility_resource_broken_link_reported';
-  static const String accessibilityModeSelected = 'accessibility_mode_selected';
 
   static const List<String> values = <String>[
-    goalSelected,
-    interestSelected,
-    accessibilityInterest,
-    communicationPreferenceSelected,
     destinationSaved,
     providerContactStarted,
     centerContactStarted,
@@ -52,6 +42,5 @@ class SignalTypeRegistry {
     accessibilityResourceOpened,
     accessibilityResourceSaved,
     accessibilityResourceBrokenLinkReported,
-    accessibilityModeSelected,
   ];
 }

@@ -24,8 +24,7 @@ class SignalMagnetRegistry {
 
   factory SignalMagnetRegistry.fromMap(Map<String, dynamic> map) {
     return SignalMagnetRegistry(
-      registryVersion:
-          (map['registryVersion'] ?? currentVersion).toString(),
+      registryVersion: (map['registryVersion'] ?? currentVersion).toString(),
       registryMetadata: _mapValue(map['registryMetadata']),
       signalRegistryReference:
           (map['signalRegistryReference'] ?? '').toString(),

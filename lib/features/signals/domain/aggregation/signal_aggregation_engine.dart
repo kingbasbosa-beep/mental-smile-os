@@ -52,10 +52,6 @@ class SignalAggregationEngine {
 
   static String? aggregationCategoryFor(SignalPackage signal) {
     switch (signal.signalCategory) {
-      case SignalCategoryRegistry.goal:
-        return SignalAggregationCategoryRegistry.goalAggregates;
-      case SignalCategoryRegistry.interest:
-        return SignalAggregationCategoryRegistry.interestAggregates;
       case SignalCategoryRegistry.accessibility:
         return SignalAggregationCategoryRegistry.accessibilityAggregates;
       case SignalCategoryRegistry.destination:

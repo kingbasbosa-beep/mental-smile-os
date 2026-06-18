@@ -55,6 +55,7 @@ class _GoldBackIcon extends StatelessWidget {
     );
   }
 }
+
 class ChatPage extends StatefulWidget {
   const ChatPage({
     super.key,
@@ -70,6 +71,7 @@ class ChatPage extends StatefulWidget {
   @override
   State<ChatPage> createState() => _ChatPageState();
 }
+
 class _ChatPageState extends State<ChatPage> {
   final ChatController _controller = ChatController();
   final TextEditingController _textController = TextEditingController();
@@ -251,9 +253,7 @@ class _ChatPageState extends State<ChatPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isArabic
-                ? 'تم تجهيز إشارة الدعم.'
-                : 'Support signal prepared.',
+            isArabic ? 'تم تجهيز إشارة الدعم.' : 'Support signal prepared.',
           ),
         ),
       );
@@ -397,7 +397,9 @@ class _ChatPageState extends State<ChatPage> {
                         : CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isArabic ? 'معاينة إشارة الدعم' : 'Support Signal Preview',
+                        isArabic
+                            ? 'معاينة إشارة الدعم'
+                            : 'Support Signal Preview',
                         textAlign: isArabic ? TextAlign.right : TextAlign.left,
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                               color: const Color(0xFFE7C766),
@@ -450,7 +452,9 @@ class _ChatPageState extends State<ChatPage> {
                                 },
                           icon: const Icon(Icons.send_rounded),
                           label: Text(
-                            isArabic ? 'مشاركة إشارة الدعم' : 'Share Support Signal',
+                            isArabic
+                                ? 'مشاركة إشارة الدعم'
+                                : 'Share Support Signal',
                           ),
                         ),
                       ),

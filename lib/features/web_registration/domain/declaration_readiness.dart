@@ -86,10 +86,9 @@ class DeclarationReadiness {
 
     return <String, dynamic>{
       'declarationSignals': signals,
-      'visibilityReadiness':
-          missingSignals.isEmpty
-              ? DeclarationReadiness.ready
-              : DeclarationReadiness.incomplete,
+      'visibilityReadiness': missingSignals.isEmpty
+          ? DeclarationReadiness.ready
+          : DeclarationReadiness.incomplete,
       'missingSignals': missingSignals,
       'completedSignals': completedSignals,
       'readinessUpdatedAt': FieldValue.serverTimestamp(),
@@ -117,8 +116,7 @@ class DeclarationReadiness {
       'clinician.signals.learning':
           _hasItems(providerSignals['learningSignals']),
       'clinician.documents.submitted': data['documentsSubmitted'] == true,
-      'clinician.documents.identity_file':
-          _hasText(data['identityFileName']),
+      'clinician.documents.identity_file': _hasText(data['identityFileName']),
       'clinician.documents.certificate_file':
           _hasText(data['certificateFileName']),
       'clinician.documents.extra_file': _hasText(data['extraFileName']),
@@ -158,7 +156,8 @@ class DeclarationReadiness {
       'center.location.address': _hasText(data['address']),
       'center.profile.description': _hasText(data['description']),
       'center.capability.detox_unit': data['hasDetoxUnit'] == true,
-      'center.signals.capabilities': _map(data['centerCapabilities']).isNotEmpty,
+      'center.signals.capabilities':
+          _map(data['centerCapabilities']).isNotEmpty,
       'center.media.front_image': galleryReady('front'),
       'center.media.reception_image': galleryReady('reception'),
       'center.media.inside_image_1': galleryReady('inside_1'),

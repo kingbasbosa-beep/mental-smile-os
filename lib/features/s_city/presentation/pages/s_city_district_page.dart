@@ -637,4 +637,3 @@ class _CityTextStyles {
     fontWeight: FontWeight.w800,
   );
 }
-

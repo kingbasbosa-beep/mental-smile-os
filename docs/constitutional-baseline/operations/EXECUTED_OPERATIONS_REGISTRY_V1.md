@@ -2611,3 +2611,482 @@ Integrity Verification:
 - Owner command results: OWNER_PENDING
 Final Verdict: CLIENT_LEGACY_EXTRACTION_COMPLETE_WITH_DOC_RESIDUE
 Next Action: Owner provides manual command results for format, analyze, APK debug build, and web build.
+
+### OP-POST-PUSH-CONTAMINATION-SWEEP-V1
+
+Operation ID: OP-POST-PUSH-CONTAMINATION-SWEEP-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 058
+Operation Title: Post-Push Contamination Sweep V1
+Prompt / Block Name: POST-PUSH CONTAMINATION SWEEP V1
+Phase: Post-push contamination sweep
+Execution Type: AUDIT / DOC_CREATION / REGISTRY_UPDATE
+Classification:
+- CONTAMINATION_SWEEP
+- POST_EXTRACTION_AUDIT
+- NO_RUNTIME_CHANGE
+Domain: GOVERNANCE / FIREBASE / RUNTIME / ASSETS
+Purpose: Check remaining contamination after client legacy extraction and accessibility gateway push across YAML, Firebase, runtime residue, assets, identity, and git status.
+Scope: Audit only. No commit, no push, no tag, no Firebase deploy, no runtime change, no cleanup.
+Files Created:
+- `docs/audits/POST_PUSH_CONTAMINATION_SWEEP_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_POST_PUSH_CONTAMINATION_WARNINGS_FOUND_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: CONTAMINATION_WARNINGS_FOUND
+Evidence: Operation pre-registered before contamination sweep; removed client route/page tokens were absent from active `lib` and `test` code; report created; finding, memory, operations registry, and operations index updated.
+Contamination Summary:
+- WARNING: bundled legacy client dashboard/register assets remain in `pubspec.yaml`.
+- WARNING: signed-in `clientId` assumptions remain in saved destination and contact request flows.
+- WARNING: Firebase app configuration includes an extra web app/sender branch requiring Owner verification.
+- WARNING: `.github/` Hosting workflow files exist as untracked files and include deploy behavior.
+- DOC_HISTORY: older reports and inventories preserve pre-removal route/page truth.
+- SAFE_ARCHIVE: no active removed route/page tokens found in `lib` or `test`.
+Integrity Verification:
+- Operation pre-registration: COMPLETE
+- Audit report created: COMPLETE
+- Operations Registry updated: COMPLETE
+- Operations Index updated: COMPLETE
+- Memory Registry updated: COMPLETE
+- Finding Registry updated: COMPLETE
+- Archive Registry update: NOT_APPLICABLE
+- Runtime code changes: NONE
+- Firebase deploy: NONE
+- Commit/push/tag: NONE
+Final Verdict: CONTAMINATION_WARNINGS_FOUND
+Next Action: Owner reviews warnings before Firebase sweep, especially workflows, Firebase app configuration, asset bundles, and signed-in client data assumptions.
+
+### OP-PURE-CLIENT-IDENTITY-HARD-REMOVAL-V1
+
+Operation ID: OP-PURE-CLIENT-IDENTITY-HARD-REMOVAL-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 059
+Operation Title: Pure Client Identity Hard Removal
+Prompt / Block Name: PURE CLIENT IDENTITY EXTRACTION - HARD REMOVAL
+Phase: Hard removal
+Execution Type: SURGICAL_REMOVAL / DOC_CREATION / REGISTRY_UPDATE
+Classification:
+- PURE_CLIENT_IDENTITY_EXTRACTION
+- HARD_REMOVAL
+- OWNER_DECISION
+Domain: RESIDENTIAL / CLIENT_IDENTITY / FIREBASE_RULES / ASSETS
+Purpose: Remove dormant client identity residue before user testing, including client collection assumptions, client role validators, old client profile/account residue, obsolete scaffold residue, and client dashboard/register asset bundles.
+Scope: Do not touch provider, center, owner, monitoring, registry, declaration, or support roles. Do not modify forensic history except archive/registry classification. No commit, push, tag, or Firebase deploy.
+Files Created:
+- `docs/constitutional-baseline/cards/archive/ARCHIVE_CARD_PURE_CLIENT_IDENTITY_HARD_REMOVAL_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_PURE_CLIENT_IDENTITY_RESIDUE_REMOVED_V1.md`
+- `docs/constitutional-baseline/operations/PURE_CLIENT_IDENTITY_HARD_REMOVAL_REPORT_V1.md`
+Files Modified:
+- `firestore.rules`
+- `storage.rules`
+- `pubspec.yaml`
+- runtime Dart files under router, auth, role gateway/contracts, client session room, contact requests, saved destinations, provider/center/library surfaces, signal factory/export, and neutralized provider/center/clinician room backgrounds.
+- route, collection, asset, archive, finding, memory, residential/commercial ownership, library route, signal governance, and signal ownership registries.
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted:
+- `lib/features/s_personal_space/presentation/pages/s_personal_space_page.dart`
+- `lib/features/s_personal_space/presentation/widgets/signal_communication_board.dart`
+- `lib/features/signals/domain/models/client_signals.dart`
+Runtime Effect: yes
+Git Effect: none
+Firebase Effect: none
+Result: PURE_CLIENT_IDENTITY_REMOVED_PENDING_OWNER_VERIFICATION
+Evidence: Operation pre-registered before hard-removal inspection and edits; client auth fallback, client role constants/checks, `/clients` rules, `/s/personal-space`, `ClientSignals`, `clientId` runtime fields, `actorRole: client` emissions, and client dashboard/register asset bundles were removed or rewired to session-scoped behavior.
+Hard Removal Summary:
+- Removed `clients` collection assumptions from app auth resolution, Firestore rules, and Storage rules.
+- Removed `RoleNames.client`, `RoleAccessGateway.isClient()`, and client login routing.
+- Removed `/s/personal-space` route/page/widget implementation.
+- Removed `ClientSignals` model/export and changed residential signal target language to `session_signal`.
+- Rewired provider/center contact requests from `clientId` to `requesterSessionId`.
+- Rewired saved destinations from `clientId` to `sessionId`.
+- Rewired library/provider/center emitted user-facing signals from `actorRole: client` to `actorRole: session`.
+- Removed old client dashboard/register asset bundles from `pubspec.yaml`.
+- Updated archive, finding, memory, route, collection, asset, ownership, and signal registries.
+Verification:
+- Static sweep for active runtime `clientId`: no matches.
+- Static sweep for `RoleNames.client`, `_roleClient`, `RoleAccessGateway.isClient()`, `clientCreateValid`, `clientUpdateValid`: no active account/identity matches.
+- Static sweep for `actorRole: 'client'`: no matches.
+- Static sweep for client dashboard/register asset references in `lib` and `pubspec.yaml`: no matches.
+- Remaining `client_support` / `_isClientSupport` strings: support taxonomy only, rewired to `session` actor role.
+- Format/analyze/build: NOT_RUN_OWNER_MANUAL_VERIFICATION_REQUIRED.
+Manual Verification Required:
+- `dart format <changed dart files>`
+- `flutter analyze`
+- `flutter build apk --debug`
+- `flutter build web`
+Final Verdict: PURE_CLIENT_IDENTITY_REMOVED_PENDING_OWNER_VERIFICATION
+Next Action: Owner runs manual verification commands and reviews session-scoped Firebase rules before deploy.
+
+### OP-PURPOSE-NULL-AUDIT-GHOST-INFRASTRUCTURE-V1
+
+Operation ID: OP-PURPOSE-NULL-AUDIT-GHOST-INFRASTRUCTURE-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 060
+Operation Title: Purpose Null Audit Ghost Infrastructure
+Prompt / Block Name: PURPOSE NULL AUDIT - GHOST INFRASTRUCTURE TERMINATION V1
+Phase: Post-hard-removal audit
+Execution Type: AUDIT / DOC_CREATION / REGISTRY_UPDATE
+Classification:
+- PURPOSE_NULL_AUDIT
+- GHOST_INFRASTRUCTURE_DETECTION
+- NO_RUNTIME_REMOVAL
+Domain: GOVERNANCE / ROUTES / PAGES / COLLECTIONS / SIGNALS / ASSETS / ROLES / LOCALIZATION
+Purpose: Find runtime, config, and governance items that are connected or present but have no clear active purpose after Pure DNA V2, client identity hard removal, Accessibility Gateway Alpha, and signal-first/session-first doctrine.
+Scope: Audit first only. No removal, refactor, new feature, commit, push, tag, Firebase deploy, forensic history modification, or archive/history deletion.
+Files Created:
+- `docs/audits/PURPOSE_NULL_AUDIT_GHOST_INFRASTRUCTURE_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_GHOST_INFRASTRUCTURE_AFTER_CLIENT_EXTRACTION_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_CONNECTED_DOES_NOT_MEAN_NEEDED_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_FUNCTIONLESS_LEGACY_RISK_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: GHOST_INFRASTRUCTURE_FOUND
+Evidence: Inspected routes, pages, collections/rules, signals, assets/YAML, roles/authority, and localization. Created the purpose-null audit report and registered the required findings and memory entry.
+Summary:
+- Total ghost candidates: 31
+- Immediate remove candidates: 14
+- Owner decisions required: 11
+- Do-not-touch list: provider identity, center identity, owner authority, monitoring authority, registry authority, declaration reviewer authority, support observer authority, accessibility runtime, client session room, forensic history, and archive history.
+Final Verdict: GHOST_INFRASTRUCTURE_FOUND
+Next Action: Owner approval is required before any removal, hiding, route pruning, signal pruning, asset cleanup, workflow change, or localization cleanup.
+
+---
+
+### OP-GHOST-INFRASTRUCTURE-ARCHIVAL-GUIDE-V1
+
+Operation ID: OP-GHOST-INFRASTRUCTURE-ARCHIVAL-GUIDE-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 061
+Operation Title: Ghost Infrastructure Archival Guide
+Prompt / Block Name: GHOST INFRASTRUCTURE ARCHIVAL GUIDE V1
+Phase: Post-purpose-null archival preparation
+Execution Type: DOC_CREATION / REGISTRY_UPDATE / ARCHIVAL_GUIDE
+Classification:
+- ARCHIVAL_GUIDE_CREATION
+- GHOST_INFRASTRUCTURE_GOVERNANCE
+- NO_RUNTIME_REMOVAL
+Domain: GOVERNANCE / ARCHIVE / ROUTES / SIGNALS / ASSETS / LOCALIZATION / WORKFLOWS
+Purpose: Convert ghost and legacy runtime elements found by `PURPOSE_NULL_AUDIT_GHOST_INFRASTRUCTURE_V1.md` into governed archival cards before any Owner-approved removal.
+Scope: Documentation and registry updates only. No runtime removal, refactor, commit, push, tag, Firebase deploy, or workflow execution.
+Files Created:
+- `docs/constitutional-baseline/guides/GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md`
+- `docs/constitutional-baseline/operations/GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_CREATION_REPORT_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+- `docs/constitutional-baseline/registries/ARCHIVE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/ROUTE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/SIGNAL_GOVERNANCE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/SIGNAL_OWNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/RESIDENTIAL_SIGNAL_OWNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/ASSET_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/COLLECTION_REGISTRY_V1.md`
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: GHOST_ARCHIVAL_GUIDE_READY_FOR_REMOVAL
+Evidence: Created a unified ghost infrastructure archival guide from `PURPOSE_NULL_AUDIT_GHOST_INFRASTRUCTURE_V1.md`, covering every immediate remove candidate and Owner-decision group requested by the Owner.
+Summary:
+- Immediate remove candidate cards created: 14
+- Owner decision cards created: 7
+- Additional governance cards created: 4
+- Runtime removals performed: 0
+- Firebase actions performed: 0
+- Git actions performed: 0
+Final Verdict: GHOST_ARCHIVAL_GUIDE_READY_FOR_REMOVAL
+Next Action: Owner approval is required before any removal block is executed.
+
+---
+
+### OP-PERMANENT-SYSTEM-CARD-COVERAGE-RULE-V1
+
+Operation ID: OP-PERMANENT-SYSTEM-CARD-COVERAGE-RULE-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 062
+Operation Title: Permanent System Card Coverage Rule
+Prompt / Block Name: PERMANENT SYSTEM CARD COVERAGE RULE
+Phase: Governance directive
+Execution Type: OWNER_DIRECTIVE / DOC_CREATION / REGISTRY_UPDATE
+Classification:
+- CARD_COVERAGE_RULE
+- GOVERNANCE_DIRECTIVE
+- NO_RUNTIME_CHANGE
+Domain: GOVERNANCE / REGISTRIES / MEMORY / OPERATIONS
+Purpose: Establish a permanent rule that every active runtime, config, governance, external, localization, field, and accessibility item must have a card or registry entry.
+Scope: Documentation and registry update only. No runtime change, no removal, no Firebase action, no Git action.
+Files Created:
+- `docs/constitutional-baseline/cards/decision/PERMANENT_SYSTEM_CARD_COVERAGE_RULE_V1.md`
+- `docs/constitutional-baseline/findings/FINDING_ACTIVE_SYSTEM_ITEMS_REQUIRE_CARD_COVERAGE_V1.md`
+- `docs/constitutional-baseline/registries/CARD_COVERAGE_GAP_REGISTRY_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+- `docs/constitutional-baseline/registries/GOVERNANCE_DECISION_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: PERMANENT_SYSTEM_CARD_COVERAGE_RULE_ACTIVE
+Evidence: Created permanent card coverage decision card, active finding, Card Coverage Gap Registry, and registry bindings in governance decision, finding, memory, operations, and index registries.
+Summary:
+- Decision card created: yes
+- Finding created: yes
+- Card Coverage Gap Registry created: yes
+- Runtime changes performed: 0
+- Firebase actions performed: 0
+- Git actions performed: 0
+Final Verdict: PERMANENT_SYSTEM_CARD_COVERAGE_RULE_ACTIVE
+Next Action: Apply this rule to every future audit, removal, runtime change, config change, registry edit, card edit, and one-line fix unless Owner explicitly says `DO NOT LOG THIS OPERATION`.
+
+---
+
+### OP-PACKAGE-A-GHOST-SIGNAL-PURGE-V1
+
+Operation ID: OP-PACKAGE-A-GHOST-SIGNAL-PURGE-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 063
+Operation Title: Package A Ghost Signal Purge
+Prompt / Block Name: PACKAGE A - GHOST SIGNAL PURGE V1
+Phase: Ghost infrastructure removal package
+Execution Type: SURGICAL_REMOVAL / REGISTRY_UPDATE
+Classification:
+- GHOST_SIGNAL_PURGE
+- SURGICAL_REMOVAL
+- NO_NEW_FEATURES
+Domain: SIGNALS / GOVERNANCE / REGISTRIES / MEMORY
+Purpose: Remove only ghost signals already archived in `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md`: `communication_preference_selected`, `goal_selected`, `interest_selected`, `accessibility_interest`, and `accessibility_mode_selected`.
+Scope: No new features, no Firebase deploy, no Git commit/push/tag. Runtime signal cleanup and registry/memory updates only.
+Files Created:
+- `docs/constitutional-baseline/operations/GHOST_SIGNAL_PURGE_REPORT_V1.md`
+Files Modified:
+- `lib/features/signals/domain/registries/signal_type_registry.dart`
+- `lib/features/signals/domain/factories/signal_package_factory.dart`
+- `lib/features/signals/domain/validators/signal_aggregation_validator.dart`
+- `lib/features/signals/domain/registries/signal_aggregation_category_registry.dart`
+- `lib/features/signals/domain/aggregation/signal_aggregation_engine.dart`
+- `lib/features/monitoring/domain/validators/monitoring_aggregate_validator.dart`
+- `lib/features/monitoring/domain/adapters/monitoring_aggregation_adapter.dart`
+- `lib/features/monitoring/residential/domain/residential_monitoring_registry.dart`
+- `lib/features/accessibility/domain/models/accessibility_signal_type.dart`
+- `lib/features/accessibility/domain/factories/accessibility_signal_factory.dart`
+- `lib/features/accessibility/domain/registries/accessibility_signal_registry.dart`
+- `docs/constitutional-baseline/guides/GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md`
+- `docs/constitutional-baseline/registries/ARCHIVE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/SIGNAL_GOVERNANCE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/SIGNAL_OWNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/RESIDENTIAL_SIGNAL_OWNERSHIP_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Runtime Effect: removed ghost signal runtime references for `communication_preference_selected`, `goal_selected`, `interest_selected`, `accessibility_interest`, and `accessibility_mode_selected`
+Git Effect: none
+Firebase Effect: none
+Result: GHOST_SIGNALS_REMOVED_PENDING_OWNER_VERIFICATION
+Evidence: Removed the five archived ghost signals from active signal type registry, signal factory methods, aggregation validator, monitoring readable signal sets, residential monitoring registry, accessibility signal enum/factory/registry, and goal/interest aggregation category mappings. Text search found no active `lib` references to the five removed signal names after the purge.
+Summary:
+- Signals removed: `communication_preference_selected`, `goal_selected`, `interest_selected`, `accessibility_interest`, `accessibility_mode_selected`
+- Runtime removals performed: yes
+- New features added: 0
+- Firebase actions performed: 0
+- Git actions performed: 0
+- Manual verification required: dart format, flutter analyze, flutter build apk --debug, flutter build web
+Final Verdict: GHOST_SIGNALS_REMOVED_PENDING_OWNER_VERIFICATION
+Next Action: Owner manual verification.
+
+---
+
+### OP-PACKAGE-B-GHOST-ASSET-YAML-PURGE-V1
+
+Operation ID: OP-PACKAGE-B-GHOST-ASSET-YAML-PURGE-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 064
+Operation Title: Package B Ghost Asset YAML Purge
+Prompt / Block Name: PACKAGE B - GHOST ASSET YAML PURGE V1
+Phase: Ghost infrastructure removal package
+Execution Type: SURGICAL_ASSET_REMOVAL / REGISTRY_UPDATE
+Classification:
+- GHOST_ASSET_PURGE
+- SURGICAL_ASSET_REMOVAL
+- NO_NEW_FEATURES
+Domain: ASSETS / YAML / GOVERNANCE / REGISTRIES / MEMORY
+Purpose: Remove only archived ghost asset folders confirmed in `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md`: `assets/branding/client_dashboard/**`, `assets/branding/web_registration/clients/**`, and `assets/images/client_dashboard/actions/**`.
+Scope: No new features, no Firebase deploy, no Git commit/push/tag, no forensic docs modification, and no `mental-smile-os-workspace` modification. C5/C6 assets may be inspected but must not be removed in this package.
+Files Created:
+- `docs/constitutional-baseline/operations/GHOST_ASSET_YAML_PURGE_REPORT_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/guides/GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md`
+- `docs/constitutional-baseline/registries/ARCHIVE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/ASSET_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Files Deleted:
+- `assets/branding/client_dashboard/**`
+- `assets/branding/web_registration/clients/**`
+- `assets/images/client_dashboard/actions/**`
+YAML Effect: `pubspec.yaml` inspected; no leftover bundle entries found and no changes required.
+Runtime Effect: archived ghost asset folders removed from disk after confirming no active references
+Git Effect: none
+Firebase Effect: none
+Result: GHOST_ASSETS_REMOVED_PENDING_OWNER_VERIFICATION
+Evidence: Confirmed target asset folders existed, were not bundled in `pubspec.yaml`, and had no active refs in `lib`, `pubspec.yaml`, `firebase.json`, `.firebaserc`, `analysis_options.yaml`, or `l10n.yaml`. Removed only the three archived ghost asset folders. Confirmed C5/C6 directories remained untouched.
+Summary:
+- Asset folders deleted: 3
+- Pubspec changes required: 0
+- Active references found: 0
+- C5/C6 removed: no
+- New features added: 0
+- Firebase actions performed: 0
+- Git actions performed: 0
+- Manual verification required: flutter analyze, flutter build apk --debug, flutter build web
+Final Verdict: GHOST_ASSETS_REMOVED_PENDING_OWNER_VERIFICATION
+Next Action: Owner manual verification.
+
+---
+
+### OP-PACKAGE-C-GHOST-ROUTE-VISIBILITY-PURGE-V1
+
+Operation ID: OP-PACKAGE-C-GHOST-ROUTE-VISIBILITY-PURGE-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 065
+Operation Title: Package C Ghost Route Visibility Purge
+Prompt / Block Name: PACKAGE C - GHOST ROUTE VISIBILITY PURGE V1
+Phase: Ghost infrastructure removal package
+Execution Type: ROUTE_VISIBILITY_REMOVAL / REGISTRY_UPDATE
+Classification:
+- GHOST_ROUTE_VISIBILITY_PURGE
+- PLACEHOLDER_HIDING
+- NO_NEW_FEATURES
+Domain: ROUTES / NAVIGATION / GOVERNANCE / REGISTRIES / MEMORY
+Purpose: Remove or hide only ghost placeholder routes already archived in `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md`: `/s/capital/incidents`, `/s/capital/maintenance`, `/s/capital/broadcasts`, `/s/capital/emergency-brief`, `/request/service`, and `/request/package`.
+Scope: No provider/center/owner/monitoring identity change, no active accessibility route change, no client session room change, no Firebase deploy, no Git commit/push/tag, and no Owner-decision route removal.
+Files Created:
+- `docs/constitutional-baseline/operations/GHOST_ROUTE_VISIBILITY_PURGE_REPORT_V1.md`
+Files Modified:
+- `lib/app/router/routes.dart`
+- `lib/app/router/app_router.dart`
+- `lib/features/web_portal/presentation/pages/portal_skeleton_pages.dart`
+- `lib/features/s_capital/presentation/pages/s_capital_operations_office_page.dart`
+- `docs/constitutional-baseline/guides/GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md`
+- `docs/constitutional-baseline/registries/ROUTE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/DOMAIN_BOUNDARY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MONITORING_AUTHORITY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/ARCHIVE_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Runtime Effect: removed normal navigation visibility, route constants, and router cases for archived ghost placeholder routes `/s/capital/incidents`, `/s/capital/maintenance`, `/s/capital/broadcasts`, `/s/capital/emergency-brief`, `/request/service`, and `/request/package`
+Git Effect: none
+Firebase Effect: none
+Result: GHOST_ROUTE_VISIBILITY_PURGED_PENDING_OWNER_VERIFICATION
+Evidence: Removed Capital ghost route navigation and router visibility, removed public portal service/package nav/action links and router visibility, and confirmed no active `lib` references remain for the six target ghost routes. Owner-decision routes and active provider/center/owner/monitoring/accessibility/client-session routes were preserved.
+Summary:
+- Routes hidden/removed: 6
+- Navigation link groups removed: Capital ghost links, Portal Services/Packages links, Portal Request Service action
+- Construction-only routes retained: 0
+- Owner-decision routes left untouched: `/s/city/tools`, `/s/city/programs`, `/s/city/marketplace`, `/s/capital/departments`, `/s/capital/trust-safety`, `/s/capital/reports`, `/contact`
+- New features added: 0
+- Firebase actions performed: 0
+- Git actions performed: 0
+- Manual verification required: dart format, flutter analyze, flutter build apk --debug, flutter build web
+Final Verdict: GHOST_ROUTE_VISIBILITY_PURGED_PENDING_OWNER_VERIFICATION
+Next Action: Owner manual verification.
+
+---
+
+### OP-GHOST-PACKAGES-SYSTEM-STATE-SUMMARY-REPORT-V1
+
+Operation ID: OP-GHOST-PACKAGES-SYSTEM-STATE-SUMMARY-REPORT-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 066
+Operation Title: Ghost Packages System State Summary Report
+Prompt / Block Name: Consolidated report after ghost packages and governance operations
+Phase: Post-package summary
+Execution Type: AUDIT_SUMMARY / DOC_CREATION / REGISTRY_UPDATE
+Classification:
+- SYSTEM_STATE_SUMMARY
+- CARD_COVERAGE_REVIEW
+- REGISTRY_STATUS_REVIEW
+Domain: GOVERNANCE / RUNTIME_STATE / CARDS / REGISTRIES / FIREBASE / YAML
+Purpose: Create a consolidated report covering recent operations, system state before/after, card inventory, current uncovered items, operation registry count/status, and Firebase rules/YAML status.
+Scope: Documentation and registry update only. No runtime changes, no Firebase deploy, no Git commit/push/tag.
+Files Created:
+- `docs/constitutional-baseline/operations/GHOST_PACKAGES_SYSTEM_STATE_SUMMARY_REPORT_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: GHOST_PACKAGES_SYSTEM_STATE_SUMMARY_COMPLETE
+Evidence: Created consolidated report covering operations 060-066, system before/after state, card inventory, coverage gaps, operation registry count, Firebase rules state, YAML state, localization residue, and remaining Owner-decision items.
+Summary:
+- Operations registered after this report: 66
+- File-backed cards counted: 18
+- Embedded ghost archival cards counted: 26
+- Registry files counted: 28
+- Current explicit missing-card gaps found: none beyond Card Coverage Gap Registry baseline
+- Firebase deploy performed: 0
+- Git commit/push/tag performed: 0
+Final Verdict: GHOST_PACKAGES_SYSTEM_STATE_SUMMARY_COMPLETE
+Next Action: Owner manual review of remaining Owner-decision items and manual verification commands from Packages A-C.
+
+---
+
+### OP-FIREBASE-YAML-FINAL-COMPATIBILITY-SWEEP-V1
+
+Operation ID: OP-FIREBASE-YAML-FINAL-COMPATIBILITY-SWEEP-V1
+Operation Date/Time: 2026-06-18
+Chronological Order Number: 067
+Operation Title: Firebase YAML Final Compatibility Sweep
+Prompt / Block Name: FIREBASE YAML FINAL COMPATIBILITY SWEEP V1
+Phase: Final compatibility sweep
+Execution Type: AUDIT_ONLY / DOC_CREATION / REGISTRY_UPDATE
+Classification:
+- FIREBASE_YAML_COMPATIBILITY
+- AUDIT_ONLY
+- NO_RUNTIME_CHANGE
+Domain: FIREBASE / YAML / RULES / CONFIG / GOVERNANCE
+Purpose: Audit Firebase, YAML, rules, generated Firebase config, Android Firebase references, and held GitHub workflows against current doctrine after ghost signal/asset/route purge.
+Scope: Audit only. No changes to runtime/config behavior, no commit, no push, no deploy.
+Files Created:
+- `docs/constitutional-baseline/operations/FIREBASE_YAML_FINAL_COMPATIBILITY_SWEEP_V1.md`
+Files Modified:
+- `docs/constitutional-baseline/registries/FINDING_REGISTRY_V1.md`
+- `docs/constitutional-baseline/registries/MEMORY_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_REGISTRY_V1.md`
+- `docs/constitutional-baseline/operations/EXECUTED_OPERATIONS_INDEX_V1.md`
+Runtime Effect: none
+Git Effect: none
+Firebase Effect: none
+Result: FIREBASE_YAML_WARNINGS_FOUND
+Evidence: Audited `pubspec.yaml`, `l10n.yaml`, `analysis_options.yaml`, `firebase.json`, `.firebaserc`, `firestore.rules`, `storage.rules`, `firestore.indexes.json`, `lib/firebase_options.dart`, Android Firebase references, and held GitHub workflows. Found no blockers and no ghost/client-account return in audited Firebase/YAML surfaces; warnings and Owner decisions remain.
+Summary:
+- Blockers found: 0
+- Compatible surfaces: pubspec, l10n config, analysis options, Firestore indexes, storage rules, .firebaserc, active Android Firebase app config
+- Warnings / Owner decisions: Firebase Hosting target, GitHub Hosting workflows, saved destinations, signal aggregates, Windows Firebase options, Android backup config history
+- Runtime changes performed: 0
+- Firebase actions performed: 0
+- Git actions performed: 0
+Final Verdict: FIREBASE_YAML_WARNINGS_FOUND
+Next Action: Owner decision before deploy on hosting target/workflows and future focused audit for saved destinations/signal aggregates if needed.

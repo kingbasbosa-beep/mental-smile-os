@@ -6,7 +6,7 @@ Runtime effect: none
 
 | Entry | Owner | Consumers | Dependencies | Signals | Collections | Status | Lifecycle | Classification |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `clients` | Client/System | client registration, login routing | Firebase Auth | client registration | `clients` | ACTIVE | Runtime | ACTIVE |
+| `clients` | Archive/System | archived client registration identity | none | none | `clients` | ARCHIVED_HARD_REMOVED | Runtime archive | PURE_CLIENT_IDENTITY_REMOVED |
 | `clinicians` | Clinician/System | registration, declaration review, discovery | Firebase Auth, readiness | declaration readiness | `clinicians` | ACTIVE | Runtime | ACTIVE |
 | `centers` | Center/System | registration, declaration review, discovery | Firebase Auth, readiness | declaration readiness | `centers` | ACTIVE | Runtime | ACTIVE |
 | `clinician_profile_change_requests` | Clinician/Declaration Reviewer | clinician room, declaration review | Firestore | profile declaration | `clinician_profile_change_requests` | ACTIVE | Runtime | ACTIVE |

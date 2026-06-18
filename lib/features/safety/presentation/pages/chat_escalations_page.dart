@@ -87,7 +87,8 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
               stream: _service.streamEscalations(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Center(child: Text('Unable to load: ${snapshot.error}'));
+                  return Center(
+                      child: Text('Unable to load: ${snapshot.error}'));
                 }
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
@@ -130,9 +131,11 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
                                     'Safety: ${escalation.safetyEscalationLevel}',
                                   ),
                                 ),
-                                Chip(label: Text('State: ${escalation.status}')),
                                 Chip(
-                                  label: Text('Risk score: ${escalation.riskScore}'),
+                                    label: Text('State: ${escalation.status}')),
+                                Chip(
+                                  label: Text(
+                                      'Risk score: ${escalation.riskScore}'),
                                 ),
                               ],
                             ),
@@ -170,7 +173,9 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
                                   onPressed: () {
                                     Navigator.of(context).pushNamed(
                                       Routes.chatEscalationReport,
-                                      arguments: {'escalationId': escalation.id},
+                                      arguments: {
+                                        'escalationId': escalation.id
+                                      },
                                     );
                                   },
                                   icon: const Icon(Icons.description_outlined),
@@ -180,7 +185,9 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
                                   onPressed: () {
                                     Navigator.of(context).pushNamed(
                                       Routes.chat,
-                                      arguments: {'threadId': escalation.threadId},
+                                      arguments: {
+                                        'threadId': escalation.threadId
+                                      },
                                     );
                                   },
                                   icon: const Icon(Icons.forum_outlined),
@@ -191,8 +198,10 @@ class _ChatEscalationsPageState extends State<ChatEscalationsPage> {
                                     onPressed: _resolvingId == escalation.id
                                         ? null
                                         : () => _resolveEscalation(escalation),
-                                    icon: const Icon(Icons.verified_user_outlined),
-                                    label: const Text('Resolve safety escalation'),
+                                    icon: const Icon(
+                                        Icons.verified_user_outlined),
+                                    label:
+                                        const Text('Resolve safety escalation'),
                                   ),
                               ],
                             ),

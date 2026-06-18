@@ -8,82 +8,6 @@ import '../registries/signal_type_registry.dart';
 class SignalPackageFactory {
   const SignalPackageFactory._();
 
-  static SignalPackage goalSelected({
-    required String actorId,
-    required String actorRole,
-    String targetId = '',
-    String signalSource = 'client_room',
-    DateTime? timestamp,
-  }) {
-    return _residential(
-      signalType: SignalTypeRegistry.goalSelected,
-      signalCategory: SignalCategoryRegistry.goal,
-      signalSource: signalSource,
-      actorId: actorId,
-      actorRole: actorRole,
-      targetType: 'client_signal',
-      targetId: targetId,
-      timestamp: timestamp,
-    );
-  }
-
-  static SignalPackage interestSelected({
-    required String actorId,
-    required String actorRole,
-    String targetId = '',
-    String signalSource = 'client_room',
-    DateTime? timestamp,
-  }) {
-    return _residential(
-      signalType: SignalTypeRegistry.interestSelected,
-      signalCategory: SignalCategoryRegistry.interest,
-      signalSource: signalSource,
-      actorId: actorId,
-      actorRole: actorRole,
-      targetType: 'client_signal',
-      targetId: targetId,
-      timestamp: timestamp,
-    );
-  }
-
-  static SignalPackage accessibilityInterest({
-    required String actorId,
-    required String actorRole,
-    String targetId = '',
-    String signalSource = 'client_room',
-    DateTime? timestamp,
-  }) {
-    return _residential(
-      signalType: SignalTypeRegistry.accessibilityInterest,
-      signalCategory: SignalCategoryRegistry.accessibility,
-      signalSource: signalSource,
-      actorId: actorId,
-      actorRole: actorRole,
-      targetType: 'client_signal',
-      targetId: targetId,
-      timestamp: timestamp,
-    );
-  }
-
-  static SignalPackage communicationPreferenceSelected({
-    required String actorId,
-    required String actorRole,
-    String targetId = '',
-    String signalSource = 'client_room',
-    DateTime? timestamp,
-  }) {
-    return _residential(
-      signalType: SignalTypeRegistry.communicationPreferenceSelected,
-      signalCategory: SignalCategoryRegistry.communication,
-      signalSource: signalSource,
-      actorId: actorId,
-      actorRole: actorRole,
-      targetType: 'client_signal',
-      targetId: targetId,
-      timestamp: timestamp,
-    );
-  }
-
   static SignalPackage destinationSaved({
     required String actorId,
     required String actorRole,
@@ -297,30 +221,6 @@ class SignalPackageFactory {
       targetId: targetId,
       timestamp: timestamp,
       routingTarget: SignalRoutingTarget.commercialMonitoring,
-    );
-  }
-
-  static SignalPackage _residential({
-    required String signalType,
-    required String signalCategory,
-    required String signalSource,
-    required String actorId,
-    required String actorRole,
-    required String targetType,
-    required String targetId,
-    DateTime? timestamp,
-  }) {
-    return _package(
-      signalType: signalType,
-      signalCategory: signalCategory,
-      signalDomain: 'residential',
-      signalSource: signalSource,
-      actorId: actorId,
-      actorRole: actorRole,
-      targetType: targetType,
-      targetId: targetId,
-      timestamp: timestamp,
-      routingTarget: SignalRoutingTarget.residentialMonitoring,
     );
   }
 

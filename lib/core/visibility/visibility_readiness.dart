@@ -11,10 +11,8 @@ class VisibilityReadiness {
   static const String withdrawn = 'withdrawn';
 
   static String resolve(Map<String, dynamic> data) {
-    final readiness = (data['visibilityReadiness'] ?? '')
-        .toString()
-        .trim()
-        .toLowerCase();
+    final readiness =
+        (data['visibilityReadiness'] ?? '').toString().trim().toLowerCase();
     return readiness.isEmpty ? incomplete : readiness;
   }
 
@@ -34,8 +32,8 @@ class VisibilityReadinessStreams {
       watchVisibleDocuments(
     CollectionReference<Map<String, dynamic>> collection,
   ) {
-    late StreamController<
-        List<QueryDocumentSnapshot<Map<String, dynamic>>>> controller;
+    late StreamController<List<QueryDocumentSnapshot<Map<String, dynamic>>>>
+        controller;
     StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
         canonicalSubscription;
     StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? subscription;

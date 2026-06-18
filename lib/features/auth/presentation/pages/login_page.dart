@@ -61,8 +61,7 @@ class _LoginPageState extends State<LoginPage> {
     final needsReadiness =
         a.role == RoleNames.clinician || a.role == RoleNames.center;
 
-    if (needsReadiness &&
-        a.visibilityReadiness != VisibilityReadiness.ready) {
+    if (needsReadiness && a.visibilityReadiness != VisibilityReadiness.ready) {
       return Routes.blockedAccount;
     }
 
@@ -82,8 +81,6 @@ class _LoginPageState extends State<LoginPage> {
         return Routes.clinicianRoom;
       case RoleNames.center:
         return Routes.centerDashboard;
-      case RoleNames.client:
-        return Routes.clientSessionRoom;
       default:
         return Routes.menu;
     }

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PortalHomePage extends StatelessWidget {
@@ -25,102 +25,6 @@ class PortalAboutPage extends StatelessWidget {
         subtitle: 'Mental Smile Service Marketplace + Operational Federation',
         body:
             'Mental Smile is a signal-aware service marketplace for access, support, transparency, education, and professional services.',
-      ),
-    );
-  }
-}
-
-class PortalServiceRequestPage extends StatelessWidget {
-  const PortalServiceRequestPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return _PortalScaffold(
-      currentRoute: '/request/service',
-      child: _PortalIntakePage(
-        intakeType: _PortalIntakeType.service,
-        title: 'Service Request',
-        subtitle: 'Commerce Intake + Service Request',
-        disclaimer:
-            'This captures interest signals for future service contact. It does not create authority over people or journeys.',
-        submitLabel: 'Open Gmail Draft / ÙØªØ­ Ù…Ø³ÙˆØ¯Ø© Gmail',
-        fields: [
-          _PortalTextFieldSpec(key: 'requester', label: 'Requester name'),
-          _PortalTextFieldSpec(key: 'email', label: 'Email'),
-          _PortalTextFieldSpec(key: 'phone', label: 'Phone'),
-          _PortalTextFieldSpec(key: 'organization', label: 'Organization name'),
-          _PortalSelectFieldSpec(
-            key: 'serviceType',
-            label: 'Service type',
-            value: 'Marketing Campaign',
-            options: [
-              'Marketing Campaign',
-              'Content Creation',
-              'Technical Service',
-              'AI Service',
-              'White Label / Tenant',
-              'Partnership',
-            ],
-          ),
-          _PortalTextFieldSpec(
-            key: 'summary',
-            label: 'Request summary',
-            maxLines: 4,
-          ),
-          _PortalTextFieldSpec(key: 'budget', label: 'Budget range'),
-          _PortalTextFieldSpec(key: 'timeline', label: 'Timeline'),
-          _PortalBooleanFieldSpec(
-            key: 'discoveryCall',
-            label: 'Needs discovery call',
-          ),
-          _PortalTextFieldSpec(key: 'notes', label: 'Notes', maxLines: 3),
-        ],
-      ),
-    );
-  }
-}
-
-class PortalPackageRequestPage extends StatelessWidget {
-  const PortalPackageRequestPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return _PortalScaffold(
-      currentRoute: '/request/package',
-      child: _PortalIntakePage(
-        intakeType: _PortalIntakeType.package,
-        title: 'Package Information',
-        subtitle: 'Package + Subscription Intake',
-        disclaimer:
-            'Package information is handled as external service cost information. Mental Smile does not process financial decisions through this portal.',
-        submitLabel: 'Open Gmail Draft / ÙØªØ­ Ù…Ø³ÙˆØ¯Ø© Gmail',
-        fields: [
-          _PortalTextFieldSpec(key: 'requester', label: 'Requester name'),
-          _PortalTextFieldSpec(key: 'email', label: 'Email'),
-          _PortalTextFieldSpec(key: 'phone', label: 'Phone'),
-          _PortalTextFieldSpec(
-            key: 'providerCenter',
-            label: 'Provider / center name',
-          ),
-          _PortalSelectFieldSpec(
-            key: 'packageType',
-            label: 'Package type',
-            value: 'Subscription',
-            options: [
-              'Subscription',
-              'Verification',
-              'Visibility Information',
-              'Tool / AI Package',
-              'Optional Module Rental',
-            ],
-          ),
-          _PortalTextFieldSpec(
-            key: 'billingPreference',
-            label: 'Billing preference',
-          ),
-          _PortalBooleanFieldSpec(key: 'needsQuote', label: 'Needs quote'),
-          _PortalTextFieldSpec(key: 'notes', label: 'Notes', maxLines: 3),
-        ],
       ),
     );
   }
@@ -220,8 +124,6 @@ class _PortalNavbar extends StatelessWidget {
     _PortalNavItem('Library', '/library'),
     _PortalNavItem('Providers', '/register/provider'),
     _PortalNavItem('Centers', '/register/center'),
-    _PortalNavItem('Services', '/request/service'),
-    _PortalNavItem('Packages', '/request/package'),
     _PortalNavItem('Contact', '/contact'),
   ];
 
@@ -343,14 +245,11 @@ class _PortalHeroHome extends StatelessWidget {
               label: 'Register as Center',
               route: '/register/center',
             ),
-            _PortalActionButton(
-              label: 'Request Service',
-              route: '/request/service',
-            ),
             _PortalActionButton(label: 'Library', route: '/library'),
             _PortalActionButton(label: 'Contact', route: '/contact'),
             _PortalActionButton(
-              label: 'Open Mental Smile App / Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¥Ù„Ù‰ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚',
+              label:
+                  'Open Mental Smile App / Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¥Ù„Ù‰ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚',
               route: '/splash',
             ),
           ],
@@ -407,7 +306,7 @@ class _PortalTextPage extends StatelessWidget {
   }
 }
 
-enum _PortalIntakeType { service, package, contact }
+enum _PortalIntakeType { contact }
 
 class _PortalIntakePage extends StatefulWidget {
   const _PortalIntakePage({
@@ -435,22 +334,18 @@ class _PortalIntakePageState extends State<_PortalIntakePage> {
 
   late final Map<String, TextEditingController> _controllers;
   late final Map<String, String> _selectValues;
-  late final Map<String, bool> _boolValues;
 
   @override
   void initState() {
     super.initState();
     _controllers = <String, TextEditingController>{};
     _selectValues = <String, String>{};
-    _boolValues = <String, bool>{};
 
     for (final field in widget.fields) {
       if (field is _PortalTextFieldSpec) {
         _controllers[field.key] = TextEditingController();
       } else if (field is _PortalSelectFieldSpec) {
         _selectValues[field.key] = field.value;
-      } else if (field is _PortalBooleanFieldSpec) {
-        _boolValues[field.key] = false;
       }
     }
   }
@@ -466,8 +361,6 @@ class _PortalIntakePageState extends State<_PortalIntakePage> {
   String _textValue(String key) => _controllers[key]?.text.trim() ?? '';
 
   String _selectValue(String key) => _selectValues[key] ?? '';
-
-  String _boolValue(String key) => (_boolValues[key] ?? false) ? 'Yes' : 'No';
 
   Future<void> _openGmailDraft() async {
     final nameKey =
@@ -510,10 +403,6 @@ class _PortalIntakePageState extends State<_PortalIntakePage> {
 
   String _subject() {
     switch (widget.intakeType) {
-      case _PortalIntakeType.service:
-        return '[Mental Smile Service Request] ${_selectValue('serviceType')}';
-      case _PortalIntakeType.package:
-        return '[Mental Smile Package Request]';
       case _PortalIntakeType.contact:
         return '[Mental Smile Contact Request]';
     }
@@ -521,36 +410,6 @@ class _PortalIntakePageState extends State<_PortalIntakePage> {
 
   String _body() {
     switch (widget.intakeType) {
-      case _PortalIntakeType.service:
-        return '''
-Mental Smile Service Request
-
-Requester name: ${_textValue('requester')}
-Email: ${_textValue('email')}
-Phone: ${_textValue('phone')}
-Organization: ${_textValue('organization')}
-Service type: ${_selectValue('serviceType')}
-Budget: ${_textValue('budget')}
-Timeline: ${_textValue('timeline')}
-Discovery call: ${_boolValue('discoveryCall')}
-Notes: ${_textValue('notes')}
-
-Request summary:
-${_textValue('summary')}
-''';
-      case _PortalIntakeType.package:
-        return '''
-Mental Smile Package Request
-
-Requester: ${_textValue('requester')}
-Email: ${_textValue('email')}
-Phone: ${_textValue('phone')}
-Provider / center: ${_textValue('providerCenter')}
-Package type: ${_selectValue('packageType')}
-Billing preference: ${_textValue('billingPreference')}
-Quote request: ${_boolValue('needsQuote')}
-Notes: ${_textValue('notes')}
-''';
       case _PortalIntakeType.contact:
         return '''
 Mental Smile Contact Request
@@ -680,17 +539,6 @@ ${_textValue('message')}
         },
       );
     }
-    if (field is _PortalBooleanFieldSpec) {
-      return CheckboxListTile(
-        value: _boolValues[field.key] ?? false,
-        onChanged: (value) {
-          setState(() => _boolValues[field.key] = value ?? false);
-        },
-        contentPadding: EdgeInsets.zero,
-        title: Text(field.label),
-        controlAffinity: ListTileControlAffinity.leading,
-      );
-    }
     return const SizedBox.shrink();
   }
 }
@@ -725,15 +573,6 @@ class _PortalSelectFieldSpec extends _PortalFieldSpec {
   final String key;
   final String value;
   final List<String> options;
-}
-
-class _PortalBooleanFieldSpec extends _PortalFieldSpec {
-  const _PortalBooleanFieldSpec({
-    required this.key,
-    required super.label,
-  });
-
-  final String key;
 }
 
 class _PortalActionButton extends StatelessWidget {
@@ -786,4 +625,3 @@ class _PortalNavItem {
   final String label;
   final String route;
 }
-

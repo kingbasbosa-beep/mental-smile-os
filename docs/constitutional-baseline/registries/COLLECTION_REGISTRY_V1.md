@@ -13,12 +13,12 @@ Runtime effect: none
 
 | Collection | Status |
 | --- | --- |
-| `clients` | ACTIVE |
+| `clients` | ARCHIVED_HARD_REMOVED |
 | `clinicians` | ACTIVE |
 | `centers` | ACTIVE |
-| `provider_contact_requests` | ACTIVE |
-| `center_contact_requests` | ACTIVE |
-| `saved_destinations` | ACTIVE |
+| `provider_contact_requests` | ACTIVE_SESSION_SCOPED |
+| `center_contact_requests` | ACTIVE_SESSION_SCOPED |
+| `saved_destinations` | ACTIVE_SESSION_SCOPED |
 | `support_requests` | ACTIVE |
 | `chat_threads` | ACTIVE |
 | `chat_threads/{threadId}/messages` | ACTIVE |
@@ -32,7 +32,15 @@ Runtime effect: none
 | `booking_requests` | ARCHIVE_CANDIDATE |
 | `tool_registry` | UNKNOWN |
 
+## Ghost Infrastructure Archival Guide Collection Notes
+
+| Collection / Collection Name | Status | Related Guide | Related Operation | Note |
+| --- | --- | --- | --- | --- |
+| `saved_destinations` | OWNER_DECISION_REQUIRED | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` | OP-GHOST-INFRASTRUCTURE-ARCHIVAL-GUIDE-V1 | Session-scoped writes exist, but user-visible readback journey was not found in the Purpose Null Audit. |
+| `signal_aggregates` | OWNER_DECISION_REQUIRED | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` | OP-GHOST-INFRASTRUCTURE-ARCHIVAL-GUIDE-V1 | Read rules/models exist, but aggregate write lifecycle requires focused audit before activation or removal. |
+| `accessibility_resources` | ARCHIVAL_CARD_CREATED_PENDING_OWNER_DECISION | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` | OP-GHOST-INFRASTRUCTURE-ARCHIVAL-GUIDE-V1 | Model collection name exists while current accessibility resources are static sample data. |
+| `ai_policies` | OWNER_DECISION_REQUIRED | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` | OP-GHOST-INFRASTRUCTURE-ARCHIVAL-GUIDE-V1 | Registry/seeder references exist without a confirmed Firestore rule path in the Purpose Null Audit. |
+
 ## Rule
 
 No collection creation, deletion, or rule change before Owner-approved collection governance.
-

@@ -13,12 +13,12 @@ Provide a cross-domain ownership view for signal families. Domain-specific owner
 
 | Signal Family | Owner | Consumers | Dependencies | Signals | Collections | Status | Lifecycle | Classification |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Client profile and goal signals | Residential | Client Room, Personal Space, Monitoring | Residential ownership registry | client goals, interests, accessibility | `clients`, `signal_events` | ACTIVE | Runtime | RESIDENTIAL_SIGNAL |
-| Saved destination signals | Residential | Personal Space, Discovery, Monitoring | Residential collection ownership | saved destination | `saved_destinations`, `signal_events` | ACTIVE | Runtime | RESIDENTIAL_SIGNAL |
+| Client profile and goal signals | Archive | Archived client room/personal space | Pure client identity hard removal | client goals, interests, accessibility | none | ARCHIVED_HARD_REMOVED | Runtime archive | PURE_CLIENT_IDENTITY_REMOVED |
+| Saved destination signals | Residential | Session discovery, Monitoring | Residential collection ownership | saved destination | `saved_destinations`, `signal_events` | ACTIVE_SESSION_SCOPED | Runtime | SESSION_SIGNAL |
 | Support request signals | Residential with Monitoring observation | Support Room, Monitoring | Support boundary governance | support issue, risk support | `support_requests` | ACTIVE_CROSS_DOMAIN | Runtime | CROSS_DOMAIN_SIGNAL |
 | Chat escalation signals | Residential with Monitoring observation | Chat, Monitoring, Owner | Escalation ownership registry recommended | chat escalation, report, resolution | `chat_threads`, `chat_escalations` | ACTIVE_CROSS_DOMAIN | Runtime | CROSS_DOMAIN_SIGNAL |
-| Provider/clinician contact signals | Commercial | Specialists, Discovery, Administrative | Commercial ownership registry, terminology map | provider contact, clinician interest | `provider_contact_requests`, `clinicians` | ACTIVE_WITH_TERMINOLOGY_RISK | Runtime | COMMERCIAL_SIGNAL |
-| Center contact signals | Commercial | Centers, Discovery, Monitoring | Commercial ownership registry | center contact, center discovery | `center_contact_requests`, `centers` | ACTIVE | Runtime | COMMERCIAL_SIGNAL |
+| Provider/clinician contact signals | Commercial | Specialists, Discovery, Administrative | Commercial ownership registry, terminology map | provider contact, clinician interest | `provider_contact_requests`, `clinicians` | ACTIVE_SESSION_SCOPED_WITH_TERMINOLOGY_RISK | Runtime | COMMERCIAL_SIGNAL |
+| Center contact signals | Commercial | Centers, Discovery, Monitoring | Commercial ownership registry | center contact, center discovery | `center_contact_requests`, `centers` | ACTIVE_SESSION_SCOPED | Runtime | COMMERCIAL_SIGNAL |
 | Tool and marketplace signals | Commercial | Tools, Marketplace, Owner | Tool registry decision | tool usage, marketplace intent | `tool_registry` | UNKNOWN_ACTIVE_SURFACE | Future/runtime | COMMERCIAL_SIGNAL |
 | Registration declaration signals | Administrative | Registration, Declaration Review, Owner | Declaration Review Registry | declaration readiness, profile change | `clinicians`, `centers`, profile change requests | ACTIVE | Runtime | ADMINISTRATIVE_SIGNAL |
 | Library category signals | Library | Library, Monitoring, Owner | Library Content Registry | category opened, featured opened | `signal_events` | ACTIVE | Runtime | LIBRARY_SIGNAL |
@@ -31,6 +31,17 @@ Provide a cross-domain ownership view for signal families. Domain-specific owner
 | Signal Family | Owner | Consumers | Dependencies | Signals | Collections | Status | Lifecycle | Classification |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Accessible communication contact signals | Accessibility / Commercial | Provider pages, Center pages, Monitoring | Accessibility Gateway cards, Commercial signal ownership registry | accessible_contact_requested, accessible_contact_completed, accessible_provider_selected, accessible_center_selected | `signal_events`, `provider_contact_requests`, `center_contact_requests` | ACTIVE_PENDING_OWNER_MANUAL_VERIFICATION | Runtime | ACCESSIBILITY_COMMERCIAL_SIGNAL |
+
+## Ghost Infrastructure Archival Guide Signal Ownership Notes
+
+| Signal / Family | Owner | Consumers | Status | Classification | Related Guide |
+| --- | --- | --- | --- | --- | --- |
+| `communication_preference_selected` | Archive/System | none verified | REMOVED_FROM_RUNTIME | GHOST_SIGNAL | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` |
+| `goal_selected` | Archive/System | none verified | REMOVED_FROM_RUNTIME | CLIENT_ERA_GHOST_SIGNAL | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` |
+| `interest_selected` | Archive/System | none verified | REMOVED_FROM_RUNTIME | CLIENT_ERA_GHOST_SIGNAL | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` |
+| `accessibility_interest` | Archive/System | none verified | REMOVED_FROM_RUNTIME | SUPERSEDED_SIGNAL | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` |
+| `accessibility_mode_selected` | Archive/System | none verified | REMOVED_FROM_RUNTIME | ACCESSIBILITY_GHOST_SIGNAL | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` |
+| `destination_saved` | Residential/Owner decision | Monitoring / saved destination workflow | OWNER_DECISION_REQUIRED | WRITEBACK_PURPOSE_UNCLEAR | `GHOST_INFRASTRUCTURE_ARCHIVAL_GUIDE_V1.md` |
 
 ## Coverage
 

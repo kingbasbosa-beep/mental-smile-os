@@ -76,8 +76,7 @@ class ChatController {
       throw Exception('لا يوجد مستخدم مسجل حاليًا');
     }
 
-    final query =
-        await _firestoreService.getThreadsForParticipant(user.uid);
+    final query = await _firestoreService.getThreadsForParticipant(user.uid);
 
     for (final thread in query) {
       if (_isSupportRoomThread(thread)) {

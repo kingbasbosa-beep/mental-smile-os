@@ -65,7 +65,8 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
         ),
         _SupportIssueOption(
           key: 'provider_contact_question',
-          label: isArabic ? 'مساعدة في التواصل مع مختص' : 'Provider contact help',
+          label:
+              isArabic ? 'مساعدة في التواصل مع مختص' : 'Provider contact help',
         ),
         _SupportIssueOption(
           key: 'account_profile_issue',
@@ -98,11 +99,14 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
         ),
         _SupportIssueOption(
           key: 'contact_request_question',
-          label: isArabic ? 'استفسار عن إشارة تواصل' : 'Contact signal question',
+          label:
+              isArabic ? 'استفسار عن إشارة تواصل' : 'Contact signal question',
         ),
         _SupportIssueOption(
           key: 'accessibility_information_issue',
-          label: isArabic ? 'مشكلة في معلومات الإتاحة' : 'Accessibility information issue',
+          label: isArabic
+              ? 'مشكلة في معلومات الإتاحة'
+              : 'Accessibility information issue',
         ),
         _SupportIssueOption(
           key: 'system_issue',
@@ -127,7 +131,9 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
         ),
         _SupportIssueOption(
           key: 'recommendation_visibility_question',
-          label: isArabic ? 'استفسار عن ظهور التوصيات' : 'Recommendation visibility question',
+          label: isArabic
+              ? 'استفسار عن ظهور التوصيات'
+              : 'Recommendation visibility question',
         ),
         _SupportIssueOption(
           key: 'system_issue',
@@ -202,10 +208,10 @@ class _SupportIssueSelectorPageState extends State<SupportIssueSelectorPage> {
   String _userRole() {
     if (_isCenterSupport) return 'center';
     if (_isClinicianSupport) return 'clinician';
-    if (_isClientSupport) return 'client';
+    if (_isClientSupport) return 'session';
 
     final user = FirebaseAuth.instance.currentUser;
-    return user == null || user.isAnonymous ? 'guest' : 'client';
+    return user == null || user.isAnonymous ? 'guest' : 'session';
   }
 
   Future<void> _submitIssue(_SupportIssueOption option) async {

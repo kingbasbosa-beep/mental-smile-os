@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mental_smile_os/app/router/routes.dart';
 import 'package:mental_smile_os/core/visibility/visibility_readiness.dart';
@@ -73,14 +72,18 @@ class SpecialistDetailsPage extends StatelessWidget {
     ].where((value) => value.trim().isNotEmpty).toSet().toList();
   }
 
+  String _sessionActorId() {
+    return 'session_${DateTime.now().toUtc().microsecondsSinceEpoch}';
+  }
+
   Future<void> _sendProviderContactRequest({
     required BuildContext context,
     required String providerId,
     required bool isArabic,
     bool accessibleContact = false,
   }) async {
-    final clientId = FirebaseAuth.instance.currentUser?.uid ?? '';
-    if (clientId.isEmpty) {
+    final sessionId = _sessionActorId();
+    if (sessionId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -97,22 +100,22 @@ class SpecialistDetailsPage extends StatelessWidget {
       if (accessibleContact) {
         await CleanSignalRuntime.firestore().emit(
           SignalPackageFactory.accessibleProviderSelected(
-            actorId: clientId,
-            actorRole: 'client',
+            actorId: sessionId,
+            actorRole: 'session',
             targetId: providerId,
           ),
         );
         await CleanSignalRuntime.firestore().emit(
           SignalPackageFactory.accessibleContactRequested(
-            actorId: clientId,
-            actorRole: 'client',
+            actorId: sessionId,
+            actorRole: 'session',
             targetType: 'provider',
             targetId: providerId,
           ),
         );
       }
       await ContactRequestRepository().createProviderContactRequest(
-        clientId: clientId,
+        requesterSessionId: sessionId,
         providerId: providerId,
         message: isArabic
             ? 'أرغب في التواصل مع مقدم الخدمة لمعرفة الخيارات المناسبة.'
@@ -126,8 +129,8 @@ class SpecialistDetailsPage extends StatelessWidget {
       if (accessibleContact) {
         await CleanSignalRuntime.firestore().emit(
           SignalPackageFactory.accessibleContactCompleted(
-            actorId: clientId,
-            actorRole: 'client',
+            actorId: sessionId,
+            actorRole: 'session',
             targetType: 'provider',
             targetId: providerId,
           ),
@@ -163,8 +166,8 @@ class SpecialistDetailsPage extends StatelessWidget {
     required String providerName,
     required bool isArabic,
   }) async {
-    final clientId = FirebaseAuth.instance.currentUser?.uid ?? '';
-    if (clientId.isEmpty) {
+    final sessionId = _sessionActorId();
+    if (sessionId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -179,7 +182,7 @@ class SpecialistDetailsPage extends StatelessWidget {
 
     try {
       await SavedDestinationRepository().saveDestination(
-        clientId: clientId,
+        sessionId: sessionId,
         destinationType: SavedDestinationType.provider,
         destinationId: providerId,
         title: providerName,
@@ -755,16 +758,13 @@ class SpecialistDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final providerId = _text(args['uid'], '');
     if (providerId.isNotEmpty) {
-      final user = FirebaseAuth.instance.currentUser;
-      final eventKey = '${user?.uid}:$providerId';
-      if (user != null &&
-          !user.isAnonymous &&
-          _emittedProfileViews.add(eventKey)) {
+      final eventKey = 'session:$providerId';
+      if (_emittedProfileViews.add(eventKey)) {
         unawaited(
           CleanSignalRuntime.firestore().emit(
             SignalPackageFactory.providerProfileOpened(
-              actorId: user.uid,
-              actorRole: 'client',
+              actorId: _sessionActorId(),
+              actorRole: 'session',
               targetId: providerId,
             ),
           ),

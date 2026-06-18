@@ -81,6 +81,7 @@ class SpecialistsListPage extends StatelessWidget {
     if (value.isNotEmpty) return value;
     return isArabic ? 'لا توجد نبذة متاحة حاليًا.' : 'No bio available yet.';
   }
+
   List<String> _stringList(dynamic value) {
     if (value is List) {
       return value

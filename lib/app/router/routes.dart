@@ -4,14 +4,11 @@ class Routes {
   static const portalAbout = '/about';
   static const portalLibrary = '/library';
   static const portalProviderRegister = '/register/provider';
-  static const portalServiceRequest = '/request/service';
-  static const portalPackageRequest = '/request/package';
   static const portalContact = '/contact';
   static const splash = '/splash';
 
   // Signal-first Web Surfaces [S]
   static const sIndex = '/s';
-  static const sPersonalSpace = '/s/personal-space';
   static const sSupportRoom = '/s/support-room';
   static const sRegistryRoom = '/s/registry-room';
   static const sDeclarationReviewRoom = '/s/declaration-review-room';
@@ -30,10 +27,6 @@ class Routes {
   // Federation Capital Web [S]: observability and departments only.
   static const sCapitalHome = '/s/capital';
   static const sCapitalOperationsOffice = '/s/capital/operations-office';
-  static const sCapitalIncidents = '/s/capital/incidents';
-  static const sCapitalMaintenance = '/s/capital/maintenance';
-  static const sCapitalBroadcasts = '/s/capital/broadcasts';
-  static const sCapitalEmergencyBrief = '/s/capital/emergency-brief';
   static const sSignalMonitoringRoom = '/s/capital/signal-monitoring-room';
   static const sCapitalDepartments = '/s/capital/departments';
   static const sTrustSafety = '/s/capital/trust-safety';

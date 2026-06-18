@@ -27,7 +27,6 @@ import 'package:mental_smile_os/features/sovereign_construction/presentation/pag
 import 'package:mental_smile_os/features/s_city/presentation/pages/s_city_district_page.dart';
 import 'package:mental_smile_os/features/s_owner/presentation/pages/s_owner_district_page.dart';
 import 'package:mental_smile_os/features/s_web_surfaces/presentation/pages/s_web_surface_pages.dart';
-import 'package:mental_smile_os/features/s_personal_space/presentation/pages/s_personal_space_page.dart';
 import 'package:mental_smile_os/features/s_support_room/presentation/pages/s_support_room_page.dart';
 import 'package:mental_smile_os/features/s_registry_room/presentation/pages/s_registry_room_page.dart';
 import 'package:mental_smile_os/features/s_declaration_review_room/presentation/pages/s_declaration_review_room_page.dart';
@@ -64,7 +63,6 @@ const String _roleDeclarationReviewer = 'declaration_reviewer';
 const String _roleSupportObserver = 'support_observer';
 const String _roleClinician = 'clinician';
 const String _roleCenter = 'center';
-const String _roleClient = 'client';
 
 class AppRouter {
   static const Set<String> _ownerOnlyRoutes = {
@@ -115,10 +113,6 @@ class AppRouter {
     Routes.centerProfileEditRequest,
   };
 
-  static const Set<String> _clientOnlyRoutes = {
-    Routes.sPersonalSpace,
-  };
-
   static bool _isScopedProtectedRoute(String? routeName) {
     if (routeName == null) return false;
     return _ownerOnlyRoutes.contains(routeName) ||
@@ -142,7 +136,6 @@ class AppRouter {
       case Routes.clinicianProfileEditRequest:
       case Routes.clinicianChatInbox:
       case Routes.blockedAccount:
-      case Routes.sPersonalSpace:
         return true;
       default:
         return false;
@@ -169,7 +162,6 @@ class AppRouter {
     }
     if (_clinicianOnlyRoutes.contains(routeName)) return {_roleClinician};
     if (_centerOnlyRoutes.contains(routeName)) return {_roleCenter};
-    if (_clientOnlyRoutes.contains(routeName)) return {_roleClient};
     return null;
   }
 
@@ -271,12 +263,6 @@ class AppRouter {
       case Routes.sIndex:
         return MaterialPageRoute(
           builder: (_) => const SSurfaceIndexPage(),
-          settings: settings,
-        );
-
-      case Routes.sPersonalSpace:
-        return _protectedRoute(
-          child: const SPersonalSpacePage(),
           settings: settings,
         );
 
@@ -443,38 +429,6 @@ class AppRouter {
           settings: settings,
         );
 
-      case Routes.sCapitalIncidents:
-        return MaterialPageRoute(
-          builder: (_) => const SCapitalOperationsOfficePage(
-            focus: SCapitalOfficeFocus.incidents,
-          ),
-          settings: settings,
-        );
-
-      case Routes.sCapitalMaintenance:
-        return MaterialPageRoute(
-          builder: (_) => const SCapitalOperationsOfficePage(
-            focus: SCapitalOfficeFocus.maintenance,
-          ),
-          settings: settings,
-        );
-
-      case Routes.sCapitalBroadcasts:
-        return MaterialPageRoute(
-          builder: (_) => const SCapitalOperationsOfficePage(
-            focus: SCapitalOfficeFocus.broadcasts,
-          ),
-          settings: settings,
-        );
-
-      case Routes.sCapitalEmergencyBrief:
-        return MaterialPageRoute(
-          builder: (_) => const SCapitalOperationsOfficePage(
-            focus: SCapitalOfficeFocus.emergencyBrief,
-          ),
-          settings: settings,
-        );
-
       case Routes.sSignalMonitoringRoom:
         return _protectedRoute(
           child: const SSignalMonitoringRoomPage(),
@@ -634,18 +588,6 @@ class AppRouter {
       case Routes.portalProviderRegister:
         return MaterialPageRoute(
           builder: (_) => const WebClinicianRegisterPortalPage(),
-          settings: settings,
-        );
-
-      case Routes.portalServiceRequest:
-        return MaterialPageRoute(
-          builder: (_) => const PortalServiceRequestPage(),
-          settings: settings,
-        );
-
-      case Routes.portalPackageRequest:
-        return MaterialPageRoute(
-          builder: (_) => const PortalPackageRequestPage(),
           settings: settings,
         );
 

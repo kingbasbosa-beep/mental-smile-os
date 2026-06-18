@@ -120,4 +120,3 @@ class DomainStatus {
     return const <String>[];
   }
 }
-

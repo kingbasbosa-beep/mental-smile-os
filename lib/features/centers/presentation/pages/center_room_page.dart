@@ -13,6 +13,7 @@ class CenterRoomPage extends StatefulWidget {
   @override
   State<CenterRoomPage> createState() => _CenterRoomPageState();
 }
+
 class _CenterRoomPageState extends State<CenterRoomPage> {
   final _centerNameController = TextEditingController();
   final _managerNameController = TextEditingController();
@@ -63,13 +64,7 @@ class _CenterRoomPageState extends State<CenterRoomPage> {
       Localizations.localeOf(context).languageCode.toLowerCase() == 'ar';
 
   String _dashboardBackgroundAsset(double width) {
-    if (width < 700) {
-      return 'assets/branding/client_dashboard/mobile/client_dashboard_mobile_bg.png';
-    }
-    if (width <= 1100) {
-      return 'assets/branding/client_dashboard/tablet/client_dashboard_tablet_bg.png';
-    }
-    return 'assets/branding/client_dashboard/desktop/client_dashboard_desktop_bg.png';
+    return 'assets/c7_branding/home/home_bg.png';
   }
 
   Alignment _dashboardBackgroundAlignment(double width) {
@@ -1545,6 +1540,7 @@ class _CenterRoomPageState extends State<CenterRoomPage> {
     );
   }
 }
+
 class CenterProfileEditRequestPage extends StatefulWidget {
   const CenterProfileEditRequestPage({super.key});
 
@@ -2031,7 +2027,8 @@ class _CenterProfileEditRequestPageState
                   builder: (context, requestSnapshot) {
                     final docs = requestSnapshot.data?.docs ?? const [];
                     final hasPending = docs.any(
-                      (doc) => (doc.data()['status'] ?? 'submitted') == 'submitted',
+                      (doc) =>
+                          (doc.data()['status'] ?? 'submitted') == 'submitted',
                     );
 
                     return ListView(

@@ -8,7 +8,7 @@ enum SavedDestinationType {
 class SavedDestination {
   const SavedDestination({
     required this.savedId,
-    required this.clientId,
+    required this.sessionId,
     required this.destinationType,
     required this.destinationId,
     required this.title,
@@ -21,7 +21,7 @@ class SavedDestination {
   static const String collectionName = 'saved_destinations';
 
   final String savedId;
-  final String clientId;
+  final String sessionId;
   final SavedDestinationType destinationType;
   final String destinationId;
   final String title;
@@ -33,7 +33,7 @@ class SavedDestination {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'savedId': savedId,
-      'clientId': clientId,
+      'sessionId': sessionId,
       'destinationType': destinationType.name,
       'destinationId': destinationId,
       'title': title,
@@ -47,7 +47,7 @@ class SavedDestination {
   factory SavedDestination.fromMap(Map<String, dynamic> map) {
     return SavedDestination(
       savedId: (map['savedId'] ?? '').toString(),
-      clientId: (map['clientId'] ?? '').toString(),
+      sessionId: (map['sessionId'] ?? '').toString(),
       destinationType: _typeFromValue(map['destinationType']),
       destinationId: (map['destinationId'] ?? '').toString(),
       title: (map['title'] ?? '').toString(),

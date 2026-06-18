@@ -6,7 +6,7 @@ Runtime effect: none
 
 | Entry | Owner | Consumers | Dependencies | Signals | Collections | Status | Lifecycle | Classification |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `/module/library` | Owner/System | app clients | LibraryPage, signals | libraryCategoryOpened | `signal_events` | ACTIVE | Runtime | ACTIVE |
+| `/module/library` | Owner/System | session users | LibraryPage, signals | libraryCategoryOpened | `signal_events` | ACTIVE_SESSION_SCOPED | Runtime | ACTIVE |
 | `/web/library` | Owner/System | public web users | LibraryPage | libraryCategoryOpened | `signal_events` | ACTIVE | Runtime | ACTIVE |
 | `/web/library/policy` | Owner/System | public web users | LibraryPolicyPage | policy view intent | none | ACTIVE | Runtime | ACTIVE |
 | `/library` | Owner/System | portal users | LibraryPage | libraryCategoryOpened | `signal_events` | ACTIVE | Runtime | ACTIVE |

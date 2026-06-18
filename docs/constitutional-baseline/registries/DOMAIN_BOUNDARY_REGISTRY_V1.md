@@ -72,3 +72,11 @@ Any cross-domain runtime change must identify source domain, consuming domain, o
 | Monitoring | ACTIVE_NEEDS_AUTHORITY_REGISTRY | Monitoring Operator/Owner | Observability must not become control. |
 | Owner | ACTIVE_NEEDS_APPROVAL_REGISTRY | Owner | Approval flow now materialized by this registry. |
 | Governance | ACTIVE | Owner | Guides/cards/registries/operations are file-backed. |
+
+## Package C Ghost Route Boundary Notes
+
+| Boundary Item | Source Domain | Consuming Domain | Status | Related Operation | Note |
+| --- | --- | --- | --- | --- | --- |
+| Capital incident/maintenance/broadcast/emergency placeholder routes | Monitoring / Operations placeholders | Public route map / Capital navigation | REMOVED_FROM_ROUTER_AND_NAVIGATION | OP-PACKAGE-C-GHOST-ROUTE-VISIBILITY-PURGE-V1 | Placeholder operational routes were removed from normal route visibility because they had no registered collection/service/runtime workflow. Monitoring identity and active monitoring routes were not changed. |
+| Public service/package request placeholders | Public portal / Commercial intake placeholder | Public visitors | REMOVED_FROM_ROUTER_AND_NAVIGATION | OP-PACKAGE-C-GHOST-ROUTE-VISIBILITY-PURGE-V1 | Public intake placeholder routes were removed because they had no governed persistence/runtime intake. `/contact` remains Owner-decision and was not touched. |
+| Owner-decision placeholder routes | Public City / Capital | Owner decision | OWNER_DECISION_REQUIRED | OP-PACKAGE-C-GHOST-ROUTE-VISIBILITY-PURGE-V1 | `/s/city/tools`, `/s/city/programs`, `/s/city/marketplace`, `/s/capital/departments`, `/s/capital/trust-safety`, `/s/capital/reports`, and `/contact` were intentionally left untouched. |

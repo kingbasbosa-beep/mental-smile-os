@@ -181,9 +181,7 @@ class _SDeclarationReviewRoomPageState
   int _compareRecords(_DeclarationRecord a, _DeclarationRecord b) {
     final aDate = a.createdAt;
     final bDate = b.createdAt;
-    return _sort == 'oldest'
-        ? aDate.compareTo(bDate)
-        : bDate.compareTo(aDate);
+    return _sort == 'oldest' ? aDate.compareTo(bDate) : bDate.compareTo(aDate);
   }
 }
 
@@ -244,8 +242,7 @@ class _DeclarationRecord {
     switch (stream) {
       case _DeclarationStream.clinicians:
       case _DeclarationStream.centers:
-        final readiness =
-            (data['visibilityReadiness'] ?? '').toString().trim();
+        final readiness = (data['visibilityReadiness'] ?? '').toString().trim();
         if (readiness.isNotEmpty) return readiness;
         return 'incomplete';
       case _DeclarationStream.clinicianProfileChanges:
@@ -532,15 +529,15 @@ class _DeclarationSummaryStrip extends StatelessWidget {
         .length;
     final blocked = records
         .where(
-          (record) =>
-              record.status == 'blocked' || record.status == 'stored',
+          (record) => record.status == 'blocked' || record.status == 'stored',
         )
         .length;
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width =
-            constraints.maxWidth >= 760 ? (constraints.maxWidth - 28) / 3 : null;
+        final width = constraints.maxWidth >= 760
+            ? (constraints.maxWidth - 28) / 3
+            : null;
         return Wrap(
           spacing: 14,
           runSpacing: 14,
@@ -1045,16 +1042,19 @@ List<_MetadataItem> _metadataFor(_DeclarationRecord record) {
     case _DeclarationStream.clinicians:
       return <_MetadataItem>[
         _MetadataItem('Email', _text(data['email'])),
-        _MetadataItem('Phone', _firstText(data, const ['phone', 'phoneNumber'])),
+        _MetadataItem(
+            'Phone', _firstText(data, const ['phone', 'phoneNumber'])),
         _MetadataItem('Specialty', _text(data['specialty'])),
-        _MetadataItem('Professional title', _text(data['professionalTitleLabelAr'])),
+        _MetadataItem(
+            'Professional title', _text(data['professionalTitleLabelAr'])),
         _MetadataItem('Created at', _dateText(data['createdAt'])),
         _MetadataItem('Visibility readiness', record.statusLabel),
       ];
     case _DeclarationStream.centers:
       return <_MetadataItem>[
         _MetadataItem('Email', _text(data['email'])),
-        _MetadataItem('Phone', _firstText(data, const ['phone', 'phoneNumber'])),
+        _MetadataItem(
+            'Phone', _firstText(data, const ['phone', 'phoneNumber'])),
         _MetadataItem('City', _text(data['city'])),
         _MetadataItem('Area', _text(data['area'])),
         _MetadataItem('Category', _text(data['category'])),
@@ -1104,7 +1104,8 @@ List<_MetadataItem> _readinessFor(_DeclarationRecord record) {
           _dateText(data['readinessUpdatedAt']),
         ),
         _MetadataItem('Identity file', _presence(data['identityFileName'])),
-        _MetadataItem('Certificate file', _presence(data['certificateFileName'])),
+        _MetadataItem(
+            'Certificate file', _presence(data['certificateFileName'])),
       ];
     case _DeclarationStream.centers:
       final docs = _mapList(data['documentItems']);
@@ -1140,7 +1141,8 @@ List<_MetadataItem> _readinessFor(_DeclarationRecord record) {
     case _DeclarationStream.clinicianProfileChanges:
       return <_MetadataItem>[
         _MetadataItem('Bio declaration', _presence(data['requestedBio'])),
-        _MetadataItem('Photo declaration', _presence(data['requestedPhotoUrl'])),
+        _MetadataItem(
+            'Photo declaration', _presence(data['requestedPhotoUrl'])),
       ];
     case _DeclarationStream.centerProfileChanges:
       final requestedDocs = _mapList(data['requestedDocumentItems']);
@@ -1148,8 +1150,10 @@ List<_MetadataItem> _readinessFor(_DeclarationRecord record) {
       return <_MetadataItem>[
         _MetadataItem('Image declarations', '${requestedImages.length}'),
         _MetadataItem('Document declarations', '${requestedDocs.length}'),
-        _MetadataItem('Accommodation cost declaration', _listPresence(data['requestedAccommodationCosts'])),
-        _MetadataItem('Capability declaration', _mapPresence(data['requestedCenterCapabilities'])),
+        _MetadataItem('Accommodation cost declaration',
+            _listPresence(data['requestedAccommodationCosts'])),
+        _MetadataItem('Capability declaration',
+            _mapPresence(data['requestedCenterCapabilities'])),
       ];
   }
 }
@@ -1240,27 +1244,25 @@ List<_DocumentItem> _documentItems(_DeclarationRecord record) {
   }
   if (rawItems.isEmpty) return const <_DocumentItem>[];
 
-  return rawItems
-      .map((item) {
-        final type = _firstText(
-          item,
-          const ['documentType', 'type', 'label', 'name', 'fileName'],
-          fallback: 'Document',
-        );
-        final url = _firstText(
-          item,
-          const ['fileUrl', 'url'],
-        );
-        return _DocumentItem(
-          label: type,
-          status: _declarationStatus(
-            _text(item['status'], fallback: 'submitted'),
-          ),
-          url: url,
-          uploadedAt: _dateText(item['uploadedAt']),
-        );
-      })
-      .toList(growable: false);
+  return rawItems.map((item) {
+    final type = _firstText(
+      item,
+      const ['documentType', 'type', 'label', 'name', 'fileName'],
+      fallback: 'Document',
+    );
+    final url = _firstText(
+      item,
+      const ['fileUrl', 'url'],
+    );
+    return _DocumentItem(
+      label: type,
+      status: _declarationStatus(
+        _text(item['status'], fallback: 'submitted'),
+      ),
+      url: url,
+      uploadedAt: _dateText(item['uploadedAt']),
+    );
+  }).toList(growable: false);
 }
 
 Map<String, int> _requiredDocumentSignalSummary(

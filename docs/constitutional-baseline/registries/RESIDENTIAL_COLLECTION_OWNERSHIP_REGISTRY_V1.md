@@ -6,9 +6,9 @@ Runtime effect: none
 
 | Entry | Owner | Consumers | Dependencies | Signals | Collections | Status | Lifecycle | Classification |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `clients` | Client/System | Client Room, Personal Space | Auth, Firestore | clientSignals | `clients` | ACTIVE | Runtime | ACTIVE |
-| `saved_destinations` | Client/System | Client dashboard, saved repo | Auth, Firestore | destinationSaved | `saved_destinations` | ACTIVE | Runtime | ACTIVE |
+| `clients` | Archive/System | Archived client identity | none | none | `clients` | ARCHIVED_HARD_REMOVED | Runtime archive | PURE_CLIENT_IDENTITY_REMOVED |
+| `saved_destinations` | Session/System | Discovery save actions | Firestore session id | destinationSaved | `saved_destinations` | ACTIVE_SESSION_SCOPED | Runtime | SESSION_SCOPED |
 | `support_requests` | Client/Support Observer | Support Room, Monitoring | Firestore, support selector | support/risk/technical | `support_requests` | ACTIVE | Runtime | CROSS_DOMAIN |
 | `chat_threads` | Client/System | Chat | Firestore, chat service | chat activity | `chat_threads` | ACTIVE | Runtime | ACTIVE |
 | `chat_threads/{threadId}/messages` | Client/System | Chat | Firestore, chat service | message activity | subcollection | ACTIVE | Runtime | ACTIVE |
-| `signal_events` | System/Monitoring | Personal Space, Monitoring | Signal storage | signal packages | `signal_events` | ACTIVE | Runtime | CROSS_DOMAIN |
+| `signal_events` | System/Monitoring | Session surfaces, Monitoring | Signal storage | signal packages | `signal_events` | ACTIVE_SESSION_SCOPED | Runtime | CROSS_DOMAIN |
