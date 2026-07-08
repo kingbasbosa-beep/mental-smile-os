@@ -15,10 +15,13 @@ concurrency:
 
 jobs:
   build_and_deploy:
+    if: github.ref == 'refs/heads/post-separation-pure-dna-v1'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -32,12 +35,17 @@ jobs:
       - name: Build Flutter Web
         run: flutter build web --release --base-href /mental-smile-os/
 
+      - name: Verify clean publish source
+        run: test -f build/web/index.html
+
       - name: Deploy build/web to gh-pages branch
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
           publish_branch: gh-pages
+          destination_dir: .
           force_orphan: true
+          keep_files: false
           enable_jekyll: false
           commit_message: Deploy Flutter Web to GitHub Pages from ${{ github.sha }}
